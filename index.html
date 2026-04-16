@@ -950,20 +950,9 @@
         </div>
     </div>
 
-    <!-- ================= 新增：全局加载过场动画 ================= -->
-    <div id="globalLoadingOverlay" class="fixed inset-0 z-[110] bg-[#0a0502]/90 backdrop-blur-md flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="relative w-20 h-20 flex items-center justify-center mb-6">
-            <i class="ph-duotone ph-magic-wand text-4xl text-amber-400 relative z-10 drop-shadow-[0_0_10px_rgba(251,191,36,0.6)] animate-pulse"></i>
-            <div class="absolute inset-0 border-2 border-dashed border-amber-500/40 rounded-full animate-spin-slow"></div>
-            <div class="absolute inset-1 border border-amber-500/20 rounded-full animate-spin-slow" style="animation-direction: reverse;"></div>
-        </div>
-        <div class="text-amber-200 font-black tracking-[0.2em] text-lg mb-4 drop-shadow-md" id="globalLoadingText">正在同步数据...</div>
-        <div class="w-64 h-1.5 bg-black rounded-full overflow-hidden border border-amber-900/50 shadow-inner">
-            <div id="globalLoadingBar" class="h-full bg-gradient-to-r from-amber-600 to-yellow-400 w-0 transition-all duration-150 ease-out shadow-[0_0_8px_rgba(251,191,36,0.6)]"></div>
-        </div>
-    </div>
+    <!-- 修改：彻底删除了原有的 globalLoadingOverlay 全局加载组件 -->
 
-    <!-- 修改：Toast 层级提高至 120 防止被 Loading 遮挡 -->
+    <!-- 修改：Toast 层级保持最高 -->
     <div id="toast" class="fixed top-24 left-1/2 transform -translate-x-1/2 bg-[#1a0a05]/95 border border-amber-500/50 text-amber-100 px-6 py-3 rounded-full shadow-[0_0_20px_rgba(251,191,36,0.4)] backdrop-blur-md z-[120] transition-all duration-300 opacity-0 pointer-events-none -translate-y-4 flex items-center gap-2">
         <i class="ph-fill ph-info text-amber-400 text-lg"></i>
         <span id="toastMessage" class="font-bold tracking-wider text-sm drop-shadow-md"></span>
@@ -971,6 +960,8 @@
 
     <script>
         let hasSelectedSubject = false;
+        let isSubjectDownloaded = false; // 新增：是否已下载当前科目音频
+        let isDownloading = false; // 新增：是否正在下载中，防止重复点击
         let toastTimeout;
         let currentRoomIsHost = false;
         let isInRoom = false; 
@@ -1044,6 +1035,7 @@
             }
 
             hasSelectedSubject = true;
+            isSubjectDownloaded = false; // 修改：每次切换科目时，重置下载状态
             
             const tabs = document.getElementById('subjectTabs');
             if(tabs) {
@@ -1068,29 +1060,28 @@
             }
         }
 
-        // 新增：全局拉取数据的延时动效函数
-        function executeWithLoading(actionName, callback) {
-            const overlay = document.getElementById('globalLoadingOverlay');
-            const bar = document.getElementById('globalLoadingBar');
-            const text = document.getElementById('globalLoadingText');
+        // 修改：使用轻量级的上方提示替代原有的全屏 Loading
+        function executeActionWithCheck(callback) {
+            if (isSubjectDownloaded) {
+                // 若该科目音频已下载过，直接秒进
+                callback();
+                return;
+            }
             
-            text.innerText = `正在同步${actionName}数据...`;
-            overlay.classList.remove('opacity-0', 'pointer-events-none');
-            bar.style.width = '0%';
+            if (isDownloading) {
+                showToast('⏳ 音频正在努力下载中，请稍候...');
+                return;
+            }
             
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += Math.floor(Math.random() * 20) + 10;
-                if (progress >= 100) {
-                    progress = 100;
-                    clearInterval(interval);
-                    setTimeout(() => {
-                        overlay.classList.add('opacity-0', 'pointer-events-none');
-                        callback();
-                    }, 300); // 满条后略作停留
-                }
-                bar.style.width = progress + '%';
-            }, 150); // 模拟网络波动下载
+            isDownloading = true;
+            showToast('⏳ 请等待当前科目音频下载完毕即可...');
+            
+            // 模拟短暂的后台下载过场（1.5秒）
+            setTimeout(() => {
+                isDownloading = false;
+                isSubjectDownloaded = true;
+                callback();
+            }, 1500); 
         }
 
         function cancelMatch() {
@@ -1137,64 +1128,51 @@
             }
 
             if (actionType === 'quickMatch') {
-                // 修改：去除全局 Loading，直接进入匹配状态，让操作更丝滑
-                const btn = document.getElementById('quickMatchBtn');
-                const textContainer = document.getElementById('quickMatchTextContainer');
-                const icon = document.getElementById('quickMatchIcon');
-                const radarBg = document.getElementById('quickMatchRadarBg');
+                executeActionWithCheck(() => {
+                    const btn = document.getElementById('quickMatchBtn');
+                    const textContainer = document.getElementById('quickMatchTextContainer');
+                    const icon = document.getElementById('quickMatchIcon');
+                    const radarBg = document.getElementById('quickMatchRadarBg');
 
-                if (!isMatching) {
-                    isMatching = true;
-                    matchSeconds = 0;
-                    
-                    btn.classList.remove('from-blue-700', 'to-[#1a1a4a]', 'border-blue-400');
-                    btn.classList.add('from-green-800', 'to-[#051a0a]', 'border-green-500');
-                    
-                    icon.className = "ph-duotone ph-x-circle text-5xl text-green-300 drop-shadow-[0_0_10px_rgba(34,197,94,0.8)] transition-colors duration-300";
-                    radarBg.classList.replace('border-blue-400', 'border-green-500');
-                    
-                    textContainer.innerHTML = `
-                        <span id="quickMatchTime" class="text-white font-black text-3xl xl:text-4xl tracking-widest text-glow-green drop-shadow-lg font-mono">00:00</span>
-                        <span class="text-green-200/80 text-xs font-bold tracking-widest mt-1">点击取消匹配</span>
-                    `;
+                    if (!isMatching) {
+                        isMatching = true;
+                        matchSeconds = 0;
+                        
+                        btn.classList.remove('from-blue-700', 'to-[#1a1a4a]', 'border-blue-400');
+                        btn.classList.add('from-green-800', 'to-[#051a0a]', 'border-green-500');
+                        
+                        icon.className = "ph-duotone ph-x-circle text-5xl text-green-300 drop-shadow-[0_0_10px_rgba(34,197,94,0.8)] transition-colors duration-300";
+                        radarBg.classList.replace('border-blue-400', 'border-green-500');
+                        
+                        textContainer.innerHTML = `
+                            <span id="quickMatchTime" class="text-white font-black text-3xl xl:text-4xl tracking-widest text-glow-green drop-shadow-lg font-mono">00:00</span>
+                            <span class="text-green-200/80 text-xs font-bold tracking-widest mt-1">点击取消匹配</span>
+                        `;
 
-                    matchInterval = setInterval(() => {
-                        matchSeconds++;
-                        updateMatchTimeDisplay();
-                    }, 1000);
+                        matchInterval = setInterval(() => {
+                            matchSeconds++;
+                            updateMatchTimeDisplay();
+                        }, 1000);
 
-                    matchTimeoutTimer = setTimeout(() => {
-                        toggleModal('matchTimeoutModal', 'matchTimeoutContent', true);
-                    }, 3000);
-                } else {
-                    cancelMatch();
-                    showToast('已取消匹配');
-                }
+                        matchTimeoutTimer = setTimeout(() => {
+                            toggleModal('matchTimeoutModal', 'matchTimeoutContent', true);
+                        }, 3000);
+                    } else {
+                        cancelMatch();
+                        showToast('已取消匹配');
+                    }
+                });
             } else if (actionType === 'botMode') {
-                // 仅保留这里的全局拉取题目动效
-                executeWithLoading('演练题库', () => {
+                executeActionWithCheck(() => {
                     toggleBotModal(true);
                 });
             } else if (actionType === 'createRoom') {
-                // 修改：直接弹出建立房间，去除 Loading
-                toggleRoomModal(true);
+                executeActionWithCheck(() => {
+                    toggleRoomModal(true);
+                });
             } else if (actionType === 'revealSecret') {
                 loadContentData();
             }
-        }
-
-        // 修改：对战大厅去除全局加载动效
-        function openMatchLobbyWithLoading() {
-            if (!hasSelectedSubject) {
-                showToast('🚨 请先在左侧选择目标战役科目！');
-                const sidebar = document.getElementById('subjectSidebar');
-                if (sidebar) {
-                    sidebar.classList.add('ring-2', 'ring-amber-500', 'animate-pulse');
-                    setTimeout(() => sidebar.classList.remove('ring-2', 'ring-amber-500', 'animate-pulse'), 1500);
-                }
-                return;
-            }
-            toggleMatchLobby(true);
         }
 
         function closeMatchTimeoutModal() {
@@ -1229,16 +1207,15 @@
         const toggleRoomModal = (show) => toggleModal('roomModal', 'roomModalContent', show);
         const toggleBotModal = (show) => toggleModal('botModal', 'botModalContent', show);
         
-        // 新增：处理存档删除
         function deleteSave(event, btn) {
-            event.stopPropagation(); // 阻止触发卡片本身的点击事件
+            event.stopPropagation(); 
             const card = btn.closest('.save-card');
             card.style.transform = 'scale(0.9)';
             card.style.opacity = '0';
             setTimeout(() => {
                 card.remove();
                 showToast('存档记忆已被成功抹除。');
-            }, 300); // 预留动画时间
+            }, 300); 
         }
 
         function toggleMatchLobby(show) {
@@ -1248,6 +1225,21 @@
             } else {
                 lobby.classList.add('translate-x-full', 'pointer-events-none');
             }
+        }
+
+        function openMatchLobbyWithLoading() {
+            if (!hasSelectedSubject) {
+                showToast('🚨 请先在左侧选择目标战役科目！');
+                const sidebar = document.getElementById('subjectSidebar');
+                if (sidebar) {
+                    sidebar.classList.add('ring-2', 'ring-amber-500', 'animate-pulse');
+                    setTimeout(() => sidebar.classList.remove('ring-2', 'ring-amber-500', 'animate-pulse'), 1500);
+                }
+                return;
+            }
+            executeActionWithCheck(() => {
+                toggleMatchLobby(true);
+            });
         }
 
         function toggleTeamSelectModal(show) {
