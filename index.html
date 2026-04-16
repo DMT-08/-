@@ -247,8 +247,8 @@
                 </button>
             </div>
             
-            <button onclick="toggleMatchLobby(true)" class="w-full rounded-xl bg-gradient-to-br from-[#3d2716]/90 to-[#1a100a]/90 border border-amber-500/60 shadow-[0_5px_15px_rgba(245,158,11,0.3)] flex items-center justify-center cursor-pointer active:scale-[0.98] transition-all hover:border-amber-400 relative overflow-hidden group" style="flex-grow: 2.5;">
-                <!-- 修改：图标更新为更符合“大厅/殿堂”样式的经典建筑柱廊图标 -->
+            <!-- 修改：对战大厅按钮接入独立加载逻辑 -->
+            <button onclick="openMatchLobbyWithLoading()" class="w-full rounded-xl bg-gradient-to-br from-[#3d2716]/90 to-[#1a100a]/90 border border-amber-500/60 shadow-[0_5px_15px_rgba(245,158,11,0.3)] flex items-center justify-center cursor-pointer active:scale-[0.98] transition-all hover:border-amber-400 relative overflow-hidden group" style="flex-grow: 2.5;">
                 <i class="ph-fill ph-bank text-amber-400 text-3xl mr-3 pointer-events-none drop-shadow-md group-hover:scale-110 transition-transform"></i>
                 <span class="text-amber-100 font-bold text-xl tracking-[0.2em] drop-shadow-md pointer-events-none text-glow-gold">对战大厅</span>
             </button>
@@ -568,18 +568,56 @@
                 </button>
             </div>
             <div class="flex-1 p-6 overflow-y-auto grid grid-cols-2 md:grid-cols-3 gap-6 content-start -webkit-overflow-scrolling-touch">
-                <div class="bg-[#1a0f0a]/60 border border-amber-500/50 rounded-lg p-5 cursor-pointer active:scale-95 active:bg-[#2a1a10] transition-transform duration-150 shadow-[0_5px_15px_rgba(0,0,0,0.5)] relative overflow-hidden backdrop-blur-md">
+                
+                <!-- 修改：增加多个存档并引入悬停删除功能 -->
+                <div class="save-card bg-[#1a0f0a]/60 border border-amber-500/50 rounded-lg p-5 cursor-pointer active:scale-95 transition-all duration-300 shadow-[0_5px_15px_rgba(0,0,0,0.5)] relative overflow-hidden backdrop-blur-md group">
                     <div class="absolute top-0 left-0 w-1.5 h-full bg-amber-500 shadow-[0_0_10px_#fbbf24]"></div>
-                    <div class="flex justify-between text-amber-200 text-sm font-bold mb-3 pointer-events-none">
+                    <button onclick="deleteSave(event, this)" class="absolute top-3 right-3 text-red-500/50 hover:text-red-400 hover:bg-red-950/50 p-1.5 rounded transition-all opacity-0 group-hover:opacity-100 z-20" title="删除存档">
+                        <i class="ph-bold ph-trash text-lg pointer-events-none"></i>
+                    </button>
+                    <div class="flex justify-between text-amber-200 text-sm font-bold mb-3 pointer-events-none pr-6">
                         <span class="bg-amber-900/50 text-amber-100 px-2 py-0.5 rounded border border-amber-500/50">自动存档</span>
-                        <span>14:30</span>
+                        <span>今日 14:30</span>
                     </div>
                     <h3 class="text-white font-bold text-xl mb-1 tracking-wider pointer-events-none drop-shadow-md">英语单词</h3>
-                    <p class="text-amber-200/60 text-sm mb-5 pointer-events-none">模式：英中翻译 / 对战模式</p>
-                    <button class="w-full bg-gradient-to-r from-amber-600 to-amber-500 active:from-amber-700 active:to-amber-600 text-white font-black py-2.5 rounded shadow-lg transition-colors tracking-widest text-lg border border-amber-300/50">
+                    <p class="text-amber-200/60 text-sm mb-5 pointer-events-none">模式：英中翻译 / 第 3 关</p>
+                    <button class="w-full bg-gradient-to-r from-amber-600 to-amber-500 active:from-amber-700 active:to-amber-600 text-white font-black py-2.5 rounded shadow-lg transition-colors tracking-widest text-lg border border-amber-300/50 relative z-10">
                         继续冒险
                     </button>
                 </div>
+
+                <div class="save-card bg-[#1a0f0a]/60 border border-amber-500/50 rounded-lg p-5 cursor-pointer active:scale-95 transition-all duration-300 shadow-[0_5px_15px_rgba(0,0,0,0.5)] relative overflow-hidden backdrop-blur-md group">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-blue-500 shadow-[0_0_10px_#3b82f6]"></div>
+                    <button onclick="deleteSave(event, this)" class="absolute top-3 right-3 text-red-500/50 hover:text-red-400 hover:bg-red-950/50 p-1.5 rounded transition-all opacity-0 group-hover:opacity-100 z-20" title="删除存档">
+                        <i class="ph-bold ph-trash text-lg pointer-events-none"></i>
+                    </button>
+                    <div class="flex justify-between text-blue-200 text-sm font-bold mb-3 pointer-events-none pr-6">
+                        <span class="bg-blue-900/50 text-blue-100 px-2 py-0.5 rounded border border-blue-500/50">手动存档</span>
+                        <span>昨日 20:15</span>
+                    </div>
+                    <h3 class="text-white font-bold text-xl mb-1 tracking-wider pointer-events-none drop-shadow-md">数学题库</h3>
+                    <p class="text-blue-200/60 text-sm mb-5 pointer-events-none">模式：挑战模式 / 第 7 关</p>
+                    <button class="w-full bg-gradient-to-r from-blue-700 to-blue-600 active:from-blue-800 active:to-blue-700 text-white font-black py-2.5 rounded shadow-lg transition-colors tracking-widest text-lg border border-blue-400/50 relative z-10">
+                        继续冒险
+                    </button>
+                </div>
+
+                <div class="save-card bg-[#1a0f0a]/60 border border-amber-500/50 rounded-lg p-5 cursor-pointer active:scale-95 transition-all duration-300 shadow-[0_5px_15px_rgba(0,0,0,0.5)] relative overflow-hidden backdrop-blur-md group">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-green-500 shadow-[0_0_10px_#22c55e]"></div>
+                    <button onclick="deleteSave(event, this)" class="absolute top-3 right-3 text-red-500/50 hover:text-red-400 hover:bg-red-950/50 p-1.5 rounded transition-all opacity-0 group-hover:opacity-100 z-20" title="删除存档">
+                        <i class="ph-bold ph-trash text-lg pointer-events-none"></i>
+                    </button>
+                    <div class="flex justify-between text-green-200 text-sm font-bold mb-3 pointer-events-none pr-6">
+                        <span class="bg-green-900/50 text-green-100 px-2 py-0.5 rounded border border-green-500/50">通关记录</span>
+                        <span>10月12日</span>
+                    </div>
+                    <h3 class="text-white font-bold text-xl mb-1 tracking-wider pointer-events-none drop-shadow-md">语文古诗</h3>
+                    <p class="text-green-200/60 text-sm mb-5 pointer-events-none">模式：基础默写 / 已通关</p>
+                    <button class="w-full bg-gradient-to-r from-green-700 to-green-600 active:from-green-800 active:to-green-700 text-white font-black py-2.5 rounded shadow-lg transition-colors tracking-widest text-lg border border-green-400/50 relative z-10">
+                        重温战役
+                    </button>
+                </div>
+
             </div>
         </div>
     </div>
@@ -911,7 +949,21 @@
         </div>
     </div>
 
-    <div id="toast" class="fixed top-24 left-1/2 transform -translate-x-1/2 bg-[#1a0a05]/95 border border-amber-500/50 text-amber-100 px-6 py-3 rounded-full shadow-[0_0_20px_rgba(251,191,36,0.4)] backdrop-blur-md z-[100] transition-all duration-300 opacity-0 pointer-events-none -translate-y-4 flex items-center gap-2">
+    <!-- ================= 新增：全局加载过场动画 ================= -->
+    <div id="globalLoadingOverlay" class="fixed inset-0 z-[110] bg-[#0a0502]/90 backdrop-blur-md flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="relative w-20 h-20 flex items-center justify-center mb-6">
+            <i class="ph-duotone ph-magic-wand text-4xl text-amber-400 relative z-10 drop-shadow-[0_0_10px_rgba(251,191,36,0.6)] animate-pulse"></i>
+            <div class="absolute inset-0 border-2 border-dashed border-amber-500/40 rounded-full animate-spin-slow"></div>
+            <div class="absolute inset-1 border border-amber-500/20 rounded-full animate-spin-slow" style="animation-direction: reverse;"></div>
+        </div>
+        <div class="text-amber-200 font-black tracking-[0.2em] text-lg mb-4 drop-shadow-md" id="globalLoadingText">正在同步数据...</div>
+        <div class="w-64 h-1.5 bg-black rounded-full overflow-hidden border border-amber-900/50 shadow-inner">
+            <div id="globalLoadingBar" class="h-full bg-gradient-to-r from-amber-600 to-yellow-400 w-0 transition-all duration-150 ease-out shadow-[0_0_8px_rgba(251,191,36,0.6)]"></div>
+        </div>
+    </div>
+
+    <!-- 修改：Toast 层级提高至 120 防止被 Loading 遮挡 -->
+    <div id="toast" class="fixed top-24 left-1/2 transform -translate-x-1/2 bg-[#1a0a05]/95 border border-amber-500/50 text-amber-100 px-6 py-3 rounded-full shadow-[0_0_20px_rgba(251,191,36,0.4)] backdrop-blur-md z-[120] transition-all duration-300 opacity-0 pointer-events-none -translate-y-4 flex items-center gap-2">
         <i class="ph-fill ph-info text-amber-400 text-lg"></i>
         <span id="toastMessage" class="font-bold tracking-wider text-sm drop-shadow-md"></span>
     </div>
@@ -1015,6 +1067,31 @@
             }
         }
 
+        // 新增：全局拉取数据的延时动效函数
+        function executeWithLoading(actionName, callback) {
+            const overlay = document.getElementById('globalLoadingOverlay');
+            const bar = document.getElementById('globalLoadingBar');
+            const text = document.getElementById('globalLoadingText');
+            
+            text.innerText = `正在同步${actionName}数据...`;
+            overlay.classList.remove('opacity-0', 'pointer-events-none');
+            bar.style.width = '0%';
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 20) + 10;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        overlay.classList.add('opacity-0', 'pointer-events-none');
+                        callback();
+                    }, 300); // 满条后略作停留
+                }
+                bar.style.width = progress + '%';
+            }, 150); // 模拟网络波动下载
+        }
+
         function cancelMatch() {
             isMatching = false;
             clearInterval(matchInterval);
@@ -1059,45 +1136,68 @@
             }
 
             if (actionType === 'quickMatch') {
-                const btn = document.getElementById('quickMatchBtn');
-                const textContainer = document.getElementById('quickMatchTextContainer');
-                const icon = document.getElementById('quickMatchIcon');
-                const radarBg = document.getElementById('quickMatchRadarBg');
+                // 修改：匹配前先拉取题目数据
+                executeWithLoading('战局', () => {
+                    const btn = document.getElementById('quickMatchBtn');
+                    const textContainer = document.getElementById('quickMatchTextContainer');
+                    const icon = document.getElementById('quickMatchIcon');
+                    const radarBg = document.getElementById('quickMatchRadarBg');
 
-                if (!isMatching) {
-                    isMatching = true;
-                    matchSeconds = 0;
-                    
-                    btn.classList.remove('from-blue-700', 'to-[#1a1a4a]', 'border-blue-400');
-                    btn.classList.add('from-green-800', 'to-[#051a0a]', 'border-green-500');
-                    
-                    icon.className = "ph-duotone ph-x-circle text-5xl text-green-300 drop-shadow-[0_0_10px_rgba(34,197,94,0.8)] transition-colors duration-300";
-                    radarBg.classList.replace('border-blue-400', 'border-green-500');
-                    
-                    textContainer.innerHTML = `
-                        <span id="quickMatchTime" class="text-white font-black text-3xl xl:text-4xl tracking-widest text-glow-green drop-shadow-lg font-mono">00:00</span>
-                        <span class="text-green-200/80 text-xs font-bold tracking-widest mt-1">点击取消匹配</span>
-                    `;
+                    if (!isMatching) {
+                        isMatching = true;
+                        matchSeconds = 0;
+                        
+                        btn.classList.remove('from-blue-700', 'to-[#1a1a4a]', 'border-blue-400');
+                        btn.classList.add('from-green-800', 'to-[#051a0a]', 'border-green-500');
+                        
+                        icon.className = "ph-duotone ph-x-circle text-5xl text-green-300 drop-shadow-[0_0_10px_rgba(34,197,94,0.8)] transition-colors duration-300";
+                        radarBg.classList.replace('border-blue-400', 'border-green-500');
+                        
+                        textContainer.innerHTML = `
+                            <span id="quickMatchTime" class="text-white font-black text-3xl xl:text-4xl tracking-widest text-glow-green drop-shadow-lg font-mono">00:00</span>
+                            <span class="text-green-200/80 text-xs font-bold tracking-widest mt-1">点击取消匹配</span>
+                        `;
 
-                    matchInterval = setInterval(() => {
-                        matchSeconds++;
-                        updateMatchTimeDisplay();
-                    }, 1000);
+                        matchInterval = setInterval(() => {
+                            matchSeconds++;
+                            updateMatchTimeDisplay();
+                        }, 1000);
 
-                    matchTimeoutTimer = setTimeout(() => {
-                        toggleModal('matchTimeoutModal', 'matchTimeoutContent', true);
-                    }, 3000);
-                } else {
-                    cancelMatch();
-                    showToast('已取消匹配');
-                }
+                        matchTimeoutTimer = setTimeout(() => {
+                            toggleModal('matchTimeoutModal', 'matchTimeoutContent', true);
+                        }, 3000);
+                    } else {
+                        cancelMatch();
+                        showToast('已取消匹配');
+                    }
+                });
             } else if (actionType === 'botMode') {
-                toggleBotModal(true);
+                executeWithLoading('演练题库', () => {
+                    toggleBotModal(true);
+                });
             } else if (actionType === 'createRoom') {
-                toggleRoomModal(true);
+                executeWithLoading('房间题库', () => {
+                    toggleRoomModal(true);
+                });
             } else if (actionType === 'revealSecret') {
                 loadContentData();
             }
+        }
+
+        // 修改：对战大厅专用的加载分流
+        function openMatchLobbyWithLoading() {
+            if (!hasSelectedSubject) {
+                showToast('🚨 请先在左侧选择目标战役科目！');
+                const sidebar = document.getElementById('subjectSidebar');
+                if (sidebar) {
+                    sidebar.classList.add('ring-2', 'ring-amber-500', 'animate-pulse');
+                    setTimeout(() => sidebar.classList.remove('ring-2', 'ring-amber-500', 'animate-pulse'), 1500);
+                }
+                return;
+            }
+            executeWithLoading('大厅', () => {
+                toggleMatchLobby(true);
+            });
         }
 
         function closeMatchTimeoutModal() {
@@ -1132,6 +1232,18 @@
         const toggleRoomModal = (show) => toggleModal('roomModal', 'roomModalContent', show);
         const toggleBotModal = (show) => toggleModal('botModal', 'botModalContent', show);
         
+        // 新增：处理存档删除
+        function deleteSave(event, btn) {
+            event.stopPropagation(); // 阻止触发卡片本身的点击事件
+            const card = btn.closest('.save-card');
+            card.style.transform = 'scale(0.9)';
+            card.style.opacity = '0';
+            setTimeout(() => {
+                card.remove();
+                showToast('存档记忆已被成功抹除。');
+            }, 300); // 预留动画时间
+        }
+
         function toggleMatchLobby(show) {
             const lobby = document.getElementById('matchLobby');
             if (show) {
