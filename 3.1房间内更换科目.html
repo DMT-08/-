@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>抖学平板端 - 奇幻冒险大厅</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1"></script>
+    <style>
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(251, 191, 36, 0.4); border-radius: 4px; } 
+        
+        .fantasy-panel {
+            background: linear-gradient(135deg, rgba(30, 20, 15, 0.85) 0%, rgba(15, 10, 5, 0.95) 100%);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            box-shadow: inset 0 0 20px rgba(251, 191, 36, 0.05), 0 10px 30px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(12px);
+        }
+
+        .text-glow-gold { text-shadow: 0 0 8px rgba(251, 191, 36, 0.6), 0 0 16px rgba(251, 191, 36, 0.4); }
+        .text-glow-crimson { text-shadow: 0 0 8px rgba(239, 68, 68, 0.6), 0 0 16px rgba(239, 68, 68, 0.4); }
+        .text-glow-blue { text-shadow: 0 0 8px rgba(59, 130, 246, 0.6), 0 0 16px rgba(59, 130, 246, 0.4); }
+
+        .nav-item-active {
+            background: linear-gradient(90deg, rgba(251, 191, 36, 0.2) 0%, transparent 100%);
+            border-left: 4px solid #fbbf24; 
+        }
+        
+        .chat-bubble { border-top-left-radius: 2px; }
+
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        .skeleton-shimmer {
+            background: #2a1a10;
+            background-image: linear-gradient(to right, #2a1a10 0%, #3d2716 20%, #2a1a10 40%, #2a1a10 100%);
+            background-repeat: no-repeat;
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite linear;
+        }
+        
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow { animation: spin-slow 8s linear infinite; }
+
+        .text-\[9px\] { font-size: 12px !important; }
+        .text-\[10px\] { font-size: 13px !important; }
+        .text-\[11px\], .text-\[12px\] { font-size: 14px !important; }
+        .text-xs { font-size: 15px !important; }
+        .text-sm { font-size: 16px !important; }
+        .text-base { font-size: 18px !important; }
+    </style>
+</head>
+<body class="bg-gray-950 text-gray-100 h-screen w-screen overflow-hidden font-sans select-none relative flex flex-col">
+
+    <div class="absolute inset-0 z-0 pointer-events-none">
+        <img src="image_a867b5.jpg" alt="Fantasy Background" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_10%,rgba(20,10,5,0.75)_100%)] backdrop-blur-[1px]"></div>
+    </div>
+
+    <!-- ================= 顶部 HUD ================= -->
+    <header class="w-full h-20 px-6 flex items-center z-20 bg-gradient-to-b from-[#140a05]/90 to-transparent">
+        
+        <div class="flex items-center gap-6 mt-2 ml-4">
+            <div class="flex items-center bg-[#140a05]/90 border border-amber-600/40 rounded-full p-1 pr-5 shadow-[0_4px_12px_rgba(0,0,0,0.6)] cursor-pointer active:scale-[0.98] transition-transform duration-150 backdrop-blur-md">
+                <div class="relative w-12 h-12 rounded-full border-2 border-amber-400 overflow-hidden shadow-inner flex-shrink-0 pointer-events-none">
+                     <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="w-full h-full object-cover bg-[#3d2716]">
+                </div>
+                <div class="ml-3 flex flex-col justify-center pointer-events-none">
+                     <span class="text-base font-bold text-white drop-shadow-md tracking-wider leading-tight text-glow-gold">王语嫣z1</span>
+                     <div class="flex items-center gap-2 mt-1.5">
+                         <div class="bg-gradient-to-b from-amber-400 to-amber-600 text-black text-[9px] font-black px-1.5 py-0.5 rounded-sm leading-none shadow-sm">Lv.30</div>
+                         <div class="w-24 h-1.5 bg-[#0a0502] rounded-full relative shadow-inner overflow-hidden border border-amber-900/50">
+                             <div class="absolute top-0 left-0 h-full bg-gradient-to-r from-amber-600 to-yellow-400 rounded-full" style="width: 62%;"></div>
+                         </div>
+                         <span class="text-[10px] font-mono text-amber-200/80 font-bold tracking-tighter">620/1000</span>
+                     </div>
+                </div>
+            </div>
+
+            <div class="flex items-center h-12 bg-[#140a05]/90 border border-amber-600/40 rounded-full px-4 shadow-[0_4px_12px_rgba(0,0,0,0.6)] cursor-pointer active:scale-[0.98] transition-transform duration-150 backdrop-blur-md">
+                <span class="text-amber-400 text-sm font-bold pointer-events-none drop-shadow-md">资产</span>
+                <div class="w-px h-5 bg-amber-600/50 mx-3 pointer-events-none"></div>
+                <div class="flex items-center gap-2 pointer-events-none">
+                    <div class="flex items-center gap-1.5 bg-black/60 border border-green-500/50 rounded px-2 py-0.5 shadow-[inset_0_0_8px_rgba(34,197,94,0.2)]">
+                        <i class="ph-fill ph-hexagon text-green-400 text-xs drop-shadow-md"></i><span class="font-mono text-sm text-white font-bold">999+</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 bg-black/60 border border-blue-500/50 rounded px-2 py-0.5 shadow-[inset_0_0_8px_rgba(59,130,246,0.2)]">
+                        <i class="ph-fill ph-hexagon text-blue-400 text-xs drop-shadow-md"></i><span class="font-mono text-sm text-white font-bold">256</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 bg-black/60 border border-red-500/50 rounded px-2 py-0.5 shadow-[inset_0_0_8px_rgba(239,68,68,0.2)]">
+                        <i class="ph-fill ph-hexagon text-red-500 text-xs drop-shadow-md"></i><span class="font-mono text-sm text-white font-bold">128</span>
+                    </div>
+                </div>
+                <i class="ph-bold ph-caret-right text-amber-500 text-lg ml-3 mr-3 hover:text-amber-300 transition-colors"></i>
+                <div class="text-amber-600/50 mr-3 pointer-events-none">|</div>
+                <div onclick="event.stopPropagation(); showToast('聊天发送表情包剩余数量');" class="flex items-center gap-1.5 bg-black/60 border border-yellow-500/50 rounded px-2.5 py-0.5 shadow-[inset_0_0_8px_rgba(250,204,21,0.2)] active:bg-yellow-900/40 transition-colors" title="表情符号">
+                    <i class="ph-fill ph-smiley text-yellow-400 text-sm drop-shadow-[0_0_3px_rgba(250,204,21,0.8)] pointer-events-none"></i>
+                    <span class="font-mono text-sm text-white font-bold pointer-events-none">50</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="ml-auto flex items-center gap-5 mt-2">
+            <div class="hidden md:flex items-center gap-6 mr-2">
+                <div class="flex flex-col items-center cursor-pointer group active:scale-95 transition-transform relative">
+                    <div class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full border border-[#1a0a05] z-10 shadow-sm"></div>
+                    <i class="ph-fill ph-clipboard-text text-amber-400 text-2xl drop-shadow-[0_0_6px_rgba(251,191,36,0.6)] group-hover:-translate-y-1 transition-transform"></i>
+                    <span class="text-[9px] text-amber-100 font-bold tracking-wider mt-1 drop-shadow-md">每日任务</span>
+                </div>
+                <div class="flex flex-col items-center cursor-pointer group active:scale-95 transition-transform">
+                    <i class="ph-fill ph-gift text-amber-400 text-2xl drop-shadow-[0_0_6px_rgba(251,191,36,0.6)] group-hover:-translate-y-1 transition-transform"></i>
+                    <span class="text-[9px] text-amber-100 font-bold tracking-wider mt-1 drop-shadow-md">里程碑</span>
+                </div>
+                <div class="flex flex-col items-center cursor-pointer group active:scale-95 transition-transform">
+                    <i class="ph-fill ph-trophy text-yellow-400 text-2xl drop-shadow-[0_0_6px_rgba(250,204,21,0.6)] group-hover:-translate-y-1 transition-transform"></i>
+                    <span class="text-[9px] text-amber-100 font-bold tracking-wider mt-1 drop-shadow-md">排行榜</span>
+                </div>
+            </div>
+
+            <div class="w-px h-8 bg-gradient-to-b from-transparent via-amber-500/30 to-transparent mx-1"></div>
+
+            <div class="flex items-center gap-3">
+                <button class="p-1.5 text-amber-100/70 active:text-white active:scale-90 transition-all drop-shadow-md" title="设置"><i class="ph-fill ph-gear text-2xl pointer-events-none"></i></button>
+                <button class="p-1.5 text-amber-100/70 active:text-white active:scale-90 transition-all drop-shadow-md" title="反馈"><i class="ph-fill ph-chat-teardrop-dots text-2xl pointer-events-none"></i></button>
+            </div>
+            <button class="bg-[#2a1b10]/80 active:bg-[#3d2716] active:scale-95 border border-amber-600/50 text-amber-100 px-4 py-1.5 rounded-lg flex items-center gap-2 font-bold backdrop-blur shadow-lg transition-all ml-2">
+                <i class="ph-bold ph-sign-out pointer-events-none"></i> 返回音记
+            </button>
+        </div>
+    </header>
+
+    <!-- ================= 核心主战场布局 ================= -->
+    <main class="flex-1 w-full flex overflow-hidden z-10 pl-2 pr-4 pb-6 pt-4 gap-4 xl:gap-8">
+        
+        <aside id="subjectSidebar" class="w-[280px] flex flex-col gap-4 relative flex-shrink-0 rounded-xl transition-all duration-300">
+            <div class="flex flex-col gap-2 h-full">
+                <div class="text-amber-400 text-sm font-bold tracking-[0.2em] mb-1 px-4 drop-shadow-md text-glow-gold">战役选择</div>
+                <div class="flex-1 overflow-y-auto space-y-2 pr-2">
+                    <div id="subject-english" onclick="selectSubject('english', this)" class="subject-item relative bg-black/40 border border-transparent rounded-r-lg p-4 cursor-pointer active:bg-black/60 active:scale-[0.98] transition-all duration-150 flex items-center gap-4 backdrop-blur-md">
+                        <div class="w-10 h-10 rounded bg-[#1a100a] flex items-center justify-center border border-gray-600/50 pointer-events-none icon-bg">
+                            <i class="ph-bold ph-translate text-gray-400 text-xl icon-text"></i>
+                        </div>
+                        <div class="flex-1 pointer-events-none">
+                            <h3 class="text-gray-400 font-bold text-lg tracking-wider title-text">英语单词</h3>
+                        </div>
+                        <i class="ph-bold ph-caret-right text-transparent pointer-events-none arrow-icon"></i>
+                    </div>
+
+                    <div id="subject-math" onclick="selectSubject('math', this)" class="subject-item relative bg-black/40 border border-transparent rounded-r-lg p-4 cursor-pointer active:bg-black/60 active:scale-[0.98] transition-all duration-150 flex items-center gap-4 backdrop-blur-md">
+                        <div class="w-10 h-10 rounded bg-[#1a100a] flex items-center justify-center border border-gray-600/50 pointer-events-none icon-bg">
+                            <i class="ph-duotone ph-math-operations text-gray-400 text-xl icon-text"></i>
+                        </div>
+                        <div class="flex-1 pointer-events-none">
+                            <h3 class="text-gray-400 font-bold text-lg tracking-wider title-text">数学题库</h3>
+                        </div>
+                        <i class="ph-bold ph-caret-right text-transparent pointer-events-none arrow-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <section class="flex-1 flex flex-col relative h-full mx-2 xl:mx-6">
+            <div id="subjectTabs" class="flex justify-center gap-6 mb-4 opacity-0 pointer-events-none transition-opacity duration-300">
+                <button class="relative px-6 py-2 text-lg font-bold text-white drop-shadow-md active:scale-95 transition-transform duration-150">
+                    英中翻译
+                    <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/2 h-1 bg-gradient-to-r from-transparent via-[#fbbf24] to-transparent shadow-[0_0_10px_#fbbf24]"></div>
+                </button>
+                <button class="relative px-6 py-2 text-lg font-bold text-amber-200/50 active:text-white active:scale-95 transition-all duration-150">
+                    中英翻译
+                </button>
+            </div>
+
+            <div class="flex-1 rounded-xl border border-amber-500/20 bg-[#140a05]/60 flex flex-col relative overflow-hidden backdrop-blur-md shadow-2xl">
+                <div class="absolute top-3 right-4 z-20">
+                    <button onclick="loadContentData()" id="refreshBtn" class="flex items-center gap-1.5 px-4 py-2 rounded-full bg-amber-500/20 border border-amber-500/60 text-amber-400 hover:bg-amber-500/30 hover:text-amber-200 active:scale-95 transition-all backdrop-blur-sm shadow-[0_0_15px_rgba(251,191,36,0.3)] relative" title="获取战役情报">
+                        <i class="ph-bold ph-arrows-clockwise text-lg pointer-events-none"></i>
+                        <span class="text-xs font-black tracking-widest pointer-events-none">刷新情报</span>
+                        <span id="refreshDot" class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border border-[#140a05] hidden shadow-[0_0_8px_rgba(239,68,68,0.8)]"></span>
+                    </button>
+                </div>
+
+                <div id="unloadedState" class="absolute inset-0 flex flex-col items-center justify-center z-0 transition-opacity duration-300">
+                    <div class="relative w-24 h-24 flex items-center justify-center mb-4">
+                        <i class="ph-duotone ph-book-open-text text-5xl text-amber-500/40 relative z-10 drop-shadow-[0_0_10px_rgba(251,191,36,0.3)]"></i>
+                        <div class="absolute inset-0 border-2 border-dashed border-amber-500/20 rounded-full animate-spin-slow"></div>
+                        <div class="absolute inset-2 border border-amber-500/10 rounded-full animate-spin-slow" style="animation-direction: reverse;"></div>
+                    </div>
+                    <p class="text-amber-200/50 font-bold tracking-[0.2em] mb-4 text-sm">请确认左侧面板已选择目标科目，并设定模式</p>
+                    <button onclick="loadContentData()" class="px-6 py-3 bg-gradient-to-r from-amber-700 to-[#3d2716] border border-amber-500/50 rounded-lg text-amber-100 font-bold tracking-widest text-sm shadow-[0_0_15px_rgba(251,191,36,0.2)] active:scale-95 transition-transform">
+                        确认科目并获取情报
+                    </button>
+                </div>
+
+                <div id="loadingState" class="absolute inset-0 flex flex-col p-3 space-y-2 z-0 opacity-0 pointer-events-none transition-opacity duration-300 pt-16">
+                    <div class="w-full h-12 rounded-lg skeleton-shimmer opacity-60"></div>
+                    <div class="w-full h-12 rounded-lg skeleton-shimmer opacity-50"></div>
+                    <div class="w-full h-12 rounded-lg skeleton-shimmer opacity-40"></div>
+                    <div class="w-full h-12 rounded-lg skeleton-shimmer opacity-30"></div>
+                    <div class="w-full h-12 rounded-lg skeleton-shimmer opacity-20"></div>
+                </div>
+
+                <div id="loadedState" class="flex-1 overflow-y-auto p-3 space-y-1.5 -webkit-overflow-scrolling-touch opacity-0 pointer-events-none transition-opacity duration-500 relative z-0 pt-16 pb-10">
+                </div>
+                
+                <div class="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-[#0a0502]/90 to-transparent pointer-events-none z-10"></div>
+            </div>
+        </section>
+
+        <aside class="w-[320px] xl:w-[350px] flex flex-col h-full relative pb-0 gap-3 flex-shrink-0">
+            
+            <button onclick="handleBattleAction('quickMatch')" class="w-full rounded-2xl bg-gradient-to-br from-blue-700 to-[#1a1a4a] border-2 border-blue-400 shadow-[0_10px_30px_rgba(59,130,246,0.4)] flex flex-col items-center justify-center cursor-pointer relative overflow-hidden active:scale-[0.98] transition-all group" style="flex-grow: 3.5;">
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-active:translate-x-full transition-transform duration-700 pointer-events-none"></div>
+                <div class="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none">
+                    <div class="w-48 h-48 border-2 border-dashed border-blue-400 rounded-full animate-spin-slow"></div>
+                </div>
+                <div class="flex items-center gap-3 pointer-events-none z-10">
+                    <i class="ph-duotone ph-lightning text-5xl text-blue-200 drop-shadow-[0_0_10px_rgba(96,165,250,0.8)]"></i>
+                    <div class="flex flex-col items-start justify-center h-full">
+                        <span class="text-white font-black text-3xl xl:text-4xl tracking-[0.2em] text-glow-blue drop-shadow-lg">快速匹配</span>
+                    </div>
+                </div>
+            </button>
+
+            <div class="w-full flex gap-3" style="flex-grow: 2.5;">
+                <button onclick="handleBattleAction('botMode')" class="flex-1 rounded-xl bg-gradient-to-br from-[#3d1c08]/90 to-[#1a0a05]/90 border border-orange-500/60 shadow-[0_5px_15px_rgba(249,115,22,0.3)] flex flex-col items-center justify-center cursor-pointer active:scale-95 transition-all hover:border-orange-400">
+                    <i class="ph-fill ph-robot text-orange-400 text-[28px] mb-1.5 pointer-events-none drop-shadow-md"></i>
+                    <span class="text-orange-100 font-bold text-lg tracking-[0.1em] drop-shadow-md pointer-events-none">人机模式</span>
+                </button>
+                <button onclick="handleBattleAction('createRoom')" class="flex-1 rounded-xl bg-gradient-to-br from-red-800/90 to-[#3a0a05]/90 border border-red-500/60 shadow-[0_5px_15px_rgba(220,38,38,0.3)] flex flex-col items-center justify-center cursor-pointer active:scale-95 transition-all hover:border-red-400">
+                    <i class="ph-fill ph-sword text-red-300 text-[28px] mb-1.5 pointer-events-none drop-shadow-md"></i>
+                    <span class="text-red-100 font-bold text-lg tracking-[0.1em] drop-shadow-md pointer-events-none">创建房间</span>
+                </button>
+            </div>
+            
+            <button onclick="toggleMatchLobby(true)" class="w-full rounded-xl bg-gradient-to-br from-[#3d2716]/90 to-[#1a100a]/90 border border-amber-500/60 shadow-[0_5px_15px_rgba(245,158,11,0.3)] flex items-center justify-center cursor-pointer active:scale-[0.98] transition-all hover:border-amber-400 relative overflow-hidden group" style="flex-grow: 2.5;">
+                <i class="ph-fill ph-users-three text-amber-400 text-3xl mr-3 pointer-events-none drop-shadow-md group-hover:scale-110 transition-transform"></i>
+                <span class="text-amber-100 font-bold text-xl tracking-[0.2em] drop-shadow-md pointer-events-none text-glow-gold">对战大厅</span>
+            </button>
+
+            <div class="w-full h-px bg-gradient-to-r from-transparent via-amber-500/30 to-transparent my-0.5"></div>
+
+            <div class="w-full flex gap-3 mt-auto" style="flex-grow: 1.5;">
+                <div onclick="toggleSaveModal(true)" class="relative flex-1 rounded-lg overflow-hidden cursor-pointer border border-blue-400/20 shadow-lg active:scale-95 transition-all flex items-center justify-center hover:border-blue-400/50 bg-gradient-to-r from-[#101a2a]/90 to-[#050a10]/95 backdrop-blur-sm">
+                    <i class="ph-fill ph-floppy-disk text-blue-300 text-lg mr-1.5 pointer-events-none z-20"></i>
+                    <h3 class="text-gray-300 font-bold text-xs tracking-wider pointer-events-none z-20">游戏存档</h3>
+                </div>
+                <div class="relative flex-1 rounded-lg overflow-hidden cursor-pointer border border-gray-400/20 shadow-lg active:scale-95 transition-all flex items-center justify-center hover:border-gray-400/50 bg-gradient-to-r from-[#1a1a1a]/90 to-[#0a0502]/95 backdrop-blur-sm">
+                    <i class="ph-fill ph-clock-counter-clockwise text-gray-400 text-lg mr-1.5 pointer-events-none z-20"></i>
+                    <h3 class="text-gray-300 font-bold text-xs tracking-wider pointer-events-none z-20">战绩中心</h3>
+                </div>
+            </div>
+            
+        </aside>
+
+    </main>
+
+    <!-- ================= 悬浮可拖拽聊天按钮 ================= -->
+    <div id="floatingChatBtn" class="fixed w-14 h-14 rounded-full bg-gradient-to-br from-[#3d2716] to-[#1a0a05] border-2 border-amber-500 shadow-[0_5px_20px_rgba(0,0,0,0.9)] flex items-center justify-center cursor-pointer z-[95] transition-transform active:scale-90" style="touch-action: none; left: 1.5rem; bottom: 1.5rem;">
+        <i class="ph-fill ph-chat-centered-text text-amber-300 text-2xl drop-shadow-[0_0_5px_rgba(251,191,36,0.8)] pointer-events-none"></i>
+        <span class="absolute -top-1 -right-1 bg-red-600 border-2 border-[#1a0a05] text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full shadow-md pointer-events-none">5</span>
+    </div>
+
+    <!-- ================= 全局悬浮聊天室 ================= -->
+    <div id="chatContainer" class="fixed flex flex-col w-[320px] h-[500px] bg-[#140a05]/95 border border-amber-500/30 rounded-xl overflow-hidden backdrop-blur-xl shadow-[0_15px_40px_rgba(0,0,0,0.8)] z-[96] transition-all duration-200 opacity-0 pointer-events-none scale-90" style="left: -999px; top: -999px;">
+        <div id="chatHeader" class="flex border-b border-amber-500/30 bg-black/60 justify-between items-center pr-2 h-10 flex-shrink-0 select-none">
+            <div class="flex flex-1 h-full">
+                <button onclick="handleChatWorldTab()" id="chatWorldTab" class="flex-1 text-xs font-bold text-amber-300 border-b-2 border-amber-500 bg-amber-900/20 transition-colors">世界</button>
+                <button onclick="handleChatRoomTab()" id="chatRoomTab" class="flex-1 text-xs font-bold text-gray-400 hover:text-white transition-colors">房间</button>
+            </div>
+            <button onclick="toggleChat(false)" class="text-amber-400/80 hover:text-amber-200 active:scale-90 p-1.5 transition-all" title="收起聊天">
+                <i class="ph-bold ph-caret-down text-lg pointer-events-none"></i>
+            </button>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto p-3 space-y-4 -webkit-overflow-scrolling-touch scroll-smooth" id="chatScrollArea">
+            <div class="flex justify-center">
+                <span class="bg-amber-500/20 text-amber-300 text-[10px] px-3 py-1 rounded-full border border-amber-500/30 shadow-sm backdrop-blur-sm">系统：欢迎来到抖学峡谷！</span>
+            </div>
+            <div class="flex gap-2 items-start">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Annie" class="w-8 h-8 rounded-full bg-[#2a1a10] border border-amber-400/50 flex-shrink-0 shadow-sm">
+                <div class="flex flex-col items-start max-w-[85%]">
+                    <div class="flex items-baseline gap-2 mb-0.5 px-1">
+                        <span class="text-[11px] font-bold text-amber-100">无敌学霸</span>
+                    </div>
+                    <div class="text-[12px] text-white bg-[#2a1a10]/80 px-2.5 py-1.5 rounded-lg chat-bubble border border-amber-500/30 leading-relaxed shadow-sm backdrop-blur-md">
+                        有人一起刷英语听力吗？缺个辅助！
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-2 items-start flex-row-reverse">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="w-8 h-8 rounded-full bg-[#3d2716] border border-amber-400 flex-shrink-0 shadow-sm">
+                <div class="flex flex-col items-end max-w-[85%]">
+                    <div class="flex items-baseline gap-2 mb-0.5 px-1 flex-row-reverse">
+                        <span class="text-[11px] font-bold text-amber-300">王语嫣z1</span>
+                    </div>
+                    <div class="text-[12px] text-amber-50 bg-amber-700/80 px-2.5 py-1.5 rounded-lg rounded-tr-[2px] border border-amber-400/50 leading-relaxed shadow-sm backdrop-blur-md text-right">
+                        寻求切磋！有人匹配吗？
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-2 border-t border-amber-500/30 flex items-center gap-2 bg-black/70 flex-shrink-0">
+            <div class="flex-1 bg-black/60 border border-amber-700/50 rounded-lg px-2 py-1.5 flex items-center focus-within:border-amber-400 transition-colors shadow-inner">
+                <input type="text" placeholder="交流..." class="bg-transparent text-xs text-white outline-none w-full placeholder-amber-100/30">
+            </div>
+            <button class="flex items-center gap-1 bg-black/40 border border-amber-500/40 hover:bg-amber-900/30 active:scale-95 px-2 py-1.5 rounded transition-colors text-amber-400" title="选择表情">
+                <i class="ph-fill ph-smiley text-lg pointer-events-none"></i>
+                <span class="text-[11px] font-bold font-mono text-amber-100 pointer-events-none">50</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ================= 弹窗 1：人机模式 ================= -->
+    <div id="botModal" class="fixed inset-0 z-[50] flex items-center justify-center bg-[#0a0502]/90 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="absolute inset-0" onclick="toggleBotModal(false)"></div>
+        <div class="fantasy-panel w-[85%] max-w-4xl rounded-xl flex flex-col z-10 overflow-hidden transform scale-95 transition-transform duration-300" id="botModalContent">
+            <div class="flex justify-between items-center p-5 border-b border-orange-500/30 bg-black/40">
+                <h2 class="text-2xl font-bold text-orange-400 tracking-[0.2em] flex items-center gap-2 drop-shadow-md">
+                    <i class="ph-fill ph-robot pointer-events-none"></i> 作战模式选择
+                </h2>
+                <button onclick="toggleBotModal(false)" class="text-orange-200 active:bg-orange-900/80 p-2 rounded transition-colors border border-orange-500/40">
+                    <i class="ph-bold ph-x text-xl pointer-events-none"></i>
+                </button>
+            </div>
+            <div class="p-6 flex md:flex-row flex-col gap-6">
+                <!-- 左侧：训练 -->
+                <div class="flex-1 bg-gradient-to-b from-[#102a1a]/60 to-[#05150a]/80 border border-green-500/40 hover:border-green-400/80 rounded-xl p-6 flex flex-col items-center text-center cursor-pointer shadow-[0_0_15px_rgba(16,185,129,0.1)] transition-all group active:scale-[0.98]">
+                    <div class="w-20 h-20 rounded-full bg-green-900/50 border-2 border-green-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <i class="ph-fill ph-barbell text-4xl text-green-400 pointer-events-none"></i>
+                    </div>
+                    <h3 class="text-2xl font-black text-white tracking-widest mb-3 text-glow-green pointer-events-none">训练模式</h3>
+                    <p class="text-sm text-green-200/70 font-bold leading-relaxed mb-6 pointer-events-none">没有敌方英雄<br>只有小兵与野怪</p>
+                    <button class="mt-auto w-full bg-green-700 hover:bg-green-600 text-white font-bold py-3 rounded-lg shadow-[0_0_10px_rgba(74,222,128,0.4)] transition-colors tracking-widest text-lg">
+                        进入训练
+                    </button>
+                </div>
+                <!-- 右侧：人机 -->
+                <div class="flex-1 bg-gradient-to-b from-[#3d1c08]/60 to-[#1a0a05]/80 border border-orange-500/40 hover:border-orange-400/80 rounded-xl p-6 flex flex-col items-center text-center shadow-[0_0_15px_rgba(249,115,22,0.1)] transition-all relative">
+                    <div class="w-20 h-20 rounded-full bg-orange-900/50 border-2 border-orange-500 flex items-center justify-center mb-4">
+                        <i class="ph-fill ph-robot text-4xl text-orange-400 pointer-events-none"></i>
+                    </div>
+                    <h3 class="text-2xl font-black text-white tracking-widest mb-3 text-glow-gold pointer-events-none">人机对战</h3>
+                    <div class="w-full flex gap-2 mb-2.5">
+                        <button class="flex-1 py-2.5 rounded-lg border border-orange-500/30 bg-orange-900/20 text-orange-200 text-sm font-bold active:bg-orange-600 active:text-white transition-colors outline-none">简单</button>
+                        <button class="flex-1 py-2.5 rounded-lg border border-orange-300 bg-gradient-to-b from-orange-500 to-orange-700 text-white text-sm font-bold active:scale-95 transition-transform shadow-[0_0_10px_rgba(249,115,22,0.5)] outline-none">普通</button>
+                        <button class="flex-1 py-2.5 rounded-lg border border-orange-500/30 bg-orange-900/20 text-orange-200 text-sm font-bold active:bg-orange-600 active:text-white transition-colors outline-none">困难</button>
+                    </div>
+                    <p class="text-[10px] text-orange-200/60 mb-4 pointer-events-none tracking-wider">注：三个难度调整的是对方人机英雄的数值。</p>
+                    <label class="flex items-center gap-2 cursor-pointer text-amber-200/80 hover:text-amber-100 transition-colors group mb-4 w-full justify-center">
+                        <input type="checkbox" class="w-3.5 h-3.5 bg-black border border-amber-500 rounded cursor-pointer" checked>
+                        <span class="text-xs font-bold tracking-wider group-active:scale-95 transition-transform">对战结束时保存回放</span>
+                    </label>
+                    <button class="mt-auto w-full bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-black font-black py-3 rounded-lg shadow-[0_0_15px_rgba(249,115,22,0.5)] transition-colors tracking-widest text-lg active:scale-95">
+                        开始对战
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 弹窗 2：对战大厅 ================= -->
+    <div id="matchLobby" class="fixed inset-0 z-[40] flex flex-col bg-black/60 backdrop-blur-xl opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="absolute inset-0 z-0 pointer-events-none">
+            <img src="image_a867b5.jpg" alt="Background" class="w-full h-full object-cover opacity-30">
+            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(10,5,2,0.9)_100%)]"></div>
+        </div>
+
+        <div class="w-full h-20 px-8 flex items-center justify-between z-10 bg-gradient-to-b from-[#140a05] to-transparent border-b border-amber-500/20">
+            <button onclick="toggleMatchLobby(false)" class="flex items-center gap-2 text-amber-200/80 active:text-white transition-colors cursor-pointer group">
+                <div class="w-10 h-10 rounded-full bg-black/50 border border-amber-500/30 flex items-center justify-center group-active:scale-90 transition-transform">
+                    <i class="ph-bold ph-arrow-left text-xl pointer-events-none"></i>
+                </div>
+                <span class="font-bold tracking-widest text-sm uppercase">返回基地</span>
+            </button>
+            <h1 class="text-2xl font-black text-amber-400 tracking-[0.3em] text-glow-gold">对战大厅</h1>
+            <div class="w-24"></div>
+        </div>
+
+        <div class="flex-1 flex gap-8 p-8 h-[calc(100vh-5rem)] z-10">
+            <div class="flex-1 flex flex-col bg-[#140a05]/80 border border-amber-500/30 rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
+                
+                <div class="flex-1 overflow-y-auto p-6 grid grid-cols-2 lg:grid-cols-3 gap-6 content-start -webkit-overflow-scrolling-touch mt-2">
+                    
+                    <div class="bg-[#160d08]/90 border border-amber-500/30 rounded-xl p-4 flex flex-col gap-3 shadow-lg hover:-translate-y-1 transition-transform group relative">
+                        <div class="absolute -top-2 -right-2 bg-gradient-to-r from-amber-500 to-amber-600 text-black px-3 py-1 text-xs font-black rounded-bl-lg rounded-tr-lg shadow-md transform rotate-12 z-10 border border-amber-300">曾参与</div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl border border-amber-500 overflow-hidden flex-shrink-0 shadow-[0_0_8px_rgba(251,191,36,0.3)]">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Jack" class="w-full h-full object-cover bg-[#3d2716]">
+                            </div>
+                            <div class="flex flex-col justify-center">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-black text-white text-base tracking-wide">李明宇的房间</span>
+                                </div>
+                                <div class="text-[10px] text-blue-200 bg-blue-900/50 px-1.5 py-0.5 rounded-sm w-fit mt-1 border border-blue-500/30">高二 (3) 班</div>
+                            </div>
+                        </div>
+                        <div class="bg-black/50 rounded-lg p-2.5 border border-white/5 relative">
+                            <p class="text-sm font-bold text-amber-200 tracking-wider flex items-center gap-1.5">
+                                <i class="ph-bold ph-translate text-base text-amber-500/80"></i> 房主科目：英语单词 · 英中翻译
+                            </p>
+                            <p class="text-xs text-green-400 mt-1.5 font-bold flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span> 准备中 (5v5 经典)
+                            </p>
+                        </div>
+                        <div class="flex gap-3 mt-3 w-full">
+                            <button class="flex-1 bg-[#1a2a40]/80 border border-blue-500/40 hover:border-blue-400 text-blue-300 font-bold text-sm py-2.5 rounded-lg transition-colors active:scale-95 flex items-center justify-center gap-1.5 shadow-md">
+                                <i class="ph-bold ph-eye text-lg"></i> 观战 (1/3)
+                            </button>
+                            <button onclick="toggleRoomDetailModal(false)" class="flex-1 bg-gradient-to-b from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-black text-sm py-2.5 rounded-lg shadow-[0_0_10px_rgba(251,191,36,0.2)] transition-colors active:scale-95 flex items-center justify-center gap-1.5">
+                                <i class="ph-bold ph-sword text-lg"></i> 加入 (7/10)
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-[#160d08]/90 border border-amber-500/30 rounded-xl p-4 flex flex-col gap-3 shadow-lg hover:-translate-y-1 transition-transform group relative">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl border border-amber-500 overflow-hidden flex-shrink-0 shadow-[0_0_8px_rgba(251,191,36,0.3)]">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Luna" class="w-full h-full object-cover bg-[#2a1a2a]">
+                            </div>
+                            <div class="flex flex-col justify-center">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-black text-white text-base tracking-wide">张晓萱的对局</span>
+                                </div>
+                                <div class="text-[10px] text-blue-200 bg-blue-900/50 px-1.5 py-0.5 rounded-sm w-fit mt-1 border border-blue-500/30">高一 (1) 班</div>
+                            </div>
+                        </div>
+                        <div class="bg-black/50 rounded-lg p-2.5 border border-white/5 relative">
+                            <p class="text-sm font-bold text-purple-300 tracking-wider flex items-center gap-1.5">
+                                <i class="ph-bold ph-math-operations text-base text-purple-500/80"></i> 房主科目：数学题库 · 自由刷题
+                            </p>
+                            <div class="flex justify-between items-center mt-1.5">
+                                <p class="text-xs text-red-500 font-bold flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> 游戏中 (10v10 乱斗)
+                                </p>
+                                <span class="text-[10px] text-gray-500 font-mono tracking-wider bg-black/40 px-1.5 py-0.5 rounded border border-white/5">19:45:00 开始</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 mt-3 w-full">
+                            <button class="flex-1 bg-[#1a2a40]/80 border border-blue-500/40 hover:border-blue-400 text-blue-300 font-bold text-sm py-2.5 rounded-lg transition-colors active:scale-95 flex items-center justify-center gap-1.5 shadow-md">
+                                <i class="ph-bold ph-eye text-lg"></i> 观战 (0/3)
+                            </button>
+                            <button onclick="toggleTeamSelectModal(true)" class="flex-1 bg-gradient-to-b from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-black text-sm py-2.5 rounded-lg shadow-[0_0_10px_rgba(220,38,38,0.3)] transition-colors active:scale-95 flex items-center justify-center gap-1.5">
+                                <i class="ph-bold ph-sword text-lg"></i> 参战 (14/20)
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-[#160d08]/90 border border-amber-500/30 rounded-xl p-4 flex flex-col gap-3 shadow-lg hover:-translate-y-1 transition-transform group relative opacity-80">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl border border-amber-500 overflow-hidden flex-shrink-0 shadow-[0_0_8px_rgba(251,191,36,0.3)]">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Bob" class="w-full h-full object-cover bg-[#1a1a2a]">
+                            </div>
+                            <div class="flex flex-col justify-center">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-black text-white text-base tracking-wide">王志强</span>
+                                </div>
+                                <div class="text-[10px] text-blue-200 bg-blue-900/50 px-1.5 py-0.5 rounded-sm w-fit mt-1 border border-blue-500/30">高三 (5) 班</div>
+                            </div>
+                        </div>
+                        <div class="bg-black/50 rounded-lg p-2.5 border border-white/5 relative">
+                            <p class="text-sm font-bold text-blue-300 tracking-wider flex items-center gap-1.5">
+                                <i class="ph-bold ph-translate text-base text-blue-400/80"></i> 房主科目：英语单词 · 中英翻译
+                            </p>
+                            <div class="flex justify-between items-center mt-1.5">
+                                <p class="text-xs text-red-500 font-bold flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> 游戏中 (1v1 单挑)
+                                </p>
+                                <span class="text-[10px] text-gray-500 font-mono tracking-wider bg-black/40 px-1.5 py-0.5 rounded border border-white/5">20:10:35 开始</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 mt-3 w-full">
+                            <button class="flex-1 bg-gray-800 border border-gray-700 text-gray-500 font-bold text-sm py-2.5 rounded-lg cursor-not-allowed flex items-center justify-center gap-1.5">
+                                <i class="ph-bold ph-eye-closed text-lg"></i> 观战 (3/3)
+                            </button>
+                            <button class="flex-1 bg-gray-800 border border-gray-700 text-gray-500 font-black text-sm py-2.5 rounded-lg cursor-not-allowed flex items-center justify-center gap-1.5">
+                                <i class="ph-bold ph-prohibit text-lg"></i> 爆满 (2/2)
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-[#160d08]/90 border border-amber-500/50 rounded-xl p-4 flex flex-col gap-3 shadow-[0_0_15px_rgba(251,191,36,0.15)] hover:-translate-y-1 transition-transform group relative">
+                        <div class="absolute -top-2 -right-2 bg-gradient-to-r from-amber-500 to-amber-600 text-black px-3 py-1 text-xs font-black rounded-bl-lg rounded-tr-lg shadow-md transform rotate-12 z-10 border border-amber-300">曾参与</div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl border border-amber-500 overflow-hidden flex-shrink-0 shadow-[0_0_8px_rgba(251,191,36,0.3)]">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sam" class="w-full h-full object-cover bg-[#3d2716]">
+                            </div>
+                            <div class="flex flex-col justify-center">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-black text-white text-base tracking-wide">郭靖的对局</span>
+                                </div>
+                                <div class="text-[10px] text-blue-200 bg-blue-900/50 px-1.5 py-0.5 rounded-sm w-fit mt-1 border border-blue-500/30">高三 (1) 班</div>
+                            </div>
+                        </div>
+                        <div class="bg-black/50 rounded-lg p-2.5 border border-white/5 relative">
+                            <p class="text-sm font-bold text-amber-200 tracking-wider flex items-center gap-1.5">
+                                <i class="ph-bold ph-book-open-text text-base text-amber-500/80"></i> 房主科目：语文古诗 · 挑战
+                            </p>
+                            <p class="text-xs text-green-400 mt-1.5 font-bold flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span> 准备中 (5v5 经典)
+                            </p>
+                        </div>
+                        <div class="flex gap-3 mt-3 w-full">
+                            <button class="flex-1 bg-[#1a2a40]/80 border border-blue-500/40 hover:border-blue-400 text-blue-300 font-bold text-sm py-2.5 rounded-lg transition-colors active:scale-95 flex items-center justify-center gap-1.5 shadow-md">
+                                <i class="ph-bold ph-eye text-lg"></i> 观战 (1/3)
+                            </button>
+                            <button onclick="toggleRoomDetailModal(false)" class="flex-1 bg-gradient-to-b from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-black text-sm py-2.5 rounded-lg shadow-[0_0_10px_rgba(251,191,36,0.2)] transition-colors active:scale-95 flex items-center justify-center gap-1.5">
+                                <i class="ph-bold ph-swords text-lg"></i> 加入 (4/10)
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 弹窗 4：游戏存档 ================= -->
+    <div id="saveModal" class="fixed inset-0 z-[50] flex items-center justify-center bg-[#0a0502]/90 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="absolute inset-0" onclick="toggleSaveModal(false)"></div>
+        <div class="fantasy-panel w-[85%] max-w-5xl h-[75vh] rounded-xl flex flex-col z-10 overflow-hidden transform scale-95 transition-transform duration-300" id="saveModalContent">
+            <div class="flex justify-between items-center p-5 border-b border-amber-500/30 bg-black/40">
+                <h2 class="text-2xl font-bold text-amber-400 tracking-[0.2em] flex items-center gap-2 text-glow-gold drop-shadow-md">
+                    <i class="ph-fill ph-floppy-disk"></i> 进度载入
+                </h2>
+                <button onclick="toggleSaveModal(false)" class="text-amber-100 active:bg-amber-800/80 p-2 rounded transition-colors border border-amber-400/40">
+                    <i class="ph-bold ph-x text-xl pointer-events-none"></i>
+                </button>
+            </div>
+            <div class="flex-1 p-6 overflow-y-auto grid grid-cols-2 md:grid-cols-3 gap-6 content-start -webkit-overflow-scrolling-touch">
+                <div class="bg-[#1a0f0a]/60 border border-amber-500/50 rounded-lg p-5 cursor-pointer active:scale-95 active:bg-[#2a1a10] transition-transform duration-150 shadow-[0_5px_15px_rgba(0,0,0,0.5)] relative overflow-hidden backdrop-blur-md">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-amber-500 shadow-[0_0_10px_#fbbf24]"></div>
+                    <div class="flex justify-between text-amber-200 text-sm font-bold mb-3 pointer-events-none">
+                        <span class="bg-amber-900/50 text-amber-100 px-2 py-0.5 rounded border border-amber-500/50">自动存档</span>
+                        <span>14:30</span>
+                    </div>
+                    <h3 class="text-white font-bold text-xl mb-1 tracking-wider pointer-events-none drop-shadow-md">英语单词</h3>
+                    <p class="text-amber-200/60 text-sm mb-5 pointer-events-none">模式：英中翻译 / 对战模式</p>
+                    <button class="w-full bg-gradient-to-r from-amber-600 to-amber-500 active:from-amber-700 active:to-amber-600 text-white font-black py-2.5 rounded shadow-lg transition-colors tracking-widest text-lg border border-amber-300/50">
+                        继续冒险
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 弹窗 5：创建房间 ================= -->
+    <div id="roomModal" class="fixed inset-0 z-[50] flex items-center justify-center bg-[#050200]/95 backdrop-blur-2xl opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="absolute inset-0" onclick="toggleRoomModal(false)"></div>
+        <div class="w-full max-w-6xl h-[85vh] flex flex-col z-10 overflow-hidden transform scale-95 transition-transform duration-300 relative" id="roomModalContent">
+            
+            <div class="flex justify-between items-center py-6 px-10 relative z-20">
+                <div class="flex items-center gap-5">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center shadow-[0_0_30px_rgba(220,38,38,0.5)] border border-red-400/50">
+                        <i class="ph-fill ph-sword text-white text-3xl drop-shadow-md"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <h2 class="text-3xl font-black text-white tracking-[0.2em] drop-shadow-md">建立专属房间</h2>
+                        <span class="text-gray-400 text-sm font-bold tracking-widest mt-1 uppercase">选择对局规模</span>
+                    </div>
+                </div>
+                <button onclick="toggleRoomModal(false)" class="w-14 h-14 rounded-full bg-white/5 border border-white/10 text-white/50 hover:text-white hover:bg-white/20 flex items-center justify-center transition-all active:scale-90 backdrop-blur-md">
+                    <i class="ph-bold ph-x text-2xl"></i>
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto px-10 pb-16 pt-6 z-20 relative -webkit-overflow-scrolling-touch">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                    
+                    <div class="relative h-44 rounded-2xl bg-gradient-to-br from-[#1a0a05] to-[#0a0200] border border-white/10 hover:border-red-500/60 transition-all duration-300 group cursor-pointer overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.6)] hover:-translate-y-2 hover:shadow-[0_15px_40px_rgba(220,38,38,0.2)]">
+                        <div class="absolute -right-4 -bottom-4 text-8xl text-white opacity-[0.02] group-hover:opacity-[0.08] transition-opacity duration-300 pointer-events-none"><i class="ph-fill ph-user"></i></div>
+                        <div class="p-6 flex flex-col h-full justify-between relative z-10 items-center text-center">
+                            <i class="ph-fill ph-user text-4xl text-gray-500 group-hover:text-red-400 transition-colors drop-shadow-md mt-2"></i>
+                            <div class="mb-2">
+                                <h3 class="text-3xl font-black text-white tracking-widest drop-shadow-md">1 V 1</h3>
+                                <p class="text-gray-400 group-hover:text-red-300 text-sm font-bold tracking-wider mt-1.5 transition-colors">单挑模式</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="relative h-44 rounded-2xl bg-gradient-to-br from-[#1a0a05] to-[#0a0200] border border-white/10 hover:border-red-500/60 transition-all duration-300 group cursor-pointer overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.6)] hover:-translate-y-2 hover:shadow-[0_15px_40px_rgba(220,38,38,0.2)]">
+                        <div class="absolute -right-4 -bottom-4 text-8xl text-white opacity-[0.02] group-hover:opacity-[0.08] transition-opacity duration-300 pointer-events-none"><i class="ph-fill ph-users"></i></div>
+                        <div class="p-6 flex flex-col h-full justify-between relative z-10 items-center text-center">
+                            <i class="ph-fill ph-users text-4xl text-gray-500 group-hover:text-red-400 transition-colors drop-shadow-md mt-2"></i>
+                            <div class="mb-2">
+                                <h3 class="text-3xl font-black text-white tracking-widest drop-shadow-md">2 V 2</h3>
+                                <p class="text-gray-400 group-hover:text-red-300 text-sm font-bold tracking-wider mt-1.5 transition-colors">双排合作</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="relative h-44 rounded-2xl bg-gradient-to-br from-[#1a0a05] to-[#0a0200] border border-white/10 hover:border-red-500/60 transition-all duration-300 group cursor-pointer overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.6)] hover:-translate-y-2 hover:shadow-[0_15px_40px_rgba(220,38,38,0.2)]">
+                        <div class="absolute -right-4 -bottom-4 text-8xl text-white opacity-[0.02] group-hover:opacity-[0.08] transition-opacity duration-300 pointer-events-none"><i class="ph-fill ph-users-three"></i></div>
+                        <div class="p-6 flex flex-col h-full justify-between relative z-10 items-center text-center">
+                            <i class="ph-fill ph-users-three text-4xl text-gray-500 group-hover:text-red-400 transition-colors drop-shadow-md mt-2"></i>
+                            <div class="mb-2">
+                                <h3 class="text-3xl font-black text-white tracking-widest drop-shadow-md">3 V 3</h3>
+                                <p class="text-gray-400 group-hover:text-red-300 text-sm font-bold tracking-wider mt-1.5 transition-colors">小队突击</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5V5: 修正为统一群体人物图标 -->
+                    <div onclick="toggleRoomDetailModal(true)" class="relative h-44 rounded-2xl bg-gradient-to-br from-[#1a0a05] to-[#0a0200] border border-white/10 hover:border-red-500/60 transition-all duration-300 group cursor-pointer overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.6)] hover:-translate-y-2 hover:shadow-[0_15px_40px_rgba(220,38,38,0.2)]">
+                        <div class="absolute -right-4 -bottom-4 text-8xl text-white opacity-[0.02] group-hover:opacity-[0.08] transition-opacity duration-300 pointer-events-none"><i class="ph-fill ph-users-three"></i></div>
+                        <div class="p-6 flex flex-col h-full justify-between relative z-10 items-center text-center">
+                            <i class="ph-fill ph-users-three text-4xl text-gray-500 group-hover:text-red-400 transition-colors drop-shadow-md mt-2"></i>
+                            <div class="mb-2">
+                                <h3 class="text-3xl font-black text-white tracking-widest drop-shadow-md">5 V 5</h3>
+                                <p class="text-gray-400 group-hover:text-red-300 text-sm font-bold tracking-wider mt-1.5 transition-colors">经典团战</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="relative h-44 rounded-2xl bg-gradient-to-br from-[#1a0a05] to-[#0a0200] border border-white/10 hover:border-red-500/60 transition-all duration-300 group cursor-pointer overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.6)] hover:-translate-y-2 hover:shadow-[0_15px_40px_rgba(220,38,38,0.2)]">
+                        <div class="absolute -right-4 -bottom-4 text-8xl text-white opacity-[0.02] group-hover:opacity-[0.08] transition-opacity duration-300 pointer-events-none"><i class="ph-fill ph-flag"></i></div>
+                        <div class="p-6 flex flex-col h-full justify-between relative z-10 items-center text-center">
+                            <i class="ph-fill ph-flag text-4xl text-gray-500 group-hover:text-red-400 transition-colors drop-shadow-md mt-2"></i>
+                            <div class="mb-2">
+                                <h3 class="text-3xl font-black text-white tracking-widest drop-shadow-md">10V10</h3>
+                                <p class="text-gray-400 group-hover:text-red-300 text-sm font-bold tracking-wider mt-1.5 transition-colors">大型乱斗</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="relative h-44 rounded-2xl bg-gradient-to-br from-[#1a0a05] to-[#0a0200] border border-white/10 hover:border-red-500/60 transition-all duration-300 group cursor-pointer overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.6)] hover:-translate-y-2 hover:shadow-[0_15px_40px_rgba(220,38,38,0.2)]">
+                        <div class="absolute -right-4 -bottom-4 text-8xl text-white opacity-[0.02] group-hover:opacity-[0.08] transition-opacity duration-300 pointer-events-none"><i class="ph-fill ph-shield"></i></div>
+                        <div class="p-6 flex flex-col h-full justify-between relative z-10 items-center text-center">
+                            <i class="ph-fill ph-shield text-4xl text-gray-500 group-hover:text-red-400 transition-colors drop-shadow-md mt-2"></i>
+                            <div class="mb-2">
+                                <h3 class="text-3xl font-black text-white tracking-widest drop-shadow-md">15V15</h3>
+                                <p class="text-gray-400 group-hover:text-red-300 text-sm font-bold tracking-wider mt-1.5 transition-colors">史诗战役</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="relative h-44 rounded-2xl bg-gradient-to-br from-[#1a0a05] to-[#0a0200] border border-white/10 hover:border-red-500/60 transition-all duration-300 group cursor-pointer overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.6)] hover:-translate-y-2 hover:shadow-[0_15px_40px_rgba(220,38,38,0.2)]">
+                        <div class="absolute -right-4 -bottom-4 text-8xl text-white opacity-[0.02] group-hover:opacity-[0.08] transition-opacity duration-300 pointer-events-none"><i class="ph-fill ph-shield-star"></i></div>
+                        <div class="p-6 flex flex-col h-full justify-between relative z-10 items-center text-center">
+                            <i class="ph-fill ph-shield-star text-4xl text-gray-500 group-hover:text-red-400 transition-colors drop-shadow-md mt-2"></i>
+                            <div class="mb-2">
+                                <h3 class="text-3xl font-black text-white tracking-widest drop-shadow-md">30V30</h3>
+                                <p class="text-gray-400 group-hover:text-red-300 text-sm font-bold tracking-wider mt-1.5 transition-colors">军团冲突</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="relative h-44 rounded-2xl bg-gradient-to-br from-[#1a0a05] to-[#0a0200] border border-white/10 hover:border-red-500/60 transition-all duration-300 group cursor-pointer overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.6)] hover:-translate-y-2 hover:shadow-[0_15px_40px_rgba(220,38,38,0.2)]">
+                        <div class="absolute -right-4 -bottom-4 text-8xl text-white opacity-[0.02] group-hover:opacity-[0.08] transition-opacity duration-300 pointer-events-none"><i class="ph-fill ph-globe-hemisphere-west"></i></div>
+                        <div class="p-6 flex flex-col h-full justify-between relative z-10 items-center text-center">
+                            <i class="ph-fill ph-globe-hemisphere-west text-4xl text-gray-500 group-hover:text-red-400 transition-colors drop-shadow-md mt-2"></i>
+                            <div class="mb-2">
+                                <h3 class="text-3xl font-black text-white tracking-widest drop-shadow-md">50V50</h3>
+                                <p class="text-gray-400 group-hover:text-red-300 text-sm font-bold tracking-wider mt-1.5 transition-colors">国战战场</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            
+            <div class="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-[#050200]/90 to-transparent pointer-events-none z-0"></div>
+        </div>
+    </div>
+
+    <!-- ================= 弹窗 6：房间备战详情 (全屏沉浸风) ================= -->
+    <div id="roomDetailModal" class="fixed inset-0 z-[80] flex flex-col bg-black opacity-0 pointer-events-none transition-opacity duration-300">
+        
+        <div class="absolute inset-0 z-0 pointer-events-none">
+            <img src="image_a867b5.jpg" alt="Background" class="w-full h-full object-cover opacity-30">
+            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(10,5,2,0.95)_100%)]"></div>
+        </div>
+        
+        <div class="w-full h-full flex flex-col relative z-10" id="roomDetailContent">
+            
+            <div class="h-20 border-b border-amber-500/20 bg-gradient-to-b from-[#140a05] to-transparent flex justify-between items-center px-8 shadow-md flex-shrink-0">
+                <div class="flex items-center gap-5">
+                    
+                    <div class="w-10 h-10 rounded-full border border-amber-400 flex items-center justify-center bg-[#3d2716] shadow-[0_0_10px_rgba(251,191,36,0.3)] overflow-hidden">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex flex-col justify-center">
+                        <span class="text-white font-black tracking-[0.1em] text-xl text-glow-gold" id="roomTitle">[王语嫣c1] 建立的房间</span>
+                        <div class="flex items-center gap-4 text-xs font-bold text-amber-200/60 mt-1">
+                            <span class="bg-amber-900/50 text-amber-400 px-2 py-0.5 rounded border border-amber-500/30 font-mono tracking-wider">5 V 5 经典团战</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-6">
+                    <span id="roomTopMessage" class="text-amber-400/80 text-sm tracking-widest font-bold animate-pulse">等待其余法师连线...</span>
+                    <div class="w-px h-6 bg-amber-500/30 mx-1"></div>
+                    <label class="flex items-center gap-2 cursor-pointer group">
+                        <input type="checkbox" checked class="w-4 h-4 bg-black/50 border border-amber-500 rounded-sm appearance-none checked:bg-amber-500 transition-colors relative after:content-[''] after:absolute after:hidden checked:after:block after:w-1.5 after:h-2.5 after:border-r-2 after:border-b-2 after:border-[#1a0a05] after:rotate-45 after:left-[5px] after:top-[1px]">
+                        <span class="text-gray-300 text-sm font-bold group-hover:text-amber-100 transition-colors tracking-wider">保存回放</span>
+                    </label>
+                    <button onclick="handleExitRoom()" class="flex items-center gap-2 text-amber-400 hover:text-amber-200 bg-amber-950/30 border border-amber-900/50 px-4 py-2 rounded-lg transition-colors active:scale-95 font-bold text-sm tracking-widest">
+                        <i class="ph-bold ph-sign-out"></i> 退出房间
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex-1 flex flex-col overflow-hidden p-8 gap-6 relative">
+                
+                <!-- 上方：对垒双雄 -->
+                <div class="flex-1 flex items-stretch gap-12 relative min-h-0">
+                    <div class="flex-1 flex flex-col rounded-2xl border-2 border-amber-600/60 transition-all duration-300 bg-[#140a05]/80 backdrop-blur-md shadow-[inset_0_0_50px_rgba(0,0,0,0.8)] overflow-hidden" id="team1Container">
+                        <div class="h-16 flex justify-between items-center px-6 border-b border-amber-500/30 bg-gradient-to-r from-amber-900/20 to-transparent" id="team1HeaderBg">
+                            <span class="font-black tracking-[0.2em] text-xl text-amber-400 drop-shadow-md" id="team1Name">队伍一</span>
+                            <div class="flex items-center gap-4">
+                                <span class="text-sm font-bold tracking-wider text-amber-400" id="team1Status"></span>
+                                <!-- 修改：强化加入按钮视觉 -->
+                                <button class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-amber-600 to-amber-800 text-white text-xs font-bold shadow-md hover:from-amber-500 hover:to-amber-700 transition-colors active:scale-95 flex items-center gap-1 border border-amber-500/50"><i class="ph-bold ph-plus"></i> 加入队伍</button>
+                            </div>
+                        </div>
+                        <div class="flex-1 p-4 space-y-2 overflow-y-auto" id="team1Players"></div>
+                    </div>
+
+                    <div class="flex-1 flex flex-col rounded-2xl border-2 border-amber-600/60 transition-all duration-300 bg-[#140a05]/80 backdrop-blur-md shadow-[inset_0_0_50px_rgba(0,0,0,0.8)] overflow-hidden" id="team2Container">
+                        <div class="h-16 flex justify-between items-center px-6 border-b border-amber-500/30 bg-gradient-to-r from-transparent to-amber-900/20" id="team2HeaderBg">
+                            <span class="font-black tracking-[0.2em] text-xl text-amber-400 drop-shadow-md" id="team2Name">队伍二</span>
+                            <div class="flex items-center gap-4">
+                                <span class="text-sm font-bold tracking-wider text-amber-400" id="team2Status"></span>
+                                <!-- 修改：强化加入按钮视觉 -->
+                                <button class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-amber-600 to-amber-800 text-white text-xs font-bold shadow-md hover:from-amber-500 hover:to-amber-700 transition-colors active:scale-95 flex items-center gap-1 border border-amber-500/50"><i class="ph-bold ph-plus"></i> 加入队伍</button>
+                            </div>
+                        </div>
+                        <div class="flex-1 p-4 space-y-2 overflow-y-auto" id="team2Players"></div>
+                    </div>
+                </div>
+                
+                <!-- 下方：观战与控制塔 -->
+                <div class="h-36 flex gap-12 flex-shrink-0">
+                    <div class="flex-1 bg-[#140a05]/80 backdrop-blur-md rounded-2xl border border-white/5 flex flex-col overflow-hidden">
+                        <div class="h-12 border-b border-white/5 bg-black/40 flex justify-between items-center px-6">
+                            <span class="font-bold text-gray-400 tracking-widest text-sm">观战席 (1/3)</span>
+                            <!-- 修改：强化加入按钮视觉 -->
+                            <button class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-blue-600 to-blue-800 text-white text-xs font-bold shadow-md hover:from-blue-500 hover:to-blue-700 transition-colors active:scale-95 flex items-center gap-1 border border-blue-500/50"><i class="ph-bold ph-eye"></i> 加入观战</button>
+                        </div>
+                        <div class="flex-1 p-4 flex gap-4 overflow-x-auto items-center" id="spectatorPlayers">
+                            <div class="flex flex-col items-center gap-1">
+                                <div class="w-10 h-10 rounded-full bg-[#1a0a05] border border-blue-500/50 overflow-hidden shadow-[0_0_8px_rgba(59,130,246,0.3)]">
+                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Spectator1" class="w-full h-full object-cover opacity-80">
+                                </div>
+                                <div class="flex flex-col items-center text-center mt-1">
+                                    <span class="text-[10px] font-mono text-blue-300 bg-blue-900/30 px-1 py-0.5 rounded border border-blue-500/20 mb-0.5">高二(1)班</span>
+                                    <span class="text-xs font-bold text-gray-300 tracking-wider">张三</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="w-80 flex flex-col justify-end" id="roomActionBar">
+                        <!-- JS 动态注入右下角状态按钮 -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 弹窗 7：选择队伍 (直接加入战场) ================= -->
+    <div id="teamSelectModal" class="fixed inset-0 z-[90] flex items-center justify-center bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-[#1a0a05] border border-amber-500/50 p-8 rounded-2xl flex flex-col items-center shadow-[0_10px_40px_rgba(0,0,0,0.8)] w-[400px] transform scale-95 transition-transform duration-300 relative" id="teamSelectContent">
+            <button onclick="toggleTeamSelectModal(false)" class="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors">
+                <i class="ph-bold ph-x text-xl"></i>
+            </button>
+            <div class="w-16 h-16 rounded-full bg-red-900/30 flex items-center justify-center mb-4 border border-red-500/50 shadow-[0_0_15px_rgba(220,38,38,0.3)]">
+                <i class="ph-fill ph-sword text-4xl text-red-400 drop-shadow-md"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2 tracking-widest text-glow-gold">选择您的阵营</h3>
+            <p class="text-sm text-gray-400 mb-6 text-center leading-relaxed">该战局正在火热进行中，<br>请选择您要援助的阵营降临战场！</p>
+            <div class="flex gap-4 w-full">
+                <button onclick="executeJoinGame('队伍一')" class="flex-1 py-4 rounded-xl bg-gradient-to-b from-[#2a1105] to-[#140502] border border-amber-600/60 hover:border-amber-400 text-amber-400 font-bold tracking-widest shadow-[0_0_15px_rgba(251,191,36,0.1)] transition-all active:scale-95 flex flex-col items-center gap-1.5 group">
+                    <span class="text-lg group-hover:text-amber-300">队伍一</span>
+                    <span class="text-[10px] text-amber-200/60 font-normal bg-amber-900/50 px-2 py-0.5 rounded border border-amber-500/20">7/10 人</span>
+                </button>
+                <button onclick="executeJoinGame('队伍二')" class="flex-1 py-4 rounded-xl bg-gradient-to-b from-[#2a1105] to-[#140502] border border-amber-600/60 hover:border-amber-400 text-amber-400 font-bold tracking-widest shadow-[0_0_15px_rgba(251,191,36,0.1)] transition-all active:scale-95 flex flex-col items-center gap-1.5 group">
+                    <span class="text-lg group-hover:text-amber-300">队伍二</span>
+                    <span class="text-[10px] text-amber-200/60 font-normal bg-amber-900/50 px-2 py-0.5 rounded border border-amber-500/20">7/10 人</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 弹窗 8：房间内更换科目联动 ================= -->
+    <div id="roomSubjectModal" class="fixed inset-0 z-[90] flex items-center justify-center bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="absolute inset-0" onclick="toggleRoomSubjectModal(false)"></div>
+        <div class="fantasy-panel w-[90%] max-w-3xl h-[65vh] rounded-2xl flex flex-col z-10 overflow-hidden transform scale-95 transition-transform duration-300 relative border border-amber-500/30 shadow-[0_15px_50px_rgba(0,0,0,0.8)]" id="roomSubjectContent">
+            
+            <div class="h-16 flex justify-between items-center px-6 border-b border-amber-500/20 bg-black/50">
+                <h2 class="text-xl font-bold text-amber-400 tracking-[0.2em] flex items-center gap-2 drop-shadow-md text-glow-gold">
+                    <i class="ph-fill ph-book-open-text"></i> 更换备战科目
+                </h2>
+                <button onclick="toggleRoomSubjectModal(false)" class="text-amber-200/50 hover:text-amber-100 active:scale-90 transition-all p-1">
+                    <i class="ph-bold ph-x text-2xl"></i>
+                </button>
+            </div>
+
+            <div class="flex-1 flex overflow-hidden">
+                <!-- 左侧：大科目导航 -->
+                <div class="w-1/3 border-r border-amber-500/20 bg-[#0a0502]/60 overflow-y-auto flex flex-col p-3 gap-2">
+                    <div onclick="selectRoomSubjectCat('english', this)" class="room-sub-cat bg-amber-900/40 border border-amber-500/50 text-amber-300 rounded-lg p-3 cursor-pointer flex items-center gap-3 transition-all font-bold tracking-wider shadow-[0_0_10px_rgba(251,191,36,0.1)]">
+                        <i class="ph-bold ph-translate text-xl"></i> 英语单词
+                    </div>
+                    <div onclick="selectRoomSubjectCat('math', this)" class="room-sub-cat bg-white/5 border border-transparent text-gray-400 hover:bg-white/10 rounded-lg p-3 cursor-pointer flex items-center gap-3 transition-all font-bold tracking-wider">
+                        <i class="ph-duotone ph-math-operations text-xl"></i> 数学题库
+                    </div>
+                </div>
+                
+                <!-- 右侧：具体模式选项 -->
+                <div class="flex-1 bg-[#140a05]/80 p-6 overflow-y-auto" id="roomModeList">
+                    <h3 class="text-amber-100/50 text-sm font-bold tracking-widest mb-4">选择具体模式</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div onclick="confirmRoomSubject('英语单词 · 英中翻译')" class="bg-[#1a0a05] border border-amber-600/40 hover:border-amber-400 rounded-xl p-4 cursor-pointer active:scale-95 transition-all group flex flex-col items-center text-center shadow-lg">
+                            <i class="ph-fill ph-translate text-3xl text-amber-500/80 group-hover:text-amber-400 mb-2"></i>
+                            <span class="text-amber-100 font-bold tracking-wider">英中翻译</span>
+                        </div>
+                        <div onclick="confirmRoomSubject('英语单词 · 中英翻译')" class="bg-[#1a0a05] border border-amber-600/40 hover:border-amber-400 rounded-xl p-4 cursor-pointer active:scale-95 transition-all group flex flex-col items-center text-center shadow-lg">
+                            <i class="ph-fill ph-translate text-3xl text-amber-500/80 group-hover:text-amber-400 mb-2"></i>
+                            <span class="text-amber-100 font-bold tracking-wider">中英翻译</span>
+                        </div>
+                        <div onclick="confirmRoomSubject('英语单词 · 听力测验')" class="bg-[#1a0a05] border border-amber-600/40 hover:border-amber-400 rounded-xl p-4 cursor-pointer active:scale-95 transition-all group flex flex-col items-center text-center shadow-lg">
+                            <i class="ph-fill ph-headphones text-3xl text-amber-500/80 group-hover:text-amber-400 mb-2"></i>
+                            <span class="text-amber-100 font-bold tracking-wider">听力测验</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 解散确认弹窗 -->
+    <div id="leaveConfirmModal" class="fixed inset-0 z-[90] flex items-center justify-center bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-[#1a0a05] border border-amber-500/50 p-8 rounded-2xl flex flex-col items-center shadow-[0_10px_40px_rgba(0,0,0,0.8)] w-[360px]">
+            <div class="w-16 h-16 rounded-full bg-amber-500/20 flex items-center justify-center mb-4 border border-amber-500/50 shadow-[0_0_15px_rgba(251,191,36,0.3)]">
+                <i class="ph-fill ph-warning text-4xl text-amber-400 drop-shadow-md"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2 tracking-widest">确认退出房间？</h3>
+            <p class="text-sm text-gray-400 mb-8 text-center leading-relaxed">您是房主，退出将解散当前战局，<br>并断开所有人的连接。</p>
+            <div class="flex gap-4 w-full">
+                <button onclick="closeLeaveConfirm()" class="flex-1 py-2.5 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 font-bold tracking-widest transition-colors">取消</button>
+                <button onclick="executeLeaveRoom()" class="flex-1 py-2.5 rounded-lg bg-gradient-to-r from-amber-600 to-amber-500 text-black hover:from-amber-500 hover:to-amber-400 font-black tracking-widest shadow-[0_0_15px_rgba(251,191,36,0.4)] transition-colors active:scale-95">确认解散</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 全局轻量提示框 ================= -->
+    <div id="toast" class="fixed top-24 left-1/2 transform -translate-x-1/2 bg-[#1a0a05]/95 border border-amber-500/50 text-amber-100 px-6 py-3 rounded-full shadow-[0_0_20px_rgba(251,191,36,0.4)] backdrop-blur-md z-[100] transition-all duration-300 opacity-0 pointer-events-none -translate-y-4 flex items-center gap-2">
+        <i class="ph-fill ph-info text-amber-400 text-lg"></i>
+        <span id="toastMessage" class="font-bold tracking-wider text-sm drop-shadow-md"></span>
+    </div>
+
+    <script>
+        let hasSelectedSubject = false;
+        let toastTimeout;
+        let currentRoomIsHost = false;
+        let isInRoom = false; 
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const defaultSubject = document.getElementById('subject-english');
+            if(defaultSubject) {
+                selectSubject('english', defaultSubject, true); 
+            }
+            setTimeout(() => {
+                toggleChat(true);
+            }, 100);
+        });
+
+        function selectSubject(subjectId, el, isInit = false) {
+            document.querySelectorAll('.subject-item').forEach(item => {
+                item.classList.remove('nav-item-active', 'border-amber-500/20', 'bg-[#1a100a]/60');
+                item.classList.add('border-transparent', 'bg-black/40');
+                
+                const iconBg = item.querySelector('.icon-bg');
+                const iconText = item.querySelector('.icon-text');
+                const titleText = item.querySelector('.title-text');
+                const arrowIcon = item.querySelector('.arrow-icon');
+                
+                if (iconBg) {
+                    iconBg.classList.remove('bg-gradient-to-br', 'from-amber-500', 'to-orange-700', 'shadow-[0_0_10px_rgba(251,191,36,0.5)]', 'border-amber-400/50');
+                    iconBg.classList.add('bg-[#1a100a]', 'border-gray-600/50');
+                }
+                if (iconText) {
+                    iconText.classList.remove('text-white');
+                    iconText.classList.add('text-gray-400');
+                }
+                if (titleText) {
+                    titleText.classList.remove('text-white', 'drop-shadow-md');
+                    titleText.classList.add('text-gray-400');
+                }
+                if (arrowIcon) {
+                    arrowIcon.classList.remove('text-amber-400');
+                    arrowIcon.classList.add('text-transparent');
+                }
+            });
+            
+            el.classList.add('nav-item-active', 'border-amber-500/20', 'bg-[#1a100a]/60');
+            el.classList.remove('border-transparent', 'bg-black/40');
+            
+            const iconBg = el.querySelector('.icon-bg');
+            const iconText = el.querySelector('.icon-text');
+            const titleText = el.querySelector('.title-text');
+            const arrowIcon = el.querySelector('.arrow-icon');
+            
+            if (iconBg) {
+                iconBg.classList.remove('bg-[#1a100a]', 'border-gray-600/50');
+                iconBg.classList.add('bg-gradient-to-br', 'from-amber-500', 'to-orange-700', 'shadow-[0_0_10px_rgba(251,191,36,0.5)]', 'border-amber-400/50');
+            }
+            if (iconText) {
+                iconText.classList.remove('text-gray-400');
+                iconText.classList.add('text-white');
+            }
+            if (titleText) {
+                titleText.classList.remove('text-gray-400');
+                titleText.classList.add('text-white', 'drop-shadow-md');
+            }
+            if (arrowIcon) {
+                arrowIcon.classList.remove('text-transparent');
+                arrowIcon.classList.add('text-amber-400');
+            }
+
+            hasSelectedSubject = true;
+            
+            const tabs = document.getElementById('subjectTabs');
+            if(tabs) {
+                tabs.classList.remove('opacity-0', 'pointer-events-none');
+                tabs.classList.add('opacity-100');
+            }
+
+            if (!isInit) {
+                const refreshBtn = document.getElementById('refreshBtn');
+                const refreshDot = document.getElementById('refreshDot');
+                if(refreshBtn) refreshBtn.classList.add('animate-pulse');
+                if(refreshDot) refreshDot.classList.remove('hidden');
+            }
+        }
+
+        function handleBattleAction(actionType) {
+            if (!hasSelectedSubject) {
+                showToast('🚨 请先在左侧选择您要挑战的战役科目！');
+                
+                const sidebar = document.getElementById('subjectSidebar');
+                if (sidebar) {
+                    sidebar.classList.add('ring-2', 'ring-amber-500', 'animate-pulse');
+                    setTimeout(() => {
+                        sidebar.classList.remove('ring-2', 'ring-amber-500', 'animate-pulse');
+                    }, 1500);
+                }
+                return;
+            }
+
+            if (actionType === 'quickMatch') {
+                showToast('正在为您寻找实力相近的对手...');
+            } else if (actionType === 'botMode') {
+                toggleBotModal(true);
+            } else if (actionType === 'createRoom') {
+                toggleRoomModal(true);
+            } else if (actionType === 'revealSecret') {
+                loadContentData();
+            }
+        }
+
+        function toggleModal(modalId, contentId, show) {
+            const modal = document.getElementById(modalId);
+            const content = document.getElementById(contentId);
+            if (show) {
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                if(content) {
+                    content.classList.remove('scale-95');
+                    content.classList.add('scale-100');
+                }
+            } else {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                if(content) {
+                    content.classList.remove('scale-100');
+                    content.classList.add('scale-95');
+                }
+            }
+        }
+
+        const toggleSaveModal = (show) => toggleModal('saveModal', 'saveModalContent', show);
+        const toggleRoomModal = (show) => toggleModal('roomModal', 'roomModalContent', show);
+        const toggleBotModal = (show) => toggleModal('botModal', 'botModalContent', show);
+        
+        function toggleMatchLobby(show) {
+            const lobby = document.getElementById('matchLobby');
+            if (show) {
+                lobby.classList.remove('opacity-0', 'pointer-events-none');
+            } else {
+                lobby.classList.add('opacity-0', 'pointer-events-none');
+            }
+        }
+
+        function toggleTeamSelectModal(show) {
+            const modal = document.getElementById('teamSelectModal');
+            const content = document.getElementById('teamSelectContent');
+            if (show) {
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                if(content) {
+                    content.classList.remove('scale-95');
+                    content.classList.add('scale-100');
+                }
+            } else {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                if(content) {
+                    content.classList.remove('scale-100');
+                    content.classList.add('scale-95');
+                }
+            }
+        }
+
+        function executeJoinGame(teamName) {
+            toggleTeamSelectModal(false);
+            showToast(`已选定 ${teamName}，正在为您空降战场...`);
+        }
+
+        let isPlayerReady = false;
+
+        function toggleReadyState() {
+            isPlayerReady = !isPlayerReady;
+            const btn = document.getElementById('readyBtn');
+            if (btn) {
+                if (isPlayerReady) {
+                    btn.innerText = "取消准备";
+                    btn.className = "w-full py-5 rounded-2xl font-black tracking-[0.2em] text-xl transition-all shadow-[0_0_20px_rgba(239,68,68,0.4)] bg-gradient-to-r from-red-600 to-red-800 border border-red-500/50 text-white hover:from-red-500 hover:to-red-700 active:scale-95";
+                    showToast('已完成准备部署！');
+                } else {
+                    btn.innerText = "准备";
+                    btn.className = "w-full py-5 rounded-2xl font-black tracking-[0.2em] text-xl transition-all shadow-[0_0_20px_rgba(251,191,36,0.4)] bg-gradient-to-r from-amber-600 to-amber-800 border border-amber-500/50 text-white hover:from-amber-500 hover:to-amber-700 active:scale-95";
+                    showToast('已取消准备状态。');
+                }
+            }
+            
+            const p1 = document.getElementById('selfPlayerReadyIcon');
+            if(p1) {
+                if (isPlayerReady) {
+                    p1.innerHTML = `<i class="ph-fill ph-check-circle text-3xl text-amber-400 drop-shadow-[0_0_5px_rgba(251,191,36,0.8)]"></i>`;
+                } else {
+                    p1.innerHTML = `<span class="text-gray-500 text-sm font-bold tracking-widest mr-2">未准备</span>`;
+                }
+            }
+        }
+
+        function toggleRoomDetailModal(isHost) {
+            const modal = document.getElementById('roomDetailModal');
+            if (isHost === undefined) {
+                if(modal) modal.classList.add('opacity-0', 'pointer-events-none');
+                isInRoom = false; 
+                return;
+            }
+            
+            isInRoom = true; 
+            currentRoomIsHost = isHost;
+
+            toggleChat(false);
+
+            const actionBar = document.getElementById('roomActionBar');
+            const topMsg = document.getElementById('roomTopMessage');
+            
+            const t1Container = document.getElementById('team1Container');
+            const t1Status = document.getElementById('team1Status');
+            const t1Players = document.getElementById('team1Players');
+            
+            const t2Container = document.getElementById('team2Container');
+            const t2Status = document.getElementById('team2Status');
+            const t2Players = document.getElementById('team2Players');
+
+            if (!actionBar || !topMsg || !t1Container || !t2Container) return;
+
+            const getPlayerSlotHTML = (name, className, subject, isReady, isSelf, isRoomHost = false) => {
+                const nameColor = isSelf ? 'text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)] font-black' : 'text-gray-200';
+                const hostIcon = isRoomHost ? '<i class="ph-fill ph-crown text-yellow-400 mr-1.5 text-lg drop-shadow-md" title="房主"></i>' : '';
+                
+                const subjectDisplay = isSelf ? 
+                    `<div onclick="toggleRoomSubjectModal(true)" class="mt-1 flex items-center gap-1.5 px-2 py-1 rounded border border-amber-500/40 bg-amber-950/30 hover:bg-amber-900/50 cursor-pointer active:scale-95 transition-all w-fit max-w-full group/subject">
+                        <i class="ph-fill ph-book-open-text text-amber-500 text-sm"></i>
+                        <span class="text-xs font-bold text-amber-200 truncate" id="selfRoomSubjectText">${subject}</span>
+                        <i class="ph-bold ph-caret-right text-amber-500/80 text-xs ml-1 group-hover/subject:translate-x-0.5 transition-transform"></i>
+                    </div>`
+                    :
+                    `<span class="text-sm font-bold text-gray-400 truncate mt-0.5 flex items-center"><i class="ph-fill ph-book-open-text text-amber-500/70 mr-1 text-base"></i> ${subject}</span>`;
+
+                return `
+                <div class="flex items-center gap-4 p-3 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 transition-colors group">
+                    <div class="w-12 h-12 rounded-full bg-[#1a0a05] border-2 border-amber-500 shadow-[0_0_10px_rgba(251,191,36,0.3)] overflow-hidden flex-shrink-0 relative">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${name}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity">
+                    </div>
+                    <div class="flex-1 flex flex-col overflow-hidden justify-center">
+                        <div class="flex items-baseline gap-2">
+                            ${hostIcon}
+                            <span class="font-bold text-lg tracking-wider ${nameColor} truncate">${name}</span>
+                            <span class="text-[11px] font-mono text-blue-300 bg-blue-900/30 px-1.5 py-0.5 rounded border border-blue-500/20 whitespace-nowrap">${className}</span>
+                        </div>
+                        ${subjectDisplay}
+                    </div>
+                    <div id="${isSelf ? 'selfPlayerReadyIcon' : ''}">
+                        ${isReady ? '<i class="ph-fill ph-check-circle text-3xl text-amber-400 drop-shadow-[0_0_5px_rgba(251,191,36,0.8)]"></i>' : '<span class="text-gray-500 text-sm font-bold tracking-widest mr-2">未准备</span>'}
+                    </div>
+                </div>
+                `;
+            };
+
+            if (isHost) {
+                topMsg.innerText = "等待其余法师连线...";
+                topMsg.className = "text-amber-500/80 text-sm tracking-widest font-bold animate-pulse";
+                
+                actionBar.innerHTML = `
+                    <button onclick="handleStartGame()" class="w-full py-5 rounded-2xl font-black tracking-[0.2em] text-xl transition-all bg-[#0a0502]/80 border border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white cursor-pointer active:scale-95 shadow-inner">
+                        <i class="ph-bold ph-play"></i> 开始游戏
+                    </button>
+                `;
+                
+                t1Container.className = "flex-1 flex flex-col rounded-2xl border-2 border-amber-600/60 transition-all duration-300 bg-[#140a05]/80 backdrop-blur-md shadow-[inset_0_0_50px_rgba(0,0,0,0.8)] overflow-hidden";
+                t1Status.innerHTML = `<span class="text-amber-400 flex items-center gap-1.5 drop-shadow-md"><i class="ph-bold ph-user text-lg"></i> 3/5</span>`;
+                t1Players.innerHTML = 
+                    getPlayerSlotHTML("王语嫣c1", "高二(3)班", "英语单词 · 英中翻译", true, true, true) +
+                    getPlayerSlotHTML("赵敏", "高二(3)班", "英语单词 · 听力测验", true, false, false) +
+                    getPlayerSlotHTML("周芷若", "高二(1)班", "语文古诗 · 默写", false, false, false);
+
+                t2Container.className = "flex-1 flex flex-col rounded-2xl border border-white/5 transition-all duration-300 bg-[#140a05]/80 backdrop-blur-md shadow-[inset_0_0_50px_rgba(0,0,0,0.8)] overflow-hidden";
+                t2Status.innerHTML = `2/5`;
+                t2Players.innerHTML = 
+                    getPlayerSlotHTML("张无忌", "高一(2)班", "数学题库 · 挑战", true, false, false) +
+                    getPlayerSlotHTML("黄蓉", "高一(2)班", "物理公式", false, false, false);
+
+            } else {
+                isPlayerReady = false; 
+                topMsg.innerText = "房主即将开启战役，请确认备战";
+                topMsg.className = "text-amber-400/80 text-sm tracking-widest font-bold animate-pulse";
+                
+                actionBar.innerHTML = `
+                    <button id="readyBtn" onclick="toggleReadyState()" class="w-full py-5 rounded-2xl font-black tracking-[0.2em] text-xl transition-all shadow-[0_0_20px_rgba(251,191,36,0.4)] bg-gradient-to-r from-amber-600 to-amber-800 border border-amber-500/50 text-white hover:from-amber-500 hover:to-amber-700 active:scale-95">
+                        准备
+                    </button>
+                `;
+                
+                t1Container.className = "flex-1 flex flex-col rounded-2xl border border-white/5 transition-all duration-300 bg-[#140a05]/80 backdrop-blur-md shadow-[inset_0_0_50px_rgba(0,0,0,0.8)] overflow-hidden";
+                t1Status.innerHTML = `3/5`;
+                t1Players.innerHTML = 
+                    getPlayerSlotHTML("王语嫣c1", "高二(3)班", "英语单词 · 英中翻译", true, false, true) +
+                    getPlayerSlotHTML("赵敏", "高二(3)班", "英语单词 · 听力测验", true, false, false) +
+                    getPlayerSlotHTML("周芷若", "高二(1)班", "语文古诗 · 默写", false, false, false);
+
+                t2Container.className = "flex-1 flex flex-col rounded-2xl border-2 border-amber-600/60 transition-all duration-300 bg-[#140a05]/80 backdrop-blur-md shadow-[0_0_20px_rgba(251,191,36,0.1),inset_0_0_30px_rgba(0,0,0,0.8)] overflow-hidden";
+                t2Status.innerHTML = `<span class="text-amber-400 flex items-center gap-1.5 drop-shadow-md"><i class="ph-bold ph-user text-lg"></i> 2/5</span>`;
+                t2Players.innerHTML = 
+                    getPlayerSlotHTML("张无忌", "高一(2)班", "数学题库 · 挑战", true, false, false) +
+                    getPlayerSlotHTML("小龙女c1", "高一(1)班", "数学题库 · 挑战模式", false, true, false);
+            }
+
+            toggleRoomModal(false);
+            toggleMatchLobby(false);
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        // ================= 弹窗8：更换房间科目逻辑 =================
+        function toggleRoomSubjectModal(show) {
+            toggleModal('roomSubjectModal', 'roomSubjectContent', show);
+        }
+
+        function selectRoomSubjectCat(catId, el) {
+            document.querySelectorAll('.room-sub-cat').forEach(item => {
+                item.classList.remove('bg-amber-900/40', 'border-amber-500/50', 'text-amber-300', 'shadow-[0_0_10px_rgba(251,191,36,0.1)]');
+                item.classList.add('bg-white/5', 'border-transparent', 'text-gray-400');
+            });
+            el.classList.remove('bg-white/5', 'border-transparent', 'text-gray-400');
+            el.classList.add('bg-amber-900/40', 'border-amber-500/50', 'text-amber-300', 'shadow-[0_0_10px_rgba(251,191,36,0.1)]');
+
+            const modeList = document.getElementById('roomModeList');
+            if (catId === 'english') {
+                modeList.innerHTML = `
+                    <h3 class="text-amber-100/50 text-sm font-bold tracking-widest mb-4">选择具体模式</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div onclick="confirmRoomSubject('英语单词 · 英中翻译')" class="bg-[#1a0a05] border border-amber-600/40 hover:border-amber-400 rounded-xl p-4 cursor-pointer active:scale-95 transition-all group flex flex-col items-center text-center shadow-lg">
+                            <i class="ph-fill ph-translate text-3xl text-amber-500/80 group-hover:text-amber-400 mb-2"></i>
+                            <span class="text-amber-100 font-bold tracking-wider">英中翻译</span>
+                        </div>
+                        <div onclick="confirmRoomSubject('英语单词 · 中英翻译')" class="bg-[#1a0a05] border border-amber-600/40 hover:border-amber-400 rounded-xl p-4 cursor-pointer active:scale-95 transition-all group flex flex-col items-center text-center shadow-lg">
+                            <i class="ph-fill ph-translate text-3xl text-amber-500/80 group-hover:text-amber-400 mb-2"></i>
+                            <span class="text-amber-100 font-bold tracking-wider">中英翻译</span>
+                        </div>
+                        <div onclick="confirmRoomSubject('英语单词 · 听力测验')" class="bg-[#1a0a05] border border-amber-600/40 hover:border-amber-400 rounded-xl p-4 cursor-pointer active:scale-95 transition-all group flex flex-col items-center text-center shadow-lg">
+                            <i class="ph-fill ph-headphones text-3xl text-amber-500/80 group-hover:text-amber-400 mb-2"></i>
+                            <span class="text-amber-100 font-bold tracking-wider">听力测验</span>
+                        </div>
+                    </div>
+                `;
+            } else if (catId === 'math') {
+                modeList.innerHTML = `
+                    <h3 class="text-amber-100/50 text-sm font-bold tracking-widest mb-4">选择具体模式</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div onclick="confirmRoomSubject('数学题库 · 基础运算')" class="bg-[#1a0a05] border border-amber-600/40 hover:border-amber-400 rounded-xl p-4 cursor-pointer active:scale-95 transition-all group flex flex-col items-center text-center shadow-lg">
+                            <i class="ph-fill ph-calculator text-3xl text-amber-500/80 group-hover:text-amber-400 mb-2"></i>
+                            <span class="text-amber-100 font-bold tracking-wider">基础运算</span>
+                        </div>
+                        <div onclick="confirmRoomSubject('数学题库 · 挑战模式')" class="bg-[#1a0a05] border border-amber-600/40 hover:border-amber-400 rounded-xl p-4 cursor-pointer active:scale-95 transition-all group flex flex-col items-center text-center shadow-lg">
+                            <i class="ph-fill ph-function text-3xl text-amber-500/80 group-hover:text-amber-400 mb-2"></i>
+                            <span class="text-amber-100 font-bold tracking-wider">挑战模式</span>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function confirmRoomSubject(subjectText) {
+            const selfSubjectEl = document.getElementById('selfRoomSubjectText');
+            if (selfSubjectEl) {
+                selfSubjectEl.innerText = subjectText;
+            }
+            toggleRoomSubjectModal(false);
+            showToast(`已更换备战科目为：${subjectText}`);
+        }
+
+        function handleStartGame() {
+            showToast('🚨 无法开启战局，需要所有队伍成员准备就绪！');
+        }
+
+        function handleExitRoom() {
+            if (currentRoomIsHost) {
+                const confirmModal = document.getElementById('leaveConfirmModal');
+                confirmModal.classList.remove('opacity-0', 'pointer-events-none');
+            } else {
+                toggleRoomDetailModal(undefined);
+                toggleMatchLobby(true); // 返回对战大厅
+                showToast('您已成功退出房间。');
+            }
+        }
+
+        function closeLeaveConfirm() {
+            const confirmModal = document.getElementById('leaveConfirmModal');
+            confirmModal.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function executeLeaveRoom() {
+            closeLeaveConfirm();
+            toggleRoomDetailModal(undefined);
+            toggleMatchLobby(true); // 返回对战大厅
+            showToast('结界已被解散，所有人员已断开连接。');
+        }
+
+        function handleChatRoomTab() {
+            if (!isInRoom) {
+                showToast('🚨 请先进入一个房间，才能使用房间频道！');
+            } else {
+                showToast('已切换到房间频道');
+                document.getElementById('chatRoomTab').classList.replace('text-gray-400', 'text-amber-300');
+                document.getElementById('chatRoomTab').classList.add('border-b-2', 'border-amber-500', 'bg-amber-900/20');
+                document.getElementById('chatWorldTab').classList.replace('text-amber-300', 'text-gray-400');
+                document.getElementById('chatWorldTab').classList.remove('border-b-2', 'border-amber-500', 'bg-amber-900/20');
+            }
+        }
+
+        function handleChatWorldTab() {
+            document.getElementById('chatWorldTab').classList.replace('text-gray-400', 'text-amber-300');
+            document.getElementById('chatWorldTab').classList.add('border-b-2', 'border-amber-500', 'bg-amber-900/20');
+            document.getElementById('chatRoomTab').classList.replace('text-amber-300', 'text-gray-400');
+            document.getElementById('chatRoomTab').classList.remove('border-b-2', 'border-amber-500', 'bg-amber-900/20');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMessage');
+            toastMsg.innerText = message;
+            toast.classList.remove('opacity-0', '-translate-y-4');
+            toast.classList.add('opacity-100', 'translate-y-0');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', '-translate-y-4');
+            }, 3000);
+        }
+
+        // ================= 聊天框（全局悬浮拖拽）逻辑 =================
+        const chatContainer = document.getElementById('chatContainer');
+        const chatHeader = document.getElementById('chatHeader');
+        const floatingChatBtn = document.getElementById('floatingChatBtn');
+        const chatScrollArea = document.getElementById('chatScrollArea');
+
+        if(chatScrollArea) { chatScrollArea.scrollTop = chatScrollArea.scrollHeight; }
+
+        function toggleChat(show) {
+            if (show) {
+                const btnRect = floatingChatBtn.getBoundingClientRect();
+                const chatW = 320;
+                const chatH = 500;
+                
+                let destLeft = btnRect.left;
+                let destTop = btnRect.top - chatH - 10;
+                
+                if (destTop < 0) { destTop = btnRect.bottom + 10; }
+                if (destLeft + chatW > window.innerWidth) { destLeft = window.innerWidth - chatW - 10; }
+                if (destLeft < 0) { destLeft = 10; }
+
+                chatContainer.style.left = destLeft + 'px';
+                chatContainer.style.top = destTop + 'px';
+                chatContainer.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    chatContainer.classList.remove('opacity-0', 'pointer-events-none', 'scale-90');
+                    chatContainer.classList.add('opacity-100', 'scale-100');
+                }, 10);
+                
+                if (floatingChatBtn) floatingChatBtn.classList.add('opacity-0', 'pointer-events-none');
+                if (chatScrollArea) chatScrollArea.scrollTop = chatScrollArea.scrollHeight;
+            } else {
+                if (chatContainer) {
+                    chatContainer.classList.remove('opacity-100', 'scale-100');
+                    chatContainer.classList.add('opacity-0', 'pointer-events-none', 'scale-90');
+                }
+                setTimeout(() => {
+                    if (floatingChatBtn) floatingChatBtn.classList.remove('opacity-0', 'pointer-events-none');
+                    chatContainer.style.left = '-999px'; 
+                }, 200);
+            }
+        }
+
+        let isDragging = false, hasMoved = false; 
+        let startX, startY, initialLeft, initialTop;
+        let currentDragTarget = null;
+
+        function startDrag(e, target) {
+            if (e.target.closest('button') || e.target.tagName.toLowerCase() === 'input') return;
+            
+            isDragging = true; hasMoved = false;
+            currentDragTarget = target;
+            
+            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            startX = clientX; startY = clientY;
+            
+            let style = window.getComputedStyle(target);
+            initialLeft = parseInt(style.left, 10);
+            initialTop = parseInt(style.top, 10);
+        }
+
+        function doDrag(e) {
+            if (!isDragging || !currentDragTarget) return;
+            
+            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            let dx = clientX - startX, dy = clientY - startY;
+            
+            if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+                hasMoved = true;
+                if(e.cancelable) e.preventDefault();
+            }
+            
+            if (hasMoved) {
+                let newL = initialLeft + dx;
+                let newT = initialTop + dy;
+                let maxL = window.innerWidth - currentDragTarget.offsetWidth;
+                let maxT = window.innerHeight - currentDragTarget.offsetHeight;
+                
+                if(newL < 0) newL = 0;
+                if(newL > maxL) newL = maxL;
+                if(newT < 0) newT = 0;
+                if(newT > maxT) newT = maxT;
+
+                currentDragTarget.style.left = newL + 'px';
+                currentDragTarget.style.top = newT + 'px';
+                currentDragTarget.style.bottom = 'auto'; 
+                currentDragTarget.style.right = 'auto'; 
+            }
+        }
+
+        function endDrag(e) {
+            if (!isDragging) return;
+            isDragging = false;
+            if (!hasMoved && currentDragTarget === floatingChatBtn) {
+                toggleChat(true);
+            }
+            currentDragTarget = null;
+        }
+
+        if (floatingChatBtn) {
+            floatingChatBtn.addEventListener('touchstart', (e) => startDrag(e, floatingChatBtn), { passive: true });
+            floatingChatBtn.addEventListener('mousedown', (e) => startDrag(e, floatingChatBtn));
+        }
+
+        if (chatHeader) {
+            chatHeader.style.cursor = 'move';
+            chatHeader.addEventListener('touchstart', (e) => startDrag(e, chatContainer), { passive: true });
+            chatHeader.addEventListener('mousedown', (e) => startDrag(e, chatContainer));
+        }
+
+        document.addEventListener('touchmove', doDrag, { passive: false });
+        document.addEventListener('touchend', endDrag);
+        document.addEventListener('mousemove', doDrag);
+        document.addEventListener('mouseup', endDrag);
+
+        const mockBackendData = [
+            { combinedStr: "Abandon[əˈbændən]", desc: "v. 放弃，遗弃，抛弃" },
+            { combinedStr: "Absolute[ˈæbsəluːt]", desc: "adj. 绝对的，完全的" },
+            { combinedStr: "Boundary[ˈbaʊndəri]", desc: "n. 边界，分界线" },
+            { combinedStr: "Cognitive[ˈkɒɡnətɪv]", desc: "adj. 认知的，认识的" },
+            { combinedStr: "Dilemma[dɪˈlemə]", desc: "n. 困境，进退两难" },
+            { combinedStr: "Ecosystem[iːkəʊˌsɪstəm]", desc: "n. 生态系统" },
+            { combinedStr: "Fascinate[ˈfæsɪneɪt]", desc: "v. 迷住，深深吸引" }
+        ];
+
+        function createWordItemHTML(data) {
+            let formattedStr = data.combinedStr.replace(/【/g, '[').replace(/】/g, ']');
+            return `
+                <div class="flex items-center px-3 py-2.5 rounded-lg bg-white/5 active:bg-white/10 active:scale-[0.99] transition-all duration-150 border border-amber-500/10 shadow-sm mb-1.5">
+                    <div class="w-[45%] font-bold text-base text-white tracking-wide truncate pr-2">${formattedStr}</div>
+                    <div class="flex-1 text-sm text-gray-300 tracking-wide truncate">${data.desc}</div>
+                    <div class="w-10 flex justify-center">
+                        <button onclick="event.stopPropagation();" class="w-8 h-8 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center active:bg-amber-500 active:text-white active:scale-90 transition-all duration-150 border border-amber-400/30">
+                            <i class="ph-fill ph-speaker-high text-lg pointer-events-none"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function loadContentData() {
+            const refreshBtn = document.getElementById('refreshBtn');
+            const refreshDot = document.getElementById('refreshDot');
+            
+            if(refreshBtn) refreshBtn.classList.remove('animate-pulse');
+            if(refreshDot) refreshDot.classList.add('hidden');
+
+            const refreshBtnIcon = document.querySelector('#refreshBtn i');
+            if (refreshBtnIcon) {
+                refreshBtnIcon.classList.add('animate-spin');
+                setTimeout(() => refreshBtnIcon.classList.remove('animate-spin'), 1000);
+            }
+
+            const unloadedState = document.getElementById('unloadedState');
+            const loadingState = document.getElementById('loadingState');
+            const loadedState = document.getElementById('loadedState');
+
+            if (unloadedState) unloadedState.style.opacity = '0';
+            if (loadedState) loadedState.style.opacity = '0';
+            
+            setTimeout(() => {
+                if (unloadedState) unloadedState.classList.add('hidden');
+                if (loadedState) loadedState.classList.add('hidden');
+                
+                if (loadingState) {
+                    loadingState.classList.remove('hidden');
+                    loadingState.classList.remove('pointer-events-none');
+                    void loadingState.offsetWidth;
+                    loadingState.style.opacity = '1';
+                }
+
+                setTimeout(() => {
+                    if (loadingState) {
+                        loadingState.style.opacity = '0';
+                        loadingState.classList.add('pointer-events-none');
+                    }
+                    setTimeout(() => {
+                        if (loadedState) {
+                            loadedState.innerHTML = mockBackendData.map(createWordItemHTML).join('');
+                            loadedState.classList.remove('hidden');
+                            loadedState.classList.remove('pointer-events-none');
+                            void loadedState.offsetWidth;
+                            loadedState.style.opacity = '1';
+                        }
+                    }, 300); 
+                }, 1000);
+            }, 300); 
+        }
+    </script>
+</body>
+</html>
