@@ -318,9 +318,10 @@
         </div>
 
         <div class="p-2 border-t border-amber-500/30 flex items-center gap-2 bg-black/70 flex-shrink-0">
-            <!-- 修改：布局调整，左表情，中输入，右发送按钮 -->
-            <button class="text-amber-400 hover:text-amber-300 active:scale-90 p-1 transition-colors" title="选择表情">
+            <!-- 修改：布局调整，左表情，中输入，右发送按钮，并补回表情包剩余次数 50 -->
+            <button class="flex items-center gap-1 text-amber-400 hover:text-amber-300 active:scale-90 p-1 transition-colors" title="选择表情">
                 <i class="ph-fill ph-smiley text-[22px] pointer-events-none"></i>
+                <span class="text-[11px] font-bold font-mono text-amber-100 pointer-events-none">50</span>
             </button>
             <div class="flex-1 bg-black/60 border border-amber-700/50 rounded-lg px-2 py-1.5 flex items-center focus-within:border-amber-400 transition-colors shadow-inner">
                 <input type="text" placeholder="交流..." class="bg-transparent text-xs text-white outline-none w-full placeholder-amber-100/30">
@@ -569,13 +570,13 @@
             </div>
             <div class="flex-1 p-6 overflow-y-auto grid grid-cols-2 md:grid-cols-3 gap-6 content-start -webkit-overflow-scrolling-touch">
                 
-                <!-- 修改：增加多个存档并引入悬停删除功能 -->
+                <!-- 修改：移除 hover 依赖，改为常驻的叉叉按钮，完美适配平板触控 -->
                 <div class="save-card bg-[#1a0f0a]/60 border border-amber-500/50 rounded-lg p-5 cursor-pointer active:scale-95 transition-all duration-300 shadow-[0_5px_15px_rgba(0,0,0,0.5)] relative overflow-hidden backdrop-blur-md group">
                     <div class="absolute top-0 left-0 w-1.5 h-full bg-amber-500 shadow-[0_0_10px_#fbbf24]"></div>
-                    <button onclick="deleteSave(event, this)" class="absolute top-3 right-3 text-red-500/50 hover:text-red-400 hover:bg-red-950/50 p-1.5 rounded transition-all opacity-0 group-hover:opacity-100 z-20" title="删除存档">
-                        <i class="ph-bold ph-trash text-lg pointer-events-none"></i>
+                    <button onclick="deleteSave(event, this)" class="absolute top-2.5 right-2.5 text-gray-500/80 active:text-red-400 active:scale-90 p-1.5 rounded-full transition-all z-20 bg-black/20 hover:text-red-400" title="删除存档">
+                        <i class="ph-bold ph-x text-base pointer-events-none"></i>
                     </button>
-                    <div class="flex justify-between text-amber-200 text-sm font-bold mb-3 pointer-events-none pr-6">
+                    <div class="flex justify-between text-amber-200 text-sm font-bold mb-3 pointer-events-none pr-8">
                         <span class="bg-amber-900/50 text-amber-100 px-2 py-0.5 rounded border border-amber-500/50">自动存档</span>
                         <span>今日 14:30</span>
                     </div>
@@ -588,10 +589,10 @@
 
                 <div class="save-card bg-[#1a0f0a]/60 border border-amber-500/50 rounded-lg p-5 cursor-pointer active:scale-95 transition-all duration-300 shadow-[0_5px_15px_rgba(0,0,0,0.5)] relative overflow-hidden backdrop-blur-md group">
                     <div class="absolute top-0 left-0 w-1.5 h-full bg-blue-500 shadow-[0_0_10px_#3b82f6]"></div>
-                    <button onclick="deleteSave(event, this)" class="absolute top-3 right-3 text-red-500/50 hover:text-red-400 hover:bg-red-950/50 p-1.5 rounded transition-all opacity-0 group-hover:opacity-100 z-20" title="删除存档">
-                        <i class="ph-bold ph-trash text-lg pointer-events-none"></i>
+                    <button onclick="deleteSave(event, this)" class="absolute top-2.5 right-2.5 text-gray-500/80 active:text-red-400 active:scale-90 p-1.5 rounded-full transition-all z-20 bg-black/20 hover:text-red-400" title="删除存档">
+                        <i class="ph-bold ph-x text-base pointer-events-none"></i>
                     </button>
-                    <div class="flex justify-between text-blue-200 text-sm font-bold mb-3 pointer-events-none pr-6">
+                    <div class="flex justify-between text-blue-200 text-sm font-bold mb-3 pointer-events-none pr-8">
                         <span class="bg-blue-900/50 text-blue-100 px-2 py-0.5 rounded border border-blue-500/50">手动存档</span>
                         <span>昨日 20:15</span>
                     </div>
@@ -604,10 +605,10 @@
 
                 <div class="save-card bg-[#1a0f0a]/60 border border-amber-500/50 rounded-lg p-5 cursor-pointer active:scale-95 transition-all duration-300 shadow-[0_5px_15px_rgba(0,0,0,0.5)] relative overflow-hidden backdrop-blur-md group">
                     <div class="absolute top-0 left-0 w-1.5 h-full bg-green-500 shadow-[0_0_10px_#22c55e]"></div>
-                    <button onclick="deleteSave(event, this)" class="absolute top-3 right-3 text-red-500/50 hover:text-red-400 hover:bg-red-950/50 p-1.5 rounded transition-all opacity-0 group-hover:opacity-100 z-20" title="删除存档">
-                        <i class="ph-bold ph-trash text-lg pointer-events-none"></i>
+                    <button onclick="deleteSave(event, this)" class="absolute top-2.5 right-2.5 text-gray-500/80 active:text-red-400 active:scale-90 p-1.5 rounded-full transition-all z-20 bg-black/20 hover:text-red-400" title="删除存档">
+                        <i class="ph-bold ph-x text-base pointer-events-none"></i>
                     </button>
-                    <div class="flex justify-between text-green-200 text-sm font-bold mb-3 pointer-events-none pr-6">
+                    <div class="flex justify-between text-green-200 text-sm font-bold mb-3 pointer-events-none pr-8">
                         <span class="bg-green-900/50 text-green-100 px-2 py-0.5 rounded border border-green-500/50">通关记录</span>
                         <span>10月12日</span>
                     </div>
@@ -1136,55 +1137,53 @@
             }
 
             if (actionType === 'quickMatch') {
-                // 修改：匹配前先拉取题目数据
-                executeWithLoading('战局', () => {
-                    const btn = document.getElementById('quickMatchBtn');
-                    const textContainer = document.getElementById('quickMatchTextContainer');
-                    const icon = document.getElementById('quickMatchIcon');
-                    const radarBg = document.getElementById('quickMatchRadarBg');
+                // 修改：去除全局 Loading，直接进入匹配状态，让操作更丝滑
+                const btn = document.getElementById('quickMatchBtn');
+                const textContainer = document.getElementById('quickMatchTextContainer');
+                const icon = document.getElementById('quickMatchIcon');
+                const radarBg = document.getElementById('quickMatchRadarBg');
 
-                    if (!isMatching) {
-                        isMatching = true;
-                        matchSeconds = 0;
-                        
-                        btn.classList.remove('from-blue-700', 'to-[#1a1a4a]', 'border-blue-400');
-                        btn.classList.add('from-green-800', 'to-[#051a0a]', 'border-green-500');
-                        
-                        icon.className = "ph-duotone ph-x-circle text-5xl text-green-300 drop-shadow-[0_0_10px_rgba(34,197,94,0.8)] transition-colors duration-300";
-                        radarBg.classList.replace('border-blue-400', 'border-green-500');
-                        
-                        textContainer.innerHTML = `
-                            <span id="quickMatchTime" class="text-white font-black text-3xl xl:text-4xl tracking-widest text-glow-green drop-shadow-lg font-mono">00:00</span>
-                            <span class="text-green-200/80 text-xs font-bold tracking-widest mt-1">点击取消匹配</span>
-                        `;
+                if (!isMatching) {
+                    isMatching = true;
+                    matchSeconds = 0;
+                    
+                    btn.classList.remove('from-blue-700', 'to-[#1a1a4a]', 'border-blue-400');
+                    btn.classList.add('from-green-800', 'to-[#051a0a]', 'border-green-500');
+                    
+                    icon.className = "ph-duotone ph-x-circle text-5xl text-green-300 drop-shadow-[0_0_10px_rgba(34,197,94,0.8)] transition-colors duration-300";
+                    radarBg.classList.replace('border-blue-400', 'border-green-500');
+                    
+                    textContainer.innerHTML = `
+                        <span id="quickMatchTime" class="text-white font-black text-3xl xl:text-4xl tracking-widest text-glow-green drop-shadow-lg font-mono">00:00</span>
+                        <span class="text-green-200/80 text-xs font-bold tracking-widest mt-1">点击取消匹配</span>
+                    `;
 
-                        matchInterval = setInterval(() => {
-                            matchSeconds++;
-                            updateMatchTimeDisplay();
-                        }, 1000);
+                    matchInterval = setInterval(() => {
+                        matchSeconds++;
+                        updateMatchTimeDisplay();
+                    }, 1000);
 
-                        matchTimeoutTimer = setTimeout(() => {
-                            toggleModal('matchTimeoutModal', 'matchTimeoutContent', true);
-                        }, 3000);
-                    } else {
-                        cancelMatch();
-                        showToast('已取消匹配');
-                    }
-                });
+                    matchTimeoutTimer = setTimeout(() => {
+                        toggleModal('matchTimeoutModal', 'matchTimeoutContent', true);
+                    }, 3000);
+                } else {
+                    cancelMatch();
+                    showToast('已取消匹配');
+                }
             } else if (actionType === 'botMode') {
+                // 仅保留这里的全局拉取题目动效
                 executeWithLoading('演练题库', () => {
                     toggleBotModal(true);
                 });
             } else if (actionType === 'createRoom') {
-                executeWithLoading('房间题库', () => {
-                    toggleRoomModal(true);
-                });
+                // 修改：直接弹出建立房间，去除 Loading
+                toggleRoomModal(true);
             } else if (actionType === 'revealSecret') {
                 loadContentData();
             }
         }
 
-        // 修改：对战大厅专用的加载分流
+        // 修改：对战大厅去除全局加载动效
         function openMatchLobbyWithLoading() {
             if (!hasSelectedSubject) {
                 showToast('🚨 请先在左侧选择目标战役科目！');
@@ -1195,9 +1194,7 @@
                 }
                 return;
             }
-            executeWithLoading('大厅', () => {
-                toggleMatchLobby(true);
-            });
+            toggleMatchLobby(true);
         }
 
         function closeMatchTimeoutModal() {
