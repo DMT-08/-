@@ -12,8 +12,6 @@
                     colors: {
                         primary: '#1F5FFF',
                         primaryHover: '#174EDB',
-                        bgStart: '#EFF6FF',
-                        bgEnd: '#DFE7FF',
                     },
                     fontFamily: {
                         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
@@ -27,7 +25,6 @@
         }
     </script>
     <style>
-        /* 页面底色，用于突出手机模型 */
         body {
             background-color: #f0f2f5;
             display: flex;
@@ -37,9 +34,15 @@
             margin: 0;
             font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        input, textarea {
+            -webkit-user-select: auto;
+            user-select: auto;
         }
 
-        /* 核心：模拟 375x812 手机容器 */
+        /* 手机外壳模拟，自带全局线性渐变 */
         #phone-wrapper {
             width: 375px;
             height: 812px;
@@ -48,36 +51,13 @@
             overflow: hidden;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             border-radius: 40px;
-            border: 8px solid #ffffff; /* 模拟手机边框 */
-            display: flex;
-            flex-direction: column;
+            border: 8px solid #ffffff;
         }
 
-        /* 隐藏滚动条但保留滚动 */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* 视图切换动画 */
-        .view-screen {
-            position: absolute;
-            inset: 0;
-            display: none;
-            overflow-y: auto;
-            background: transparent;
-            z-index: 10;
-            flex-direction: column;
-        }
-        .view-screen.active {
-            display: flex;
-            animation: slideInRight 0.3s ease-out forwards;
-        }
-
-        @keyframes slideInRight {
-            from { opacity: 0; transform: translateX(30px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        /* 磨砂玻璃卡片 */
+        /* 统一磨砂玻璃特效 */
         .glass {
             background: rgba(255, 255, 255, 0.65);
             backdrop-filter: blur(12px);
@@ -85,33 +65,29 @@
             border: 1px solid rgba(255, 255, 255, 0.8);
         }
 
-        /* 树形结构连接线 */
-        .tree-line {
-            position: absolute;
-            left: 11px;
-            top: 24px;
-            bottom: -16px;
-            width: 1px;
-            background-color: #CBD5E1;
-            z-index: 0;
-        }
-        
-        /* 底部弹窗 */
+        /* 底部弹窗动画 */
         .bottom-sheet {
             transform: translateY(100%);
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            visibility: hidden; 
+            pointer-events: none;
         }
         .bottom-sheet.open {
             transform: translateY(0);
+            visibility: visible;
+            pointer-events: auto;
         }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
     </style>
 </head>
 <body>
 
     <div id="phone-wrapper">
 
-        <!-- ================= 第一步：登录页 ================= -->
-        <div id="view-login" class="view-screen active no-scrollbar p-6 justify-center">
+        <!-- ================= 视图 1：登录页 ================= -->
+        <div id="view-login" class="absolute inset-0 z-50 flex flex-col justify-center p-6 bg-gradient-to-br from-[#EFF6FF] to-[#DFE7FF] transition-transform duration-300">
             <div class="text-center mb-10">
                 <div class="w-20 h-20 bg-primary rounded-2xl mx-auto shadow-float flex items-center justify-center mb-6">
                     <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
@@ -119,909 +95,509 @@
                 <h1 class="text-2xl font-bold text-gray-900">项目管理中心</h1>
                 <p class="text-sm text-gray-500 mt-2">统一身份认证</p>
             </div>
-
             <form onsubmit="handleLogin(event)" class="space-y-5 glass p-6 rounded-3xl shadow-card">
-                <!-- 租户选择 -->
                 <div>
                     <label class="block text-xs font-medium text-gray-500 mb-1 ml-1">组织/租户</label>
                     <div class="relative">
-                        <select class="w-full bg-white/80 border border-gray-200 text-gray-800 rounded-xl px-4 py-3 appearance-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm">
-                            <option value="corp-a">A科技集团研发部</option>
-                            <option value="corp-b">B互娱工作室</option>
+                        <!-- 加入 appearance-none 清除系统默认样式，pr-10 给右侧自定义箭头留出空间 -->
+                        <select class="w-full bg-white/80 border border-gray-200 text-gray-800 rounded-xl px-4 py-3 outline-none focus:border-primary text-sm appearance-none pr-10">
+                            <option>A科技集团研发部</option>
                         </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                        <!-- 自定义居中箭头 -->
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-500">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </div>
                     </div>
                 </div>
-
-                <!-- 账号 -->
                 <div>
                     <label class="block text-xs font-medium text-gray-500 mb-1 ml-1">账号</label>
-                    <input type="text" value="admin" class="w-full bg-white/80 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm" required>
+                    <input type="text" value="admin" class="w-full bg-white/80 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary text-sm" required>
                 </div>
-
-                <!-- 密码 -->
                 <div>
                     <label class="block text-xs font-medium text-gray-500 mb-1 ml-1">密码</label>
-                    <input type="password" value="123456" class="w-full bg-white/80 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm" required>
+                    <input type="password" value="123456" class="w-full bg-white/80 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary text-sm" required>
                 </div>
-
-                <button type="submit" class="w-full bg-primary hover:bg-primaryHover text-white font-bold py-3.5 rounded-xl shadow-float transition-all active:scale-95 mt-2">
-                    登 录
-                </button>
+                <button type="submit" class="w-full bg-primary hover:bg-primaryHover text-white font-bold py-3.5 rounded-xl shadow-float active:scale-95 transition-all mt-2">登 录</button>
             </form>
         </div>
 
-        <!-- ================= 第二步：选择项目 ================= -->
-        <div id="view-projects" class="view-screen no-scrollbar flex-col">
-            <header class="pt-12 pb-4 px-6 glass sticky top-0 z-20 border-b border-white/50">
-                <h1 class="text-2xl font-bold text-gray-900">选择项目</h1>
-                <p class="text-sm text-gray-500 mt-1">请选择您要进入的工作空间</p>
+        <!-- ================= 视图 1.5：登录后的首次全屏项目选择页 ================= -->
+        <div id="view-project-select" class="absolute inset-0 z-40 hidden flex-col bg-gradient-to-br from-[#EFF6FF] to-[#DFE7FF] transition-transform duration-300">
+            <header class="px-6 pt-16 pb-6 flex-shrink-0">
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">选择项目</h1>
+                <p class="text-sm text-gray-500">请选择您要进入的工作空间</p>
             </header>
-
-            <div class="p-4 space-y-4 flex-1 pb-10">
-                <!-- 项目卡片 1 -->
-                <div onclick="enterProject('在线教育平台重构')" class="glass rounded-2xl p-5 cursor-pointer shadow-sm hover:shadow-card active:scale-[0.98] transition-all">
+            <div class="flex-1 overflow-y-auto no-scrollbar px-6 pb-10 space-y-4">
+                <div onclick="enterMainApp('在线教育平台重构')" class="glass rounded-2xl p-5 cursor-pointer active:scale-95 transition-all shadow-sm border border-white/60">
                     <div class="flex items-center mb-2">
-                        <div class="w-8 h-8 rounded-full bg-blue-100 text-primary flex items-center justify-center font-bold text-xs mr-3">教</div>
                         <h2 class="text-lg font-bold text-gray-800">在线教育平台重构</h2>
                     </div>
-                    <p class="text-xs text-gray-500 mb-3 ml-11">包含核心课程体系、直播模块及后端重构。</p>
-                    <div class="ml-11 flex space-x-2">
-                        <span class="px-2 py-0.5 bg-blue-50 text-primary text-[10px] rounded border border-blue-100">进行中</span>
-                        <span class="px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded border border-gray-200">我负责</span>
-                    </div>
+                    <p class="text-xs text-gray-500">包含核心课程体系、直播模块及后端重构。</p>
                 </div>
-
-                <!-- 项目卡片 2 -->
-                <div onclick="enterProject('内部资产管理系统V2')" class="glass rounded-2xl p-5 cursor-pointer shadow-sm hover:shadow-card active:scale-[0.98] transition-all">
+                <div onclick="enterMainApp('内部资产管理系统V2')" class="glass rounded-2xl p-5 cursor-pointer active:scale-95 transition-all shadow-sm border border-white/60">
                     <div class="flex items-center mb-2">
-                        <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xs mr-3">资</div>
                         <h2 class="text-lg font-bold text-gray-800">内部资产管理系统V2</h2>
                     </div>
-                    <p class="text-xs text-gray-500 mb-3 ml-11">公司内部固定资产及无形资产生命周期管理。</p>
-                    <div class="ml-11 flex space-x-2">
-                        <span class="px-2 py-0.5 bg-green-50 text-green-600 text-[10px] rounded border border-green-100">需求阶段</span>
-                    </div>
-                </div>
-
-                <!-- 项目卡片 3 -->
-                <div onclick="enterProject('数据分析驾驶舱')" class="glass rounded-2xl p-5 cursor-pointer shadow-sm hover:shadow-card active:scale-[0.98] transition-all opacity-80">
-                    <div class="flex items-center mb-2">
-                        <div class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-xs mr-3">数</div>
-                        <h2 class="text-lg font-bold text-gray-800">数据分析驾驶舱</h2>
-                    </div>
-                    <p class="text-xs text-gray-500 mb-3 ml-11">高管大屏可视化数据展示系统搭建。</p>
-                    <div class="ml-11 flex space-x-2">
-                        <span class="px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded border border-gray-200">已暂停</span>
-                    </div>
+                    <p class="text-xs text-gray-500 mb-3">公司内部固定资产及无形资产生命周期管理。</p>
                 </div>
             </div>
         </div>
 
-        <!-- ================= 第三步：主界面 ================= -->
-        <div id="view-main" class="view-screen no-scrollbar overflow-hidden flex-col">
+        <!-- ================= 视图 2：主界面 (物理隔离布局) ================= -->
+        <div id="view-main" class="absolute inset-0 flex flex-col hidden">
             
-            <!-- 底部固定导航栏 -->
-            <nav class="absolute bottom-0 w-full glass border-t border-white/60 pb-8 pt-4 px-10 flex justify-between items-center z-40 rounded-b-[32px]">
-                <div onclick="switchTab('tab-project')" class="nav-item text-primary opacity-100 flex flex-col items-center cursor-pointer transition-all w-12">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                    <span class="text-[10px] mt-1 font-medium">项目</span>
-                </div>
+            <!-- 核心内容区 (绝对限制在底部导航栏上方) -->
+            <div class="absolute top-0 left-0 right-0 bottom-[88px] overflow-hidden">
                 
-                <!-- 中间按钮：需求 / 添加 -->
-                <div id="nav-req-btn-group" class="relative flex items-center justify-center w-12 h-8">
-                    <!-- 默认需求图标 -->
-                    <div id="nav-req-tab" onclick="switchTab('tab-req')" class="nav-item text-gray-400 opacity-60 flex flex-col items-center cursor-pointer transition-all w-full absolute top-0">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                        <span class="text-[10px] mt-1 font-medium">需求</span>
-                    </div>
-                    <!-- 加号 FAB 图标 (默认隐藏，进入需求页时展示) -->
-                    <div id="nav-req-add" onclick="openAddReqModal()" class="hidden w-12 h-12 bg-primary text-white rounded-full shadow-float flex items-center justify-center active:scale-95 transition-transform transform absolute -top-4 cursor-pointer z-50">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                    </div>
-                </div>
-
-                <div onclick="switchTab('tab-profile')" class="nav-item text-gray-400 opacity-60 flex flex-col items-center cursor-pointer transition-all w-12">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                    <span class="text-[10px] mt-1 font-medium">我的</span>
-                </div>
-            </nav>
-
-            <!-- 标签页内容区 -->
-            <div class="flex-1 relative w-full h-full">
-                
-                <!-- === TAB 1: 项目主页 === -->
-                <div id="tab-project" class="tab-pane absolute inset-0 overflow-y-auto no-scrollbar pb-28">
-                    <!-- 顶部常驻标签栏 -->
-                    <header class="sticky top-0 z-30 glass border-b border-white/60 px-4 pt-12 pb-3 flex justify-between items-center shadow-sm">
-                        <!-- 左侧大标题 + 切换图标 -->
-                        <div class="flex items-center cursor-pointer active:opacity-70" onclick="showProjectSwitcher()">
-                            <h1 id="current-project-title" class="text-xl font-extrabold text-gray-900 truncate max-w-[220px]">在线教育平台重构</h1>
-                            <div class="ml-2 w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center">
-                                <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                <!-- === TAB 1: 数据模型 === -->
+                <div id="tab-model" class="tab-pane absolute inset-0 flex flex-col overflow-y-auto no-scrollbar pb-6">
+                    <header class="sticky top-0 z-30 glass border-b border-white/60 px-4 pt-12 pb-3 flex items-center shadow-sm flex-shrink-0">
+                        <div class="flex items-center cursor-pointer active:scale-95 transition-all" onclick="openProjectSwitcher()">
+                            <h1 class="text-2xl font-extrabold text-gray-900 current-project-name tracking-tight">内部资产管理系统V2</h1>
+                            <svg class="w-6 h-6 ml-1.5 text-gray-900 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </header>
+                    <div class="p-4 space-y-5">
+                        <h2 class="text-sm font-bold text-gray-800 flex items-center"><div class="w-6 h-6 rounded bg-blue-50 text-primary flex items-center justify-center mr-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg></div>概念图</h2>
+                        <div class="glass rounded-2xl p-4 shadow-sm border border-white/60 space-y-6">
+                            <div>
+                                <h3 class="font-bold text-gray-800 text-sm mb-1">1. 核心交易与订单模型</h3>
+                                <p class="text-xs text-gray-500 mb-3">梳理了用户从选课、下单、支付到生成听课证的完整流转关系。</p>
+                                <div class="grid grid-cols-3 gap-2" id="gallery-model-1"></div>
+                            </div>
+                            <div class="h-px w-full bg-white/60"></div>
+                            <div>
+                                <h3 class="font-bold text-gray-800 text-sm mb-1">2. 用户成长体系模型</h3>
+                                <p class="text-xs text-gray-500 mb-3">涵盖了用户积分、等级、成就勋章等轻量级互动元素。</p>
+                                <div class="grid grid-cols-2 gap-2" id="gallery-model-2"></div>
                             </div>
                         </div>
-                        <!-- 右侧铃铛已被移除 -->
-                    </header>
 
-                    <div class="p-4 space-y-5">
-                        <!-- 模块1：数据模型 -->
-                        <section class="bg-white rounded-2xl p-5 shadow-sm border border-white">
-                            <div class="flex items-center mb-4">
-                                <div class="w-8 h-8 rounded-lg bg-blue-50 text-primary flex items-center justify-center mr-3">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
-                                </div>
-                                <h2 class="text-base font-bold text-gray-800">数据模型</h2>
-                            </div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div onclick="openModelDetail('概念图')" class="bg-gray-50 hover:bg-blue-50 cursor-pointer rounded-xl p-3 flex flex-col items-center justify-center text-center border border-gray-100 transition-colors">
-                                    <svg class="w-6 h-6 text-primary/70 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"></path></svg>
-                                    <span class="text-sm font-medium text-gray-700">概念图 (ER)</span>
-                                </div>
-                                <div onclick="openModelDetail('物理图')" class="bg-gray-50 hover:bg-blue-50 cursor-pointer rounded-xl p-3 flex flex-col items-center justify-center text-center border border-gray-100 transition-colors">
-                                    <svg class="w-6 h-6 text-primary/70 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                                    <span class="text-sm font-medium text-gray-700">物理图 (DB)</span>
-                                </div>
-                            </div>
-                        </section>
-
-                        <!-- 模块2：功能点 -->
-                        <section class="bg-white rounded-2xl p-5 shadow-sm border border-white">
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="flex items-center">
-                                    <div class="w-8 h-8 rounded-lg bg-green-50 text-green-600 flex items-center justify-center mr-3">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-                                    </div>
-                                    <h2 class="text-base font-bold text-gray-800">功能点分布</h2>
-                                </div>
-                                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">共 24 项</span>
-                            </div>
-
-                            <div class="text-sm relative">
-                                <!-- 加入了独立外层相对定位，方便遮罩盖住滚动容器 -->
-                                <div class="relative">
-                                    <!-- 限制最大高度并允许触屏滚动 -->
-                                    <div id="func-points-container" class="max-h-[155px] overflow-y-auto no-scrollbar transition-all duration-300 relative z-10 pb-2">
-                                        <div class="flex items-center font-bold text-gray-800 py-2">
-                                            <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                            客户端 (C端)
-                                        </div>
-                                        <div class="ml-2 pl-4 border-l-2 border-gray-100 relative">
-                                            <div class="py-2">
-                                                <div class="flex items-center font-medium text-gray-700 mb-1 relative">
-                                                    <div class="absolute -left-[17px] top-1/2 w-4 h-[2px] bg-gray-100"></div>
-                                                    核心业务模块
-                                                </div>
-                                                <div class="ml-4 space-y-2 mt-2 relative">
-                                                    <div class="absolute -left-4 top-0 bottom-4 w-px bg-gray-100"></div>
-                                                    
-                                                    <div onclick="openFunctionDetail()" class="relative flex items-center justify-between bg-blue-50/50 p-2 rounded-lg border border-blue-100 cursor-pointer hover:bg-blue-50 transition-colors">
-                                                        <div class="absolute -left-[17px] top-1/2 w-4 h-px bg-gray-100"></div>
-                                                        <span class="text-gray-600 text-xs font-medium">1. 考生在线报名</span>
-                                                        <span class="text-[10px] text-primary bg-white px-1.5 py-0.5 rounded shadow-sm flex items-center">
-                                                            <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                                            详情
-                                                        </span>
-                                                    </div>
-                                                    
-                                                    <div class="relative flex items-center justify-between bg-gray-50 p-2 rounded-lg border border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors">
-                                                        <div class="absolute -left-[17px] top-1/2 w-4 h-px bg-gray-100"></div>
-                                                        <span class="text-gray-600 text-xs font-medium">2. 资质证件上传</span>
-                                                    </div>
-
-                                                    <div class="relative flex items-center justify-between bg-gray-50 p-2 rounded-lg border border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors">
-                                                        <div class="absolute -left-[17px] top-1/2 w-4 h-px bg-gray-100"></div>
-                                                        <span class="text-gray-600 text-xs font-medium">3. 在线支付学费</span>
-                                                    </div>
-                                                    
-                                                    <div class="relative flex items-center justify-between bg-gray-50 p-2 rounded-lg border border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors">
-                                                        <div class="absolute -left-[17px] top-1/2 w-4 h-px bg-gray-100"></div>
-                                                        <span class="text-gray-600 text-xs font-medium">4. 课程视频播放器</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- 底部渐变遮罩放在滚动容器外，使其固定悬浮 -->
-                                    <div id="func-points-mask" class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white to-transparent pointer-events-none z-20 transition-opacity duration-300"></div>
-                                </div>
-                                <div class="text-center mt-1 border-t border-gray-50 pt-2 relative z-30">
-                                    <button onclick="toggleFunctionPoints()" id="func-toggle-btn" class="text-xs text-primary font-medium flex items-center justify-center w-full py-1.5 active:opacity-70 transition-opacity">
-                                        展开更多功能 
-                                        <svg class="w-4 h-4 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                    </button>
-                                </div>
-                            </div>
-                        </section>
-
-                        <!-- 模块3：业务流程 -->
-                        <section class="bg-white rounded-2xl p-5 shadow-sm border border-white">
-                            <div class="flex items-center mb-5">
-                                <div class="w-8 h-8 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center mr-3">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-                                </div>
-                                <div>
-                                    <h2 class="text-base font-bold text-gray-800">业务流程图</h2>
-                                </div>
-                            </div>
-                            
-                            <!-- 树形结构图（带滚动和展开） -->
-                            <div class="text-sm relative">
-                                <div class="relative">
-                                    <div id="tree-points-container" class="max-h-[165px] overflow-y-auto no-scrollbar transition-all duration-300 relative z-10 pl-1 pb-4">
-                                        <!-- 根节点 -->
-                                        <div class="flex items-center font-bold text-gray-800 mb-2">
-                                            <div class="w-6 h-6 rounded-md bg-primary text-white flex items-center justify-center mr-2 shadow-sm">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                                            </div>
-                                            <span class="text-sm">项目管理体系</span>
-                                        </div>
-                                        
-                                        <!-- 一级与二级分支 -->
-                                        <div class="ml-3 pl-5 border-l-2 border-gray-200 relative space-y-4 pt-1">
-                                            
-                                            <!-- 分支 1：项目 -->
-                                            <div class="relative">
-                                                <div class="absolute -left-[22px] top-3.5 w-5 h-[2px] bg-gray-200"></div>
-                                                <div class="inline-block bg-blue-50 border border-blue-100 rounded-lg px-3 py-1.5 text-xs font-bold text-primary shadow-sm mb-2">
-                                                    1. 项目主页
-                                                </div>
-                                                <!-- 二级子节点 -->
-                                                <div class="ml-4 pl-4 border-l border-gray-100 relative space-y-2">
-                                                    <div class="relative flex items-center">
-                                                        <div class="absolute -left-[17px] top-1/2 w-4 h-[1px] bg-gray-200"></div>
-                                                        <span class="text-[11px] font-medium text-gray-600 bg-gray-50 px-2 py-1 rounded border border-gray-100">查看概念/物理数据模型</span>
-                                                    </div>
-                                                    <div class="relative flex items-center">
-                                                        <div class="absolute -left-[17px] top-1/2 w-4 h-[1px] bg-gray-200"></div>
-                                                        <span class="text-[11px] font-medium text-gray-600 bg-gray-50 px-2 py-1 rounded border border-gray-100">浏览功能点与需求状态</span>
-                                                    </div>
-                                                    <div class="relative flex items-center">
-                                                        <div class="absolute -left-[17px] top-1/2 w-4 h-[1px] bg-gray-200"></div>
-                                                        <span class="text-[11px] font-medium text-gray-600 bg-gray-50 px-2 py-1 rounded border border-gray-100">全局业务流程脑图展示</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- 分支 2：需求 -->
-                                            <div class="relative">
-                                                <div class="absolute -left-[22px] top-3.5 w-5 h-[2px] bg-gray-200"></div>
-                                                <div class="inline-block bg-purple-50 border border-purple-100 rounded-lg px-3 py-1.5 text-xs font-bold text-purple-600 shadow-sm mb-2">
-                                                    2. 业务需求
-                                                </div>
-                                                <!-- 二级子节点 -->
-                                                <div class="ml-4 pl-4 border-l border-gray-100 relative space-y-2">
-                                                    <div class="relative flex items-center">
-                                                        <div class="absolute -left-[17px] top-1/2 w-4 h-[1px] bg-gray-200"></div>
-                                                        <span class="text-[11px] font-medium text-gray-600 bg-gray-50 px-2 py-1 rounded border border-gray-100">集中浏览历史需求池</span>
-                                                    </div>
-                                                    <div class="relative flex items-center">
-                                                        <div class="absolute -left-[17px] top-1/2 w-4 h-[1px] bg-gray-200"></div>
-                                                        <span class="text-[11px] font-medium text-gray-600 bg-gray-50 px-2 py-1 rounded border border-gray-100">快速悬浮录入新一笔需求</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- 分支 3：我的 -->
-                                            <div class="relative">
-                                                <div class="absolute -left-[22px] top-3.5 w-5 h-[2px] bg-gray-200"></div>
-                                                <div class="inline-block bg-green-50 border border-green-100 rounded-lg px-3 py-1.5 text-xs font-bold text-green-600 shadow-sm mb-2">
-                                                    3. 个人中心
-                                                </div>
-                                                <!-- 二级子节点 -->
-                                                <div class="ml-4 pl-4 border-l border-gray-100 relative space-y-2">
-                                                    <div class="relative flex items-center">
-                                                        <div class="absolute -left-[17px] top-1/2 w-4 h-[1px] bg-gray-200"></div>
-                                                        <span class="text-[11px] font-medium text-gray-600 bg-gray-50 px-2 py-1 rounded border border-gray-100">支持多账号/身份无缝切换</span>
-                                                    </div>
-                                                    <div class="relative flex items-center">
-                                                        <div class="absolute -left-[17px] top-1/2 w-4 h-[1px] bg-gray-200"></div>
-                                                        <span class="text-[11px] font-medium text-gray-600 bg-gray-50 px-2 py-1 rounded border border-gray-100">安全退出登录机制</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                    <!-- 树形图底部渐变遮罩 -->
-                                    <div id="tree-points-mask" class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white to-transparent pointer-events-none z-20 transition-opacity duration-300"></div>
-                                </div>
-                                <div class="text-center mt-1 border-t border-gray-50 pt-2 relative z-30">
-                                    <button onclick="toggleTreePoints()" id="tree-toggle-btn" class="text-xs text-primary font-medium flex items-center justify-center w-full py-1.5 active:opacity-70 transition-opacity">
-                                        展开完整流程 
-                                        <svg class="w-4 h-4 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                    </button>
-                                </div>
-                            </div>
-                        </section>
+                        <h2 class="text-sm font-bold text-gray-800 flex items-center pt-2"><div class="w-6 h-6 rounded bg-purple-50 text-purple-600 flex items-center justify-center mr-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg></div>物理图</h2>
+                        <div class="glass rounded-2xl p-4 shadow-sm border border-white/60">
+                            <h3 class="font-bold text-gray-800 text-sm mb-1">1. 数据库全量架构图</h3>
+                            <p class="text-xs text-gray-500 mb-3">展示项目物理数据库表及字段说明，包含分库分表设计。</p>
+                            <div id="gallery-model-3"></div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- === TAB 2: 需求 === -->
-                <div id="tab-req" class="tab-pane absolute inset-0 overflow-y-auto no-scrollbar pb-28 hidden">
-                    <header class="sticky top-0 z-30 glass border-b border-white/60 px-4 pt-12 pb-3 flex items-center shadow-sm">
-                        <h1 class="text-xl font-extrabold text-gray-900">业务需求</h1>
+                <!-- === TAB 2: 需求池 === -->
+                <div id="tab-req" class="tab-pane absolute inset-0 flex flex-col overflow-y-auto no-scrollbar pb-6 hidden">
+                    <header class="sticky top-0 z-30 glass border-b border-white/60 px-4 pt-12 pb-3 flex items-center shadow-sm flex-shrink-0">
+                        <div class="flex items-center cursor-pointer active:scale-95 transition-all" onclick="openProjectSwitcher()">
+                            <h1 class="text-2xl font-extrabold text-gray-900 current-project-name tracking-tight">内部资产管理系统V2</h1>
+                            <svg class="w-6 h-6 ml-1.5 text-gray-900 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
                     </header>
-                    <div class="p-4 space-y-5">
-                        
-                        <section class="bg-white rounded-2xl p-4 shadow-sm border border-white mt-2">
-                            <div class="flex items-center mb-4">
-                                <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center mr-3">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                                </div>
-                                <h2 class="text-base font-bold text-gray-800">当前需求池</h2>
+                    <div class="p-4 space-y-4" id="req-list">
+                        <div class="p-4 glass rounded-2xl shadow-sm border border-white/60">
+                            <h3 class="font-bold text-gray-800 text-sm mb-2">增加夜间模式</h3>
+                            <p class="text-xs text-gray-600 mb-4 leading-relaxed">用户在夜间使用APP时，强光刺眼，希望能有一键切换的夜间深色模式。</p>
+                            <div class="flex justify-between items-center text-[10px]">
+                                <div class="text-gray-400">2026/4/21 16:09</div>
+                                <div class="flex items-center text-gray-500">提出人：<span class="text-primary bg-blue-50/80 px-1.5 py-0.5 rounded ml-1 border border-blue-100">庞总</span></div>
                             </div>
-
-                            <div class="space-y-3" id="req-list">
-                                <!-- 需求卡片 1 -->
-                                <div class="p-4 bg-gray-50 rounded-xl border border-gray-100">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <span class="font-bold text-gray-800 text-sm">增加报名状态短信通知</span>
-                                    </div>
-                                    <p class="text-xs text-gray-600 mb-3 leading-relaxed">考生审核通过或被驳回时，希望能触发一条短信通知到绑定的手机号上。</p>
-                                    <div class="flex justify-between items-center text-[10px]">
-                                        <div class="text-gray-400 flex items-center">
-                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                            2026/4/21 16:09
-                                        </div>
-                                        <div class="flex items-center text-gray-500 font-medium">
-                                            提出人：<span class="text-primary bg-blue-50 px-1.5 py-0.5 rounded ml-1">庞总</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- 需求卡片 2 -->
-                                <div class="p-4 bg-gray-50 rounded-xl border border-gray-100">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <span class="font-bold text-gray-800 text-sm">学历认证接口对接</span>
-                                    </div>
-                                    <p class="text-xs text-gray-600 mb-3 leading-relaxed">人工审核太慢了，后续版本需要直接对接学信网接口自动校验学历真实性。</p>
-                                    <div class="flex justify-between items-center text-[10px]">
-                                        <div class="text-gray-400 flex items-center">
-                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                            2026/4/20 09:30
-                                        </div>
-                                        <div class="flex items-center text-gray-500 font-medium">
-                                            提出人：<span class="text-gray-600 bg-gray-200 px-1.5 py-0.5 rounded ml-1">李四</span>
-                                        </div>
-                                    </div>
-                                </div>
+                        </div>
+                        <div class="p-4 glass rounded-2xl shadow-sm border border-white/60">
+                            <h3 class="font-bold text-gray-800 text-sm mb-2">支持导出报表</h3>
+                            <p class="text-xs text-gray-600 mb-4 leading-relaxed">需要能够将本月的项目进度明细一键导出为Excel文件。</p>
+                            <div class="flex justify-between items-center text-[10px]">
+                                <div class="text-gray-400">2026/4/20 09:30</div>
+                                <div class="flex items-center text-gray-500">提出人：<span class="bg-white/60 px-1.5 py-0.5 rounded ml-1 border border-white">李四</span></div>
                             </div>
-                        </section>
+                        </div>
+                    </div>
+                    <!-- 需求专享：右下角浮动加号按钮 -->
+                    <button onclick="openAddReqModal()" class="absolute bottom-6 right-5 w-14 h-14 bg-primary text-white rounded-full flex items-center justify-center shadow-float active:scale-95 transition-transform z-30">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    </button>
+                </div>
+
+                <!-- === TAB 3: 功能架构 (左导航右详情分栏) === -->
+                <!-- === TAB 3: 功能架构 (分栏视图) === -->
+                <div id="tab-func" class="tab-pane absolute inset-0 flex flex-col hidden">
+                    <header class="sticky top-0 z-30 glass border-b border-white/60 px-4 pt-12 pb-3 flex items-center shadow-sm flex-shrink-0">
+                        <div class="flex items-center cursor-pointer active:scale-95 transition-all" onclick="openProjectSwitcher()">
+                            <h1 class="text-2xl font-extrabold text-gray-900 current-project-name tracking-tight">内部资产管理系统V2</h1>
+                            <svg class="w-6 h-6 ml-1.5 text-gray-900 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </header>
+                    <div class="flex-1 flex overflow-hidden">
+                        <!-- 左侧菜单 -->
+                        <div class="w-[110px] bg-white/40 border-r border-white/60 overflow-y-auto no-scrollbar pb-6" id="func-sidebar"></div>
+                        <!-- 右侧详情 -->
+                        <div class="flex-1 overflow-y-auto no-scrollbar p-4" id="func-content"></div>
                     </div>
                 </div>
 
-                <!-- === TAB 3: 我的 === -->
-                <div id="tab-profile" class="tab-pane absolute inset-0 overflow-y-auto no-scrollbar pb-28 hidden">
-                    <header class="sticky top-0 z-30 glass border-b border-white/60 px-4 pt-12 pb-3 flex items-center shadow-sm">
-                        <h1 class="text-xl font-extrabold text-gray-900">我的</h1>
+                <!-- === TAB 4: 业务流程 (平铺时间轴直展) === -->
+                <!-- === TAB 4: 业务流程 (平铺伸缩直展) === -->
+                <div id="tab-flow" class="tab-pane absolute inset-0 flex flex-col hidden overflow-hidden">
+                    <header class="sticky top-0 z-30 glass border-b border-white/60 px-4 pt-12 pb-3 flex items-center shadow-sm flex-shrink-0">
+                        <div class="flex items-center cursor-pointer active:scale-95 transition-all" onclick="openProjectSwitcher()">
+                            <h1 class="text-2xl font-extrabold text-gray-900 current-project-name tracking-tight">内部资产管理系统V2</h1>
+                            <svg class="w-6 h-6 ml-1.5 text-gray-900 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </header>
+                    <!-- 业务流程内容区 -->
+                    <div class="flex-1 overflow-y-auto no-scrollbar p-4 space-y-6" id="flow-container">
+                        <!-- 流程内容将由 JS 以时间轴形式平铺渲染在这里 -->
+                    </div>
+                </div>
+
+                <!-- === TAB 5: 我的 === -->
+                <div id="tab-profile" class="tab-pane absolute inset-0 flex flex-col overflow-y-auto no-scrollbar pb-6 hidden">
+                    <header class="sticky top-0 z-30 glass border-b border-white/60 px-4 pt-12 pb-3 flex items-center shadow-sm flex-shrink-0">
+                        <div class="flex items-center cursor-pointer active:scale-95 transition-all" onclick="openProjectSwitcher()">
+                            <h1 class="text-2xl font-extrabold text-gray-900 current-project-name tracking-tight">内部资产管理系统V2</h1>
+                            <svg class="w-6 h-6 ml-1.5 text-gray-900 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
                     </header>
                     <div class="p-4 space-y-5">
-                        
-                        <!-- 用户卡片及账号切换 -->
-                        <div class="relative bg-white rounded-2xl p-5 shadow-sm border border-white flex items-center justify-between">
+                        <div class="relative glass rounded-2xl p-5 shadow-sm border border-white/60 flex items-center justify-between z-10">
                             <div class="flex items-center">
-                                <div class="w-14 h-14 bg-primary text-white rounded-full flex items-center justify-center text-xl font-bold mr-4 shadow-float">
-                                    A
-                                </div>
+                                <div class="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center text-lg font-bold mr-4 shadow-float">A</div>
                                 <div>
-                                    <h2 id="current-account-name" class="text-lg font-bold text-gray-800">admin</h2>
-                                    <p class="text-xs text-gray-500 mt-1">A科技集团研发部</p>
+                                    <h2 id="current-account-name" class="text-base font-bold text-gray-800">admin</h2>
+                                    <p class="text-[10px] text-gray-500 mt-0.5">A科技集团研发部</p>
                                 </div>
                             </div>
-                            
-                            <!-- 切换账号触发器 -->
-                            <div onclick="toggleAccountDropdown(event)" class="cursor-pointer bg-gray-50 hover:bg-blue-50 text-gray-500 hover:text-primary p-2 rounded-full border border-gray-100 transition-colors">
+                            <div onclick="toggleAccountDropdown(event)" class="cursor-pointer bg-white/50 p-2 rounded-full border border-white transition-colors text-gray-500 hover:text-primary">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
                             </div>
-
-                            <!-- 下拉菜单 -->
-                            <div id="account-dropdown" class="hidden absolute top-20 right-5 w-40 bg-white rounded-xl shadow-card border border-gray-100 z-50 overflow-hidden transform origin-top-right transition-all">
-                                <div onclick="switchAccount('admin')" class="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center justify-between">
+                            <!-- 账号下拉菜单 -->
+                            <div id="account-dropdown" class="hidden absolute top-20 right-5 w-36 glass rounded-xl shadow-card border border-white overflow-hidden transform origin-top-right transition-all">
+                                <div onclick="switchAccount('admin')" class="px-4 py-3 hover:bg-white/80 cursor-pointer flex justify-between items-center">
                                     <span class="text-sm font-bold text-primary">admin</span>
                                     <svg class="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
                                 </div>
-                                <div onclick="switchAccount('庞总')" class="px-4 py-3 border-t border-gray-50 hover:bg-gray-50 cursor-pointer">
+                                <div onclick="switchAccount('庞总')" class="px-4 py-3 border-t border-white/40 hover:bg-white/80 cursor-pointer">
                                     <span class="text-sm font-medium text-gray-600">庞总</span>
                                 </div>
-                                <div onclick="switchAccount('李四')" class="px-4 py-3 border-t border-gray-50 hover:bg-gray-50 cursor-pointer">
-                                    <span class="text-sm font-medium text-gray-600">李四</span>
-                                </div>
                             </div>
                         </div>
-
-                        <!-- 菜单项 -->
-                        <section class="bg-white rounded-2xl shadow-sm border border-white overflow-hidden">
-                            <div onclick="doLogout()" class="flex items-center justify-between p-4 hover:bg-gray-50 cursor-pointer active:bg-gray-100 transition-colors">
-                                <div class="flex items-center">
-                                    <div class="w-8 h-8 rounded-lg bg-red-50 text-red-500 flex items-center justify-center mr-3">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                                    </div>
-                                    <span class="text-sm font-medium text-red-500">退出登录</span>
-                                </div>
-                            </div>
-                        </section>
+                        <div onclick="doLogout()" class="glass rounded-2xl shadow-sm border border-white/60 p-4 flex items-center cursor-pointer active:scale-95 transition-transform">
+                            <div class="w-8 h-8 rounded-lg bg-red-50 text-red-500 flex items-center justify-center mr-3"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg></div>
+                            <span class="text-sm font-medium text-red-500">退出登录</span>
+                        </div>
                     </div>
                 </div>
 
-            </div>
-        </div>
+            </div> <!-- END OF Tabs Container -->
 
-        <!-- ================= 第四步：模型详情页 ================= -->
-        <div id="view-model-detail" class="view-screen no-scrollbar flex-col bg-[#f8fafc] z-50">
-            <!-- 顶部导航栏 -->
-            <header class="sticky top-0 z-30 glass border-b border-white/60 px-4 pt-12 pb-3 flex items-center justify-between shadow-sm">
-                <button onclick="switchView('view-main')" class="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center text-gray-700 shadow-sm active:scale-95 transition-all">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                </button>
-                <h1 id="model-detail-title" class="text-lg font-bold text-gray-900">详情</h1>
-                <div class="w-8"></div><!-- 占位平衡 -->
-            </header>
+            <!-- ================= 5个底部导航 Tab (绝对固定在最底部) ================= -->
+            <nav class="absolute bottom-0 left-0 right-0 h-[88px] glass border-t border-white/60 pb-6 pt-2 px-2 flex justify-between items-center z-40 rounded-b-[40px]">
+                <div data-target="tab-model" onclick="switchTab('tab-model')" class="nav-item text-primary flex flex-col items-center cursor-pointer flex-1">
+                    <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+                    <span class="text-[10px] font-medium">数据模型</span>
+                </div>
+                <div data-target="tab-req" onclick="switchTab('tab-req')" class="nav-item text-gray-400 flex flex-col items-center cursor-pointer flex-1">
+                    <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                    <span class="text-[10px] font-medium">需求池</span>
+                </div>
+                <div data-target="tab-func" onclick="switchTab('tab-func')" class="nav-item text-gray-400 flex flex-col items-center cursor-pointer flex-1">
+                    <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                    <span class="text-[10px] font-medium">功能点</span>
+                </div>
+                <div data-target="tab-flow" onclick="switchTab('tab-flow')" class="nav-item text-gray-400 flex flex-col items-center cursor-pointer flex-1">
+                    <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                    <span class="text-[10px] font-medium">业务流程</span>
+                </div>
+                <div data-target="tab-profile" onclick="switchTab('tab-profile')" class="nav-item text-gray-400 flex flex-col items-center cursor-pointer flex-1">
+                    <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    <span class="text-[10px] font-medium">我的</span>
+                </div>
+            </nav>
 
-            <div class="p-4 space-y-4 pb-10">
-                <!-- 一、详情板块 -->
-                <section class="bg-white rounded-2xl p-5 shadow-sm border border-white">
-                    <h2 class="text-base font-bold text-gray-800 mb-5 flex items-center">
-                        <div class="w-1 h-4 bg-primary rounded-full mr-2"></div>详情
-                    </h2>
-                    <div class="space-y-4">
-                        <div>
-                            <h3 class="text-xs font-medium text-gray-500 mb-1">描述文字</h3>
-                            <p class="text-sm text-gray-800">这是该数据模型的详细描述信息，用于指导后续的数据库结构设计与开发工作。</p>
+        </div> <!-- END OF #view-main -->
+
+        <!-- ================= 全局弹窗系统 ================= -->
+        <div id="overlay" class="absolute inset-0 bg-gray-900/40 z-[50] hidden opacity-0 transition-opacity" onclick="closeAllModals()"></div>
+
+        <!-- 切换项目弹窗 (底部抽屉) -->
+        <div id="modal-switch-project" class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl z-[60] bottom-sheet flex flex-col h-[55%]">
+            <div class="flex justify-center pt-3 pb-2" onclick="closeAllModals()"><div class="w-10 h-1.5 bg-gray-200 rounded-full"></div></div>
+            <div class="px-6 py-2 flex-1 flex flex-col">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">切换项目</h3>
+                <div class="flex-1 overflow-y-auto no-scrollbar pb-6 space-y-3" id="project-list-container">
+                    <div onclick="switchProject('在线教育平台重构')" class="border border-gray-100 bg-gray-50 rounded-2xl p-4 cursor-pointer active:scale-95 transition-all relative">
+                        <div class="flex items-center mb-1">
+                            <h2 class="text-base font-bold text-gray-700">在线教育平台重构</h2>
                         </div>
-                        <div>
-                            <h3 class="text-xs font-medium text-gray-500 mb-2">图片</h3>
-                            <div class="bg-gray-50 p-2 rounded-xl border border-gray-100 flex justify-center">
-                                <img src="https://placehold.co/600x400/eff6ff/1f5fff?text=Model+Diagram" alt="模型图" class="w-full rounded-lg object-cover">
-                            </div>
-                        </div>
-                        <div>
-                            <h3 class="text-xs font-medium text-gray-500 mb-1">附件</h3>
-                            <p class="text-sm text-gray-800">无</p>
-                        </div>
+                        <p class="text-[10px] text-gray-500">包含核心课程体系、直播模块及后端重构。</p>
                     </div>
-                </section>
-
-                <!-- 二、基础信息板块 -->
-                <section class="bg-white rounded-2xl p-5 shadow-sm border border-white">
-                    <h2 class="text-base font-bold text-gray-800 mb-5 flex items-center">
-                        <div class="w-1 h-4 bg-primary rounded-full mr-2"></div>基础信息
-                    </h2>
-                    
-                    <div class="flex justify-between items-center py-3 border-b border-gray-50 mb-4">
-                        <span class="text-sm text-gray-500">所属项目</span>
-                        <span id="model-detail-project-name" class="text-sm text-gray-800 font-medium">--</span>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <!-- 创建信息卡片 -->
-                        <div class="bg-gray-50 rounded-xl p-3 border border-gray-100">
-                            <div class="flex items-center text-gray-500 mb-2">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                                <span class="text-xs font-medium">初始创建</span>
-                            </div>
-                            <div class="font-bold text-gray-800 text-sm mb-1">admin</div>
-                            <div class="text-[10px] text-gray-400">2023-10-25 10:30</div>
+                    <div onclick="switchProject('内部资产管理系统V2')" class="border border-primary/30 bg-blue-50/50 rounded-2xl p-4 cursor-pointer active:scale-95 transition-all relative overflow-hidden">
+                        <div class="absolute top-0 right-0 bg-primary text-white text-[10px] px-2 py-0.5 rounded-bl-lg font-medium">当前</div>
+                        <div class="flex items-center mb-1">
+                            <h2 class="text-base font-bold text-primary">内部资产管理系统V2</h2>
                         </div>
-                        
-                        <!-- 更新信息卡片 -->
-                        <div class="bg-blue-50/50 rounded-xl p-3 border border-blue-100">
-                            <div class="flex items-center text-primary mb-2">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                                <span class="text-xs font-medium">最后更新</span>
-                            </div>
-                            <div class="font-bold text-gray-800 text-sm mb-1">李四</div>
-                            <div class="text-[10px] text-gray-500">2023-10-26 14:20</div>
-                        </div>
-                    </div>
-                </section>
-            </div>
-        </div>
-
-        <!-- ================= 第五步：功能点详情页 ================= -->
-        <div id="view-function-detail" class="view-screen no-scrollbar flex-col bg-[#f8fafc] z-50">
-            <!-- 顶部导航栏 -->
-            <header class="sticky top-0 z-30 glass border-b border-white/60 px-4 pt-12 pb-3 flex items-center justify-between shadow-sm">
-                <button onclick="switchView('view-main')" class="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center text-gray-700 shadow-sm active:scale-95 transition-all">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                </button>
-                <h1 class="text-lg font-bold text-gray-900">功能详情</h1>
-                <div class="w-8"></div><!-- 占位平衡 -->
-            </header>
-
-            <div class="p-4 space-y-4 pb-10">
-                <!-- 一、详情板块 -->
-                <section class="bg-white rounded-2xl p-5 shadow-sm border border-white">
-                    <h2 class="text-base font-bold text-gray-800 mb-5 flex items-center">
-                        <div class="w-1 h-4 bg-primary rounded-full mr-2"></div>详情
-                    </h2>
-                    <div class="space-y-4">
-                        <div>
-                            <h3 class="text-xs font-medium text-gray-500 mb-1">描述</h3>
-                            <p class="text-sm text-gray-800">实现考生在线填报个人资料、选择考点并提交的功能。</p>
-                        </div>
-                        <div>
-                            <h3 class="text-xs font-medium text-gray-500 mb-1">备注</h3>
-                            <p class="text-sm text-gray-800">需要对接学信网接口进行学历校验。</p>
-                        </div>
-                        <div>
-                            <h3 class="text-xs font-medium text-gray-500 mb-2">图片</h3>
-                            <div class="bg-gray-50 p-2 rounded-xl border border-gray-100 flex justify-center">
-                                <img src="https://placehold.co/600x300/eff6ff/1f5fff?text=UI+Draft" alt="原型图" class="w-full rounded-lg object-cover">
-                            </div>
-                        </div>
-                        <div>
-                            <h3 class="text-xs font-medium text-gray-500 mb-1">附件</h3>
-                            <div class="flex items-center text-sm text-primary">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
-                                报名流程规范.pdf
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- 二、基础信息板块 -->
-                <section class="bg-white rounded-2xl p-5 shadow-sm border border-white">
-                    <h2 class="text-base font-bold text-gray-800 mb-5 flex items-center">
-                        <div class="w-1 h-4 bg-primary rounded-full mr-2"></div>基础信息
-                    </h2>
-                    <div class="space-y-3">
-                        <div class="flex justify-between items-center py-1.5 border-b border-gray-50">
-                            <span class="text-xs text-gray-500">所属项目</span>
-                            <span class="text-sm text-gray-800 font-medium">测试0421</span>
-                        </div>
-                        <div class="flex justify-between items-center py-1.5 border-b border-gray-50">
-                            <span class="text-xs text-gray-500">所属项目版本</span>
-                            <span class="text-sm text-gray-800">v1.0</span>
-                        </div>
-                        <div class="flex justify-between items-center py-1.5 border-b border-gray-50">
-                            <span class="text-xs text-gray-500">所属功能点</span>
-                            <span class="text-sm text-gray-800 font-medium">考生报名</span>
-                        </div>
-                        <div class="flex justify-between items-center py-1.5 border-b border-gray-50">
-                            <span class="text-xs text-gray-500">任务类型</span>
-                            <span class="text-sm text-gray-800">审核业务需求</span>
-                        </div>
-                        <div class="flex justify-between items-center py-1.5 border-b border-gray-50">
-                            <span class="text-xs text-gray-500">优先级</span>
-                            <span class="text-sm text-red-500 font-bold">P1</span>
-                        </div>
-                        <div class="flex justify-between items-center py-1.5 border-b border-gray-50">
-                            <span class="text-xs text-gray-500">状态</span>
-                            <span class="text-sm text-orange-500 font-medium">未审核</span>
-                        </div>
-                        <div class="flex justify-between items-center py-1.5 border-b border-gray-50">
-                            <span class="text-xs text-gray-500">审核人</span>
-                            <span class="text-sm text-gray-800">邓辉斌</span>
-                        </div>
-                        <div class="flex justify-between items-center py-1.5 border-b border-gray-50">
-                            <span class="text-xs text-gray-500">指派人</span>
-                            <span class="text-sm text-gray-400">无</span>
-                        </div>
-                        <div class="flex justify-between items-center py-1.5 border-b border-gray-50">
-                            <span class="text-xs text-gray-500">开始时间</span>
-                            <span class="text-sm text-gray-800">2026-04-14</span>
-                        </div>
-                        <div class="flex justify-between items-center py-1.5 border-b border-gray-50">
-                            <span class="text-xs text-gray-500">结束时间</span>
-                            <span class="text-sm text-gray-800">2026-04-28</span>
-                        </div>
-                        <div class="flex justify-between items-center py-1.5 border-b border-gray-50">
-                            <span class="text-xs text-gray-500">创建人</span>
-                            <span class="text-sm text-gray-800">邓辉斌</span>
-                        </div>
-                        <div class="flex justify-between items-center py-1.5">
-                            <span class="text-xs text-gray-500">创建时间</span>
-                            <span class="text-sm text-gray-800">2026-04-21</span>
-                        </div>
-                    </div>
-                </section>
-            </div>
-        </div>
-
-        <!-- ================= 弹窗与组件 ================= -->
-        
-        <!-- 全局半透明遮罩 -->
-        <div id="overlay" class="absolute inset-0 bg-gray-900/40 z-40 hidden opacity-0 transition-opacity" onclick="closeAllModals()"></div>
-
-        <!-- 切换项目 底部弹窗 -->
-        <div id="modal-switcher" class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl z-50 bottom-sheet flex flex-col max-h-[70%]">
-            <div class="flex justify-center pt-3 pb-2" onclick="closeAllModals()">
-                <div class="w-10 h-1.5 bg-gray-200 rounded-full"></div>
-            </div>
-            <div class="px-6 py-2">
-                <h3 class="text-lg font-bold text-gray-800 mb-4">切换当前项目</h3>
-                <div class="space-y-3 pb-8 overflow-y-auto max-h-[300px] no-scrollbar">
-                    <div onclick="switchProject('在线教育平台重构')" class="p-3 border-2 border-primary bg-blue-50 rounded-xl flex items-center justify-between cursor-pointer">
-                        <span class="font-medium text-primary">在线教育平台重构</span>
-                        <svg class="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-                    </div>
-                    <div onclick="switchProject('内部资产管理系统V2')" class="p-3 border border-gray-100 bg-white rounded-xl flex items-center justify-between cursor-pointer hover:bg-gray-50">
-                        <span class="font-medium text-gray-700">内部资产管理系统V2</span>
-                    </div>
-                    <div onclick="switchProject('数据分析驾驶舱')" class="p-3 border border-gray-100 bg-white rounded-xl flex items-center justify-between cursor-pointer hover:bg-gray-50 opacity-60">
-                        <span class="font-medium text-gray-700">数据分析驾驶舱</span>
+                        <p class="text-[10px] text-gray-500">公司内部固定资产及无形资产生命周期管理。</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 新增需求 底部弹窗 -->
-        <div id="modal-add-req" class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl z-50 bottom-sheet flex flex-col h-[70%]">
-            <div class="flex justify-center pt-3 pb-2" onclick="closeAllModals()">
-                <div class="w-10 h-1.5 bg-gray-200 rounded-full"></div>
-            </div>
+        <!-- 新增需求弹窗 -->
+        <div id="modal-add-req" class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl z-[60] bottom-sheet flex flex-col h-[70%]">
+            <div class="flex justify-center pt-3 pb-2" onclick="closeAllModals()"><div class="w-10 h-1.5 bg-gray-200 rounded-full"></div></div>
             <div class="px-6 py-2 flex-1 flex flex-col">
                 <h3 class="text-lg font-bold text-gray-800 mb-4">记录新业务需求</h3>
-                <form onsubmit="submitReq(event)" class="flex-1 flex flex-col">
-                    <div class="mb-4">
-                        <input type="text" id="req-title" placeholder="需求简述（如：增加夜间模式）" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-primary text-sm" required>
-                    </div>
-                    <div class="mb-4 flex-1">
-                        <textarea id="req-desc" placeholder="详细说明业务场景或诉求..." class="w-full h-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-primary text-sm resize-none" required></textarea>
-                    </div>
-                    <div class="pb-8 pt-2">
-                        <button type="submit" class="w-full bg-primary text-white font-bold py-3.5 rounded-xl shadow-float active:scale-95 transition-all">
-                            保存需求
-                        </button>
-                    </div>
+                <form onsubmit="submitReq(event)" class="flex-1 flex flex-col" novalidate>
+                    <div class="mb-4"><input type="text" id="req-title" placeholder="需求简述（如：增加夜间模式）" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary text-sm" required></div>
+                    <div class="mb-4 flex-1"><textarea id="req-desc" placeholder="详细说明业务场景或诉求..." class="w-full h-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary text-sm resize-none" required></textarea></div>
+                    <div class="pb-8 pt-2"><button type="submit" class="w-full bg-primary text-white font-bold py-3.5 rounded-xl shadow-float active:scale-95 transition-transform">保存需求</button></div>
                 </form>
             </div>
         </div>
 
         <!-- Toast 提示 -->
-        <div id="toast" class="absolute top-16 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-5 py-2.5 rounded-full text-xs font-medium z-[60] opacity-0 transition-opacity duration-300 pointer-events-none whitespace-nowrap shadow-xl">
-            提示信息
+        <div id="toast" class="absolute top-16 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-5 py-2.5 rounded-full text-xs font-medium z-[80] opacity-0 transition-opacity duration-300 pointer-events-none whitespace-nowrap shadow-xl">提示</div>
+
+        <!-- 全屏图片查看器 -->
+        <div id="gallery-viewer" class="absolute inset-0 bg-black/95 z-[90] hidden flex-col">
+            <div class="flex justify-between items-center px-4 py-8 z-10 bg-gradient-to-b from-black/60 to-transparent">
+                <button onclick="closeGallery()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 text-white active:scale-95"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                <div id="gallery-counter" class="text-white font-medium text-sm bg-black/40 px-3 py-1 rounded-full tracking-widest">1 / 1</div>
+                <div class="w-10 h-10"></div>
+            </div>
+            <div class="flex-1 flex items-center justify-center relative overflow-hidden" id="gallery-touch-area">
+                <img id="gallery-image" src="" class="max-w-full max-h-full object-contain">
+                <button onclick="prevGalleryImage(event)" id="gallery-prev-btn" class="absolute left-2 w-10 h-10 flex items-center justify-center rounded-full bg-black/40 text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+                <button onclick="nextGalleryImage(event)" id="gallery-next-btn" class="absolute right-2 w-10 h-10 flex items-center justify-center rounded-full bg-black/40 text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
+            </div>
         </div>
 
     </div>
 
+    <!-- ================= JavaScript ================= -->
     <script>
-        /* 视图管理逻辑 */
-        function switchView(viewId) {
-            // 隐藏所有视图
-            document.querySelectorAll('.view-screen').forEach(el => {
-                el.classList.remove('active');
-            });
-            // 显示目标视图
-            const target = document.getElementById(viewId);
-            if(target) {
-                target.classList.add('active');
-                // 确保滚动条回顶
-                target.scrollTop = 0;
+        // 登录逻辑：登录后进入全屏的“选择项目页”，而不是直接进主界面
+        function handleLogin(e) { 
+            e.preventDefault(); 
+            showToast('登录成功'); 
+            setTimeout(() => { 
+                document.getElementById('view-login').style.display='none'; 
+                document.getElementById('view-project-select').classList.remove('hidden');
+                document.getElementById('view-project-select').classList.add('flex');
+            }, 500); 
+        }
+
+        // 首次进入主界面逻辑
+        function enterMainApp(projectName) {
+            document.querySelectorAll('.current-project-name').forEach(el => el.textContent = projectName);
+            document.getElementById('view-project-select').classList.add('hidden');
+            document.getElementById('view-project-select').classList.remove('flex');
+            document.getElementById('view-main').classList.remove('hidden');
+            showToast('已进入: ' + projectName);
+            switchProjectUI(projectName); // 同步更新底部弹窗的选中状态
+        }
+
+        function switchTab(tabId) {
+            closeAllModals(); // 清理残留弹窗
+            document.querySelectorAll('.tab-pane').forEach(el => { el.classList.add('hidden'); el.classList.remove('flex'); });
+            const target = document.getElementById(tabId);
+            if(target) { target.classList.remove('hidden'); target.classList.add('flex'); }
+
+            document.querySelectorAll('.nav-item').forEach(el => { el.classList.remove('text-primary'); el.classList.add('text-gray-400'); });
+            const activeNav = document.querySelector(`.nav-item[data-target="${tabId}"]`);
+            if(activeNav) {
+                activeNav.classList.remove('text-gray-400');
+                activeNav.classList.add('text-primary');
             }
         }
 
-        /* 步骤一：处理登录 */
-        function handleLogin(event) {
-            event.preventDefault();
-            showToast('登录成功，加载项目中...');
-            setTimeout(() => {
-                switchView('view-projects');
-            }, 600);
+        // 项目切换逻辑 (主界面内通过底部弹窗切换)
+        function openProjectSwitcher() { showOverlay(); document.getElementById('modal-switch-project').classList.add('open'); }
+        function switchProject(name) {
+            document.querySelectorAll('.current-project-name').forEach(el => el.textContent = name);
+            closeAllModals(); showToast('已切换至: ' + name);
+            switchProjectUI(name);
         }
 
-        /* 步骤二：选择进入项目 */
-        function enterProject(projectName) {
-            // 设置主界面的标题
-            document.getElementById('current-project-title').textContent = projectName;
-            switchTab('tab-project'); // 确保进入时默认显示项目主页
-            switchView('view-main');
-        }
-
-        /* 步骤三：主界面交互逻辑 */
-
-        // --- 底部导航 Tab 切换 ---
-        function switchTab(tabId) {
-            // 隐藏所有标签页
-            document.querySelectorAll('.tab-pane').forEach(el => {
-                el.classList.add('hidden');
-            });
-            // 显示目标标签页
-            document.getElementById(tabId).classList.remove('hidden');
-
-            // 恢复所有底部导航到默认状态
-            document.querySelectorAll('.nav-item').forEach(el => {
-                el.classList.remove('text-primary', 'opacity-100');
-                el.classList.add('text-gray-400', 'opacity-60');
-            });
-
-            // 处理中间“需求/加号”按钮的特殊交互
-            const navReqTab = document.getElementById('nav-req-tab');
-            const navReqAdd = document.getElementById('nav-req-add');
-            
-            if (tabId === 'tab-req') {
-                // 如果当前在需求页：隐藏文字“需求”图标，显示大号「+」按钮
-                navReqTab.classList.add('hidden');
-                navReqTab.classList.remove('flex');
-                navReqAdd.classList.remove('hidden');
-                navReqAdd.classList.add('flex');
-            } else {
-                // 如果不在需求页：显示文字“需求”图标，隐藏「+」按钮
-                navReqTab.classList.remove('hidden');
-                navReqTab.classList.add('flex');
-                navReqAdd.classList.add('hidden');
-                navReqAdd.classList.remove('flex');
-                
-                // 激活对应的导航颜色
-                const activeNav = document.querySelector(`.nav-item[onclick="switchTab('${tabId}')"]`);
-                if (activeNav) {
-                    activeNav.classList.remove('text-gray-400', 'opacity-60');
-                    activeNav.classList.add('text-primary', 'opacity-100');
+        // 抽离出来的UI更新复用函数
+        function switchProjectUI(name) {
+            const cards = document.getElementById('project-list-container').children;
+            for(let card of cards) {
+                if(card.textContent.includes(name)) {
+                    card.className = "border border-primary/30 bg-blue-50/50 rounded-2xl p-4 cursor-pointer active:scale-95 transition-all relative overflow-hidden";
+                    if(!card.querySelector('.absolute')) card.insertAdjacentHTML('afterbegin', '<div class="absolute top-0 right-0 bg-primary text-white text-[10px] px-2 py-0.5 rounded-bl-lg font-medium">当前</div>');
+                    card.querySelector('h2').className = "text-base font-bold text-primary";
+                } else {
+                    card.className = "border border-gray-100 bg-gray-50 rounded-2xl p-4 cursor-pointer active:scale-95 transition-all relative";
+                    const badge = card.querySelector('.absolute'); if(badge) badge.remove();
+                    card.querySelector('h2').className = "text-base font-bold text-gray-700";
                 }
             }
         }
-        
-        // --- 弹窗基础控制 ---
-        const overlay = document.getElementById('overlay');
-        function showOverlay() {
-            overlay.classList.remove('hidden');
-            setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+
+        // 使用纯英文生成图片，彻底杜绝 placehold.co 的 SVG 报错撑爆屏幕Bug
+        const gImg = (text, w=800, h=600, bg='eff6ff', fg='1f5fff') => `https://placehold.co/${w}x${h}/${bg}/${fg}?text=${encodeURIComponent(text)}`;
+
+        function generateGalleryHtml(images) {
+            if (!images || !images.length) return '';
+            const safeStr = JSON.stringify(images).replace(/"/g, '&quot;');
+            if (images.length === 1) return `<div class="col-span-full aspect-video rounded-xl overflow-hidden cursor-pointer shadow-sm active:scale-95 transition-transform bg-white/50" onclick="openGallery(${safeStr}, 0)"><img src="${images[0]}" class="w-full h-full object-cover"></div>`;
+            if (images.length === 2) return `<div class="col-span-1 aspect-[4/3] rounded-xl overflow-hidden cursor-pointer shadow-sm active:scale-95 bg-white/50" onclick="openGallery(${safeStr}, 0)"><img src="${images[0]}" class="w-full h-full object-cover"></div><div class="col-span-1 aspect-[4/3] rounded-xl overflow-hidden cursor-pointer shadow-sm active:scale-95 bg-white/50" onclick="openGallery(${safeStr}, 1)"><img src="${images[1]}" class="w-full h-full object-cover"></div>`;
+            let html = '';
+            for(let i=0; i<3; i++) {
+                if (i === 2 && images.length > 3) html += `<div class="col-span-1 aspect-square rounded-xl overflow-hidden relative cursor-pointer shadow-sm active:scale-95 bg-white/50" onclick="openGallery(${safeStr}, ${i})"><img src="${images[i]}" class="w-full h-full object-cover"><div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center"><span class="text-white text-xs font-bold">共 ${images.length} 张</span></div></div>`;
+                else html += `<div class="col-span-1 aspect-square rounded-xl overflow-hidden cursor-pointer shadow-sm active:scale-95 bg-white/50" onclick="openGallery(${safeStr}, ${i})"><img src="${images[i]}" class="w-full h-full object-cover"></div>`;
+            }
+            return html;
         }
+
+        // 渲染模型页
+        document.getElementById('gallery-model-1').innerHTML = generateGalleryHtml([gImg('Model 1'), gImg('Model 2'), gImg('Model 3'), gImg('Model 4')]);
+        document.getElementById('gallery-model-2').innerHTML = generateGalleryHtml([gImg('System 1',800,600,'f0fdf4','16a34a'), gImg('System 2',800,600,'f0fdf4','16a34a')]);
+        document.getElementById('gallery-model-3').innerHTML = generateGalleryHtml([gImg('Database',1200,800,'f3e8ff','9333ea')]);
+
+        const funcData = [
+            { id: '1', name: '考生在线报名', desc: '实现考生在线填报个人资料、选择考点并提交。', imgs: [gImg('Signup 1'), gImg('Signup 2')] },
+            { id: '2', name: '资质证件上传', desc: '支持格式识别身份证正反面信息。', imgs: [gImg('Upload')] },
+            { id: '3', name: '在线支付学费', desc: '对接微信、支付宝接口，生成收银台。', imgs: [gImg('Checkout')] },
+            { id: '4', name: '视频播放器', desc: '支持高清视频播放、倍速及断点续播。', imgs: [gImg('Player 1'), gImg('Player 2'), gImg('Player 3')] }
+        ];
+        let curFuncId = '1';
+
+        function renderFunc() {
+            let sHtml = '';
+            funcData.forEach(i => {
+                const act = i.id === curFuncId ? 'bg-white/60 border-l-4 border-primary text-primary font-bold shadow-sm' : 'border-l-4 border-transparent text-gray-500 hover:bg-white/30';
+                sHtml += `<div class="px-3 py-4 text-xs cursor-pointer transition-all flex items-start ${act}" onclick="curFuncId='${i.id}';renderFunc()"><span class="mr-1 opacity-70">${i.id}.</span><span class="leading-tight">${i.name}</span></div>`;
+            });
+            document.getElementById('func-sidebar').innerHTML = sHtml;
+
+            const cEl = document.getElementById('func-content');
+            const item = funcData.find(i => i.id === curFuncId);
+            if(item) {
+                cEl.classList.remove('animate-fade-in'); void cEl.offsetWidth; cEl.classList.add('animate-fade-in');
+                cEl.innerHTML = `
+                    <div class="mb-5"><h2 class="text-base font-bold text-gray-900 mb-2">${item.id}. ${item.name}</h2><p class="text-xs text-gray-600 leading-relaxed bg-white/40 p-3 rounded-xl border border-white/60">${item.desc}</p></div>
+                    <div><h3 class="text-[10px] font-bold text-gray-400 mb-2.5 flex items-center">界面草图</h3><div class="grid grid-cols-2 gap-2">${generateGalleryHtml(item.imgs)}</div></div>
+                `;
+            }
+        }
+        renderFunc();
+
+        const flowData = {
+            'flow-1': { title: '核心购课流程', steps: [{ name: '选课与加购', desc: '学员浏览课程并加入购物车。', imgs: [gImg('Step 1',800,800,'eff6ff','1f5fff'), gImg('Cart',800,800,'eff6ff','1f5fff')] }, { name: '结算支付', desc: '核对订单并付款。', imgs: [gImg('Checkout')] }, { name: '开通听课', desc: '自动开通权限。', imgs: [gImg('Success')] }] },
+            'flow-2': { title: '退费审批流程', steps: [{ name: '发起申请', desc: '填写退款原因及凭证。', imgs: [gImg('Refund',800,800,'fffbeb','d97706'), gImg('Form',800,800,'fffbeb','d97706'), gImg('Upload',800,800,'fffbeb','d97706')] }, { name: '班主任初审', desc: '核实情况并审批。', imgs: [gImg('Audit',800,800,'fffbeb','d97706')] }] }
+        };
+
+        function renderFlattenedFlows() {
+            const container = document.getElementById('flow-container');
+            if(!container) return;
+            let html = '';
+            
+            for (const key in flowData) {
+                const flow = flowData[key];
+                html += `
+                    <div class="glass rounded-3xl p-5 shadow-sm border border-white/80">
+                        <h2 class="text-base font-bold text-gray-900 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform" onclick="toggleFlowCard(this)">
+                            <div class="flex items-center">
+                                <div class="w-1.5 h-4 bg-primary rounded-full mr-2"></div>${flow.title}
+                            </div>
+                            <div class="w-6 h-6 rounded-full bg-gray-100/80 flex items-center justify-center border border-gray-200/50 shadow-sm">
+                                <svg class="w-4 h-4 text-gray-500 transform transition-transform duration-300 chevron-icon rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+                            </div>
+                        </h2>
+                        <div class="space-y-0 ml-1 flow-content origin-top transition-all mt-5">`;
+                
+                flow.steps.forEach((s, idx) => {
+                    const isLast = idx === flow.steps.length - 1;
+                    html += `
+                            <div class="relative pl-6 ${isLast ? '' : 'border-l-2 border-primary/20 pb-6'}">
+                                <div class="absolute left-[-9px] top-0 w-4 h-4 rounded-full bg-primary text-white text-[10px] flex items-center justify-center font-bold shadow-sm">${idx + 1}</div>
+                                <h3 class="font-bold text-gray-800 text-sm mb-1.5 leading-none">${s.name}</h3>
+                                <p class="text-xs text-gray-500 mb-3 leading-relaxed">${s.desc}</p>
+                                <div class="grid grid-cols-2 gap-2 mt-2 w-full">
+                                    ${generateGalleryHtml(s.imgs)}
+                                </div>
+                            </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>`;
+            }
+            container.innerHTML = html;
+        }
+        
+        // 展开/收起卡片逻辑
+        function toggleFlowCard(el) {
+            const content = el.nextElementSibling;
+            const icon = el.querySelector('.chevron-icon');
+            // 切换隐藏状态
+            content.classList.toggle('hidden');
+            // 箭头反转 (180度)
+            icon.classList.toggle('rotate-180');
+            // 收起时去掉标题底部的 margin，展开时恢复
+            el.classList.toggle('mb-5');
+        }
+
+        // 页面初始化时渲染平铺的业务流程
+        renderFlattenedFlows();
+
+        const overlay = document.getElementById('overlay');
+        function showOverlay() { overlay.classList.remove('hidden'); setTimeout(() => overlay.classList.remove('opacity-0'), 10); }
         function closeAllModals() {
             overlay.classList.add('opacity-0');
-            document.querySelectorAll('.bottom-sheet').forEach(sheet => {
-                sheet.classList.remove('open');
-            });
+            document.querySelectorAll('.bottom-sheet').forEach(s => s.classList.remove('open'));
             setTimeout(() => overlay.classList.add('hidden'), 300);
         }
 
-        // --- 项目切换相关 ---
-        function showProjectSwitcher() {
-            showOverlay();
-            document.getElementById('modal-switcher').classList.add('open');
-        }
-        function switchProject(projectName) {
-            document.getElementById('current-project-title').textContent = projectName;
+        function openAddReqModal() { showOverlay(); document.getElementById('modal-add-req').classList.add('open'); document.getElementById('req-title').value = ''; document.getElementById('req-desc').value = ''; }
+        function submitReq(e) {
+            e.preventDefault();
+            const t = document.getElementById('req-title').value, d = document.getElementById('req-desc').value;
+            document.getElementById('req-list').insertAdjacentHTML('afterbegin', `<div class="p-4 bg-white/80 rounded-2xl border border-primary/20 shadow-sm animate-fade-in"><h3 class="font-bold text-gray-800 text-sm mb-2">${t}</h3><p class="text-xs text-gray-600 mb-4">${d}</p><div class="flex justify-between items-center text-[10px]"><div class="text-gray-400">刚刚</div><div class="text-gray-500">提出人：<span class="text-primary bg-blue-50 px-1.5 py-0.5 rounded ml-1">我</span></div></div></div>`);
             closeAllModals();
-            showToast('已切换至: ' + projectName);
-            // 滚动回顶部
-            document.getElementById('view-main').scrollTop = 0;
+            showToast('保存成功');
         }
 
-        // --- 业务需求相关 ---
-        function openAddReqModal() {
-            showOverlay();
-            document.getElementById('modal-add-req').classList.add('open');
-            // 清空表单
-            document.getElementById('req-title').value = '';
-            document.getElementById('req-desc').value = '';
+        // 账号下拉与切换逻辑补全
+        function toggleAccountDropdown(e) {
+            e.stopPropagation();
+            document.getElementById('account-dropdown').classList.toggle('hidden');
         }
-        function submitReq(event) {
-            event.preventDefault();
-            const title = document.getElementById('req-title').value;
-            const desc = document.getElementById('req-desc').value;
-            
-            // 动态创建新需求节点并插入到列表顶部
-            const list = document.getElementById('req-list');
-            const newHtml = `
-                <div class="p-4 bg-blue-50/50 rounded-xl border border-blue-100 animate-pulse">
-                    <div class="flex justify-between items-start mb-2">
-                        <span class="font-bold text-gray-800 text-sm">${title}</span>
-                    </div>
-                    <p class="text-xs text-gray-600 mb-3 leading-relaxed">${desc}</p>
-                    <div class="flex justify-between items-center text-[10px]">
-                        <div class="text-gray-400 flex items-center">
-                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            刚刚
-                        </div>
-                        <div class="flex items-center text-gray-500 font-medium">
-                            提出人：<span class="text-primary bg-white px-1.5 py-0.5 rounded ml-1 shadow-sm border border-gray-100">我</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-            list.insertAdjacentHTML('afterbegin', newHtml);
-            
-            // 移除动画使其变稳定
-            setTimeout(() => {
-                list.firstElementChild.classList.remove('animate-pulse');
-            }, 1000);
-
-            closeAllModals();
-            showToast('需求记录成功');
-        }
-
-        // --- 查看功能详情 ---
-        function openFunctionDetail() {
-            switchView('view-function-detail');
-        }
-
-        // --- 功能点展开/收起逻辑 ---
-        let isFuncExpanded = false;
-        function toggleFunctionPoints() {
-            const container = document.getElementById('func-points-container');
-            const mask = document.getElementById('func-points-mask');
-            const btn = document.getElementById('func-toggle-btn');
-            
-            isFuncExpanded = !isFuncExpanded;
-            if (isFuncExpanded) {
-                container.classList.remove('max-h-[155px]');
-                container.classList.add('max-h-[400px]'); 
-                mask.style.opacity = '0'; // 使用透明度过渡更平滑
-                btn.innerHTML = `收起功能列表 <svg class="w-4 h-4 ml-0.5 transform rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>`;
-            } else {
-                container.classList.remove('max-h-[400px]');
-                container.classList.add('max-h-[155px]');
-                mask.style.opacity = '1';
-                btn.innerHTML = `展开更多功能 <svg class="w-4 h-4 ml-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>`;
-            }
-        }
-
-        // --- 业务流程图展开/收起逻辑 ---
-        let isTreeExpanded = false;
-        function toggleTreePoints() {
-            const container = document.getElementById('tree-points-container');
-            const mask = document.getElementById('tree-points-mask');
-            const btn = document.getElementById('tree-toggle-btn');
-            
-            isTreeExpanded = !isTreeExpanded;
-            if (isTreeExpanded) {
-                container.classList.remove('max-h-[165px]');
-                container.classList.add('max-h-[400px]'); 
-                mask.style.opacity = '0'; 
-                btn.innerHTML = `收起完整流程 <svg class="w-4 h-4 ml-0.5 transform rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>`;
-            } else {
-                container.classList.remove('max-h-[400px]');
-                container.classList.add('max-h-[165px]');
-                mask.style.opacity = '1';
-                btn.innerHTML = `展开完整流程 <svg class="w-4 h-4 ml-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>`;
-            }
-        }
-
-        // --- 切换账号下拉框逻辑 ---
-        function toggleAccountDropdown(event) {
-            event.stopPropagation();
-            const dropdown = document.getElementById('account-dropdown');
-            dropdown.classList.toggle('hidden');
-        }
-
         function switchAccount(name) {
             document.getElementById('current-account-name').textContent = name;
             document.getElementById('account-dropdown').classList.add('hidden');
-            showToast('已切换至账号: ' + name);
+            showToast('已切换账号: ' + name);
         }
-
-        // 点击页面其他区域关闭下拉菜单
         document.addEventListener('click', function(e) {
             const dropdown = document.getElementById('account-dropdown');
-            if (dropdown && !dropdown.classList.contains('hidden')) {
+            if(dropdown && !dropdown.classList.contains('hidden') && !e.target.closest('.relative')) {
                 dropdown.classList.add('hidden');
             }
         });
 
-        // --- 退出登录 ---
-        function doLogout() {
-            switchView('view-login');
-            showToast('已安全退出');
+        function doLogout() { 
+            document.getElementById('view-main').classList.add('hidden'); 
+            document.getElementById('view-project-select').classList.add('hidden');
+            document.getElementById('view-project-select').classList.remove('flex');
+            document.getElementById('view-login').style.display='flex'; 
+            showToast('已退出'); 
         }
 
-        // --- 全局 Toast 提示 ---
-        let toastTimeout;
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.style.opacity = '1';
-            
-            clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => {
-                toast.style.opacity = '0';
-            }, 2000);
+        let gImgs=[], gIdx=0;
+        const gView=document.getElementById('gallery-viewer'), gImgEl=document.getElementById('gallery-image'), gCount=document.getElementById('gallery-counter'), gPrev=document.getElementById('gallery-prev-btn'), gNext=document.getElementById('gallery-next-btn');
+        function openGallery(imgs, idx) { gImgs=imgs; gIdx=idx; updateGallery(); gView.classList.remove('hidden'); gView.classList.add('flex'); }
+        function closeGallery() { gView.classList.add('hidden'); gView.classList.remove('flex'); }
+        function updateGallery() {
+            gImgEl.src = gImgs[gIdx]; gCount.textContent = `${gIdx+1} / ${gImgs.length}`;
+            gPrev.classList.toggle('hidden', gImgs.length <= 1 || gIdx === 0);
+            gNext.classList.toggle('hidden', gImgs.length <= 1 || gIdx === gImgs.length - 1);
         }
+        function prevGalleryImage(e) { if(e)e.stopPropagation(); if(gIdx>0){gIdx--;updateGallery();} }
+        function nextGalleryImage(e) { if(e)e.stopPropagation(); if(gIdx<gImgs.length-1){gIdx++;updateGallery();} }
+        
+        let tsX=0; document.getElementById('gallery-touch-area').addEventListener('touchstart', e=>tsX=e.changedTouches[0].screenX);
+        document.getElementById('gallery-touch-area').addEventListener('touchend', e=>{ const teX=e.changedTouches[0].screenX; if(teX<tsX-50) nextGalleryImage(); if(teX>tsX+50) prevGalleryImage(); });
 
-        // --- 模型详情页逻辑 ---
-        function openModelDetail(modelType) {
-            // 动态设置详情页标题
-            document.getElementById('model-detail-title').textContent = modelType + '详情';
-            // 动态设置所属项目名称为当前所选项目
-            const currentProj = document.getElementById('current-project-title').textContent;
-            document.getElementById('model-detail-project-name').textContent = currentProj;
-            
-            // 切换视图
-            switchView('view-model-detail');
-        }
+        let tTo; function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.style.opacity='1'; clearTimeout(tTo); tTo=setTimeout(()=>t.style.opacity='0', 2000); }
     </script>
 </body>
 </html>
