@@ -42,7 +42,7 @@
             user-select: auto;
         }
 
-        /* 手机外壳模拟，自带全局线性渐变 */
+        /* 手机外壳模拟 */
         #phone-wrapper {
             width: 375px;
             height: 812px;
@@ -57,7 +57,7 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* 统一磨砂玻璃特效 */
+        /* 磨砂玻璃特效 */
         .glass {
             background: rgba(255, 255, 255, 0.65);
             backdrop-filter: blur(12px);
@@ -76,6 +76,12 @@
             transform: translateY(0);
             visibility: visible;
             pointer-events: auto;
+        }
+
+        /* 新增：无限画布点阵背景样式 */
+        .dot-matrix-bg {
+            background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
         }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
@@ -99,11 +105,9 @@
                 <div>
                     <label class="block text-xs font-medium text-gray-500 mb-1 ml-1">组织/租户</label>
                     <div class="relative">
-                        <!-- 加入 appearance-none 清除系统默认样式，pr-10 给右侧自定义箭头留出空间 -->
                         <select class="w-full bg-white/80 border border-gray-200 text-gray-800 rounded-xl px-4 py-3 outline-none focus:border-primary text-sm appearance-none pr-10">
                             <option>A科技集团研发部</option>
                         </select>
-                        <!-- 自定义居中箭头 -->
                         <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-500">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </div>
@@ -121,7 +125,7 @@
             </form>
         </div>
 
-        <!-- ================= 视图 1.5：登录后的首次全屏项目选择页 ================= -->
+        <!-- ================= 视图 1.5：项目选择页 ================= -->
         <div id="view-project-select" class="absolute inset-0 z-40 hidden flex-col bg-gradient-to-br from-[#EFF6FF] to-[#DFE7FF] transition-transform duration-300">
             <header class="px-6 pt-16 pb-6 flex-shrink-0">
                 <h1 class="text-2xl font-bold text-gray-900 mb-2">选择项目</h1>
@@ -143,10 +147,9 @@
             </div>
         </div>
 
-        <!-- ================= 视图 2：主界面 (物理隔离布局) ================= -->
+        <!-- ================= 视图 2：主界面 ================= -->
         <div id="view-main" class="absolute inset-0 flex flex-col hidden">
             
-            <!-- 核心内容区 (绝对限制在底部导航栏上方) -->
             <div class="absolute top-0 left-0 right-0 bottom-[88px] overflow-hidden">
                 
                 <!-- === TAB 1: 数据模型 === -->
@@ -168,15 +171,14 @@
                             <div class="h-px w-full bg-white/60"></div>
                             <div>
                                 <h3 class="font-bold text-gray-800 text-sm mb-1">2. 用户成长体系模型</h3>
-                                <p class="text-xs text-gray-500 mb-3">涵盖了用户积分、等级、成就勋章等轻量级互动元素。</p>
+                                <p class="text-xs text-gray-500 mb-3">涵盖了用户积分、等级、成就勋章等互动元素。</p>
                                 <div class="grid grid-cols-2 gap-2" id="gallery-model-2"></div>
                             </div>
                         </div>
-
                         <h2 class="text-sm font-bold text-gray-800 flex items-center pt-2"><div class="w-6 h-6 rounded bg-purple-50 text-purple-600 flex items-center justify-center mr-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg></div>物理图</h2>
                         <div class="glass rounded-2xl p-4 shadow-sm border border-white/60">
                             <h3 class="font-bold text-gray-800 text-sm mb-1">1. 数据库全量架构图</h3>
-                            <p class="text-xs text-gray-500 mb-3">展示项目物理数据库表及字段说明，包含分库分表设计。</p>
+                            <p class="text-xs text-gray-500 mb-3">展示项目物理数据库表及字段说明。</p>
                             <div id="gallery-model-3"></div>
                         </div>
                     </div>
@@ -199,40 +201,46 @@
                                 <div class="flex items-center text-gray-500">提出人：<span class="text-primary bg-blue-50/80 px-1.5 py-0.5 rounded ml-1 border border-blue-100">庞总</span></div>
                             </div>
                         </div>
-                        <div class="p-4 glass rounded-2xl shadow-sm border border-white/60">
-                            <h3 class="font-bold text-gray-800 text-sm mb-2">支持导出报表</h3>
-                            <p class="text-xs text-gray-600 mb-4 leading-relaxed">需要能够将本月的项目进度明细一键导出为Excel文件。</p>
-                            <div class="flex justify-between items-center text-[10px]">
-                                <div class="text-gray-400">2026/4/20 09:30</div>
-                                <div class="flex items-center text-gray-500">提出人：<span class="bg-white/60 px-1.5 py-0.5 rounded ml-1 border border-white">李四</span></div>
-                            </div>
-                        </div>
                     </div>
-                    <!-- 需求专享：右下角浮动加号按钮 -->
                     <button onclick="openAddReqModal()" class="absolute bottom-6 right-5 w-14 h-14 bg-primary text-white rounded-full flex items-center justify-center shadow-float active:scale-95 transition-transform z-30">
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                     </button>
                 </div>
 
-                <!-- === TAB 3: 功能架构 (左导航右详情分栏) === -->
-                <!-- === TAB 3: 功能架构 (分栏视图) === -->
-                <div id="tab-func" class="tab-pane absolute inset-0 flex flex-col hidden">
+                <!-- === TAB 3: 功能架构 (已更改为树结构布局) === -->
+                <div id="tab-func" class="tab-pane absolute inset-0 flex flex-col hidden overflow-hidden">
                     <header class="sticky top-0 z-30 glass border-b border-white/60 px-4 pt-12 pb-3 flex items-center shadow-sm flex-shrink-0">
                         <div class="flex items-center cursor-pointer active:scale-95 transition-all" onclick="openProjectSwitcher()">
                             <h1 class="text-2xl font-extrabold text-gray-900 current-project-name tracking-tight">内部资产管理系统V2</h1>
                             <svg class="w-6 h-6 ml-1.5 text-gray-900 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
                         </div>
                     </header>
-                    <div class="flex-1 flex overflow-hidden">
-                        <!-- 左侧菜单 -->
-                        <div class="w-[110px] bg-white/40 border-r border-white/60 overflow-y-auto no-scrollbar pb-6" id="func-sidebar"></div>
-                        <!-- 右侧详情 -->
-                        <div class="flex-1 overflow-y-auto no-scrollbar p-4" id="func-content"></div>
+                    <!-- 树结构容器 (增加点阵背景 dot-matrix-bg) -->
+                    <div class="flex-1 overflow-y-auto no-scrollbar p-6 space-y-0 dot-matrix-bg relative" id="func-tree-container">
+                        <!-- 由 JS 渲染树形节点 -->
+                    </div>
+                    
+                    <!-- 新增：右下角缩放控制控件 -->
+                    <div class="absolute bottom-4 right-4 z-40">
+                        <div id="zoom-dropdown" class="hidden absolute bottom-full right-0 mb-2 w-36 bg-white/95 backdrop-blur-md rounded-2xl shadow-float border border-white/80 py-2 text-[13px] text-gray-700 origin-bottom-right transition-all">
+                            <div class="px-4 py-2 hover:bg-primary/10 cursor-pointer transition-colors" onclick="setZoom(0.1)">10%</div>
+                            <div class="px-4 py-2 hover:bg-primary/10 cursor-pointer transition-colors" onclick="setZoom(0.25)">25%</div>
+                            <div class="px-4 py-2 hover:bg-primary/10 cursor-pointer transition-colors" onclick="setZoom(0.5)">50%</div>
+                            <div class="px-4 py-2 hover:bg-primary/10 cursor-pointer transition-colors" onclick="setZoom(0.75)">75%</div>
+                            <div class="px-4 py-2 hover:bg-primary/10 cursor-pointer transition-colors" onclick="setZoom(1)">100%</div>
+                            <div class="px-4 py-2 hover:bg-primary/10 cursor-pointer transition-colors" onclick="setZoom(2)">200%</div>
+                            <div class="px-4 py-2 hover:bg-primary/10 cursor-pointer transition-colors" onclick="setZoom(4)">400%</div>
+                            <div class="h-px bg-gray-200 my-1 mx-2"></div>
+                            <div class="px-4 py-2 hover:bg-primary/10 cursor-pointer transition-colors text-[12px]" onclick="zoomToFit()">缩放以适合内容</div>
+                        </div>
+                        <button onclick="toggleZoomDropdown(event)" class="glass bg-white/90 rounded-full px-3.5 py-1.5 flex items-center shadow-sm border border-white/80 active:scale-95 transition-all text-gray-900 font-bold min-w-[80px] justify-between">
+                            <span id="zoom-level-text" class="text-[13px] tracking-wide ml-1">100%</span>
+                            <svg class="w-4 h-4 text-gray-400 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
                     </div>
                 </div>
 
-                <!-- === TAB 4: 业务流程 (平铺时间轴直展) === -->
-                <!-- === TAB 4: 业务流程 (平铺伸缩直展) === -->
+                <!-- === TAB 4: 业务流程 === -->
                 <div id="tab-flow" class="tab-pane absolute inset-0 flex flex-col hidden overflow-hidden">
                     <header class="sticky top-0 z-30 glass border-b border-white/60 px-4 pt-12 pb-3 flex items-center shadow-sm flex-shrink-0">
                         <div class="flex items-center cursor-pointer active:scale-95 transition-all" onclick="openProjectSwitcher()">
@@ -240,10 +248,7 @@
                             <svg class="w-6 h-6 ml-1.5 text-gray-900 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
                         </div>
                     </header>
-                    <!-- 业务流程内容区 -->
-                    <div class="flex-1 overflow-y-auto no-scrollbar p-4 space-y-6" id="flow-container">
-                        <!-- 流程内容将由 JS 以时间轴形式平铺渲染在这里 -->
-                    </div>
+                    <div class="flex-1 overflow-y-auto no-scrollbar p-4 space-y-6" id="flow-container"></div>
                 </div>
 
                 <!-- === TAB 5: 我的 === -->
@@ -266,7 +271,6 @@
                             <div onclick="toggleAccountDropdown(event)" class="cursor-pointer bg-white/50 p-2 rounded-full border border-white transition-colors text-gray-500 hover:text-primary">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
                             </div>
-                            <!-- 账号下拉菜单 -->
                             <div id="account-dropdown" class="hidden absolute top-20 right-5 w-36 glass rounded-xl shadow-card border border-white overflow-hidden transform origin-top-right transition-all">
                                 <div onclick="switchAccount('admin')" class="px-4 py-3 hover:bg-white/80 cursor-pointer flex justify-between items-center">
                                     <span class="text-sm font-bold text-primary">admin</span>
@@ -284,9 +288,8 @@
                     </div>
                 </div>
 
-            </div> <!-- END OF Tabs Container -->
+            </div>
 
-            <!-- ================= 5个底部导航 Tab (绝对固定在最底部) ================= -->
             <nav class="absolute bottom-0 left-0 right-0 h-[88px] glass border-t border-white/60 pb-6 pt-2 px-2 flex justify-between items-center z-40 rounded-b-[40px]">
                 <div data-target="tab-model" onclick="switchTab('tab-model')" class="nav-item text-primary flex flex-col items-center cursor-pointer flex-1">
                     <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
@@ -309,52 +312,33 @@
                     <span class="text-[10px] font-medium">我的</span>
                 </div>
             </nav>
+        </div>
 
-        </div> <!-- END OF #view-main -->
-
-        <!-- ================= 全局弹窗系统 ================= -->
+        <!-- ================= 全局组件 ================= -->
         <div id="overlay" class="absolute inset-0 bg-gray-900/40 z-[50] hidden opacity-0 transition-opacity" onclick="closeAllModals()"></div>
 
-        <!-- 切换项目弹窗 (底部抽屉) -->
         <div id="modal-switch-project" class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl z-[60] bottom-sheet flex flex-col h-[55%]">
             <div class="flex justify-center pt-3 pb-2" onclick="closeAllModals()"><div class="w-10 h-1.5 bg-gray-200 rounded-full"></div></div>
             <div class="px-6 py-2 flex-1 flex flex-col">
                 <h3 class="text-lg font-bold text-gray-800 mb-4">切换项目</h3>
-                <div class="flex-1 overflow-y-auto no-scrollbar pb-6 space-y-3" id="project-list-container">
-                    <div onclick="switchProject('在线教育平台重构')" class="border border-gray-100 bg-gray-50 rounded-2xl p-4 cursor-pointer active:scale-95 transition-all relative">
-                        <div class="flex items-center mb-1">
-                            <h2 class="text-base font-bold text-gray-700">在线教育平台重构</h2>
-                        </div>
-                        <p class="text-[10px] text-gray-500">包含核心课程体系、直播模块及后端重构。</p>
-                    </div>
-                    <div onclick="switchProject('内部资产管理系统V2')" class="border border-primary/30 bg-blue-50/50 rounded-2xl p-4 cursor-pointer active:scale-95 transition-all relative overflow-hidden">
-                        <div class="absolute top-0 right-0 bg-primary text-white text-[10px] px-2 py-0.5 rounded-bl-lg font-medium">当前</div>
-                        <div class="flex items-center mb-1">
-                            <h2 class="text-base font-bold text-primary">内部资产管理系统V2</h2>
-                        </div>
-                        <p class="text-[10px] text-gray-500">公司内部固定资产及无形资产生命周期管理。</p>
-                    </div>
-                </div>
+                <div class="flex-1 overflow-y-auto no-scrollbar pb-6 space-y-3" id="project-list-container"></div>
             </div>
         </div>
 
-        <!-- 新增需求弹窗 -->
         <div id="modal-add-req" class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl z-[60] bottom-sheet flex flex-col h-[70%]">
             <div class="flex justify-center pt-3 pb-2" onclick="closeAllModals()"><div class="w-10 h-1.5 bg-gray-200 rounded-full"></div></div>
             <div class="px-6 py-2 flex-1 flex flex-col">
                 <h3 class="text-lg font-bold text-gray-800 mb-4">记录新业务需求</h3>
                 <form onsubmit="submitReq(event)" class="flex-1 flex flex-col" novalidate>
-                    <div class="mb-4"><input type="text" id="req-title" placeholder="需求简述（如：增加夜间模式）" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary text-sm" required></div>
-                    <div class="mb-4 flex-1"><textarea id="req-desc" placeholder="详细说明业务场景或诉求..." class="w-full h-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary text-sm resize-none" required></textarea></div>
+                    <div class="mb-4"><input type="text" id="req-title" placeholder="需求简述" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary text-sm" required></div>
+                    <div class="mb-4 flex-1"><textarea id="req-desc" placeholder="详细说明诉求..." class="w-full h-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary text-sm resize-none" required></textarea></div>
                     <div class="pb-8 pt-2"><button type="submit" class="w-full bg-primary text-white font-bold py-3.5 rounded-xl shadow-float active:scale-95 transition-transform">保存需求</button></div>
                 </form>
             </div>
         </div>
 
-        <!-- Toast 提示 -->
         <div id="toast" class="absolute top-16 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-5 py-2.5 rounded-full text-xs font-medium z-[80] opacity-0 transition-opacity duration-300 pointer-events-none whitespace-nowrap shadow-xl">提示</div>
 
-        <!-- 全屏图片查看器 -->
         <div id="gallery-viewer" class="absolute inset-0 bg-black/95 z-[90] hidden flex-col">
             <div class="flex justify-between items-center px-4 py-8 z-10 bg-gradient-to-b from-black/60 to-transparent">
                 <button onclick="closeGallery()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 text-white active:scale-95"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
@@ -372,7 +356,6 @@
 
     <!-- ================= JavaScript ================= -->
     <script>
-        // 登录逻辑：登录后进入全屏的“选择项目页”，而不是直接进主界面
         function handleLogin(e) { 
             e.preventDefault(); 
             showToast('登录成功'); 
@@ -383,18 +366,17 @@
             }, 500); 
         }
 
-        // 首次进入主界面逻辑
         function enterMainApp(projectName) {
             document.querySelectorAll('.current-project-name').forEach(el => el.textContent = projectName);
             document.getElementById('view-project-select').classList.add('hidden');
             document.getElementById('view-project-select').classList.remove('flex');
             document.getElementById('view-main').classList.remove('hidden');
             showToast('已进入: ' + projectName);
-            switchProjectUI(projectName); // 同步更新底部弹窗的选中状态
+            switchProjectUI(projectName);
         }
 
         function switchTab(tabId) {
-            closeAllModals(); // 清理残留弹窗
+            closeAllModals(); 
             document.querySelectorAll('.tab-pane').forEach(el => { el.classList.add('hidden'); el.classList.remove('flex'); });
             const target = document.getElementById(tabId);
             if(target) { target.classList.remove('hidden'); target.classList.add('flex'); }
@@ -407,7 +389,6 @@
             }
         }
 
-        // 项目切换逻辑 (主界面内通过底部弹窗切换)
         function openProjectSwitcher() { showOverlay(); document.getElementById('modal-switch-project').classList.add('open'); }
         function switchProject(name) {
             document.querySelectorAll('.current-project-name').forEach(el => el.textContent = name);
@@ -415,34 +396,35 @@
             switchProjectUI(name);
         }
 
-        // 抽离出来的UI更新复用函数
         function switchProjectUI(name) {
-            const cards = document.getElementById('project-list-container').children;
-            for(let card of cards) {
-                if(card.textContent.includes(name)) {
-                    card.className = "border border-primary/30 bg-blue-50/50 rounded-2xl p-4 cursor-pointer active:scale-95 transition-all relative overflow-hidden";
-                    if(!card.querySelector('.absolute')) card.insertAdjacentHTML('afterbegin', '<div class="absolute top-0 right-0 bg-primary text-white text-[10px] px-2 py-0.5 rounded-bl-lg font-medium">当前</div>');
-                    card.querySelector('h2').className = "text-base font-bold text-primary";
-                } else {
-                    card.className = "border border-gray-100 bg-gray-50 rounded-2xl p-4 cursor-pointer active:scale-95 transition-all relative";
-                    const badge = card.querySelector('.absolute'); if(badge) badge.remove();
-                    card.querySelector('h2').className = "text-base font-bold text-gray-700";
-                }
-            }
+            const container = document.getElementById('project-list-container');
+            const data = [
+                { name: '在线教育平台重构', desc: '包含核心课程体系、直播模块及后端重构。' },
+                { name: '内部资产管理系统V2', desc: '公司内部固定资产及无形资产生命周期管理。' }
+            ];
+            container.innerHTML = data.map(p => {
+                const isCur = p.name === name;
+                return `
+                    <div onclick="switchProject('${p.name}')" class="border ${isCur ? 'border-primary/30 bg-blue-50/50' : 'border-gray-100 bg-gray-50'} rounded-2xl p-4 cursor-pointer active:scale-95 transition-all relative overflow-hidden">
+                        ${isCur ? '<div class="absolute top-0 right-0 bg-primary text-white text-[10px] px-2 py-0.5 rounded-bl-lg font-medium">当前</div>' : ''}
+                        <h2 class="text-base font-bold ${isCur ? 'text-primary' : 'text-gray-700'}">${p.name}</h2>
+                        <p class="text-[10px] text-gray-500">${p.desc}</p>
+                    </div>
+                `;
+            }).join('');
         }
 
-        // 使用纯英文生成图片，彻底杜绝 placehold.co 的 SVG 报错撑爆屏幕Bug
         const gImg = (text, w=800, h=600, bg='eff6ff', fg='1f5fff') => `https://placehold.co/${w}x${h}/${bg}/${fg}?text=${encodeURIComponent(text)}`;
 
         function generateGalleryHtml(images) {
             if (!images || !images.length) return '';
             const safeStr = JSON.stringify(images).replace(/"/g, '&quot;');
-            if (images.length === 1) return `<div class="col-span-full aspect-video rounded-xl overflow-hidden cursor-pointer shadow-sm active:scale-95 transition-transform bg-white/50" onclick="openGallery(${safeStr}, 0)"><img src="${images[0]}" class="w-full h-full object-cover"></div>`;
-            if (images.length === 2) return `<div class="col-span-1 aspect-[4/3] rounded-xl overflow-hidden cursor-pointer shadow-sm active:scale-95 bg-white/50" onclick="openGallery(${safeStr}, 0)"><img src="${images[0]}" class="w-full h-full object-cover"></div><div class="col-span-1 aspect-[4/3] rounded-xl overflow-hidden cursor-pointer shadow-sm active:scale-95 bg-white/50" onclick="openGallery(${safeStr}, 1)"><img src="${images[1]}" class="w-full h-full object-cover"></div>`;
+            if (images.length === 1) return `<div class="col-span-full aspect-video rounded-xl overflow-hidden cursor-pointer shadow-sm active:scale-95 bg-white/80" onclick="openGallery(${safeStr}, 0)"><img src="${images[0]}" class="w-full h-full object-cover"></div>`;
+            if (images.length === 2) return `<div class="col-span-1 aspect-[4/3] rounded-xl overflow-hidden cursor-pointer shadow-sm active:scale-95 bg-white/80" onclick="openGallery(${safeStr}, 0)"><img src="${images[0]}" class="w-full h-full object-cover"></div><div class="col-span-1 aspect-[4/3] rounded-xl overflow-hidden cursor-pointer shadow-sm active:scale-95 bg-white/80" onclick="openGallery(${safeStr}, 1)"><img src="${images[1]}" class="w-full h-full object-cover"></div>`;
             let html = '';
-            for(let i=0; i<3; i++) {
-                if (i === 2 && images.length > 3) html += `<div class="col-span-1 aspect-square rounded-xl overflow-hidden relative cursor-pointer shadow-sm active:scale-95 bg-white/50" onclick="openGallery(${safeStr}, ${i})"><img src="${images[i]}" class="w-full h-full object-cover"><div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center"><span class="text-white text-xs font-bold">共 ${images.length} 张</span></div></div>`;
-                else html += `<div class="col-span-1 aspect-square rounded-xl overflow-hidden cursor-pointer shadow-sm active:scale-95 bg-white/50" onclick="openGallery(${safeStr}, ${i})"><img src="${images[i]}" class="w-full h-full object-cover"></div>`;
+            for(let i=0; i<Math.min(images.length, 3); i++) {
+                if (i === 2 && images.length > 3) html += `<div class="col-span-1 aspect-square rounded-xl overflow-hidden relative cursor-pointer shadow-sm active:scale-95 bg-white/80" onclick="openGallery(${safeStr}, ${i})"><img src="${images[i]}" class="w-full h-full object-cover"><div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center"><span class="text-white text-[10px] font-bold">共 ${images.length} 张</span></div></div>`;
+                else html += `<div class="col-span-1 aspect-square rounded-xl overflow-hidden cursor-pointer shadow-sm active:scale-95 bg-white/80" onclick="openGallery(${safeStr}, ${i})"><img src="${images[i]}" class="w-full h-full object-cover"></div>`;
             }
             return html;
         }
@@ -452,34 +434,119 @@
         document.getElementById('gallery-model-2').innerHTML = generateGalleryHtml([gImg('System 1',800,600,'f0fdf4','16a34a'), gImg('System 2',800,600,'f0fdf4','16a34a')]);
         document.getElementById('gallery-model-3').innerHTML = generateGalleryHtml([gImg('Database',1200,800,'f3e8ff','9333ea')]);
 
+        // ================= 功能树逻辑 =================
         const funcData = [
-            { id: '1', name: '考生在线报名', desc: '实现考生在线填报个人资料、选择考点并提交。', imgs: [gImg('Signup 1'), gImg('Signup 2')] },
-            { id: '2', name: '资质证件上传', desc: '支持格式识别身份证正反面信息。', imgs: [gImg('Upload')] },
-            { id: '3', name: '在线支付学费', desc: '对接微信、支付宝接口，生成收银台。', imgs: [gImg('Checkout')] },
-            { id: '4', name: '视频播放器', desc: '支持高清视频播放、倍速及断点续播。', imgs: [gImg('Player 1'), gImg('Player 2'), gImg('Player 3')] }
+            { id: '1', name: '考生在线报名', desc: '实现考生在线填报个人资料、选择考点并提交报名申请。', imgs: [gImg('Signup Screen')] },
+            { id: '2', name: '资质证件识别', desc: '支持身份证、学生证正反面OCR识别，自动抓取关键信息减少手输。', imgs: [gImg('OCR 1'), gImg('OCR 2')] },
+            { id: '3', name: '在线支付结算', desc: '集成主流收银台，支持微信、支付宝分账及开票。', imgs: [gImg('Payment')] },
+            { id: '4', name: '考试结果查询', desc: '成绩发布后一键触达，支持电子证书实时下载与查看。', imgs: [gImg('Results 1'), gImg('Results 2'), gImg('Results 3')] }
         ];
-        let curFuncId = '1';
 
-        function renderFunc() {
-            let sHtml = '';
-            funcData.forEach(i => {
-                const act = i.id === curFuncId ? 'bg-white/60 border-l-4 border-primary text-primary font-bold shadow-sm' : 'border-l-4 border-transparent text-gray-500 hover:bg-white/30';
-                sHtml += `<div class="px-3 py-4 text-xs cursor-pointer transition-all flex items-start ${act}" onclick="curFuncId='${i.id}';renderFunc()"><span class="mr-1 opacity-70">${i.id}.</span><span class="leading-tight">${i.name}</span></div>`;
-            });
-            document.getElementById('func-sidebar').innerHTML = sHtml;
-
-            const cEl = document.getElementById('func-content');
-            const item = funcData.find(i => i.id === curFuncId);
-            if(item) {
-                cEl.classList.remove('animate-fade-in'); void cEl.offsetWidth; cEl.classList.add('animate-fade-in');
-                cEl.innerHTML = `
-                    <div class="mb-5"><h2 class="text-base font-bold text-gray-900 mb-2">${item.id}. ${item.name}</h2><p class="text-xs text-gray-600 leading-relaxed bg-white/40 p-3 rounded-xl border border-white/60">${item.desc}</p></div>
-                    <div><h3 class="text-[10px] font-bold text-gray-400 mb-2.5 flex items-center">界面草图</h3><div class="grid grid-cols-2 gap-2">${generateGalleryHtml(item.imgs)}</div></div>
+        function renderFuncTree() {
+            const container = document.getElementById('func-tree-container');
+            // 添加一个包裹层以支持自由缩放
+            let html = '<div id="func-tree-zoom-wrapper" class="relative origin-top transform transition-transform duration-75 min-h-full pb-10">';
+            
+            // 贯穿始终的垂直背景连接线
+            html += '<div class="absolute left-1/2 top-8 bottom-8 w-0.5 bg-gray-300/70 transform -translate-x-1/2 z-0"></div>';
+            
+            funcData.forEach((item, idx) => {
+                const isLast = idx === funcData.length - 1;
+                html += `
+                    <div class="flex flex-col items-center relative z-10 ${isLast ? '' : 'mb-8'}">
+                        <!-- 功能节点卡片 (恢复为大尺寸并移除序号) -->
+                        <div class="w-full glass bg-white/90 rounded-3xl p-5 shadow-sm border border-white/80 animate-fade-in relative">
+                            <div class="flex items-center mb-2">
+                                <h3 class="text-base font-bold text-gray-900">${item.name}</h3>
+                            </div>
+                            <p class="text-xs text-gray-600 mb-4 leading-relaxed">${item.desc}</p>
+                            <div class="grid grid-cols-2 gap-2 w-full">
+                                ${generateGalleryHtml(item.imgs)}
+                            </div>
+                        </div>
+                    </div>
                 `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+        renderFuncTree();
+
+        // 缩放功能实现 (专门针对功能架构树页面)
+        const funcTreeContainer = document.getElementById('func-tree-container');
+        let funcScale = 1;
+        let funcIsPinching = false;
+        let funcStartDist = 0;
+        let funcInitScale = 1;
+        
+        // 统一提取更新UI与样式的函数
+        function applyZoomUI() {
+            const wrapper = document.getElementById('func-tree-zoom-wrapper');
+            if (wrapper) wrapper.style.transform = `scale(${funcScale})`;
+            const text = document.getElementById('zoom-level-text');
+            if (text) text.textContent = Math.round(funcScale * 100) + '%';
+        }
+
+        // 新增：控件直选缩放
+        function setZoom(scale) {
+            funcScale = Math.max(0.1, Math.min(scale, 4)); // 限制在 10% - 400%
+            applyZoomUI();
+            document.getElementById('zoom-dropdown').classList.add('hidden');
+        }
+
+        // 新增：缩放以适合内容
+        function zoomToFit() {
+            const container = document.getElementById('func-tree-container');
+            const wrapper = document.getElementById('func-tree-zoom-wrapper');
+            if(container && wrapper) {
+                // 计算让内容刚好能在一个屏幕里完整显示的缩放比例，预留 10% 边距
+                const fitScale = (container.clientHeight * 0.9) / wrapper.scrollHeight;
+                setZoom(fitScale);
             }
         }
-        renderFunc();
+        
+        function toggleZoomDropdown(e) {
+            e.stopPropagation();
+            document.getElementById('zoom-dropdown').classList.toggle('hidden');
+        }
 
+        // 移动端双指手势缩放
+        funcTreeContainer.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                funcIsPinching = true;
+                funcStartDist = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
+                funcInitScale = funcScale;
+            }
+        });
+
+        funcTreeContainer.addEventListener('touchmove', (e) => {
+            if (funcIsPinching && e.touches.length === 2) {
+                e.preventDefault(); // 阻止缩放时的页面原生滚动
+                const currentDist = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
+                funcScale = funcInitScale * (currentDist / funcStartDist);
+                // 限制边界 (10% - 400%)
+                funcScale = Math.max(0.1, Math.min(funcScale, 4));
+                applyZoomUI();
+            }
+        });
+
+        funcTreeContainer.addEventListener('touchend', (e) => {
+            if (e.touches.length < 2) {
+                funcIsPinching = false;
+            }
+        });
+        
+        // 支持电脑端 Cmd/Ctrl + 滚轮缩放查看
+        funcTreeContainer.addEventListener('wheel', (e) => {
+            if(e.ctrlKey || e.metaKey) {
+                e.preventDefault();
+                funcScale += e.deltaY * -0.005;
+                funcScale = Math.max(0.1, Math.min(funcScale, 4));
+                applyZoomUI();
+            }
+        });
+
+        // ================= 业务流程还原 =================
         const flowData = {
             'flow-1': { title: '核心购课流程', steps: [{ name: '选课与加购', desc: '学员浏览课程并加入购物车。', imgs: [gImg('Step 1',800,800,'eff6ff','1f5fff'), gImg('Cart',800,800,'eff6ff','1f5fff')] }, { name: '结算支付', desc: '核对订单并付款。', imgs: [gImg('Checkout')] }, { name: '开通听课', desc: '自动开通权限。', imgs: [gImg('Success')] }] },
             'flow-2': { title: '退费审批流程', steps: [{ name: '发起申请', desc: '填写退款原因及凭证。', imgs: [gImg('Refund',800,800,'fffbeb','d97706'), gImg('Form',800,800,'fffbeb','d97706'), gImg('Upload',800,800,'fffbeb','d97706')] }, { name: '班主任初审', desc: '核实情况并审批。', imgs: [gImg('Audit',800,800,'fffbeb','d97706')] }] }
@@ -537,7 +604,6 @@
             el.classList.toggle('mb-5');
         }
 
-        // 页面初始化时渲染平铺的业务流程
         renderFlattenedFlows();
 
         const overlay = document.getElementById('overlay');
@@ -548,7 +614,7 @@
             setTimeout(() => overlay.classList.add('hidden'), 300);
         }
 
-        function openAddReqModal() { showOverlay(); document.getElementById('modal-add-req').classList.add('open'); document.getElementById('req-title').value = ''; document.getElementById('req-desc').value = ''; }
+        function openAddReqModal() { showOverlay(); document.getElementById('modal-add-req').classList.add('open'); }
         function submitReq(e) {
             e.preventDefault();
             const t = document.getElementById('req-title').value, d = document.getElementById('req-desc').value;
@@ -557,27 +623,20 @@
             showToast('保存成功');
         }
 
-        // 账号下拉与切换逻辑补全
-        function toggleAccountDropdown(e) {
-            e.stopPropagation();
-            document.getElementById('account-dropdown').classList.toggle('hidden');
-        }
-        function switchAccount(name) {
-            document.getElementById('current-account-name').textContent = name;
-            document.getElementById('account-dropdown').classList.add('hidden');
-            showToast('已切换账号: ' + name);
-        }
-        document.addEventListener('click', function(e) {
-            const dropdown = document.getElementById('account-dropdown');
-            if(dropdown && !dropdown.classList.contains('hidden') && !e.target.closest('.relative')) {
-                dropdown.classList.add('hidden');
-            }
+        function toggleAccountDropdown(e) { e.stopPropagation(); document.getElementById('account-dropdown').classList.toggle('hidden'); }
+        function switchAccount(name) { document.getElementById('current-account-name').textContent = name; document.getElementById('account-dropdown').classList.add('hidden'); showToast('已切换账号: ' + name); }
+        document.addEventListener('click', e => { 
+            const d = document.getElementById('account-dropdown'); 
+            if(d && !d.classList.contains('hidden') && !e.target.closest('.relative')) d.classList.add('hidden'); 
+            
+            // 补充处理全局点击关闭缩放下拉菜单
+            const z = document.getElementById('zoom-dropdown');
+            if(z && !z.classList.contains('hidden') && !e.target.closest('.z-40')) z.classList.add('hidden');
         });
 
         function doLogout() { 
             document.getElementById('view-main').classList.add('hidden'); 
             document.getElementById('view-project-select').classList.add('hidden');
-            document.getElementById('view-project-select').classList.remove('flex');
             document.getElementById('view-login').style.display='flex'; 
             showToast('已退出'); 
         }
@@ -593,7 +652,6 @@
         }
         function prevGalleryImage(e) { if(e)e.stopPropagation(); if(gIdx>0){gIdx--;updateGallery();} }
         function nextGalleryImage(e) { if(e)e.stopPropagation(); if(gIdx<gImgs.length-1){gIdx++;updateGallery();} }
-        
         let tsX=0; document.getElementById('gallery-touch-area').addEventListener('touchstart', e=>tsX=e.changedTouches[0].screenX);
         document.getElementById('gallery-touch-area').addEventListener('touchend', e=>{ const teX=e.changedTouches[0].screenX; if(teX<tsX-50) nextGalleryImage(); if(teX>tsX+50) prevGalleryImage(); });
 
