@@ -423,7 +423,7 @@
             if (images.length === 2) return `<div class="col-span-1 aspect-[4/3] rounded-xl overflow-hidden cursor-pointer shadow-sm active:scale-95 bg-white/80" onclick="openGallery(${safeStr}, 0)"><img src="${images[0]}" class="w-full h-full object-cover"></div><div class="col-span-1 aspect-[4/3] rounded-xl overflow-hidden cursor-pointer shadow-sm active:scale-95 bg-white/80" onclick="openGallery(${safeStr}, 1)"><img src="${images[1]}" class="w-full h-full object-cover"></div>`;
             let html = '';
             for(let i=0; i<Math.min(images.length, 3); i++) {
-                if (i === 2 && images.length > 3) html += `<div class="col-span-1 aspect-square rounded-xl overflow-hidden relative cursor-pointer shadow-sm active:scale-95 bg-white/80" onclick="openGallery(${safeStr}, ${i})"><img src="${images[i]}" class="w-full h-full object-cover"><div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center"><span class="text-white text-[10px] font-bold">共 ${images.length} 张</span></div></div>`;
+                if (i === 2 && images.length > 3) html += `<div class="col-span-1 aspect-square rounded-xl overflow-hidden relative cursor-pointer shadow-sm active:scale-95 bg-white/80" onclick="openGallery(${safeStr}, ${i})"><img src="${images[i]}" class="w-full h-full object-cover"><div class="absolute inset-0 bg-gray-800/70 backdrop-blur-[2px] flex items-center justify-center"><span class="text-white text-xs font-bold tracking-widest">共 ${images.length} 张</span></div></div>`;
                 else html += `<div class="col-span-1 aspect-square rounded-xl overflow-hidden cursor-pointer shadow-sm active:scale-95 bg-white/80" onclick="openGallery(${safeStr}, ${i})"><img src="${images[i]}" class="w-full h-full object-cover"></div>`;
             }
             return html;
@@ -439,7 +439,8 @@
             { id: '1', name: '考生在线报名', desc: '实现考生在线填报个人资料、选择考点并提交报名申请。', imgs: [gImg('Signup Screen')] },
             { id: '2', name: '资质证件识别', desc: '支持身份证、学生证正反面OCR识别，自动抓取关键信息减少手输。', imgs: [gImg('OCR 1'), gImg('OCR 2')] },
             { id: '3', name: '在线支付结算', desc: '集成主流收银台，支持微信、支付宝分账及开票。', imgs: [gImg('Payment')] },
-            { id: '4', name: '考试结果查询', desc: '成绩发布后一键触达，支持电子证书实时下载与查看。', imgs: [gImg('Results 1'), gImg('Results 2'), gImg('Results 3')] }
+            // 为了演示效果，此处加到了4张图
+            { id: '4', name: '考试结果查询', desc: '成绩发布后一键触达，支持电子证书实时下载与查看。', imgs: [gImg('Results 1'), gImg('Results 2'), gImg('Results 3'), gImg('Results 4')] }
         ];
 
         function renderFuncTree() {
@@ -452,6 +453,11 @@
             
             funcData.forEach((item, idx) => {
                 const isLast = idx === funcData.length - 1;
+                // 动态计算网格列数，确保最多在一行展示三个
+                let gridColsClass = 'grid-cols-1';
+                if (item.imgs.length === 2) gridColsClass = 'grid-cols-2';
+                if (item.imgs.length >= 3) gridColsClass = 'grid-cols-3';
+
                 html += `
                     <div class="flex flex-col items-center relative z-10 ${isLast ? '' : 'mb-8'}">
                         <!-- 功能节点卡片 (恢复为大尺寸并移除序号) -->
@@ -460,7 +466,7 @@
                                 <h3 class="text-base font-bold text-gray-900">${item.name}</h3>
                             </div>
                             <p class="text-xs text-gray-600 mb-4 leading-relaxed">${item.desc}</p>
-                            <div class="grid grid-cols-2 gap-2 w-full">
+                            <div class="grid ${gridColsClass} gap-2 w-full">
                                 ${generateGalleryHtml(item.imgs)}
                             </div>
                         </div>
@@ -573,12 +579,18 @@
                 
                 flow.steps.forEach((s, idx) => {
                     const isLast = idx === flow.steps.length - 1;
+                    
+                    // 为业务流程也保持图片不换行逻辑的统一性
+                    let gridColsClass = 'grid-cols-1';
+                    if (s.imgs.length === 2) gridColsClass = 'grid-cols-2';
+                    if (s.imgs.length >= 3) gridColsClass = 'grid-cols-3';
+
                     html += `
                             <div class="relative pl-6 ${isLast ? '' : 'border-l-2 border-primary/20 pb-6'}">
                                 <div class="absolute left-[-9px] top-0 w-4 h-4 rounded-full bg-primary text-white text-[10px] flex items-center justify-center font-bold shadow-sm">${idx + 1}</div>
                                 <h3 class="font-bold text-gray-800 text-sm mb-1.5 leading-none">${s.name}</h3>
                                 <p class="text-xs text-gray-500 mb-3 leading-relaxed">${s.desc}</p>
-                                <div class="grid grid-cols-2 gap-2 mt-2 w-full">
+                                <div class="grid ${gridColsClass} gap-2 mt-2 w-full">
                                     ${generateGalleryHtml(s.imgs)}
                                 </div>
                             </div>
