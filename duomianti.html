@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<!-- 锁定 375x812 尺寸的视口 -->
+<meta name="viewport" content="width=375, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>多面体 MVP - 彩色二十面体版</title>
+<style>
+    :root {
+        /* 品牌色系 */
+        --bg-main: #F7F8FA;
+        --card-bg: rgba(255, 255, 255, 0.85);
+        --text-primary: #1D1D1F;
+        --text-secondary: #86868B;
+        --theme-blue: #007AFF;
+        --theme-purple: #AF52DE;
+        --theme-orange: #FF9500;
+        
+        /* 多面体基础彩色 (柔和) */
+        --poly-1: #FFB3BA; --poly-2: #FFDFBA; --poly-3: #FFFFBA;
+        --poly-4: #BAFFC9; --poly-5: #BAE1FF; --poly-6: #D5AAFF;
+        --poly-7: #FFC4E1; --poly-8: #E2F0CB; --poly-9: #FFDAC1;
+        --poly-10: #B5EAD7;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+
+    body {
+        background-color: #E5E5EA; /* 外围背景 */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    /* 模拟手机容器 */
+    #device-container {
+        width: 375px;
+        height: 812px;
+        background: var(--bg-main);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        border-radius: 40px; /* 模拟真机圆角 */
+        border: 8px solid #FFFFFF;
+    }
+
+    /* 视图基础类 */
+    .view {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.4s ease;
+        background: var(--bg-main);
+        z-index: 1;
+    }
+    .view.hidden-right { transform: translateX(100%); opacity: 0; pointer-events: none; }
+    .view.hidden-left { transform: translateX(-10%); opacity: 0; pointer-events: none; }
+    .view.hidden-bottom { transform: translateY(20px); opacity: 0; pointer-events: none; }
+    .view.active { transform: translateX(0); opacity: 1; z-index: 5; pointer-events: auto; }
+
+    /* --- 多面体 SVG 样式 --- */
+    .icosahedron-box {
+        width: 140px; height: 140px;
+        margin: 0 auto;
+        animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+    }
+    .face {
+        stroke: #FFF; stroke-width: 1.5; stroke-linejoin: round;
+        transition: fill 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    /* 默认彩色状态 */
+    .poly-default .f1 { fill: var(--poly-1); } .poly-default .f2 { fill: var(--poly-2); }
+    .poly-default .f3 { fill: var(--poly-3); } .poly-default .f4 { fill: var(--poly-4); }
+    .poly-default .f5 { fill: var(--poly-5); } .poly-default .f6 { fill: var(--poly-6); }
+    .poly-default .f7 { fill: var(--poly-7); } .poly-default .f8 { fill: var(--poly-8); }
+    .poly-default .f9 { fill: var(--poly-9); } .poly-default .f10 { fill: var(--poly-10); }
+
+    /* 统一高亮蒙版色，模拟点亮效果 */
+    .poly-note .face { fill: #E8F0FE; } .poly-note .f5, .poly-note .f6, .poly-note .f10 { fill: var(--theme-blue); }
+    .poly-weight .face { fill: #FFF0E5; } .poly-weight .f1, .poly-weight .f2, .poly-weight .f9 { fill: var(--theme-orange); }
+    .poly-dream .face { fill: #F4E8FA; } .poly-dream .f3, .poly-dream .f4, .poly-dream .f8 { fill: var(--theme-purple); }
+
+    /* --- 1. 登录视图 --- */
+    #login-view {
+        padding: 80px 30px 40px;
+        background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+    }
+    .login-header { text-align: center; margin-bottom: 50px; }
+    .login-header h1 { font-size: 28px; color: var(--text-primary); margin: 20px 0 8px; letter-spacing: 1px;}
+    .login-header p { font-size: 14px; color: var(--text-secondary); }
+    
+    .input-group { margin-bottom: 20px; }
+    .input-box {
+        display: flex; align-items: center;
+        background: rgba(255,255,255,0.7);
+        border: 1px solid rgba(0,0,0,0.05);
+        border-radius: 16px; padding: 4px 16px;
+        backdrop-filter: blur(10px);
+        height: 56px;
+    }
+    .input-box input {
+        border: none; background: transparent; outline: none;
+        flex: 1; font-size: 16px; color: var(--text-primary);
+    }
+    .input-box input::placeholder { color: #B0B0B0; }
+    .btn-get-code {
+        background: transparent; border: none; color: var(--theme-blue);
+        font-size: 14px; font-weight: 600; cursor: pointer; padding-left: 10px;
+        border-left: 1px solid rgba(0,0,0,0.1);
+    }
+    .btn-primary {
+        width: 100%; height: 56px; margin-top: 10px;
+        background: var(--text-primary); color: #FFF;
+        border: none; border-radius: 16px; font-size: 16px; font-weight: 600;
+        cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+        transition: transform 0.1s;
+    }
+    .btn-primary:active { transform: scale(0.98); }
+
+    .third-party-login { margin-top: auto; text-align: center; }
+    .third-party-login p { font-size: 12px; color: var(--text-secondary); margin-bottom: 20px; position: relative; }
+    .third-party-login p::before, .third-party-login p::after {
+        content: ''; position: absolute; top: 50%; width: 30%; height: 1px; background: rgba(0,0,0,0.05);
+    }
+    .third-party-login p::before { left: 0; }
+    .third-party-login p::after { right: 0; }
+    .icons { display: flex; justify-content: center; gap: 20px; }
+    .icon-circle { width: 44px; height: 44px; border-radius: 22px; background: #FFF; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 12px; color: var(--text-primary); cursor: pointer;}
+
+    /* --- 2. 极简记录视图 --- */
+    #input-view { padding: 50px 24px 24px; }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; height: 44px; margin-bottom: 20px;}
+    .mini-logo { width: 32px; height: 32px; }
+    .settings-btn { width: 28px; height: 28px; background: var(--text-primary); border-radius: 8px; }
+    
+    .editor-area { flex: 1; position: relative; }
+    textarea {
+        width: 100%; height: 100%; border: none; resize: none; background: transparent;
+        font-size: 22px; line-height: 1.5; color: var(--text-primary); outline: none;
+    }
+    textarea::placeholder { color: #C7C7CC; font-weight: 400; }
+    
+    .bottom-action { height: 80px; display: flex; align-items: center; justify-content: flex-end; }
+    .btn-submit {
+        background: var(--text-primary); color: #FFF; border: none;
+        padding: 12px 28px; border-radius: 20px; font-size: 16px; font-weight: 600;
+        opacity: 0.3; transition: opacity 0.3s; pointer-events: none;
+    }
+    .btn-submit.active { opacity: 1; pointer-events: auto; cursor: pointer; }
+
+    /* --- 3. 反馈视图 --- */
+    #feedback-view { padding: 60px 24px 40px; align-items: center; justify-content: center; background: #FFFFFF; }
+    .feedback-header { text-align: center; margin-bottom: 40px; height: 60px; }
+    .status-text { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; }
+    .ai-tag {
+        display: inline-block; padding: 6px 16px; background: var(--bg-main);
+        border-radius: 12px; font-size: 20px; font-weight: 700; color: var(--text-primary);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .loading .ai-tag { animation: pulse 1s infinite; color: transparent; background: #E5E5EA; width: 100px; height: 32px; }
+
+    .card-footer {
+        width: 100%; background: var(--bg-main); padding: 24px; border-radius: 24px;
+        margin-top: 50px; margin-bottom: 30px; text-align: center;
+    }
+    .card-text { font-size: 15px; color: var(--text-primary); line-height: 1.5; font-weight: 500;}
+    .card-meta { font-size: 12px; color: var(--text-secondary); margin-top: 12px; }
+
+    .btn-group { display: flex; gap: 12px; width: 100%; }
+    .btn-group button {
+        flex: 1; padding: 16px 0; font-size: 15px; font-weight: 600;
+        border: none; border-radius: 16px; cursor: pointer;
+    }
+    .btn-share { background: var(--text-primary); color: #FFF; }
+    .btn-back { background: var(--bg-main); color: var(--text-primary); }
+
+    @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+
+    /* 辅助消息弹窗 */
+    .toast {
+        position: absolute; top: 60px; left: 50%; transform: translateX(-50%);
+        background: rgba(0,0,0,0.8); color: #FFF; padding: 10px 20px; border-radius: 20px;
+        font-size: 14px; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 100;
+    }
+    .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div id="device-container">
+    <!-- 提示框 -->
+    <div id="toast" class="toast">验证码已发送</div>
+
+    <!-- === 视图 1：登录 === -->
+    <div id="login-view" class="view active">
+        <div class="login-header">
+            <!-- 登录页正二十面体 Logo -->
+            <div class="icosahedron-box">
+                <svg id="logo-poly" class="poly-default" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <!-- 2D 投影的10个可见面 -->
+                    <polygon class="face f1" points="20,55 100,10 100,60" />
+                    <polygon class="face f2" points="100,10 180,55 100,60" />
+                    <polygon class="face f3" points="180,55 140,130 100,60" />
+                    <polygon class="face f4" points="180,55 180,145 140,130" />
+                    <polygon class="face f5" points="180,145 100,190 140,130" />
+                    <polygon class="face f6" points="100,190 60,130 140,130" />
+                    <polygon class="face f7" points="100,190 20,145 60,130" />
+                    <polygon class="face f8" points="20,145 20,55 60,130" />
+                    <polygon class="face f9" points="20,55 100,60 60,130" />
+                    <polygon class="face f10" points="100,60 140,130 60,130" />
+                </svg>
+            </div>
+            <h1>多面体</h1>
+            <p>记录生活，看见多面的自己</p>
+        </div>
+
+        <div class="input-group">
+            <div class="input-box" style="margin-bottom: 12px;">
+                <input type="tel" id="phone-input" placeholder="输入手机号" maxlength="11">
+            </div>
+            <div class="input-box">
+                <input type="number" id="code-input" placeholder="验证码">
+                <button class="btn-get-code" id="get-code-btn">获取验证码</button>
+            </div>
+            <button class="btn-primary" id="login-btn">登 录</button>
+        </div>
+
+        <div class="third-party-login">
+            <p>或使用以下方式快捷登录</p>
+            <div class="icons">
+                <div class="icon-circle" onclick="showToast('调用微信登录...')">微信</div>
+                <div class="icon-circle" onclick="showToast('调用Apple登录...')">Apple</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- === 视图 2：极简记录 === -->
+    <div id="input-view" class="view hidden-right">
+        <div class="top-bar">
+            <!-- 顶部的迷你 Logo -->
+            <div class="icosahedron-box mini-logo">
+                <svg class="poly-default" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <polygon class="face f1" points="20,55 100,10 100,60" />
+                    <polygon class="face f2" points="100,10 180,55 100,60" />
+                    <polygon class="face f3" points="180,55 140,130 100,60" />
+                    <polygon class="face f4" points="180,55 180,145 140,130" />
+                    <polygon class="face f5" points="180,145 100,190 140,130" />
+                    <polygon class="face f6" points="100,190 60,130 140,130" />
+                    <polygon class="face f7" points="100,190 20,145 60,130" />
+                    <polygon class="face f8" points="20,145 20,55 60,130" />
+                    <polygon class="face f9" points="20,55 100,60 60,130" />
+                    <polygon class="face f10" points="100,60 140,130 60,130" />
+                </svg>
+            </div>
+            <div class="settings-btn" onclick="showToast('打开设置面板')"></div>
+        </div>
+        
+        <div class="editor-area">
+            <textarea id="main-input" placeholder="此刻的想法，交给多面体..."></textarea>
+        </div>
+        
+        <div class="bottom-action">
+            <button class="btn-submit" id="submit-btn">记录</button>
+        </div>
+    </div>
+
+    <!-- === 视图 3：反馈与正向循环 === -->
+    <div id="feedback-view" class="view hidden-right">
+        <div class="feedback-header" id="feedback-header">
+            <div class="status-text" id="status-label">AI 正在整理</div>
+            <div class="ai-tag" id="ai-tag"></div>
+        </div>
+
+        <div class="icosahedron-box" style="width: 180px; height: 180px; margin-top: 20px;">
+            <svg id="feedback-poly" class="poly-default" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <polygon class="face f1" points="20,55 100,10 100,60" />
+                <polygon class="face f2" points="100,10 180,55 100,60" />
+                <polygon class="face f3" points="180,55 140,130 100,60" />
+                <polygon class="face f4" points="180,55 180,145 140,130" />
+                <polygon class="face f5" points="180,145 100,190 140,130" />
+                <polygon class="face f6" points="100,190 60,130 140,130" />
+                <polygon class="face f7" points="100,190 20,145 60,130" />
+                <polygon class="face f8" points="20,145 20,55 60,130" />
+                <polygon class="face f9" points="20,55 100,60 60,130" />
+                <polygon class="face f10" points="100,60 140,130 60,130" />
+            </svg>
+        </div>
+
+        <div class="card-footer" id="card-stats">
+            <div class="card-text" id="card-desc">--</div>
+            <div class="card-meta">来自「多面体」</div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn-share" onclick="showToast('已生成精美分享图')">分享卡片</button>
+            <button class="btn-back" id="back-btn">继续记录</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    /* --- 视图切换逻辑 --- */
+    const viewLogin = document.getElementById('login-view');
+    const viewInput = document.getElementById('input-view');
+    const viewFeedback = document.getElementById('feedback-view');
+
+    function navigate(fromView, toView) {
+        fromView.classList.remove('active');
+        fromView.classList.add('hidden-left');
+        toView.classList.remove('hidden-right');
+        toView.classList.add('active');
+    }
+
+    /* --- 辅助功能 --- */
+    const toastEl = document.getElementById('toast');
+    function showToast(msg) {
+        toastEl.innerText = msg;
+        toastEl.classList.add('show');
+        setTimeout(() => toastEl.classList.remove('show'), 2000);
+    }
+
+    /* --- 登录逻辑 (MVP 简单验证) --- */
+    const phoneInput = document.getElementById('phone-input');
+    const codeInput = document.getElementById('code-input');
+    const getCodeBtn = document.getElementById('get-code-btn');
+    const loginBtn = document.getElementById('login-btn');
+
+    getCodeBtn.addEventListener('click', () => {
+        if(phoneInput.value.length === 11) {
+            showToast('验证码 8888 已发送');
+            codeInput.value = '8888'; // 自动填充以便测试
+        } else {
+            showToast('请输入11位手机号');
+        }
+    });
+
+    loginBtn.addEventListener('click', () => {
+        if(phoneInput.value && codeInput.value) {
+            navigate(viewLogin, viewInput);
+            // 延迟聚焦输入框
+            setTimeout(() => document.getElementById('main-input').focus(), 500);
+        } else {
+            showToast('请输入手机号和验证码');
+        }
+    });
+
+    /* --- 记录与 AI 反馈逻辑 --- */
+    const inputField = document.getElementById('main-input');
+    const submitBtn = document.getElementById('submit-btn');
+    const feedbackPoly = document.getElementById('feedback-poly');
+    const feedbackHeader = document.getElementById('feedback-header');
+    const statusLabel = document.getElementById('status-label');
+    const aiTag = document.getElementById('ai-tag');
+    const cardDesc = document.getElementById('card-desc');
+    const backBtn = document.getElementById('back-btn');
+
+    inputField.addEventListener('input', () => {
+        if (inputField.value.trim().length > 0) {
+            submitBtn.classList.add('active');
+        } else {
+            submitBtn.classList.remove('active');
+        }
+    });
+
+    submitBtn.addEventListener('click', () => {
+        const text = inputField.value.trim();
+        if (!text) return;
+
+        // 进入反馈页
+        navigate(viewInput, viewFeedback);
+        
+        // 还原加载状态
+        feedbackHeader.classList.add('loading');
+        statusLabel.innerText = "多面体正在为你整理...";
+        aiTag.innerText = "";
+        feedbackPoly.className = "poly-default"; // 彩色基础状态
+        cardDesc.innerText = "数据分析中...";
+
+        // 模拟 AI API 延迟
+        setTimeout(() => {
+            feedbackHeader.classList.remove('loading');
+            statusLabel.innerText = "已自动归类，点击标签可确认";
+            
+            let categoryClass = "";
+            let generatedTag = "";
+            let statText = "";
+
+            // 规则一：体重（数字/小数）
+            if (/^\d+(\.\d+)?$/.test(text)) {
+                categoryClass = "poly-weight"; // 橙色系高亮
+                generatedTag = "#身体管理";
+                statText = `记录体重 ${text}kg，你正在变得更好。`;
+            } 
+            // 规则二：梦境（超100字或包含标记）
+            else if (text.length >= 100 || text.startsWith("梦到") || text.startsWith("梦见")) {
+                categoryClass = "poly-dream"; // 紫色系高亮
+                generatedTag = "#潜意识切面";
+                statText = "记录了一场梦。本周第 2 次探索潜意识。";
+            } 
+            // 规则三：日常速记（默认）
+            else {
+                categoryClass = "poly-note"; // 蓝色系高亮
+                const mockTags = ["#生活碎片", "#稍后阅读", "#灵感迸发", "#日常反思"];
+                generatedTag = mockTags[Math.floor(Math.random() * mockTags.length)];
+                statText = `已沉淀。你在这里留下了 ${Math.floor(Math.random() * 10 + 5)} 块思想碎片。`;
+            }
+
+            aiTag.innerText = generatedTag;
+            cardDesc.innerText = statText;
+            feedbackPoly.setAttribute('class', categoryClass); // 触发点亮动画
+
+        }, 1200); // 1.2秒延迟增加仪式感
+    });
+
+    // 返回继续记录
+    backBtn.addEventListener('click', () => {
+        inputField.value = '';
+        submitBtn.classList.remove('active');
+        
+        // 逆向动画返回
+        viewFeedback.classList.remove('active');
+        viewFeedback.classList.add('hidden-right');
+        viewInput.classList.remove('hidden-left');
+        viewInput.classList.add('active');
+        
+        setTimeout(() => inputField.focus(), 400);
+    });
+</script>
+
+</body>
+</html>
