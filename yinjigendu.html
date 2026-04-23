@@ -131,29 +131,22 @@
             <div class="absolute inset-0 p-8 flex pointer-events-none">
                 
                 <!-- 左半区：评测队列 (50%宽度) -->
-                <div class="w-[50%] h-full flex flex-col pointer-events-auto pr-8 border-r border-gray-300/30 mr-4">
+                <!-- 调整：取消 pb-6，改为 pb-0 让底部可以紧贴 p-8 的安全线 -->
+                <div class="w-[50%] h-full flex flex-col pointer-events-auto pr-8 border-r border-gray-300/30 mr-4 pb-0">
                     
                     <!-- 队列头部，加入返回按钮 -->
-                    <div class="flex items-center justify-between h-12 mb-6 px-2 z-20">
-                        <div class="flex items-center">
-                            <button onclick="exitScoringMode()" class="w-11 h-11 bg-white/60 hover:bg-white rounded-full flex items-center justify-center shadow-sm hover:shadow-md transition-all text-gray-700 hover:text-[#1F5FFF] border border-white/50 backdrop-blur-md mr-4 shrink-0">
-                                <i data-lucide="chevron-left" class="w-6 h-6 -ml-0.5"></i>
-                            </button>
-                            <h3 class="font-bold text-gray-800 text-[28px] flex items-center tracking-wide">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7 mr-3 text-[#1F5FFF]">
-                                    <rect x="3" y="4" width="5" height="5" rx="1.5" />
-                                    <path d="M3 17l2 2 4-4" />
-                                    <path d="M13 6h8" />
-                                    <path d="M13 12h8" />
-                                    <path d="M13 18h8" />
-                                </svg>
-                                评测队列
-                            </h3>
-                        </div>
+                    <div class="flex items-center justify-between h-12 mb-6 px-2 z-20 shrink-0">
+                        <!-- 强化返回按钮，使其充当大标题，整体更清爽 -->
+                        <button onclick="exitScoringMode()" class="flex items-center text-gray-800 hover:text-[#1F5FFF] transition-colors group">
+                            <div class="w-10 h-10 bg-white/70 group-hover:bg-white rounded-full flex items-center justify-center shadow-sm group-hover:shadow-md transition-all border border-white/50 backdrop-blur-md mr-3 shrink-0">
+                                <i data-lucide="chevron-left" class="w-6 h-6 -ml-0.5 text-gray-500 group-hover:text-[#1F5FFF]"></i>
+                            </div>
+                            <span class="text-[24px] font-bold tracking-wide">返回音记</span>
+                        </button>
                         
-                        <div class="flex items-center space-x-4">
-                            <!-- 已删除手动/自动播放按钮，仅保留进度指示 -->
-                            <div id="score-progress" class="bg-[#1F5FFF]/10 backdrop-blur-md text-[#1F5FFF] font-bold px-5 py-2.5 rounded-full text-[15px] border border-[#1F5FFF]/20 shadow-sm">1/5</div>
+                        <div class="flex items-center">
+                            <!-- 进度指示器靠右对齐 -->
+                            <div id="score-progress" class="bg-[#1F5FFF]/10 backdrop-blur-md text-[#1F5FFF] font-bold px-5 py-2.5 rounded-full text-[15px] border border-[#1F5FFF]/20 shadow-sm">1/11</div>
                         </div>
                     </div>
                     
@@ -161,6 +154,11 @@
                     <ul id="queue-words-list" class="flex-1 overflow-y-auto px-4 space-y-[6px] scroll-smooth no-scrollbar relative">
                         <!-- JS 动态注入 -->
                     </ul>
+
+                    <!-- 底部提交栏 (固定高度 64px 保证与右侧对齐) -->
+                    <div id="queue-submit-bar" class="mt-4 pt-4 border-t border-gray-300/30 flex items-center justify-between px-2 shrink-0 h-[64px]">
+                        <!-- JS 动态注入状态 -->
+                    </div>
                 </div>
 
                 <!-- 右半区：当前单词极致沉浸区 (50%宽度) -->
@@ -181,7 +179,8 @@
                     </div>
 
                     <!-- 底部拆解信息 -->
-                    <div class="w-full px-6 z-20 mb-8 mt-4">
+                    <!-- 修复：加大底部 margin 至 mb-[190px]，防备更高层的麦克风按钮遮挡 -->
+                    <div class="w-full px-6 z-20 mb-[190px] mt-4">
                         <div class="bg-white/40 backdrop-blur-xl rounded-[24px] py-6 px-6 border border-white/60 shadow-sm flex flex-col items-center space-y-4">
                             <div id="score-word-split-en" class="w-full text-center text-[24px] text-gray-700 font-bold tracking-widest break-words leading-tight">af-ter-noon</div>
                             <div class="w-[80%] h-px bg-gray-300/50"></div>
@@ -189,38 +188,34 @@
                         </div>
                     </div>
 
-                    <!-- 新增：主操作区内的按住发音按钮 -->
-                    <div class="w-full flex flex-col items-center justify-center z-20 mb-6">
-                        <button id="score-action-btn" class="w-[80px] h-[80px] bg-[#1F5FFF] text-white rounded-full flex items-center justify-center shadow-[0_8px_20px_rgba(31,95,255,0.35)] hover:bg-[#004ce6] transition-all focus:outline-none relative select-none">
-                            <i data-lucide="mic" class="w-10 h-10 pointer-events-none"></i>
+                    <!-- 悬浮录音按钮 (独立悬浮并往上提至 bottom-[96px]，不再与胶囊挤压) -->
+                    <div class="absolute right-8 bottom-[96px] z-50 pointer-events-auto">
+                        <button id="score-action-btn" class="w-[72px] h-[72px] bg-[#1F5FFF] text-white rounded-full flex items-center justify-center shadow-[0_8px_20px_rgba(31,95,255,0.35)] hover:bg-[#004ce6] transition-all focus:outline-none select-none group">
+                            <i data-lucide="mic" class="w-8 h-8 pointer-events-none transition-transform group-active:scale-90"></i>
                         </button>
                     </div>
 
-                    <!-- 调整：等宽于右半区的控制栏 -->
-                    <div class="w-full flex justify-between items-center bg-white/70 backdrop-blur-2xl px-8 py-2.5 rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-white/60 z-50 pointer-events-auto">
-                        <button id="prev-btn" class="flex items-center hover:text-[#004ce6] transition-colors font-medium text-[#1F5FFF] text-[15px] w-32 justify-start hover:bg-[#1F5FFF]/10 py-2.5 px-6 rounded-full cursor-pointer" onclick="prevScoreWord()">
-                            <i data-lucide="skip-back" class="w-6 h-6 mr-3"></i>
-                            <div class="flex flex-col items-start leading-[1.2] text-[14px]">
-                                <span>上一</span>
-                                <span>题</span>
-                            </div>
+                    <!-- 底部通栏控制胶囊 (高度强制 64px 并且 bottom-0 以便精确水平对齐左侧底栏) -->
+                    <div class="absolute bottom-0 left-4 right-8 flex justify-between items-center bg-white/80 backdrop-blur-2xl px-10 h-[64px] rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-white/60 z-50 pointer-events-auto">
+                        
+                        <!-- 上一题 (横向排列，严格不换行) -->
+                        <button id="prev-btn" class="flex items-center text-[#1F5FFF] hover:text-[#004ce6] transition-colors font-medium text-[16px] py-2 px-4 rounded-full cursor-pointer hover:bg-[#1F5FFF]/10 whitespace-nowrap" onclick="prevScoreWord()">
+                            <i data-lucide="skip-back" class="w-6 h-6 mr-1.5"></i>
+                            上一题
                         </button>
                         
-                        <!-- 恢复居中的系统播放按钮 -->
-                        <div class="relative flex items-center justify-center">
-                            <button id="system-play-btn" class="w-[52px] h-[52px] bg-white text-[#1F5FFF] border-[2px] border-[#1F5FFF] rounded-full flex items-center justify-center shadow-sm hover:bg-[#1F5FFF]/10 transition-all active:scale-95 focus:outline-none" onclick="playSystemAudio()">
-                                <i data-lucide="play" class="w-6 h-6 ml-0.5"></i>
-                            </button>
-                        </div>
+                        <!-- 系统发音 -->
+                        <button id="system-play-btn" class="w-14 h-14 bg-white text-[#1F5FFF] border-[1.5px] border-[#1F5FFF] rounded-full flex items-center justify-center shadow-sm hover:bg-[#f0f5ff] transition-all active:scale-95 focus:outline-none" onclick="playSystemAudio()">
+                            <i data-lucide="play" class="w-6 h-6 ml-1"></i>
+                        </button>
                         
-                        <button id="next-btn" class="flex items-center hover:text-[#004ce6] transition-colors text-[#1F5FFF] font-medium text-[15px] w-32 justify-end hover:bg-[#1F5FFF]/10 py-2.5 px-6 rounded-full cursor-pointer" onclick="nextScoreWord()">
-                            <div class="flex flex-col items-end leading-[1.2] text-[14px]">
-                                <span>下一</span>
-                                <span>题</span>
-                            </div>
-                            <i data-lucide="skip-forward" class="w-6 h-6 ml-3"></i>
+                        <!-- 下一题 (横向排列，严格不换行) -->
+                        <button id="next-btn" class="flex items-center text-[#1F5FFF] hover:text-[#004ce6] transition-colors font-medium text-[16px] py-2 px-4 rounded-full cursor-pointer hover:bg-[#1F5FFF]/10 whitespace-nowrap" onclick="nextScoreWord()">
+                            下一题
+                            <i data-lucide="skip-forward" class="w-6 h-6 ml-1.5"></i>
                         </button>
                     </div>
+
                 </div>
 
             </div>
@@ -250,6 +245,7 @@
         let isRecording = false;
         let isPlayingSystem = false;
         let systemAudioTimeout = null;
+        let isAverageRevealed = false; // 新增：是否已揭晓平均分
 
         function refreshIcons() {
             if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -320,7 +316,7 @@
                 btnEl.classList.replace('hover:bg-[#004ce6]', 'hover:bg-red-600');
                 btnEl.classList.replace('shadow-[0_8px_20px_rgba(31,95,255,0.35)]', 'shadow-[0_8px_20px_rgba(239,68,68,0.35)]');
                 btnEl.style.transform = 'scale(0.95)';
-                btnEl.innerHTML = `<i data-lucide="mic" class="w-10 h-10 animate-pulse pointer-events-none"></i>`;
+                btnEl.innerHTML = `<i data-lucide="mic" class="w-8 h-8 animate-pulse pointer-events-none"></i>`;
                 refreshIcons();
                 
                 updateQueueList();
@@ -360,10 +356,19 @@
                 btnEl.classList.replace('hover:bg-red-600', 'hover:bg-[#004ce6]');
                 btnEl.classList.replace('shadow-[0_8px_20px_rgba(239,68,68,0.35)]', 'shadow-[0_8px_20px_rgba(31,95,255,0.35)]');
                 btnEl.style.transform = 'scale(1)';
-                btnEl.innerHTML = `<i data-lucide="mic" class="w-10 h-10 pointer-events-none"></i>`;
+                btnEl.innerHTML = `<i data-lucide="mic" class="w-8 h-8 pointer-events-none"></i>`;
                 refreshIcons();
                 
                 updateQueueList();
+
+                // 新增：评分完成后 0.5 秒自动切换下一题
+                if (currentScoreIdx < scoringData.length - 1) {
+                    setTimeout(() => {
+                        if (!isRecording) {
+                            nextScoreWord();
+                        }
+                    }, 500);
+                }
             };
 
             btn.addEventListener('mousedown', startRecord);
@@ -408,24 +413,24 @@
             document.getElementById('score-word-phon').innerText = currWord.phon;
             document.getElementById('score-word-split-phon').innerText = currWord.splitPhon;
 
-            // 控制上一题/下一题按钮状态 (使用 #1F5FFF)
+            // 控制上一题/下一题按钮状态，适配双层控制台样式
             const prevBtn = document.getElementById('prev-btn');
             const nextBtn = document.getElementById('next-btn');
 
             if (currentScoreIdx === 0) {
                 prevBtn.disabled = true;
-                prevBtn.className = "flex items-center transition-colors font-medium text-gray-300 text-[15px] w-32 justify-start py-2.5 px-6 rounded-full cursor-not-allowed opacity-60";
+                prevBtn.className = "flex items-center text-gray-300 font-medium text-[16px] py-2 px-4 rounded-full cursor-not-allowed opacity-50 whitespace-nowrap";
             } else {
                 prevBtn.disabled = false;
-                prevBtn.className = "flex items-center hover:text-[#004ce6] transition-colors font-medium text-[#1F5FFF] text-[15px] w-32 justify-start hover:bg-[#1F5FFF]/10 py-2.5 px-6 rounded-full cursor-pointer";
+                prevBtn.className = "flex items-center text-[#1F5FFF] hover:text-[#004ce6] hover:bg-[#1F5FFF]/10 transition-colors font-medium text-[16px] py-2 px-4 rounded-full cursor-pointer whitespace-nowrap";
             }
 
             if (currentScoreIdx === scoringData.length - 1) {
                 nextBtn.disabled = true;
-                nextBtn.className = "flex items-center transition-colors font-medium text-gray-300 text-[15px] w-32 justify-end py-2.5 px-6 rounded-full cursor-not-allowed opacity-60";
+                nextBtn.className = "flex items-center text-gray-300 font-medium text-[16px] py-2 px-4 rounded-full cursor-not-allowed opacity-50 whitespace-nowrap";
             } else {
                 nextBtn.disabled = false;
-                nextBtn.className = "flex items-center hover:text-[#004ce6] transition-colors text-[#1F5FFF] font-medium text-[15px] w-32 justify-end hover:bg-[#1F5FFF]/10 py-2.5 px-6 rounded-full cursor-pointer";
+                nextBtn.className = "flex items-center text-[#1F5FFF] hover:text-[#004ce6] hover:bg-[#1F5FFF]/10 transition-colors font-medium text-[16px] py-2 px-4 rounded-full cursor-pointer whitespace-nowrap";
             }
 
             updateQueueList();
@@ -483,13 +488,14 @@
                     titleColor = 'text-[#1F5FFF]';
                 }
 
-                li.className = `${bgClass} px-6 rounded-[20px] border ${borderClass} flex justify-between items-center transition-all duration-300 cursor-pointer h-[80px]`;
+                // 优化排版：卡片高度缩至68px，左右内边距微调，缩小字号
+                li.className = `${bgClass} px-5 rounded-[16px] border ${borderClass} flex justify-between items-center transition-all duration-300 cursor-pointer h-[68px]`;
                 li.innerHTML = `
-                    <div class="flex-1 flex items-baseline space-x-4 overflow-hidden pr-4">
-                        <span class="font-bold text-[32px] ${titleColor} transition-colors truncate flex-shrink-0">${item.en}</span>
+                    <div class="flex-1 flex items-baseline space-x-3 overflow-hidden pr-4">
+                        <span class="font-bold text-[22px] ${titleColor} transition-colors truncate flex-shrink-0">${item.en}</span>
                         <div class="flex items-baseline space-x-2 truncate flex-1 min-w-0">
-                            <!-- 中文字号暴涨至 28px，视觉体量与 32px 英文几乎一致 -->
-                            <span class="text-[28px] text-gray-500 truncate font-medium">${item.cn}</span>
+                            <!-- 中文字号相应缩减至 18px -->
+                            <span class="text-[18px] text-gray-500 truncate font-medium">${item.cn}</span>
                             <span class="text-[13px] text-gray-400 font-serif tracking-wide truncate flex-shrink-0">${item.phon}</span>
                         </div>
                     </div>
@@ -514,7 +520,119 @@
                     listContainer.scrollTo({ top: itemCenter - targetCenterInsideUl, behavior: 'smooth' });
                 }
             }, 100);
+            
+            // 每次更新列表时，同步更新底部提交栏状态
+            updateSubmitBar();
+            
             refreshIcons();
+        }
+
+        // 新增：手动触发揭晓平均分
+        function revealAverageScore() {
+            isAverageRevealed = true;
+            updateSubmitBar();
+        }
+
+        // 修改：更新底部提交栏状态（隐藏实时均分，替换配色）
+        function updateSubmitBar() {
+            const completedItems = scoringData.filter(item => item.score !== null);
+            const unfinishedItems = scoringData.filter(item => item.score === null);
+            const unfinishedCount = unfinishedItems.length;
+
+            const barContainer = document.getElementById('queue-submit-bar');
+
+            if (unfinishedCount > 0) {
+                // 将原先突兀的橙色，替换成搭配蓝色主题的高级靛蓝色 (Indigo)
+                barContainer.innerHTML = `
+                    <div class="flex items-center cursor-pointer group" onclick="scrollToFirstUnfinished()">
+                        <div class="w-6 h-6 rounded-full bg-[#eef2ff] border border-[#c7d2fe] flex items-center justify-center text-[#6366f1] mr-2 group-hover:bg-[#e0e7ff] transition-colors">
+                            <span class="font-bold text-[13px] -mt-px">!</span>
+                        </div>
+                        <span class="text-[#6366f1] font-medium text-[15px] transition-colors flex items-center">
+                            剩余待完成：<span class="font-bold text-[22px] mx-1.5 leading-none">${unfinishedCount}</span> 题 
+                            <i data-lucide="chevron-right" class="w-4 h-4 ml-0.5 opacity-70 group-hover:translate-x-1 transition-transform"></i>
+                        </span>
+                    </div>
+                    <div class="flex items-center space-x-5">
+                        <button class="bg-[#e2e8f0] text-[#94a3b8] font-bold py-2.5 px-6 rounded-xl text-[15px] cursor-not-allowed transition-all">
+                            查看平均分
+                        </button>
+                    </div>
+                `;
+            } else {
+                if (!isAverageRevealed) {
+                    // 全做完但未点击查看
+                    barContainer.innerHTML = `
+                        <div class="flex items-center">
+                            <div class="w-7 h-7 rounded-full bg-[#dcfce7] flex items-center justify-center text-[#10b981] mr-2 shadow-sm">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </div>
+                            <span class="text-[#10b981] font-bold text-[16px] tracking-wide">所有题目都已完成</span>
+                        </div>
+                        <div class="flex items-center space-x-5">
+                            <button onclick="revealAverageScore()" class="bg-[#1F5FFF] hover:bg-[#004ce6] text-white font-bold py-2.5 px-6 rounded-xl text-[15px] shadow-[0_4px_12px_rgba(31,95,255,0.3)] hover:shadow-[0_6px_16px_rgba(31,95,255,0.4)] transition-all active:scale-95">
+                                查看平均分
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    // 已点击查看平均分，执行颜色判断逻辑
+                    const totalScore = completedItems.reduce((sum, item) => sum + item.score, 0);
+                    const avgScore = Math.round(totalScore / completedItems.length);
+                    
+                    let scoreColorClass = '';
+                    if (avgScore >= 80) {
+                        scoreColorClass = 'text-[#10b981]'; // 绿色
+                    } else if (avgScore >= 60) {
+                        scoreColorClass = 'text-[#f97316]'; // 橙色
+                    } else {
+                        scoreColorClass = 'text-[#ef4444]'; // 红色
+                    }
+
+                    // 取消 font-serif 使用默认黑体
+                    barContainer.innerHTML = `
+                        <div class="flex items-center">
+                            <div class="w-7 h-7 rounded-full bg-[#dcfce7] flex items-center justify-center text-[#10b981] mr-2 shadow-sm">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </div>
+                            <span class="text-[#10b981] font-bold text-[16px] tracking-wide">所有题目都已完成</span>
+                        </div>
+                        <div class="flex items-center space-x-5">
+                            <div class="flex flex-col items-end">
+                                <span class="text-[12px] text-gray-400 leading-none mb-1">最终均分</span>
+                                <span class="text-[26px] font-bold ${scoreColorClass} leading-none tracking-wide">${avgScore}<span class="text-[14px] ml-0.5">分</span></span>
+                            </div>
+                            <button class="bg-[#e2e8f0] text-[#94a3b8] font-bold py-2.5 px-6 rounded-xl text-[15px] cursor-not-allowed transition-all">
+                                已出分
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+            refreshIcons();
+        }
+
+        // 修改：自动定位并高亮第一道未答题目
+        function scrollToFirstUnfinished() {
+            if (isRecording) return; 
+            
+            const firstIdx = scoringData.findIndex(item => item.score === null);
+            if (firstIdx === -1) return;
+
+            currentScoreIdx = firstIdx;
+            updateScoringUI(); 
+            
+            // 高亮效果改为对应的靛蓝色系，保证与蓝色的主体视觉和谐
+            setTimeout(() => {
+                const targetEl = document.getElementById(`queue-item-${firstIdx}`);
+                if (targetEl) {
+                    targetEl.classList.add('!border-[#818cf8]', 'shadow-[0_0_0_2px_rgba(129,140,248,0.4)]', '!bg-[#eef2ff]');
+                    
+                    setTimeout(() => {
+                        targetEl.classList.remove('!border-[#818cf8]', 'shadow-[0_0_0_2px_rgba(129,140,248,0.4)]', '!bg-[#eef2ff]');
+                    }, 1200);
+                }
+            }, 150); 
         }
 
         function prevScoreWord() {
@@ -532,6 +650,7 @@
         function resetScoringState() {
             isRecording = false;
             isPlayingSystem = false;
+            isAverageRevealed = false; // 重置均分状态
             clearTimeout(systemAudioTimeout);
             
             const statusPill = document.getElementById('scoring-status-pill');
@@ -540,9 +659,10 @@
             
             const btnEl = document.getElementById('score-action-btn');
             if (btnEl) {
-                btnEl.className = "w-[80px] h-[80px] bg-[#1F5FFF] text-white rounded-full flex items-center justify-center shadow-[0_8px_20px_rgba(31,95,255,0.35)] hover:bg-[#004ce6] transition-all focus:outline-none relative select-none";
+                // 适配新版双层布局的悬浮录音按键
+                btnEl.className = "w-[72px] h-[72px] bg-[#1F5FFF] text-white rounded-full flex items-center justify-center shadow-[0_8px_20px_rgba(31,95,255,0.35)] hover:bg-[#004ce6] transition-all focus:outline-none select-none group";
                 btnEl.style.transform = 'scale(1)';
-                btnEl.innerHTML = `<i data-lucide="mic" class="w-10 h-10 pointer-events-none"></i>`;
+                btnEl.innerHTML = `<i data-lucide="mic" class="w-8 h-8 pointer-events-none transition-transform group-active:scale-90"></i>`;
             }
             
             refreshIcons();
