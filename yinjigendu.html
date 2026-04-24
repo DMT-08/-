@@ -245,7 +245,7 @@
         let isRecording = false;
         let isPlayingSystem = false;
         let systemAudioTimeout = null;
-        let isAverageRevealed = false; // 新增：是否已揭晓平均分
+        let isSubmitted = false; // 新增：是否已提交
 
         function refreshIcons() {
             if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -527,9 +527,9 @@
             refreshIcons();
         }
 
-        // 新增：手动触发揭晓平均分
-        function revealAverageScore() {
-            isAverageRevealed = true;
+        // 新增：手动触发提交
+        function submitScore() {
+            isSubmitted = true;
             updateSubmitBar();
         }
 
@@ -555,13 +555,13 @@
                     </div>
                     <div class="flex items-center space-x-5">
                         <button class="bg-[#e2e8f0] text-[#94a3b8] font-bold py-2.5 px-6 rounded-xl text-[15px] cursor-not-allowed transition-all">
-                            查看平均分
+                            提交
                         </button>
                     </div>
                 `;
             } else {
-                if (!isAverageRevealed) {
-                    // 全做完但未点击查看
+                if (!isSubmitted) {
+                    // 全做完但未点击提交
                     barContainer.innerHTML = `
                         <div class="flex items-center">
                             <div class="w-7 h-7 rounded-full bg-[#dcfce7] flex items-center justify-center text-[#10b981] mr-2 shadow-sm">
@@ -570,13 +570,13 @@
                             <span class="text-[#10b981] font-bold text-[16px] tracking-wide">所有题目都已完成</span>
                         </div>
                         <div class="flex items-center space-x-5">
-                            <button onclick="revealAverageScore()" class="bg-[#1F5FFF] hover:bg-[#004ce6] text-white font-bold py-2.5 px-6 rounded-xl text-[15px] shadow-[0_4px_12px_rgba(31,95,255,0.3)] hover:shadow-[0_6px_16px_rgba(31,95,255,0.4)] transition-all active:scale-95">
-                                查看平均分
+                            <button onclick="submitScore()" class="bg-[#1F5FFF] hover:bg-[#004ce6] text-white font-bold py-2.5 px-6 rounded-xl text-[15px] shadow-[0_4px_12px_rgba(31,95,255,0.3)] hover:shadow-[0_6px_16px_rgba(31,95,255,0.4)] transition-all active:scale-95">
+                                提交
                             </button>
                         </div>
                     `;
                 } else {
-                    // 已点击查看平均分，执行颜色判断逻辑
+                    // 已点击提交，执行颜色判断逻辑
                     const totalScore = completedItems.reduce((sum, item) => sum + item.score, 0);
                     const avgScore = Math.round(totalScore / completedItems.length);
                     
@@ -603,7 +603,7 @@
                                 <span class="text-[26px] font-bold ${scoreColorClass} leading-none tracking-wide">${avgScore}<span class="text-[14px] ml-0.5">分</span></span>
                             </div>
                             <button class="bg-[#e2e8f0] text-[#94a3b8] font-bold py-2.5 px-6 rounded-xl text-[15px] cursor-not-allowed transition-all">
-                                已出分
+                                已提交
                             </button>
                         </div>
                     `;
@@ -650,7 +650,7 @@
         function resetScoringState() {
             isRecording = false;
             isPlayingSystem = false;
-            isAverageRevealed = false; // 重置均分状态
+            isSubmitted = false; // 重置提交状态
             clearTimeout(systemAudioTimeout);
             
             const statusPill = document.getElementById('scoring-status-pill');
