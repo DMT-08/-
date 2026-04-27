@@ -2,12 +2,12 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI 记词 - 单词学习系统</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI 记词 - 安卓原生体验</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -16,38 +16,37 @@
             min-height: 100vh;
             color: #1f2937;
             overflow-x: hidden;
+            overscroll-behavior-y: none;
         }
 
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        *::-webkit-scrollbar { display: none; }
+        * { -ms-overflow-style: none; scrollbar-width: none; }
 
-        .view-section { display: none; opacity: 0; transition: opacity 0.3s ease; }
+        .view-section { display: none; opacity: 0; transition: opacity 0.25s ease-in-out; }
         .view-section.active { display: flex; opacity: 1; }
 
-        @keyframes slideUp {
-            from { transform: translateY(10px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .animate-slide-up { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-
-        /* 极简轻投影 */
-        .shadow-soft {
-            box-shadow: 0 10px 40px -10px rgba(31, 95, 255, 0.08), 0 4px 12px -4px rgba(31, 95, 255, 0.04);
+        .shadow-app-card {
+            box-shadow: 0 8px 24px rgba(149, 157, 165, 0.12);
             border: 1px solid rgba(255, 255, 255, 0.9);
         }
-
-        .judge-btn { transition: all 0.2s ease; }
-        .judge-btn.disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
-        .judge-x.active { background-color: #FEE2E2 !important; color: #EF4444 !important; border-color: #FCA5A5 !important; }
-        .judge-check.active { background-color: #DCFCE7 !important; color: #22C55E !important; border-color: #86EFAC !important; }
         
+        .shadow-app-floating { box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05); }
+
+        .judge-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        .modal-enter { animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
         .timeline-item::before {
             content: '';
             position: absolute;
             left: -19px;
-            top: 5px;
-            width: 8px;
-            height: 8px;
+            top: 6px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             background-color: #3B82F6;
             border: 2px solid #ffffff;
@@ -55,152 +54,193 @@
         }
     </style>
 </head>
-<body class="flex flex-col h-screen overflow-hidden">
+<body class="flex flex-col h-screen overflow-hidden text-[16px]">
+
+    <!-- ================= 全局原生弹窗 ================= -->
+    <div id="native-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-gray-900/60 backdrop-blur-sm transition-opacity duration-300 opacity-0">
+        <div class="bg-white rounded-[24px] p-8 w-[90%] max-w-sm shadow-2xl flex flex-col modal-enter" id="native-modal-content">
+            <h3 id="modal-title" class="text-[24px] font-bold text-gray-900 mb-3">提示</h3>
+            <p id="modal-msg" class="text-[16px] text-gray-600 mb-8 leading-relaxed whitespace-pre-wrap"></p>
+            <button id="modal-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-[18px] py-4 rounded-2xl shadow-lg active:scale-95 transition-all">
+                我知道了
+            </button>
+        </div>
+    </div>
+
 
     <!-- ================= 视图 1：主界面 (仪表盘) ================= -->
-    <div id="view-dashboard" class="view-section active flex-col w-full h-full max-w-6xl mx-auto p-4 md:px-6 md:py-4 overflow-hidden animate-slide-up">
+    <div id="view-dashboard" class="view-section active flex-col w-full h-full max-w-[1400px] mx-auto p-4 md:p-6 overflow-hidden">
         
-        <!-- Header 高度压缩 -->
-        <header class="flex justify-between items-center mb-4 shrink-0">
-            <div class="flex items-center gap-3">
-                <button class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-soft hover:scale-105 transition text-slate-700 cursor-pointer" onclick="alert('返回上一级系统')">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="mr-0.5">
+        <!-- App Header -->
+        <header class="flex justify-between items-center mb-5 shrink-0 pt-2">
+            <div class="flex items-center gap-4">
+                <button class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-app-card active:scale-90 transition-transform text-slate-700 cursor-pointer" onclick="showModal('返回提示', '此处将返回安卓系统的上一级页面或桌面。')">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mr-0.5">
                         <polyline points="15 18 9 12 15 6"></polyline>
                     </svg>
                 </button>
-                <h1 class="text-xl font-bold flex items-center text-gray-800 tracking-tight">
+                <h1 class="text-[32px] font-extrabold text-gray-900 tracking-tight leading-none">
                     AI 记词
                 </h1>
             </div>
+            <button onclick="toggleTeacherTasks()" class="bg-white text-blue-600 border border-blue-200 px-4 py-3 rounded-xl font-bold text-[14px] shadow-sm active:scale-95 transition-transform flex items-center gap-2">
+                <i class="ph-bold ph-arrows-clockwise text-[18px]"></i> 模拟任务分配
+            </button>
         </header>
 
-        <!-- 个人学习数据看板 (高度压缩) -->
-        <div class="bg-white/80 backdrop-blur-xl rounded-[1.5rem] shadow-soft p-5 mb-5 shrink-0 flex flex-col lg:flex-row gap-6 relative overflow-hidden">
-            <div class="absolute right-0 top-0 w-64 h-64 bg-blue-50/50 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2"></div>
+        <!-- 上半部分：数据看板大卡片 -->
+        <div class="bg-white/90 backdrop-blur-xl rounded-[24px] shadow-app-card p-6 mb-6 shrink-0 flex flex-col lg:flex-row gap-8 relative overflow-hidden">
+            <div class="absolute right-0 top-0 w-80 h-80 bg-blue-50/50 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2"></div>
+            <div class="absolute right-0 bottom-0 opacity-[0.03] z-0 pointer-events-none translate-x-1/4 translate-y-1/4">
+                <i class="ph-fill ph-chart-bar text-[300px]"></i>
+            </div>
             
-            <!-- 左侧核心指标 -->
-            <div class="flex-1 flex flex-col justify-between">
-                <div class="flex items-center gap-2 mb-3">
-                    <i class="ph-fill ph-chart-line-up text-blue-500 text-lg"></i>
-                    <h2 class="text-base font-bold text-gray-800">AI 记词数据看板</h2>
-                    <span class="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium ml-2">多班级联网同步中</span>
-                </div>
-
-                <div class="grid grid-cols-2 gap-6 mb-4">
-                    <div>
-                        <div class="text-xs text-gray-500 font-medium mb-1">今日新记单词</div>
-                        <div class="flex items-end gap-2">
-                            <span class="text-4xl font-extrabold text-gray-800 tracking-tight" id="statTodayLearned">120</span>
-                            <div class="flex flex-col pb-0.5">
-                                <span class="text-[10px] font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded border border-green-100 flex items-center w-max">
-                                    <i class="ph-bold ph-trend-up mr-0.5"></i>+<span id="statCompareYesterday">35</span>
+            <!-- 看板左侧：数据指标 -->
+            <div class="flex-1 flex flex-col justify-center relative z-10">
+                <div class="grid grid-cols-2 gap-8 mb-5">
+                    <!-- 核心指标1：排行 -->
+                    <div class="flex flex-col">
+                        <div class="text-[14px] text-gray-500 font-bold mb-1 flex items-center gap-1.5"><i class="ph-fill ph-ranking text-yellow-500"></i> 校区总排行榜</div>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-[48px] font-extrabold text-blue-600 leading-none" id="statRank">5</span>
+                            <span class="text-[16px] text-gray-500 font-medium">/ <span id="statTotalStudents">350</span> 人</span>
+                        </div>
+                    </div>
+                    <!-- 核心指标2：今日新增 -->
+                    <div class="flex flex-col">
+                        <div class="text-[14px] text-gray-500 font-bold mb-1 flex items-center gap-1.5"><i class="ph-fill ph-fire text-orange-500"></i> 今日新记单词</div>
+                        <div class="flex items-baseline gap-3">
+                            <span class="text-[48px] font-extrabold text-gray-900 leading-none" id="statTodayLearned">120</span>
+                            <div class="flex flex-col pb-1">
+                                <span class="text-[12px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-lg border border-green-100 flex items-center mb-1">
+                                    <i class="ph-bold ph-trend-up mr-1"></i>+<span id="statCompareYesterday">35</span>
                                 </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="text-xs text-gray-500 font-medium mb-1">校区总排行榜</div>
-                        <div class="flex items-end gap-1">
-                            <span class="text-4xl font-extrabold text-blue-600 tracking-tight" id="statRank">5</span>
-                            <div class="flex flex-col pb-1 ml-1">
-                                <span class="text-xs text-gray-400 font-medium">/ <span id="statTotalStudents">350</span> 人</span>
+                                <span class="text-[12px] text-gray-400">昨日: <span id="statYesterdayLearned">85</span></span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-xl p-3 border border-blue-50 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
-                    <div class="flex justify-between items-center mb-1.5">
-                        <span class="text-xs text-gray-600 font-medium flex items-center gap-1.5"><i class="ph-fill ph-flag-checkered text-gray-400"></i> 总词汇掌握进度</span>
-                        <span class="text-xs font-bold text-gray-800"><span id="statTotalLearned">1,250</span> <span class="text-gray-400 font-normal">/ 3000</span></span>
+                <!-- 总进度条 -->
+                <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-[14px] text-gray-700 font-bold flex items-center gap-2">
+                            <i class="ph-fill ph-flag-checkered text-gray-400 text-[18px]"></i> 累计掌握词汇
+                        </span>
+                        <span class="text-[16px] font-extrabold text-gray-900"><span id="statTotalLearned">1,250</span> <span class="text-[14px] text-gray-400 font-medium">/ 3000词</span></span>
                     </div>
-                    <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div class="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden">
                         <div class="h-full bg-blue-500 rounded-full transition-all duration-500" id="statTotalProgress" style="width: 41%;"></div>
                     </div>
                 </div>
             </div>
 
-            <div class="hidden lg:block w-px bg-gray-100 my-2"></div>
+            <div class="hidden lg:block w-px bg-gray-100/80 my-2 z-10"></div>
 
-            <!-- 右侧全局日志 -->
-            <div class="lg:w-72 flex flex-col z-10">
-                <div class="flex justify-between items-center mb-3">
-                    <h3 class="text-xs font-bold text-gray-800 flex items-center gap-1.5"><i class="ph-fill ph-clock-counter-clockwise text-gray-400"></i> 全局学习动态</h3>
-                    <span class="text-[10px] text-blue-500 cursor-pointer hover:underline font-medium">完整日志</span>
+            <!-- 看板右侧：历史记录 -->
+            <div class="lg:w-[320px] flex flex-col z-10 h-[140px]">
+                <div class="flex justify-between items-center mb-4 shrink-0">
+                    <h3 class="text-[16px] font-bold text-gray-800 flex items-center gap-1.5"><i class="ph-fill ph-clock-counter-clockwise text-gray-400"></i> 全局学习动态</h3>
+                    <span class="text-[12px] text-blue-600 font-bold px-2 py-1 bg-blue-50 rounded-full cursor-pointer active:scale-95 transition-transform">查看明细</span>
                 </div>
-                <div class="flex-1 relative pl-4 border-l-2 border-blue-50 ml-1.5 overflow-y-auto hide-scrollbar max-h-[120px]" id="actionLogContainer">
+                <div class="flex-1 relative pl-5 border-l-2 border-blue-50/80 ml-2 overflow-y-auto" id="actionLogContainer">
                     <!-- JS动态插入日志 -->
                 </div>
             </div>
         </div>
 
-        <!-- 底部区域 (Flex-1 完美填满剩余空间) -->
+        <!-- 下半部分：操作区 -->
         <div class="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-6 pb-2">
             
-            <!-- 快速记词区 -->
-            <div class="flex flex-col h-full min-h-0 gap-3">
-                <div class="flex items-center justify-between px-1 shrink-0">
-                    <h2 class="text-base font-bold text-gray-800">快速记词区</h2>
-                    <span id="passStatusTag" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-700">状态：正常</span>
+            <!-- 左侧：快速记词区 -->
+            <div class="flex flex-col gap-4 relative">
+                
+                <!-- 头部状态 -->
+                <div class="flex items-center justify-between px-2 shrink-0">
+                    <h2 class="text-[24px] font-bold text-gray-900">快速记词</h2>
+                    <span id="passStatusTag" class="text-[14px] font-bold px-3 py-1 rounded-full bg-green-100 text-green-700">可自由学习</span>
                 </div>
                 
-                <!-- 动态列表 (自适应滚动) -->
-                <div id="assignedTaskContainer" class="bg-slate-50/50 border border-slate-200/60 rounded-2xl p-2 shadow-inner hidden shrink-0">
-                    <div id="assignedTasksWrapper" class="flex flex-col gap-2 overflow-y-auto hide-scrollbar max-h-[140px]">
-                        <!-- JS动态插入 -->
+                <!-- 内部全区锁定遮罩 -->
+                <div id="zoneLockMask" class="absolute inset-0 top-10 bg-white/70 backdrop-blur-[4px] rounded-[24px] z-20 hidden flex-col items-center justify-center text-center shadow-inner border border-white">
+                    <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-3">
+                        <i class="ph-fill ph-lock-key text-red-500 text-[32px]"></i>
                     </div>
-                </div>
-
-                <!-- 方块 Grid -->
-                <div id="passAreaContainer" class="grid grid-cols-2 gap-3 mt-1 shrink-0">
-                    <button id="btnNew" onclick="startPassing('new', '过新词')" class="pass-btn col-span-1 bg-white/80 backdrop-blur-xl p-4 rounded-[1.5rem] shadow-soft transition-all flex flex-col items-center justify-center text-center group aspect-square relative overflow-hidden">
-                        <div id="lockNew" class="absolute inset-0 bg-white/70 backdrop-blur-[2px] flex flex-col items-center justify-center z-10 transition-opacity hidden">
-                            <i class="ph-fill ph-lock-key text-gray-400 text-2xl mb-1"></i>
-                            <span class="text-[10px] text-gray-500 font-medium">完成指定任务解锁</span>
-                        </div>
-                        <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center mb-2">
-                            <i class="ph-bold ph-sparkle text-blue-600 text-xl"></i>
-                        </div>
-                        <h3 class="font-bold text-sm mb-1 text-gray-800">过新词</h3>
-                        <p class="text-[10px] text-gray-500">学习全新单词</p>
-                    </button>
-
-                    <button id="btnOld" onclick="startPassing('old', '过旧词')" class="pass-btn col-span-1 bg-white/80 backdrop-blur-xl p-4 rounded-[1.5rem] shadow-soft transition-all flex flex-col items-center justify-center text-center group aspect-square relative overflow-hidden">
-                        <div id="lockOld" class="absolute inset-0 bg-white/70 backdrop-blur-[2px] flex flex-col items-center justify-center z-10 transition-opacity hidden">
-                            <i class="ph-fill ph-lock-key text-gray-400 text-2xl mb-1"></i>
-                            <span class="text-[10px] text-gray-500 font-medium">完成指定任务解锁</span>
-                        </div>
-                        <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center mb-2">
-                            <i class="ph-bold ph-clock-counter-clockwise text-green-600 text-xl"></i>
-                        </div>
-                        <h3 class="font-bold text-sm mb-1 text-gray-800">过旧词</h3>
-                        <p class="text-[10px] text-gray-500">记忆曲线复习</p>
-                    </button>
+                    <p class="text-[18px] font-bold text-gray-800">记词区已锁定</p>
+                    <p class="text-[14px] text-gray-500 mt-1">需先攻克右侧关卡</p>
                 </div>
                 
-                <div id="blockMessage" class="hidden mt-1 bg-orange-50 border border-orange-200 p-3 rounded-xl flex flex-col gap-1.5 animate-slide-up shadow-sm shrink-0">
-                    <div class="flex items-center gap-1.5">
-                        <i class="ph-fill ph-warning-circle text-orange-500 text-base"></i>
-                        <h4 class="font-bold text-orange-800 text-xs">记词区已锁定</h4>
+                <!-- 1. 上方：过新词 & 过旧词 -->
+                <div class="grid grid-cols-2 gap-4 shrink-0">
+                    <button id="btnNew" onclick="startPassing('new', '过新词')" class="bg-white rounded-[20px] p-5 shadow-app-card flex flex-col items-center justify-center text-center active:scale-95 transition-all relative overflow-hidden group">
+                        <div id="lockNew" class="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center z-10 hidden">
+                            <i class="ph-fill ph-lock-key text-gray-400 text-[28px] mb-2"></i>
+                        </div>
+                        <div class="w-14 h-14 bg-blue-50 rounded-[16px] flex items-center justify-center mb-3 group-hover:bg-blue-600 transition-colors">
+                            <i class="ph-bold ph-sparkle text-blue-600 text-[24px] group-hover:text-white transition-colors"></i>
+                        </div>
+                        <h3 class="font-bold text-[18px] text-gray-900 mb-0.5">过新词</h3>
+                        <p class="text-[12px] text-gray-500">发现生词卡点</p>
+                    </button>
+
+                    <button id="btnOld" onclick="startPassing('old', '过旧词')" class="bg-white rounded-[20px] p-5 shadow-app-card flex flex-col items-center justify-center text-center active:scale-95 transition-all relative overflow-hidden group">
+                        <div id="lockOld" class="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center z-10 hidden">
+                            <i class="ph-fill ph-lock-key text-gray-400 text-[28px] mb-2"></i>
+                        </div>
+                        <div class="w-14 h-14 bg-green-50 rounded-[16px] flex items-center justify-center mb-3 group-hover:bg-green-600 transition-colors">
+                            <i class="ph-bold ph-clock-counter-clockwise text-green-600 text-[24px] group-hover:text-white transition-colors"></i>
+                        </div>
+                        <h3 class="font-bold text-[18px] text-gray-900 mb-0.5">过旧词</h3>
+                        <p class="text-[12px] text-gray-500">按记忆曲线复习</p>
+                    </button>
+                </div>
+
+                <!-- 2. 下方：老师指定任务 -->
+                <div class="flex flex-col gap-3 min-h-0 flex-1">
+                    <h3 class="text-[18px] font-bold text-gray-700 px-2 shrink-0">老师指定任务</h3>
+                    
+                    <div id="assignedTaskContainer" class="flex flex-col gap-3 overflow-y-auto px-1 pb-2">
+                        <!-- JS 动态插入任务卡片 -->
                     </div>
-                    <p class="text-[10px] text-orange-600 leading-relaxed">右侧有待处理的关卡，必须优先完成。</p>
+
+                    <div id="noAssignedTaskBox" class="bg-white/50 border-2 border-gray-200 border-dashed rounded-[20px] p-6 text-center flex flex-col items-center justify-center flex-1 min-h-[120px]">
+                        <i class="ph-fill ph-check-circle text-[32px] text-gray-300 mb-2"></i>
+                        <p class="text-[16px] font-bold text-gray-600 mb-1">老师暂未分配任务</p>
+                        <p class="text-[12px] text-gray-400">您可以自由使用上方模块</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- 深度学习区 (填满容器) -->
-            <div class="flex flex-col bg-white/80 backdrop-blur-xl rounded-[1.5rem] shadow-soft p-6 h-full min-h-0 border border-white relative overflow-hidden">
-                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2 relative z-10 shrink-0">
-                    <i class="ph-fill ph-target text-red-500"></i> 深度学习区
+            <!-- 右侧：深度学习区 -->
+            <div class="flex flex-col gap-4">
+                <h2 class="text-[24px] font-bold text-gray-900 px-2 flex items-center gap-2 shrink-0">
+                    <i class="ph-fill ph-target text-red-500 text-[28px]"></i> 深度学习区
                 </h2>
                 
-                <div id="learningArea" class="flex-1 min-h-0 overflow-y-auto hide-scrollbar flex flex-col relative z-10">
-                    <div id="emptyLearning" class="flex flex-col items-center justify-center h-full text-center opacity-70 m-auto">
-                        <div class="w-16 h-16 bg-gray-50/80 rounded-full flex items-center justify-center mb-3 border border-gray-100">
-                            <i class="ph-fill ph-check-circle text-gray-300 text-3xl"></i>
+                <div id="learningArea" class="flex-1 bg-white rounded-[24px] shadow-app-card p-6 overflow-y-auto relative flex flex-col">
+                    <div id="emptyLearningState" class="flex flex-col items-center justify-center h-full text-center m-auto opacity-70">
+                        <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4 border border-gray-100">
+                            <i class="ph-fill ph-check-circle text-gray-300 text-[40px]"></i>
                         </div>
-                        <p class="text-sm font-bold text-gray-600">当前没有积压的关卡</p>
-                        <p class="text-xs text-gray-400 mt-1">在左侧任选一个模式开始记词</p>
+                        <p class="text-[18px] font-bold text-gray-600">当前没有积压的生词关卡</p>
+                        <p class="text-[14px] text-gray-400 mt-2">请继续在左侧记词，发现薄弱点</p>
+                    </div>
+
+                    <div id="activeLearningState" class="hidden flex-col h-full relative">
+                        <div class="absolute right-[-20px] top-[-20px] opacity-10 z-0">
+                            <i class="ph-fill ph-fire text-[180px] text-red-500"></i>
+                        </div>
+                        <div class="flex justify-between items-start mb-4 relative z-10">
+                            <div class="bg-red-500 text-white text-[12px] font-bold px-3 py-1 rounded-lg shadow-sm">优先级最高任务</div>
+                        </div>
+                        <h3 class="font-extrabold text-[28px] text-gray-900 mb-2 relative z-10" id="learningCardTitle">生词深加工卡点</h3>
+                        <p class="text-[16px] text-gray-600 mb-6 leading-relaxed relative z-10 w-4/5">包含 <span class="font-extrabold text-red-600 text-[20px]" id="learningCardCount">0</span> 个您刚标记的不认识单词。请必须完成深加工，解锁系统。</p>
+                        
+                        <div class="mt-auto relative z-10">
+                            <button onclick="switchView('view-learning')" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-[16px] shadow-lg active:scale-95 transition-all text-[18px] flex items-center justify-center gap-2">
+                                立即攻克生词 <i class="ph-bold ph-arrow-right"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -210,111 +250,130 @@
 
 
     <!-- ================= 视图 2：过词界面 ================= -->
-    <!-- 同样的，给 passing 界面加上完美填满约束 -->
-    <div id="view-passing" class="view-section flex-col w-full h-full max-w-6xl mx-auto p-4 md:px-6 md:py-4 relative overflow-hidden">
-        <div class="flex items-center gap-4 mb-4 shrink-0">
-            <button onclick="switchView('view-dashboard')" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-soft hover:scale-105 transition text-slate-700 z-10 shrink-0">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="mr-0.5">
+    <div id="view-passing" class="view-section flex-col w-full h-full p-4 bg-gray-50 relative overflow-hidden">
+        <!-- App Top Bar -->
+        <div class="flex items-center justify-between mb-4 shrink-0 bg-white p-4 rounded-[20px] shadow-sm">
+            <button onclick="switchView('view-dashboard')" class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center active:scale-90 transition-transform text-slate-700">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mr-0.5">
                     <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
             </button>
-            <h2 class="font-bold text-lg text-gray-800">记词模式</h2>
+            <h2 class="font-bold text-[24px] text-gray-900" id="passingTitle">请判断您是否认识这些单词</h2>
+            <div class="w-12"></div>
         </div>
 
-        <div class="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-[260px_1fr] gap-6 pb-2">
-            <!-- 左侧进度 -->
-            <div class="bg-white/90 backdrop-blur-xl rounded-[1.5rem] p-5 shadow-soft flex flex-col h-full min-h-0 overflow-y-auto hide-scrollbar hidden md:flex border border-white">
-                <div class="flex justify-between items-center mb-5 shrink-0">
-                    <h3 class="font-bold text-base">全等级进度</h3>
-                    <span class="text-[10px] bg-blue-50 text-blue-600 px-2 py-1 rounded">当前：高二</span>
-                </div>
-                
-                <div class="flex flex-col gap-4 flex-1">
-                    <div class="flex items-center gap-2"><span class="text-xs w-10 text-gray-600">幼儿</span><div class="flex-1 h-1.5 bg-blue-600 rounded-full"></div><span class="text-[10px] w-14 text-right">5/5</span></div>
-                    <div class="flex items-center gap-2"><span class="text-xs w-10 text-gray-600">一年级</span><div class="flex-1 h-1.5 bg-blue-600 rounded-full"></div><span class="text-[10px] w-14 text-right">8/8</span></div>
-                    <div class="flex items-center gap-2"><span class="text-xs w-10 text-gray-600">二年级</span><div class="flex-1 h-1.5 bg-blue-600 rounded-full"></div><span class="text-[10px] w-14 text-right">10/10</span></div>
-                    <div class="flex items-center gap-2"><span class="text-xs w-10 font-bold text-gray-800">高二</span><div class="flex-1 h-1.5 bg-gray-100 rounded-full relative"><div id="sidebarProgress" class="absolute left-0 top-0 h-full bg-blue-600 rounded-full" style="width: 30%"></div></div><span class="text-[10px] w-14 text-right font-bold text-blue-600"><span id="sidebarDone">6</span>/20</span></div>
-                    <div class="flex items-center gap-2 opacity-40"><span class="text-xs w-10 text-gray-400">高三</span><div class="flex-1 border-t border-dashed border-gray-300"></div><span class="text-[10px] w-16 text-right"><i class="ph-fill ph-lock-key"></i> 暂未达到</span></div>
+        <div class="flex-1 min-h-0 flex flex-col bg-white rounded-[24px] shadow-app-card relative overflow-hidden">
+            <!-- 头部状态 -->
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">
+                <span class="text-[16px] text-gray-500 font-medium">共 <span id="totalPassCount">10</span> 词</span>
+                <div class="flex items-center gap-4 text-[16px] font-bold">
+                    <div class="flex items-center gap-2 text-gray-700"><div class="w-3 h-3 rounded-full bg-[#10B981]"></div>认识: <span id="statKnown">0</span></div>
+                    <div class="flex items-center gap-2 text-gray-700"><div class="w-3 h-3 rounded-full bg-[#EF4444]"></div>不认识: <span id="statUnknown">0</span></div>
                 </div>
             </div>
 
-            <!-- 右侧列表 -->
-            <div class="bg-white/90 backdrop-blur-xl rounded-[1.5rem] shadow-soft flex flex-col h-full min-h-0 relative overflow-hidden border border-white">
-                <div class="px-6 py-4 border-b border-gray-50 flex justify-between items-center shrink-0 bg-white/50 backdrop-blur-md">
-                    <h2 class="font-bold text-base tracking-wide text-gray-800">请判断是否认识</h2>
-                    <div class="flex items-center gap-3 text-xs font-medium">
-                        <div class="flex items-center gap-1.5"><div class="w-2 h-2 rounded-full bg-green-500"></div>认识 <span id="statKnown">0</span></div>
-                        <div class="flex items-center gap-1.5"><div class="w-2 h-2 rounded-full bg-red-500"></div>不认识 <span id="statUnknown">0</span></div>
-                    </div>
-                </div>
+            <!-- 左侧侧边进度条，因为全等级进度隐藏，这里保留但不影响主要逻辑展示 -->
+            <!-- 如果需要显示全等级可以解开，此处仅作为结构展示 -->
+            <div class="hidden">
+                 <span class="text-[10px] w-14 text-right font-bold text-blue-600"><span id="sidebarDone">0</span>/10</span>
+                 <div class="flex-1 h-1.5 bg-gray-100 rounded-full relative"><div id="sidebarProgress" class="absolute left-0 top-0 h-full bg-blue-600 rounded-full" style="width: 0%"></div></div>
+            </div>
 
-                <div id="wordListContainer" class="flex-1 min-h-0 overflow-y-auto hide-scrollbar px-4 py-3 flex flex-col gap-2.5 pb-20">
-                    <!-- 动态插入 -->
-                </div>
+            <!-- 列表 -->
+            <div id="wordListContainer" class="flex-1 min-h-0 overflow-y-auto px-4 py-4 flex flex-col gap-3 pb-28">
+                <!-- 动态插入 -->
+            </div>
 
-                <div class="absolute bottom-0 left-0 w-full bg-white/90 backdrop-blur-xl border-t border-gray-50 px-6 py-3 flex justify-between items-center z-10 shadow-[0_-10px_30px_rgba(0,0,0,0.03)] shrink-0">
-                    <div class="flex items-center gap-2 text-orange-500 text-sm font-medium">
-                        <i class="ph-fill ph-warning-circle"></i>
-                        <span>剩余待完成：<span id="statRemaining" class="text-lg font-bold">20</span> 题</span>
-                    </div>
-                    <button id="submitLevelBtn" onclick="submitPassResults()" class="bg-gray-200 text-gray-400 font-bold py-2 px-6 text-sm rounded-xl transition cursor-not-allowed">
-                        提交当页
-                    </button>
+            <!-- 底部悬浮操作区 -->
+            <div class="absolute bottom-0 left-0 w-full bg-white border-t border-gray-100 px-6 py-4 flex justify-between items-center z-10 shadow-app-floating shrink-0">
+                <div class="flex items-center gap-2 text-[#F97316] text-[18px] font-medium cursor-pointer active:opacity-70 transition-all" onclick="scrollToFirstUnanswered()">
+                    <i class="ph-fill ph-warning-circle text-[24px]"></i>
+                    <span>剩余待完成：<span id="statRemaining" class="text-[24px] font-extrabold px-1">10</span> 题</span>
+                    <i class="ph-bold ph-caret-right text-[18px] ml-0.5"></i>
                 </div>
+                <button id="submitLevelBtn" onclick="submitPassResults()" class="bg-[#F1F5F9] text-[#94A3B8] font-bold py-3.5 px-10 text-[18px] rounded-[16px] transition-all cursor-not-allowed">
+                    提 交
+                </button>
             </div>
         </div>
     </div>
 
 
-    <!-- ================= 视图 3 & 4 (保持不变的悬浮弹窗) ================= -->
-    <div id="view-learning" class="view-section flex-col items-center justify-center w-full h-full p-6 animate-slide-up bg-white/40 backdrop-blur-md z-50 fixed inset-0">
-        <div class="bg-white/90 backdrop-blur-2xl w-full max-w-2xl rounded-[2rem] shadow-2xl p-10 relative border border-white">
-            <button onclick="switchView('view-dashboard')" class="absolute top-6 right-6 text-gray-400 hover:text-gray-700 bg-gray-50 p-2 rounded-full">
-                <i class="ph-bold ph-x text-xl"></i>
-            </button>
-            <div class="flex items-center gap-3 mb-2">
-                <span class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-bold border border-red-200">死磕模式</span>
-                <span class="text-gray-500 text-sm">针对刚筛出的 <span id="learningWordCount" class="font-bold text-gray-800">0</span> 个生词</span>
+    <!-- ================= 视图 3 & 4: 学习关卡与拍照 ================= -->
+    <div id="view-learning" class="view-section flex-col items-center justify-center w-full h-full p-4 bg-gray-900/60 backdrop-blur-md z-50 fixed inset-0">
+        <div class="bg-white w-full max-w-lg rounded-[32px] shadow-2xl p-8 relative flex flex-col modal-enter">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-gray-500 text-[16px]">需消灭 <span id="learningWordCount" class="font-bold text-gray-900">0</span> 个生词</span>
             </div>
-            <h2 class="text-3xl font-bold text-gray-800 mb-8" id="learningTitle">生词深加工关卡</h2>
+            <h2 class="text-[32px] font-extrabold text-gray-900 mb-8" id="learningTitle">深加工关卡</h2>
+            
             <div class="flex flex-col gap-4 mb-8">
-                <div class="flex items-center justify-between p-5 rounded-2xl bg-blue-50/50 border border-blue-100">
+                <div class="flex items-center justify-between p-5 rounded-[20px] bg-blue-50/60 border border-blue-100">
                     <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-blue-600 text-xl"><i class="ph-fill ph-eye"></i></div>
-                        <div><h3 class="font-bold text-gray-800">音记 (看词识音)</h3><p class="text-xs text-gray-500">将发音与拼写建立联系</p></div>
+                        <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-blue-600 text-[28px] shadow-sm"><i class="ph-fill ph-eye"></i></div>
+                        <div><h3 class="font-bold text-[18px] text-gray-900">音记</h3></div>
                     </div>
                     <div class="text-right">
-                        <div class="text-xl font-bold text-blue-600">3<span class="text-sm text-gray-400">/5次</span></div>
-                        <div class="text-xs text-gray-500">进行中</div>
+                        <div class="text-[20px] font-extrabold text-blue-600">3<span class="text-[14px] text-gray-400 font-medium">/5次</span></div>
+                        <div class="text-[14px] text-blue-500 font-bold mt-1">进行中</div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between p-5 rounded-[20px] bg-gray-50 border border-gray-100">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-gray-600 text-[28px] shadow-sm"><i class="ph-fill ph-headphones"></i></div>
+                        <div><h3 class="font-bold text-[18px] text-gray-900">听写</h3></div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-[20px] font-extrabold text-gray-800">0<span class="text-[14px] text-gray-400 font-medium">/3次</span></div>
+                        <div class="text-[14px] text-gray-500 font-bold mt-1">未开始</div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between p-5 rounded-[20px] bg-gray-50 border border-gray-100">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-gray-600 text-[28px] shadow-sm"><i class="ph-fill ph-microphone-stage"></i></div>
+                        <div><h3 class="font-bold text-[18px] text-gray-900">跟读</h3></div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-[20px] font-extrabold text-gray-800">0<span class="text-[14px] text-gray-400 font-medium">/2次</span></div>
+                        <div class="text-[14px] text-gray-500 font-bold mt-1">未开始</div>
                     </div>
                 </div>
             </div>
-            <button onclick="triggerPhotoUpload()" class="w-full py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg shadow-[0_10px_20px_rgba(31,95,255,0.2)] transition transform hover:-translate-y-1">
-                模拟一键完成任务
+            
+            <button onclick="triggerPhotoUpload()" class="w-full py-4 rounded-[20px] bg-blue-600 hover:bg-blue-700 text-white font-bold text-[20px] shadow-lg active:scale-95 transition-all">
+                一键模拟完成任务
+            </button>
+            <button onclick="switchView('view-dashboard')" class="mt-4 text-[16px] text-gray-400 font-bold p-2">
+                稍后继续
             </button>
         </div>
     </div>
 
-    <div id="view-photo" class="view-section flex-col items-center justify-center w-full h-full p-6 animate-slide-up bg-gray-900/80 backdrop-blur-md z-50 fixed inset-0">
-        <div class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl p-8 flex flex-col items-center text-center relative border border-white/20">
-            <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 text-3xl mb-4">
+    <div id="view-photo" class="view-section flex-col items-center justify-center w-full h-full p-4 bg-gray-900/80 backdrop-blur-md z-50 fixed inset-0">
+        <div class="bg-white w-full max-w-lg rounded-[32px] shadow-2xl p-8 flex flex-col items-center text-center relative modal-enter">
+            <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 text-[40px] mb-5">
                 <i class="ph-fill ph-camera"></i>
             </div>
-            <h2 class="text-xl font-bold text-gray-800 mb-2">上传手写凭证</h2>
-            <p class="text-gray-500 text-xs mb-6">您已完成线上训练。<br>请将纸上听写的单词拍照上传，供老师审核。</p>
-            <div id="uploadBox" class="w-full h-40 border-2 border-dashed border-gray-300 rounded-2xl bg-gray-50 flex flex-col items-center justify-center mb-6 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition" onclick="mockSelectPhoto()">
-                <i class="ph ph-image text-3xl text-gray-400 mb-2"></i>
-                <span class="text-gray-500 text-sm font-medium">点击调起相机或相册</span>
+            <h2 class="text-[28px] font-extrabold text-gray-900 mb-3">上传手写凭证</h2>
+            <p class="text-[16px] text-gray-500 mb-8 leading-relaxed">已完成线上训练。<br>请将纸上听写的单词拍照上传供老师审核。</p>
+            
+            <div id="uploadBox" class="w-full h-48 border-2 border-dashed border-gray-300 rounded-[24px] bg-gray-50 flex flex-col items-center justify-center mb-8 active:bg-blue-50 transition-colors cursor-pointer" onclick="mockSelectPhoto()">
+                <i class="ph ph-image text-[48px] text-gray-400 mb-3"></i>
+                <span class="text-gray-600 text-[18px] font-bold">点击调起系统相机</span>
             </div>
-            <div id="uploadedPreview" class="hidden w-full h-40 rounded-2xl bg-gray-200 bg-cover bg-center mb-6 border border-gray-300 relative overflow-hidden" style="background-image: url('https://images.unsplash.com/photo-1581447109200-bf2769116351?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');">
+            
+            <div id="uploadedPreview" class="hidden w-full h-48 rounded-[24px] bg-gray-200 bg-cover bg-center mb-8 border border-gray-200 relative overflow-hidden" style="background-image: url('https://images.unsplash.com/photo-1581447109200-bf2769116351?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');">
                 <div class="absolute inset-0 bg-black/20 flex items-center justify-center">
-                    <div class="bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-green-600 flex items-center gap-1">
-                        <i class="ph-fill ph-check-circle"></i> 已上传
+                    <div class="bg-white/95 backdrop-blur px-4 py-2 rounded-full text-[14px] font-bold text-green-600 flex items-center gap-1.5 shadow-sm">
+                        <i class="ph-fill ph-check-circle text-[18px]"></i> 识别通过
                     </div>
                 </div>
             </div>
-            <button id="finishLevelBtn" onclick="clearActiveLevel()" class="w-full py-3 rounded-xl bg-gray-200 text-gray-400 font-bold text-base transition cursor-not-allowed">
-                确认提交并结束关卡
+            
+            <button id="finishLevelBtn" onclick="clearActiveLevel()" class="w-full py-4 rounded-[20px] bg-gray-200 text-gray-400 font-bold text-[20px] transition-all cursor-not-allowed">
+                确认提交并解锁
             </button>
         </div>
     </div>
@@ -322,6 +381,38 @@
 
     <!-- Javascript 逻辑控制 -->
     <script>
+        // ================= 原生弹窗工具 =================
+        function showModal(title, msg, onConfirm = null) {
+            const titleEl = document.getElementById('modal-title');
+            if (titleEl) titleEl.innerText = title;
+            
+            const msgEl = document.getElementById('modal-msg');
+            if (msgEl) msgEl.innerText = msg;
+            
+            const modal = document.getElementById('native-modal');
+            const btn = document.getElementById('modal-btn');
+            
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                setTimeout(() => modal.classList.replace('opacity-0', 'opacity-100'), 10);
+            }
+            
+            if (btn) {
+                btn.onclick = () => {
+                    if (modal) modal.classList.replace('opacity-100', 'opacity-0');
+                    setTimeout(() => {
+                        if (modal) {
+                            modal.classList.add('hidden');
+                            modal.classList.remove('flex');
+                        }
+                        if (onConfirm) onConfirm();
+                    }, 300);
+                };
+            }
+        }
+
+        // ================= 数据记录层 =================
         const dataStore = {
             stats: {
                 totalPlanned: 3000,
@@ -332,11 +423,79 @@
                 totalStudents: 350
             },
             actionLogs: [
-                { time: '10:05', type: '记词', desc: '完成过新词的记忆曲线', count: 20 },
-                { time: '09:30', type: '阅读理解', desc: '完成2篇长难句特训', count: 0 },
-                { time: '08:15', type: '记词', desc: '完成过旧词的记忆曲线', count: 50 }
+                { time: '10:05', type: '记词', desc: '完成新词记忆曲线', count: 10 },
+                { time: '09:30', type: '听写', desc: '完成易错词复习', count: 10 },
+                { time: '08:15', type: '记词', desc: '完成旧词记忆曲线', count: 10 }
             ]
         };
+
+        const rawWordsData = [
+            { word: "dilemma", phonetic: "/dɪˈlemə/", meaning: "进退两难的困境" },
+            { word: "ambitious", phonetic: "/æmˈbɪʃəs/", meaning: "有野心的" },
+            { word: "extraordinary", phonetic: "/ɪkˈstrɔːrdəneri/", meaning: "非凡的" },
+            { word: "phenomenon", phonetic: "/fəˈnɑːmɪnən/", meaning: "现象，杰出的人" },
+            { word: "exaggerate", phonetic: "/ɪɡˈzædʒəreɪt/", meaning: "夸大，夸张" },
+            { word: "vulnerable", phonetic: "/ˈvʌlnərəbl/", meaning: "脆弱的，易受伤害的" },
+            { word: "simultaneous", phonetic: "/ˌsaɪmlˈteɪniəs/", meaning: "同时发生的" },
+            { word: "anonymous", phonetic: "/əˈnɑːnɪməs/", meaning: "匿名的，无名的" },
+            { word: "symptom", phonetic: "/ˈsɪmptəm/", meaning: "症状，征兆" },
+            { word: "evaluate", phonetic: "/ɪˈvæljueɪt/", meaning: "评估，评价" },
+            { word: "sustainable", phonetic: "/səˈsteɪnəbl/", meaning: "可持续的" },
+            { word: "perspective", phonetic: "/pərˈspektɪv/", meaning: "观点，视角" },
+            { word: "comprehend", phonetic: "/ˌkɑːmprɪˈhend/", meaning: "理解，领悟" },
+            { word: "innovative", phonetic: "/ˈɪnəveɪtɪv/", meaning: "创新的，革新的" },
+            { word: "crucial", phonetic: "/ˈkruːʃl/", meaning: "至关重要的" },
+            { word: "inevitable", phonetic: "/ɪnˈevɪtəbl/", meaning: "不可避免的" },
+            { word: "consequence", phonetic: "/ˈkɑːnsɪkwens/", meaning: "结果，后果" },
+            { word: "fascinating", phonetic: "/ˈfæsɪneɪtɪŋ/", meaning: "迷人的" },
+            { word: "hypothesis", phonetic: "/haɪˈpɑːθəsɪs/", meaning: "假设，假说" },
+            { word: "reluctant", phonetic: "/rɪˈlʌktənt/", meaning: "勉强的，不情愿的" }
+        ];
+
+        let testWords = []; 
+        let TOTAL_WORDS = 0;
+        
+        const state = {
+            activeLevel: null,
+            unknownBasket: [], 
+            passingStats: { known: 0, unknown: 0, remaining: 0, answered: 0 },
+            currentActionName: '',
+            currentTaskId: null,
+            assignedTasks: [] 
+        };
+
+        function initData(count = 10) {
+            const uniqueMap = new Map();
+            rawWordsData.forEach(item => {
+                if (!uniqueMap.has(item.word)) {
+                    uniqueMap.set(item.word, item);
+                }
+            });
+            const uniqueWords = Array.from(uniqueMap.values());
+            const processWords = uniqueWords.slice(0, count);
+            TOTAL_WORDS = processWords.length;
+            testWords = processWords.map((item, index) => ({ 
+                id: index, 
+                word: item.word, 
+                phonetic: item.phonetic,
+                meaning: item.meaning,
+                status: null 
+            }));
+        }
+
+        // ================= 模拟切换老师分配状态 =================
+        function toggleTeacherTasks() {
+            if (state.assignedTasks.length > 0) {
+                state.assignedTasks = [];
+                showModal('状态切换', '老师收回了任务。\n您可以自由过新词或旧词了。', renderDashboardUI);
+            } else {
+                state.assignedTasks = [
+                    { id: 101, title: "高二核心易错词冲刺", count: 10 },
+                    { id: 102, title: "开学摸底检测包", count: 10 }
+                ];
+                showModal('新任务到达', '老师为您派发了指定任务！\n必须优先完成指定批次才能解锁过词区。', renderDashboardUI);
+            }
+        }
 
         function logLearningAction(actionType, actionDesc, count) {
             const now = new Date();
@@ -348,54 +507,54 @@
                 dataStore.stats.todayLearned += count;
                 dataStore.stats.totalLearned += count;
             }
-            
             if(dataStore.stats.todayLearned % 30 === 0 && dataStore.stats.classRank > 1) {
                 dataStore.stats.classRank -= 1;
             }
-
             renderDataDashboard();
+        }
+
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            const targetView = document.getElementById(viewId);
+            if (targetView) targetView.classList.add('active');
+            if(viewId === 'view-dashboard') renderDashboardUI();
         }
 
         function renderDataDashboard() {
             const elTotalLearned = document.getElementById('statTotalLearned');
-            if(elTotalLearned) elTotalLearned.innerText = dataStore.stats.totalLearned.toLocaleString();
+            if (elTotalLearned) elTotalLearned.innerText = dataStore.stats.totalLearned.toLocaleString();
             
             const elTotalProgress = document.getElementById('statTotalProgress');
-            if(elTotalProgress) elTotalProgress.style.width = `${(dataStore.stats.totalLearned / dataStore.stats.totalPlanned) * 100}%`;
+            if (elTotalProgress) elTotalProgress.style.width = `${(dataStore.stats.totalLearned / dataStore.stats.totalPlanned) * 100}%`;
             
             const elTodayLearned = document.getElementById('statTodayLearned');
-            if(elTodayLearned) elTodayLearned.innerText = dataStore.stats.todayLearned;
+            if (elTodayLearned) elTodayLearned.innerText = dataStore.stats.todayLearned;
             
             const elYesterdayLearned = document.getElementById('statYesterdayLearned');
-            if(elYesterdayLearned) elYesterdayLearned.innerText = dataStore.stats.yesterdayLearned;
+            if (elYesterdayLearned) elYesterdayLearned.innerText = dataStore.stats.yesterdayLearned;
             
             const elCompareYesterday = document.getElementById('statCompareYesterday');
-            if(elCompareYesterday) {
-                const diff = dataStore.stats.todayLearned - dataStore.stats.yesterdayLearned;
-                elCompareYesterday.innerText = Math.abs(diff);
-            }
+            if (elCompareYesterday) elCompareYesterday.innerText = Math.abs(dataStore.stats.todayLearned - dataStore.stats.yesterdayLearned);
             
             const elRank = document.getElementById('statRank');
-            if(elRank) elRank.innerText = dataStore.stats.classRank;
+            if (elRank) elRank.innerText = dataStore.stats.classRank;
             
             const elTotalStudents = document.getElementById('statTotalStudents');
-            if(elTotalStudents) elTotalStudents.innerText = dataStore.stats.totalStudents;
+            if (elTotalStudents) elTotalStudents.innerText = dataStore.stats.totalStudents;
 
             const logContainer = document.getElementById('actionLogContainer');
             if (logContainer) {
                 logContainer.innerHTML = '';
-                
                 dataStore.actionLogs.slice(0, 4).forEach(log => {
                     const div = document.createElement('div');
-                    div.className = 'timeline-item relative text-xs mb-3 pb-0.5';
+                    div.className = 'timeline-item relative text-[14px] mb-4 pb-1';
                     let countHtml = log.count > 0 ? `<span class="ml-1 text-blue-500 font-bold">涉及 ${log.count} 词</span>` : '';
-                    
                     div.innerHTML = `
                         <div class="flex items-center justify-between">
-                            <span class="text-gray-800 font-bold">${log.type}</span>
-                            <span class="text-gray-400 text-[10px]">${log.time}</span>
+                            <span class="text-gray-900 font-bold">${log.type}</span>
+                            <span class="text-gray-400 text-[12px]">${log.time}</span>
                         </div>
-                        <div class="text-gray-500 text-[10px] mt-0.5 leading-relaxed">
+                        <div class="text-gray-500 text-[12px] mt-1 leading-relaxed">
                             ${log.desc} ${countHtml}
                         </div>
                     `;
@@ -404,178 +563,134 @@
             }
         }
 
-        const rawWordsWithDuplicates = ["dilemma", "ambitious", "extraordinary", "dilemma", "phenomenon", "exaggerate", "vulnerable", "simultaneous", "anonymous", "ambitious", "symptom", "evaluate", "sustainable", "perspective", "comprehend", "innovative", "crucial", "inevitable", "consequence", "fascinating", "hypothesis", "reluctant"];
-        let testWords = []; 
-        let TOTAL_WORDS = 0;
-        
-        const state = {
-            activeLevel: null,
-            unknownBasket: [], 
-            passingStats: { known: 0, unknown: 0, remaining: 0, answered: 0 },
-            currentActionName: '',
-            currentTaskId: null,
-            assignedTasks: [
-                { id: 101, title: "高二核心词汇冲刺", count: 20 },
-                { id: 102, title: "开学摸底易错词", count: 20 },
-                { id: 103, title: "期中综合复习库", count: 30 }
-            ]
-        };
-
-        function initData() {
-            const uniqueWords = [...new Set(rawWordsWithDuplicates)];
-            const processWords = uniqueWords.slice(0, 20);
-            TOTAL_WORDS = processWords.length;
-            testWords = processWords.map((word, index) => ({ id: index, word: word, status: null }));
-        }
-
-        function switchView(viewId) {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            document.getElementById(viewId).classList.add('active');
-            if(viewId === 'view-dashboard') renderDashboardUI();
-        }
-
         function renderDashboardUI() {
-            renderDataDashboard(); 
+            renderDataDashboard();
             
             const hasBlocker = state.activeLevel !== null;
             const hasAssignedTask = state.assignedTasks.length > 0;
 
             const assignedTaskContainer = document.getElementById('assignedTaskContainer');
-            const assignedTasksWrapper = document.getElementById('assignedTasksWrapper');
+            const noAssignedTaskBox = document.getElementById('noAssignedTaskBox');
             const btnNew = document.getElementById('btnNew');
             const btnOld = document.getElementById('btnOld');
-            
             const lockNew = document.getElementById('lockNew');
             const lockOld = document.getElementById('lockOld');
-            
+            const zoneLockMask = document.getElementById('zoneLockMask');
             const passStatusTag = document.getElementById('passStatusTag');
             const blockMessage = document.getElementById('blockMessage');
-            const learningArea = document.getElementById('learningArea');
+            const emptyLearningState = document.getElementById('emptyLearningState');
+            const activeLearningState = document.getElementById('activeLearningState');
 
-            if (hasAssignedTask && assignedTaskContainer && assignedTasksWrapper) {
-                assignedTaskContainer.classList.remove('hidden');
-                assignedTasksWrapper.innerHTML = '';
-                state.assignedTasks.forEach(task => {
-                    const isLocked = hasBlocker;
-                    assignedTasksWrapper.innerHTML += `
-                        <button onclick="${isLocked ? '' : `startPassing('assigned', '指定批次: ${task.title}', ${task.id})`}" class="w-full bg-white/90 backdrop-blur-xl p-3 rounded-[1rem] shadow-soft transition-all flex items-center gap-3 text-left group ${isLocked ? 'opacity-50 cursor-not-allowed' : 'hover:-translate-y-0.5 hover:shadow-[0_10px_20px_-10px_rgba(31,95,255,0.1)]'} border border-slate-100/80 relative overflow-hidden shrink-0">
-                            <div class="w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center shrink-0 border border-blue-100">
-                                <i class="ph-fill ph-chalkboard-teacher text-blue-500 text-base"></i>
-                            </div>
-                            <div class="flex-1 overflow-hidden">
-                                <h3 class="font-bold text-xs text-gray-800 truncate mb-0.5">${task.title}</h3>
-                                <p class="text-[10px] text-gray-500">共 ${task.count} 个单词</p>
-                            </div>
-                            <div class="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 ${isLocked ? '' : 'group-hover:bg-blue-600 group-hover:text-white'} transition-colors shrink-0">
-                                ${isLocked ? '<i class="ph-bold ph-lock-key text-[10px]"></i>' : '<i class="ph-bold ph-arrow-right text-[10px]"></i>'}
-                            </div>
-                        </button>
-                    `;
-                });
-            } else if (assignedTaskContainer && assignedTasksWrapper) {
-                assignedTaskContainer.classList.add('hidden');
-                assignedTasksWrapper.innerHTML = '';
+            if (assignedTaskContainer && noAssignedTaskBox) {
+                if (hasAssignedTask) {
+                    assignedTaskContainer.classList.remove('hidden');
+                    noAssignedTaskBox.classList.add('hidden');
+                    assignedTaskContainer.innerHTML = '';
+                    
+                    state.assignedTasks.forEach(task => {
+                        const isLocked = hasBlocker;
+                        assignedTaskContainer.innerHTML += `
+                            <button onclick="${isLocked ? '' : `startPassing('assigned', '任务: ${task.title}', ${task.id}, ${task.count})`}" class="w-full bg-white p-5 rounded-[20px] shadow-app-card transition-all flex items-center gap-4 text-left ${isLocked ? 'opacity-40 pointer-events-none' : 'active:scale-95'} border border-blue-50 relative overflow-hidden">
+                                <div class="w-14 h-14 rounded-[16px] bg-blue-50 flex items-center justify-center shrink-0 border border-blue-100">
+                                    <i class="ph-fill ph-chalkboard-teacher text-blue-600 text-[24px]"></i>
+                                </div>
+                                <div class="flex-1 overflow-hidden">
+                                    <h3 class="font-bold text-[18px] text-gray-900 truncate mb-1">${task.title}</h3>
+                                    <p class="text-[14px] text-gray-500 font-medium">老师指定 · ${task.count} 词</p>
+                                </div>
+                                <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
+                                    ${isLocked ? '<i class="ph-bold ph-lock-key text-[16px]"></i>' : '<i class="ph-bold ph-arrow-right text-[18px]"></i>'}
+                                </div>
+                            </button>
+                        `;
+                    });
+                } else {
+                    assignedTaskContainer.classList.add('hidden');
+                    noAssignedTaskBox.classList.remove('hidden');
+                }
             }
 
             if (hasBlocker) {
                 [btnNew, btnOld].forEach(btn => {
-                    if(!btn) return;
-                    btn.classList.add('opacity-50', 'cursor-not-allowed');
-                    btn.classList.remove('hover:-translate-y-0.5', 'hover:shadow-[0_15px_30px_-10px_rgba(31,95,255,0.1)]');
-                    btn.onclick = (e) => { e.preventDefault(); };
+                    if (btn) btn.classList.add('opacity-40', 'pointer-events-none');
                 });
-                
-                if(lockNew) lockNew.classList.remove('hidden');
-                if(lockOld) lockOld.classList.remove('hidden');
-                if(lockNew) lockNew.querySelector('span').innerText = '记词区已锁定';
-                if(lockOld) lockOld.querySelector('span').innerText = '记词区已锁定';
+                if (lockNew) lockNew.classList.remove('hidden');
+                if (lockOld) lockOld.classList.remove('hidden');
+                if (zoneLockMask) zoneLockMask.classList.remove('hidden');
 
-                if(passStatusTag) {
-                    passStatusTag.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700';
-                    passStatusTag.innerText = '状态：锁定中';
+                if (passStatusTag) {
+                    passStatusTag.className = 'text-[14px] font-bold px-3 py-1 rounded-full bg-red-100 text-red-700';
+                    passStatusTag.innerText = '全面锁定中';
                 }
-                if(blockMessage) blockMessage.classList.remove('hidden');
+                if (blockMessage) blockMessage.classList.remove('hidden');
 
-                if(learningArea) {
-                    learningArea.innerHTML = `
-                        <div class="bg-red-50/80 border border-red-100 rounded-[1.5rem] p-5 relative overflow-hidden animate-slide-up shadow-sm">
-                            <div class="absolute right-0 top-0 w-20 h-20 bg-red-100 rounded-bl-full flex items-center justify-center opacity-40">
-                                <i class="ph-fill ph-fire text-red-500 text-3xl mb-3 ml-3"></i>
-                            </div>
-                            <div class="flex justify-between items-start mb-3">
-                                <div class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded">优先级最高任务</div>
-                            </div>
-                            <h3 class="font-bold text-gray-800 text-lg mb-1.5">${state.activeLevel.title}</h3>
-                            <p class="text-xs text-gray-600 mb-4 w-4/5 leading-relaxed">包含 <span class="font-bold text-red-600">${state.activeLevel.wordCount}</span> 个您刚才标记为不认识的生词。必须优先完成深加工任务。</p>
-                            <button onclick="switchView('view-learning')" class="bg-white text-red-600 border border-red-200 font-bold py-2.5 px-6 text-sm rounded-xl hover:bg-red-50 transition shadow-sm inline-flex items-center gap-1.5 w-max">
-                                立即进入学习 <i class="ph-bold ph-arrow-right"></i>
-                            </button>
-                        </div>`;
+                if (emptyLearningState) emptyLearningState.classList.add('hidden');
+                if (activeLearningState) {
+                    activeLearningState.classList.remove('hidden');
+                    activeLearningState.classList.add('flex');
+                    const titleEl = document.getElementById('learningCardTitle');
+                    const countEl = document.getElementById('learningCardCount');
+                    if (titleEl) titleEl.innerText = state.activeLevel.title;
+                    if (countEl) countEl.innerText = state.activeLevel.wordCount;
                 }
             } 
             else if (hasAssignedTask) {
-                if(blockMessage) blockMessage.classList.add('hidden');
-                if(passStatusTag) {
-                    passStatusTag.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200';
-                    passStatusTag.innerText = '执行老师任务中';
+                if (zoneLockMask) zoneLockMask.classList.add('hidden');
+                if (blockMessage) blockMessage.classList.add('hidden');
+                
+                if (passStatusTag) {
+                    passStatusTag.className = 'text-[14px] font-bold px-3 py-1 rounded-full bg-blue-100 text-blue-700';
+                    passStatusTag.innerText = '请先完成老师任务';
                 }
 
                 [btnNew, btnOld].forEach(btn => {
-                    if(!btn) return;
-                    btn.classList.add('opacity-50', 'cursor-not-allowed');
-                    btn.classList.remove('hover:-translate-y-0.5', 'hover:shadow-[0_15px_30px_-10px_rgba(31,95,255,0.1)]');
-                    btn.onclick = (e) => { e.preventDefault(); };
+                    if (btn) btn.classList.add('opacity-40', 'pointer-events-none');
                 });
-                
-                if(lockNew) lockNew.classList.remove('hidden');
-                if(lockOld) lockOld.classList.remove('hidden');
-                if(lockNew) lockNew.querySelector('span').innerText = '需先完成指定任务';
-                if(lockOld) lockOld.querySelector('span').innerText = '需先完成指定任务';
+                if (lockNew) lockNew.classList.remove('hidden');
+                if (lockOld) lockOld.classList.remove('hidden');
 
-                if(learningArea) learningArea.innerHTML = renderEmptyLearningState();
+                if (emptyLearningState) emptyLearningState.classList.remove('hidden');
+                if (activeLearningState) {
+                    activeLearningState.classList.add('hidden');
+                    activeLearningState.classList.remove('flex');
+                }
             } 
             else {
-                if(blockMessage) blockMessage.classList.add('hidden');
-                if(passStatusTag) {
-                    passStatusTag.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-700';
-                    passStatusTag.innerText = '状态：正常';
+                if (zoneLockMask) zoneLockMask.classList.add('hidden');
+                if (blockMessage) blockMessage.classList.add('hidden');
+                
+                if (passStatusTag) {
+                    passStatusTag.className = 'text-[14px] font-bold px-3 py-1 rounded-full bg-green-100 text-green-700';
+                    passStatusTag.innerText = '自由学习中';
                 }
 
                 [btnNew, btnOld].forEach(btn => {
-                    if(!btn) return;
-                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                    btn.classList.add('hover:-translate-y-0.5', 'hover:shadow-[0_15px_30px_-10px_rgba(31,95,255,0.1)]');
+                    if (btn) btn.classList.remove('opacity-40', 'pointer-events-none');
                 });
-                
-                if(btnNew) btnNew.onclick = () => startPassing('new', '过新词');
-                if(btnOld) btnOld.onclick = () => startPassing('old', '过旧词');
-                
-                if(lockNew) lockNew.classList.add('hidden');
-                if(lockOld) lockOld.classList.add('hidden');
+                if (lockNew) lockNew.classList.add('hidden');
+                if (lockOld) lockOld.classList.add('hidden');
 
-                if(learningArea) learningArea.innerHTML = renderEmptyLearningState();
+                if (emptyLearningState) emptyLearningState.classList.remove('hidden');
+                if (activeLearningState) {
+                    activeLearningState.classList.add('hidden');
+                    activeLearningState.classList.remove('flex');
+                }
             }
         }
 
-        function renderEmptyLearningState() {
-            return `
-                <div class="flex flex-col items-center justify-center h-full text-center opacity-70 m-auto">
-                    <div class="w-16 h-16 bg-gray-50/80 rounded-full flex items-center justify-center mb-3 border border-gray-100">
-                        <i class="ph-fill ph-check-circle text-gray-300 text-3xl"></i>
-                    </div>
-                    <p class="text-sm font-bold text-gray-600">当前没有积压的关卡</p>
-                    <p class="text-xs text-gray-400 mt-1">在左侧任选一个模式开始记词</p>
-                </div>
-            `;
-        }
-
-        function startPassing(typeKey, typeName, taskId = null) {
-            if(state.activeLevel !== null) return;
-            initData();
+        function startPassing(typeKey, typeName, taskId = null, wordCount = 10) {
+            initData(wordCount);
             state.currentActionName = typeName;
             state.currentTaskId = taskId;
             state.unknownBasket = [];
             state.passingStats = { known: 0, unknown: 0, remaining: TOTAL_WORDS, answered: 0 };
+            
+            const titleEl = document.getElementById('passingTitle');
+            if (titleEl) titleEl.innerText = typeName || '请判断您是否认识这些单词';
+            
+            const totalEl = document.getElementById('totalPassCount');
+            if (totalEl) totalEl.innerText = TOTAL_WORDS;
+            
             renderWordList();
             updatePassingStats();
             switchView('view-passing');
@@ -585,20 +700,48 @@
             const container = document.getElementById('wordListContainer');
             if(!container) return;
             container.innerHTML = '';
+            
             testWords.forEach((item, index) => {
-                const isAnswered = item.status !== null;
                 const div = document.createElement('div');
-                div.className = `flex justify-between items-center p-3.5 rounded-2xl border ${isAnswered ? 'bg-gray-50 border-transparent opacity-80' : 'bg-white border-white shadow-soft'} transition-all`;
+                div.id = `word-row-${item.id}`;
+                div.className = `flex justify-between items-center p-4 rounded-[16px] border border-gray-100 shadow-sm bg-white transition-colors duration-300`;
+                
                 const wordDisplay = item.word === 'ambitious' && index === 2 ? 'ambitioussssss' : item.word;
                 
                 div.innerHTML = `
-                    <span id="word-text-${item.id}" class="font-bold text-gray-800 text-base tracking-wide ${isAnswered ? 'text-gray-400' : ''}">${wordDisplay}</span>
-                    <div class="flex gap-2">
-                        <button id="btn-x-${item.id}" onclick="judgeWord(${item.id}, 'unknown')" class="judge-btn judge-x w-12 h-9 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-red-400 border border-transparent ${item.status === 'unknown' ? 'active' : ''} ${isAnswered && item.status !== 'unknown' ? 'disabled' : ''}"><i class="ph-bold ph-x text-sm"></i></button>
-                        <button id="btn-c-${item.id}" onclick="judgeWord(${item.id}, 'known')" class="judge-btn judge-check w-12 h-9 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 hover:bg-green-50 hover:text-green-500 border border-transparent ${item.status === 'known' ? 'active' : ''} ${isAnswered && item.status !== 'known' ? 'disabled' : ''}"><i class="ph-bold ph-check text-sm"></i></button>
+                    <div class="flex items-center gap-4 flex-1 overflow-hidden pr-3">
+                        <span id="word-text-${item.id}" class="font-extrabold text-gray-900 text-[20px] tracking-wide shrink-0 max-w-[45%] truncate">${wordDisplay}</span>
+                        <span id="word-desc-${item.id}" class="text-[16px] text-gray-400 truncate flex items-center gap-2">
+                            ${item.meaning} <span class="font-normal text-gray-300 text-[14px]">${item.phonetic}</span>
+                        </span>
+                    </div>
+                    <div class="flex gap-2 shrink-0">
+                        <button id="btn-x-${item.id}" onclick="judgeWord(${item.id}, 'unknown')" class="judge-btn w-[72px] h-[44px] rounded-[12px] bg-[#F1F5F9] text-gray-400 flex items-center justify-center text-[20px] hover:bg-red-50 hover:text-red-400 active:scale-95 transition-all"><i class="ph-bold ph-x"></i></button>
+                        <button id="btn-c-${item.id}" onclick="judgeWord(${item.id}, 'known')" class="judge-btn w-[72px] h-[44px] rounded-[12px] bg-[#F1F5F9] text-gray-400 flex items-center justify-center text-[20px] hover:bg-green-50 hover:text-green-500 active:scale-95 transition-all"><i class="ph-bold ph-check"></i></button>
                     </div>`;
                 container.appendChild(div);
             });
+        }
+
+        function scrollToFirstUnanswered() {
+            const firstUnanswered = testWords.find(w => w.status === null);
+            if (!firstUnanswered) return;
+
+            const rowElement = document.getElementById(`word-row-${firstUnanswered.id}`);
+            if (rowElement) {
+                rowElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                rowElement.classList.add('bg-[#FFF7ED]', 'border-[#F97316]');
+                rowElement.classList.remove('bg-white', 'border-gray-100', 'shadow-sm');
+                
+                setTimeout(() => {
+                    const currentWord = testWords.find(w => w.id === firstUnanswered.id);
+                    rowElement.classList.remove('bg-[#FFF7ED]', 'border-[#F97316]');
+                    if (currentWord && currentWord.status === null) {
+                        rowElement.classList.add('bg-white', 'border-gray-100', 'shadow-sm');
+                    }
+                }, 1000);
+            }
         }
 
         function judgeWord(id, result) {
@@ -617,23 +760,30 @@
             state.passingStats.answered++;
             state.passingStats.remaining = TOTAL_WORDS - state.passingStats.answered;
 
+            const row = document.getElementById(`word-row-${id}`);
             const btnX = document.getElementById(`btn-x-${id}`);
             const btnC = document.getElementById(`btn-c-${id}`);
             const wordSpan = document.getElementById(`word-text-${id}`);
+            const wordDesc = document.getElementById(`word-desc-${id}`);
 
-            if(btnX && btnX.parentElement && btnX.parentElement.parentElement) {
-                btnX.parentElement.parentElement.classList.add('bg-gray-50', 'border-transparent', 'opacity-80');
-                btnX.parentElement.parentElement.classList.remove('bg-white', 'shadow-soft', 'border-white');
+            if (row && btnX && btnC) {
+                row.className = `flex justify-between items-center p-4 rounded-[16px] border transition-colors duration-300`;
+                btnX.className = `judge-btn w-[72px] h-[44px] rounded-[12px] flex items-center justify-center text-[20px] transition-all`;
+                btnC.className = `judge-btn w-[72px] h-[44px] rounded-[12px] flex items-center justify-center text-[20px] transition-all`;
+
+                if (result === 'unknown') {
+                    row.classList.add('bg-[#FEF2F2]', 'border-[#FECACA]');
+                    btnX.classList.add('bg-[#EF4444]', 'text-white', 'shadow-sm');
+                    btnC.classList.add('bg-gray-50', 'text-gray-300', 'pointer-events-none');
+                } else {
+                    row.classList.add('bg-[#F0FDF4]', 'border-[#BBF7D0]');
+                    btnC.classList.add('bg-[#10B981]', 'text-white', 'shadow-sm');
+                    btnX.classList.add('bg-gray-50', 'text-gray-300', 'pointer-events-none');
+                }
             }
+
             if(wordSpan) wordSpan.classList.add('text-gray-400');
-
-            if (result === 'unknown') { 
-                if(btnX) btnX.classList.add('active'); 
-                if(btnC) btnC.classList.add('disabled'); 
-            } else { 
-                if(btnC) btnC.classList.add('active'); 
-                if(btnX) btnX.classList.add('disabled'); 
-            }
+            if(wordDesc) wordDesc.classList.add('opacity-60');
 
             updatePassingStats();
         }
@@ -641,29 +791,23 @@
         function updatePassingStats() {
             const elKnown = document.getElementById('statKnown');
             if (elKnown) elKnown.innerText = state.passingStats.known;
-
             const elUnknown = document.getElementById('statUnknown');
             if (elUnknown) elUnknown.innerText = state.passingStats.unknown;
-
             const elRemaining = document.getElementById('statRemaining');
             if (elRemaining) elRemaining.innerText = state.passingStats.remaining;
 
             const elSidebarDone = document.getElementById('sidebarDone');
             if (elSidebarDone) elSidebarDone.innerText = state.passingStats.answered;
-            
-            const sidebarWrong = document.getElementById('sidebarWrong');
-            if(sidebarWrong) sidebarWrong.innerText = state.passingStats.unknown;
-            
             const progress = document.getElementById('sidebarProgress');
             if(progress) progress.style.width = `${(state.passingStats.answered / TOTAL_WORDS) * 100}%`;
 
             const submitBtn = document.getElementById('submitLevelBtn');
             if (submitBtn) {
                 if (state.passingStats.remaining === 0) {
-                    submitBtn.className = 'bg-blue-600 text-white font-bold py-2 px-6 text-sm rounded-xl shadow-[0_8px_20px_rgba(31,95,255,0.25)] transition transform hover:-translate-y-0.5 hover:bg-blue-700';
+                    submitBtn.className = 'bg-blue-600 text-white font-bold py-3.5 px-10 text-[18px] rounded-[16px] shadow-lg shadow-blue-500/30 active:scale-95 transition-all';
                     submitBtn.disabled = false;
                 } else {
-                    submitBtn.className = 'bg-gray-200 text-gray-400 font-bold py-2 px-6 text-sm rounded-xl transition cursor-not-allowed';
+                    submitBtn.className = 'bg-[#F1F5F9] text-[#94A3B8] font-bold py-3.5 px-10 text-[18px] rounded-[16px] transition-all cursor-not-allowed';
                     submitBtn.disabled = true;
                 }
             }
@@ -672,39 +816,44 @@
         function submitPassResults() {
             if (state.passingStats.remaining > 0) return;
             
+            dataStore.stats.todayLearned += TOTAL_WORDS;
+            dataStore.stats.totalLearned += TOTAL_WORDS;
+            if(dataStore.stats.todayLearned % 30 === 0 && dataStore.stats.classRank > 1) {
+                dataStore.stats.classRank -= 1;
+            }
+            
             if (state.currentTaskId !== null) {
                 state.assignedTasks = state.assignedTasks.filter(t => t.id !== state.currentTaskId);
                 state.currentTaskId = null;
             }
-            
+
             logLearningAction('记词', `完成[${state.currentActionName}]`, TOTAL_WORDS);
 
             if (state.unknownBasket.length > 0) {
                 state.activeLevel = { title: '生词深加工关卡', wordCount: state.unknownBasket.length, words: state.unknownBasket };
-                alert(`记词完成！共筛出 ${state.unknownBasket.length} 个不认识的词。已自动生成深度学习关卡，必须完成后才能继续。`);
+                showModal('记词完成', `本次共筛出 ${state.unknownBasket.length} 个不认识的词。\n系统已自动为您生成专属的深度学习关卡，需完成后才能继续记词。`, () => switchView('view-dashboard'));
             } else {
-                alert("太棒了！本批次全部认识，未产生新的学习关卡。");
+                showModal('太棒了！', `本批次单词您全部认识，词汇量 +${TOTAL_WORDS}！\n未产生新的生词关卡。`, () => switchView('view-dashboard'));
             }
-            switchView('view-dashboard');
         }
 
         function triggerPhotoUpload() {
-            const elWordCount = document.getElementById('learningWordCount');
-            if(elWordCount) elWordCount.innerText = state.activeLevel.wordCount;
+            const elCount = document.getElementById('learningWordCount');
+            if (elCount) elCount.innerText = state.activeLevel.wordCount;
             switchView('view-photo');
         }
 
         function mockSelectPhoto() {
             const box = document.getElementById('uploadBox');
             if(!box) return;
-            box.innerHTML = '<div class="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div><span class="mt-3 text-blue-500 text-sm font-medium">识别上传中...</span>';
+            box.innerHTML = '<div class="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div><span class="mt-4 text-blue-500 text-[16px] font-bold">识别上传中...</span>';
             setTimeout(() => {
                 box.classList.add('hidden');
                 const preview = document.getElementById('uploadedPreview');
-                if(preview) preview.classList.remove('hidden');
+                if (preview) preview.classList.remove('hidden');
                 const finishBtn = document.getElementById('finishLevelBtn');
                 if(finishBtn) {
-                    finishBtn.className = 'w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-base shadow-[0_8px_20px_rgba(31,95,255,0.25)] transition transform hover:-translate-y-1';
+                    finishBtn.className = 'w-full py-4 rounded-[20px] bg-blue-600 hover:bg-blue-700 text-white font-bold text-[20px] shadow-lg active:scale-95 transition-all';
                     finishBtn.disabled = false;
                 }
             }, 1000);
@@ -714,27 +863,25 @@
             const finishBtn = document.getElementById('finishLevelBtn');
             if(finishBtn && finishBtn.disabled) return;
             
-            logLearningAction('深度加工', `攻克并消灭遗留生词卡点`, state.activeLevel.wordCount);
-
-            alert("关卡完成并已提交听写凭证！阻断解除，您可以继续记词了。");
             state.activeLevel = null;
             
-            setTimeout(() => {
-                const box = document.getElementById('uploadBox');
-                if(box) {
-                    box.classList.remove('hidden');
-                    box.innerHTML = '<i class="ph ph-image text-3xl text-gray-400 mb-2"></i><span class="text-gray-500 text-sm font-medium">点击调起相机或相册</span>';
-                }
-                const preview = document.getElementById('uploadedPreview');
-                if(preview) preview.classList.add('hidden');
-                
-                if(finishBtn) {
-                    finishBtn.className = 'w-full py-3 rounded-xl bg-gray-200 text-gray-400 font-bold text-base transition cursor-not-allowed';
-                    finishBtn.disabled = true;
-                }
-            }, 500);
+            showModal('关卡攻克', '恭喜！您已成功完成本批生词卡点的深加工。\n锁定已解除，可以继续记词了。', () => {
+                setTimeout(() => {
+                    const box = document.getElementById('uploadBox');
+                    if(box) {
+                        box.classList.remove('hidden');
+                        box.innerHTML = '<i class="ph ph-image text-[48px] text-gray-400 mb-3"></i><span class="text-gray-600 text-[18px] font-bold">点击调起系统相机</span>';
+                    }
+                    const preview = document.getElementById('uploadedPreview');
+                    if(preview) preview.classList.add('hidden');
+                    if(finishBtn) {
+                        finishBtn.className = 'w-full py-4 rounded-[20px] bg-gray-200 text-gray-400 font-bold text-[20px] transition-all cursor-not-allowed';
+                        finishBtn.disabled = true;
+                    }
+                }, 500);
 
-            switchView('view-dashboard');
+                switchView('view-dashboard');
+            });
         }
 
         renderDashboardUI();
