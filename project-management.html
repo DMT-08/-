@@ -462,9 +462,10 @@
         function renderTree(nodes, level = 0) {
             if (!nodes || nodes.length === 0) return '';
             // 如果是子节点，向右缩进并增加间距
-            let html = `<div class="${level > 0 ? 'mt-6 ml-5 space-y-6' : 'space-y-6'}">`;
+            let html = `<div class="${level > 0 ? 'mt-6 ml-4 space-y-6' : 'space-y-6'}">`;
 
             nodes.forEach((item, index) => {
+                const isFirst = index === 0;
                 const isLast = index === nodes.length - 1;
                 
                 // 动态设置优先级颜色标签
@@ -473,17 +474,31 @@
                 else if (item.priority === 'P2') priorityColor = 'bg-orange-50 text-orange-500 border-orange-100';
                 else if (item.priority === 'P3') priorityColor = 'bg-blue-50 text-primary border-blue-100';
 
+                // 智能连线系统：计算每一层（包括最外层主干）的垂直线
+                let vertLine = '';
+                if (isLast) {
+                    if (level === 0 && isFirst) {
+                        // 只有一个根节点时，不需要冗余的主干连线
+                    } else {
+                        // 最后一个节点，连线到此为止形成 L 型
+                        vertLine = `<div class="absolute left-0 top-[-32px] h-[64px] w-[2px] bg-primary/30 z-0"></div>`;
+                    }
+                } else if (level === 0 && isFirst) {
+                    // 第一个根节点，主干连线从自身中心向下延展
+                    vertLine = `<div class="absolute left-0 top-[32px] bottom-[-32px] w-[2px] bg-primary/30 z-0"></div>`;
+                } else {
+                    // 中间的节点，主干连线贯穿上下
+                    vertLine = `<div class="absolute left-0 top-[-32px] bottom-[-32px] w-[2px] bg-primary/30 z-0"></div>`;
+                }
+
                 html += `
-                    <div class="relative ${level > 0 ? 'pl-8' : ''}">
-                        ${level > 0 ? `
-                            <!-- 连线系统 -->
-                            <!-- 垂直主干: 自动贯穿当前同级兄弟，最后节点自动截断 -->
-                            <div class="absolute left-0 top-[-24px] ${isLast ? 'h-[56px]' : 'bottom-[-24px]'} w-[2px] bg-primary/20 z-0"></div>
-                            <!-- 水平分支 -->
-                            <div class="absolute left-0 top-[32px] w-8 h-[2px] bg-primary/20 z-0"></div>
-                            <!-- 节点圆点 -->
-                            <div class="absolute left-[28px] top-[29px] w-2 h-2 rounded-full bg-primary/60 z-10 shadow-sm ring-[3px] ring-[#f0f2f5]/80"></div>
-                        ` : ''}
+                    <div class="relative pl-7">
+                        <!-- 连线系统 (统一应用到每一层级) -->
+                        ${vertLine}
+                        <!-- 水平分支 -->
+                        <div class="absolute left-0 top-[32px] w-7 h-[2px] bg-primary/30 z-0"></div>
+                        <!-- 节点圆点 -->
+                        <div class="absolute left-[24px] top-[29px] w-2 h-2 rounded-full bg-primary/80 z-10 shadow-sm ring-[3px] ring-[#f0f2f5]"></div>
 
                         <!-- 功能节点卡片 (统一的卡片模板) -->
                         <div class="w-full glass bg-white/90 rounded-3xl p-5 shadow-sm border border-white/80 animate-fade-in relative z-10">
@@ -523,9 +538,10 @@
 
         function renderFuncTree() {
             const container = document.getElementById('func-tree-container');
-            // 添加包裹层以支持自由缩放，缩放原点改为左上角以适配向右展开的树状图
-            let html = '<div id="func-tree-zoom-wrapper" class="relative origin-top-left transform transition-transform duration-75 min-h-full pb-10">';
+            // 添加包裹层以支持自由缩放，微调上内边距留出呼吸感
+            let html = '<div id="func-tree-zoom-wrapper" class="relative origin-top-left transform transition-transform duration-75 min-h-full pb-10 pt-2">';
             
+            // 移除了旧版的居中连线，全权交由递归函数自动计算完美左侧主干
             html += renderTree(funcData, 0);
             
             html += '</div>';
@@ -533,7 +549,7 @@
         }
         renderFuncTree();
 
-        // 缩悉功能实现 (专门针对功能架构树页面)
+        // 缩放功能实现 (专门针对功能架构树页面)
         const funcTreeContainer = document.getElementById('func-tree-container');
         let funcScale = 1;
         let funcIsPinching = false;
