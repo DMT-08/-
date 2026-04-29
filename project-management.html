@@ -492,7 +492,7 @@
                 }
 
                 html += `
-                    <div class="relative pl-7">
+                    <div class="relative pl-7 tree-node-container">
                         <!-- 连线系统 (统一应用到每一层级) -->
                         ${vertLine}
                         <!-- 水平分支 -->
@@ -500,35 +500,44 @@
                         <!-- 节点圆点 -->
                         <div class="absolute left-[24px] top-[29px] w-2 h-2 rounded-full bg-primary/80 z-10 shadow-sm ring-[3px] ring-[#f0f2f5]"></div>
 
-                        <!-- 功能节点卡片 (统一的卡片模板) -->
-                        <div class="w-full glass bg-white/90 rounded-3xl p-5 shadow-sm border border-white/80 animate-fade-in relative z-10">
-                            <!-- 顶部：优先级与功能名称 -->
-                            <div class="flex items-center mb-4">
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${priorityColor} mr-2 shadow-sm">${item.priority}</span>
-                                <h3 class="text-base font-bold text-gray-900">${item.name}</h3>
-                            </div>
+                        <!-- 功能节点卡片 (加入折叠展开功能) -->
+                        <div class="w-full glass bg-white/90 rounded-3xl p-5 shadow-sm border border-white/80 animate-fade-in relative z-10 cursor-pointer transition-all active:scale-[0.98] hover:bg-white" onclick="toggleFuncNode(this)">
                             
-                            <!-- 中部：类型与版本 -->
-                            <div class="grid grid-cols-2 gap-y-3 gap-x-4 mb-3 bg-gray-50/50 p-3 rounded-xl border border-gray-100/60">
-                                <div>
-                                    <span class="block text-[10px] text-gray-400 mb-0.5 flex items-center"><span class="text-red-400 mr-0.5 mt-0.5">*</span>功能类型</span>
-                                    <span class="text-[13px] font-medium text-gray-700">${item.type}</span>
+                            <!-- 顶部：优先级与功能名称 (永远可见的 Header) -->
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${priorityColor} mr-2 shadow-sm">${item.priority}</span>
+                                    <h3 class="text-base font-bold text-gray-900">${item.name}</h3>
                                 </div>
-                                <div>
-                                    <span class="block text-[10px] text-gray-400 mb-0.5 flex items-center"><span class="text-red-400 mr-0.5 mt-0.5">*</span>关联项目版本</span>
-                                    <span class="text-[13px] font-medium text-gray-700">${item.version}</span>
+                                <div class="w-6 h-6 rounded-full bg-gray-100/80 flex items-center justify-center border border-gray-200/50 shadow-sm">
+                                    <svg class="w-4 h-4 text-gray-500 transform transition-transform duration-300 chevron-icon rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
                                 </div>
                             </div>
                             
-                            <!-- 底部：功能描述 -->
-                            <div class="px-1">
-                                <span class="block text-[10px] text-gray-400 mb-1">功能描述</span>
-                                <p class="text-[13px] text-gray-600 leading-relaxed">${item.desc}</p>
+                            <!-- 详细内容区 (增加 hidden 类名，默认收起) -->
+                            <div class="func-node-content mt-4 transition-all origin-top hidden">
+                                <!-- 中部：类型与版本 -->
+                                <div class="grid grid-cols-2 gap-y-3 gap-x-4 mb-3 bg-gray-50/50 p-3 rounded-xl border border-gray-100/60">
+                                    <div>
+                                        <span class="block text-[10px] text-gray-400 mb-0.5 flex items-center"><span class="text-red-400 mr-0.5 mt-0.5">*</span>功能类型</span>
+                                        <span class="text-[13px] font-medium text-gray-700">${item.type}</span>
+                                    </div>
+                                    <div>
+                                        <span class="block text-[10px] text-gray-400 mb-0.5 flex items-center"><span class="text-red-400 mr-0.5 mt-0.5">*</span>关联项目版本</span>
+                                        <span class="text-[13px] font-medium text-gray-700">${item.version}</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- 底部：功能描述 -->
+                                <div class="px-1">
+                                    <span class="block text-[10px] text-gray-400 mb-1">功能描述</span>
+                                    <p class="text-[13px] text-gray-600 leading-relaxed">${item.desc}</p>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- 递归生成子节点 (无限嵌套) -->
-                        ${item.children ? renderTree(item.children, level + 1) : ''}
+                        <!-- 递归生成子节点 (增加 hidden 类名，默认收起) -->
+                        ${item.children ? `<div class="func-node-children transition-all origin-top hidden">${renderTree(item.children, level + 1)}</div>` : ''}
                     </div>
                 `;
             });
@@ -562,6 +571,24 @@
             if (wrapper) wrapper.style.transform = `scale(${funcScale})`;
             const text = document.getElementById('zoom-level-text');
             if (text) text.textContent = Math.round(funcScale * 100) + '%';
+        }
+
+        // 新增：功能节点卡片的折叠/展开逻辑
+        function toggleFuncNode(el) {
+            const content = el.querySelector('.func-node-content');
+            const icon = el.querySelector('.chevron-icon');
+            // 获取紧跟在卡片后面的子节点容器
+            const childrenContainer = el.nextElementSibling;
+
+            // 切换内容的显示隐藏
+            content.classList.toggle('hidden');
+            // 切换箭头的方向
+            icon.classList.toggle('rotate-180');
+            
+            // 如果存在子节点，同步收起或展开
+            if (childrenContainer && childrenContainer.classList.contains('func-node-children')) {
+                childrenContainer.classList.toggle('hidden');
+            }
         }
 
         // 新增：控件直选缩放
