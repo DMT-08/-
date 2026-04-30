@@ -141,7 +141,7 @@
         <!-- 2. 中下部主体：左侧生词本 vs 右侧AI中枢 -->
         <div class="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[1.1fr_1.5fr] gap-5 md:gap-6">
             
-            <!-- 【左侧】：生词本 (极简重构) -->
+            <!-- 【左侧】：生词本 -->
             <div class="bg-[#FFFDF8] rounded-[24px] shadow-premium flex flex-col h-full min-h-0 border border-[#FDE68A] relative overflow-hidden">
                 <div class="flex items-center justify-between px-5 pt-5 pb-3 shrink-0 border-b border-[#FDE68A]/40">
                     <h2 class="text-[18px] font-bold text-gray-800 flex items-center gap-1.5">
@@ -149,12 +149,12 @@
                     </h2>
                 </div>
 
-                <!-- 数据呈现+筛选的大一统控制栏 -->
-                <div class="flex items-center gap-2.5 px-4 py-3 border-b border-[#FDE68A]/30 shrink-0 overflow-x-auto hide-scrollbar">
-                    <button onclick="setVocabFilter('all')" id="filter-all" class="..."></button>
-                    <button onclick="setVocabFilter('new')" id="filter-new" class="..."></button>
-                    <button onclick="setVocabFilter('old')" id="filter-old" class="..."></button>
-                    <button onclick="setVocabFilter('assigned')" id="filter-assigned" class="..."></button>
+                <!-- 数据呈现+筛选的大一统控制栏 (无冗余背景，全由JS渲染) -->
+                <div class="flex items-center gap-2 px-4 py-3 border-b border-[#FDE68A]/30 shrink-0 overflow-x-auto hide-scrollbar">
+                    <button onclick="setVocabFilter('all')" id="filter-all"></button>
+                    <button onclick="setVocabFilter('new')" id="filter-new"></button>
+                    <button onclick="setVocabFilter('old')" id="filter-old"></button>
+                    <button onclick="setVocabFilter('assigned')" id="filter-assigned"></button>
                 </div>
                 
                 <div class="flex-1 min-h-0 flex flex-col relative z-10 p-3">
@@ -227,9 +227,8 @@
     <!-- ================= 视图 2：全新过词界面 (无底部栏，完美还原胶囊头) ================= -->
     <div id="view-passing" class="view-section flex-col w-full h-full p-4 md:p-5 overflow-hidden max-w-[1200px] mx-auto gap-4">
         
-        <!-- 还原极简标题栏：去除底板，仅保留返回按钮和标题 -->
+        <!-- 还原极简标题栏 -->
         <div class="flex items-center gap-4 shrink-0 mb-3 px-2">
-            <!-- 带有浅灰底色的独立返回按钮 -->
             <button onclick="switchView('view-dashboard')" class="w-11 h-11 bg-[#F1F5F9] hover:bg-[#E2E8F0] rounded-[14px] flex items-center justify-center transition-colors text-slate-600 shadow-sm active:scale-95">
                 <i class="ph-bold ph-caret-left text-[22px]"></i>
             </button>
@@ -439,7 +438,6 @@
             }
         }
 
-        // 修改：精简版过滤按钮控制逻辑，进度更新移步 render 内部统一管理
         function setVocabFilter(type) {
             state.vocabFilter = type;
             renderVocabBookInline();
@@ -471,41 +469,89 @@
             const assignedCount = state.vocabBook.filter(w => w.type === 'assigned').length;
             const allCount = state.vocabBook.length;
 
-            // ===== 核心大一统：更新筛选按钮内部的文本和进度 =====
-            const updateTab = (id, label, count, typeKey, activeClasses) => {
-                const btn = document.getElementById(id);
-                if (!btn) return;
-                const isActive = state.vocabFilter === typeKey;
-                const isFull = typeKey !== 'all' && count >= VOCAB_THRESHOLD; // 是否溢出/满载
-                
-                let countHtml = '';
-                if (typeKey === 'all') {
-                    countHtml = `<span class="${isActive ? 'opacity-100' : 'opacity-60'} ml-1 font-mono">${count}</span>`;
-                } else {
-                    if (isFull) {
-                        // 满载时：红底白字 + 呼吸动画，保留真实溢出数值
-                        countHtml = `<span class="text-red-600 bg-red-100/80 border border-red-200 font-extrabold animate-pulse ml-1.5 px-1.5 py-0.5 rounded-[4px] leading-none">${count}/${VOCAB_THRESHOLD}</span>`;
-                    } else {
-                        // 未满载：柔和的文本
-                        countHtml = `<span class="${isActive ? 'opacity-100' : 'opacity-60'} ml-1.5 font-mono">${count}/${VOCAB_THRESHOLD}</span>`;
-                    }
-                }
-
-                btn.innerHTML = `${label} ${countHtml}`;
-                
-                // 状态切花
-                if (isActive) {
-                    btn.className = `text-[12px] font-bold px-3 py-1.5 rounded-[8px] shadow-sm transition-colors flex items-center shrink-0 border ${activeClasses}`;
-                } else {
-                    btn.className = `text-[12px] font-bold px-3 py-1.5 rounded-[8px] bg-gray-50 text-gray-500 hover:bg-gray-100 transition-colors flex items-center shrink-0 border border-transparent`;
+            // ================== 大一统渲染：筛选按钮主题引擎 ==================
+            // 包含 默认彩色(文字深色图标浅色) 与 选中反转(图标深色文字浅色)
+            const themes = {
+                all: {
+                    lightBg: 'bg-gray-100', lightBorder: 'border-gray-200', hoverBg: 'bg-gray-200',
+                    darkText: 'text-gray-700', lightIconText: 'text-gray-400', lightIconBg: 'bg-gray-200/80',
+                    solidBg: 'bg-gray-800'
+                },
+                new: {
+                    lightBg: 'bg-blue-50', lightBorder: 'border-blue-100', hoverBg: 'bg-blue-100',
+                    darkText: 'text-blue-600', lightIconText: 'text-blue-400', lightIconBg: 'bg-blue-100/80',
+                    solidBg: 'bg-[#1F5FFF]'
+                },
+                old: {
+                    lightBg: 'bg-emerald-50', lightBorder: 'border-emerald-100', hoverBg: 'bg-emerald-100',
+                    darkText: 'text-emerald-600', lightIconText: 'text-emerald-400', lightIconBg: 'bg-emerald-100/80',
+                    solidBg: 'bg-[#10B981]'
+                },
+                assigned: {
+                    lightBg: 'bg-indigo-50', lightBorder: 'border-indigo-100', hoverBg: 'bg-indigo-100',
+                    darkText: 'text-indigo-600', lightIconText: 'text-indigo-400', lightIconBg: 'bg-indigo-100/80',
+                    solidBg: 'bg-[#6366F1]'
                 }
             };
 
-            // 绘制 4 个大一统按钮
-            updateTab('filter-all', '全部', allCount, 'all', 'bg-white text-gray-800 border-gray-200');
-            updateTab('filter-new', '新词', newCount, 'new', 'bg-blue-50 text-blue-600 border-blue-200');
-            updateTab('filter-old', '旧词', oldCount, 'old', 'bg-emerald-50 text-emerald-600 border-emerald-200');
-            updateTab('filter-assigned', '指定', assignedCount, 'assigned', 'bg-indigo-50 text-indigo-600 border-indigo-200');
+            const updateTab = (id, label, iconClass, count, typeKey) => {
+                const btn = document.getElementById(id);
+                if (!btn) return;
+                const isActive = state.vocabFilter === typeKey;
+                const isFull = typeKey !== 'all' && count >= VOCAB_THRESHOLD;
+                const theme = themes[typeKey];
+                
+                let contentHtml = '';
+
+                if (isActive) {
+                    // 【选中后】：背景实心(深)，文字白(浅)，Icon置入白框(深色)
+                    let badgeHtml = '';
+                    if (typeKey === 'all') {
+                        badgeHtml = `<span class="bg-white/20 text-white px-1.5 py-0.5 rounded-[6px] font-mono text-[10px] ml-1.5">${count}</span>`;
+                    } else {
+                        if (isFull) {
+                            badgeHtml = `<span class="bg-red-500 text-white border border-red-400 font-extrabold animate-pulse ml-1.5 px-1.5 py-0.5 rounded-[6px] leading-none text-[10px] shadow-sm">${count}/${VOCAB_THRESHOLD}</span>`;
+                        } else {
+                            badgeHtml = `<span class="bg-white/20 text-white px-1.5 py-0.5 rounded-[6px] font-mono text-[10px] ml-1.5">${count}/${VOCAB_THRESHOLD}</span>`;
+                        }
+                    }
+
+                    contentHtml = `
+                        <div class="bg-white ${theme.darkText} w-5 h-5 rounded-[6px] flex items-center justify-center mr-1.5 shadow-sm shrink-0">
+                            <i class="${iconClass} text-[12px]"></i>
+                        </div>
+                        <span class="text-white whitespace-nowrap">${label}</span>
+                        ${badgeHtml}
+                    `;
+                    btn.className = `text-[12px] font-bold pr-2 pl-1.5 py-1.5 rounded-[10px] shadow-md transition-all duration-300 flex items-center shrink-0 ${theme.solidBg} border border-transparent transform scale-[1.02]`;
+                } else {
+                    // 【默认彩色】：背景浅彩，文字深色，Icon浅色
+                    let badgeHtml = '';
+                    if (typeKey === 'all') {
+                        badgeHtml = `<span class="${theme.lightIconBg} ${theme.darkText} opacity-70 px-1.5 py-0.5 rounded-[6px] font-mono text-[10px] ml-1.5">${count}</span>`;
+                    } else {
+                        if (isFull) {
+                            badgeHtml = `<span class="bg-red-100 text-red-600 border border-red-200 font-extrabold animate-pulse ml-1.5 px-1.5 py-0.5 rounded-[6px] leading-none text-[10px]">${count}/${VOCAB_THRESHOLD}</span>`;
+                        } else {
+                            badgeHtml = `<span class="${theme.lightIconBg} ${theme.darkText} opacity-70 px-1.5 py-0.5 rounded-[6px] font-mono text-[10px] ml-1.5">${count}/${VOCAB_THRESHOLD}</span>`;
+                        }
+                    }
+
+                    contentHtml = `
+                        <i class="${iconClass} ${theme.lightIconText} text-[16px] mr-1 shrink-0"></i>
+                        <span class="${theme.darkText} whitespace-nowrap">${label}</span>
+                        ${badgeHtml}
+                    `;
+                    btn.className = `text-[12px] font-bold pr-2.5 pl-2 py-1.5 rounded-[10px] transition-all duration-300 flex items-center shrink-0 ${theme.lightBg} border ${theme.lightBorder} hover:${theme.hoverBg}`;
+                }
+                btn.innerHTML = contentHtml;
+            };
+
+            // 应用筛选按钮渲染
+            updateTab('filter-all', '全部', 'ph-bold ph-list-dashes', allCount, 'all');
+            updateTab('filter-new', '新词', 'ph-bold ph-rocket', newCount, 'new');
+            updateTab('filter-old', '旧词', 'ph-bold ph-arrows-clockwise', oldCount, 'old');
+            updateTab('filter-assigned', '指定', 'ph-bold ph-chalkboard-teacher', assignedCount, 'assigned');
 
 
             const filteredList = state.vocabBook.filter(item => state.vocabFilter === 'all' || item.type === state.vocabFilter);
@@ -662,6 +708,9 @@
                 if(btnNew) {
                     btnNew.className = "bg-gradient-to-r from-[#508BFF] to-[#3B66FF] rounded-[16px] shadow-sm flex flex-col items-center justify-center text-center active:scale-95 transition-all relative group overflow-hidden h-full w-full cursor-pointer";
                     btnNew.innerHTML = `
+                        <div class="absolute top-2.5 right-2.5 bg-white/20 backdrop-blur-md text-white text-[11px] font-bold px-2 py-0.5 rounded-[6px] border border-white/20 transition-opacity">
+                            待学新词 <span id="badgeUnlearnedNew">${dataStore.stats.unlearnedNew}</span>
+                        </div>
                         <i class="ph-bold ph-rocket text-white text-[28px] mb-1 group-hover:-translate-y-1 transition-transform duration-300 relative z-0"></i>
                         <h3 class="font-bold text-[15px] text-white relative z-0 tracking-wide mt-0.5">学习新词</h3>
                     `;
@@ -856,7 +905,7 @@
             }
         }
 
-        // 渲染生词本及顶部进度预警 (支持溢出红色跳动)
+        // 渲染生词本及顶部进度预警
         function renderBasket() {
             const queueList = document.getElementById('queueList');
             const badge = document.getElementById('basketProgressBadge');
@@ -917,7 +966,7 @@
             if (state._tempUnknowns.length > 0) {
                 state._tempUnknowns.forEach(w => {
                     if(!state.vocabBook.find(ex => ex.word === w.word)) {
-                        w.type = state.currentActionType; // 'new', 'old', 或 'assigned'
+                        w.type = state.currentActionType; 
                         state.vocabBook.push(w);
                     }
                 });
@@ -927,7 +976,6 @@
             const oldCount = state.vocabBook.filter(w => w.type === 'old').length;
             const assignedCount = state.vocabBook.filter(w => w.type === 'assigned').length;
 
-            // 核心触发条件：新旧均满，或者老师指定的满了
             const isLevelTriggered = (newCount >= VOCAB_THRESHOLD && oldCount >= VOCAB_THRESHOLD) || (assignedCount >= VOCAB_THRESHOLD);
 
             if (isLevelTriggered) {
