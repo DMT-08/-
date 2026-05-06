@@ -64,7 +64,7 @@
 
 
     <!-- ================= 视图 1：主界面 (仪表盘) ================= -->
-    <div id="view-dashboard" class="view-section active flex-col w-full h-full max-w-[1300px] mx-auto p-4 md:p-5 overflow-hidden gap-5">
+    <div id="view-dashboard" class="view-section active flex-col w-full h-full max-w-[1300px] mx-auto p-4 md:p-5 overflow-hidden gap-4">
         
         <!-- Header -->
         <header class="flex justify-between items-center shrink-0">
@@ -83,92 +83,97 @@
             </button>
         </header>
 
-        <!-- 1. 顶部：可视化优化看板 -->
+        <!-- 1. 顶部：可视化优化看板 (极限压缩垂直空间) -->
         <div class="flex shrink-0 gap-4">
             <!-- 左侧主指标：环形进度看板 -->
-            <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[24px] p-5 flex items-center justify-between w-[280px] md:w-[320px] shadow-lg shadow-blue-500/20 shrink-0 relative overflow-hidden">
-                <i class="ph-fill ph-target absolute left-4 top-1/2 -translate-y-1/2 text-[120px] text-white opacity-[0.03] transform -translate-x-1/4 pointer-events-none"></i>
+            <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[24px] p-4 flex items-center justify-between w-[280px] md:w-[320px] shadow-lg shadow-blue-500/20 shrink-0 relative overflow-hidden">
+                <i class="ph-fill ph-target absolute left-4 top-1/2 -translate-y-1/2 text-[100px] text-white opacity-[0.03] transform -translate-x-1/4 pointer-events-none"></i>
                 
-                <div class="flex flex-col relative z-10">
-                    <span class="text-[13px] font-bold text-white/80 mb-1">总学习目标</span>
-                    <div class="text-[40px] font-extrabold text-white tracking-tight leading-none drop-shadow-sm" id="statTotalTarget">3000</div>
-                    <div class="flex flex-wrap items-center gap-2 mt-2.5">
-                        <div class="text-[12px] text-white/80 flex items-center gap-1.5 bg-white/10 px-2 py-1 rounded-[6px] w-max font-medium backdrop-blur-sm border border-white/10">
-                            <i class="ph-fill ph-check-circle text-green-300"></i> 已学 <span id="statLearnedSum" class="font-bold text-white font-mono">1730</span> 词
+                <div class="flex flex-col relative z-10 justify-center">
+                    <span class="text-[12px] font-bold text-white/80 mb-0.5">总学习目标</span>
+                    <div class="text-[36px] font-extrabold text-white tracking-tight leading-none drop-shadow-sm" id="statTotalTarget">3000</div>
+                    
+                    <!-- 合并后的已学与待学信息框 -->
+                    <div class="mt-2 bg-white/10 px-2.5 py-1 rounded-[6px] backdrop-blur-sm border border-white/10 flex items-center gap-3 w-max">
+                        <div class="flex items-baseline gap-1.5">
+                            <span class="text-[11px] text-white/70 font-medium">已学</span>
+                            <span id="statLearnedSum" class="text-[13px] font-bold text-white font-mono leading-none">1730</span>
                         </div>
-                        <div class="text-[12px] text-white/80 flex items-center gap-1.5 bg-white/10 px-2 py-1 rounded-[6px] w-max font-medium backdrop-blur-sm border border-white/10">
-                            <i class="ph-fill ph-book-open text-purple-300"></i> 待学 <span id="statUnlearned" class="font-bold text-white font-mono">1270</span> 词
+                        <div class="w-[1px] h-2.5 bg-white/20"></div>
+                        <div class="flex items-baseline gap-1.5">
+                            <span class="text-[11px] text-white/70 font-medium">待学</span>
+                            <span id="statUnlearned" class="text-[13px] font-bold text-white font-mono leading-none">1270</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- SVG 圆环进度条 -->
-                <div class="relative w-[84px] h-[84px] flex items-center justify-center z-10 shrink-0 drop-shadow-md">
+                <div class="relative w-[72px] h-[72px] flex items-center justify-center z-10 shrink-0 drop-shadow-md">
                     <svg class="w-full h-full transform -rotate-90">
                         <!-- 底环 -->
-                        <circle cx="42" cy="42" r="34" stroke="rgba(255,255,255,0.15)" stroke-width="8" fill="none" />
-                        <!-- 进度环 (213.6 是周长) -->
-                        <circle id="targetProgressRing" cx="42" cy="42" r="34" stroke="white" stroke-width="8" fill="none" stroke-dasharray="213.6" stroke-dashoffset="90" stroke-linecap="round" class="transition-all duration-1000 ease-out" />
+                        <circle cx="36" cy="36" r="28" stroke="rgba(255,255,255,0.15)" stroke-width="7" fill="none" />
+                        <!-- 进度环 (175.9 是周长 2*pi*28) -->
+                        <circle id="targetProgressRing" cx="36" cy="36" r="28" stroke="white" stroke-width="7" fill="none" stroke-dasharray="175.9" stroke-dashoffset="90" stroke-linecap="round" class="transition-all duration-1000 ease-out" />
                     </svg>
                     <div class="absolute inset-0 flex flex-col items-center justify-center">
-                        <span class="text-[18px] font-extrabold text-white leading-none font-mono" id="targetProgressText">57%</span>
+                        <span class="text-[16px] font-extrabold text-white leading-none font-mono" id="targetProgressText">57%</span>
                     </div>
                 </div>
             </div>
 
             <!-- 右侧细节指标网格：带数据可视化增强 -->
-            <div class="flex-1 bg-white/90 backdrop-blur-xl rounded-[24px] shadow-premium p-4 flex flex-col gap-3 min-w-0">
-                <!-- 上层：词汇状态 (2列 - 极简数据卡片拉伸填充) -->
-                <div class="grid grid-cols-2 gap-3 flex-1 min-h-0">
-                    <div class="bg-[#F0FDF4] border border-[#BBF7D0] rounded-[16px] p-4 flex flex-col justify-center relative overflow-hidden group transition-all hover:shadow-md h-full">
-                        <div class="flex items-center gap-1.5 text-green-600 mb-1 z-10">
+            <div class="flex-1 bg-white/90 backdrop-blur-xl rounded-[24px] shadow-premium p-3 flex flex-col gap-2 min-w-0">
+                <!-- 上层：词汇状态 (2列 - 高度压缩) -->
+                <div class="grid grid-cols-2 gap-2 flex-1 min-h-0">
+                    <div class="bg-[#F0FDF4] border border-[#BBF7D0] rounded-[16px] p-3 flex flex-col justify-center relative overflow-hidden group transition-all hover:shadow-md h-full">
+                        <div class="flex items-center gap-1.5 text-green-600 mb-0.5 z-10">
                             <div class="flex items-center justify-center w-4 h-4 rounded-full bg-green-100 text-green-600"><i class="ph-bold ph-check text-[10px]"></i></div>
-                            <span class="text-[13px] font-bold">过词认识</span>
+                            <span class="text-[12px] font-bold">过词认识</span>
                         </div>
-                        <span class="text-[28px] font-extrabold text-green-700 leading-none tracking-tight font-mono z-10 mt-1" id="statKnownTotal">1280</span>
-                        <i class="ph-fill ph-check-circle text-green-500/10 text-[64px] absolute -right-3 -bottom-3 group-hover:scale-110 transition-transform"></i>
+                        <span class="text-[26px] font-extrabold text-green-700 leading-none tracking-tight font-mono z-10 mt-1" id="statKnownTotal">1280</span>
+                        <i class="ph-fill ph-check-circle text-green-500/10 text-[56px] absolute -right-2 -bottom-2 group-hover:scale-110 transition-transform"></i>
                     </div>
 
-                    <div class="bg-[#FFF7ED] border border-[#FED7AA] rounded-[16px] p-4 flex flex-col justify-center relative overflow-hidden group transition-all hover:shadow-md h-full">
-                        <div class="flex items-center gap-1.5 text-orange-600 mb-1 z-10">
+                    <div class="bg-[#FFF7ED] border border-[#FED7AA] rounded-[16px] p-3 flex flex-col justify-center relative overflow-hidden group transition-all hover:shadow-md h-full">
+                        <div class="flex items-center gap-1.5 text-orange-600 mb-0.5 z-10">
                             <div class="flex items-center justify-center w-4 h-4 rounded-full bg-orange-100 text-orange-600"><i class="ph-bold ph-x text-[10px]"></i></div>
-                            <span class="text-[13px] font-bold">过词生词</span>
+                            <span class="text-[12px] font-bold">过词生词</span>
                         </div>
-                        <span class="text-[28px] font-extrabold text-orange-700 leading-none tracking-tight font-mono z-10 mt-1" id="statUnknownTotal">450</span>
-                        <i class="ph-fill ph-warning-circle text-orange-500/10 text-[64px] absolute -right-3 -bottom-3 group-hover:scale-110 transition-transform"></i>
+                        <span class="text-[26px] font-extrabold text-orange-700 leading-none tracking-tight font-mono z-10 mt-1" id="statUnknownTotal">450</span>
+                        <i class="ph-fill ph-x-circle text-orange-500/10 text-[56px] absolute -right-2 -bottom-2 group-hover:scale-110 transition-transform"></i>
                     </div>
                 </div>
 
-                <!-- 下层：交互训练分布 (强视觉基底 - 分割线等分通栏) -->
-                <div class="grid grid-cols-3 divide-x divide-gray-200/80 bg-[#F8FAFC] rounded-[16px] border border-gray-200/80 py-3 shrink-0 shadow-[inset_0_2px_4px_rgba(0,0,0,0.01)]">
+                <!-- 下层：交互训练分布 (分割线等分通栏) -->
+                <div class="grid grid-cols-3 divide-x divide-gray-200/80 bg-[#F8FAFC] rounded-[16px] border border-gray-200/80 py-2 shrink-0 shadow-[inset_0_2px_4px_rgba(0,0,0,0.01)]">
                     
-                    <div class="flex items-center justify-center gap-3 px-2">
-                        <div class="w-10 h-10 rounded-[12px] bg-white shadow-sm border border-blue-100 flex items-center justify-center text-blue-500 shrink-0">
-                            <i class="ph-fill ph-microphone-stage text-[20px]"></i>
+                    <div class="flex items-center justify-center gap-2.5 px-2">
+                        <div class="w-9 h-9 rounded-[10px] bg-white shadow-sm border border-blue-100 flex items-center justify-center text-blue-500 shrink-0">
+                            <i class="ph-fill ph-microphone-stage text-[18px]"></i>
                         </div>
                         <div class="flex flex-col">
-                            <span class="text-[11px] font-bold text-gray-500 mb-0.5">跟读</span>
-                            <span class="text-[18px] font-extrabold text-gray-800 leading-none font-mono" id="statReadTotal">1200</span>
+                            <span class="text-[10px] font-bold text-gray-500 mb-0.5">跟读</span>
+                            <span class="text-[16px] font-extrabold text-gray-800 leading-none font-mono" id="statReadTotal">1200</span>
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-center gap-3 px-2">
-                        <div class="w-10 h-10 rounded-[12px] bg-white shadow-sm border border-cyan-100 flex items-center justify-center text-cyan-600 shrink-0">
-                            <i class="ph-fill ph-headphones text-[20px]"></i>
+                    <div class="flex items-center justify-center gap-2.5 px-2">
+                        <div class="w-9 h-9 rounded-[10px] bg-white shadow-sm border border-cyan-100 flex items-center justify-center text-cyan-600 shrink-0">
+                            <i class="ph-fill ph-headphones text-[18px]"></i>
                         </div>
                         <div class="flex flex-col">
-                            <span class="text-[11px] font-bold text-gray-500 mb-0.5">音记</span>
-                            <span class="text-[18px] font-extrabold text-gray-800 leading-none font-mono" id="statMemoTotal">1100</span>
+                            <span class="text-[10px] font-bold text-gray-500 mb-0.5">音记</span>
+                            <span class="text-[16px] font-extrabold text-gray-800 leading-none font-mono" id="statMemoTotal">1100</span>
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-center gap-3 px-2">
-                        <div class="w-10 h-10 rounded-[12px] bg-white shadow-sm border border-rose-100 flex items-center justify-center text-rose-500 shrink-0">
-                            <i class="ph-fill ph-pencil-simple text-[20px]"></i>
+                    <div class="flex items-center justify-center gap-2.5 px-2">
+                        <div class="w-9 h-9 rounded-[10px] bg-white shadow-sm border border-rose-100 flex items-center justify-center text-rose-500 shrink-0">
+                            <i class="ph-fill ph-pencil-simple text-[18px]"></i>
                         </div>
                         <div class="flex flex-col">
-                            <span class="text-[11px] font-bold text-gray-500 mb-0.5">听写</span>
-                            <span class="text-[18px] font-extrabold text-gray-800 leading-none font-mono" id="statDictTotal">1050</span>
+                            <span class="text-[10px] font-bold text-gray-500 mb-0.5">听写</span>
+                            <span class="text-[16px] font-extrabold text-gray-800 leading-none font-mono" id="statDictTotal">1050</span>
                         </div>
                     </div>
 
@@ -177,7 +182,7 @@
         </div>
 
         <!-- 2. 中下部主体：左侧生词本 vs 右侧AI中枢 -->
-        <div class="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[1.1fr_1.5fr] gap-5 md:gap-6">
+        <div class="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[1.1fr_1.5fr] gap-5 md:gap-6 mt-1">
             
             <!-- 【左侧】：生词本 -->
             <div class="bg-[#FFFDF8] rounded-[24px] shadow-premium flex flex-col h-full min-h-0 border border-[#FDE68A] relative overflow-hidden">
@@ -269,7 +274,7 @@
             <button onclick="switchView('view-dashboard')" class="w-11 h-11 bg-[#F1F5F9] hover:bg-[#E2E8F0] rounded-[14px] flex items-center justify-center transition-colors text-slate-600 shadow-sm active:scale-95">
                 <i class="ph-bold ph-caret-left text-[22px]"></i>
             </button>
-            <h2 class="font-extrabold text-[32px] text-gray-900 tracking-tight领导性 leading-none" id="passingTitle">学习新词</h2>
+            <h2 class="font-extrabold text-[32px] text-gray-900 tracking-tight leading-none" id="passingTitle">学习新词</h2>
         </div>
 
         <!-- 核心过词区域 -->
@@ -379,7 +384,7 @@
 
         const dataStore = {
             stats: { 
-                totalPlanned: 3000, totalLearned: 1250, unlearnedNew: 1750, unlearnedOld: 30, todayLearned: 120,
+                totalPlanned: 3000, totalLearned: 1250, unlearnedNew: 1270, unlearnedOld: 30, todayLearned: 120,
                 totalPool: 5000, totalTarget: 3000, known: 1280, read: 1200, memo: 1100, dict: 1050, 
                 unknown: 450, unknownNew: 420, unlearned: 1270
             }
@@ -436,12 +441,9 @@
             for (let i = 0; i < count; i++) {
                 const rawIndex = (state.wordOffset + i) % rawWordsData.length;
                 const baseWord = rawWordsData[rawIndex];
-                
-                const wordText = baseWord.word;
-                
                 testWords.push({ 
                     id: state.wordOffset + i, 
-                    word: wordText, 
+                    word: baseWord.word, 
                     phonetic: baseWord.phonetic, 
                     meaning: baseWord.meaning, 
                     type: baseWord.type, 
@@ -502,8 +504,8 @@
             const ringText = document.getElementById('targetProgressText');
             if (ringText) ringText.innerText = ringPct + '%';
             if (ringEl) {
-                // 213.6 是 r=34 的圆周长 (2 * PI * 34)
-                const offset = 213.6 - (ringPct / 100) * 213.6;
+                // 175.9 是 r=28 的圆周长 (2 * PI * 28)
+                const offset = 175.9 - (ringPct / 100) * 175.9;
                 ringEl.style.strokeDashoffset = offset;
             }
 
@@ -648,7 +650,6 @@
                     taskContainer.innerHTML = '';
                     state.assignedTasks.forEach(task => {
                         const isDoneToday = task.lastDone === today;
-                        
                         const btnClass = isDoneToday 
                             ? 'opacity-70 cursor-not-allowed bg-gradient-to-r from-gray-50 to-white border border-gray-100' 
                             : 'bg-gradient-to-r from-[#F0F5FF] to-white active:scale-95 border border-blue-100 hover:border-blue-300 cursor-pointer shadow-sm';
@@ -677,7 +678,6 @@
 
             const btnNew = document.getElementById('btnNew');
             const btnOld = document.getElementById('btnOld');
-            
             const hubIdleState = document.getElementById('hubIdleState');
             const hubActiveState = document.getElementById('hubActiveState');
             const hubStepsContainer = document.getElementById('hubStepsContainer');
@@ -1004,6 +1004,7 @@
             dataStore.stats.totalLearned += TOTAL_WORDS;
             if (state.currentActionType === 'new') {
                 dataStore.stats.unlearnedNew = Math.max(0, dataStore.stats.unlearnedNew - TOTAL_WORDS);
+                dataStore.stats.unlearned = dataStore.stats.unlearnedNew; 
             }
 
             if (state._tempUnknowns.length > 0) {
@@ -1017,8 +1018,7 @@
 
             const newCount = state.vocabBook.filter(w => w.type === 'new').length;
             const oldCount = state.vocabBook.filter(w => w.type === 'old').length;
-            const assignedCount = state.vocabBook.filter(w => w.type === 'assigned').length;
-
+            
             const isLevelTriggered = (newCount >= VOCAB_THRESHOLD && oldCount >= VOCAB_THRESHOLD);
 
             if (isLevelTriggered) {
@@ -1047,7 +1047,7 @@
                 if (isLevelTriggered) {
                     showModal('双轨收集完毕！', `生词本已达触发条件！\n系统已为您生成专属学习关卡，在攻坚解锁之前，AI中枢已锁定。`, () => switchView('view-dashboard'));
                 } else if (state._tempUnknowns.length > 0) {
-                    showModal('今日任务打卡成功', `进度 +1，并且发现了 ${state._tempUnknowns.length} 个盲点，已存入生词本。\n(注：需新旧词均达${VOCAB_THRESHOLD}个方考触发关卡)`, () => switchView('view-dashboard'));
+                    showModal('今日任务打卡成功', `进度 +1，并且发现了 ${state._tempUnknowns.length} 个盲点，已存入生词本。\n(注：需新旧词均达${VOCAB_THRESHOLD}个方可触发关卡)`, () => switchView('view-dashboard'));
                 } else {
                     showModal('今日任务打卡成功', `进度 +1，本批次单词全部认识！`, () => switchView('view-dashboard'));
                 }
