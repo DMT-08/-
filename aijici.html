@@ -47,26 +47,6 @@
             50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
         }
         .pulse-alert-light { animation: pulse-red-light 2s infinite; }
-
-        /* CSS Container Queries 文本自动滚动 */
-        .marquee-container {
-            container-type: inline-size;
-            overflow: hidden;
-            white-space: nowrap;
-            -webkit-mask-image: linear-gradient(to right, black calc(100% - 16px), transparent 100%);
-            mask-image: linear-gradient(to right, black calc(100% - 16px), transparent 100%);
-        }
-
-        .marquee-text {
-            display: inline-block;
-            padding-right: 16px; 
-            animation: auto-scroll-x 4s ease-in-out infinite alternate;
-        }
-
-        @keyframes auto-scroll-x {
-            0%, 15% { transform: translateX(0); }
-            85%, 100% { transform: translateX(min(0px, calc(100cqw - 100%))); }
-        }
     </style>
 </head>
 <body class="flex flex-col h-screen">
@@ -103,37 +83,99 @@
             </button>
         </header>
 
-        <!-- 1. 顶部：极简全融合看板 -->
-        <div class="bg-white/90 backdrop-blur-xl rounded-[24px] shadow-premium p-5 md:p-6 shrink-0 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8">
-            <div class="absolute right-0 top-0 w-80 h-80 bg-blue-50/50 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2"></div>
-            
-            <div class="flex-1 w-full relative z-10 pr-0 md:pr-8 border-b border-gray-100 md:border-b-0 md:border-r pb-4 md:pb-0">
-                <div class="flex justify-between items-end mb-3">
-                    <div class="flex items-center gap-1.5 text-[15px] text-gray-500 font-bold mb-1">
-                        <i class="ph-fill ph-flag-checkered text-brand text-[18px]"></i> 词汇掌握总进度
-                    </div>
-                    <div class="flex items-baseline gap-1">
-                        <span class="text-[36px] font-extrabold text-gray-900 leading-none tracking-tight" id="statTotalLearned">1,280</span>
-                        <span class="text-[14px] text-gray-400 font-bold ml-0.5">/ <span id="statTotalPlanned">3,000</span></span>
+        <!-- 1. 顶部：可视化优化看板 -->
+        <div class="flex shrink-0 gap-4">
+            <!-- 左侧主指标：环形进度看板 -->
+            <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[24px] p-5 flex items-center justify-between w-[280px] md:w-[320px] shadow-lg shadow-blue-500/20 shrink-0 relative overflow-hidden">
+                <i class="ph-fill ph-target absolute left-4 top-1/2 -translate-y-1/2 text-[120px] text-white opacity-[0.03] transform -translate-x-1/4 pointer-events-none"></i>
+                
+                <div class="flex flex-col relative z-10">
+                    <span class="text-[13px] font-bold text-white/80 mb-1">总学习目标</span>
+                    <div class="text-[40px] font-extrabold text-white tracking-tight leading-none drop-shadow-sm" id="statTotalTarget">3000</div>
+                    <div class="flex flex-wrap items-center gap-2 mt-2.5">
+                        <div class="text-[12px] text-white/80 flex items-center gap-1.5 bg-white/10 px-2 py-1 rounded-[6px] w-max font-medium backdrop-blur-sm border border-white/10">
+                            <i class="ph-fill ph-check-circle text-green-300"></i> 已学 <span id="statLearnedSum" class="font-bold text-white font-mono">1730</span> 词
+                        </div>
+                        <div class="text-[12px] text-white/80 flex items-center gap-1.5 bg-white/10 px-2 py-1 rounded-[6px] w-max font-medium backdrop-blur-sm border border-white/10">
+                            <i class="ph-fill ph-book-open text-purple-300"></i> 待学 <span id="statUnlearned" class="font-bold text-white font-mono">1270</span> 词
+                        </div>
                     </div>
                 </div>
-                <div class="w-full h-2.5 bg-gray-100 rounded-[6px] overflow-hidden shadow-inner">
-                    <div class="h-full bg-brand rounded-[6px] transition-all duration-500" id="statTotalProgress" style="width: 42%;"></div>
+
+                <!-- SVG 圆环进度条 -->
+                <div class="relative w-[84px] h-[84px] flex items-center justify-center z-10 shrink-0 drop-shadow-md">
+                    <svg class="w-full h-full transform -rotate-90">
+                        <!-- 底环 -->
+                        <circle cx="42" cy="42" r="34" stroke="rgba(255,255,255,0.15)" stroke-width="8" fill="none" />
+                        <!-- 进度环 (213.6 是周长) -->
+                        <circle id="targetProgressRing" cx="42" cy="42" r="34" stroke="white" stroke-width="8" fill="none" stroke-dasharray="213.6" stroke-dashoffset="90" stroke-linecap="round" class="transition-all duration-1000 ease-out" />
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <span class="text-[18px] font-extrabold text-white leading-none font-mono" id="targetProgressText">57%</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- 右侧：剩余总词数 -->
-            <div class="w-full md:w-auto relative z-10 shrink-0">
-                <div class="bg-[#ECFDF5] border border-[#D1FAE5] rounded-[16px] px-5 py-3 flex flex-col justify-center shadow-sm relative overflow-hidden group min-w-[160px]">
-                    <i class="ph-fill ph-chart-line-up absolute -right-3 -bottom-4 text-[72px] text-[#22C55E]/10 group-hover:scale-110 transition-transform duration-300"></i>
+            <!-- 右侧细节指标网格：带数据可视化增强 -->
+            <div class="flex-1 bg-white/90 backdrop-blur-xl rounded-[24px] shadow-premium p-4 flex flex-col gap-3 min-w-0">
+                <!-- 上层：词汇状态 (2列 - 极简数据卡片) -->
+                <div class="grid grid-cols-2 gap-3 flex-1">
+                    <div class="bg-[#F0FDF4] border border-[#BBF7D0] rounded-[16px] p-3.5 flex flex-col justify-center relative overflow-hidden group transition-all hover:shadow-md">
+                        <div class="flex items-center gap-1.5 text-green-600 mb-1 z-10">
+                            <div class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
+                            <span class="text-[12px] font-bold">认识数</span>
+                        </div>
+                        <span class="text-[26px] font-extrabold text-green-700 leading-none tracking-tight font-mono z-10 mt-0.5" id="statKnownTotal">1280</span>
+                        <i class="ph-fill ph-check-circle text-green-500/10 text-[56px] absolute -right-3 -bottom-3 group-hover:scale-110 transition-transform"></i>
+                    </div>
+
+                    <div class="bg-[#FFF7ED] border border-[#FED7AA] rounded-[16px] p-3.5 flex flex-col justify-center relative overflow-hidden group transition-all hover:shadow-md">
+                        <div class="flex items-center gap-1.5 text-orange-600 mb-1 z-10">
+                            <div class="w-1.5 h-1.5 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.6)]"></div>
+                            <span class="text-[12px] font-bold">不认识数</span>
+                        </div>
+                        <span class="text-[26px] font-extrabold text-orange-700 leading-none tracking-tight font-mono z-10 mt-0.5" id="statUnknownTotal">450</span>
+                        <i class="ph-fill ph-warning-circle text-orange-500/10 text-[56px] absolute -right-3 -bottom-3 group-hover:scale-110 transition-transform"></i>
+                    </div>
+                </div>
+
+                <!-- 下层：交互训练分布 (非卡片风格 - 水平通栏) -->
+                <div class="flex items-center justify-around px-4 py-2 bg-gray-50/50 rounded-[16px] border border-gray-100/60 flex-1">
                     
-                    <div class="text-[13px] text-[#15803D] font-bold mb-1 flex items-center gap-1.5 z-10">
-                        剩余总词数 <i class="ph-fill ph-target text-[#22C55E] text-[15px]"></i>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-[12px] bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-500 shrink-0">
+                            <i class="ph-fill ph-microphone-stage text-[20px]"></i>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[11px] font-bold text-gray-500 mb-0.5">跟读</span>
+                            <span class="text-[20px] font-extrabold text-gray-800 leading-none font-mono" id="statReadTotal">1200</span>
+                        </div>
                     </div>
-                    <div class="flex items-baseline gap-1 z-10">
-                        <span class="text-[36px] font-extrabold text-[#16A34A] leading-none tracking-tight" id="statRemainingTotal">1,720</span>
-                        <span class="text-[13px] text-gray-400 font-bold ml-0.5 mb-1">词</span>
+
+                    <div class="w-[1px] h-10 bg-gray-200"></div>
+
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-[12px] bg-cyan-50 border border-cyan-100 flex items-center justify-center text-cyan-600 shrink-0">
+                            <i class="ph-fill ph-headphones text-[20px]"></i>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[11px] font-bold text-gray-500 mb-0.5">音记</span>
+                            <span class="text-[20px] font-extrabold text-gray-800 leading-none font-mono" id="statMemoTotal">1100</span>
+                        </div>
                     </div>
+
+                    <div class="w-[1px] h-10 bg-gray-200"></div>
+
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-[12px] bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-500 shrink-0">
+                            <i class="ph-fill ph-pencil-simple text-[20px]"></i>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[11px] font-bold text-gray-500 mb-0.5">听写</span>
+                            <span class="text-[20px] font-extrabold text-gray-800 leading-none font-mono" id="statDictTotal">1050</span>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -154,7 +196,6 @@
                     <button onclick="setVocabFilter('all')" id="filter-all"></button>
                     <button onclick="setVocabFilter('new')" id="filter-new"></button>
                     <button onclick="setVocabFilter('old')" id="filter-old"></button>
-                    <button onclick="setVocabFilter('assigned')" id="filter-assigned"></button>
                 </div>
                 
                 <div class="flex-1 min-h-0 flex flex-col relative z-10 p-3">
@@ -232,7 +273,7 @@
             <button onclick="switchView('view-dashboard')" class="w-11 h-11 bg-[#F1F5F9] hover:bg-[#E2E8F0] rounded-[14px] flex items-center justify-center transition-colors text-slate-600 shadow-sm active:scale-95">
                 <i class="ph-bold ph-caret-left text-[22px]"></i>
             </button>
-            <h2 class="font-extrabold text-[32px] text-gray-900 tracking-tight leading-none" id="passingTitle">学习新词</h2>
+            <h2 class="font-extrabold text-[32px] text-gray-900 tracking-tight领导性 leading-none" id="passingTitle">学习新词</h2>
         </div>
 
         <!-- 核心过词区域 -->
@@ -341,7 +382,11 @@
         }
 
         const dataStore = {
-            stats: { totalPlanned: 3000, totalLearned: 1250, unlearnedNew: 1750, unlearnedOld: 30, todayLearned: 120 }
+            stats: { 
+                totalPlanned: 3000, totalLearned: 1250, unlearnedNew: 1750, unlearnedOld: 30, todayLearned: 120,
+                totalPool: 5000, totalTarget: 3000, known: 1280, read: 1200, memo: 1100, dict: 1050, 
+                unknown: 450, unknownNew: 420, unlearned: 1270
+            }
         };
 
         const rawWordsData = [
@@ -370,7 +415,6 @@
         
         const state = {
             activeLevel: null, 
-            // 预设：新词 4个，旧词 4个，指定任务 0个
             vocabBook: [ 
                 { word: "dilemma", phonetic: "/dɪˈlemə/", meaning: "进退两难的困境", type: "new" },
                 { word: "ambitious", phonetic: "/æmˈbɪʃəs/", meaning: "有野心的", type: "new" },
@@ -391,7 +435,6 @@
             wordOffset: 0 
         };
 
-        // 动态生成干净且不重复的测试词
         function initData(count = 10) {
             testWords = [];
             for (let i = 0; i < count; i++) {
@@ -444,19 +487,38 @@
         }
 
         function renderDataDashboard() {
-            const remainingTotal = dataStore.stats.totalPlanned - dataStore.stats.totalLearned;
+            const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; }; // 彻底去除 .toLocaleString()，无逗号
             
-            const elTotalPlanned = document.getElementById('statTotalPlanned');
-            if (elTotalPlanned) elTotalPlanned.innerText = dataStore.stats.totalPlanned.toLocaleString();
-
-            const elTotalLearned = document.getElementById('statTotalLearned');
-            if (elTotalLearned) elTotalLearned.innerText = dataStore.stats.totalLearned.toLocaleString();
+            const total = dataStore.stats.totalTarget;
+            const known = dataStore.stats.known;
+            const unknown = dataStore.stats.unknown;
+            const unlearned = dataStore.stats.unlearned;
+            const learnedSum = known + unknown;
             
-            const elRemainingTotal = document.getElementById('statRemainingTotal');
-            if (elRemainingTotal) elRemainingTotal.innerText = remainingTotal.toLocaleString();
+            // 左侧更新
+            setVal('statTotalTarget', total);
+            setVal('statLearnedSum', learnedSum);
+            setVal('statUnlearned', unlearned);
+            
+            // 计算环形进度
+            const ringPct = Math.round((learnedSum / total) * 100) || 0;
+            const ringEl = document.getElementById('targetProgressRing');
+            const ringText = document.getElementById('targetProgressText');
+            if (ringText) ringText.innerText = ringPct + '%';
+            if (ringEl) {
+                // 213.6 是 r=34 的圆周长 (2 * PI * 34)
+                const offset = 213.6 - (ringPct / 100) * 213.6;
+                ringEl.style.strokeDashoffset = offset;
+            }
 
-            const elTotalProgress = document.getElementById('statTotalProgress');
-            if (elTotalProgress) elTotalProgress.style.width = `${(dataStore.stats.totalLearned / dataStore.stats.totalPlanned) * 100}%`;
+            // 右上：纯数据更新
+            setVal('statKnownTotal', known);
+            setVal('statUnknownTotal', unknown);
+
+            // 右下：交互数据更新
+            setVal('statReadTotal', dataStore.stats.read);
+            setVal('statMemoTotal', dataStore.stats.memo);
+            setVal('statDictTotal', dataStore.stats.dict);
         }
 
         function renderVocabBookInline() {
@@ -464,13 +526,12 @@
             if (!container) return;
             container.innerHTML = '';
             
-            const newCount = state.vocabBook.filter(w => w.type === 'new').length;
-            const oldCount = state.vocabBook.filter(w => w.type === 'old').length;
-            const assignedCount = state.vocabBook.filter(w => w.type === 'assigned').length;
-            const allCount = state.vocabBook.length;
+            const validVocab = state.vocabBook.filter(item => item.type !== 'assigned');
+            
+            const newCount = validVocab.filter(w => w.type === 'new').length;
+            const oldCount = validVocab.filter(w => w.type === 'old').length;
+            const allCount = validVocab.length;
 
-            // ================== 大一统渲染：筛选按钮主题引擎 ==================
-            // 包含 默认彩色(文字深色图标浅色) 与 选中反转(图标深色文字浅色)
             const themes = {
                 all: {
                     lightBg: 'bg-gray-100', lightBorder: 'border-gray-200', hoverBg: 'bg-gray-200',
@@ -486,11 +547,6 @@
                     lightBg: 'bg-emerald-50', lightBorder: 'border-emerald-100', hoverBg: 'bg-emerald-100',
                     darkText: 'text-emerald-600', lightIconText: 'text-emerald-400', lightIconBg: 'bg-emerald-100/80',
                     solidBg: 'bg-[#10B981]'
-                },
-                assigned: {
-                    lightBg: 'bg-indigo-50', lightBorder: 'border-indigo-100', hoverBg: 'bg-indigo-100',
-                    darkText: 'text-indigo-600', lightIconText: 'text-indigo-400', lightIconBg: 'bg-indigo-100/80',
-                    solidBg: 'bg-[#6366F1]'
                 }
             };
 
@@ -504,7 +560,6 @@
                 let contentHtml = '';
 
                 if (isActive) {
-                    // 【选中后】：背景实心(深)，文字白(浅)，Icon置入白框(深色)
                     let badgeHtml = '';
                     if (typeKey === 'all') {
                         badgeHtml = `<span class="bg-white/20 text-white px-1.5 py-0.5 rounded-[6px] font-mono text-[10px] ml-1.5">${count}</span>`;
@@ -525,7 +580,6 @@
                     `;
                     btn.className = `text-[12px] font-bold pr-2 pl-1.5 py-1.5 rounded-[10px] shadow-md transition-all duration-300 flex items-center shrink-0 ${theme.solidBg} border border-transparent transform scale-[1.02]`;
                 } else {
-                    // 【默认彩色】：背景浅彩，文字深色，Icon浅色
                     let badgeHtml = '';
                     if (typeKey === 'all') {
                         badgeHtml = `<span class="${theme.lightIconBg} ${theme.darkText} opacity-70 px-1.5 py-0.5 rounded-[6px] font-mono text-[10px] ml-1.5">${count}</span>`;
@@ -547,14 +601,11 @@
                 btn.innerHTML = contentHtml;
             };
 
-            // 应用筛选按钮渲染
             updateTab('filter-all', '全部', 'ph-bold ph-list-dashes', allCount, 'all');
             updateTab('filter-new', '新词', 'ph-bold ph-rocket', newCount, 'new');
             updateTab('filter-old', '旧词', 'ph-bold ph-arrows-clockwise', oldCount, 'old');
-            updateTab('filter-assigned', '指定', 'ph-bold ph-chalkboard-teacher', assignedCount, 'assigned');
 
-
-            const filteredList = state.vocabBook.filter(item => state.vocabFilter === 'all' || item.type === state.vocabFilter);
+            const filteredList = validVocab.filter(item => state.vocabFilter === 'all' || item.type === state.vocabFilter);
 
             if (filteredList.length === 0) {
                 container.innerHTML = `
@@ -566,20 +617,16 @@
                 [...filteredList].reverse().forEach(item => {
                     const typeTag = item.type === 'new' 
                         ? `<span class="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded-[4px] font-bold shrink-0">新词</span>` 
-                        : item.type === 'old' 
-                            ? `<span class="text-[10px] bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded-[4px] font-bold shrink-0">旧词</span>`
-                            : `<span class="text-[10px] bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded-[4px] font-bold shrink-0">指定</span>`;
+                        : `<span class="text-[10px] bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded-[4px] font-bold shrink-0">旧词</span>`;
 
                     container.innerHTML += `
                         <div class="flex items-center w-full bg-gradient-to-r from-[#FFFDF0] to-white p-2.5 rounded-[12px] shadow-sm border border-[#FDE68A]/50 hover:border-[#FDE68A] hover:from-[#FFFBEB] transition-colors z-10 shrink-0 gap-3">
-                            <div class="marquee-container w-[35%] shrink-0 text-gray-900">
-                                <span class="marquee-text font-extrabold text-[15px]">${item.word}</span>
+                            <div class="flex-1 min-w-0 flex items-baseline gap-2 truncate text-gray-800 font-extrabold text-[15px] font-mono tracking-tight">
+                                <span class="shrink-0">${item.word}</span>
+                                <span class="shrink-0 ml-1">${item.phonetic}</span>
                             </div>
-                            <div class="marquee-container w-[30%] shrink-0 text-gray-400">
-                                <span class="marquee-text text-[12px] font-medium font-mono">${item.phonetic}</span>
-                            </div>
-                            <div class="marquee-container flex-1 min-w-0 text-gray-600 px-1">
-                                <span class="marquee-text text-[13px]">${item.meaning}</span>
+                            <div class="flex-1 min-w-0 text-gray-600 px-1 truncate">
+                                <span class="text-[13px]">${item.meaning}</span>
                             </div>
                             ${typeTag}
                         </div>
@@ -596,7 +643,6 @@
             const hasAssignedTask = state.assignedTasks.length > 0;
             const today = getTodayDateString();
 
-            // 1. 渲染老师任务
             const taskContainer = document.getElementById('assignedTaskContainer');
             const noTaskBox = document.getElementById('noAssignedTaskBox');
             if (taskContainer && noTaskBox) {
@@ -633,7 +679,6 @@
                 }
             }
 
-            // 2. 更新 AI学习区 & 关卡引擎
             const btnNew = document.getElementById('btnNew');
             const btnOld = document.getElementById('btnOld');
             
@@ -755,7 +800,6 @@
             }
         }
 
-        // ================= 记词过词模块 =================
         function startPassing(typeKey, typeName, taskId = null, wordCount = 10) {
             if(state.activeLevel !== null && typeKey !== 'assigned') return; 
             
@@ -789,13 +833,14 @@
                 div.className = `flex justify-between items-center p-3.5 rounded-[16px] border border-gray-100 shadow-sm bg-white transition-colors duration-300 shrink-0`;
                 
                 div.innerHTML = `
-                    <div class="flex items-center gap-3 flex-1 overflow-hidden pr-2">
-                        <span id="word-text-${item.id}" class="font-extrabold text-gray-900 text-[16px] tracking-wide shrink-0">${item.word}</span>
-                        <span id="word-desc-${item.id}" class="text-[13px] text-gray-500 truncate flex items-center gap-2 shrink-0">
-                            ${item.meaning}
-                        </span>
-                        <span id="word-phonetic-${item.id}" class="font-normal text-gray-300 text-[12px] font-mono truncate">
+                    <div class="flex items-baseline gap-2 flex-1 overflow-hidden pr-2">
+                        <span class="font-mono text-[14px] text-gray-400 font-bold shrink-0 w-6">${index + 1}.</span>
+                        <span id="word-text-${item.id}" class="font-extrabold text-[15px] font-mono tracking-tight shrink-0 text-gray-800">${item.word}</span>
+                        <span id="word-phonetic-${item.id}" class="font-extrabold text-[15px] font-mono tracking-tight shrink-0 text-gray-800 ml-1">
                             ${item.phonetic}
+                        </span>
+                        <span id="word-desc-${item.id}" class="text-[13px] text-gray-500 truncate flex items-center gap-2 shrink-0 ml-3">
+                            ${item.meaning}
                         </span>
                     </div>
                     <div class="flex gap-2 shrink-0">
@@ -858,13 +903,15 @@
             const btnX = document.getElementById(`btn-x-${id}`);
             const btnC = document.getElementById(`btn-c-${id}`);
             const wordSpan = document.getElementById(`word-text-${id}`);
+            const wordPhonetic = document.getElementById(`word-phonetic-${id}`);
             const wordDesc = document.getElementById(`word-desc-${id}`);
 
             if (row && btnX && btnC) {
                 row.className = `flex justify-between items-center p-3.5 rounded-[16px] border transition-colors duration-300 shrink-0`;
                 btnX.className = `judge-btn w-[48px] h-[36px] rounded-[10px] flex items-center justify-center text-[16px] hover:bg-red-50 hover:text-red-500 active:scale-90 transition-all`;
                 btnC.className = `judge-btn w-[48px] h-[36px] rounded-[10px] flex items-center justify-center text-[16px] hover:bg-green-50 hover:text-green-500 active:scale-90 transition-all`;
-                wordSpan.classList.remove('text-gray-400', 'text-gray-500');
+                wordSpan.classList.remove('text-gray-400', 'text-gray-500', 'text-gray-800');
+                wordPhonetic.classList.remove('text-gray-400', 'text-gray-500', 'text-gray-800');
                 wordDesc.classList.remove('opacity-60', 'opacity-80');
 
                 if (result === 'unknown') {
@@ -877,7 +924,8 @@
                     btnX.classList.add('bg-gray-50', 'text-gray-400'); 
                 }
 
-                wordSpan.classList.add('text-gray-500');
+                wordSpan.classList.add('text-gray-400');
+                wordPhonetic.classList.add('text-gray-400');
                 wordDesc.classList.add('opacity-80');
             }
 
@@ -905,7 +953,6 @@
             }
         }
 
-        // 渲染生词本及顶部进度预警
         function renderBasket() {
             const queueList = document.getElementById('queueList');
             const badge = document.getElementById('basketProgressBadge');
@@ -942,17 +989,16 @@
                 const div = document.createElement('div');
                 div.className = `flex flex-col p-2.5 rounded-[12px] bg-orange-50/80 border border-orange-100 shrink-0`;
                 div.innerHTML = `
-                    <div class="flex items-center justify-between w-full">
-                        <span class="text-orange-600 font-bold text-[13px] truncate pr-2">${item.word}</span>
-                        <i class="ph-fill ph-check-circle text-orange-400 text-[14px] shrink-0"></i>
+                    <div class="flex items-baseline gap-2 w-full truncate text-orange-600 font-extrabold text-[15px] font-mono tracking-tight">
+                        <span class="shrink-0">${item.word}</span>
+                        <span class="shrink-0 ml-1">${item.phonetic}</span>
                     </div>
-                    <span class="text-gray-500 font-medium text-[11px] truncate mt-0.5">${item.meaning}</span>
+                    <span class="text-orange-600/70 font-medium text-[12px] truncate mt-0.5">${item.meaning}</span>
                 `;
                 queueList.appendChild(div);
             });
         }
 
-        // 手动提交过词结果
         function submitPassResults() {
             if (state.passingStats.remaining > 0) return;
             
@@ -962,7 +1008,6 @@
                 dataStore.stats.unlearnedNew = Math.max(0, dataStore.stats.unlearnedNew - TOTAL_WORDS);
             }
 
-            // 把生词合并到大库
             if (state._tempUnknowns.length > 0) {
                 state._tempUnknowns.forEach(w => {
                     if(!state.vocabBook.find(ex => ex.word === w.word)) {
@@ -976,7 +1021,7 @@
             const oldCount = state.vocabBook.filter(w => w.type === 'old').length;
             const assignedCount = state.vocabBook.filter(w => w.type === 'assigned').length;
 
-            const isLevelTriggered = (newCount >= VOCAB_THRESHOLD && oldCount >= VOCAB_THRESHOLD) || (assignedCount >= VOCAB_THRESHOLD);
+            const isLevelTriggered = (newCount >= VOCAB_THRESHOLD && oldCount >= VOCAB_THRESHOLD);
 
             if (isLevelTriggered) {
                 state.activeLevel = { 
@@ -991,7 +1036,6 @@
                 };
             }
 
-            // 结算后界面跳转与弹窗
             if (state.currentActionType === 'assigned') {
                 const task = state.assignedTasks.find(t => t.id === state.currentTaskId);
                 if (task) {
@@ -1005,7 +1049,7 @@
                 if (isLevelTriggered) {
                     showModal('双轨收集完毕！', `生词本已达触发条件！\n系统已为您生成专属学习关卡，在攻坚解锁之前，AI中枢已锁定。`, () => switchView('view-dashboard'));
                 } else if (state._tempUnknowns.length > 0) {
-                    showModal('今日任务打卡成功', `进度 +1，并且发现了 ${state._tempUnknowns.length} 个盲点，已存入生词本。\n(注：需新旧词均达${VOCAB_THRESHOLD}个方可触发关卡)`, () => switchView('view-dashboard'));
+                    showModal('今日任务打卡成功', `进度 +1，并且发现了 ${state._tempUnknowns.length} 个盲点，已存入生词本。\n(注：需新旧词均达${VOCAB_THRESHOLD}个方考触发关卡)`, () => switchView('view-dashboard'));
                 } else {
                     showModal('今日任务打卡成功', `进度 +1，本批次单词全部认识！`, () => switchView('view-dashboard'));
                 }
