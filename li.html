@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI 记词 - 极致原生体验</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #EFF6FF 0%, #DFE7FF 100%);
+            background-attachment: fixed;
+            color: #1f2937;
+            overflow: hidden; 
+            overscroll-behavior-y: none;
+        }
+
+        .bg-brand { background-color: #1F5FFF; }
+        .text-brand { color: #1F5FFF; }
+        .border-brand { border-color: #1F5FFF; }
+        .hover-bg-brand:hover { background-color: #004ce6; }
+
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .view-section { display: none; opacity: 0; transition: opacity 0.2s ease-in-out; }
+        .view-section.active { display: flex; opacity: 1; }
+
+        .shadow-premium {
+            box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.03), 0 2px 8px -2px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+        }
+
+        .modal-enter { animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .judge-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        @keyframes pulse-red-light {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.15); }
+            50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+        }
+        .pulse-alert-light { animation: pulse-red-light 2s infinite; }
+    </style>
+</head>
+<body class="flex flex-col h-screen">
+
+    <!-- ================= 全局原生弹窗 ================= -->
+    <div id="native-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-gray-900/40 backdrop-blur-sm transition-opacity duration-300 opacity-0">
+        <div class="bg-white rounded-[24px] p-7 w-[90%] max-w-sm shadow-2xl flex flex-col modal-enter" id="native-modal-content">
+            <h3 id="modal-title" class="text-[20px] font-bold text-gray-900 mb-2">提示</h3>
+            <p id="modal-msg" class="text-[14px] text-gray-600 mb-6 leading-relaxed whitespace-pre-wrap"></p>
+            <button id="modal-btn" class="w-full bg-brand hover-bg-brand text-white font-bold text-[15px] py-3.5 rounded-[16px] shadow-sm active:scale-95 transition-all">
+                我知道了
+            </button>
+        </div>
+    </div>
+
+
+    <!-- ================= 视图 1：主界面 (仪表盘) ================= -->
+    <div id="view-dashboard" class="view-section active flex-col w-full h-full max-w-[1300px] mx-auto p-4 md:p-5 overflow-hidden gap-4">
+        
+        <!-- Header -->
+        <header class="flex justify-between items-center shrink-0">
+            <div class="flex items-center gap-4">
+                <button class="w-10 h-10 bg-white rounded-[14px] flex items-center justify-center shadow-premium active:scale-90 transition-transform text-slate-700 cursor-pointer" onclick="showModal('返回提示', '学习可随时退出，此处将返回上一级页面。')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mr-0.5">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                <h1 class="text-[32px] font-extrabold text-gray-900 tracking-tight leading-none">
+                    AI 记词
+                </h1>
+            </div>
+            <button onclick="toggleTeacherTasks()" class="bg-white text-brand border border-blue-100 px-3.5 py-2 rounded-[10px] font-bold text-[13px] shadow-sm active:scale-95 transition-transform flex items-center gap-1.5">
+                <i class="ph-bold ph-gear text-[16px]"></i> 模拟下发任务
+            </button>
+        </header>
+
+        <!-- 1. 顶部：可视化优化看板 (极限压缩垂直空间) -->
+        <div class="flex shrink-0 gap-4">
+            <!-- 左侧主指标：环形进度看板 -->
+            <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[24px] p-4 flex items-center justify-between w-[280px] md:w-[320px] shadow-lg shadow-blue-500/20 shrink-0 relative overflow-hidden">
+                <i class="ph-fill ph-target absolute left-4 top-1/2 -translate-y-1/2 text-[100px] text-white opacity-[0.03] transform -translate-x-1/4 pointer-events-none"></i>
+                
+                <div class="flex flex-col relative z-10 justify-center">
+                    <span class="text-[12px] font-bold text-white/80 mb-0.5">总学习目标</span>
+                    <div class="text-[36px] font-extrabold text-white tracking-tight leading-none drop-shadow-sm" id="statTotalTarget">3000</div>
+                    
+                    <!-- 合并后的已学与待学信息框 -->
+                    <div class="mt-2 bg-white/10 px-2.5 py-1 rounded-[6px] backdrop-blur-sm border border-white/10 flex items-center gap-3 w-max">
+                        <div class="flex items-baseline gap-1.5">
+                            <span class="text-[11px] text-white/70 font-medium">已学</span>
+                            <span id="statLearnedSum" class="text-[13px] font-bold text-white font-mono leading-none">1730</span>
+                        </div>
+                        <div class="w-[1px] h-2.5 bg-white/20"></div>
+                        <div class="flex items-baseline gap-1.5">
+                            <span class="text-[11px] text-white/70 font-medium">待学</span>
+                            <span id="statUnlearned" class="text-[13px] font-bold text-white font-mono leading-none">1270</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SVG 圆环进度条 -->
+                <div class="relative w-[72px] h-[72px] flex items-center justify-center z-10 shrink-0 drop-shadow-md">
+                    <svg class="w-full h-full transform -rotate-90">
+                        <!-- 底环 -->
+                        <circle cx="36" cy="36" r="28" stroke="rgba(255,255,255,0.15)" stroke-width="7" fill="none" />
+                        <!-- 进度环 (175.9 是周长 2*pi*28) -->
+                        <circle id="targetProgressRing" cx="36" cy="36" r="28" stroke="white" stroke-width="7" fill="none" stroke-dasharray="175.9" stroke-dashoffset="90" stroke-linecap="round" class="transition-all duration-1000 ease-out" />
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <span class="text-[16px] font-extrabold text-white leading-none font-mono" id="targetProgressText">57%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧细节指标网格：带数据可视化增强 -->
+            <div class="flex-1 bg-white/90 backdrop-blur-xl rounded-[24px] shadow-premium p-3 flex flex-col gap-2 min-w-0">
+                <!-- 上层：词汇状态 (2列 - 高度压缩) -->
+                <div class="grid grid-cols-2 gap-2 flex-1 min-h-0">
+                    <div class="bg-[#F0FDF4] border border-[#BBF7D0] rounded-[16px] p-3 flex flex-col justify-center relative overflow-hidden group transition-all hover:shadow-md h-full">
+                        <div class="flex items-center gap-1.5 text-green-600 mb-0.5 z-10">
+                            <div class="flex items-center justify-center w-4 h-4 rounded-full bg-green-100 text-green-600"><i class="ph-bold ph-check text-[10px]"></i></div>
+                            <span class="text-[12px] font-bold">累计认识总数</span>
+                        </div>
+                        <span class="text-[26px] font-extrabold text-green-700 leading-none tracking-tight font-mono z-10 mt-1" id="statKnownTotal">1280</span>
+                    </div>
+
+                    <div class="bg-[#FEF2F2] border border-[#FECACA] rounded-[16px] p-3 flex flex-col justify-center relative overflow-hidden group transition-all hover:shadow-md h-full">
+                        <div class="flex items-center gap-1.5 text-red-600 mb-0.5 z-10">
+                            <div class="flex items-center justify-center w-4 h-4 rounded-full bg-red-100 text-red-600"><i class="ph-bold ph-x text-[10px]"></i></div>
+                            <span class="text-[12px] font-bold">累计生词总数</span>
+                        </div>
+                        <span class="text-[26px] font-extrabold text-red-700 leading-none tracking-tight font-mono z-10 mt-1" id="statUnknownTotal">450</span>
+                    </div>
+                </div>
+
+                <!-- 下层：交互训练分布 (分割线等分通栏) -->
+                <div class="grid grid-cols-3 divide-x divide-gray-200/80 bg-[#F8FAFC] rounded-[16px] border border-gray-200/80 py-2 shrink-0 shadow-[inset_0_2px_4px_rgba(0,0,0,0.01)]">
+                    
+                    <div class="flex items-center justify-center gap-2.5 px-2">
+                        <div class="w-9 h-9 rounded-[10px] bg-white shadow-sm border border-blue-100 flex items-center justify-center text-blue-500 shrink-0">
+                            <i class="ph-fill ph-microphone-stage text-[18px]"></i>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-bold text-gray-500 mb-0.5">跟读次数</span>
+                            <span class="text-[16px] font-extrabold text-gray-800 leading-none font-mono" id="statReadTotal">1200</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-center gap-2.5 px-2">
+                        <div class="w-9 h-9 rounded-[10px] bg-white shadow-sm border border-cyan-100 flex items-center justify-center text-cyan-600 shrink-0">
+                            <i class="ph-fill ph-headphones text-[18px]"></i>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-bold text-gray-500 mb-0.5">音记次数</span>
+                            <span class="text-[16px] font-extrabold text-gray-800 leading-none font-mono" id="statMemoTotal">1100</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-center gap-2.5 px-2">
+                        <div class="w-9 h-9 rounded-[10px] bg-white shadow-sm border border-rose-100 flex items-center justify-center text-rose-500 shrink-0">
+                            <i class="ph-fill ph-pencil-simple text-[18px]"></i>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-bold text-gray-500 mb-0.5">听写次数</span>
+                            <span class="text-[16px] font-extrabold text-gray-800 leading-none font-mono" id="statDictTotal">1050</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 中下部主体：左侧生词本入口 vs 右侧AI中枢 -->
+        <div class="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-5 md:gap-6 mt-1">
+            
+            <!-- 【左侧】：生词本入口卡片 -->
+            <div class="bg-[#FFFDF8] rounded-[24px] shadow-premium p-6 flex flex-col h-full min-h-0 border border-[#FDE68A] relative overflow-hidden justify-center items-center text-center group cursor-pointer hover:border-orange-300 transition-all" onclick="switchView('view-vocab')">
+                <div class="absolute -right-4 -top-4 w-24 h-24 bg-orange-100/50 rounded-full blur-xl group-hover:bg-orange-200/50 transition-colors pointer-events-none"></div>
+                <div class="absolute -left-4 -bottom-4 w-20 h-20 bg-yellow-100/50 rounded-full blur-lg group-hover:bg-yellow-200/50 transition-colors pointer-events-none"></div>
+
+                <div class="w-16 h-16 bg-gradient-to-br from-orange-100 to-orange-50 rounded-[18px] flex items-center justify-center text-orange-500 mb-4 group-hover:-translate-y-1 group-hover:shadow-md transition-all relative z-10 border border-orange-200">
+                    <i class="ph-fill ph-books text-[32px]"></i>
+                </div>
+                <h2 class="text-[20px] font-extrabold text-gray-800 mb-1.5 relative z-10">我的生词本</h2>
+                <p class="text-[13px] text-gray-500 mb-5 relative z-10">待消灭盲点: <span id="dashVocabCount" class="font-extrabold text-orange-500 text-[15px]">0</span> 词</p>
+                <button class="bg-white text-orange-500 border border-orange-200 px-5 py-2.5 rounded-[12px] font-bold text-[13px] group-hover:bg-orange-500 group-hover:text-white transition-colors shadow-sm relative z-10 flex items-center gap-1.5">
+                    进入详情 <i class="ph-bold ph-arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- 【右侧】：全融合无界 AI 学习中枢 -->
+            <div class="bg-white rounded-[24px] shadow-premium p-4 md:p-5 flex flex-col justify-between gap-4 h-full min-h-0 relative">
+                
+                <!-- 【第一层】置顶横向：关卡引擎 -->
+                <div class="bg-gray-50/60 rounded-[16px] border border-gray-100 p-3 shrink-0 relative overflow-hidden h-[80px] flex flex-col justify-center">
+                    
+                    <div id="hubIdleState" class="absolute inset-0 flex flex-row items-center justify-center gap-2.5 opacity-50 pointer-events-none transition-opacity">
+                        <i class="ph-bold ph-check-circle text-[22px] text-gray-400"></i>
+                        <span class="text-[14px] font-bold text-gray-500">生词暂未集满，暂未生成关卡</span>
+                    </div>
+
+                    <div id="hubActiveState" class="hidden absolute inset-0 bg-[#FFF5F5] border-[2px] border-[#FECACA] flex-row items-center justify-between p-3 z-20 pulse-alert-light rounded-[16px] gap-3">
+                        <div class="flex flex-col shrink-0">
+                            <h3 class="font-extrabold text-[15px] text-red-600 flex items-center gap-1"><i class="ph-fill ph-warning-circle"></i> 阻断关卡</h3>
+                            <span class="text-[10px] font-bold text-red-500 mt-1">待消灭 <span id="hubLevelCount" class="text-[12px]">0</span> 词</span>
+                        </div>
+                        
+                        <div class="flex-1 flex flex-row items-center justify-center gap-1 md:gap-2 overflow-hidden px-2" id="hubStepsContainer">
+                            <!-- 由 JS 动态渲染 -->
+                        </div>
+                        
+                        <button onclick="simulateNextStep()" class="shrink-0 bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 px-4 rounded-[12px] shadow-sm active:scale-95 transition-all text-[13px] flex items-center justify-center gap-1.5">
+                            攻坚解锁 <i class="ph-bold ph-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 【第二层】中间引擎区：学新词 & 复习旧词 -->
+                <div class="grid grid-cols-2 gap-4 h-[90px] shrink-0">
+                    <button id="btnNew" onclick="startPassing('new', '学习新词')" class="w-full h-full">
+                        <!-- JS 动态填充 -->
+                    </button>
+                    <button id="btnOld" onclick="startPassing('old', '复习旧词')" class="w-full h-full">
+                        <!-- JS 动态填充 -->
+                    </button>
+                </div>
+
+                <!-- 【第三层】置底纵向列表：老师指定任务 -->
+                <div class="bg-gray-50/60 rounded-[16px] border border-gray-100 p-3 shrink-0 flex flex-col relative overflow-hidden flex-1 min-h-[150px]">
+                    <div class="flex items-center gap-1.5 mb-2 px-1 shrink-0 text-slate-700">
+                        <i class="ph-fill ph-chalkboard-teacher text-indigo-500 text-[16px]"></i>
+                        <span class="text-[14px] font-bold">老师指定任务</span>
+                    </div>
+                    
+                    <div id="assignedTaskContainer" class="w-full overflow-y-auto hide-scrollbar flex flex-col gap-2 pb-1 relative z-10">
+                        <!-- JS 动态垂直插入 -->
+                    </div>
+                    
+                    <div id="noAssignedTaskBox" class="absolute inset-0 flex flex-col items-center justify-center text-center opacity-50 pointer-events-none z-0 mt-4">
+                        <i class="ph-fill ph-coffee text-[32px] text-gray-400 mb-1"></i>
+                        <p class="text-[12px] font-bold text-gray-500 mt-1">暂未发布指定任务</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ================= 视图：我的生词本 (二级页面) ================= -->
+    <div id="view-vocab" class="view-section flex-col w-full h-full max-w-[900px] mx-auto p-4 md:p-5 overflow-hidden gap-4">
+        <div class="flex items-center justify-between shrink-0 mb-2 px-2">
+            <div class="flex items-center gap-4">
+                <button onclick="switchView('view-dashboard')" class="w-11 h-11 bg-white hover:bg-gray-50 rounded-[14px] shadow-sm flex items-center justify-center transition-colors text-slate-600 active:scale-95 border border-gray-100">
+                    <i class="ph-bold ph-caret-left text-[22px]"></i>
+                </button>
+                <h2 class="font-extrabold text-[32px] text-gray-900 tracking-tight leading-none">我的生词本</h2>
+            </div>
+            <button onclick="manualGenerateLevel()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 rounded-[12px] font-bold text-[14px] shadow-sm active:scale-95 transition-transform flex items-center gap-1.5">
+                <i class="ph-bold ph-magic-wand text-[18px]"></i> 一键生成关卡
+            </button>
+        </div>
+
+        <div class="bg-white rounded-[24px] shadow-premium flex flex-col flex-1 min-h-0 border border-gray-100 relative overflow-hidden">
+            <div class="flex justify-between items-center px-5 py-4 border-b border-gray-100 bg-gray-50/50 shrink-0">
+                <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar" id="vocab-filters-full">
+                    <button onclick="setVocabFilterFull('all')" id="full-filter-all"></button>
+                    <button onclick="setVocabFilterFull('new')" id="full-filter-new"></button>
+                    <button onclick="setVocabFilterFull('old')" id="full-filter-old"></button>
+                </div>
+                <div class="text-[13px] text-gray-500 font-medium">共 <span id="fullVocabCount">0</span> 词</div>
+            </div>
+            
+            <div class="flex-1 min-h-0 overflow-y-auto p-4 md:p-5 hide-scrollbar bg-gray-50/30">
+                <div id="fullVocabList" class="flex flex-col gap-3">
+                    <!-- JS 动态渲染内部列表 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================= 视图：全新过词界面 (无底部栏，单列沉浸) ================= -->
+    <div id="view-passing" class="view-section flex-col w-full h-full p-4 md:p-5 overflow-hidden max-w-[800px] mx-auto gap-4">
+        
+        <!-- 还原极简标题栏 -->
+        <div class="flex items-center gap-4 shrink-0 mb-3 px-2">
+            <button onclick="switchView('view-dashboard')" class="w-11 h-11 bg-[#F1F5F9] hover:bg-[#E2E8F0] rounded-[14px] flex items-center justify-center transition-colors text-slate-600 shadow-sm active:scale-95">
+                <i class="ph-bold ph-caret-left text-[22px]"></i>
+            </button>
+            <h2 class="font-extrabold text-[32px] text-gray-900 tracking-tight leading-none" id="passingTitle">学习新词</h2>
+        </div>
+
+        <!-- 核心过词区域：去除生词篮，改为单列宽版 -->
+        <div class="flex-1 min-h-0 flex flex-col bg-white rounded-[24px] shadow-premium relative overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 shrink-0">
+                <span class="text-[13px] text-gray-500 font-medium">共 <span id="totalPassCount">10</span> 词</span>
+                <div class="flex items-center gap-4 text-[13px] font-bold">
+                    <div class="flex items-center gap-1.5 text-gray-700"><div class="w-2.5 h-2.5 rounded-[4px] bg-[#10B981]"></div>认识: <span id="statKnown">0</span></div>
+                    <div class="flex items-center gap-1.5 text-gray-700"><div class="w-2.5 h-2.5 rounded-[4px] bg-[#EF4444]"></div>不认识: <span id="statUnknown">0</span></div>
+                </div>
+            </div>
+
+            <div id="wordListContainer" class="flex-1 min-h-0 overflow-y-auto px-5 py-4 flex flex-col gap-3 pb-24 hide-scrollbar bg-gray-50/30">
+                <!-- 动态插入单词列表 -->
+            </div>
+
+            <!-- 悬浮底部操作栏：包含剩余题数提示与纯手动确认提交按钮 -->
+            <div class="absolute bottom-0 left-0 w-full bg-white border-t border-gray-100 px-6 py-4 flex justify-between items-center z-10 shadow-[0_-4px_20px_rgba(0,0,0,0.03)] shrink-0">
+                <div class="flex items-center gap-1.5 text-[#F97316] text-[15px] font-medium cursor-pointer active:opacity-70 transition-all" onclick="scrollToFirstUnanswered()">
+                    <i class="ph-fill ph-warning-circle text-[22px]"></i>
+                    <span>剩余待完成：<span id="statRemaining" class="text-[22px] font-extrabold px-1">10</span> 题</span>
+                    <i class="ph-bold ph-caret-right text-[16px] ml-0.5"></i>
+                </div>
+                <button id="submitLevelBtn" onclick="submitPassResults()" class="bg-[#F1F5F9] text-[#94A3B8] font-bold py-3 px-10 text-[16px] rounded-[14px] transition-all cursor-not-allowed">
+                    提 交
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================= 视图：过词结果页 ================= -->
+    <div id="view-result" class="view-section flex-col items-center justify-center w-full h-full p-4 md:p-5 relative z-40">
+        <div class="bg-white rounded-[32px] shadow-2xl p-8 max-w-sm w-full text-center relative overflow-hidden modal-enter border border-gray-100">
+            <div class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center text-green-500 mx-auto mb-6 shadow-sm border border-green-100">
+                <i class="ph-bold ph-check-circle text-[42px]"></i>
+            </div>
+            <h2 class="text-[26px] font-extrabold text-gray-900 mb-2 tracking-tight">学习完成</h2>
+            <p class="text-[14px] text-gray-500 mb-8">本次过词结果结算</p>
+            
+            <div class="flex justify-center items-center gap-8 mb-8 bg-gray-50/50 py-4 rounded-[16px] border border-gray-100">
+                <div class="text-center flex-1">
+                    <div class="text-[36px] font-black text-green-500 font-mono leading-none mb-1 drop-shadow-sm" id="resultKnown">0</div>
+                    <div class="text-[13px] font-bold text-gray-500">认识</div>
+                </div>
+                <div class="w-[2px] h-10 bg-gray-200/60 rounded-full"></div>
+                <div class="text-center flex-1">
+                    <div class="text-[36px] font-black text-red-500 font-mono leading-none mb-1 drop-shadow-sm" id="resultUnknown">0</div>
+                    <div class="text-[13px] font-bold text-gray-500">不认识</div>
+                </div>
+            </div>
+
+            <div id="resultMessageBox" class="bg-orange-50 rounded-[16px] p-4 border border-orange-100 mb-8 text-left shadow-sm">
+                <p class="text-[13px] text-orange-600 font-medium leading-relaxed" id="resultMessage">
+                    <!-- 动态生成 -->
+                </p>
+            </div>
+
+            <button onclick="switchView('view-dashboard')" class="w-full bg-brand hover-bg-brand text-white font-bold py-4 rounded-[16px] shadow-sm active:scale-95 transition-all text-[16px] flex items-center justify-center gap-2">
+                返回主页 <i class="ph-bold ph-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+
+    <!-- ================= 视图 3: 学习关卡 (仅直驱模拟器) ================= -->
+    <div id="view-learning" class="view-section flex-col items-center justify-center w-full h-full p-4 bg-gray-900/80 backdrop-blur-md z-50 fixed inset-0">
+        <div class="bg-white w-full max-w-sm rounded-[24px] shadow-2xl p-7 relative flex flex-col modal-enter items-center text-center">
+            <button onclick="switchView('view-dashboard')" class="absolute top-5 right-5 text-gray-400 hover:text-gray-700 bg-gray-50 p-2 rounded-[12px] active:scale-90 transition-transform">
+                <i class="ph-bold ph-x text-[16px]"></i>
+            </button>
+
+            <div class="w-14 h-14 bg-red-50 rounded-[14px] flex items-center justify-center text-red-500 mb-4 mt-2">
+                <i class="ph-bold ph-fire text-[28px]"></i>
+            </div>
+            
+            <h2 class="text-[20px] font-extrabold text-gray-900 mb-1" id="learningTitle">强制攻坚中</h2>
+            <p class="text-[13px] text-gray-500 mb-6">正在执行底层关卡任务模拟</p>
+            
+            <div class="w-full bg-gray-50 rounded-[16px] p-3 mb-6 border border-gray-100 flex flex-col gap-2 relative" id="learningStepsContainerModal">
+                <!-- 垂直时间轴由 JS 动态渲染 -->
+            </div>
+            
+            <button id="stepActionBtn" onclick="simulateNextStep()" class="w-full py-3.5 rounded-[14px] bg-red-500 hover:bg-red-600 text-white font-bold text-[15px] shadow-sm active:scale-95 transition-all">
+                点击模拟进度 +1
+            </button>
+        </div>
+    </div>
+
+
+    <!-- Javascript 逻辑控制 -->
+    <script>
+        function showModal(title, msg, onConfirm = null) {
+            const titleEl = document.getElementById('modal-title');
+            const msgEl = document.getElementById('modal-msg');
+            const modal = document.getElementById('native-modal');
+            const btn = document.getElementById('modal-btn');
+            
+            if(titleEl) titleEl.innerText = title;
+            if(msgEl) msgEl.innerText = msg;
+            
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                setTimeout(() => modal.classList.replace('opacity-0', 'opacity-100'), 10);
+            }
+            if (btn) {
+                btn.onclick = () => {
+                    if (modal) modal.classList.replace('opacity-100', 'opacity-0');
+                    setTimeout(() => {
+                        if (modal) {
+                            modal.classList.add('hidden');
+                            modal.classList.remove('flex');
+                        }
+                        if (onConfirm) onConfirm();
+                    }, 300);
+                };
+            }
+        }
+
+        const dataStore = {
+            stats: { 
+                totalPlanned: 3000, totalLearned: 1250, unlearnedNew: 1270, unlearnedOld: 30, todayLearned: 120,
+                totalPool: 5000, totalTarget: 3000, known: 1280, read: 1200, memo: 1100, dict: 1050, 
+                unknown: 450, unknownNew: 420, unlearned: 1270
+            }
+        };
+
+        const rawWordsData = [
+            { word: "dilemma", phonetic: "/dɪˈlemə/", meaning: "进退两难的困境", type: "new" },
+            { word: "ambitious", phonetic: "/æmˈbɪʃəs/", meaning: "有野心的", type: "new" },
+            { word: "vulnerable", phonetic: "/ˈvʌlnərəbl/", meaning: "脆弱的，易受伤害的", type: "new" },
+            { word: "symptom", phonetic: "/ˈsɪmptəm/", meaning: "症状，征兆", type: "new" },
+            { word: "comprehend", phonetic: "/ˌkɑːmprɪˈhend/", meaning: "理解，领悟", type: "new" },
+            { word: "fascinate", phonetic: "/ˈfæsɪneɪt/", meaning: "深深吸引", type: "new" },
+            { word: "lucrative", phonetic: "/ˈluːkrətɪv/", meaning: "赚大钱的", type: "new" },
+            { word: "meticulous", phonetic: "/mɪˈtɪkjələs/", meaning: "一丝不苟的", type: "new" },
+            
+            { word: "phenomenon", phonetic: "/fəˈnɑːmɪnən/", meaning: "现象，杰出的人", type: "old" },
+            { word: "evaluate", phonetic: "/ɪˈvæljueɪt/", meaning: "评估，评价", type: "old" },
+            { word: "extraordinary", phonetic: "/ɪkˈstrɔːrdəneri/", meaning: "非凡的并且超出寻常的", type: "old" },
+            { word: "anonymous", phonetic: "/əˈnɑːnɪməs/", meaning: "匿名的，无名的", type: "old" },
+            { word: "innovative", phonetic: "/ˈɪnəveɪtɪv/", meaning: "创新的，革新的", type: "old" },
+            { word: "paradigm", phonetic: "/pəˈrædɪm/", meaning: "范例，典范", type: "old" },
+            { word: "resilient", phonetic: "/rɪˈzɪliənt/", meaning: "有弹性的，适应力强的", type: "old" },
+            { word: "scrutinize", phonetic: "/skruːtɪnaɪz/", meaning: "仔细检查", type: "old" }
+        ];
+
+        let testWords = []; 
+        let TOTAL_WORDS = 0;
+        const VOCAB_THRESHOLD = 5; 
+        
+        const state = {
+            activeLevel: null, 
+            vocabBook: [ 
+                { word: "dilemma", phonetic: "/dɪˈlemə/", meaning: "进退两难的困境", type: "new" },
+                { word: "ambitious", phonetic: "/æmˈbɪʃəs/", meaning: "有野心的", type: "new" },
+                { word: "vulnerable", phonetic: "/ˈvʌlnərəbl/", meaning: "脆弱的，易受伤害的", type: "new" },
+                { word: "symptom", phonetic: "/ˈsɪmptəm/", meaning: "症状，征兆", type: "new" },
+
+                { word: "phenomenon", phonetic: "/fəˈnɑːmɪnən/", meaning: "现象，杰出的人", type: "old" },
+                { word: "evaluate", phonetic: "/ɪˈvæljueɪt/", meaning: "评估，评价", type: "old" },
+                { word: "extraordinary", phonetic: "/ɪkˈstrɔːrdəneri/", meaning: "非凡的并且超出寻常的", type: "old" },
+                { word: "anonymous", phonetic: "/əˈnɑːnɪməs/", meaning: "匿名的，无名的", type: "old" }
+            ], 
+            vocabFilter: 'all', 
+            passingStats: { known: 0, unknown: 0, remaining: 0, answered: 0 },
+            currentActionType: '', 
+            currentTaskId: null,
+            assignedTasks: [],
+            _tempUnknowns: [],
+            wordOffset: 0 
+        };
+
+        function initData(count = 10) {
+            testWords = [];
+            for (let i = 0; i < count; i++) {
+                const rawIndex = (state.wordOffset + i) % rawWordsData.length;
+                const baseWord = rawWordsData[rawIndex];
+                testWords.push({ 
+                    id: state.wordOffset + i, 
+                    word: baseWord.word, 
+                    phonetic: baseWord.phonetic, 
+                    meaning: baseWord.meaning, 
+                    type: baseWord.type, 
+                    status: null 
+                });
+            }
+            state.wordOffset += count;
+            TOTAL_WORDS = count;
+        }
+
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            const targetView = document.getElementById(viewId);
+            if (targetView) targetView.classList.add('active');
+            if(viewId === 'view-dashboard') renderDashboardUI();
+            if(viewId === 'view-vocab') renderVocabBookFull();
+        }
+
+        function getTodayDateString() {
+            return new Date().toDateString(); 
+        }
+
+        function toggleTeacherTasks() {
+            if (state.assignedTasks.length > 0) {
+                state.assignedTasks = [];
+                showModal('重置任务', '模拟：已清空老师下发的指定任务。', renderDashboardUI);
+            } else {
+                state.assignedTasks = [
+                    { id: 101, title: "高二核心易错词冲刺", count: 10, target: 3, current: 0, lastDone: null },
+                    { id: 102, title: "阅读长难句高频词", count: 15, target: 1, current: 0, lastDone: null },
+                    { id: 103, title: "高考大纲提分包", count: 20, target: 2, current: 0, lastDone: null }
+                ];
+                showModal('任务送达', '模拟：已下发 3 个指定批次任务！\n请在下方的列表中查看。', renderDashboardUI);
+            }
+        }
+
+        function setVocabFilter(type) {
+            state.vocabFilter = type;
+            renderVocabBookFull();
+        }
+
+        function setVocabFilterFull(type) {
+            state.vocabFilter = type;
+            renderVocabBookFull();
+        }
+
+        function renderDataDashboard() {
+            const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; }; // 彻底去除 .toLocaleString()，无逗号
+            
+            const total = dataStore.stats.totalTarget;
+            const known = dataStore.stats.known;
+            const unknown = dataStore.stats.unknown;
+            const unlearned = dataStore.stats.unlearned;
+            const learnedSum = known + unknown;
+            
+            // 左侧更新
+            setVal('statTotalTarget', total);
+            setVal('statLearnedSum', learnedSum);
+            setVal('statUnlearned', unlearned);
+            
+            // 计算环形进度
+            const ringPct = Math.round((learnedSum / total) * 100) || 0;
+            const ringEl = document.getElementById('targetProgressRing');
+            const ringText = document.getElementById('targetProgressText');
+            if (ringText) ringText.innerText = ringPct + '%';
+            if (ringEl) {
+                // 175.9 是 r=28 的圆周长 (2 * PI * 28)
+                const offset = 175.9 - (ringPct / 100) * 175.9;
+                ringEl.style.strokeDashoffset = offset;
+            }
+
+            // 右上：纯数据更新
+            setVal('statKnownTotal', known);
+            setVal('statUnknownTotal', unknown);
+
+            // 右下：交互数据更新
+            setVal('statReadTotal', dataStore.stats.read);
+            setVal('statMemoTotal', dataStore.stats.memo);
+            setVal('statDictTotal', dataStore.stats.dict);
+        }
+
+        function renderVocabBookFull() {
+            const container = document.getElementById('fullVocabList');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            const validVocab = state.vocabBook; 
+            
+            const newCount = validVocab.filter(w => w.type === 'new').length;
+            const oldCount = validVocab.filter(w => w.type === 'old').length;
+            const allCount = validVocab.length;
+
+            const themes = {
+                all: {
+                    lightBg: 'bg-gray-100', lightBorder: 'border-gray-200', hoverBg: 'bg-gray-200',
+                    darkText: 'text-gray-700', lightIconText: 'text-gray-400', lightIconBg: 'bg-gray-200/80',
+                    solidBg: 'bg-gray-800'
+                },
+                new: {
+                    lightBg: 'bg-blue-50', lightBorder: 'border-blue-100', hoverBg: 'bg-blue-100',
+                    darkText: 'text-blue-600', lightIconText: 'text-blue-400', lightIconBg: 'bg-blue-100/80',
+                    solidBg: 'bg-[#1F5FFF]'
+                },
+                old: {
+                    lightBg: 'bg-emerald-50', lightBorder: 'border-emerald-100', hoverBg: 'bg-emerald-100',
+                    darkText: 'text-emerald-600', lightIconText: 'text-emerald-400', lightIconBg: 'bg-emerald-100/80',
+                    solidBg: 'bg-[#10B981]'
+                }
+            };
+
+            const updateTab = (id, label, iconClass, count, typeKey) => {
+                const btn = document.getElementById(id);
+                if (!btn) return;
+                const isActive = state.vocabFilter === typeKey;
+                const isFull = typeKey !== 'all' && count >= VOCAB_THRESHOLD;
+                const theme = themes[typeKey];
+                
+                let contentHtml = '';
+
+                if (isActive) {
+                    let badgeHtml = '';
+                    if (typeKey === 'all') {
+                        badgeHtml = `<span class="bg-white/20 text-white px-1.5 py-0.5 rounded-[6px] font-mono text-[10px] ml-1.5">${count}</span>`;
+                    } else {
+                        if (isFull) {
+                            badgeHtml = `<span class="bg-red-500 text-white border border-red-400 font-extrabold animate-pulse ml-1.5 px-1.5 py-0.5 rounded-[6px] leading-none text-[10px] shadow-sm">${count}/${VOCAB_THRESHOLD}</span>`;
+                        } else {
+                            badgeHtml = `<span class="bg-white/20 text-white px-1.5 py-0.5 rounded-[6px] font-mono text-[10px] ml-1.5">${count}/${VOCAB_THRESHOLD}</span>`;
+                        }
+                    }
+
+                    contentHtml = `
+                        <div class="bg-white ${theme.darkText} w-5 h-5 rounded-[6px] flex items-center justify-center mr-1.5 shadow-sm shrink-0">
+                            <i class="${iconClass} text-[12px]"></i>
+                        </div>
+                        <span class="text-white whitespace-nowrap">${label}</span>
+                        ${badgeHtml}
+                    `;
+                    btn.className = `text-[13px] font-bold pr-2.5 pl-2 py-2 rounded-[12px] shadow-md transition-all duration-300 flex items-center shrink-0 ${theme.solidBg} border border-transparent transform scale-[1.02]`;
+                } else {
+                    let badgeHtml = '';
+                    if (typeKey === 'all') {
+                        badgeHtml = `<span class="${theme.lightIconBg} ${theme.darkText} opacity-70 px-1.5 py-0.5 rounded-[6px] font-mono text-[10px] ml-1.5">${count}</span>`;
+                    } else {
+                        if (isFull) {
+                            badgeHtml = `<span class="bg-red-100 text-red-600 border border-red-200 font-extrabold animate-pulse ml-1.5 px-1.5 py-0.5 rounded-[6px] leading-none text-[10px]">${count}/${VOCAB_THRESHOLD}</span>`;
+                        } else {
+                            badgeHtml = `<span class="${theme.lightIconBg} ${theme.darkText} opacity-70 px-1.5 py-0.5 rounded-[6px] font-mono text-[10px] ml-1.5">${count}/${VOCAB_THRESHOLD}</span>`;
+                        }
+                    }
+
+                    contentHtml = `
+                        <i class="${iconClass} ${theme.lightIconText} text-[18px] mr-1 shrink-0"></i>
+                        <span class="${theme.darkText} whitespace-nowrap">${label}</span>
+                        ${badgeHtml}
+                    `;
+                    btn.className = `text-[13px] font-bold pr-3 pl-2.5 py-2 rounded-[12px] transition-all duration-300 flex items-center shrink-0 ${theme.lightBg} border ${theme.lightBorder} hover:${theme.hoverBg}`;
+                }
+                btn.innerHTML = contentHtml;
+            };
+
+            updateTab('full-filter-all', '全部', 'ph-bold ph-list-dashes', allCount, 'all');
+            updateTab('full-filter-new', '新词', 'ph-bold ph-rocket', newCount, 'new');
+            updateTab('full-filter-old', '旧词', 'ph-bold ph-arrows-clockwise', oldCount, 'old');
+
+            const filteredList = validVocab.filter(item => state.vocabFilter === 'all' || item.type === state.vocabFilter);
+            
+            const countEl = document.getElementById('fullVocabCount');
+            if (countEl) countEl.innerText = filteredList.length;
+
+            if (filteredList.length === 0) {
+                container.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-48 text-center opacity-40 py-10">
+                        <i class="ph-fill ph-book-bookmark text-[48px] text-gray-400 mb-3"></i>
+                        <p class="text-[14px] font-bold text-gray-500">空空如也，暂无生词</p>
+                    </div>`;
+            } else {
+                [...filteredList].reverse().forEach(item => {
+                    let sourceText = '练习测出';
+                    let sourceIcon = 'ph-sword';
+                    if (item.type === 'assigned') {
+                        sourceText = '老师任务';
+                        sourceIcon = 'ph-chalkboard-teacher';
+                    } else if (item.type === 'new') {
+                        sourceText = '过新词';
+                        sourceIcon = 'ph-rocket';
+                    } else if (item.type === 'old') {
+                        sourceText = '过旧词';
+                        sourceIcon = 'ph-arrows-clockwise';
+                    }
+
+                    container.innerHTML += `
+                        <div class="flex items-center w-full bg-white p-4 rounded-[16px] shadow-sm border border-gray-100 hover:border-orange-200 transition-colors z-10 shrink-0 gap-4">
+                            <div class="shrink-0 flex flex-col gap-1 w-[120px] md:w-[150px]">
+                                <span class="text-gray-800 font-extrabold text-[16px] md:text-[18px] font-mono tracking-tight truncate">${item.word}</span>
+                                <span class="text-gray-400 font-mono text-[13px] truncate">${item.phonetic}</span>
+                            </div>
+                            <div class="flex-1 min-w-0 text-gray-600 px-3 border-l-2 border-gray-50 flex items-center h-full">
+                                <span class="text-[14px] line-clamp-2 leading-relaxed">${item.meaning}</span>
+                            </div>
+                            <div class="shrink-0 flex flex-col gap-2 items-end justify-center">
+                                <span class="text-[11px] bg-red-50 border border-red-100 text-red-600 px-2 py-0.5 rounded-[6px] font-bold flex items-center gap-1 shadow-sm">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>待学
+                                </span>
+                                <span class="text-[11px] font-medium text-gray-400 flex items-center gap-1">
+                                    <i class="ph-fill ${sourceIcon}"></i> 来源: ${sourceText}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function manualGenerateLevel() {
+            if(state.vocabBook.length === 0) {
+                showModal('无法生成', '生词本空空如也，快去背词收集盲点吧！');
+                return;
+            }
+            if (state.activeLevel !== null) {
+                showModal('暂不可用', '当前已有未完成的攻坚关卡，请先将其完成！');
+                return;
+            }
+
+            state.activeLevel = { 
+                title: '自主强化关卡', 
+                wordCount: state.vocabBook.length, 
+                words: [...state.vocabBook],
+                steps: [
+                    { id: 'read', name: '跟读', target: 2, current: 0 },
+                    { id: 'memo', name: '音记', target: 2, current: 0 },
+                    { id: 'dict', name: '听写', target: 1, current: 0 }
+                ]
+            };
+            showModal('一键生成成功', `已为您将生词本中的 ${state.vocabBook.length} 个盲点生成专属强化关卡！\nAI引擎已锁定，请前往首页攻坚。`, () => {
+                switchView('view-dashboard');
+            });
+        }
+
+        function renderDashboardUI() {
+            renderDataDashboard();
+            
+            const dashVocabCount = document.getElementById('dashVocabCount');
+            if (dashVocabCount) dashVocabCount.innerText = state.vocabBook.length;
+            
+            const hasBlocker = state.activeLevel !== null;
+            const hasAssignedTask = state.assignedTasks.length > 0;
+            const today = getTodayDateString();
+
+            const taskContainer = document.getElementById('assignedTaskContainer');
+            const noTaskBox = document.getElementById('noAssignedTaskBox');
+            if (taskContainer && noTaskBox) {
+                if (hasAssignedTask) {
+                    taskContainer.classList.remove('hidden');
+                    noTaskBox.classList.add('hidden');
+                    taskContainer.innerHTML = '';
+                    state.assignedTasks.forEach(task => {
+                        const isDoneToday = task.lastDone === today;
+                        const btnClass = isDoneToday 
+                            ? 'opacity-70 cursor-not-allowed bg-gradient-to-r from-gray-50 to-white border border-gray-100' 
+                            : 'bg-gradient-to-r from-[#F0F5FF] to-white active:scale-95 border border-blue-100 hover:border-blue-300 cursor-pointer shadow-sm';
+
+                        const statusBadgeHtml = isDoneToday
+                            ? `<span class="text-green-600 bg-green-50 border border-green-200 px-2.5 py-1 rounded-[6px] flex items-center gap-1"><i class="ph-fill ph-check-circle"></i> 今日已完成</span>`
+                            : `<span class="text-orange-500 bg-orange-50 border border-orange-200 px-2.5 py-1 rounded-[6px] flex items-center gap-1"><i class="ph-fill ph-sparkle"></i> 今日待打卡</span>`;
+
+                        taskContainer.innerHTML += `
+                            <button onclick="${isDoneToday ? '' : `startPassing('assigned', '老师指定任务', ${task.id}, ${task.count})`}" class="w-full p-3.5 rounded-[14px] transition-colors flex justify-between items-center text-left relative overflow-hidden ${btnClass}">
+                                <div class="flex flex-col gap-1 w-full pr-4">
+                                    <h3 class="font-bold text-[14px] ${isDoneToday ? 'text-gray-500' : 'text-gray-900'} truncate w-full">${task.title}</h3>
+                                    <div class="text-[11px] font-bold ${isDoneToday ? 'text-gray-500' : 'text-blue-600'} font-mono mt-0.5">进度 ${task.current}/${task.target}</div>
+                                </div>
+                                <div class="shrink-0 text-[12px] font-bold">
+                                    ${statusBadgeHtml}
+                                </div>
+                            </button>
+                        `;
+                    });
+                } else {
+                    taskContainer.classList.add('hidden');
+                    noTaskBox.classList.remove('hidden');
+                }
+            }
+
+            const btnNew = document.getElementById('btnNew');
+            const btnOld = document.getElementById('btnOld');
+            const hubIdleState = document.getElementById('hubIdleState');
+            const hubActiveState = document.getElementById('hubActiveState');
+            const hubStepsContainer = document.getElementById('hubStepsContainer');
+            const hubLevelCount = document.getElementById('hubLevelCount');
+
+            if (hasBlocker) {
+                if(btnNew) {
+                    btnNew.className = "bg-[#F8FAFC] border border-blue-100 rounded-[16px] flex flex-col items-center justify-center text-center relative pointer-events-none transition-all h-full w-full shadow-sm";
+                    btnNew.innerHTML = `
+                        <i class="ph-fill ph-lock-key text-gray-400 text-[26px] mb-2"></i>
+                        <span class="text-[11px] text-gray-500 font-bold bg-gray-100 px-3 py-1 rounded-[6px]">请通关后继续</span>
+                    `;
+                }
+                if(btnOld) {
+                    btnOld.className = "bg-[#F4FBF7] border border-emerald-100 rounded-[16px] flex flex-col items-center justify-center text-center relative pointer-events-none transition-all h-full w-full shadow-sm";
+                    btnOld.innerHTML = `
+                        <i class="ph-fill ph-lock-key text-gray-400 text-[26px] mb-2"></i>
+                        <span class="text-[11px] text-gray-500 font-bold bg-gray-100 px-3 py-1 rounded-[6px]">请通关后继续</span>
+                    `;
+                }
+
+                if(hubIdleState) hubIdleState.classList.add('hidden');
+                if(hubActiveState) {
+                    hubActiveState.classList.remove('hidden');
+                    hubActiveState.classList.add('flex');
+                }
+                if(hubLevelCount) hubLevelCount.innerText = state.activeLevel.wordCount;
+
+                if(hubStepsContainer) {
+                    let stepsHtml = '<div class="flex items-center justify-center gap-1 md:gap-2 w-full">';
+                    state.activeLevel.steps.forEach((step, idx) => {
+                        const isDone = step.current >= step.target;
+                        const isCurrent = !isDone && (idx === 0 || state.activeLevel.steps[idx-1].current >= state.activeLevel.steps[idx-1].target);
+                        let icon = '', textClass = '', boxClass = '';
+
+                        if (isDone) {
+                            icon = '<i class="ph-bold ph-check text-green-500 text-[12px]"></i>';
+                            textClass = 'text-green-600 line-through';
+                            boxClass = 'bg-green-50/50 border-green-200';
+                        } else if (isCurrent) {
+                            icon = '<i class="ph-bold ph-hourglass-high text-brand text-[12px] animate-pulse"></i>';
+                            textClass = 'text-brand font-bold';
+                            boxClass = 'bg-blue-50 border-blue-200 shadow-sm';
+                        } else {
+                            icon = '<i class="ph-fill ph-lock-key text-gray-300 text-[12px]"></i>';
+                            textClass = 'text-gray-400';
+                            boxClass = 'bg-transparent border-gray-100';
+                        }
+
+                        stepsHtml += `
+                            <div class="flex items-center gap-1.5 px-2 py-1.5 rounded-[8px] border ${boxClass} transition-colors shrink-0">
+                                <div class="w-5 h-5 rounded-[6px] bg-white flex items-center justify-center z-10 shrink-0 border border-gray-100 shadow-sm">
+                                    ${icon}
+                                </div>
+                                <div class="flex flex-col text-left">
+                                    <span class="text-[11px] leading-tight ${textClass}">${step.name}</span>
+                                    <span class="text-[9px] font-bold opacity-80 leading-none mt-[1px] ${textClass} font-mono">${step.current}/${step.target}</span>
+                                </div>
+                            </div>
+                        `;
+                        if (idx < state.activeLevel.steps.length - 1) {
+                            stepsHtml += `<i class="ph-bold ph-caret-right text-red-300 text-[12px] shrink-0"></i>`;
+                        }
+                    });
+                    stepsHtml += '</div>';
+                    hubStepsContainer.innerHTML = stepsHtml;
+                }
+            } else {
+                if(btnNew) {
+                    btnNew.className = "bg-gradient-to-r from-[#508BFF] to-[#3B66FF] rounded-[16px] shadow-sm flex flex-col items-center justify-center text-center active:scale-95 transition-all relative group overflow-hidden h-full w-full cursor-pointer";
+                    btnNew.innerHTML = `
+                        <div class="absolute top-2.5 right-2.5 bg-white/20 backdrop-blur-md text-white text-[11px] font-bold px-2 py-0.5 rounded-[6px] border border-white/20 transition-opacity">
+                            待学新词 <span id="badgeUnlearnedNew">${dataStore.stats.unlearnedNew}</span>
+                        </div>
+                        <i class="ph-bold ph-rocket text-white text-[28px] mb-1 group-hover:-translate-y-1 transition-transform duration-300 relative z-0"></i>
+                        <h3 class="font-bold text-[15px] text-white relative z-0 tracking-wide mt-0.5">学习新词</h3>
+                    `;
+                }
+                if(btnOld) {
+                    btnOld.className = "bg-gradient-to-r from-[#44D99B] to-[#12A772] rounded-[16px] shadow-sm flex flex-col items-center justify-center text-center active:scale-95 transition-all relative group overflow-hidden h-full w-full cursor-pointer";
+                    btnOld.innerHTML = `
+                        <i class="ph-bold ph-arrows-clockwise text-white text-[28px] mb-1 group-hover:-rotate-90 transition-transform duration-300 relative z-0"></i>
+                        <h3 class="font-bold text-[15px] text-white relative z-0 tracking-wide mt-0.5">复习旧词</h3>
+                    `;
+                }
+
+                if(hubIdleState) {
+                    hubIdleState.classList.remove('hidden');
+                    hubIdleState.classList.add('flex');
+                }
+                if(hubActiveState) {
+                    hubActiveState.classList.add('hidden');
+                    hubActiveState.classList.remove('flex');
+                }
+            }
+        }
+
+        function simulateNextStep() {
+            if (!state.activeLevel) return;
+            const currentStep = state.activeLevel.steps.find(s => s.current < s.target);
+            if (currentStep) {
+                currentStep.current++;
+                renderDashboardUI(); 
+                if (document.getElementById('view-learning').classList.contains('active')) {
+                    renderLearningStepsModal();
+                }
+                
+                const allDone = state.activeLevel.steps.every(s => s.current >= s.target);
+                if (allDone) {
+                    setTimeout(() => {
+                        state.activeLevel = null;
+                        state.vocabBook = []; 
+                        showModal('关卡完美攻克', '恭喜！您已成功完成全部学习任务。\n中枢锁定已解除，生词本已清空，可继续探索。', () => switchView('view-dashboard'));
+                    }, 300);
+                }
+            }
+        }
+
+        function startPassing(typeKey, typeName, taskId = null, wordCount = 10) {
+            if(state.activeLevel !== null && typeKey !== 'assigned') return; 
+            
+            initData(wordCount);
+            state.currentActionType = typeKey;
+            state.currentTaskId = taskId;
+            state.passingStats = { known: 0, unknown: 0, remaining: TOTAL_WORDS, answered: 0 };
+            state._tempUnknowns = []; 
+            
+            const titleEl = document.getElementById('passingTitle');
+            if (titleEl) titleEl.innerText = typeName;
+            
+            const totalEl = document.getElementById('totalPassCount');
+            if (totalEl) totalEl.innerText = TOTAL_WORDS;
+            
+            renderWordList();
+            updatePassingStats();
+            switchView('view-passing');
+        }
+
+        function renderWordList() {
+            const container = document.getElementById('wordListContainer');
+            if(!container) return;
+            container.innerHTML = '';
+            
+            testWords.forEach((item, index) => {
+                const isAnswered = item.status !== null;
+                const div = document.createElement('div');
+                div.id = `word-row-${item.id}`;
+                div.className = `flex justify-between items-center p-4 rounded-[20px] border border-gray-100 shadow-sm bg-white transition-colors duration-300 shrink-0`;
+                
+                div.innerHTML = `
+                    <div class="flex items-baseline gap-2 flex-1 overflow-hidden pr-2">
+                        <span class="font-mono text-[16px] text-gray-400 font-bold shrink-0 w-8">${index + 1}.</span>
+                        <div class="shrink-0 flex items-baseline gap-2 flex-wrap md:flex-nowrap">
+                            <span id="word-text-${item.id}" class="font-extrabold text-[18px] md:text-[20px] font-mono tracking-tight text-gray-800">${item.word}</span>
+                            <span id="word-phonetic-${item.id}" class="font-extrabold text-[14px] md:text-[16px] font-mono tracking-tight text-gray-500">
+                                ${item.phonetic}
+                            </span>
+                        </div>
+                        <span id="word-desc-${item.id}" class="text-[14px] md:text-[15px] text-gray-500 truncate flex-1 min-w-0 ml-2">
+                            ${item.meaning}
+                        </span>
+                    </div>
+                    <div class="flex gap-3 shrink-0 ml-4">
+                        <button id="btn-x-${item.id}" onclick="judgeWord(${item.id}, 'unknown')" class="judge-btn w-[64px] h-[48px] rounded-[14px] bg-gray-50 text-gray-400 flex items-center justify-center text-[24px] hover:bg-red-50 hover:text-red-500 active:scale-90 transition-all"><i class="ph-bold ph-x"></i></button>
+                        <button id="btn-c-${item.id}" onclick="judgeWord(${item.id}, 'known')" class="judge-btn w-[64px] h-[48px] rounded-[14px] bg-gray-50 text-gray-400 flex items-center justify-center text-[24px] hover:bg-green-50 hover:text-green-500 active:scale-90 transition-all"><i class="ph-bold ph-check"></i></button>
+                    </div>`;
+                container.appendChild(div);
+            });
+        }
+
+        function scrollToFirstUnanswered() {
+            const firstUnanswered = testWords.find(w => w.status === null);
+            if (!firstUnanswered) return;
+
+            const rowElement = document.getElementById(`word-row-${firstUnanswered.id}`);
+            if (rowElement) {
+                rowElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                rowElement.classList.add('bg-[#FFF7ED]', 'border-[#F97316]');
+                rowElement.classList.remove('bg-white', 'border-gray-100', 'shadow-sm');
+                
+                setTimeout(() => {
+                    const currentWord = testWords.find(w => w.id === firstUnanswered.id);
+                    if (rowElement) rowElement.classList.remove('bg-[#FFF7ED]', 'border-[#F97316]');
+                    if (currentWord && currentWord.status === null && rowElement) {
+                        rowElement.classList.add('bg-white', 'border-gray-100', 'shadow-sm');
+                    }
+                }, 1000);
+            }
+        }
+
+        function judgeWord(id, result) {
+            const wordObj = testWords.find(w => w.id === id);
+            if (!wordObj) return;
+
+            const oldStatus = wordObj.status;
+            if (oldStatus === result) return;
+
+            if (oldStatus === null) {
+                state.passingStats.answered++;
+            } else {
+                if (oldStatus === 'unknown') {
+                    state.passingStats.unknown--;
+                    state._tempUnknowns = state._tempUnknowns.filter(w => w.id !== id);
+                } else if (oldStatus === 'known') {
+                    state.passingStats.known--;
+                }
+            }
+
+            if (result === 'unknown') {
+                state.passingStats.unknown++;
+                state._tempUnknowns.push(wordObj);
+            } else {
+                state.passingStats.known++;
+            }
+            
+            state.passingStats.remaining = TOTAL_WORDS - state.passingStats.answered;
+            wordObj.status = result;
+
+            const row = document.getElementById(`word-row-${id}`);
+            const btnX = document.getElementById(`btn-x-${id}`);
+            const btnC = document.getElementById(`btn-c-${id}`);
+            const wordSpan = document.getElementById(`word-text-${id}`);
+            const wordPhonetic = document.getElementById(`word-phonetic-${id}`);
+            const wordDesc = document.getElementById(`word-desc-${id}`);
+
+            if (row && btnX && btnC) {
+                row.className = `flex justify-between items-center p-4 rounded-[20px] border transition-colors duration-300 shrink-0`;
+                btnX.className = `judge-btn w-[64px] h-[48px] rounded-[14px] flex items-center justify-center text-[24px] hover:bg-red-50 hover:text-red-500 active:scale-90 transition-all`;
+                btnC.className = `judge-btn w-[64px] h-[48px] rounded-[14px] flex items-center justify-center text-[24px] hover:bg-green-50 hover:text-green-500 active:scale-90 transition-all`;
+                wordSpan.classList.remove('text-gray-400', 'text-gray-500', 'text-gray-800');
+                wordPhonetic.classList.remove('text-gray-400', 'text-gray-500', 'text-gray-800');
+                wordDesc.classList.remove('opacity-60', 'opacity-80');
+
+                if (result === 'unknown') {
+                    row.classList.add('bg-[#FEF2F2]', 'border-[#FECACA]');
+                    btnX.classList.add('bg-[#EF4444]', 'text-white', 'shadow-sm'); 
+                    btnC.classList.add('bg-gray-50', 'text-gray-400'); 
+                } else {
+                    row.classList.add('bg-[#F0FDF4]', 'border-[#BBF7D0]');
+                    btnC.classList.add('bg-[#10B981]', 'text-white', 'shadow-sm'); 
+                    btnX.classList.add('bg-gray-50', 'text-gray-400'); 
+                }
+
+                wordSpan.classList.add('text-gray-400');
+                wordPhonetic.classList.add('text-gray-400');
+                wordDesc.classList.add('opacity-80');
+            }
+
+            updatePassingStats();
+        }
+
+        function updatePassingStats() {
+            const elKnown = document.getElementById('statKnown');
+            if (elKnown) elKnown.innerText = state.passingStats.known;
+            const elUnknown = document.getElementById('statUnknown');
+            if (elUnknown) elUnknown.innerText = state.passingStats.unknown;
+            const elRemaining = document.getElementById('statRemaining');
+            if (elRemaining) elRemaining.innerText = state.passingStats.remaining;
+
+            const submitBtn = document.getElementById('submitLevelBtn');
+            if (submitBtn) {
+                if (state.passingStats.remaining === 0) {
+                    submitBtn.className = 'bg-brand hover-bg-brand text-white font-bold py-3 px-10 text-[16px] rounded-[14px] shadow-sm active:scale-95 transition-all';
+                    submitBtn.disabled = false;
+                } else {
+                    submitBtn.className = 'bg-[#F1F5F9] text-[#94A3B8] font-bold py-3 px-10 text-[16px] rounded-[14px] transition-all cursor-not-allowed';
+                    submitBtn.disabled = true;
+                }
+            }
+        }
+
+        function submitPassResults() {
+            if (state.passingStats.remaining > 0) return;
+            
+            dataStore.stats.todayLearned += TOTAL_WORDS;
+            dataStore.stats.totalLearned += TOTAL_WORDS;
+            if (state.currentActionType === 'new') {
+                dataStore.stats.unlearnedNew = Math.max(0, dataStore.stats.unlearnedNew - TOTAL_WORDS);
+                dataStore.stats.unlearned = dataStore.stats.unlearnedNew; 
+            }
+
+            if (state._tempUnknowns.length > 0) {
+                state._tempUnknowns.forEach(w => {
+                    if(!state.vocabBook.find(ex => ex.word === w.word)) {
+                        w.type = state.currentActionType === 'assigned' ? w.type : state.currentActionType; 
+                        state.vocabBook.push(w);
+                    }
+                });
+            }
+
+            const newCount = state.vocabBook.filter(w => w.type === 'new').length;
+            const oldCount = state.vocabBook.filter(w => w.type === 'old').length;
+            
+            const isLevelTriggered = (newCount >= VOCAB_THRESHOLD && oldCount >= VOCAB_THRESHOLD);
+
+            if (isLevelTriggered && state.activeLevel === null) {
+                state.activeLevel = { 
+                    title: '生词专属关卡', 
+                    wordCount: state.vocabBook.length, 
+                    words: [...state.vocabBook],
+                    steps: [
+                        { id: 'read', name: '跟读', target: 2, current: 0 },
+                        { id: 'memo', name: '音记', target: 2, current: 0 },
+                        { id: 'dict', name: '听写', target: 1, current: 0 }
+                    ]
+                };
+            }
+
+            if (state.currentActionType === 'assigned') {
+                const task = state.assignedTasks.find(t => t.id === state.currentTaskId);
+                if (task) {
+                    task.current++;
+                    task.lastDone = getTodayDateString(); 
+                    if (task.current >= task.target) {
+                        state.assignedTasks = state.assignedTasks.filter(t => t.id !== task.id);
+                    }
+                }
+            }
+            
+            showResultPage(isLevelTriggered);
+        }
+
+        function showResultPage(isLevelTriggered) {
+            document.getElementById('resultKnown').innerText = state.passingStats.known;
+            document.getElementById('resultUnknown').innerText = state.passingStats.unknown;
+
+            const msgEl = document.getElementById('resultMessage');
+            const boxEl = document.getElementById('resultMessageBox');
+            
+            if (isLevelTriggered) {
+                boxEl.className = "bg-red-50 rounded-[16px] p-4 border border-red-200 mb-8 text-left shadow-sm";
+                msgEl.className = "text-[14px] text-red-600 font-bold leading-relaxed";
+                msgEl.innerHTML = `<i class="ph-fill ph-warning-circle text-[18px] relative top-[2px] mr-1"></i> 生词本已达触发条件！系统已自动为您生成专属复习关卡，请返回主页进行攻坚。`;
+            } else if (state._tempUnknowns.length > 0) {
+                boxEl.className = "bg-orange-50 rounded-[16px] p-4 border border-orange-200 mb-8 text-left shadow-sm";
+                msgEl.className = "text-[13px] text-orange-600 font-medium leading-relaxed";
+                msgEl.innerHTML = `已将 <span class="font-extrabold text-[16px] px-1">${state._tempUnknowns.length}</span> 个生词加入生词本。<br/><span class="opacity-80 mt-1 block">💡 提示：新旧生词各满 <span class="font-bold">${VOCAB_THRESHOLD}</span> 个系统将自动生成关卡；您也可以去生词本中手动生成。</span>`;
+            } else {
+                boxEl.className = "bg-green-50 rounded-[16px] p-4 border border-green-200 mb-8 text-left shadow-sm";
+                msgEl.className = "text-[14px] text-green-600 font-bold leading-relaxed";
+                msgEl.innerHTML = `<i class="ph-fill ph-check-circle text-[18px] relative top-[2px] mr-1"></i> 太棒了！本次没有产生任何盲点生词，已全部掌握！`;
+            }
+            
+            switchView('view-result');
+        }
+
+        function renderLearningStepsModal() {
+            const container = document.getElementById('learningStepsContainerModal');
+            if (!container) return;
+            
+            let html = '<div class="flex flex-col relative py-2 w-full text-left">';
+            html += '<div class="absolute left-[20px] top-6 bottom-6 w-[2px] bg-gray-200 z-0"></div>';
+
+            state.activeLevel.steps.forEach((step, idx) => {
+                const isDone = step.current >= step.target;
+                const isCurrent = !isDone && (idx === 0 || state.activeLevel.steps[idx-1].current >= state.activeLevel.steps[idx-1].target);
+                
+                let icon = '', textClass = '', boxClass = '', borderClass = '';
+                
+                if (isDone) {
+                    icon = '<i class="ph-bold ph-check text-green-500 text-[16px]"></i>';
+                    textClass = 'text-green-600 line-through';
+                    borderClass = 'border-green-200 bg-white';
+                    boxClass = 'bg-green-50/50 border-green-100';
+                } else if (isCurrent) {
+                    icon = '<i class="ph-bold ph-hourglass-high text-brand text-[16px] animate-pulse"></i>';
+                    textClass = 'text-brand font-bold';
+                    borderClass = 'border-brand bg-white border-2 shadow-sm';
+                    boxClass = 'bg-blue-50 border-blue-100 shadow-sm';
+                } else {
+                    icon = '<i class="ph-fill ph-lock-key text-gray-400 text-[16px]"></i>';
+                    textClass = 'text-gray-400';
+                    borderClass = 'border-gray-200 bg-gray-50';
+                    boxClass = 'bg-gray-50 border-transparent';
+                }
+
+                html += `
+                    <div class="flex items-center gap-3 mb-3 last:mb-0 relative z-10 w-full">
+                        <div class="w-10 h-10 rounded-[10px] flex items-center justify-center shrink-0 z-10 ${borderClass}">
+                            ${icon}
+                        </div>
+                        <div class="flex-1 flex items-center justify-between p-3 rounded-[12px] border ${boxClass} transition-colors">
+                            <span class="text-[14px] ${textClass}">${step.name}</span>
+                            <span class="text-[12px] font-bold ${textClass} font-mono">${step.current}/${step.target}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+
+            const actionBtn = document.getElementById('stepActionBtn');
+            const currentStep = state.activeLevel.steps.find(s => s.current < s.target);
+            if (currentStep) {
+                actionBtn.innerText = `点击执行 [${currentStep.name}] (模拟 +1)`;
+            }
+        }
+
+        renderDashboardUI();
+    </script>
+</body>
+</html>
