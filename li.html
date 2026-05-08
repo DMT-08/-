@@ -340,35 +340,37 @@
 
 
     <!-- ================= 视图：过词结果页 ================= -->
-    <div id="view-result" class="view-section flex-col items-center justify-center w-full h-full p-4 md:p-5 relative z-40">
-        <div class="bg-white rounded-[32px] shadow-2xl p-8 max-w-sm w-full text-center relative overflow-hidden modal-enter border border-gray-100">
-            <div class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center text-green-500 mx-auto mb-6 shadow-sm border border-green-100">
-                <i class="ph-bold ph-check-circle text-[42px]"></i>
-            </div>
-            <h2 class="text-[26px] font-extrabold text-gray-900 mb-2 tracking-tight">学习完成</h2>
-            <p class="text-[14px] text-gray-500 mb-8">本次过词结果结算</p>
-            
-            <div class="flex justify-center items-center gap-8 mb-8 bg-gray-50/50 py-4 rounded-[16px] border border-gray-100">
-                <div class="text-center flex-1">
-                    <div class="text-[36px] font-black text-green-500 font-mono leading-none mb-1 drop-shadow-sm" id="resultKnown">0</div>
-                    <div class="text-[13px] font-bold text-gray-500">认识</div>
+    <div id="view-result" class="view-section flex-col w-full h-full p-4 md:p-5 overflow-hidden max-w-[1300px] mx-auto gap-4">
+        <div class="flex items-center gap-4 shrink-0 mb-3 px-2">
+            <h2 class="font-extrabold text-[32px] text-gray-900 tracking-tight leading-none">学习完成</h2>
+        </div>
+
+        <div class="flex-1 min-h-0 flex flex-col bg-white rounded-[24px] shadow-premium relative overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-100 flex flex-col lg:flex-row justify-between items-start lg:items-center bg-gray-50/50 shrink-0 gap-4">
+                <div class="flex items-center gap-6">
+                    <div class="flex items-center gap-2">
+                        <i class="ph-fill ph-check-circle text-green-500 text-[24px]"></i>
+                        <span class="text-[15px] font-bold text-gray-700">认识 <span id="resultKnown" class="text-[20px] text-green-600 font-black">0</span></span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="ph-fill ph-x-circle text-red-500 text-[24px]"></i>
+                        <span class="text-[15px] font-bold text-gray-700">不认识 <span id="resultUnknown" class="text-[20px] text-red-600 font-black">0</span></span>
+                    </div>
                 </div>
-                <div class="w-[2px] h-10 bg-gray-200/60 rounded-full"></div>
-                <div class="text-center flex-1">
-                    <div class="text-[36px] font-black text-red-500 font-mono leading-none mb-1 drop-shadow-sm" id="resultUnknown">0</div>
-                    <div class="text-[13px] font-bold text-gray-500">不认识</div>
+                <div id="resultMessageBox" class="px-4 py-2.5 rounded-[12px] max-w-xl">
+                    <p class="text-[13px] font-medium leading-relaxed" id="resultMessage"></p>
                 </div>
             </div>
 
-            <div id="resultMessageBox" class="bg-orange-50 rounded-[16px] p-4 border border-orange-100 mb-8 text-left shadow-sm">
-                <p class="text-[13px] text-orange-600 font-medium leading-relaxed" id="resultMessage">
-                    <!-- 动态生成 -->
-                </p>
+            <div id="resultWordList" class="flex-1 min-h-0 overflow-y-auto px-5 py-4 grid grid-cols-1 md:grid-cols-2 gap-4 pb-24 hide-scrollbar bg-gray-50/30 content-start">
+                <!-- 动态生成 -->
             </div>
 
-            <button onclick="switchView('view-dashboard')" class="w-full bg-brand hover-bg-brand text-white font-bold py-4 rounded-[16px] shadow-sm active:scale-95 transition-all text-[16px] flex items-center justify-center gap-2">
-                返回主页 <i class="ph-bold ph-arrow-right"></i>
-            </button>
+            <div class="absolute bottom-0 left-0 w-full bg-white border-t border-gray-100 px-6 py-4 flex justify-center items-center z-10 shadow-[0_-4px_20px_rgba(0,0,0,0.03)] shrink-0">
+                <button onclick="switchView('view-dashboard')" class="bg-brand hover-bg-brand text-white font-bold py-3.5 px-16 rounded-[14px] shadow-sm active:scale-95 transition-all text-[16px] flex items-center justify-center gap-2">
+                    返回主页 <i class="ph-bold ph-arrow-right"></i>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1092,18 +1094,43 @@
             const boxEl = document.getElementById('resultMessageBox');
             
             if (isLevelTriggered) {
-                boxEl.className = "bg-red-50 rounded-[16px] p-4 border border-red-200 mb-8 text-left shadow-sm";
-                msgEl.className = "text-[14px] text-red-600 font-bold leading-relaxed";
-                msgEl.innerHTML = `<i class="ph-fill ph-warning-circle text-[18px] relative top-[2px] mr-1"></i> 生词本已达触发条件！系统已自动为您生成专属复习关卡，请返回主页进行攻坚。`;
+                boxEl.className = "bg-red-50 px-4 py-2.5 rounded-[12px] max-w-xl border border-red-100";
+                msgEl.className = "text-[13px] text-red-600 font-bold leading-relaxed";
+                msgEl.innerHTML = `<i class="ph-fill ph-warning-circle text-[16px] relative top-[2px] mr-1"></i> 生词本已达触发条件！系统已生成专属复习关卡，请返回主页攻坚。`;
             } else if (state._tempUnknowns.length > 0) {
-                boxEl.className = "bg-orange-50 rounded-[16px] p-4 border border-orange-200 mb-8 text-left shadow-sm";
+                boxEl.className = "bg-orange-50 px-4 py-2.5 rounded-[12px] max-w-xl border border-orange-100";
                 msgEl.className = "text-[13px] text-orange-600 font-medium leading-relaxed";
-                msgEl.innerHTML = `已将 <span class="font-extrabold text-[16px] px-1">${state._tempUnknowns.length}</span> 个生词加入生词本。<br/><span class="opacity-80 mt-1 block">💡 提示：新旧生词各满 <span class="font-bold">${VOCAB_THRESHOLD}</span> 个系统将自动生成关卡；您也可以去生词本中手动生成。</span>`;
+                msgEl.innerHTML = `已将 <span class="font-extrabold text-[15px] px-1">${state._tempUnknowns.length}</span> 个生词加入生词本。新旧生词各满 <span class="font-bold">${VOCAB_THRESHOLD}</span> 词将自动生成关卡。`;
             } else {
-                boxEl.className = "bg-green-50 rounded-[16px] p-4 border border-green-200 mb-8 text-left shadow-sm";
-                msgEl.className = "text-[14px] text-green-600 font-bold leading-relaxed";
-                msgEl.innerHTML = `<i class="ph-fill ph-check-circle text-[18px] relative top-[2px] mr-1"></i> 太棒了！本次没有产生任何盲点生词，已全部掌握！`;
+                boxEl.className = "bg-green-50 px-4 py-2.5 rounded-[12px] max-w-xl border border-green-100";
+                msgEl.className = "text-[13px] text-green-600 font-bold leading-relaxed";
+                msgEl.innerHTML = `<i class="ph-fill ph-check-circle text-[16px] relative top-[2px] mr-1"></i> 太棒了！本次没有产生任何盲点生词，已全部掌握！`;
             }
+
+            const listContainer = document.getElementById('resultWordList');
+            listContainer.innerHTML = '';
+            
+            testWords.forEach((item, index) => {
+                const isKnown = item.status === 'known';
+                const statusIcon = isKnown
+                    ? `<div class="w-7 h-7 rounded-full bg-green-50 text-green-500 flex items-center justify-center border border-green-100 shadow-sm"><i class="ph-bold ph-check text-[14px]"></i></div>`
+                    : `<div class="w-7 h-7 rounded-full bg-red-50 text-red-500 flex items-center justify-center border border-red-100 shadow-sm"><i class="ph-bold ph-x text-[14px]"></i></div>`;
+                const borderClass = isKnown ? 'border-gray-100 hover:border-green-200' : 'border-red-200 bg-[#FEF2F2]/40 hover:border-red-300';
+
+                listContainer.innerHTML += `
+                    <div class="flex items-center w-full bg-white p-4 rounded-[20px] shadow-sm border ${borderClass} transition-colors z-10 shrink-0">
+                        <span class="font-mono text-[16px] text-gray-400 font-bold shrink-0 w-7">${index + 1}.</span>
+                        <div class="flex items-baseline gap-3 flex-1 overflow-hidden pr-2">
+                            <span class="font-extrabold text-[18px] font-mono tracking-tight text-gray-800 shrink-0">${item.word}</span>
+                            <span class="font-extrabold text-[18px] font-mono tracking-tight text-gray-800 shrink-0">${item.phonetic}</span>
+                            <span class="text-[14px] text-gray-500 truncate flex-1 min-w-0 ml-2">${item.meaning}</span>
+                        </div>
+                        <div class="shrink-0 flex items-center justify-end ml-2">
+                            ${statusIcon}
+                        </div>
+                    </div>
+                `;
+            });
             
             switchView('view-result');
         }
