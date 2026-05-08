@@ -267,7 +267,7 @@
 
 
     <!-- ================= 视图：我的生词本 (二级页面) ================= -->
-    <div id="view-vocab" class="view-section flex-col w-full h-full max-w-[900px] mx-auto p-4 md:p-5 overflow-hidden gap-4">
+    <div id="view-vocab" class="view-section flex-col w-full h-full max-w-[1300px] mx-auto p-4 md:p-5 overflow-hidden gap-4">
         <div class="flex items-center justify-between shrink-0 mb-2 px-2">
             <div class="flex items-center gap-4">
                 <button onclick="switchView('view-dashboard')" class="w-11 h-11 bg-white hover:bg-gray-50 rounded-[14px] shadow-sm flex items-center justify-center transition-colors text-slate-600 active:scale-95 border border-gray-100">
@@ -290,14 +290,13 @@
                 <div class="text-[13px] text-gray-500 font-medium">共 <span id="fullVocabCount">0</span> 词</div>
             </div>
             
-            <div class="flex-1 min-h-0 overflow-y-auto p-4 md:p-5 hide-scrollbar bg-gray-50/30">
-                <div id="fullVocabList" class="flex flex-col gap-3">
+            <div class="flex-1 min-h-0 overflow-y-auto px-5 py-4 hide-scrollbar bg-gray-50/30">
+                <div id="fullVocabList" class="grid grid-cols-1 md:grid-cols-2 gap-4 content-start">
                     <!-- JS 动态渲染内部列表 -->
                 </div>
             </div>
         </div>
     </div>
-
 
     <!-- ================= 视图：全新过词界面 (无底部栏，单列沉浸) ================= -->
     <div id="view-passing" class="view-section flex-col w-full h-full p-4 md:p-5 overflow-hidden max-w-[1300px] mx-auto gap-4">
@@ -658,7 +657,7 @@
 
             if (filteredList.length === 0) {
                 container.innerHTML = `
-                    <div class="flex flex-col items-center justify-center h-48 text-center opacity-40 py-10">
+                    <div class="flex flex-col items-center justify-center h-48 text-center opacity-40 py-10 col-span-full">
                         <i class="ph-fill ph-book-bookmark text-[48px] text-gray-400 mb-3"></i>
                         <p class="text-[14px] font-bold text-gray-500">空空如也，暂无生词</p>
                     </div>`;
@@ -676,15 +675,13 @@
                     }
 
                     container.innerHTML += `
-                        <div class="flex items-center w-full bg-white p-4 rounded-[16px] shadow-sm border border-gray-100 hover:border-orange-200 transition-colors z-10 shrink-0 gap-4">
-                            <div class="shrink-0 flex flex-col gap-1 w-[120px] md:w-[150px]">
-                                <span class="text-gray-800 font-extrabold text-[16px] md:text-[18px] font-mono tracking-tight truncate">${item.word}</span>
-                                <span class="text-gray-400 font-mono text-[13px] truncate">${item.phonetic}</span>
+                        <div class="flex items-center w-full bg-white p-4 rounded-[20px] shadow-sm border border-gray-100 hover:border-orange-200 transition-colors z-10 shrink-0">
+                            <div class="flex items-baseline gap-3 flex-1 overflow-hidden pr-2">
+                                <span class="font-extrabold text-[18px] font-mono tracking-tight text-gray-800 shrink-0">${item.word}</span>
+                                <span class="font-extrabold text-[18px] font-mono tracking-tight text-gray-800 shrink-0">${item.phonetic}</span>
+                                <span class="text-[14px] text-gray-500 truncate flex-1 min-w-0 ml-2">${item.meaning}</span>
                             </div>
-                            <div class="flex-1 min-w-0 text-gray-600 px-3 border-l-2 border-gray-50 flex items-center h-full">
-                                <span class="text-[14px] line-clamp-2 leading-relaxed">${item.meaning}</span>
-                            </div>
-                            <div class="shrink-0 flex flex-col gap-2 items-end justify-center">
+                            <div class="shrink-0 flex items-center justify-end ml-2">
                                 ${typeTag}
                             </div>
                         </div>
