@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>掌上校园 - AI录音工作台</title>
+    <style>
+        /* 基础变量与重置 */
+        :root {
+            --primary-color: #1F5FFF; /* 恢复原定品牌蓝 */
+            --primary-light: rgba(31, 95, 255, 0.1);
+            --bg-start: #EFF6FF; /* 恢复原定渐变起点 */
+            --bg-end: #DFE7FF; /* 恢复原定渐变终点 */
+            --text-main: #0F172A;
+            --text-secondary: #64748B;
+            --card-bg: #FFFFFF;
+            --danger-color: #EF4444;
+            --success-color: #10B981;
+            --border-color: #E2E8F0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background-color: #f4f5f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* 设备模拟器 (375x812) */
+        .device-simulator {
+            width: 375px;
+            height: 812px;
+            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+            position: relative;
+            overflow: hidden;
+            border-radius: 40px;
+            /* 移除这里的内阴影，将其转移到顶层伪元素 */
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15); 
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 新增：使用伪元素将手机黑色边框固定在最上层，防止被滚动内容遮挡 */
+        .device-simulator::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 40px;
+            box-shadow: inset 0 0 0 8px #000;
+            pointer-events: none; /* 穿透点击，不影响内部操作 */
+            z-index: 1000;
+        }
+
+        /* 顶部导航栏 */
+        .nav-bar {
+            padding: 54px 20px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            z-index: 10;
+        }
+        .nav-title { font-size: 18px; font-weight: 600; color: var(--text-main); }
+        .icon-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+
+        /* 主体滚动内容区 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 0 20px 20px 20px; /* 优化底部留白 */
+            scrollbar-width: none;
+        }
+        .main-content::-webkit-scrollbar { display: none; }
+
+        /* 数据看板 */
+        .stats-card {
+            background: #FFFFFF;
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03); /* 更柔和的高级阴影 */
+            border: 1px solid var(--border-color); /* 增加极细的边框提升质感 */
+            flex-shrink: 0;
+        }
+        .stat-item { text-align: center; flex: 1; position: relative; }
+        .stat-item:not(:last-child)::after {
+            content: ''; position: absolute; right: 0; top: 20%; height: 60%; width: 1px; background: var(--border-color);
+        }
+        .stat-item { text-align: center; flex: 1; position: relative; }
+        .stat-item:not(:last-child)::after {
+            content: ''; position: absolute; right: 0; top: 20%; height: 60%; width: 1px; background: #f0f0f0;
+        }
+        .stat-value { font-size: 24px; font-weight: bold; margin-bottom: 4px; }
+        .stat-label { font-size: 12px; color: var(--text-secondary); }
+
+        /* 吸顶工具栏 (包含搜索、筛选、列表头) */
+        .sticky-toolbar {
+            position: sticky;
+            top: -1px; /* 负一点防止顶部产生白边缝隙 */
+            z-index: 20;
+            margin: 0 -20px;
+            padding: 10px 20px 0;
+            background: rgba(239, 246, 255, 0.85); /* 半透明匹配背景色 */
+            backdrop-filter: blur(12px); /* 毛玻璃模糊效果 */
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* 搜索框 */
+        .search-bar {
+            background: #FFFFFF;
+            border-radius: 16px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(31, 95, 255, 0.04);
+            flex-shrink: 0;
+        }
+        .search-bar input { border: none; outline: none; margin-left: 10px; font-size: 14px; flex: 1; color: var(--text-main); }
+        .search-bar input::placeholder { color: #bbb; }
+
+        /* 筛选标签 */
+        .filter-group {
+            display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;
+            flex-shrink: 0;
+        }
+        .filter-group::-webkit-scrollbar { display: none; }
+        .filter-chip {
+            padding: 6px 16px; border-radius: 20px; font-size: 13px; white-space: nowrap;
+            background: #F1F5F9; color: var(--text-secondary); border: 1px solid transparent;
+            transition: all 0.2s ease; cursor: pointer;
+            flex-shrink: 0; font-weight: 500;
+        }
+        .filter-chip.active {
+            background: var(--text-main); color: #FFFFFF; /* 现代设计中深色背景代表强激活态 */
+        }
+
+        /* 列表区域 */
+        .list-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+            flex-shrink: 0;
+        }
+        .list-title { font-size: 16px; font-weight: 600; color: var(--text-main); }
+        
+        /* 连续审听 Switch */
+        .switch-wrap { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+        .switch {
+            position: relative; width: 36px; height: 20px; background: #e0e0e0; 
+            border-radius: 10px; cursor: pointer; transition: background 0.3s;
+        }
+        .switch::after {
+            content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; 
+            background: #fff; border-radius: 50%; transition: transform 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .switch.active { background: var(--primary-color); }
+        .switch.active::after { transform: translateX(16px); }
+
+        .btn-refresh {
+            display: flex; align-items: center; justify-content: center; width: 28px; height: 28px;
+            color: var(--primary-color); background: var(--primary-light); border: none; border-radius: 50%; cursor: pointer;
+        }
+
+        .word-list {
+            flex: 1; /* 让清单区域自动撑满下方剩余的所有空间 */
+            background: #FFFFFF;
+            border-radius: 20px;
+            padding: 8px 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px; /* 新增底部间距，防止滑动到底部时贴边 */
+        }
+        .word-item {
+            display: flex; justify-content: space-between; align-items: center; padding: 16px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .word-item {
+            display: flex; justify-content: space-between; align-items: center; padding: 16px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .word-item:last-child { border-bottom: none; }
+        .word-info { flex: 1; }
+        .word-text { font-size: 16px; font-weight: 500; color: var(--text-main); margin-bottom: 4px; }
+        .word-status { font-size: 12px; color: var(--text-secondary); transition: color 0.3s; }
+
+        /* 录音与播放按钮系统 */
+        .actions { display: flex; align-items: center; gap: 8px; }
+        .btn-record {
+            width: 44px; height: 44px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            border: none; cursor: pointer; transition: all 0.3s;
+        }
+        .btn-record svg { fill: currentColor; }
+        
+        /* 播放 AI 音频 (默认) */
+        .btn-play { background: var(--primary-light); color: var(--primary-color); }
+        .playing-ai { animation: pulse-blue 1.5s infinite; }
+        
+        /* 老师正在录音 */
+        .recording { background: var(--danger-color); color: white; animation: pulse-red 1.5s infinite; }
+        
+        /* 老师录音播放 */
+        .btn-play-teacher { background: #ECFDF5; color: var(--success-color); }
+
+        @keyframes pulse-blue {
+            0% { box-shadow: 0 0 0 0 rgba(31, 95, 255, 0.4); }
+            70% { box-shadow: 0 0 0 12px rgba(31, 95, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(31, 95, 255, 0); }
+        }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        /* 裁定操作按钮 */
+        .action-text-btn { 
+            display: inline-flex; align-items: center; gap: 4px; /* 加入 flex 使图标和文字精准居中对齐 */
+            font-size: 13px; border: none; cursor: pointer; padding: 6px 14px; border-radius: 20px; transition: all 0.2s ease;
+        }
+        .action-text-btn.default { background: #F1F5F9; color: var(--text-secondary); font-weight: 500; }
+        .action-text-btn.default:hover { background: #E2E8F0; }
+        .action-text-btn.adopt { background: var(--primary-light); color: var(--primary-color); font-weight: 600; }
+        .action-text-btn.danger { background: #FEF2F2; color: var(--danger-color); font-weight: 600; }
+
+        /* 通用小图标与状态指示圆点 */
+        .icon-sm { width: 14px; height: 14px; }
+        .status-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+        .dot-primary { background: var(--primary-color); }
+        .dot-danger { background: var(--danger-color); }
+        .dot-success { background: var(--success-color); }
+        .dot-secondary { background: var(--text-secondary); }
+
+        /* 全局轻提示 Toast */
+        .toast {
+            position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.75); color: white; padding: 12px 24px; border-radius: 12px;
+            font-size: 14px; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 100;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); backdrop-filter: blur(4px);
+        }
+        .toast.show { opacity: 1; }
+
+        /* SVG 图标库预设 */
+        .svg-icon { width: 20px; height: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="device-simulator">
+    <!-- 顶部栏 -->
+    <div class="nav-bar">
+        <div class="icon-btn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </div>
+        <div class="nav-title">音频审听台</div>
+        <div class="icon-btn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </div>
+    </div>
+
+    <!-- 主体区域 -->
+    <div class="main-content">
+        <!-- 统计看板 -->
+        <div class="stats-card">
+            <div class="stat-item">
+                <div class="stat-value" style="color: var(--text-main);">120</div>
+                <div class="stat-label">总词汇</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" style="color: var(--primary-color);">85</div>
+                <div class="stat-label">已审核</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" style="color: var(--text-secondary);">35</div>
+                <div class="stat-label">待审核</div>
+            </div>
+        </div>
+
+        <!-- 吸顶容器包裹：搜索 + 筛选 + 列表操作 -->
+        <div class="sticky-toolbar">
+            <!-- 搜索与筛选 -->
+            <div class="search-bar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" placeholder="输入关键字搜索...">
+            </div>
+
+            <!-- 筛选器 -->
+            <div class="filter-group">
+                <div class="filter-chip active">全部</div>
+                <div class="filter-chip">无音频</div>
+                <div class="filter-chip">有音频</div>
+                <div class="filter-chip">需重录</div>
+            </div>
+
+            <!-- 录音任务列表（批次） -->
+            <div class="list-header">
+                <div class="list-title">待审清单 <span style="font-size: 13px; font-weight: normal; color: var(--text-secondary);">3/10</span></div>
+                <div style="display: flex; gap: 14px; align-items: center;">
+                    <div class="switch-wrap">
+                        连续审听
+                        <div class="switch" onclick="toggleSwitch(this)"></div>
+                    </div>
+                    <button class="btn-refresh" onclick="refreshList()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="word-list">
+            <!-- 词条1：无音频 -->
+            <div class="word-item">
+                <div class="word-info">
+                    <div class="word-text">Apple</div>
+                    <div class="word-status">无音频</div>
+                </div>
+                <div class="actions">
+                    <button class="action-text-btn danger" onclick="startRecord(this)">
+                        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>录音
+                    </button>
+                </div>
+            </div>
+
+            <!-- 词条2：有音频 -->
+            <div class="word-item">
+                <div class="word-info">
+                    <div class="word-text">Banana</div>
+                    <div class="word-status">有音频</div>
+                </div>
+                <div class="actions">
+                    <button class="btn-record btn-play" onclick="playSystemAudio(this)">
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 词条3：有音频(已通过) -->
+            <div class="word-item">
+                <div class="word-info">
+                    <div class="word-text">Classroom</div>
+                    <div class="word-status" style="color: var(--success-color);">审核通过 0:02</div>
+                </div>
+                <div class="actions">
+                    <button class="action-text-btn default" onclick="startRecord(this)">重录</button>
+                    <button class="btn-record btn-play" onclick="showToast('正在播放系统音频')">
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 词条4：需重录 -->
+            <div class="word-item">
+                <div class="word-info">
+                    <div class="word-text">Morning</div>
+                    <div class="word-status" style="color: var(--danger-color);">需重录</div>
+                </div>
+                <div class="actions">
+                    <button class="action-text-btn default" onclick="startRecord(this)">重录</button>
+                    <button class="btn-record btn-play-teacher" onclick="showToast('正在播放待替换音频')">
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 词条5：无音频 (新增展示展示拉长效果) -->
+            <div class="word-item">
+                <div class="word-info">
+                    <div class="word-text">Orange</div>
+                    <div class="word-status">无音频</div>
+                </div>
+                <div class="actions">
+                    <button class="action-text-btn danger" onclick="startRecord(this)">
+                        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>录音
+                    </button>
+                </div>
+            </div>
+
+            <!-- 词条6：无音频 (新增展示拉长效果) -->
+            <div class="word-item">
+                <div class="word-info">
+                    <div class="word-text">Grape</div>
+                    <div class="word-status">无音频</div>
+                </div>
+                <div class="actions">
+                    <button class="action-text-btn danger" onclick="startRecord(this)">
+                        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>录音
+                    </button>
+                </div>
+            </div>
+
+            <!-- 以下为新增的测试数据，用于撑开列表体验吸顶效果 -->
+            <div class="word-item">
+                <div class="word-info">
+                    <div class="word-text">Watermelon</div>
+                    <div class="word-status">有音频</div>
+                </div>
+                <div class="actions">
+                    <button class="btn-record btn-play" onclick="playSystemAudio(this)">
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="word-item">
+                <div class="word-info">
+                    <div class="word-text">Teacher</div>
+                    <div class="word-status" style="color: var(--success-color);">审核通过 0:02</div>
+                </div>
+                <div class="actions">
+                    <button class="action-text-btn default" onclick="startRecord(this)">重录</button>
+                    <button class="btn-record btn-play" onclick="showToast('正在播放系统音频')">
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="word-item">
+                <div class="word-info">
+                    <div class="word-text">Student</div>
+                    <div class="word-status" style="color: var(--danger-color);">需重录</div>
+                </div>
+                <div class="actions">
+                    <button class="action-text-btn default" onclick="startRecord(this)">重录</button>
+                    <button class="btn-record btn-play-teacher" onclick="showToast('正在播放待替换音频')">
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="word-item">
+                <div class="word-info">
+                    <div class="word-text">School</div>
+                    <div class="word-status">无音频</div>
+                </div>
+                <div class="actions">
+                    <button class="action-text-btn danger" onclick="startRecord(this)">
+                        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>录音
+                    </button>
+                </div>
+            </div>
+
+            <div class="word-item">
+                <div class="word-info">
+                    <div class="word-text">Book</div>
+                    <div class="word-status">有音频</div>
+                </div>
+                <div class="actions">
+                    <button class="btn-record btn-play" onclick="playSystemAudio(this)">
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="word-item">
+                <div class="word-info">
+                    <div class="word-text">Pencil</div>
+                    <div class="word-status">无音频</div>
+                </div>
+                <div class="actions">
+                    <button class="action-text-btn danger" onclick="startRecord(this)">
+                        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>录音
+                    </button>
+                </div>
+            </div>
+
+            <div class="word-item">
+                <div class="word-info">
+                    <div class="word-text">Eraser</div>
+                    <div class="word-status" style="color: var(--success-color);">审核通过 0:03</div>
+                </div>
+                <div class="actions">
+                    <button class="action-text-btn default" onclick="startRecord(this)">重录</button>
+                    <button class="btn-record btn-play" onclick="showToast('正在播放系统音频')">
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="word-item">
+                <div class="word-info">
+                    <div class="word-text">Ruler</div>
+                    <div class="word-status">有音频</div>
+                </div>
+                <div class="actions">
+                    <button class="btn-record btn-play" onclick="playSystemAudio(this)">
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="word-item">
+                <div class="word-info">
+                    <div class="word-text">Desk</div>
+                    <div class="word-status">无音频</div>
+                </div>
+                <div class="actions">
+                    <button class="action-text-btn danger" onclick="startRecord(this)">
+                        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>录音
+                    </button>
+                </div>
+            </div>
+            
+            <div class="word-item">
+                <div class="word-info">
+                    <div class="word-text">Chair</div>
+                    <div class="word-status">有音频</div>
+                </div>
+                <div class="actions">
+                    <button class="btn-record btn-play" onclick="playSystemAudio(this)">
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 全局提示框 -->
+    <div class="toast" id="sys-toast">提示信息</div>
+</div>
+
+<script>
+    // ---------------- 基础 UI 交互 ----------------
+    // 综合过滤逻辑（支持筛选标签和搜索框联动）
+    function applyFilters() {
+        const activeFilter = document.querySelector('.filter-chip.active').innerText.trim();
+        const searchQuery = document.querySelector('.search-bar input').value.trim().toLowerCase();
+        const items = document.querySelectorAll('.word-item');
+
+        items.forEach(item => {
+            const wordText = item.querySelector('.word-text').innerText.toLowerCase();
+            const statusText = item.querySelector('.word-status').innerText;
+            
+            // 1. 检查状态筛选
+            let matchesStatus = false;
+            if (activeFilter === '全部') {
+                matchesStatus = true;
+            } else if (activeFilter === '无音频') {
+                matchesStatus = statusText.includes('无音频');
+            } else if (activeFilter === '有音频') {
+                // "有音频"和"审核通过"都属于有音频的范畴
+                matchesStatus = statusText.includes('有音频') || statusText.includes('审核通过');
+            } else if (activeFilter === '需重录') {
+                matchesStatus = statusText.includes('需重录');
+            }
+
+            // 2. 检查搜索词模糊匹配
+            let matchesSearch = wordText.includes(searchQuery);
+
+            // 3. 控制单词条目的显隐
+            if (matchesStatus && matchesSearch) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+    // 筛选器点击交互
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.addEventListener('click', function() {
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+            applyFilters(); // 触发联动过滤
+        });
+    });
+
+    // 搜索框输入交互：实时监听输入并过滤
+    const searchInput = document.querySelector('.search-bar input');
+    if (searchInput) {
+        searchInput.addEventListener('input', applyFilters);
+    }
+
+    // 换一批交互
+    function refreshList() {
+        const btn = document.querySelector('.btn-refresh svg');
+        btn.style.transition = 'transform 0.5s';
+        btn.style.transform = 'rotate(360deg)';
+        setTimeout(() => { btn.style.transition = 'none'; btn.style.transform = 'rotate(0deg)'; }, 500);
+    }
+
+    // Toast 提示框
+    function showToast(msg, duration = 2000) {
+        let toast = document.getElementById('sys-toast');
+        toast.innerText = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), duration);
+    }
+
+    // ---------------- 核心业务逻辑交互 ----------------
+    let isContinuousMode = false;
+
+    // 预设高品质 SVG 图标模板，取代原有 Emoji
+    const iconMic = `<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>`;
+    const iconCheck = `<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+    const iconStop = `<svg class="svg-icon" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2" ry="2"></rect></svg>`;
+    const iconPlay = `<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
+
+    // 切换连续审听模式
+    function toggleSwitch(el) {
+        el.classList.toggle('active');
+        isContinuousMode = el.classList.contains('active');
+        showToast(isContinuousMode ? "已开启连续审听模式" : "已关闭连续审听");
+    }
+
+    // 1. 播放系统原始发音
+    function playSystemAudio(btn) {
+        let container = btn.parentElement;
+        let status = container.parentElement.querySelector('.word-status');
+        
+        // 播放动效
+        btn.classList.add('playing-ai');
+        status.innerHTML = '<span class="status-dot dot-primary"></span>正在试听发音...';
+        status.style.color = 'var(--primary-color)';
+        
+        // 模拟音频播放结束
+        setTimeout(() => {
+            btn.classList.remove('playing-ai');
+            
+            // 展现裁定按钮 (增加重播按钮)
+            container.innerHTML = `
+                <button class="action-text-btn default" onclick="replaySystemAudio(this)" title="重播" style="padding: 6px 10px;">${iconPlay}</button>
+                <button class="action-text-btn adopt" onclick="adoptAudio(this)">${iconCheck}通过</button>
+                <button class="action-text-btn danger" onclick="startRecord(this)">${iconMic}重录</button>
+            `;
+            status.innerHTML = '<span class="status-dot dot-danger"></span>待裁定';
+            status.style.color = 'var(--danger-color)';
+
+            // 如果开启了连续审听，模拟老师没操作，1秒后自动采纳
+            if (isContinuousMode) {
+                setTimeout(() => {
+                    let adoptBtn = container.querySelector('.adopt');
+                    if(adoptBtn) adoptAudio(adoptBtn); // 自动采纳并静默上传
+                }, 1000);
+            }
+        }, 1500);
+    }
+
+    // 1.5 重播当前正在裁定的音频
+    function replaySystemAudio(btn) {
+        let container = btn.parentElement;
+        let status = container.parentElement.querySelector('.word-status');
+        
+        // 改变状态显示正在重播
+        status.innerHTML = '<span class="status-dot dot-primary"></span>正在重播...';
+        status.style.color = 'var(--primary-color)';
+        btn.style.background = 'var(--primary-light)';
+        btn.style.color = 'var(--primary-color)';
+        
+        // 模拟重播结束，恢复裁定状态
+        setTimeout(() => {
+            status.innerHTML = '<span class="status-dot dot-danger"></span>待裁定';
+            status.style.color = 'var(--danger-color)';
+            btn.style.background = '';
+            btn.style.color = '';
+        }, 1500);
+    }
+
+    // 2. 采纳发音 (静默上传)
+    function adoptAudio(btn) {
+        let container = btn.parentElement;
+        let status = container.parentElement.querySelector('.word-status');
+        
+        status.innerHTML = '<span class="status-dot dot-secondary"></span>确认中...';
+        status.style.color = 'var(--text-secondary)';
+        
+        // 模拟网络请求
+        setTimeout(() => {
+            status.innerText = '审核通过 0:02';
+            status.style.color = 'var(--success-color)';
+            // 恢复为正常展示态
+            container.innerHTML = `
+                <button class="action-text-btn default" onclick="startRecord(this)">重录</button>
+                <button class="btn-record btn-play" onclick="showToast('正在播放系统音频')">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+            `;
+        }, 600);
+    }
+
+    // 3. 老师打回，自己重录
+    function startRecord(btn) {
+        let container = btn.parentElement;
+        let status = container.parentElement.querySelector('.word-status');
+        
+        // 防错机制：覆盖自己录音时提醒
+        if (status.innerText.includes('重录') || status.innerText.includes('审核通过')) {
+            if(!confirm("这将覆盖现有的音频，确认要重录吗？")) return;
+        }
+
+        // 变成录音状态
+        container.innerHTML = `
+            <button class="btn-record recording" onclick="finishRecord(this)">
+                ${iconStop}
+            </button>
+        `;
+        status.innerHTML = '<span class="status-dot dot-danger"></span>正在录音... (点击停止)';
+        status.style.color = 'var(--danger-color)';
+    }
+
+    // 4. 老师录音完毕 (静默上传)
+    function finishRecord(btn) {
+        let container = btn.parentElement;
+        let status = container.parentElement.querySelector('.word-status');
+        
+        btn.classList.remove('recording');
+        status.innerHTML = '<span class="status-dot dot-secondary"></span>上传中...';
+        status.style.color = 'var(--text-secondary)';
+        
+        // 模拟网络请求
+        setTimeout(() => {
+            showToast('录音替换成功');
+            status.innerText = '审核通过 0:03';
+            status.style.color = 'var(--success-color)';
+            
+            container.innerHTML = `
+                <button class="action-text-btn default" onclick="startRecord(this)">重录</button>
+                <button class="btn-record btn-play-teacher" onclick="showToast('正在播放重录音频')">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+            `;
+        }, 800);
+    }
+</script>
+</body>
+</html>
