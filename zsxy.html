@@ -5,729 +5,849 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>掌上校园 - AI录音工作台</title>
     <style>
-        /* 基础变量与重置 */
         :root {
-            --primary-color: #1F5FFF; /* 恢复原定品牌蓝 */
-            --primary-light: rgba(31, 95, 255, 0.1);
-            --bg-start: #EFF6FF; /* 恢复原定渐变起点 */
-            --bg-end: #DFE7FF; /* 恢复原定渐变终点 */
-            --text-main: #0F172A;
-            --text-secondary: #64748B;
-            --card-bg: #FFFFFF;
+            --primary-color: #1F5FFF; 
+            --bg-start: #EFF6FF;
+            --bg-end: #DFE7FF;
+            
+            --text-title: #111827; 
+            --text-main: #374151;
+            --text-secondary: #9CA3AF;
             --danger-color: #EF4444;
+            --warning-color: #F59E0B; 
             --success-color: #10B981;
-            --border-color: #E2E8F0;
+            
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
-            background-color: #f4f5f7;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            background-color: #e2e8f0; 
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
 
-        /* 设备模拟器 (375x812) */
         .device-simulator {
-            width: 375px;
-            height: 812px;
+            width: 375px; height: 812px;
             background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
-            position: relative;
-            overflow: hidden;
-            border-radius: 40px;
-            /* 移除这里的内阴影，将其转移到顶层伪元素 */
+            position: relative; overflow: hidden; border-radius: 40px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.15); 
-            display: flex;
-            flex-direction: column;
+            display: flex; flex-direction: column;
         }
         
-        /* 新增：使用伪元素将手机黑色边框固定在最上层，防止被滚动内容遮挡 */
         .device-simulator::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             border-radius: 40px;
-            box-shadow: inset 0 0 0 8px #000;
-            pointer-events: none; /* 穿透点击，不影响内部操作 */
-            z-index: 1000;
+            box-shadow: inset 0 0 0 8px #FFFFFF, inset 0 0 0 9px rgba(0,0,0,0.1);
+            pointer-events: none; z-index: 1000;
         }
 
-        /* 顶部导航栏 */
         .nav-bar {
             padding: 54px 20px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: relative;
-            z-index: 10;
+            display: flex; align-items: center; justify-content: space-between;
+            position: relative; z-index: 10;
         }
-        .nav-title { font-size: 18px; font-weight: 600; color: var(--text-main); }
-        .icon-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+        .nav-title-group { display: flex; flex-direction: column; align-items: center; }
+        .nav-title { 
+            font-size: 20px; 
+            font-weight: 700; color: var(--text-title); letter-spacing: 0.5px;
+        }
+        .icon-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-title); }
 
-        /* 主体滚动内容区 */
         .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-            padding: 0 20px 20px 20px; /* 优化底部留白 */
-            scrollbar-width: none;
+            flex: 1; display: flex; flex-direction: column; overflow-y: auto;
+            padding: 10px 20px 24px 20px; scrollbar-width: none; position: relative;
         }
         .main-content::-webkit-scrollbar { display: none; }
 
-        /* 数据看板 */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+        }
+
         .stats-card {
-            background: #FFFFFF;
-            border-radius: 20px;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 24px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03); /* 更柔和的高级阴影 */
-            border: 1px solid var(--border-color); /* 增加极细的边框提升质感 */
-            flex-shrink: 0;
+            border-radius: 20px; padding: 24px 20px; display: flex; justify-content: space-between;
+            margin-bottom: 24px; flex-shrink: 0;
         }
         .stat-item { text-align: center; flex: 1; position: relative; }
         .stat-item:not(:last-child)::after {
-            content: ''; position: absolute; right: 0; top: 20%; height: 60%; width: 1px; background: var(--border-color);
+            content: ''; position: absolute; right: 0; top: 20%; height: 60%; width: 1px; background: rgba(0,0,0,0.06);
         }
-        .stat-item { text-align: center; flex: 1; position: relative; }
-        .stat-item:not(:last-child)::after {
-            content: ''; position: absolute; right: 0; top: 20%; height: 60%; width: 1px; background: #f0f0f0;
-        }
-        .stat-value { font-size: 24px; font-weight: bold; margin-bottom: 4px; }
-        .stat-label { font-size: 12px; color: var(--text-secondary); }
+        .stat-value { font-size: 24px; font-weight: 800; margin-bottom: 4px; color: var(--text-title); }
+        .stat-label { font-size: 13px; color: var(--text-secondary); font-weight: 500;}
 
-        /* 吸顶工具栏 (包含搜索、筛选、列表头) */
         .sticky-toolbar {
-            position: sticky;
-            top: -1px; /* 负一点防止顶部产生白边缝隙 */
-            z-index: 20;
-            margin: 0 -20px;
-            padding: 10px 20px 0;
-            background: rgba(239, 246, 255, 0.85); /* 半透明匹配背景色 */
-            backdrop-filter: blur(12px); /* 毛玻璃模糊效果 */
-            -webkit-backdrop-filter: blur(12px);
+            position: sticky; top: -10px; z-index: 20;
+            margin: 0 -20px; padding: 10px 20px 10px;
+            background: rgba(239, 246, 255, 0.7); 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.4);
         }
 
-        /* 搜索框 */
         .search-bar {
-            background: #FFFFFF;
-            border-radius: 16px;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 12px rgba(31, 95, 255, 0.04);
-            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.9); border-radius: 16px; padding: 14px 16px;
+            display: flex; align-items: center; margin-bottom: 16px; border: 1px solid rgba(255,255,255,1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
         }
-        .search-bar input { border: none; outline: none; margin-left: 10px; font-size: 14px; flex: 1; color: var(--text-main); }
-        .search-bar input::placeholder { color: #bbb; }
+        .search-bar input { border: none; outline: none; margin-left: 10px; font-size: 15px; flex: 1; background: transparent; color: var(--text-title);}
+        .search-bar input::placeholder { color: #9CA3AF; }
 
-        /* 筛选标签 */
-        .filter-group {
-            display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;
-            flex-shrink: 0;
+        .filter-row { 
+            display: flex; 
+            margin-bottom: 4px; 
+            padding: 4px 4px 16px 4px;
+            margin-left: -4px;
+            margin-right: -4px;
+            overflow-x: auto; 
+            scrollbar-width: none; 
         }
-        .filter-group::-webkit-scrollbar { display: none; }
-        .filter-chip {
-            padding: 6px 16px; border-radius: 20px; font-size: 13px; white-space: nowrap;
-            background: #F1F5F9; color: var(--text-secondary); border: 1px solid transparent;
-            transition: all 0.2s ease; cursor: pointer;
-            flex-shrink: 0; font-weight: 500;
-        }
-        .filter-chip.active {
-            background: var(--text-main); color: #FFFFFF; /* 现代设计中深色背景代表强激活态 */
-        }
-
-        /* 列表区域 */
-        .list-header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
-            flex-shrink: 0;
-        }
-        .list-title { font-size: 16px; font-weight: 600; color: var(--text-main); }
+        .filter-row::-webkit-scrollbar { display: none; }
+        .filter-group { display: flex; gap: 10px; flex-shrink: 0; min-width: 0; }
         
-        /* 连续审听 Switch */
-        .switch-wrap { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-secondary); font-weight: 500; }
-        .switch {
-            position: relative; width: 36px; height: 20px; background: #e0e0e0; 
-            border-radius: 10px; cursor: pointer; transition: background 0.3s;
+        .filter-chip {
+            padding: 8px 18px; border-radius: 20px; font-size: 14px; font-weight: 600;
+            background: rgba(255,255,255,0.7); color: var(--text-secondary); 
+            transition: all 0.2s ease; cursor: pointer; border: 1px solid transparent; flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
         }
-        .switch::after {
-            content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; 
-            background: #fff; border-radius: 50%; transition: transform 0.3s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        .filter-chip.active { 
+            background: var(--primary-color); color: #FFF; 
+            box-shadow: 0 4px 12px rgba(31, 95, 255, 0.3);
         }
-        .switch.active { background: var(--primary-color); }
-        .switch.active::after { transform: translateX(16px); }
+        .filter-chip.needs-rerecord-chip { color: var(--danger-color); }
+        .filter-chip.needs-rerecord-chip.active { background: var(--danger-color); color: #FFF; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);}
 
-        .btn-refresh {
-            display: flex; align-items: center; justify-content: center; width: 28px; height: 28px;
-            color: var(--primary-color); background: var(--primary-light); border: none; border-radius: 50%; cursor: pointer;
+        .list-header { display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; margin-bottom: 8px;}
+        .list-title { font-size: 16px; font-weight: 700; color: var(--text-title); display: flex; align-items: center; gap: 8px;}
+        
+        .btn-play-all {
+            display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 20px;
+            font-size: 14px; font-weight: 600; color: var(--primary-color); background: rgba(31, 95, 255, 0.1);
+            border: 1px solid rgba(31, 95, 255, 0.15); cursor: pointer; transition: all 0.2s;
         }
 
-        .word-list {
-            flex: 1; /* 让清单区域自动撑满下方剩余的所有空间 */
-            background: #FFFFFF;
-            border-radius: 20px;
-            padding: 8px 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-            border: 1px solid var(--border-color);
-            margin-bottom: 24px; /* 新增底部间距，防止滑动到底部时贴边 */
-        }
+        .word-list { flex: 1; display: flex; flex-direction: column; gap: 10px; margin-bottom: 120px; margin-top: 8px;}
+        
         .word-item {
-            display: flex; justify-content: space-between; align-items: center; padding: 16px 0;
-            border-bottom: 1px solid var(--border-color);
+            border-radius: 20px; 
+            padding: 20px; 
+            display: flex; flex-direction: column; transition: all 0.3s;
+            position: relative;
         }
-        .word-item {
-            display: flex; justify-content: space-between; align-items: center; padding: 16px 0;
-            border-bottom: 1px solid #f5f5f5;
-        }
-        .word-item:last-child { border-bottom: none; }
-        .word-info { flex: 1; }
-        .word-text { font-size: 16px; font-weight: 500; color: var(--text-main); margin-bottom: 4px; }
-        .word-status { font-size: 12px; color: var(--text-secondary); transition: color 0.3s; }
 
-        /* 录音与播放按钮系统 */
-        .actions { display: flex; align-items: center; gap: 8px; }
+        .word-main { display: flex; justify-content: space-between; align-items: center; }
+        .word-info { flex: 1; display: flex; align-items: flex-start; gap: 12px;}
+        
+        .word-index {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            opacity: 0.5;
+            min-width: 24px; 
+            flex-shrink: 0; 
+            margin-top: 2px;
+        }
+
+        .word-text-group { flex: 1; }
+
+        .word-text { font-size: 20px; font-weight: 700; color: var(--text-title); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;}
+        
+        .word-status { 
+            font-size: 14px; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; font-weight: 500;
+            flex-wrap: wrap; 
+        }
+
+        .status-unrecorded { color: var(--warning-color); }
+
+        .badge {
+            font-size: 12px; padding: 2px 8px; border-radius: 6px; font-weight: 600;
+            border: 1px solid rgba(0,0,0,0.1); color: var(--text-secondary); background: rgba(255,255,255,0.7);
+        }
+
+        .btn-mark-rerecord {
+            background: rgba(255,255,255,0.8); border: 1px solid rgba(0,0,0,0.1); color: var(--text-secondary);
+            border-radius: 6px; padding: 4px 8px; font-size: 12px; cursor: pointer; transition: all 0.2s;
+            display: inline-flex; align-items: center; gap: 4px; font-weight: 600;
+            white-space: nowrap; 
+            flex-shrink: 0;
+        }
+        .btn-mark-rerecord.marked { background: var(--danger-color); border-color: var(--danger-color); color: white; }
+
+        .actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; margin-left: 10px;}
+        
         .btn-record {
             width: 44px; height: 44px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            border: none; cursor: pointer; transition: all 0.3s;
+            border: none; cursor: pointer; transition: all 0.2s;
+            background: rgba(241, 245, 249, 0.8); 
         }
-        .btn-record svg { fill: currentColor; }
+        .btn-record svg { fill: currentColor; width: 18px; height: 18px;}
         
-        /* 播放 AI 音频 (默认) */
-        .btn-play { background: var(--primary-light); color: var(--primary-color); }
-        .playing-ai { animation: pulse-blue 1.5s infinite; }
+        /* Updated Play Button for better visibility */
+        .btn-play { 
+            color: #0F172A; 
+            background: #FFFFFF; /* 改为白色背景 */
+            border: 1px solid rgba(0,0,0,0.05); /* 加一点极细的边框防止和白底融为一体 */
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08); /* 加深一点外阴影，让它凸现出来 */
+        }
         
-        /* 老师正在录音 */
-        .recording { background: var(--danger-color); color: white; animation: pulse-red 1.5s infinite; }
+        .btn-play.playing-ai { 
+            background: rgba(31, 95, 255, 0.15) !important; 
+            color: var(--primary-color) !important; 
+            animation: pulse-blue 1.5s infinite !important;
+            box-shadow: none; /* remove default shadow when playing */
+        }
         
-        /* 老师录音播放 */
-        .btn-play-teacher { background: #ECFDF5; color: var(--success-color); }
+        .btn-mic { color: var(--danger-color); background: rgba(254, 242, 242, 0.9);}
+        .btn-mic.recording { background: var(--danger-color); color: white; animation: pulse-red 1.5s infinite; }
 
-        @keyframes pulse-blue {
-            0% { box-shadow: 0 0 0 0 rgba(31, 95, 255, 0.4); }
-            70% { box-shadow: 0 0 0 12px rgba(31, 95, 255, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(31, 95, 255, 0); }
-        }
         @keyframes pulse-red {
             0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
             70% { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
             100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
-
-        /* 裁定操作按钮 */
-        .action-text-btn { 
-            display: inline-flex; align-items: center; gap: 4px; /* 加入 flex 使图标和文字精准居中对齐 */
-            font-size: 13px; border: none; cursor: pointer; padding: 6px 14px; border-radius: 20px; transition: all 0.2s ease;
+        @keyframes pulse-blue {
+            0% { box-shadow: 0 0 0 0 rgba(31, 95, 255, 0.5); }
+            70% { box-shadow: 0 0 0 12px rgba(31, 95, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(31, 95, 255, 0); }
         }
-        .action-text-btn.default { background: #F1F5F9; color: var(--text-secondary); font-weight: 500; }
-        .action-text-btn.default:hover { background: #E2E8F0; }
-        .action-text-btn.adopt { background: var(--primary-light); color: var(--primary-color); font-weight: 600; }
-        .action-text-btn.danger { background: #FEF2F2; color: var(--danger-color); font-weight: 600; }
 
-        /* 通用小图标与状态指示圆点 */
-        .icon-sm { width: 14px; height: 14px; }
-        .status-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
-        .dot-primary { background: var(--primary-color); }
-        .dot-danger { background: var(--danger-color); }
-        .dot-success { background: var(--success-color); }
-        .dot-secondary { background: var(--text-secondary); }
+        .version-history {
+            display: none; font-size: 13px; color: var(--text-secondary); 
+            background: rgba(255,255,255,0.5); border-top: 1px solid rgba(0,0,0,0.05);
+            padding: 12px 0 0 0; margin-top: 16px; gap: 8px; flex-direction: column;
+        }
+        .version-history.show { display: flex; }
+        .version-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(255,255,255,0.7); border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);}
+        .v-meta { display: flex; gap: 12px; align-items: center;}
+        .v-actions { display: flex; gap: 12px; align-items: center;}
+        .v-btn { background: none; border: none; color: var(--text-title); cursor: pointer; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: #F1F5F9;}
+        .v-btn svg { width: 14px; height: 14px; fill: currentColor; }
+        .v-btn-text { font-size: 13px; font-weight: 600; color: var(--danger-color); background: none; border: none; cursor: pointer;}
 
-        /* 全局轻提示 Toast */
+        .toggle-history { font-size: 14px; color: var(--primary-color); cursor: pointer; text-align: left; margin-top: 16px; display: inline-block; font-weight: 600;}
+
         .toast {
-            position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.75); color: white; padding: 12px 24px; border-radius: 12px;
-            font-size: 14px; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 100;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); backdrop-filter: blur(4px);
+            position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(15, 23, 42, 0.85); color: white; padding: 14px 24px; border-radius: 12px;
+            font-size: 15px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 100;
+            backdrop-filter: blur(8px); box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
         .toast.show { opacity: 1; }
+        
+        /* Custom Modal Box */
+        .modal-overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+            display: none; justify-content: center; align-items: center; z-index: 200;
+            border-radius: 40px;
+        }
+        .modal-overlay.show { display: flex; }
+        
+        .modal-box {
+            background: rgba(255,255,255,0.95); padding: 24px; border-radius: 20px;
+            width: 80%; max-width: 300px; text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.5);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .modal-title { font-size: 18px; font-weight: 700; color: var(--text-title); margin-bottom: 8px;}
+        .modal-desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5;}
+        .modal-actions { display: flex; gap: 12px; }
+        .modal-btn { 
+            flex: 1; padding: 12px; border-radius: 12px; font-size: 15px; font-weight: 600; border: none; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-cancel { background: #F1F5F9; color: var(--text-main); }
+        .btn-cancel:active { background: #E2E8F0; }
+        .btn-confirm { background: var(--danger-color); color: white; }
+        .btn-confirm:active { background: #DC2626; }
 
-        /* SVG 图标库预设 */
-        .svg-icon { width: 20px; height: 20px; }
+        .floating-player {
+            position: absolute; bottom: 32px; left: 20px; right: 20px; 
+            background: rgba(31, 95, 255, 0.95); 
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            color: white; border-radius: 24px; padding: 20px 24px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            box-shadow: 0 16px 40px rgba(31, 95, 255, 0.4); z-index: 50;
+            transform: translateY(150%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .floating-player.show { transform: translateY(0); }
+        .fp-info { display: flex; flex-direction: column; }
+        .fp-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+        .fp-progress { font-size: 14px; opacity: 0.9; font-weight: 500;}
+        .fp-controls { display: flex; gap: 16px; align-items: center; }
+        .fp-btn { background: rgba(255,255,255,0.2); border-radius: 50%; border: none; color: white; cursor: pointer; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;}
+        .fp-btn:active { background: rgba(255,255,255,0.3); }
+        .fp-btn svg { width: 22px; height: 22px; fill: currentColor; }
+        .fp-btn.close-btn { background: transparent; width: 32px; height: 32px;}
+
     </style>
 </head>
 <body>
 
 <div class="device-simulator">
-    <!-- 顶部栏 -->
     <div class="nav-bar">
         <div class="icon-btn">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
         </div>
-        <div class="nav-title">音频审听台</div>
-        <div class="icon-btn">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <div class="nav-title-group">
+            <div class="nav-title">英语音频校对</div>
         </div>
+        <div class="icon-btn"></div>
     </div>
 
-    <!-- 主体区域 -->
     <div class="main-content">
-        <!-- 统计看板 -->
-        <div class="stats-card">
+        <div class="stats-card glass-panel">
             <div class="stat-item">
-                <div class="stat-value" style="color: var(--text-main);">120</div>
-                <div class="stat-label">总词汇</div>
+                <div class="stat-value" id="stat-total">3000</div>
+                <div class="stat-label">总词数</div>
             </div>
             <div class="stat-item">
-                <div class="stat-value" style="color: var(--primary-color);">85</div>
-                <div class="stat-label">已审核</div>
+                <div class="stat-value" id="stat-recorded" style="color: var(--primary-color);">2450</div>
+                <div class="stat-label">已录音</div>
             </div>
             <div class="stat-item">
-                <div class="stat-value" style="color: var(--text-secondary);">35</div>
-                <div class="stat-label">待审核</div>
+                <div class="stat-value" id="stat-unrecorded" style="color: var(--danger-color);">550</div>
+                <div class="stat-label">未录音</div>
             </div>
         </div>
 
-        <!-- 吸顶容器包裹：搜索 + 筛选 + 列表操作 -->
         <div class="sticky-toolbar">
-            <!-- 搜索与筛选 -->
             <div class="search-bar">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input type="text" placeholder="输入关键字搜索...">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="searchInput" placeholder="搜索词汇...">
             </div>
 
-            <!-- 筛选器 -->
-            <div class="filter-group">
-                <div class="filter-chip active">全部</div>
-                <div class="filter-chip">无音频</div>
-                <div class="filter-chip">有音频</div>
-                <div class="filter-chip">需重录</div>
-            </div>
-
-            <!-- 录音任务列表（批次） -->
-            <div class="list-header">
-                <div class="list-title">待审清单 <span style="font-size: 13px; font-weight: normal; color: var(--text-secondary);">3/10</span></div>
-                <div style="display: flex; gap: 14px; align-items: center;">
-                    <div class="switch-wrap">
-                        连续审听
-                        <div class="switch" onclick="toggleSwitch(this)"></div>
-                    </div>
-                    <button class="btn-refresh" onclick="refreshList()">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-                    </button>
+            <div class="filter-row">
+                <div class="filter-group">
+                    <div class="filter-chip active" data-filter="all" id="filter-chip-all">全部</div>
+                    <div class="filter-chip" data-filter="unrecorded" id="filter-chip-unrecorded">未录音</div>
+                    <div class="filter-chip" data-filter="recorded" id="filter-chip-recorded">已录音</div>
+                    <div class="filter-chip needs-rerecord-chip" data-filter="needs_rerecord" id="filter-chip-needs-rerecord">需重录</div>
                 </div>
+            </div>
+
+            <div class="list-header">
+                <div class="list-title">词汇列表 <span style="font-size: 14px; font-weight: 500; color: var(--text-secondary);" id="list-count"></span></div>
+                <button class="btn-play-all" onclick="startAutoPlay()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> 连播当前项
+                </button>
             </div>
         </div>
 
-        <div class="word-list">
-            <!-- 词条1：无音频 -->
-            <div class="word-item">
-                <div class="word-info">
-                    <div class="word-text">Apple</div>
-                    <div class="word-status">无音频</div>
-                </div>
-                <div class="actions">
-                    <button class="action-text-btn danger" onclick="startRecord(this)">
-                        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>录音
-                    </button>
-                </div>
-            </div>
+        <div class="word-list" id="wordListContainer">
+            <!-- Items dynamically generated -->
+        </div>
+    </div>
 
-            <!-- 词条2：有音频 -->
-            <div class="word-item">
-                <div class="word-info">
-                    <div class="word-text">Banana</div>
-                    <div class="word-status">有音频</div>
-                </div>
-                <div class="actions">
-                    <button class="btn-record btn-play" onclick="playSystemAudio(this)">
-                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    </button>
-                </div>
-            </div>
-
-            <!-- 词条3：有音频(已通过) -->
-            <div class="word-item">
-                <div class="word-info">
-                    <div class="word-text">Classroom</div>
-                    <div class="word-status" style="color: var(--success-color);">审核通过 0:02</div>
-                </div>
-                <div class="actions">
-                    <button class="action-text-btn default" onclick="startRecord(this)">重录</button>
-                    <button class="btn-record btn-play" onclick="showToast('正在播放系统音频')">
-                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    </button>
-                </div>
-            </div>
-            
-            <!-- 词条4：需重录 -->
-            <div class="word-item">
-                <div class="word-info">
-                    <div class="word-text">Morning</div>
-                    <div class="word-status" style="color: var(--danger-color);">需重录</div>
-                </div>
-                <div class="actions">
-                    <button class="action-text-btn default" onclick="startRecord(this)">重录</button>
-                    <button class="btn-record btn-play-teacher" onclick="showToast('正在播放待替换音频')">
-                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    </button>
-                </div>
-            </div>
-
-            <!-- 词条5：无音频 (新增展示展示拉长效果) -->
-            <div class="word-item">
-                <div class="word-info">
-                    <div class="word-text">Orange</div>
-                    <div class="word-status">无音频</div>
-                </div>
-                <div class="actions">
-                    <button class="action-text-btn danger" onclick="startRecord(this)">
-                        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>录音
-                    </button>
-                </div>
-            </div>
-
-            <!-- 词条6：无音频 (新增展示拉长效果) -->
-            <div class="word-item">
-                <div class="word-info">
-                    <div class="word-text">Grape</div>
-                    <div class="word-status">无音频</div>
-                </div>
-                <div class="actions">
-                    <button class="action-text-btn danger" onclick="startRecord(this)">
-                        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>录音
-                    </button>
-                </div>
-            </div>
-
-            <!-- 以下为新增的测试数据，用于撑开列表体验吸顶效果 -->
-            <div class="word-item">
-                <div class="word-info">
-                    <div class="word-text">Watermelon</div>
-                    <div class="word-status">有音频</div>
-                </div>
-                <div class="actions">
-                    <button class="btn-record btn-play" onclick="playSystemAudio(this)">
-                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    </button>
-                </div>
-            </div>
-
-            <div class="word-item">
-                <div class="word-info">
-                    <div class="word-text">Teacher</div>
-                    <div class="word-status" style="color: var(--success-color);">审核通过 0:02</div>
-                </div>
-                <div class="actions">
-                    <button class="action-text-btn default" onclick="startRecord(this)">重录</button>
-                    <button class="btn-record btn-play" onclick="showToast('正在播放系统音频')">
-                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    </button>
-                </div>
-            </div>
-
-            <div class="word-item">
-                <div class="word-info">
-                    <div class="word-text">Student</div>
-                    <div class="word-status" style="color: var(--danger-color);">需重录</div>
-                </div>
-                <div class="actions">
-                    <button class="action-text-btn default" onclick="startRecord(this)">重录</button>
-                    <button class="btn-record btn-play-teacher" onclick="showToast('正在播放待替换音频')">
-                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    </button>
-                </div>
-            </div>
-
-            <div class="word-item">
-                <div class="word-info">
-                    <div class="word-text">School</div>
-                    <div class="word-status">无音频</div>
-                </div>
-                <div class="actions">
-                    <button class="action-text-btn danger" onclick="startRecord(this)">
-                        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>录音
-                    </button>
-                </div>
-            </div>
-
-            <div class="word-item">
-                <div class="word-info">
-                    <div class="word-text">Book</div>
-                    <div class="word-status">有音频</div>
-                </div>
-                <div class="actions">
-                    <button class="btn-record btn-play" onclick="playSystemAudio(this)">
-                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    </button>
-                </div>
-            </div>
-
-            <div class="word-item">
-                <div class="word-info">
-                    <div class="word-text">Pencil</div>
-                    <div class="word-status">无音频</div>
-                </div>
-                <div class="actions">
-                    <button class="action-text-btn danger" onclick="startRecord(this)">
-                        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>录音
-                    </button>
-                </div>
-            </div>
-
-            <div class="word-item">
-                <div class="word-info">
-                    <div class="word-text">Eraser</div>
-                    <div class="word-status" style="color: var(--success-color);">审核通过 0:03</div>
-                </div>
-                <div class="actions">
-                    <button class="action-text-btn default" onclick="startRecord(this)">重录</button>
-                    <button class="btn-record btn-play" onclick="showToast('正在播放系统音频')">
-                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    </button>
-                </div>
-            </div>
-
-            <div class="word-item">
-                <div class="word-info">
-                    <div class="word-text">Ruler</div>
-                    <div class="word-status">有音频</div>
-                </div>
-                <div class="actions">
-                    <button class="btn-record btn-play" onclick="playSystemAudio(this)">
-                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    </button>
-                </div>
-            </div>
-
-            <div class="word-item">
-                <div class="word-info">
-                    <div class="word-text">Desk</div>
-                    <div class="word-status">无音频</div>
-                </div>
-                <div class="actions">
-                    <button class="action-text-btn danger" onclick="startRecord(this)">
-                        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>录音
-                    </button>
-                </div>
-            </div>
-            
-            <div class="word-item">
-                <div class="word-info">
-                    <div class="word-text">Chair</div>
-                    <div class="word-status">有音频</div>
-                </div>
-                <div class="actions">
-                    <button class="btn-record btn-play" onclick="playSystemAudio(this)">
-                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    </button>
-                </div>
+    <div class="toast" id="sys-toast">提示信息</div>
+    
+    <!-- Custom Modal -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-box">
+            <div class="modal-title">取消重录标记</div>
+            <div class="modal-desc">确定要取消该音频的需重录标记吗？</div>
+            <div class="modal-actions">
+                <button class="modal-btn btn-cancel" onclick="closeModal()">取消</button>
+                <button class="modal-btn btn-confirm" id="modalConfirmBtn">确定</button>
             </div>
         </div>
     </div>
 
-    <!-- 全局提示框 -->
-    <div class="toast" id="sys-toast">提示信息</div>
+    <div class="floating-player" id="floatingPlayer">
+        <div class="fp-info">
+            <div class="fp-title" id="fpTitle">播放中...</div>
+        </div>
+        <div class="fp-controls">
+            <button class="fp-btn" id="fpPauseBtn" onclick="togglePauseAutoPlay()">
+                <svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            </button>
+            <button class="fp-btn close-btn" onclick="stopAutoPlay()">
+                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </button>
+        </div>
+    </div>
 </div>
 
 <script>
-    // ---------------- 基础 UI 交互 ----------------
-    // 综合过滤逻辑（支持筛选标签和搜索框联动）
-    function applyFilters() {
-        const activeFilter = document.querySelector('.filter-chip.active').innerText.trim();
-        const searchQuery = document.querySelector('.search-bar input').value.trim().toLowerCase();
-        const items = document.querySelectorAll('.word-item');
+    const iconMic = `<svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>`;
+    const iconStop = `<svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" ry="2"></rect></svg>`;
+    const iconPlay = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+    const iconPause = `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+    const iconFlag = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>`;
 
-        items.forEach(item => {
-            const wordText = item.querySelector('.word-text').innerText.toLowerCase();
-            const statusText = item.querySelector('.word-status').innerText;
+    const CURRENT_USER_NAME = "张三"; 
+    
+    let sysTotal = 3000;
+    let sysRecorded = 2450;
+    let sysUnrecorded = 550;
+    let sysNeedsRerecord = 18; // 模拟系统中需重录的宏观总数
+
+    let wordsData = [
+        { id: 1, text: "Apple", needsRerecord: false, versions: [{ v: 'v1', audio: null, duration: 0, creator: CURRENT_USER_NAME }], aiAudioDuration: 0 }, 
+        { id: 2, text: "Banana", needsRerecord: false, versions: [{ v: 'v1', audio: 'url', duration: 2, creator: CURRENT_USER_NAME }], aiAudioDuration: 2 }, 
+        { id: 3, text: "Classroom", needsRerecord: true, versions: [{ v: 'v1', audio: 'url', duration: 3, creator: '赖金华' }], aiAudioDuration: 3 }, 
+        { id: 4, text: "Morning", needsRerecord: false, versions: [{ v: 'v1', audio: null, duration: 0, creator: CURRENT_USER_NAME }], aiAudioDuration: 2 }, 
+        { id: 5, text: "Orange", needsRerecord: false, versions: [{ v: 'v1', audio: 'url', duration: 2, creator: CURRENT_USER_NAME }], aiAudioDuration: 2 },
+        { id: 6, text: "Grape", needsRerecord: false, versions: [{ v: 'v1', audio: null, duration: 0, creator: CURRENT_USER_NAME }], aiAudioDuration: 0 },
+        { id: 7, text: "Watermelon", needsRerecord: false, versions: [{ v: 'v1', audio: 'url', duration: 4, creator: CURRENT_USER_NAME }], aiAudioDuration: 4 },
+        { id: 8, text: "Teacher", needsRerecord: false, versions: [{ v: 'v1', audio: 'url', duration: 2, creator: '洪登耀' }], aiAudioDuration: 2 },
+        { id: 9, text: "Student", needsRerecord: false, versions: [{ v: 'v0', audio: null, duration: 0, creator: 'System' }], aiAudioDuration: 3 } 
+    ];
+
+    let currentFilter = 'all';
+    let currentSearch = '';
+
+    function renderList(expandedItemId = null) {
+        const container = document.getElementById('wordListContainer');
+        container.innerHTML = '';
+        
+        let visibleCount = 0;
+        
+        document.getElementById('stat-total').innerText = sysTotal;
+        document.getElementById('stat-recorded').innerText = sysRecorded;
+        document.getElementById('stat-unrecorded').innerText = sysUnrecorded;
+
+        wordsData.forEach(item => {
+            const currentVersion = item.versions[item.versions.length - 1];
+            const hasUserAudio = currentVersion.audio !== null;
+            const hasAIAudio = item.aiAudioDuration > 0;
+
+            let matchFilter = true;
+            if (currentFilter === 'unrecorded' && hasUserAudio) matchFilter = false;
+            if (currentFilter === 'recorded' && !hasUserAudio) matchFilter = false;
+            if (currentFilter === 'needs_rerecord' && !item.needsRerecord) matchFilter = false;
+            if (currentSearch && !item.text.toLowerCase().includes(currentSearch)) matchFilter = false;
+
+            if (!matchFilter) return;
+            visibleCount++;
+
+            const div = document.createElement('div');
+            div.className = `word-item glass-panel`;
+            div.id = `word-${item.id}`;
             
-            // 1. 检查状态筛选
-            let matchesStatus = false;
-            if (activeFilter === '全部') {
-                matchesStatus = true;
-            } else if (activeFilter === '无音频') {
-                matchesStatus = statusText.includes('无音频');
-            } else if (activeFilter === '有音频') {
-                // "有音频"和"审核通过"都属于有音频的范畴
-                matchesStatus = statusText.includes('有音频') || statusText.includes('审核通过');
-            } else if (activeFilter === '需重录') {
-                matchesStatus = statusText.includes('需重录');
+            let historyHtml = '';
+            const userVersions = item.versions.filter(v => v.audio);
+            if (userVersions.length > 0) {
+                let rows = userVersions.map((v, index) => {
+                    const isMyVersion = v.creator === CURRENT_USER_NAME;
+                    return `
+                        <div class="version-row">
+                            <div class="v-meta">
+                                <span style="font-weight:700; color:var(--text-title);">${v.v}</span>
+                                <span>0:0${v.duration}</span>
+                                <span style="color:var(--text-secondary)">by ${v.creator}</span>
+                            </div>
+                            <div class="v-actions">
+                                <button class="v-btn" onclick="playMockAudio(this, ${v.duration})" title="试听版本">${iconPlay}</button>
+                                ${isMyVersion ? `<button class="v-btn-text" onclick="deleteVersion(${item.id}, ${index})">删除</button>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                const isExpanded = expandedItemId === item.id;
+                historyHtml = `
+                    <span class="toggle-history" onclick="toggleHistory(this)">
+                        查看版本记录 (${userVersions.length}) ${isExpanded ? '▴' : '▾'}
+                    </span>
+                    <div class="version-history ${isExpanded ? 'show' : ''}">${rows}</div>
+                `;
             }
 
-            // 2. 检查搜索词模糊匹配
-            let matchesSearch = wordText.includes(searchQuery);
-
-            // 3. 控制单词条目的显隐
-            if (matchesStatus && matchesSearch) {
-                item.style.display = 'flex';
+            let statusText = '';
+            if (hasUserAudio) {
+                 statusText = `已录音 (0:0${currentVersion.duration})`;
+                 if (item.needsRerecord) {
+                    statusText = `待重录 (0:0${currentVersion.duration})`;
+                 }
             } else {
-                item.style.display = 'none';
+                 statusText = `<span class="status-unrecorded">未录音</span>`;
+                 if (hasAIAudio) {
+                     statusText += ` <span style="font-size:13px; color:var(--text-secondary)">(AI生成音)</span>`;
+                 }
             }
+
+            let markBtnHtml = '';
+            if (hasUserAudio) {
+                if (item.needsRerecord) {
+                     markBtnHtml = `<button class="btn-mark-rerecord marked" onclick="promptCancelRerecord(${item.id})">${iconFlag} 需重录</button>`;
+                } else {
+                     markBtnHtml = `<button class="btn-mark-rerecord" onclick="toggleMarkRerecord(${item.id})">${iconFlag} 标为重录</button>`;
+                }
+            }
+
+            let playBtnHtml = '';
+            if (hasUserAudio) {
+                playBtnHtml = `<button class="btn-record btn-play" onclick="handlePlayClick(this, ${currentVersion.duration}, false)">${iconPlay}</button>`;
+            } else if (hasAIAudio) {
+                playBtnHtml = `<button class="btn-record btn-play" onclick="handlePlayClick(this, ${item.aiAudioDuration}, true)" title="试听AI生成音">${iconPlay}</button>`;
+            }
+
+            let recordBtnHtml = `
+                <button class="btn-record btn-mic" onclick="toggleRecord(this, ${item.id})">${iconMic}</button>
+            `;
+
+            let badgeHtml = hasUserAudio ? `<span class="badge">${currentVersion.v}</span>` : '';
+
+            div.innerHTML = `
+                <div class="word-main">
+                    <div class="word-info">
+                        <div class="word-index">${item.id}.</div>
+                        <div class="word-text-group">
+                            <div class="word-text">
+                                ${item.text} ${badgeHtml}
+                            </div>
+                            <div class="word-status">
+                                ${statusText} ${markBtnHtml}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        ${playBtnHtml}
+                        ${recordBtnHtml}
+                    </div>
+                </div>
+                ${historyHtml}
+            `;
+            container.appendChild(div);
         });
+        
+        let displayCount = 0;
+        if (currentFilter === 'all') displayCount = sysTotal;
+        else if (currentFilter === 'unrecorded') displayCount = sysUnrecorded;
+        else if (currentFilter === 'recorded') displayCount = sysRecorded;
+        else if (currentFilter === 'needs_rerecord') displayCount = sysNeedsRerecord;
+
+        if (currentSearch) {
+            document.getElementById('list-count').innerText = `${visibleCount} 项结果`;
+        } else {
+            document.getElementById('list-count').innerText = `${displayCount} 项结果`;
+        }
     }
 
-    // 筛选器点击交互
-    document.querySelectorAll('.filter-chip').forEach(chip => {
-        chip.addEventListener('click', function() {
-            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-            this.classList.add('active');
-            applyFilters(); // 触发联动过滤
-        });
-    });
-
-    // 搜索框输入交互：实时监听输入并过滤
-    const searchInput = document.querySelector('.search-bar input');
-    if (searchInput) {
-        searchInput.addEventListener('input', applyFilters);
+    function toggleHistory(btn) {
+        const historyDiv = btn.nextElementSibling;
+        if(historyDiv.classList.contains('show')) {
+            historyDiv.classList.remove('show');
+            btn.innerHTML = btn.innerHTML.replace('▴', '▾');
+        } else {
+            historyDiv.classList.add('show');
+            btn.innerHTML = btn.innerHTML.replace('▾', '▴');
+        }
     }
 
-    // 换一批交互
-    function refreshList() {
-        const btn = document.querySelector('.btn-refresh svg');
-        btn.style.transition = 'transform 0.5s';
-        btn.style.transform = 'rotate(360deg)';
-        setTimeout(() => { btn.style.transition = 'none'; btn.style.transform = 'rotate(0deg)'; }, 500);
-    }
-
-    // Toast 提示框
     function showToast(msg, duration = 2000) {
         let toast = document.getElementById('sys-toast');
         toast.innerText = msg;
         toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), duration);
     }
-
-    // ---------------- 核心业务逻辑交互 ----------------
-    let isContinuousMode = false;
-
-    // 预设高品质 SVG 图标模板，取代原有 Emoji
-    const iconMic = `<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>`;
-    const iconCheck = `<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-    const iconStop = `<svg class="svg-icon" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2" ry="2"></rect></svg>`;
-    const iconPlay = `<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
-
-    // 切换连续审听模式
-    function toggleSwitch(el) {
-        el.classList.toggle('active');
-        isContinuousMode = el.classList.contains('active');
-        showToast(isContinuousMode ? "已开启连续审听模式" : "已关闭连续审听");
-    }
-
-    // 1. 播放系统原始发音
-    function playSystemAudio(btn) {
-        let container = btn.parentElement;
-        let status = container.parentElement.querySelector('.word-status');
+    
+    // Modal Logic
+    let pendingItemIdForModal = null;
+    
+    function promptCancelRerecord(itemId) {
+        pendingItemIdForModal = itemId;
+        document.getElementById('confirmModal').classList.add('show');
         
-        // 播放动效
-        btn.classList.add('playing-ai');
-        status.innerHTML = '<span class="status-dot dot-primary"></span>正在试听发音...';
-        status.style.color = 'var(--primary-color)';
-        
-        // 模拟音频播放结束
-        setTimeout(() => {
-            btn.classList.remove('playing-ai');
-            
-            // 展现裁定按钮 (增加重播按钮)
-            container.innerHTML = `
-                <button class="action-text-btn default" onclick="replaySystemAudio(this)" title="重播" style="padding: 6px 10px;">${iconPlay}</button>
-                <button class="action-text-btn adopt" onclick="adoptAudio(this)">${iconCheck}通过</button>
-                <button class="action-text-btn danger" onclick="startRecord(this)">${iconMic}重录</button>
-            `;
-            status.innerHTML = '<span class="status-dot dot-danger"></span>待裁定';
-            status.style.color = 'var(--danger-color)';
-
-            // 如果开启了连续审听，模拟老师没操作，1秒后自动采纳
-            if (isContinuousMode) {
-                setTimeout(() => {
-                    let adoptBtn = container.querySelector('.adopt');
-                    if(adoptBtn) adoptAudio(adoptBtn); // 自动采纳并静默上传
-                }, 1000);
+        // Setup confirm action
+        document.getElementById('modalConfirmBtn').onclick = () => {
+            if (pendingItemIdForModal !== null) {
+                toggleMarkRerecord(pendingItemIdForModal, false);
             }
-        }, 1500);
+            closeModal();
+        };
+    }
+    
+    function closeModal() {
+        document.getElementById('confirmModal').classList.remove('show');
+        pendingItemIdForModal = null;
     }
 
-    // 1.5 重播当前正在裁定的音频
-    function replaySystemAudio(btn) {
-        let container = btn.parentElement;
-        let status = container.parentElement.querySelector('.word-status');
-        
-        // 改变状态显示正在重播
-        status.innerHTML = '<span class="status-dot dot-primary"></span>正在重播...';
-        status.style.color = 'var(--primary-color)';
-        btn.style.background = 'var(--primary-light)';
-        btn.style.color = 'var(--primary-color)';
-        
-        // 模拟重播结束，恢复裁定状态
-        setTimeout(() => {
-            status.innerHTML = '<span class="status-dot dot-danger"></span>待裁定';
-            status.style.color = 'var(--danger-color)';
-            btn.style.background = '';
-            btn.style.color = '';
-        }, 1500);
+    function toggleMarkRerecord(itemId, forceState = null) {
+        const item = wordsData.find(w => w.id === itemId);
+        if (item) {
+            const oldState = item.needsRerecord;
+            item.needsRerecord = forceState !== null ? forceState : !item.needsRerecord;
+            
+            if (!oldState && item.needsRerecord) sysNeedsRerecord++;
+            if (oldState && !item.needsRerecord) sysNeedsRerecord--;
+            
+            showToast(item.needsRerecord ? '已标记为需重录' : '已取消需重录标记');
+            renderList();
+        }
     }
 
-    // 2. 采纳发音 (静默上传)
-    function adoptAudio(btn) {
-        let container = btn.parentElement;
-        let status = container.parentElement.querySelector('.word-status');
-        
-        status.innerHTML = '<span class="status-dot dot-secondary"></span>确认中...';
-        status.style.color = 'var(--text-secondary)';
-        
-        // 模拟网络请求
-        setTimeout(() => {
-            status.innerText = '审核通过 0:02';
-            status.style.color = 'var(--success-color)';
-            // 恢复为正常展示态
-            container.innerHTML = `
-                <button class="action-text-btn default" onclick="startRecord(this)">重录</button>
-                <button class="btn-record btn-play" onclick="showToast('正在播放系统音频')">
-                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                </button>
-            `;
-        }, 600);
+    let activeRecordingBtn = null;
+    let recordingTimer = null;
+
+    function toggleRecord(btn, itemId) {
+        if(autoPlayInterval) stopAutoPlay();
+
+        const itemData = wordsData.find(w => w.id === itemId);
+        const userVersions = itemData.versions.filter(v => v.audio);
+        const lastUserVersionStr = userVersions.length > 0 ? userVersions[userVersions.length - 1].v : 'v0';
+        const statusDiv = btn.closest('.word-item').querySelector('.word-status');
+
+        if (btn.classList.contains('recording')) {
+            clearInterval(recordingTimer);
+            btn.classList.remove('recording');
+            btn.innerHTML = iconMic;
+            statusDiv.innerHTML = '<span style="color:var(--text-secondary); font-size: 14px;">正在上传生成...</span>';
+            
+            setTimeout(() => {
+                const userVersionsBefore = itemData.versions.filter(v => v.audio).length;
+                let newDuration = Math.floor(Math.random() * 3) + 2; 
+                const currentVNum = parseInt(lastUserVersionStr.replace('v', ''));
+                const newVStr = `v${currentVNum + 1}`;
+                
+                itemData.versions.push({ 
+                    v: newVStr, 
+                    audio: 'url', 
+                    duration: newDuration, 
+                    creator: CURRENT_USER_NAME 
+                });
+
+                if (userVersionsBefore === 0) {
+                    sysRecorded++;
+                    sysUnrecorded--;
+                }
+
+                if (itemData.needsRerecord) {
+                    itemData.needsRerecord = false;
+                    sysNeedsRerecord--;
+                }
+                
+                showToast(`已成功录制 ${newVStr} 版本`);
+                renderList(itemId); 
+            }, 800);
+
+            activeRecordingBtn = null;
+        } else {
+            if (activeRecordingBtn) toggleRecord(activeRecordingBtn, parseInt(activeRecordingBtn.dataset.itemId));
+            
+            btn.classList.add('recording');
+            btn.innerHTML = iconStop; 
+            btn.dataset.itemId = itemId; 
+            activeRecordingBtn = btn;
+            
+            let seconds = 0;
+            statusDiv.innerHTML = `<span style="color:var(--danger-color); font-weight:700; font-size: 14px;">录制中 0:00</span>`;
+            
+            recordingTimer = setInterval(() => {
+                seconds++;
+                statusDiv.innerHTML = `<span style="color:var(--danger-color); font-weight:700; font-size: 14px;">录制中 0:0${seconds}</span>`;
+            }, 1000);
+        }
     }
 
-    // 3. 老师打回，自己重录
-    function startRecord(btn) {
-        let container = btn.parentElement;
-        let status = container.parentElement.querySelector('.word-status');
+    function deleteVersion(itemId, versionIndex) {
+        // Fallback to basic confirm for destructive action if user bypasses custom modal
+        // Since we are not strictly banning confirm for *all* cases, but I'll make a second modal if strictly required. 
+        // For simplicity and matching typical patterns, deletion usually keeps a native confirm or separate modal. Let's stick to the rule and use a modal.
         
-        // 防错机制：覆盖自己录音时提醒
-        if (status.innerText.includes('重录') || status.innerText.includes('审核通过')) {
-            if(!confirm("这将覆盖现有的音频，确认要重录吗？")) return;
+        // Let's reuse the modal for deletion.
+        document.getElementById('confirmModal').querySelector('.modal-title').innerText = '删除版本';
+        document.getElementById('confirmModal').querySelector('.modal-desc').innerText = '确定要永久删除这个录音版本吗？';
+        document.getElementById('confirmModal').classList.add('show');
+        
+        document.getElementById('modalConfirmBtn').onclick = () => {
+             const itemData = wordsData.find(w => w.id === itemId);
+             const userVersions = itemData.versions.filter(v => v.audio);
+             const versionToDelete = userVersions[versionIndex];
+             const originalIndex = itemData.versions.indexOf(versionToDelete);
+             
+             if (originalIndex > -1) {
+                 const hasAudioBefore = itemData.versions.some(v => v.audio);
+                 itemData.versions.splice(originalIndex, 1);
+                 const hasAudioAfter = itemData.versions.some(v => v.audio);
+                 
+                 if (hasAudioBefore && !hasAudioAfter) {
+                     sysRecorded--;
+                     sysUnrecorded++;
+                     if (itemData.needsRerecord) {
+                         itemData.needsRerecord = false;
+                         sysNeedsRerecord--;
+                     }
+                 }
+                 
+                 showToast('版本已删除');
+                 renderList(itemId);
+             }
+             
+             closeModal();
+             // reset modal texts
+             setTimeout(()=>{
+                 document.getElementById('confirmModal').querySelector('.modal-title').innerText = '取消重录标记';
+                 document.getElementById('confirmModal').querySelector('.modal-desc').innerText = '确定要取消该音频的需重录标记吗？';
+             }, 300);
+        }
+    }
+
+    let currentlyPlayingBtn = null;
+    let autoPlayQueue = [];
+    let autoPlayIndex = 0;
+    let isAutoPlaying = false;
+    let isAutoPlayPaused = false;
+    let autoPlayInterval = null;
+
+    function handlePlayClick(btn, duration, isAIAudio = false) {
+        if (isAutoPlaying) stopAutoPlay();
+        
+        if (isAIAudio) {
+            showToast("正在试听AI生成音");
         }
 
-        // 变成录音状态
-        container.innerHTML = `
-            <button class="btn-record recording" onclick="finishRecord(this)">
-                ${iconStop}
-            </button>
-        `;
-        status.innerHTML = '<span class="status-dot dot-danger"></span>正在录音... (点击停止)';
-        status.style.color = 'var(--danger-color)';
+        playMockAudio(btn, duration);
     }
 
-    // 4. 老师录音完毕 (静默上传)
-    function finishRecord(btn) {
-        let container = btn.parentElement;
-        let status = container.parentElement.querySelector('.word-status');
-        
-        btn.classList.remove('recording');
-        status.innerHTML = '<span class="status-dot dot-secondary"></span>上传中...';
-        status.style.color = 'var(--text-secondary)';
-        
-        // 模拟网络请求
-        setTimeout(() => {
-            showToast('录音替换成功');
-            status.innerText = '审核通过 0:03';
-            status.style.color = 'var(--success-color)';
+    function playMockAudio(btn, duration, onComplete = null) {
+        if (currentlyPlayingBtn && currentlyPlayingBtn !== btn) {
+            currentlyPlayingBtn.classList.remove('playing-ai');
+            currentlyPlayingBtn.innerHTML = iconPlay;
+        }
+
+        currentlyPlayingBtn = btn;
+        btn.classList.add('playing-ai');
+        btn.innerHTML = iconPause;
+
+        clearTimeout(btn.playTimeout);
+        btn.playTimeout = setTimeout(() => {
+            btn.classList.remove('playing-ai');
+            btn.innerHTML = iconPlay;
+            currentlyPlayingBtn = null;
             
-            container.innerHTML = `
-                <button class="action-text-btn default" onclick="startRecord(this)">重录</button>
-                <button class="btn-record btn-play-teacher" onclick="showToast('正在播放重录音频')">
-                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                </button>
-            `;
-        }, 800);
+            if (onComplete) onComplete(); 
+        }, duration * 1000);
     }
+
+    function startAutoPlay() {
+        const visibleItems = Array.from(document.querySelectorAll('.word-item'))
+            .filter(item => item.style.display !== 'none'); 
+        
+        autoPlayQueue = [];
+        visibleItems.forEach(item => {
+            const playBtn = item.querySelector('.btn-play');
+            if (playBtn) {
+                const duration = 2; 
+                // 获取序号和文本，用于组合显示
+                const indexText = item.querySelector('.word-index').innerText.trim();
+                const wordText = item.querySelector('.word-text').childNodes[0].nodeValue.trim();
+                
+                autoPlayQueue.push({
+                    btn: playBtn,
+                    text: `${indexText} ${wordText}`, 
+                    duration: duration,
+                    element: item
+                });
+            }
+        });
+
+        if (autoPlayQueue.length === 0) {
+            showToast('当前列表没有可播放的音频');
+            return;
+        }
+
+        isAutoPlaying = true;
+        isAutoPlayPaused = false;
+        autoPlayIndex = 0;
+        
+        document.getElementById('floatingPlayer').classList.add('show');
+        document.getElementById('fpPauseBtn').innerHTML = iconPause;
+        
+        playNextInQueue();
+    }
+
+    function playNextInQueue() {
+        if (!isAutoPlaying || isAutoPlayPaused) return;
+
+        if (autoPlayIndex >= autoPlayQueue.length) {
+            stopAutoPlay();
+            showToast('列表播放完毕');
+            return;
+        }
+
+        const currentItem = autoPlayQueue[autoPlayIndex];
+        // 标题直接显示组合好的文本 (例如: 2. Banana)
+        document.getElementById('fpTitle').innerText = currentItem.text;
+        
+        currentItem.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        playMockAudio(currentItem.btn, currentItem.duration, () => {
+            if(isAutoPlaying && !isAutoPlayPaused) {
+                autoPlayIndex++;
+                autoPlayInterval = setTimeout(playNextInQueue, 800); 
+            }
+        });
+    }
+
+    function togglePauseAutoPlay() {
+        isAutoPlayPaused = !isAutoPlayPaused;
+        const pauseBtn = document.getElementById('fpPauseBtn');
+        
+        if (isAutoPlayPaused) {
+            pauseBtn.innerHTML = iconPlay;
+            document.getElementById('fpTitle').innerText = `已暂停`;
+            if(currentlyPlayingBtn) {
+                clearTimeout(currentlyPlayingBtn.playTimeout);
+                currentlyPlayingBtn.classList.remove('playing-ai');
+                currentlyPlayingBtn.innerHTML = iconPlay;
+            }
+            clearTimeout(autoPlayInterval);
+        } else {
+            pauseBtn.innerHTML = iconPause;
+            playNextInQueue();
+        }
+    }
+
+    function stopAutoPlay() {
+        isAutoPlaying = false;
+        isAutoPlayPaused = false;
+        clearTimeout(autoPlayInterval);
+        document.getElementById('floatingPlayer').classList.remove('show');
+        
+        if(currentlyPlayingBtn) {
+            clearTimeout(currentlyPlayingBtn.playTimeout);
+            currentlyPlayingBtn.classList.remove('playing-ai');
+            currentlyPlayingBtn.innerHTML = iconPlay;
+        }
+        currentlyPlayingBtn = null;
+    }
+
+    window.onload = () => {
+        document.querySelectorAll('.filter-chip').forEach(chip => {
+            chip.addEventListener('click', (e) => {
+                document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                currentFilter = e.currentTarget.dataset.filter;
+                renderList();
+            });
+        });
+
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                currentSearch = e.target.value.toLowerCase().trim();
+                renderList();
+            });
+        }
+
+        renderList();
+    };
+
 </script>
 </body>
 </html>
