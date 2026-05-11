@@ -3,296 +3,271 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>掌上校园 - AI录音工作台</title>
+    <title>英语音频校对</title>
     <style>
         :root {
-            --primary-color: #1F5FFF; 
+            --primary-color: #1F5FFF;
+            --primary-light: rgba(31, 95, 255, 0.1);
             --bg-start: #EFF6FF;
             --bg-end: #DFE7FF;
-            
-            --text-title: #111827; 
-            --text-main: #374151;
+            --text-title: #111827;
+            --text-main: #334155;
             --text-secondary: #9CA3AF;
             --danger-color: #EF4444;
-            --warning-color: #F59E0B; 
+            --danger-light: #FEF2F2;
             --success-color: #10B981;
-            
-            --glass-bg: rgba(255, 255, 255, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.6);
-            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+            --warning-color: #F59E0B;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
-            background-color: #e2e8f0; 
-            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            background-color: #E2E8F0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
 
         .device-simulator {
-            width: 375px; height: 812px;
+            width: 375px;
+            height: 812px;
             background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
-            position: relative; overflow: hidden; border-radius: 40px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 40px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.15); 
-            display: flex; flex-direction: column;
+            display: flex;
+            flex-direction: column;
         }
         
         .device-simulator::after {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
             border-radius: 40px;
             box-shadow: inset 0 0 0 8px #FFFFFF, inset 0 0 0 9px rgba(0,0,0,0.1);
-            pointer-events: none; z-index: 1000;
+            pointer-events: none;
+            z-index: 1000;
         }
 
+        /* 顶部导航 */
         .nav-bar {
             padding: 54px 20px 16px;
-            display: flex; align-items: center; justify-content: space-between;
-            position: relative; z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            z-index: 10;
         }
         .nav-title-group { display: flex; flex-direction: column; align-items: center; }
-        .nav-title { 
-            font-size: 20px; 
-            font-weight: 700; color: var(--text-title); letter-spacing: 0.5px;
-        }
+        .nav-title { font-size: 20px; font-weight: 800; color: var(--text-title); letter-spacing: 0.5px;}
         .icon-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-title); }
 
         .main-content {
-            flex: 1; display: flex; flex-direction: column; overflow-y: auto;
-            padding: 10px 20px 24px 20px; scrollbar-width: none; position: relative;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 0 20px 20px 20px;
+            scrollbar-width: none;
         }
         .main-content::-webkit-scrollbar { display: none; }
 
-        .glass-panel {
-            background: var(--glass-bg);
+        .stats-card {
+            background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
-        }
-
-        .stats-card {
-            border-radius: 20px; padding: 24px 20px; display: flex; justify-content: space-between;
-            margin-bottom: 24px; flex-shrink: 0;
+            border-radius: 24px;
+            padding: 24px 20px;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(31, 95, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            flex-shrink: 0;
         }
         .stat-item { text-align: center; flex: 1; position: relative; }
         .stat-item:not(:last-child)::after {
-            content: ''; position: absolute; right: 0; top: 20%; height: 60%; width: 1px; background: rgba(0,0,0,0.06);
+            content: ''; position: absolute; right: 0; top: 15%; height: 70%; width: 1px; background: rgba(0,0,0,0.06);
         }
-        .stat-value { font-size: 24px; font-weight: 800; margin-bottom: 4px; color: var(--text-title); }
-        .stat-label { font-size: 13px; color: var(--text-secondary); font-weight: 500;}
+        .stat-value { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
+        .stat-label { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
 
         .sticky-toolbar {
-            position: sticky; top: -10px; z-index: 20;
-            margin: 0 -20px; padding: 10px 20px 10px;
-            background: rgba(239, 246, 255, 0.7); 
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255,255,255,0.4);
+            position: sticky;
+            top: -1px;
+            z-index: 20;
+            margin: 0 -20px;
+            padding: 10px 20px 0;
+            background: rgba(239, 246, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
         }
 
         .search-bar {
-            background: rgba(255, 255, 255, 0.9); border-radius: 16px; padding: 14px 16px;
-            display: flex; align-items: center; margin-bottom: 16px; border: 1px solid rgba(255,255,255,1);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
-        }
-        .search-bar input { border: none; outline: none; margin-left: 10px; font-size: 15px; flex: 1; background: transparent; color: var(--text-title);}
-        .search-bar input::placeholder { color: #9CA3AF; }
-
-        .filter-row { 
-            display: flex; 
-            margin-bottom: 4px; 
-            padding: 4px 4px 16px 4px;
-            margin-left: -4px;
-            margin-right: -4px;
-            overflow-x: auto; 
-            scrollbar-width: none; 
-        }
-        .filter-row::-webkit-scrollbar { display: none; }
-        .filter-group { display: flex; gap: 10px; flex-shrink: 0; min-width: 0; }
-        
-        .filter-chip {
-            padding: 8px 18px; border-radius: 20px; font-size: 14px; font-weight: 600;
-            background: rgba(255,255,255,0.7); color: var(--text-secondary); 
-            transition: all 0.2s ease; cursor: pointer; border: 1px solid transparent; flex-shrink: 0;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-        }
-        .filter-chip.active { 
-            background: var(--primary-color); color: #FFF; 
-            box-shadow: 0 4px 12px rgba(31, 95, 255, 0.3);
-        }
-        .filter-chip.needs-rerecord-chip { color: var(--danger-color); }
-        .filter-chip.needs-rerecord-chip.active { background: var(--danger-color); color: #FFF; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);}
-
-        .list-header { display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; margin-bottom: 8px;}
-        .list-title { font-size: 16px; font-weight: 700; color: var(--text-title); display: flex; align-items: center; gap: 8px;}
-        
-        .btn-play-all {
-            display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 20px;
-            font-size: 14px; font-weight: 600; color: var(--primary-color); background: rgba(31, 95, 255, 0.1);
-            border: 1px solid rgba(31, 95, 255, 0.15); cursor: pointer; transition: all 0.2s;
-        }
-
-        .word-list { flex: 1; display: flex; flex-direction: column; gap: 10px; margin-bottom: 120px; margin-top: 8px;}
-        
-        .word-item {
-            border-radius: 20px; 
-            padding: 20px; 
-            display: flex; flex-direction: column; transition: all 0.3s;
-            position: relative;
-        }
-
-        .word-main { display: flex; justify-content: space-between; align-items: center; }
-        .word-info { flex: 1; display: flex; align-items: flex-start; gap: 12px;}
-        
-        .word-index {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text-secondary);
-            opacity: 0.5;
-            min-width: 24px; 
-            flex-shrink: 0; 
-            margin-top: 2px;
-        }
-
-        .word-text-group { flex: 1; }
-
-        .word-text { font-size: 20px; font-weight: 700; color: var(--text-title); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;}
-        
-        .word-status { 
-            font-size: 14px; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; font-weight: 500;
-            flex-wrap: wrap; 
-        }
-
-        .status-unrecorded { color: var(--warning-color); }
-
-        .badge {
-            font-size: 12px; padding: 2px 8px; border-radius: 6px; font-weight: 600;
-            border: 1px solid rgba(0,0,0,0.1); color: var(--text-secondary); background: rgba(255,255,255,0.7);
-        }
-
-        .btn-mark-rerecord {
-            background: rgba(255,255,255,0.8); border: 1px solid rgba(0,0,0,0.1); color: var(--text-secondary);
-            border-radius: 6px; padding: 4px 8px; font-size: 12px; cursor: pointer; transition: all 0.2s;
-            display: inline-flex; align-items: center; gap: 4px; font-weight: 600;
-            white-space: nowrap; 
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 16px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.8);
             flex-shrink: 0;
         }
-        .btn-mark-rerecord.marked { background: var(--danger-color); border-color: var(--danger-color); color: white; }
+        .search-bar input { border: none; outline: none; margin-left: 10px; font-size: 15px; flex: 1; background: transparent; color: var(--text-title); }
+        .search-bar input::placeholder { color: var(--text-secondary); }
 
-        .actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; margin-left: 10px;}
+        .filter-row {
+            display: flex; gap: 10px; margin-bottom: 16px; 
+            overflow-x: auto; padding-bottom: 8px; padding-top: 2px;
+            margin-left: -4px; padding-left: 4px; padding-right: 4px;
+            scrollbar-width: none; flex-shrink: 1; min-width: 0;
+        }
+        .filter-row::-webkit-scrollbar { display: none; }
         
+        .filter-chip {
+            padding: 8px 18px; border-radius: 20px; font-size: 14px; white-space: nowrap;
+            background: rgba(255, 255, 255, 0.8); color: var(--text-secondary); 
+            transition: all 0.2s ease; cursor: pointer; flex-shrink: 0; font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid transparent;
+        }
+        .filter-chip.active { background: var(--primary-color); color: #FFFFFF; box-shadow: 0 4px 12px rgba(31, 95, 255, 0.3); }
+        .filter-chip.rerecord { color: var(--danger-color); }
+        .filter-chip.rerecord.active { background: var(--danger-color); color: #FFF; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
+
+        .list-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-shrink: 0;
+        }
+        .list-title { font-size: 17px; font-weight: 800; color: var(--text-title); }
+        .list-count { font-size: 13px; font-weight: normal; color: var(--text-secondary); margin-left: 6px; }
+
+        .btn-action-primary {
+            display: inline-flex; align-items: center; gap: 4px;
+            background: var(--primary-light); color: var(--primary-color);
+            border: none; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer;
+        }
+
+        .word-list { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; padding-bottom: 80px; }
+
+        .word-item {
+            background: rgba(255, 255, 255, 0.65); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 24px; padding: 20px; 
+            box-shadow: 0 8px 32px rgba(31, 95, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.8); 
+            transition: all 0.3s ease; position: relative;
+        }
+
+        .word-item-header { display: flex; justify-content: space-between; align-items: center; }
+        .word-info-main { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; }
+        
+        .word-text { font-size: 20px; font-weight: 800; color: var(--text-title); letter-spacing: 0.5px;}
+        
+        .word-status-line { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
+        .word-status { font-size: 13px; color: var(--text-secondary); font-weight: 500; white-space: nowrap;}
+        .word-status.warning { color: var(--warning-color); }
+        
+        .badge-version { font-size: 11px; padding: 2px 8px; background: rgba(0,0,0,0.05); color: var(--text-secondary); border-radius: 10px; font-weight: 600; }
+
+        .actions-main { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        
+        /* 录音与播放按钮 */
         .btn-record {
-            width: 44px; height: 44px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            border: none; cursor: pointer; transition: all 0.2s;
-            background: rgba(241, 245, 249, 0.8); 
+            width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            border: none; cursor: pointer; transition: all 0.3s; flex-shrink: 0;
+            background: var(--danger-light); color: var(--danger-color); 
         }
-        .btn-record svg { fill: currentColor; width: 18px; height: 18px;}
+        .btn-record svg { width: 20px; height: 20px; fill: currentColor; stroke: currentColor; stroke-width: 2;}
+        .btn-record.recording { background: var(--danger-color); color: white; animation: pulse-red 1.5s infinite; }
         
-        /* Updated Play Button for better visibility */
-        .btn-play { 
-            color: #0F172A; 
-            background: #FFFFFF; /* 改为白色背景 */
-            border: 1px solid rgba(0,0,0,0.05); /* 加一点极细的边框防止和白底融为一体 */
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08); /* 加深一点外阴影，让它凸现出来 */
+        .btn-play {
+            width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            border: none; cursor: pointer; transition: all 0.3s; flex-shrink: 0;
+            background: #FFFFFF; color: #0F172A; 
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.8), 0 4px 12px rgba(0,0,0,0.06);
         }
+        .btn-play svg { width: 18px; height: 18px; fill: currentColor; }
         
-        .btn-play.playing-ai { 
-            background: rgba(31, 95, 255, 0.15) !important; 
+        /* 强制播放光晕特效，绝不影响卡片 */
+        .playing-ai { 
+            background: #E2E8F0 !important; 
             color: var(--primary-color) !important; 
-            animation: pulse-blue 1.5s infinite !important;
-            box-shadow: none; /* remove default shadow when playing */
-        }
-        
-        .btn-mic { color: var(--danger-color); background: rgba(254, 242, 242, 0.9);}
-        .btn-mic.recording { background: var(--danger-color); color: white; animation: pulse-red 1.5s infinite; }
-
-        @keyframes pulse-red {
-            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-            70% { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-        }
-        @keyframes pulse-blue {
-            0% { box-shadow: 0 0 0 0 rgba(31, 95, 255, 0.5); }
-            70% { box-shadow: 0 0 0 12px rgba(31, 95, 255, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(31, 95, 255, 0); }
+            animation: pulse-blue 1.5s infinite !important; 
         }
 
-        .version-history {
-            display: none; font-size: 13px; color: var(--text-secondary); 
-            background: rgba(255,255,255,0.5); border-top: 1px solid rgba(0,0,0,0.05);
-            padding: 12px 0 0 0; margin-top: 16px; gap: 8px; flex-direction: column;
-        }
-        .version-history.show { display: flex; }
-        .version-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(255,255,255,0.7); border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);}
-        .v-meta { display: flex; gap: 12px; align-items: center;}
-        .v-actions { display: flex; gap: 12px; align-items: center;}
-        .v-btn { background: none; border: none; color: var(--text-title); cursor: pointer; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: #F1F5F9;}
-        .v-btn svg { width: 14px; height: 14px; fill: currentColor; }
-        .v-btn-text { font-size: 13px; font-weight: 600; color: var(--danger-color); background: none; border: none; cursor: pointer;}
+        /* 底部操作行 */
+        .card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(0,0,0,0.04); margin-top: 16px; padding-top: 16px; }
 
-        .toggle-history { font-size: 14px; color: var(--primary-color); cursor: pointer; text-align: left; margin-top: 16px; display: inline-block; font-weight: 600;}
+        .btn-toggle-history { font-size: 13px; color: var(--primary-color); font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; background: none; border: none;}
+        
+        .btn-mark-rerecord {
+            font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 8px; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s; white-space: nowrap;
+        }
+        .btn-mark-rerecord.default { background: transparent; color: var(--text-secondary); border: 1px solid rgba(0,0,0,0.1); }
+        .btn-mark-rerecord.marked { background: var(--danger-color); color: #FFF; border: 1px solid var(--danger-color); box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);}
 
-        .toast {
-            position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(15, 23, 42, 0.85); color: white; padding: 14px 24px; border-radius: 12px;
-            font-size: 15px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 100;
-            backdrop-filter: blur(8px); box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
-        .toast.show { opacity: 1; }
+        .version-history { margin-top: 16px; background: rgba(0,0,0,0.03); border-radius: 16px; padding: 12px; display: none; }
+        .version-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed rgba(0,0,0,0.06); flex-wrap: nowrap;}
+        .version-row:last-child { border-bottom: none; }
+        .v-info { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-main); white-space: nowrap; flex: 1; overflow: hidden;}
+        .v-creator { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80px;}
+        .v-current-tag { color: var(--primary-color); font-weight: 600; font-size: 12px; white-space: nowrap; flex-shrink: 0;}
+        .v-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0;}
         
-        /* Custom Modal Box */
-        .modal-overlay {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-            display: none; justify-content: center; align-items: center; z-index: 200;
-            border-radius: 40px;
-        }
-        .modal-overlay.show { display: flex; }
-        
-        .modal-box {
-            background: rgba(255,255,255,0.95); padding: 24px; border-radius: 20px;
-            width: 80%; max-width: 300px; text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.5);
-            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes popIn {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        
-        .modal-title { font-size: 18px; font-weight: 700; color: var(--text-title); margin-bottom: 8px;}
-        .modal-desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5;}
-        .modal-actions { display: flex; gap: 12px; }
-        .modal-btn { 
-            flex: 1; padding: 12px; border-radius: 12px; font-size: 15px; font-weight: 600; border: none; cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-cancel { background: #F1F5F9; color: var(--text-main); }
-        .btn-cancel:active { background: #E2E8F0; }
-        .btn-confirm { background: var(--danger-color); color: white; }
-        .btn-confirm:active { background: #DC2626; }
+        .v-btn { padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; white-space: nowrap;}
+        /* 修复历史播放按钮黑框 */
+        .v-btn-play { width: 32px; height: 32px; padding: 0; display: flex; justify-content: center; align-items: center; background: #FFF; color: var(--text-title); border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: none; cursor: pointer;}
+        .v-btn-play svg { width: 14px; height: 14px; fill: currentColor; }
+        .v-btn-set { background: var(--primary-light); color: var(--primary-color); }
+        .v-btn-del { background: var(--danger-light); color: var(--danger-color); }
+
+        /* 特效动画 */
+        @keyframes pulse-blue { 0% { box-shadow: 0 0 0 0 rgba(31, 95, 255, 0.4); } 70% { box-shadow: 0 0 0 14px rgba(31, 95, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(31, 95, 255, 0); } }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 14px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        @keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
         .floating-player {
-            position: absolute; bottom: 32px; left: 20px; right: 20px; 
-            background: rgba(31, 95, 255, 0.95); 
-            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            color: white; border-radius: 24px; padding: 20px 24px; 
-            display: flex; justify-content: space-between; align-items: center; 
-            box-shadow: 0 16px 40px rgba(31, 95, 255, 0.4); z-index: 50;
-            transform: translateY(150%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: absolute; bottom: 30px; left: 20px; right: 20px;
+            background: rgba(31, 95, 255, 0.95); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border-radius: 20px; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 12px 32px rgba(31, 95, 255, 0.3); transform: translateY(150%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 50;
             border: 1px solid rgba(255,255,255,0.2);
         }
         .floating-player.show { transform: translateY(0); }
-        .fp-info { display: flex; flex-direction: column; }
-        .fp-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-        .fp-progress { font-size: 14px; opacity: 0.9; font-weight: 500;}
-        .fp-controls { display: flex; gap: 16px; align-items: center; }
-        .fp-btn { background: rgba(255,255,255,0.2); border-radius: 50%; border: none; color: white; cursor: pointer; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;}
-        .fp-btn:active { background: rgba(255,255,255,0.3); }
-        .fp-btn svg { width: 22px; height: 22px; fill: currentColor; }
-        .fp-btn.close-btn { background: transparent; width: 32px; height: 32px;}
+        .fp-info { color: white; display: flex; flex-direction: column; gap: 4px; }
+        .fp-title { font-size: 16px; font-weight: 700; }
+        .fp-subtitle { font-size: 12px; opacity: 0.8; }
+        .fp-controls { display: flex; align-items: center; gap: 16px; }
+        .fp-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.2); color: white; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; backdrop-filter: blur(4px); }
+        .fp-btn svg { width: 18px; height: 18px; fill: currentColor; stroke: currentColor;}
+        .fp-btn-close { width: 28px; height: 28px; background: transparent; }
 
+        .modal-overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+            z-index: 100; display: none; justify-content: center; align-items: center;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border-radius: 24px; padding: 24px;
+            width: 85%; box-shadow: 0 20px 40px rgba(0,0,0,0.2); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .modal-title { font-size: 18px; font-weight: 700; color: var(--text-title); margin-bottom: 8px; text-align: center; }
+        .modal-desc { font-size: 14px; color: var(--text-secondary); text-align: center; margin-bottom: 24px; line-height: 1.5; }
+        .modal-actions { display: flex; gap: 12px; }
+        .modal-btn { flex: 1; padding: 12px; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; border: none; text-align: center; }
+        .modal-btn-cancel { background: #F1F5F9; color: var(--text-secondary); }
+        .modal-btn-confirm { background: var(--danger-color); color: white; }
+
+        .toast { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.75); color: white; padding: 12px 24px; border-radius: 12px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 200; backdrop-filter: blur(4px); }
+        .toast.show { opacity: 1; }
+        
+        .icon-sm { width: 14px; height: 14px; }
     </style>
 </head>
 <body>
@@ -300,7 +275,7 @@
 <div class="device-simulator">
     <div class="nav-bar">
         <div class="icon-btn">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
         </div>
         <div class="nav-title-group">
             <div class="nav-title">英语音频校对</div>
@@ -309,545 +284,413 @@
     </div>
 
     <div class="main-content">
-        <div class="stats-card glass-panel">
+        <!-- 核心看板重现 -->
+        <div class="stats-card">
             <div class="stat-item">
-                <div class="stat-value" id="stat-total">3000</div>
+                <div class="stat-value" style="color: var(--text-title);" id="stat-total">3000</div>
                 <div class="stat-label">总词数</div>
             </div>
             <div class="stat-item">
-                <div class="stat-value" id="stat-recorded" style="color: var(--primary-color);">2450</div>
+                <div class="stat-value" style="color: var(--primary-color);" id="stat-recorded">2450</div>
                 <div class="stat-label">已录音</div>
             </div>
             <div class="stat-item">
-                <div class="stat-value" id="stat-unrecorded" style="color: var(--danger-color);">550</div>
+                <div class="stat-value" style="color: var(--danger-color);" id="stat-unrecorded">550</div>
                 <div class="stat-label">未录音</div>
             </div>
         </div>
 
         <div class="sticky-toolbar">
             <div class="search-bar">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input type="text" id="searchInput" placeholder="搜索词汇...">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" placeholder="搜索词汇...">
             </div>
 
             <div class="filter-row">
-                <div class="filter-group">
-                    <div class="filter-chip active" data-filter="all" id="filter-chip-all">全部</div>
-                    <div class="filter-chip" data-filter="unrecorded" id="filter-chip-unrecorded">未录音</div>
-                    <div class="filter-chip" data-filter="recorded" id="filter-chip-recorded">已录音</div>
-                    <div class="filter-chip needs-rerecord-chip" data-filter="needs_rerecord" id="filter-chip-needs-rerecord">需重录</div>
-                </div>
+                <div class="filter-chip active" data-filter="全部">全部</div>
+                <div class="filter-chip" data-filter="未录音">未录音</div>
+                <div class="filter-chip" data-filter="已录音">已录音</div>
+                <div class="filter-chip rerecord" data-filter="需重录">需重录</div>
             </div>
 
             <div class="list-header">
-                <div class="list-title">词汇列表 <span style="font-size: 14px; font-weight: 500; color: var(--text-secondary);" id="list-count"></span></div>
-                <button class="btn-play-all" onclick="startAutoPlay()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> 连播当前项
+                <div class="list-title">词汇列表 <span class="list-count" id="listCountStr">3000 项结果</span></div>
+                <button class="btn-action-primary" onclick="startAutoPlay()">
+                    <svg class="icon-sm" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> 连播列表
                 </button>
             </div>
         </div>
 
         <div class="word-list" id="wordListContainer">
-            <!-- Items dynamically generated -->
+            <!-- 列表由 JS 渲染 -->
         </div>
     </div>
 
-    <div class="toast" id="sys-toast">提示信息</div>
-    
-    <!-- Custom Modal -->
+    <!-- 底部功能组件 -->
+    <div class="floating-player" id="floatingPlayer">
+        <div class="fp-info">
+            <div class="fp-title" id="fpTitle">Apple</div>
+            <div class="fp-subtitle" id="fpSubtitle">自动连播中...</div>
+        </div>
+        <div class="fp-controls">
+            <button class="fp-btn" id="fpPauseBtn" onclick="togglePauseAutoPlay()">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+            </button>
+            <button class="fp-btn fp-btn-close" onclick="closeAutoPlay()">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="confirmModal">
         <div class="modal-box">
-            <div class="modal-title">取消重录标记</div>
-            <div class="modal-desc">确定要取消该音频的需重录标记吗？</div>
+            <div class="modal-title" id="modalTitle">确认操作</div>
+            <div class="modal-desc" id="modalDesc">确定执行吗？</div>
             <div class="modal-actions">
-                <button class="modal-btn btn-cancel" onclick="closeModal()">取消</button>
-                <button class="modal-btn btn-confirm" id="modalConfirmBtn">确定</button>
+                <button class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</button>
+                <button class="modal-btn modal-btn-confirm" id="modalConfirmBtn">确定</button>
             </div>
         </div>
     </div>
 
-    <div class="floating-player" id="floatingPlayer">
-        <div class="fp-info">
-            <div class="fp-title" id="fpTitle">播放中...</div>
-        </div>
-        <div class="fp-controls">
-            <button class="fp-btn" id="fpPauseBtn" onclick="togglePauseAutoPlay()">
-                <svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-            </button>
-            <button class="fp-btn close-btn" onclick="stopAutoPlay()">
-                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-            </button>
-        </div>
-    </div>
+    <div class="toast" id="sys-toast"></div>
 </div>
 
 <script>
-    const iconMic = `<svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>`;
-    const iconStop = `<svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" ry="2"></rect></svg>`;
-    const iconPlay = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
-    const iconPause = `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
-    const iconFlag = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>`;
+    const CURRENT_USER_NAME = "张三";
+    const TOTAL_SYSTEM_WORDS = 3000;
+    let recordedWordsCount = 2450;
+    let confirmCallback = null;
 
-    const CURRENT_USER_NAME = "张三"; 
-    
-    let sysTotal = 3000;
-    let sysRecorded = 2450;
-    let sysUnrecorded = 550;
-    let sysNeedsRerecord = 18; // 模拟系统中需重录的宏观总数
+    // 正确的麦克风图标 (修复了向下的箭头)
+    const iconMic = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>`;
+    const iconStop = `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2" ry="2"></rect></svg>`;
+    const iconPlay = `<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
+    const iconPause = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`;
+    const iconFlag = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>`;
+    const iconChevronDown = `<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
 
     let wordsData = [
-        { id: 1, text: "Apple", needsRerecord: false, versions: [{ v: 'v1', audio: null, duration: 0, creator: CURRENT_USER_NAME }], aiAudioDuration: 0 }, 
-        { id: 2, text: "Banana", needsRerecord: false, versions: [{ v: 'v1', audio: 'url', duration: 2, creator: CURRENT_USER_NAME }], aiAudioDuration: 2 }, 
-        { id: 3, text: "Classroom", needsRerecord: true, versions: [{ v: 'v1', audio: 'url', duration: 3, creator: '赖金华' }], aiAudioDuration: 3 }, 
-        { id: 4, text: "Morning", needsRerecord: false, versions: [{ v: 'v1', audio: null, duration: 0, creator: CURRENT_USER_NAME }], aiAudioDuration: 2 }, 
-        { id: 5, text: "Orange", needsRerecord: false, versions: [{ v: 'v1', audio: 'url', duration: 2, creator: CURRENT_USER_NAME }], aiAudioDuration: 2 },
-        { id: 6, text: "Grape", needsRerecord: false, versions: [{ v: 'v1', audio: null, duration: 0, creator: CURRENT_USER_NAME }], aiAudioDuration: 0 },
-        { id: 7, text: "Watermelon", needsRerecord: false, versions: [{ v: 'v1', audio: 'url', duration: 4, creator: CURRENT_USER_NAME }], aiAudioDuration: 4 },
-        { id: 8, text: "Teacher", needsRerecord: false, versions: [{ v: 'v1', audio: 'url', duration: 2, creator: '洪登耀' }], aiAudioDuration: 2 },
-        { id: 9, text: "Student", needsRerecord: false, versions: [{ v: 'v0', audio: null, duration: 0, creator: 'System' }], aiAudioDuration: 3 } 
+        { id: 'w1', text: 'Apple', needsRerecord: false, versions: [] },
+        { id: 'w2', text: 'Banana', needsRerecord: false, versions: [{ v: 1, duration: '0:02', creator: '赖金华' }] },
+        { id: 'w3', text: 'Classroom', needsRerecord: true, versions: [{ v: 1, duration: '0:03', creator: '洪登耀' }] },
+        { id: 'w4', text: 'Morning', needsRerecord: false, versions: [], hasAIAudio: true },
+        { id: 'w5', text: 'Orange', needsRerecord: false, versions: [{ v: 1, duration: '0:02', creator: CURRENT_USER_NAME }] },
+        { id: 'w6', text: 'Grape', needsRerecord: false, versions: [] },
+        { id: 'w7', text: 'Watermelon', needsRerecord: false, versions: [{ v: 1, duration: '0:04', creator: '李四' }] },
+        { id: 'w8', text: 'Teacher', needsRerecord: false, versions: [{ v: 1, duration: '0:02', creator: CURRENT_USER_NAME }] },
+        { id: 'w9', text: 'Student', needsRerecord: false, versions: [], hasAIAudio: true }
     ];
 
-    let currentFilter = 'all';
-    let currentSearch = '';
+    function init() {
+        wordsData.sort((a, b) => a.text.localeCompare(b.text));
+        
+        document.querySelectorAll('.filter-chip').forEach(chip => {
+            chip.addEventListener('click', function() {
+                document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                applyFilters(); 
+            });
+        });
 
-    function renderList(expandedItemId = null) {
+        const searchInput = document.querySelector('.search-bar input');
+        if (searchInput) searchInput.addEventListener('input', applyFilters);
+
+        renderList();
+    }
+
+    function renderList(keepExpandedId = null) {
         const container = document.getElementById('wordListContainer');
         container.innerHTML = '';
-        
-        let visibleCount = 0;
-        
-        document.getElementById('stat-total').innerText = sysTotal;
-        document.getElementById('stat-recorded').innerText = sysRecorded;
-        document.getElementById('stat-unrecorded').innerText = sysUnrecorded;
 
-        wordsData.forEach(item => {
-            const currentVersion = item.versions[item.versions.length - 1];
-            const hasUserAudio = currentVersion.audio !== null;
-            const hasAIAudio = item.aiAudioDuration > 0;
-
-            let matchFilter = true;
-            if (currentFilter === 'unrecorded' && hasUserAudio) matchFilter = false;
-            if (currentFilter === 'recorded' && !hasUserAudio) matchFilter = false;
-            if (currentFilter === 'needs_rerecord' && !item.needsRerecord) matchFilter = false;
-            if (currentSearch && !item.text.toLowerCase().includes(currentSearch)) matchFilter = false;
-
-            if (!matchFilter) return;
-            visibleCount++;
-
-            const div = document.createElement('div');
-            div.className = `word-item glass-panel`;
-            div.id = `word-${item.id}`;
+        wordsData.forEach((item) => {
+            const hasAudio = item.versions.length > 0;
+            const currentVersion = hasAudio ? item.versions[item.versions.length - 1] : null;
             
-            let historyHtml = '';
-            const userVersions = item.versions.filter(v => v.audio);
-            if (userVersions.length > 0) {
-                let rows = userVersions.map((v, index) => {
-                    const isMyVersion = v.creator === CURRENT_USER_NAME;
+            let statusHTML = '';
+            if (hasAudio) {
+                let statusText = item.needsRerecord ? `<span class="word-status warning">待重录 (${currentVersion.duration})</span>` : `<span class="word-status">已录音 (${currentVersion.duration})</span>`;
+                statusHTML = `${statusText} <span class="badge-version">v${currentVersion.v}</span>`;
+            } else if (item.hasAIAudio) {
+                statusHTML = `<span class="word-status warning">未录音 (AI生成音)</span>`;
+            } else {
+                statusHTML = `<span class="word-status warning">未录音</span>`;
+            }
+
+            let playBtnHTML = '';
+            if (hasAudio || item.hasAIAudio) {
+                let dur = hasAudio ? parseInt(currentVersion.duration.split(':')[1]) : 2;
+                playBtnHTML = `<button class="btn-play" onclick="handlePlayClick(this, ${dur}, ${!hasAudio})">${iconPlay}</button>`;
+            }
+
+            let historyBtnHTML = '';
+            let markBtnHTML = '';
+            let versionHistoryHTML = '';
+
+            if (hasAudio) {
+                historyBtnHTML = `<button class="btn-toggle-history" onclick="toggleVersionHistory('${item.id}')">查看版本记录 (${item.versions.length}) ${iconChevronDown}</button>`;
+                
+                if (item.needsRerecord) {
+                    markBtnHTML = `<button class="btn-mark-rerecord marked" onclick="promptCancelRerecord('${item.id}')">${iconFlag} 需重录</button>`;
+                } else {
+                    markBtnHTML = `<button class="btn-mark-rerecord default" onclick="toggleRerecord('${item.id}')">${iconFlag} 标为重录</button>`;
+                }
+
+                // 修复版本列表排版和播放按钮样式
+                let rowsHTML = [...item.versions].reverse().map((v, idx) => {
+                    let reversedIndex = item.versions.length - 1 - idx;
+                    let isCurrent = reversedIndex === item.versions.length - 1;
+                    
+                    let delBtn = `<button class="v-btn v-btn-del" onclick="deleteVersion('${item.id}', ${reversedIndex})">删除</button>`;
+                    let setBtn = !isCurrent ? `<button class="v-btn v-btn-set" onclick="setVersionActive('${item.id}', ${reversedIndex})">设为当前</button>` : '';
+                    let currentTag = isCurrent ? `<span class="v-current-tag">(当前)</span>` : '';
+                    
                     return `
                         <div class="version-row">
-                            <div class="v-meta">
-                                <span style="font-weight:700; color:var(--text-title);">${v.v}</span>
-                                <span>0:0${v.duration}</span>
-                                <span style="color:var(--text-secondary)">by ${v.creator}</span>
+                            <div class="v-info">
+                                <span class="badge-version">v${v.v}</span>
+                                <span>${v.duration}</span>
+                                <span class="v-creator">by ${v.creator}</span>
+                                ${currentTag}
                             </div>
                             <div class="v-actions">
-                                <button class="v-btn" onclick="playMockAudio(this, ${v.duration})" title="试听版本">${iconPlay}</button>
-                                ${isMyVersion ? `<button class="v-btn-text" onclick="deleteVersion(${item.id}, ${index})">删除</button>` : ''}
+                                <button class="v-btn-play" onclick="handlePlayClick(this, 2, false)">${iconPlay}</button>
+                                ${setBtn}
+                                ${delBtn}
                             </div>
                         </div>
                     `;
                 }).join('');
                 
-                const isExpanded = expandedItemId === item.id;
-                historyHtml = `
-                    <span class="toggle-history" onclick="toggleHistory(this)">
-                        查看版本记录 (${userVersions.length}) ${isExpanded ? '▴' : '▾'}
-                    </span>
-                    <div class="version-history ${isExpanded ? 'show' : ''}">${rows}</div>
-                `;
+                let displayStyle = (keepExpandedId === item.id) ? 'display: block;' : 'display: none;';
+                versionHistoryHTML = `<div class="version-history" id="vh-${item.id}" style="${displayStyle}">${rowsHTML}</div>`;
             }
 
-            let statusText = '';
-            if (hasUserAudio) {
-                 statusText = `已录音 (0:0${currentVersion.duration})`;
-                 if (item.needsRerecord) {
-                    statusText = `待重录 (0:0${currentVersion.duration})`;
-                 }
-            } else {
-                 statusText = `<span class="status-unrecorded">未录音</span>`;
-                 if (hasAIAudio) {
-                     statusText += ` <span style="font-size:13px; color:var(--text-secondary)">(AI生成音)</span>`;
-                 }
-            }
-
-            let markBtnHtml = '';
-            if (hasUserAudio) {
-                if (item.needsRerecord) {
-                     markBtnHtml = `<button class="btn-mark-rerecord marked" onclick="promptCancelRerecord(${item.id})">${iconFlag} 需重录</button>`;
-                } else {
-                     markBtnHtml = `<button class="btn-mark-rerecord" onclick="toggleMarkRerecord(${item.id})">${iconFlag} 标为重录</button>`;
-                }
-            }
-
-            let playBtnHtml = '';
-            if (hasUserAudio) {
-                playBtnHtml = `<button class="btn-record btn-play" onclick="handlePlayClick(this, ${currentVersion.duration}, false)">${iconPlay}</button>`;
-            } else if (hasAIAudio) {
-                playBtnHtml = `<button class="btn-record btn-play" onclick="handlePlayClick(this, ${item.aiAudioDuration}, true)" title="试听AI生成音">${iconPlay}</button>`;
-            }
-
-            let recordBtnHtml = `
-                <button class="btn-record btn-mic" onclick="toggleRecord(this, ${item.id})">${iconMic}</button>
-            `;
-
-            let badgeHtml = hasUserAudio ? `<span class="badge">${currentVersion.v}</span>` : '';
-
-            div.innerHTML = `
-                <div class="word-main">
-                    <div class="word-info">
-                        <div class="word-index">${item.id}.</div>
-                        <div class="word-text-group">
-                            <div class="word-text">
-                                ${item.text} ${badgeHtml}
-                            </div>
-                            <div class="word-status">
-                                ${statusText} ${markBtnHtml}
-                            </div>
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'word-item';
+            itemDiv.setAttribute('data-id', item.id);
+            itemDiv.innerHTML = `
+                <div class="word-item-header">
+                    <div class="word-info-main">
+                        <div class="word-text">${item.text}</div>
+                        <div class="word-status-line">
+                            ${statusHTML}
                         </div>
                     </div>
-                    <div class="actions">
-                        ${playBtnHtml}
-                        ${recordBtnHtml}
+                    <div class="actions-main">
+                        ${playBtnHTML}
+                        <button class="btn-record" onclick="startRecord(this, '${item.id}')">${iconMic}</button>
                     </div>
                 </div>
-                ${historyHtml}
+                ${hasAudio ? `
+                <div class="card-footer">
+                    <div>${historyBtnHTML}</div>
+                    <div>${markBtnHTML}</div>
+                </div>
+                ${versionHistoryHTML}
+                ` : ''}
             `;
-            container.appendChild(div);
+            container.appendChild(itemDiv);
         });
-        
-        let displayCount = 0;
-        if (currentFilter === 'all') displayCount = sysTotal;
-        else if (currentFilter === 'unrecorded') displayCount = sysUnrecorded;
-        else if (currentFilter === 'recorded') displayCount = sysRecorded;
-        else if (currentFilter === 'needs_rerecord') displayCount = sysNeedsRerecord;
 
-        if (currentSearch) {
-            document.getElementById('list-count').innerText = `${visibleCount} 项结果`;
-        } else {
-            document.getElementById('list-count').innerText = `${displayCount} 项结果`;
-        }
+        applyFilters();
     }
 
-    function toggleHistory(btn) {
-        const historyDiv = btn.nextElementSibling;
-        if(historyDiv.classList.contains('show')) {
-            historyDiv.classList.remove('show');
-            btn.innerHTML = btn.innerHTML.replace('▴', '▾');
-        } else {
-            historyDiv.classList.add('show');
-            btn.innerHTML = btn.innerHTML.replace('▾', '▴');
-        }
-    }
+    function applyFilters() {
+        const activeFilter = document.querySelector('.filter-chip.active').innerText.trim();
+        const searchQuery = document.querySelector('.search-bar input').value.trim().toLowerCase();
+        const items = document.querySelectorAll('.word-item');
+        let visibleCount = 0;
 
-    function showToast(msg, duration = 2000) {
-        let toast = document.getElementById('sys-toast');
-        toast.innerText = msg;
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), duration);
-    }
-    
-    // Modal Logic
-    let pendingItemIdForModal = null;
-    
-    function promptCancelRerecord(itemId) {
-        pendingItemIdForModal = itemId;
-        document.getElementById('confirmModal').classList.add('show');
-        
-        // Setup confirm action
-        document.getElementById('modalConfirmBtn').onclick = () => {
-            if (pendingItemIdForModal !== null) {
-                toggleMarkRerecord(pendingItemIdForModal, false);
+        items.forEach(item => {
+            const dataId = item.getAttribute('data-id');
+            const dataObj = wordsData.find(w => w.id === dataId);
+            const wordText = dataObj.text.toLowerCase();
+            const isRecorded = dataObj.versions.length > 0;
+            const needsRerecord = dataObj.needsRerecord;
+            
+            let matchesStatus = false;
+            if (activeFilter === '全部') matchesStatus = true;
+            else if (activeFilter === '未录音') matchesStatus = !isRecorded;
+            else if (activeFilter === '已录音') matchesStatus = isRecorded;
+            else if (activeFilter === '需重录') matchesStatus = needsRerecord;
+
+            if (matchesStatus && wordText.includes(searchQuery)) {
+                item.style.display = 'block';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
             }
-            closeModal();
-        };
-    }
-    
-    function closeModal() {
-        document.getElementById('confirmModal').classList.remove('show');
-        pendingItemIdForModal = null;
+        });
+
+        // 统一宏观看板数据展示
+        document.getElementById('stat-total').innerText = TOTAL_SYSTEM_WORDS;
+        document.getElementById('stat-recorded').innerText = recordedWordsCount;
+        document.getElementById('stat-unrecorded').innerText = TOTAL_SYSTEM_WORDS - recordedWordsCount;
+
+        let countStr = visibleCount + ' 项结果';
+        if (searchQuery === '') {
+             if (activeFilter === '全部') countStr = TOTAL_SYSTEM_WORDS + ' 项结果';
+             else if (activeFilter === '已录音') countStr = recordedWordsCount + ' 项结果';
+             else if (activeFilter === '未录音') countStr = (TOTAL_SYSTEM_WORDS - recordedWordsCount) + ' 项结果';
+        }
+        document.getElementById('listCountStr').innerText = countStr;
     }
 
-    function toggleMarkRerecord(itemId, forceState = null) {
-        const item = wordsData.find(w => w.id === itemId);
-        if (item) {
-            const oldState = item.needsRerecord;
-            item.needsRerecord = forceState !== null ? forceState : !item.needsRerecord;
-            
-            if (!oldState && item.needsRerecord) sysNeedsRerecord++;
-            if (oldState && !item.needsRerecord) sysNeedsRerecord--;
-            
-            showToast(item.needsRerecord ? '已标记为需重录' : '已取消需重录标记');
-            renderList();
+    function toggleVersionHistory(itemId) {
+        const el = document.getElementById('vh-' + itemId);
+        if (el) el.style.display = (el.style.display === 'none' || el.style.display === '') ? 'block' : 'none';
+    }
+
+    function setVersionActive(itemId, vIndex) {
+        let item = wordsData.find(w => w.id === itemId);
+        if(item && item.versions[vIndex]) {
+            let targetVersion = item.versions.splice(vIndex, 1)[0];
+            item.versions.push(targetVersion); 
+            showToast('已设为当前版本');
+            renderList(itemId); 
         }
     }
 
-    let activeRecordingBtn = null;
-    let recordingTimer = null;
+    function deleteVersion(itemId, vIndex) {
+        showModal('删除版本', '确定要删除此录音版本吗？', () => {
+            let item = wordsData.find(w => w.id === itemId);
+            if(item && item.versions[vIndex]) {
+                item.versions.splice(vIndex, 1);
+                if(item.versions.length === 0) {
+                    item.needsRerecord = false;
+                    recordedWordsCount--;
+                }
+                showToast('版本已删除');
+                renderList(document.getElementById(`vh-${itemId}`)?.style.display === 'block' ? itemId : null);
+            }
+        });
+    }
 
-    function toggleRecord(btn, itemId) {
-        if(autoPlayInterval) stopAutoPlay();
+    function toggleRerecord(itemId) {
+        let item = wordsData.find(w => w.id === itemId);
+        if(item) {
+            item.needsRerecord = true;
+            renderList(document.getElementById(`vh-${itemId}`)?.style.display === 'block' ? itemId : null);
+            showToast('已标记为重录');
+        }
+    }
 
-        const itemData = wordsData.find(w => w.id === itemId);
-        const userVersions = itemData.versions.filter(v => v.audio);
-        const lastUserVersionStr = userVersions.length > 0 ? userVersions[userVersions.length - 1].v : 'v0';
-        const statusDiv = btn.closest('.word-item').querySelector('.word-status');
+    function promptCancelRerecord(itemId) {
+        showModal('取消重录', '确定要取消该词汇的“需重录”状态吗？', () => {
+            let item = wordsData.find(w => w.id === itemId);
+            if(item) {
+                item.needsRerecord = false;
+                renderList(document.getElementById(`vh-${itemId}`)?.style.display === 'block' ? itemId : null);
+                showToast('已取消标记');
+            }
+        });
+    }
 
-        if (btn.classList.contains('recording')) {
-            clearInterval(recordingTimer);
+    function startRecord(btn, itemId) {
+        if(btn.classList.contains('recording')) {
             btn.classList.remove('recording');
             btn.innerHTML = iconMic;
-            statusDiv.innerHTML = '<span style="color:var(--text-secondary); font-size: 14px;">正在上传生成...</span>';
+            showToast('上传中...');
             
             setTimeout(() => {
-                const userVersionsBefore = itemData.versions.filter(v => v.audio).length;
-                let newDuration = Math.floor(Math.random() * 3) + 2; 
-                const currentVNum = parseInt(lastUserVersionStr.replace('v', ''));
-                const newVStr = `v${currentVNum + 1}`;
-                
-                itemData.versions.push({ 
-                    v: newVStr, 
-                    audio: 'url', 
-                    duration: newDuration, 
-                    creator: CURRENT_USER_NAME 
-                });
-
-                if (userVersionsBefore === 0) {
-                    sysRecorded++;
-                    sysUnrecorded--;
+                let item = wordsData.find(w => w.id === itemId);
+                if(item) {
+                    let nextV = item.versions.length > 0 ? Math.max(...item.versions.map(v => v.v)) + 1 : 1;
+                    if(item.versions.length === 0) recordedWordsCount++;
+                    
+                    item.versions.push({ v: nextV, duration: '0:03', creator: CURRENT_USER_NAME });
+                    item.needsRerecord = false;
+                    showToast('新版本录制成功');
+                    renderList(itemId); 
                 }
-
-                if (itemData.needsRerecord) {
-                    itemData.needsRerecord = false;
-                    sysNeedsRerecord--;
-                }
-                
-                showToast(`已成功录制 ${newVStr} 版本`);
-                renderList(itemId); 
             }, 800);
-
-            activeRecordingBtn = null;
         } else {
-            if (activeRecordingBtn) toggleRecord(activeRecordingBtn, parseInt(activeRecordingBtn.dataset.itemId));
-            
             btn.classList.add('recording');
-            btn.innerHTML = iconStop; 
-            btn.dataset.itemId = itemId; 
-            activeRecordingBtn = btn;
-            
-            let seconds = 0;
-            statusDiv.innerHTML = `<span style="color:var(--danger-color); font-weight:700; font-size: 14px;">录制中 0:00</span>`;
-            
-            recordingTimer = setInterval(() => {
-                seconds++;
-                statusDiv.innerHTML = `<span style="color:var(--danger-color); font-weight:700; font-size: 14px;">录制中 0:0${seconds}</span>`;
-            }, 1000);
-        }
-    }
-
-    function deleteVersion(itemId, versionIndex) {
-        // Fallback to basic confirm for destructive action if user bypasses custom modal
-        // Since we are not strictly banning confirm for *all* cases, but I'll make a second modal if strictly required. 
-        // For simplicity and matching typical patterns, deletion usually keeps a native confirm or separate modal. Let's stick to the rule and use a modal.
-        
-        // Let's reuse the modal for deletion.
-        document.getElementById('confirmModal').querySelector('.modal-title').innerText = '删除版本';
-        document.getElementById('confirmModal').querySelector('.modal-desc').innerText = '确定要永久删除这个录音版本吗？';
-        document.getElementById('confirmModal').classList.add('show');
-        
-        document.getElementById('modalConfirmBtn').onclick = () => {
-             const itemData = wordsData.find(w => w.id === itemId);
-             const userVersions = itemData.versions.filter(v => v.audio);
-             const versionToDelete = userVersions[versionIndex];
-             const originalIndex = itemData.versions.indexOf(versionToDelete);
-             
-             if (originalIndex > -1) {
-                 const hasAudioBefore = itemData.versions.some(v => v.audio);
-                 itemData.versions.splice(originalIndex, 1);
-                 const hasAudioAfter = itemData.versions.some(v => v.audio);
-                 
-                 if (hasAudioBefore && !hasAudioAfter) {
-                     sysRecorded--;
-                     sysUnrecorded++;
-                     if (itemData.needsRerecord) {
-                         itemData.needsRerecord = false;
-                         sysNeedsRerecord--;
-                     }
-                 }
-                 
-                 showToast('版本已删除');
-                 renderList(itemId);
-             }
-             
-             closeModal();
-             // reset modal texts
-             setTimeout(()=>{
-                 document.getElementById('confirmModal').querySelector('.modal-title').innerText = '取消重录标记';
-                 document.getElementById('confirmModal').querySelector('.modal-desc').innerText = '确定要取消该音频的需重录标记吗？';
-             }, 300);
+            btn.innerHTML = iconStop;
         }
     }
 
     let currentlyPlayingBtn = null;
-    let autoPlayQueue = [];
-    let autoPlayIndex = 0;
-    let isAutoPlaying = false;
-    let isAutoPlayPaused = false;
-    let autoPlayInterval = null;
-
-    function handlePlayClick(btn, duration, isAIAudio = false) {
-        if (isAutoPlaying) stopAutoPlay();
-        
-        if (isAIAudio) {
-            showToast("正在试听AI生成音");
+    function handlePlayClick(btn, durationSec, isAi) {
+        if (btn.classList.contains('playing-ai')) {
+            btn.classList.remove('playing-ai');
+            btn.innerHTML = iconPlay;
+            currentlyPlayingBtn = null;
+            return;
         }
-
-        playMockAudio(btn, duration);
-    }
-
-    function playMockAudio(btn, duration, onComplete = null) {
         if (currentlyPlayingBtn && currentlyPlayingBtn !== btn) {
             currentlyPlayingBtn.classList.remove('playing-ai');
             currentlyPlayingBtn.innerHTML = iconPlay;
         }
-
         currentlyPlayingBtn = btn;
         btn.classList.add('playing-ai');
         btn.innerHTML = iconPause;
-
-        clearTimeout(btn.playTimeout);
-        btn.playTimeout = setTimeout(() => {
-            btn.classList.remove('playing-ai');
-            btn.innerHTML = iconPlay;
-            currentlyPlayingBtn = null;
-            
-            if (onComplete) onComplete(); 
-        }, duration * 1000);
+        
+        setTimeout(() => {
+            if (currentlyPlayingBtn === btn) {
+                btn.classList.remove('playing-ai');
+                btn.innerHTML = iconPlay;
+                currentlyPlayingBtn = null;
+            }
+        }, (durationSec || 2) * 1000);
     }
 
+    let isAutoPlaying = false;
+    let isAutoPlayPaused = false;
     function startAutoPlay() {
-        const visibleItems = Array.from(document.querySelectorAll('.word-item'))
-            .filter(item => item.style.display !== 'none'); 
-        
-        autoPlayQueue = [];
-        visibleItems.forEach(item => {
-            const playBtn = item.querySelector('.btn-play');
-            if (playBtn) {
-                const duration = 2; 
-                // 获取序号和文本，用于组合显示
-                const indexText = item.querySelector('.word-index').innerText.trim();
-                const wordText = item.querySelector('.word-text').childNodes[0].nodeValue.trim();
-                
-                autoPlayQueue.push({
-                    btn: playBtn,
-                    text: `${indexText} ${wordText}`, 
-                    duration: duration,
-                    element: item
-                });
-            }
-        });
-
-        if (autoPlayQueue.length === 0) {
-            showToast('当前列表没有可播放的音频');
-            return;
-        }
-
+        document.getElementById('floatingPlayer').classList.add('show');
         isAutoPlaying = true;
         isAutoPlayPaused = false;
-        autoPlayIndex = 0;
-        
-        document.getElementById('floatingPlayer').classList.add('show');
         document.getElementById('fpPauseBtn').innerHTML = iconPause;
+        document.getElementById('fpSubtitle').innerText = '自动连播中...';
         
-        playNextInQueue();
-    }
-
-    function playNextInQueue() {
-        if (!isAutoPlaying || isAutoPlayPaused) return;
-
-        if (autoPlayIndex >= autoPlayQueue.length) {
-            stopAutoPlay();
-            showToast('列表播放完毕');
-            return;
+        let firstWord = document.querySelector('.word-item[style*="display: block"], .word-item:not([style*="display: none"])');
+        if(firstWord) {
+            document.getElementById('fpTitle').innerText = firstWord.querySelector('.word-text').innerText;
         }
-
-        const currentItem = autoPlayQueue[autoPlayIndex];
-        // 标题直接显示组合好的文本 (例如: 2. Banana)
-        document.getElementById('fpTitle').innerText = currentItem.text;
-        
-        currentItem.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-        playMockAudio(currentItem.btn, currentItem.duration, () => {
-            if(isAutoPlaying && !isAutoPlayPaused) {
-                autoPlayIndex++;
-                autoPlayInterval = setTimeout(playNextInQueue, 800); 
-            }
-        });
     }
-
+    
     function togglePauseAutoPlay() {
         isAutoPlayPaused = !isAutoPlayPaused;
-        const pauseBtn = document.getElementById('fpPauseBtn');
-        
-        if (isAutoPlayPaused) {
-            pauseBtn.innerHTML = iconPlay;
-            document.getElementById('fpTitle').innerText = `已暂停`;
-            if(currentlyPlayingBtn) {
-                clearTimeout(currentlyPlayingBtn.playTimeout);
-                currentlyPlayingBtn.classList.remove('playing-ai');
-                currentlyPlayingBtn.innerHTML = iconPlay;
-            }
-            clearTimeout(autoPlayInterval);
-        } else {
-            pauseBtn.innerHTML = iconPause;
-            playNextInQueue();
-        }
+        document.getElementById('fpPauseBtn').innerHTML = isAutoPlayPaused ? iconPlay : iconPause;
+        document.getElementById('fpSubtitle').innerText = isAutoPlayPaused ? '已暂停' : '自动连播中...';
     }
-
-    function stopAutoPlay() {
-        isAutoPlaying = false;
-        isAutoPlayPaused = false;
-        clearTimeout(autoPlayInterval);
+    
+    function closeAutoPlay() {
         document.getElementById('floatingPlayer').classList.remove('show');
-        
+        isAutoPlaying = false;
         if(currentlyPlayingBtn) {
-            clearTimeout(currentlyPlayingBtn.playTimeout);
             currentlyPlayingBtn.classList.remove('playing-ai');
             currentlyPlayingBtn.innerHTML = iconPlay;
+            currentlyPlayingBtn = null;
         }
-        currentlyPlayingBtn = null;
     }
 
-    window.onload = () => {
-        document.querySelectorAll('.filter-chip').forEach(chip => {
-            chip.addEventListener('click', (e) => {
-                document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-                e.currentTarget.classList.add('active');
-                currentFilter = e.currentTarget.dataset.filter;
-                renderList();
-            });
-        });
+    function showModal(title, desc, onConfirm) {
+        document.getElementById('modalTitle').innerText = title;
+        document.getElementById('modalDesc').innerText = desc;
+        confirmCallback = onConfirm;
+        document.getElementById('confirmModal').classList.add('show');
+    }
+    
+    function closeModal() {
+        document.getElementById('confirmModal').classList.remove('show');
+        confirmCallback = null;
+    }
+    
+    document.getElementById('modalConfirmBtn').addEventListener('click', () => {
+        if (confirmCallback) confirmCallback();
+        closeModal();
+    });
 
-        const searchInput = document.getElementById('searchInput');
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => {
-                currentSearch = e.target.value.toLowerCase().trim();
-                renderList();
-            });
-        }
+    function showToast(msg, duration = 2000) {
+        let toast = document.getElementById('sys-toast');
+        toast.innerText = msg; toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), duration);
+    }
 
-        renderList();
-    };
-
+    window.onload = init;
 </script>
 </body>
 </html>
