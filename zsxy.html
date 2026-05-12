@@ -56,7 +56,7 @@
         .page-view.hidden-right { transform: translateX(100%); opacity: 0; pointer-events: none; }
         .page-view.active { transform: translateX(0); opacity: 1; pointer-events: auto; }
 
-        /* 通用导航栏 (紧凑化) */
+        /* 工作台导航栏 */
         .nav-bar {
             padding: 48px 20px 12px; display: flex; align-items: center; justify-content: space-between;
             position: relative; z-index: 10; flex-shrink: 0;
@@ -78,21 +78,25 @@
             box-shadow: 0 8px 24px rgba(31, 95, 255, 0.04);
         }
 
-        /* 页面 1：集合列表页 */
-        .collection-list { display: flex; flex-direction: column; gap: 14px; padding-bottom: 40px; }
+        /* ================= 页面 1：选择任务 ================= */
+        .page-header {
+            padding: 0 20px 24px;
+        }
+        .page-header h1 {
+            font-size: 28px; font-weight: 800; color: var(--text-title); letter-spacing: 0.5px; margin: 0;
+        }
+
+        .collection-list { display: flex; flex-direction: column; gap: 16px; padding: 12px 20px 40px; }
         .collection-card {
-            border-radius: 20px; padding: 20px; cursor: pointer;
+            border-radius: 16px; padding: 20px; cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
         }
         .collection-card:active { transform: scale(0.98); }
-        .col-title { font-size: 17px; font-weight: 800; color: var(--text-title); margin-bottom: 6px; }
-        .col-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.4; }
-        .col-progress-bar { height: 6px; background: rgba(0,0,0,0.05); border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
-        .col-progress-inner { height: 100%; background: var(--primary-color); border-radius: 4px; }
-        .col-stats { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--text-main); }
-        .col-tag { display: inline-block; padding: 3px 8px; background: var(--primary-light); color: var(--primary-color); font-size: 11px; font-weight: 700; border-radius: 6px; margin-bottom: 10px; }
+        .col-tag { display: inline-block; padding: 3px 8px; background: rgba(31, 95, 255, 0.15); color: var(--primary-color); font-size: 11px; font-weight: 800; border-radius: 6px; margin-bottom: 12px; }
+        .col-title { font-size: 18px; font-weight: 800; color: var(--text-title); margin-bottom: 6px; letter-spacing: 0.2px;}
+        .col-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0; }
 
-        /* 页面 2：录音工作台 - 数据看板优化间距 */
+        /* ================= 页面 2：录音工作台 ================= */
         .stats-card {
             border-radius: 16px; padding: 14px 16px; display: flex; justify-content: space-between;
             margin-bottom: 12px; flex-shrink: 0;
@@ -102,7 +106,7 @@
         .stat-value { font-size: 22px; font-weight: 800; margin-bottom: 2px; }
         .stat-label { font-size: 11px; color: var(--text-secondary); font-weight: 600; }
 
-        /* ====== 重构后的超紧凑吸顶工具栏 ====== */
+        /* 吸顶工具栏 */
         .sticky-toolbar {
             position: sticky; top: -1px; z-index: 20; margin: 0 -20px 12px; padding: 10px 20px 12px;
             background: rgba(239, 246, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -110,8 +114,20 @@
             display: flex; flex-direction: column; gap: 10px;
         }
 
-        /* 第一行：搜索框 + 下拉筛选 */
+        /* 行1：[左侧]筛选 + [右侧]搜索框 */
         .toolbar-row-1 { display: flex; gap: 10px; align-items: center; }
+        .filter-select-wrapper {
+            position: relative; border-radius: 14px; height: 38px; flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02); min-width: 96px;
+        }
+        .filter-select {
+            appearance: none; -webkit-appearance: none; background: transparent;
+            border: none; padding: 0 24px 0 12px; height: 100%; font-size: 13px; font-weight: 700;
+            color: var(--primary-color); outline: none; width: 100%; cursor: pointer;
+        }
+        .filter-icon-arrow { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--primary-color); width: 14px; height: 14px; }
+
         .search-container { position: relative; flex: 1; }
         .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-secondary); }
         .search-input {
@@ -123,19 +139,7 @@
         .search-input:focus { background: rgba(255, 255, 255, 0.9); border-color: rgba(31, 95, 255, 0.3); }
         .search-input::placeholder { color: var(--text-secondary); }
 
-        .filter-select-wrapper {
-            position: relative; border-radius: 14px; height: 38px; flex-shrink: 0;
-            background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(255, 255, 255, 0.9);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-        }
-        .filter-select {
-            appearance: none; -webkit-appearance: none; background: transparent;
-            border: none; padding: 0 28px 0 14px; height: 100%; font-size: 13px; font-weight: 700;
-            color: var(--primary-color); outline: none; width: 100%; cursor: pointer;
-        }
-        .filter-icon-arrow { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--primary-color); width: 14px; height: 14px; }
-
-        /* 第二行：批次输入 + 连播动作 */
+        /* 行2：批次输入 + 连播动作 */
         .toolbar-row-2 { display: flex; justify-content: space-between; align-items: center; }
         .batch-pill {
             display: flex; align-items: center; background: rgba(255,255,255,0.7);
@@ -187,8 +191,6 @@
         
         .en-text { font-size: 17px; font-weight: 800; color: var(--text-title); letter-spacing: 0.3px; }
         .zh-text { font-size: 15px; font-weight: 700; color: var(--text-main); letter-spacing: 0.5px; }
-        
-        .lang-tag { font-size: 10px; color: var(--primary-color); background: var(--primary-light); padding: 2px 6px; border-radius: 6px; font-weight: 700; margin-left: 4px; }
 
         .word-meta { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; margin-top: 2px; padding-left: 26px;}
         
@@ -202,7 +204,7 @@
         .actions-main { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
         .action-divider { width: 1px; height: 22px; background: rgba(0,0,0,0.06); margin: 0 2px; border-radius: 1px; }
         
-        /* [核心修改] 播放按钮，支持 Disabled 状态 */
+        /* 播放按钮 */
         .btn-play {
             width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
             border: 1px solid rgba(0,0,0,0.03); cursor: pointer; transition: all 0.3s; flex-shrink: 0;
@@ -210,7 +212,6 @@
         }
         .btn-play svg { width: 13px; height: 13px; fill: currentColor; }
         
-        /* 待录音状态下禁用样式 */
         .btn-play:disabled {
             opacity: 0.4; cursor: not-allowed; background: #F8FAFC; border-color: transparent; box-shadow: none; color: #94A3B8;
         }
@@ -265,19 +266,20 @@
 <body>
 
 <div class="device-simulator">
-    <!-- PAGE 1: 集合列表页 -->
+    <!-- PAGE 1: 选择任务 -->
     <div id="page-collections" class="page-view active">
         <div class="nav-bar">
-            <div class="icon-btn"></div>
+            <div class="icon-btn" onclick="showToast('返回外部工作区')">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </div>
             <div class="nav-title-group">
-                <div class="nav-title">选择任务词库</div>
+                <div class="nav-title">选择任务</div>
             </div>
             <div class="icon-btn"></div>
         </div>
-        <div class="main-content">
-            <div class="collection-list" id="collectionList">
-                <!-- 由 JS 渲染 -->
-            </div>
+
+        <div class="collection-list" id="collectionList">
+            <!-- 由 JS 渲染 -->
         </div>
     </div>
 
@@ -311,21 +313,20 @@
 
             <!-- 超紧凑集成的工具栏 -->
             <div class="sticky-toolbar">
-                <!-- 行1：搜索与筛选联动 -->
+                <!-- 行1：[左侧]下拉筛选 + [右侧]搜索 -->
                 <div class="toolbar-row-1">
-                    <div class="search-container">
-                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        <input type="text" id="searchInput" class="search-input" placeholder="搜索词汇或释义..." oninput="handleSearch()">
-                    </div>
-                    <!-- 将筛选集成进原生的下拉框，美观且省空间 -->
                     <div class="filter-select-wrapper">
                         <select id="statusFilter" class="filter-select" onchange="handleFilterChange()">
-                            <option value="全部">全 部</option>
-                            <option value="未录音" selected>未录音</option>
+                            <option value="全部" selected>全部</option>
+                            <option value="未录音">未录音</option>
                             <option value="已录音">已录音</option>
                             <option value="需重录">需重录</option>
                         </select>
                         <svg class="filter-icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                    <div class="search-container">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" id="searchInput" class="search-input" placeholder="搜索词汇或释义..." oninput="handleSearch()">
                     </div>
                 </div>
 
@@ -356,7 +357,7 @@
     <!-- 底部连播浮窗 -->
     <div class="floating-player" id="floatingPlayer">
         <div class="fp-info">
-            <div class="fp-title" id="fpTitle">Apple (英文)</div>
+            <div class="fp-title" id="fpTitle">Apple</div>
             <div class="fp-subtitle" id="fpSubtitle">自动连播中...</div>
         </div>
         <div class="fp-controls">
@@ -379,11 +380,11 @@
     const iconPause = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`;
     const iconFlag = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>`;
 
-    // --- 模拟数据 ---
+    // --- 更新后的任务集合数据 ---
     const collections = [
-        { id: 'c1', title: '高一2班基础单词3000', tag: '英语词汇', total: 3000, recorded: 2450 },
-        { id: 'c2', title: '必修一课文核心句型', tag: '英语句型', total: 150, recorded: 50 },
-        { id: 'c3', title: '高二理科数学公式大全', tag: '数学', total: 280, recorded: 0 },
+        { id: 'c1', title: '高一2班基础单词3000', tag: '英语', desc: '包含高中一年级核心基础词汇及延伸短语。', total: 3000, recorded: 2450 },
+        { id: 'c2', title: '必修一课文核心内容', tag: '英语', desc: '包含必修一全册课文的重点长难句及语法精讲。', total: 150, recorded: 50 },
+        { id: 'c3', title: '高二理科大纲精选', tag: '数学', desc: '高中代数与几何核心公式推导及相关定理。', total: 280, recorded: 0 },
     ];
 
     let activeCollection = null;
@@ -408,21 +409,14 @@
         const listEl = document.getElementById('collectionList');
         listEl.innerHTML = '';
         collections.forEach(col => {
-            let pct = Math.round((col.recorded / col.total) * 100);
             const card = document.createElement('div');
+            // 追加 glass-card 实现玻璃质感
             card.className = 'collection-card glass-card';
             card.onclick = () => openWorkspace(col.id);
             card.innerHTML = `
-                <div class="col-tag">${col.tag}</div>
+                <span class="col-tag">${col.tag}</span>
                 <div class="col-title">${col.title}</div>
-                <div class="col-desc">共计 ${col.total} 项，已完成 ${col.recorded} 项</div>
-                <div class="col-progress-bar">
-                    <div class="col-progress-inner" style="width: ${pct}%"></div>
-                </div>
-                <div class="col-stats">
-                    <span>进度 ${pct}%</span>
-                    <span style="color: var(--primary-color);">点击进入</span>
-                </div>
+                <div class="col-desc">${col.desc}</div>
             `;
             listEl.appendChild(card);
         });
@@ -435,7 +429,7 @@
         updateStatsBoard();
 
         document.getElementById('searchInput').value = '';
-        document.getElementById('statusFilter').value = '未录音';
+        document.getElementById('statusFilter').value = '全部';
         
         currentBatchOffset = 0;
         
@@ -560,8 +554,8 @@
         let batchSize = parseInt(document.getElementById('batchSizeInput').value) || 10;
         renderedItems = currentFilteredView.slice(currentBatchOffset, currentBatchOffset + batchSize);
         
-        // 渲染紧凑连播批次数
-        document.getElementById('listCountStr').innerText = renderedItems.length > 0 ? `(${currentBatchOffset + 1}-${currentBatchOffset + renderedItems.length})` : '(0)';
+        // 永远显示相对项数： 1-N项
+        document.getElementById('listCountStr').innerText = renderedItems.length > 0 ? `(1-${renderedItems.length})` : '(0)';
 
         if(renderedItems.length === 0) {
             container.innerHTML = `<div style="text-align:center; padding: 40px; color: var(--text-secondary); font-size:14px;">没有找到符合条件的词汇</div>`;
@@ -569,14 +563,14 @@
         }
 
         renderedItems.forEach((item, index) => {
-            let displayIndex = currentBatchOffset + index + 1;
+            // 永远显示相对序号： 1, 2, 3...N
+            let displayIndex = index + 1;
             
-            const renderSubRow = (type, textContent, tagLabel) => {
+            const renderSubRow = (type, textContent) => {
                 let data = item[type];
                 let metaHTML = '';
                 let markBtnClass = 'btn-icon-small';
                 
-                // 判断是否是未录音（如果未录音，则禁用播放按钮）
                 const isUnrecorded = data.status === 'unrecorded';
                 
                 if (isUnrecorded) {
@@ -603,7 +597,6 @@
                 
                 let textClass = type === 'en' ? 'en-text' : 'zh-text';
 
-                // [修改] 如果是未录音，添加 disabled 属性，控制不可点击
                 let playBtnDisabled = isUnrecorded ? 'disabled' : '';
 
                 return `
@@ -612,7 +605,6 @@
                         <div class="word-header">
                             ${indexPrefix}
                             <span class="${textClass}">${textContent}</span>
-                            <span class="lang-tag">${tagLabel}</span>
                         </div>
                         <div class="word-meta" id="meta-${item.id}-${type}">
                             ${metaHTML}
@@ -621,7 +613,7 @@
                     <div class="actions-main">
                         <button class="${markBtnClass}" id="flag-${item.id}-${type}" onclick="toggleRerecord('${item.id}', '${type}')" title="重录标记">${iconFlag}</button>
                         <div class="action-divider"></div>
-                        <button class="btn-play" id="play-${item.id}-${type}" onclick="handleManualPlayClick(this, 2)" ${playBtnDisabled}>${iconPlay}</button>
+                        <button class="btn-play" id="play-${item.id}-${type}" onclick="handleManualPlayClick(this, '${item.id}', '${type}', 2)" ${playBtnDisabled}>${iconPlay}</button>
                         <button class="btn-record" ${pressEvents}>${iconMic}</button>
                     </div>
                 </div>
@@ -632,9 +624,9 @@
             itemDiv.className = 'word-item glass-card';
             itemDiv.id = `item-el-${item.id}`;
             itemDiv.innerHTML = `
-                ${renderSubRow('en', item.text, 'EN')}
+                ${renderSubRow('en', item.text)}
                 <div class="row-divider"></div>
-                ${renderSubRow('zh', item.meaning, 'ZH')}
+                ${renderSubRow('zh', item.meaning)}
             `;
             container.appendChild(itemDiv);
         });
@@ -693,7 +685,6 @@
                     let markBtn = itemEl.querySelector(`#flag-${item.id}-${type}`);
                     markBtn.classList.remove('flagged');
 
-                    // [重点修复] 录音完成后，解禁对应的播放按钮
                     let playBtn = document.getElementById(`play-${item.id}-${type}`);
                     if (playBtn) playBtn.disabled = false;
                 }
@@ -707,12 +698,21 @@
     let currentlyPlayingBtn = null;
     let manualPlayTimer = null;
 
-    function handleManualPlayClick(btn, durationSec) {
-        // [防御] 如果按钮被 disabled 但依然意外触发了点击
+    function handleManualPlayClick(btn, itemId, type, durationSec) {
         if (btn.disabled) return;
 
         if(isAutoPlaying) {
-            closeAutoPlay();
+            clearTimeout(autoPlayTimer);
+            let newIndex = renderedItems.findIndex(w => w.id === itemId);
+            if (newIndex !== -1) {
+                autoPlayIndex = newIndex;
+                autoPlaySubIndex = type === 'en' ? 0 : 1;
+                isAutoPlayPaused = false;
+                document.getElementById('fpPauseBtn').innerHTML = iconPause;
+                document.getElementById('fpSubtitle').innerText = '当前批次连播中...';
+                playNextInBatch();
+            }
+            return;
         }
 
         if (btn.classList.contains('playing-ai')) {
@@ -776,20 +776,37 @@
     function playNextInBatch() {
         if(!isAutoPlaying || isAutoPlayPaused) return;
 
-        if(autoPlayIndex >= renderedItems.length) {
+        let foundValid = false;
+        while(autoPlayIndex < renderedItems.length) {
+            let item = renderedItems[autoPlayIndex];
+            let type = autoPlaySubIndex === 0 ? 'en' : 'zh';
+            
+            if (item[type].status !== 'unrecorded') {
+                foundValid = true;
+                break; 
+            }
+            
+            if(autoPlaySubIndex === 0) {
+                autoPlaySubIndex = 1;
+            } else {
+                autoPlaySubIndex = 0;
+                autoPlayIndex++;
+            }
+        }
+
+        if(!foundValid || autoPlayIndex >= renderedItems.length) {
             closeAutoPlay();
             showToast('批次连播已完成');
             return;
         }
 
         let item = renderedItems[autoPlayIndex];
-        let displaySeq = currentBatchOffset + autoPlayIndex + 1;
-        
+        // 连播悬浮窗也同步修改为相对序号
+        let displaySeq = autoPlayIndex + 1;
         let type = autoPlaySubIndex === 0 ? 'en' : 'zh';
         let text = autoPlaySubIndex === 0 ? item.text : item.meaning;
-        let langLabel = autoPlaySubIndex === 0 ? '英文' : '中文';
         
-        document.getElementById('fpTitle').innerText = `${displaySeq}. ${text} (${langLabel})`;
+        document.getElementById('fpTitle').innerText = `${displaySeq}. ${text}`;
 
         let itemEl = document.getElementById(`item-el-${item.id}`);
         if(itemEl) {
@@ -802,13 +819,12 @@
             
             let targetPlayBtn = document.getElementById(`play-${item.id}-${type}`);
             if(targetPlayBtn) {
-                // 即便它是 disabled(未录音)，为了表现正在“扫描/跳过”也可以让它临时亮一下，或者直接不亮。这里选择临时亮起以指示连播进度
                 targetPlayBtn.classList.add('playing-ai');
                 targetPlayBtn.innerHTML = iconPause;
             }
         }
 
-        let mockDuration = item[type].status === 'unrecorded' ? 1000 : 2500;
+        let mockDuration = 2000;
         
         autoPlayTimer = setTimeout(() => {
             if(autoPlaySubIndex === 0) {
