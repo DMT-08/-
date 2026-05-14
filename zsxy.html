@@ -24,12 +24,12 @@
             
             --border-line: rgba(0,0,0,0.06);
 
-            /* 修改：马卡龙糖果色系标签 */
-            --tag-eng-bg: rgba(244, 114, 182, 0.15); /* 马卡龙粉色 */
-            --tag-eng-text: #DB2777;                 
-            --tag-chi-bg: rgba(245, 158, 11, 0.15);  /* 马卡龙黄棕/焦糖色 */
-            --tag-chi-text: #D97706;                 
-            --tag-math-bg: rgba(16, 185, 129, 0.15); /* 马卡龙清新绿 */
+            /* 修改：更加青春活力、高饱和度的糖果色系，配合玻璃质感 */
+            --tag-eng-bg: rgba(139, 92, 246, 0.15);  /* 活力紫罗兰 Violet */
+            --tag-eng-text: #7C3AED;                 
+            --tag-chi-bg: rgba(244, 63, 94, 0.15);   /* 青春玫瑰红 Rose */
+            --tag-chi-text: #E11D48;                 
+            --tag-math-bg: rgba(16, 185, 129, 0.15); /* 清新薄荷绿 Emerald */
             --tag-math-text: #059669;                
             --tag-type-bg: rgba(59, 130, 246, 0.12); /* 清透水蓝 Blue */
             --tag-type-text: #2563EB;                
@@ -87,61 +87,44 @@
             box-shadow: 0 8px 24px rgba(31, 95, 255, 0.04);
         }
 
-        .version-list-container { display: flex; flex-direction: column; gap: 16px; padding-bottom: 40px; }
+        .collection-list { display: flex; flex-direction: column; padding: 12px 0 40px; }
         
-        .version-card {
-            background: rgba(255, 255, 255, 0.65); 
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 20px; 
-            padding: 18px 20px; cursor: pointer;
-            box-shadow: 0 8px 24px rgba(31, 95, 255, 0.05); 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex; justify-content: space-between; align-items: center; gap: 16px;
-        }
-        .version-card:active {
-            transform: scale(0.97); background: rgba(255, 255, 255, 0.85);
-            box-shadow: 0 4px 12px rgba(31, 95, 255, 0.08);
-        }
-        
-        .version-info { flex: 1; display: flex; flex-direction: column; gap: 8px; }
-        .version-tags { display: flex; gap: 8px; flex-wrap: wrap; }
-        .version-title { font-size: 17px; font-weight: 800; color: var(--text-title); line-height: 1.4; letter-spacing: 0.2px; }
-
-        .tag {
-            display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 8px; 
-            font-size: 12px; font-weight: 700; letter-spacing: 0.3px;
-            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.7); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02); 
-        }
-        .tag-subject-english { background: var(--tag-eng-bg); color: var(--tag-eng-text); }
-        .tag-subject-chinese { background: var(--tag-chi-bg); color: var(--tag-chi-text); }
-        .tag-subject-math { background: var(--tag-math-bg); color: var(--tag-math-text); }
-        .tag-type { background: var(--tag-type-bg); color: var(--tag-type-text); }
-
-        .version-arrow-container {
-            display: flex; align-items: center; justify-content: center; width: 32px; height: 32px;
-            border-radius: 50%; background: rgba(255, 255, 255, 0.5); color: var(--text-secondary); transition: all 0.2s ease;
-        }
-        .version-card:active .version-arrow-container {
-            background: rgba(31, 95, 255, 0.1); color: var(--primary-color); transform: translateX(4px);
-        }
-
-        /* 新增：独立玻璃卡片式的字段选项 (替换之前的紧凑列表) */
-        .field-list-container { display: flex; flex-direction: column; gap: 14px; padding: 12px 0 40px; }
-        .field-card {
-            background: rgba(255, 255, 255, 0.65); 
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 18px; 
-            padding: 18px 20px; cursor: pointer;
-            box-shadow: 0 6px 20px rgba(31, 95, 255, 0.04); 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        .subject-header {
             display: flex; justify-content: space-between; align-items: center;
+            padding: 18px 4px 8px; cursor: pointer; user-select: none;
         }
-        .field-card:active {
-            transform: scale(0.97); background: rgba(255, 255, 255, 0.85);
-            box-shadow: 0 4px 12px rgba(31, 95, 255, 0.08);
+        .subject-header:active { opacity: 0.7; }
+        .subject-title {
+            font-size: 15px; font-weight: 700; color: var(--text-secondary);
         }
-        .field-card-title { font-size: 16px; font-weight: 700; color: var(--text-title); letter-spacing: 0.2px; }
+        .subject-chevron {
+            color: #9CA3AF; display: flex; align-items: center; justify-content: center;
+            transition: transform 0.3s ease;
+        }
+        .subject-chevron.collapsed { transform: rotate(-90deg); }
+
+        .compact-list-group {
+            border-radius: 16px; overflow: hidden; 
+            background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.9); box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            display: flex; flex-direction: column; width: 100%; 
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+        }
+        .compact-list-group.collapsed {
+            display: none; 
+        }
+
+        .compact-item {
+            padding: 16px 16px; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid var(--border-line); transition: background 0.2s;
+        }
+        .compact-item:last-child { border-bottom: none; }
+        .compact-item:active { background: rgba(31, 95, 255, 0.05); }
+        .compact-title { 
+            font-size: 15px; font-weight: 500; color: var(--text-title); letter-spacing: 0.2px; 
+            line-height: 1.4; padding-right: 12px;
+        }
+        .col-arrow { color: #9CA3AF; display: flex; align-items: center; justify-content: center; flex-shrink: 0;}
 
         .stats-card {
             border-radius: 16px; padding: 14px 16px; display: flex; justify-content: space-between;
@@ -160,44 +143,29 @@
         }
 
         .toolbar-row-1 { display: flex; gap: 10px; align-items: center; }
-        
-        /* 修改：全新的自定义下拉框样式 */
-        .custom-filter-container { position: relative; width: 104px; flex-shrink: 0; z-index: 30; }
-        .custom-filter-trigger {
-            height: 38px; background: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.9); border-radius: 12px;
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 12px; font-size: 13px; font-weight: 700; color: var(--primary-color);
-            cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.02); transition: all 0.2s;
+        .filter-select-wrapper {
+            position: relative; border-radius: 12px; height: 38px; flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02); min-width: 96px;
         }
-        .custom-filter-trigger:active { background: rgba(255, 255, 255, 0.95); }
-        .custom-filter-trigger svg { width: 14px; height: 14px; transition: transform 0.3s; color: var(--primary-color);}
-        .custom-filter-trigger.open svg { transform: rotate(180deg); }
-        
-        .custom-filter-dropdown {
-            position: absolute; top: 100%; left: 0; right: 0; margin-top: 6px;
-            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.9); border-radius: 12px;
-            box-shadow: 0 10px 24px rgba(31, 95, 255, 0.08); opacity: 0; pointer-events: none;
-            transform: translateY(-10px); transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); overflow: hidden;
+        .filter-select {
+            appearance: none; -webkit-appearance: none; background: transparent;
+            border: none; padding: 0 24px 0 12px; height: 100%; font-size: 13px; font-weight: 700;
+            color: var(--primary-color); outline: none; width: 100%; cursor: pointer;
         }
-        .custom-filter-dropdown.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
-        .filter-option {
-            padding: 12px 14px; font-size: 13px; font-weight: 600; color: var(--text-title);
-            cursor: pointer; transition: background 0.2s, color 0.2s; border-bottom: 1px solid var(--border-line);
-        }
-        .filter-option:last-child { border-bottom: none; }
-        .filter-option:active { background: rgba(31, 95, 255, 0.1); }
-        .filter-option.selected { color: var(--primary-color); background: rgba(31, 95, 255, 0.05); }
+        .filter-icon-arrow { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--primary-color); width: 14px; height: 14px; }
 
         .search-container { position: relative; flex: 1; }
         .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #9CA3AF; }
         .search-input {
             width: 100%; padding: 10px 14px 10px 36px; border-radius: 10px;
             background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(255, 255, 255, 0.8);
-            font-size: 14px; font-weight: 400; color: var(--text-title); outline: none; transition: all 0.2s ease;
+            font-size: 14px; font-weight: 400; color: var(--text-title); outline: none;
+            transition: all 0.2s ease;
         }
-        .search-input:focus { background: rgba(255, 255, 255, 0.9); border-color: rgba(31, 95, 255, 0.3); box-shadow: 0 0 0 2px var(--primary-light); }
+        .search-input:focus { 
+            background: rgba(255, 255, 255, 0.9); border-color: rgba(31, 95, 255, 0.3); box-shadow: 0 0 0 2px var(--primary-light); 
+        }
         .search-input::placeholder { color: #9CA3AF; }
 
         .toolbar-row-2 { display: flex; justify-content: space-between; align-items: stretch; gap: 8px; }
@@ -222,13 +190,22 @@
         .btn-action-primary:active { transform: scale(0.95); }
 
         .table-container {
-            background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.9); border-radius: 16px; box-shadow: 0 8px 24px rgba(31, 95, 255, 0.04);
-            margin-bottom: 80px; display: flex; flex-direction: column; height: auto; 
+            background: rgba(255, 255, 255, 0.75); 
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(31, 95, 255, 0.04);
+            margin-bottom: 80px;
+            display: flex;
+            flex-direction: column;
+            height: auto; 
         }
+        
         .table-row {
-            display: flex; align-items: stretch; border-bottom: 1px solid var(--border-line); transition: background 0.2s;
-            scroll-margin-top: 140px; flex-shrink: 0; 
+            display: flex; align-items: stretch; 
+            border-bottom: 1px solid var(--border-line); transition: background 0.2s;
+            scroll-margin-top: 140px; 
+            flex-shrink: 0; 
         }
         .table-row:last-child { border-bottom: none; }
         .table-row.focused { background: rgba(31, 95, 255, 0.08); }
@@ -237,18 +214,37 @@
             width: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center;
             border-right: 1px solid var(--border-line); flex-shrink: 0; padding: 12px 4px; gap: 6px;
         }
-        .row-index { font-size: 15px; font-weight: 800; color: var(--text-secondary); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
-        .badge { display: inline-flex; padding: 2px 6px; border-radius: 6px; font-size: 10px; font-weight: 700; white-space: nowrap; text-align: center; }
+        .row-index {
+            font-size: 15px; font-weight: 800; color: var(--text-secondary);
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+        .badge { 
+            display: inline-flex; padding: 2px 6px; border-radius: 6px; 
+            font-size: 10px; font-weight: 700; white-space: nowrap; text-align: center;
+        }
         .badge-success { background: var(--success-light); color: var(--success-color); }
         .badge-warning { background: var(--warning-light); color: var(--warning-color); }
 
-        .row-content-col { flex: 1; display: flex; align-items: center; justify-content: space-between; padding: 16px 14px 16px 12px; min-width: 0; gap: 12px; }
-        .row-left-content { flex: 1; min-width: 0; line-height: 1.5; }
-        .row-text { font-size: 15px; font-weight: 500; color: var(--text-main); word-break: break-word; vertical-align: middle; }
+        .row-content-col {
+            flex: 1; display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 14px 16px 12px; min-width: 0; gap: 12px;
+        }
+
+        .row-left-content {
+            flex: 1; min-width: 0; 
+            line-height: 1.5; 
+        }
+
+        .row-text { 
+            font-size: 15px; font-weight: 500; color: var(--text-main); 
+            word-break: break-word; vertical-align: middle;
+        }
         
         .inline-speaker {
-            display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; border: none; outline: none;
-            background: var(--primary-light); color: var(--primary-color); cursor: pointer; transition: all 0.2s; 
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 24px; height: 24px; border-radius: 50%; border: none; outline: none;
+            background: var(--primary-light); color: var(--primary-color);
+            cursor: pointer; transition: all 0.2s; 
             vertical-align: middle; margin-left: 6px; margin-top: -2px; flex-shrink: 0;
         }
         .inline-speaker svg { width: 13px; height: 13px; fill: currentColor; }
@@ -259,13 +255,17 @@
         .btn-record {
             width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
             border: none; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            background: linear-gradient(135deg, #FF4B4B 0%, #E11D48 100%); color: white; box-shadow: 0 4px 10px rgba(225, 29, 72, 0.25);
+            background: linear-gradient(135deg, #FF4B4B 0%, #E11D48 100%); color: white; 
+            box-shadow: 0 4px 10px rgba(225, 29, 72, 0.25);
             user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
         }
         .btn-record svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         .btn-record.recording { background: #E11D48; transform: scale(1.15); box-shadow: 0 0 0 6px rgba(225, 29, 72, 0.15); }
         
-        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; text-align: center; color: var(--text-secondary); }
+        .empty-state {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 60px 20px; text-align: center; color: var(--text-secondary);
+        }
         .empty-state svg { width: 64px; height: 64px; color: #CBD5E1; margin-bottom: 16px; }
         .empty-state h3 { font-size: 16px; font-weight: 700; color: var(--text-title); margin-bottom: 8px; }
         .empty-state p { font-size: 13px; line-height: 1.5; }
@@ -273,7 +273,8 @@
         @keyframes pulse-blue { 0% { box-shadow: 0 0 0 0 rgba(31, 95, 255, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(31, 95, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(31, 95, 255, 0); } }
         
         .floating-player {
-            position: absolute; bottom: 30px; left: 20px; right: 20px; background: rgba(31, 95, 255, 0.95); backdrop-filter: blur(16px); border-radius: 20px; padding: 16px 20px; 
+            position: absolute; bottom: 30px; left: 20px; right: 20px;
+            background: rgba(31, 95, 255, 0.95); backdrop-filter: blur(16px); border-radius: 20px; padding: 16px 20px; 
             display: flex; justify-content: space-between; align-items: center; box-shadow: 0 12px 32px rgba(31, 95, 255, 0.3); 
             transform: translateY(150%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 50;
         }
@@ -289,12 +290,100 @@
 
         .toast { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.75); color: white; padding: 12px 24px; border-radius: 12px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 200; backdrop-filter: blur(4px); }
         .toast.show { opacity: 1; }
+
+        /* 首页列表项和标签的样式优化 */
+        .version-list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px; /* 增加列表项之间的间距 */
+            padding-bottom: 40px;
+        }
+        .version-card {
+            background: rgba(255, 255, 255, 0.65); /* 稍微增加透明度，突出玻璃质感 */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 20px; /* 更圆润的倒角 */
+            padding: 18px 20px;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(31, 95, 255, 0.05); /* 更柔和的阴影 */
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 10px; /* 增加内部间距 */
+        }
+        .version-card:active {
+            transform: scale(0.97);
+            background: rgba(255, 255, 255, 0.85);
+            box-shadow: 0 4px 12px rgba(31, 95, 255, 0.08);
+        }
+        .version-card-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center; /* 垂直居中对齐箭头和标题区域 */
+            gap: 16px;
+        }
+        .version-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px; /* 标签和标题之间的间距 */
+        }
+        .version-title {
+            font-size: 17px; /* 稍微放大标题字体 */
+            font-weight: 800; /* 加粗标题 */
+            color: var(--text-title);
+            line-height: 1.4;
+            letter-spacing: 0.2px;
+        }
+        .version-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px; /* 调整内边距，使标签更饱满 */
+            border-radius: 8px; /* 更圆润的标签倒角 */
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            backdrop-filter: blur(8px); /* 给标签也加上一点玻璃质感 */
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.7); /* 增加微妙的白边，提升果冻感 */
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02); /* 增加极微弱的浮雕感 */
+        }
+        /* 根据科目定义不同颜色的标签（青春配色） */
+        .tag-subject-english { background: var(--tag-eng-bg); color: var(--tag-eng-text); }
+        .tag-subject-chinese { background: var(--tag-chi-bg); color: var(--tag-chi-text); }
+        .tag-subject-math { background: var(--tag-math-bg); color: var(--tag-math-text); }
+        .tag-type { background: var(--tag-type-bg); color: var(--tag-type-text); }
+
+        /* 优化列表项右侧箭头的容器 */
+        .version-arrow-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+        .version-card:active .version-arrow-container {
+            background: rgba(31, 95, 255, 0.1);
+            color: var(--primary-color);
+            transform: translateX(4px);
+        }
+
     </style>
 </head>
 <body>
 
 <div class="device-simulator">
-    <!-- PAGE 1: 版本选择 -->
+    <!-- PAGE 1: 版本选择 (改版) -->
     <div id="page-versions" class="page-view active">
         <div class="nav-bar">
             <div class="icon-btn" style="margin-left: -8px;" onclick="showToast('返回外部系统')">
@@ -313,7 +402,7 @@
         </div>
     </div>
 
-    <!-- PAGE 2: 动态字段选择 -->
+    <!-- PAGE 2: 动态字段选择 (恢复) -->
     <div id="page-fields" class="page-view hidden-right" style="display:none;">
         <div class="nav-bar">
             <div class="icon-btn" style="margin-left: -8px;" onclick="goBackToVersions()">
@@ -326,21 +415,20 @@
         </div>
         
         <div class="main-content">
-            <!-- 替换为新的卡片式容器 -->
-            <div class="field-list-container" id="fieldListContainer">
-                <!-- 由 JS 动态渲染独立玻璃卡片 -->
+            <div class="collection-list" id="fieldListContainer">
+                <!-- 由 JS 动态渲染 -->
             </div>
         </div>
     </div>
 
     <!-- PAGE 3: 录音工作台 -->
-    <div id="page-workspace" class="page-view hidden-right" style="display:none;">
+    <div id="page-workspace" class="page-view hidden-right">
         <div class="nav-bar">
             <div class="icon-btn" onclick="goBackToFields()">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
             </div>
             <div class="nav-title-group">
-                <div class="nav-title" id="ws-nav-title">音频校对</div>
+                <div class="nav-title" id="ws-nav-title">词汇校对</div>
             </div>
             <div class="icon-btn"></div>
         </div>
@@ -363,20 +451,15 @@
 
             <div class="sticky-toolbar">
                 <div class="toolbar-row-1">
-                    <!-- 全新自定义的玻璃态下拉菜单 -->
-                    <div class="custom-filter-container" id="filterContainer">
-                        <div class="custom-filter-trigger" id="filterTrigger" onclick="toggleCustomFilter(event)">
-                            <span id="filterLabel">未录音</span>
-                            <svg class="filter-icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                        </div>
-                        <div class="custom-filter-dropdown" id="filterDropdown">
-                            <div class="filter-option" onclick="selectFilter('全部', event)">全部</div>
-                            <div class="filter-option selected" id="opt-unrecorded" onclick="selectFilter('未录音', event)">未录音</div>
-                            <div class="filter-option" onclick="selectFilter('已录音', event)">已录音</div>
-                            <div class="filter-option" onclick="selectFilter('需重录', event)">需重录</div>
-                        </div>
+                    <div class="filter-select-wrapper">
+                        <select id="statusFilter" class="filter-select" onchange="handleFilterChange()">
+                            <option value="全部" selected>全部</option>
+                            <option value="未录音">未录音</option>
+                            <option value="已录音">已录音</option>
+                            <option value="需重录">需重录</option>
+                        </select>
+                        <svg class="filter-icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </div>
-                    
                     <div class="search-container">
                         <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         <input type="text" id="searchInput" class="search-input" placeholder="输入关键字搜索..." oninput="handleSearch()">
@@ -406,8 +489,8 @@
             
             <div id="emptyState" class="empty-state" style="display: none;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                <h3>无匹配数据</h3>
-                <p>当前筛选条件下暂无需要校对的词汇</p>
+                <h3>敬请期待</h3>
+                <p>外部纠错标记功能正在建设中<br>当前暂无需重录的数据</p>
             </div>
         </div>
     </div>
@@ -437,6 +520,7 @@
     const iconPause = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`;
     const iconInlineSpeaker = `<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>`;
     const iconArrowRight = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+    const iconChevronDown = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
 
     const fieldConfig = {
         'english': [
@@ -456,20 +540,25 @@
     };
 
     const versions = [
-        { id: 'v1', subject: 'english', title: '高一英语必修一核心词库', typeName: '英文词汇' },
-        { id: 'v1_1', subject: 'english', title: '剑桥雅思核心1000词', typeName: '英文词汇' },
-        { id: 'v1_2', subject: 'english', title: '托福听力场景必背词汇', typeName: '英文句子' },
-        { id: 'v1_3', subject: 'english', title: '专四核心词组搭配', typeName: '中英对照' },
-        { id: 'v1_4', subject: 'english', title: '考研英语历年真题长难句', typeName: '长难句' },
-        { id: 'v2', subject: 'chinese', title: '人教版初二语文古诗词', typeName: '古诗词' },
-        { id: 'v2_1', subject: 'chinese', title: '高中必背文言文大全', typeName: '文言文' },
-        { id: 'v2_2', subject: 'chinese', title: '现代汉语常用词语表', typeName: '现代汉语' },
-        { id: 'v3', subject: 'math', title: '高考理科综合：数学必背长公式', typeName: '数学公式' }, 
-        { id: 'v3_1', subject: 'math', title: '微积分导数与积分常用表', typeName: '微积分' }, 
-        { id: 'v3_2', subject: 'math', title: '解析几何定理推导集合', typeName: '解析几何' }, 
+        { id: 'v1', subject: 'english', title: '高一英语必修一核心词库', defaultType: 'en_word', typeName: '英文词汇' },
+        { id: 'v1_1', subject: 'english', title: '剑桥雅思核心1000词', defaultType: 'en_word', typeName: '英文词汇' },
+        { id: 'v1_2', subject: 'english', title: '托福听力场景必背词汇', defaultType: 'en_sentence', typeName: '英文句子' },
+        { id: 'v1_3', subject: 'english', title: '专四核心词组搭配', defaultType: 'en_zh', typeName: '中英对照' },
+        { id: 'v1_4', subject: 'english', title: '考研英语历年真题长难句', defaultType: 'en_sentence', typeName: '长难句' },
+        { id: 'v2', subject: 'chinese', title: '人教版初二语文古诗词', defaultType: 'zh_word', typeName: '古诗词' },
+        { id: 'v2_1', subject: 'chinese', title: '高中必背文言文大全', defaultType: 'zh_meaning', typeName: '文言文' },
+        { id: 'v2_2', subject: 'chinese', title: '现代汉语常用词语表', defaultType: 'zh_word', typeName: '现代汉语' },
+        { id: 'v3', subject: 'math', title: '高考理科综合：数学必背长公式', defaultType: 'math_formula', typeName: '数学公式' }, 
+        { id: 'v3_1', subject: 'math', title: '微积分导数与积分常用表', defaultType: 'math_formula', typeName: '微积分' }, 
+        { id: 'v3_2', subject: 'math', title: '解析几何定理推导集合', defaultType: 'math_name', typeName: '解析几何' }, 
     ];
 
-    const subjectNames = { 'english': '英语', 'chinese': '语文', 'math': '数学' };
+    // 学科显示名称映射
+    const subjectNames = {
+        'english': '英语',
+        'chinese': '语文',
+        'math': '数学'
+    };
 
     let activeVersion = null;
     let activeFieldId = null; 
@@ -479,63 +568,65 @@
     let currentBatchOffset = 0; 
     let currentFilteredView = []; 
     let renderedItems = []; 
-    let activeFilterValue = '未录音'; // 默认筛选改为“未录音”
+    
+    let subjectExpandedState = {
+        'english': true,
+        'chinese': true,
+        'math': true
+    };
 
     const mockContentDict = {
         'english': {
             'en_word': ["Apple", "Photosynthesis", "Incomprehensibilities"],
-            'en_zh': ["苹果", "光合作用", "不可理解的事物"],
-            'en_sentence': ["I eat an apple.", "Photosynthesis is a process.", "The sheer incomprehensibilities..."]
+            'en_zh': ["苹果", "光合作用，指绿色植物利用光能将水和二氧化碳转化为有机物的过程", "不可理解的事物，指极其复杂难以弄懂的情况或现象"],
+            'en_sentence': ["I eat an apple.", "Photosynthesis is a process used by plants and other organisms to convert light energy into chemical energy that, through cellular respiration, can later be released to fuel the organism's activities.", "The sheer incomprehensibilities of the quantum mechanics theories made the students scratch."]
         },
         'chinese': {
             'zh_word': ["落霞", "踌躇满志", "魑魅魍魉"],
             'zh_pinyin': ["luò xiá", "chóu chú mǎn zhì", "chī mèi wǎng liǎng"],
-            'zh_meaning': ["落日的彩霞。", "形容对自己的现状或取得的成就非常得意。", "指传说中害人的鬼怪。"]
+            'zh_meaning': ["落日的彩霞。", "形容对自己的现状或取得的成就非常得意。", "指传说中害人的鬼怪的统称，现多用来比喻各种各样的坏人。"]
         },
         'math': {
             'math_name': ["勾股定理", "泰勒展开式", "高斯-博内定理"],
-            'math_formula': ["a² + b² = c²", "f(x) = f(a) + f'(a)(x-a) + ...", "∫∫_M K dA + ∫_∂M k_g ds = 2πχ(M)"]
+            'math_formula': ["a² + b² = c²", "f(x) = f(a) + f'(a)(x-a) + f''(a)/2! * (x-a)² + ... + fⁿ(a)/n! * (x-a)ⁿ + Rn(x)", "∫∫_M K dA + ∫_∂M k_g ds = 2πχ(M) 其中M是一个紧致的二维黎曼流形，K是其高斯曲率，k_g是其边界的测地曲率，χ(M)是其欧拉示性数。"]
         }
     };
 
     function init() {
         renderVersions();
-        
-        // 点击页面其他地方关闭自定义下拉框
-        document.addEventListener('click', function(event) {
-            const container = document.getElementById('filterContainer');
-            const dropdown = document.getElementById('filterDropdown');
-            const trigger = document.getElementById('filterTrigger');
-            if (container && !container.contains(event.target)) {
-                dropdown.classList.remove('show');
-                trigger.classList.remove('open');
-            }
-        });
     }
 
     function renderVersions() {
         const listEl = document.getElementById('versionList');
         listEl.innerHTML = '';
 
+        if (versions.length === 0) {
+             listEl.innerHTML = `<div style="text-align:center; padding: 40px; color: var(--text-secondary); font-size:14px;">没有找到版本数据</div>`;
+             return;
+        }
+
         versions.forEach(v => {
             const card = document.createElement('div');
             card.className = 'version-card';
+            // 点击进入字段选择页面
             card.onclick = () => openFieldSelection(v.id);
             
             const subjectLabel = subjectNames[v.subject] || '通用';
             const subjectClass = `tag-subject-${v.subject}`;
             
-            // 标签在上，标题在下
+            // 调整布局：标签在上，标题在下
             card.innerHTML = `
-                <div class="version-info">
-                    <div class="version-tags">
-                        <span class="tag ${subjectClass}">${subjectLabel}</span>
-                        <span class="tag tag-type">${v.typeName}</span>
+                <div class="version-card-content">
+                    <div class="version-info">
+                        <div class="version-tags">
+                            <span class="tag ${subjectClass}">${subjectLabel}</span>
+                            <span class="tag tag-type">${v.typeName}</span>
+                        </div>
+                        <div class="version-title">${v.title}</div>
                     </div>
-                    <div class="version-title">${v.title}</div>
-                </div>
-                <div class="version-arrow-container">
-                    ${iconArrowRight}
+                    <div class="version-arrow-container">
+                        ${iconArrowRight}
+                    </div>
                 </div>
             `;
             listEl.appendChild(card);
@@ -544,13 +635,14 @@
 
     function openFieldSelection(vId) {
         activeVersion = versions.find(v => v.id === vId);
+        
+        // 动态渲染该版本对应的字段列表
         renderFieldsForSubject(activeVersion.subject);
         
-        document.getElementById('page-fields').style.display = 'flex';
+        // 显示页面
+        document.getElementById('page-fields').style.display = 'flex'; // 确保不是 display:none
         document.getElementById('page-versions').classList.replace('active', 'hidden-left');
         document.getElementById('page-fields').classList.replace('hidden-right', 'active');
-        
-        setTimeout(() => { document.getElementById('page-versions').style.display = 'none'; }, 400);
     }
 
     function renderFieldsForSubject(subjectKey) {
@@ -558,112 +650,82 @@
         fieldListEl.innerHTML = '';
         const fields = fieldConfig[subjectKey];
 
-        // 采用全新的独立卡片渲染字段，抛弃之前的紧凑组
+        const groupContainer = document.createElement('div');
+        groupContainer.className = 'compact-list-group';
+        
         fields.forEach(f => {
-            const card = document.createElement('div');
-            card.className = 'field-card';
-            card.onclick = () => openWorkspace(f.id, f.name);
-            card.innerHTML = `
-                <div class="field-card-title">${f.name}</div>
-                <div class="version-arrow-container" style="background: rgba(31, 95, 255, 0.05);">
-                    ${iconArrowRight}
-                </div>
+            const item = document.createElement('div');
+            item.className = 'compact-item';
+            item.onclick = () => openWorkspace(f.id, f.name);
+            item.innerHTML = `
+                <div class="compact-title">${f.name}</div>
+                <div class="col-arrow">${iconArrowRight}</div>
             `;
-            fieldListEl.appendChild(card);
+            groupContainer.appendChild(item);
         });
+        
+        fieldListEl.appendChild(groupContainer);
     }
 
     function goBackToVersions() {
-        document.getElementById('page-versions').style.display = 'flex';
-        // 稍微延时以确保 display:flex 生效后再进行过渡
-        requestAnimationFrame(() => {
-            document.getElementById('page-fields').classList.replace('active', 'hidden-right');
-            document.getElementById('page-versions').classList.replace('hidden-left', 'active');
-        });
+        document.getElementById('page-fields').classList.replace('active', 'hidden-right');
+        document.getElementById('page-versions').classList.replace('hidden-left', 'active');
         
-        setTimeout(() => { document.getElementById('page-fields').style.display = 'none'; }, 400);
+        // 延迟隐藏页面以完成动画
+        setTimeout(() => {
+            document.getElementById('page-fields').style.display = 'none';
+        }, 400);
     }
 
     function openWorkspace(fieldKey, fieldName) {
         activeFieldId = fieldKey;
         activeFieldName = fieldName;
         
-        // 动态设置标题，例如：英文音频校对、词语音频校对
-        document.getElementById('ws-nav-title').innerText = `${fieldName}音频校对`;
+        document.getElementById('ws-nav-title').innerText = `${activeVersion.title}`; // 使用版本标题或字段名称，这里保留版本标题更清晰
+        // 如果想标题显示字段名，可以改为： document.getElementById('ws-nav-title').innerText = `${fieldName} 校对`;
         
         generateWordsForField(activeVersion.subject, fieldKey);
         updateStatsBoard();
 
         document.getElementById('searchInput').value = '';
-        
-        // 初始化恢复为“未录音”筛选态
-        selectFilter('未录音', null); 
+        document.getElementById('statusFilter').value = '全部';
         currentBatchOffset = 0;
         
-        document.getElementById('page-workspace').style.display = 'flex';
-        requestAnimationFrame(() => {
-            document.getElementById('page-fields').classList.replace('active', 'hidden-left');
-            document.getElementById('page-workspace').classList.replace('hidden-right', 'active');
-        });
-        
-        setTimeout(() => { document.getElementById('page-fields').style.display = 'none'; }, 400);
+        document.getElementById('page-fields').classList.replace('active', 'hidden-left');
+        document.getElementById('page-workspace').classList.replace('hidden-right', 'active');
         
         applyFiltersAndRender();
     }
 
     function goBackToFields() {
         closeAutoPlay();
-        document.getElementById('page-fields').style.display = 'flex';
-        requestAnimationFrame(() => {
-            document.getElementById('page-workspace').classList.replace('active', 'hidden-right');
-            document.getElementById('page-fields').classList.replace('hidden-left', 'active');
-        });
-        setTimeout(() => { document.getElementById('page-workspace').style.display = 'none'; }, 400);
+        document.getElementById('page-workspace').classList.replace('active', 'hidden-right');
+        document.getElementById('page-fields').classList.replace('hidden-left', 'active');
     }
 
-    function toggleCustomFilter(e) {
-        if(e) e.stopPropagation();
-        const dropdown = document.getElementById('filterDropdown');
-        const trigger = document.getElementById('filterTrigger');
-        dropdown.classList.toggle('show');
-        trigger.classList.toggle('open');
-    }
-
-    function selectFilter(value, e) {
-        if(e) e.stopPropagation();
-        activeFilterValue = value;
-        document.getElementById('filterLabel').innerText = value;
-        
-        // 更新下拉列表中的选中样式
-        const options = document.querySelectorAll('.filter-option');
-        options.forEach(opt => {
-            if(opt.innerText === value) opt.classList.add('selected');
-            else opt.classList.remove('selected');
-        });
-
-        // 收起下拉框
-        document.getElementById('filterDropdown').classList.remove('show');
-        document.getElementById('filterTrigger').classList.remove('open');
-
-        // 触发列表渲染
-        currentBatchOffset = 0; 
-        applyFiltersAndRender(); 
-        closeAutoPlay();
-    }
+    // 移除废弃函数
+    function handleVersionSelect(versionObj) { /* 已被 openFieldSelection 取代 */ }
+    function goBackToVersionsFromWorkspace() { /* 已被 goBackToFields 取代 */ }
 
     function generateWordsForField(subjectKey, fieldId) {
         allWordsInField = [];
         let dataPool = mockContentDict[subjectKey][fieldId];
-        if(!dataPool) dataPool = ["模拟数据1", "模拟数据2"];
+        if(!dataPool) dataPool = ["模拟数据1", "模拟长数据2用于测试自适应换行效果是否良好"];
 
         const totalToGen = 50; 
         const recordedCount = 15; 
         
         for(let i=0; i<totalToGen; i++) {
             let text = dataPool[i % dataPool.length];
-            if(i > dataPool.length) text += ` (测试长文本自动换行 ${i})`;
+            if(i > dataPool.length) text += ` (测试长文本自动换行，当内容超过一行时，这里会自动向下延伸撑开单元格高度，非常完美适配 ${i})`;
+
             let status = i < recordedCount ? 'recorded' : 'unrecorded';
-            allWordsInField.push({ id: `item_${i}`, text: text, status: status });
+            
+            allWordsInField.push({ 
+                id: `item_${i}`, 
+                text: text, 
+                status: status
+            });
         }
     }
 
@@ -683,6 +745,12 @@
         closeAutoPlay();
     }
 
+    function handleFilterChange() {
+        currentBatchOffset = 0; 
+        applyFiltersAndRender(); 
+        closeAutoPlay();
+    }
+
     function fetchNextBatch() {
         let batchSize = parseInt(document.getElementById('batchSizeInput').value) || 10;
         currentBatchOffset += batchSize;
@@ -697,9 +765,10 @@
     }
 
     function applyFiltersAndRender() {
+        const activeFilter = document.getElementById('statusFilter').value;
         const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
 
-        if (activeFilterValue === '需重录') {
+        if (activeFilter === '需重录') {
             document.getElementById('wordListContainer').style.display = 'none';
             document.getElementById('emptyState').style.display = 'flex';
             document.getElementById('listCountStr').innerText = '(0)';
@@ -712,8 +781,8 @@
 
         currentFilteredView = allWordsInField.filter(w => {
             let matchFilter = true;
-            if (activeFilterValue === '未录音') matchFilter = w.status === 'unrecorded';
-            else if (activeFilterValue === '已录音') matchFilter = w.status === 'recorded';
+            if (activeFilter === '未录音') matchFilter = w.status === 'unrecorded';
+            else if (activeFilter === '已录音') matchFilter = w.status === 'recorded';
 
             let matchSearch = true;
             if (searchTerm !== '') matchSearch = w.text.toLowerCase().includes(searchTerm);
@@ -735,16 +804,13 @@
         document.getElementById('listCountStr').innerText = renderedItems.length > 0 ? `(1-${renderedItems.length})` : '(0)';
 
         if(renderedItems.length === 0) {
-            document.getElementById('wordListContainer').style.display = 'none';
-            document.getElementById('emptyState').style.display = 'flex';
+            container.innerHTML = `<div style="text-align:center; padding: 40px; color: var(--text-secondary); font-size:14px;">没有找到符合条件的词汇</div>`;
             return;
-        } else {
-            document.getElementById('wordListContainer').style.display = 'flex';
-            document.getElementById('emptyState').style.display = 'none';
         }
 
         renderedItems.forEach((item, index) => {
             let displayIndex = index + 1; 
+            
             let badgeHTML = '';
             let speakerDisabled = '';
             
@@ -793,7 +859,9 @@
 
     function handlePressStart(btn, itemId, e) {
         if(e.type === 'touchstart') { if (e.cancelable) e.preventDefault(); }
+        
         if(isAutoPlaying) togglePauseAutoPlay();
+
         if (btn.dataset.recording === 'true') return;
         btn.dataset.recording = 'true';
         btn.classList.add('recording');
@@ -801,11 +869,13 @@
         const itemEl = document.getElementById(`item-el-${itemId}`);
         document.querySelectorAll('.table-row').forEach(el => el.classList.remove('focused'));
         itemEl.classList.add('focused');
+        
         showToast('正在录音，松开保存...', 800);
     }
 
     function handlePressEnd(btn, itemId, saveRecord, e) {
         if(e.type === 'touchend' && e.cancelable) e.preventDefault();
+        
         if (btn.dataset.recording !== 'true') return;
         btn.dataset.recording = 'false';
         
@@ -820,8 +890,10 @@
                 if(item) {
                     item.status = 'recorded';
                     updateStatsBoard();
+                    
                     let metaDiv = itemEl.querySelector(`#meta-${item.id}`);
                     metaDiv.innerHTML = `<span class="badge badge-success">已录音</span>`;
+                    
                     let speakerBtn = document.getElementById(`play-${item.id}`);
                     if (speakerBtn) speakerBtn.disabled = false;
                 }
@@ -836,6 +908,7 @@
 
     function handleInlinePlay(btn, itemId) {
         if (btn.disabled) return;
+
         if(isAutoPlaying) {
             clearTimeout(autoPlayTimer);
             let newIndex = renderedItems.findIndex(w => w.id === itemId);
@@ -880,25 +953,21 @@
             showToast('当前批次无可播内容');
             return;
         }
-
-        // 新增检查：当前批次内是否至少存在一个“已录音”的项目
-        const hasRecordedItem = renderedItems.some(item => item.status === 'recorded');
-        if (!hasRecordedItem) {
-            showToast('当前批次无录音文件可播');
-            return;
-        }
-
+        
         if (currentlyPlayingBtn) {
             clearTimeout(manualPlayTimer);
             currentlyPlayingBtn.classList.remove('playing-ai');
             currentlyPlayingBtn = null;
         }
+
         document.getElementById('floatingPlayer').classList.add('show');
         isAutoPlaying = true;
         isAutoPlayPaused = false;
+        
         autoPlayIndex = 0;
         document.getElementById('fpPauseBtn').innerHTML = iconPause;
         document.getElementById('fpSubtitle').innerText = '当前批次连播中...';
+        
         playNextInBatch();
     }
     
@@ -908,8 +977,10 @@
         let foundValid = false;
         while(autoPlayIndex < renderedItems.length) {
             let item = renderedItems[autoPlayIndex];
-            // 修改：只有状态是 recorded (已录音) 时，才认为是有效可播放的
-            if (item.status === 'recorded') { foundValid = true; break; }
+            if (item.status !== 'unrecorded') {
+                foundValid = true;
+                break; 
+            }
             autoPlayIndex++;
         }
 
@@ -921,15 +992,22 @@
 
         let item = renderedItems[autoPlayIndex];
         let displaySeq = autoPlayIndex + 1; 
+        
         let shortText = item.text.length > 15 ? item.text.substring(0, 15) + '...' : item.text;
         document.getElementById('fpTitle').innerText = `${displaySeq}. ${shortText}`;
 
         let itemEl = document.getElementById(`item-el-${item.id}`);
         if(itemEl) {
             itemEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            document.querySelectorAll('.inline-speaker.playing-ai').forEach(btn => btn.classList.remove('playing-ai'));
+            
+            document.querySelectorAll('.inline-speaker.playing-ai').forEach(btn => {
+                btn.classList.remove('playing-ai');
+            });
+            
             let targetPlayBtn = document.getElementById(`play-${item.id}`);
-            if(targetPlayBtn) targetPlayBtn.classList.add('playing-ai');
+            if(targetPlayBtn) {
+                targetPlayBtn.classList.add('playing-ai');
+            }
         }
 
         autoPlayTimer = setTimeout(() => {
@@ -940,13 +1018,16 @@
 
     function togglePauseAutoPlay() {
         if(!isAutoPlaying) return;
+        
         isAutoPlayPaused = !isAutoPlayPaused;
         document.getElementById('fpPauseBtn').innerHTML = isAutoPlayPaused ? iconPlay : iconPause;
         document.getElementById('fpSubtitle').innerText = isAutoPlayPaused ? '已暂停连播' : '当前批次连播中...';
         
         if (isAutoPlayPaused) {
             clearTimeout(autoPlayTimer);
-            document.querySelectorAll('.inline-speaker.playing-ai').forEach(btn => btn.classList.remove('playing-ai'));
+            document.querySelectorAll('.inline-speaker.playing-ai').forEach(btn => {
+                btn.classList.remove('playing-ai');
+            });
         } else {
             playNextInBatch();
         }
@@ -954,10 +1035,14 @@
     
     function closeAutoPlay() {
         if(!isAutoPlaying) return;
+        
         document.getElementById('floatingPlayer').classList.remove('show');
         isAutoPlaying = false;
         clearTimeout(autoPlayTimer);
-        document.querySelectorAll('.inline-speaker.playing-ai').forEach(btn => btn.classList.remove('playing-ai'));
+        
+        document.querySelectorAll('.inline-speaker.playing-ai').forEach(btn => {
+            btn.classList.remove('playing-ai');
+        });
     }
 
     function showToast(msg, duration = 1500) {
