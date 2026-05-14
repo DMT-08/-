@@ -6,6 +6,7 @@
     <title>AI 记词 - 极致原生体验</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
@@ -47,72 +48,71 @@
             50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
         }
         .pulse-alert-light { animation: pulse-red-light 2s infinite; }
+
+        /* 完全隐藏左侧列表的滚动条 */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* 弹窗及淡入动画 */
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* 去除数字输入框自带的上下箭头 */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type="number"] { -moz-appearance: textfield; }
+        
+        /* 倍速选择器对齐补丁 */
+        .select-center { text-align: center; text-align-last: center; appearance: none; }
     </style>
 </head>
 <body class="flex flex-col h-screen">
 
-    <!-- ================= 全局原生弹窗 ================= -->
     <div id="native-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-gray-900/40 backdrop-blur-sm transition-opacity duration-300 opacity-0">
-        <div class="bg-white rounded-[24px] p-7 w-[90%] max-w-sm shadow-2xl flex flex-col modal-enter" id="native-modal-content">
-            <h3 id="modal-title" class="text-[20px] font-bold text-gray-900 mb-2">提示</h3>
-            <p id="modal-msg" class="text-[14px] text-gray-600 mb-6 leading-relaxed whitespace-pre-wrap"></p>
-            <button id="modal-btn" class="w-full bg-brand hover-bg-brand text-white font-bold text-[15px] py-3.5 rounded-[16px] shadow-sm active:scale-95 transition-all">
-                我知道了
-            </button>
+        <div class="bg-white rounded-[24px] p-6 md:p-7 w-[90%] max-sm:max-w-[320px] max-w-sm shadow-2xl flex flex-col items-center text-center modal-enter" id="native-modal-content">
+            <h3 id="modal-title" class="text-[20px] font-extrabold text-gray-900 mb-2 w-full text-center">提示</h3>
+            <div id="modal-msg" class="text-[15px] text-gray-600 mb-6 leading-relaxed w-full flex flex-col items-center justify-center text-center"></div>
+            <div class="flex gap-3 w-full">
+                <button id="modal-cancel-btn" class="hidden flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold text-[15px] py-3.5 rounded-[16px] transition-all active:scale-95">取消</button>
+                <button id="modal-btn" class="flex-1 bg-brand hover-bg-brand text-white font-bold text-[15px] py-3.5 rounded-[16px] shadow-sm active:scale-95 transition-all">我知道了</button>
+            </div>
         </div>
     </div>
 
 
-    <!-- ================= 视图 1：主界面 (仪表盘) ================= -->
     <div id="view-dashboard" class="view-section active flex-col w-full h-full max-w-[1300px] mx-auto p-4 md:p-5 overflow-hidden gap-4">
         
-        <!-- Header -->
         <header class="flex justify-between items-center shrink-0">
             <div class="flex items-center gap-4">
-                <button class="w-10 h-10 bg-white rounded-[14px] flex items-center justify-center shadow-premium active:scale-90 transition-transform text-slate-700 cursor-pointer" onclick="showModal('返回提示', '学习可随时退出，此处将返回上一级页面。')">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mr-0.5">
-                        <polyline points="15 18 9 12 15 6"></polyline>
-                    </svg>
+                <button class="w-10 h-10 bg-white rounded-[14px] flex items-center justify-center shadow-premium active:scale-90 transition-transform text-slate-700 cursor-pointer" onclick="showModal('返回提示', '<div class=\'mt-1 font-medium\'>学习可随时退出，<br>此处将返回上一级页面。</div>')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mr-0.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
                 </button>
-                <h1 class="text-[32px] font-extrabold text-gray-900 tracking-tight leading-none">
-                    AI 记词
-                </h1>
+                <h1 class="text-[32px] font-extrabold text-gray-900 tracking-tight leading-none">AI 记词</h1>
             </div>
             <button onclick="toggleTeacherTasks()" class="bg-white text-brand border border-blue-100 px-3.5 py-2 rounded-[10px] font-bold text-[13px] shadow-sm active:scale-95 transition-transform flex items-center gap-1.5">
                 <i class="ph-bold ph-gear text-[16px]"></i> 模拟下发任务
             </button>
         </header>
 
-        <!-- 1. 顶部：可视化优化看板 (极限压缩垂直空间) -->
-        <div class="flex shrink-0 gap-4">
-            <!-- 左侧主指标：环形进度看板 -->
-            <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[24px] p-4 flex items-center justify-between w-[280px] md:w-[320px] shadow-lg shadow-blue-500/20 shrink-0 relative overflow-hidden">
+        <!-- Top Dashboard Stats -->
+        <div class="flex shrink-0 gap-4 max-md:flex-col">
+            <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[24px] p-4 flex items-center justify-between w-[280px] md:w-[320px] max-md:w-full shadow-lg shadow-blue-500/20 shrink-0 relative overflow-hidden">
                 <i class="ph-fill ph-target absolute left-4 top-1/2 -translate-y-1/2 text-[100px] text-white opacity-[0.03] transform -translate-x-1/4 pointer-events-none"></i>
-                
                 <div class="flex flex-col relative z-10 justify-center">
                     <span class="text-[12px] font-bold text-white/80 mb-0.5">总学习目标</span>
-                    <div class="text-[36px] font-extrabold text-white tracking-tight leading-none drop-shadow-sm" id="statTotalTarget">3000</div>
-                    
-                    <!-- 合并后的已学与待学信息框 -->
+                    <div class="flex items-baseline gap-1 drop-shadow-sm">
+                        <span class="text-[36px] font-extrabold text-white tracking-tight leading-none" id="statTotalTarget">3000</span>
+                        <span class="text-[14px] font-bold text-white/80">词</span>
+                    </div>
                     <div class="mt-2 bg-white/10 px-2.5 py-1 rounded-[6px] backdrop-blur-sm border border-white/10 flex items-center gap-3 w-max">
-                        <div class="flex items-baseline gap-1.5">
-                            <span class="text-[11px] text-white/70 font-medium">已学</span>
-                            <span id="statLearnedSum" class="text-[13px] font-bold text-white font-mono leading-none">1730</span>
-                        </div>
+                        <div class="flex items-baseline gap-1.5"><span class="text-[11px] text-white/70 font-medium">已学</span><span id="statLearnedSum" class="text-[13px] font-bold text-white font-mono leading-none">1730</span></div>
                         <div class="w-[1px] h-2.5 bg-white/20"></div>
-                        <div class="flex items-baseline gap-1.5">
-                            <span class="text-[11px] text-white/70 font-medium">待学</span>
-                            <span id="statUnlearned" class="text-[13px] font-bold text-white font-mono leading-none">1270</span>
-                        </div>
+                        <div class="flex items-baseline gap-1.5"><span class="text-[11px] text-white/70 font-medium">待学</span><span id="statUnlearned" class="text-[13px] font-bold text-white font-mono leading-none">1270</span></div>
                     </div>
                 </div>
-
-                <!-- SVG 圆环进度条 -->
                 <div class="relative w-[72px] h-[72px] flex items-center justify-center z-10 shrink-0 drop-shadow-md">
                     <svg class="w-full h-full transform -rotate-90">
-                        <!-- 底环 -->
                         <circle cx="36" cy="36" r="28" stroke="rgba(255,255,255,0.15)" stroke-width="7" fill="none" />
-                        <!-- 进度环 (175.9 是周长 2*pi*28) -->
                         <circle id="targetProgressRing" cx="36" cy="36" r="28" stroke="white" stroke-width="7" fill="none" stroke-dasharray="175.9" stroke-dashoffset="90" stroke-linecap="round" class="transition-all duration-1000 ease-out" />
                     </svg>
                     <div class="absolute inset-0 flex flex-col items-center justify-center">
@@ -121,261 +121,420 @@
                 </div>
             </div>
 
-            <!-- 右侧细节指标网格：带数据可视化增强 -->
             <div class="flex-1 bg-white/90 backdrop-blur-xl rounded-[24px] shadow-premium p-3 flex flex-col gap-2 min-w-0">
-                <!-- 上层：词汇状态 (2列 - 高度压缩) -->
                 <div class="grid grid-cols-2 gap-2 flex-1 min-h-0">
-                    <div class="bg-[#F0FDF4] border border-[#BBF7D0] rounded-[16px] p-3 flex flex-col justify-center relative overflow-hidden group transition-all hover:shadow-md h-full">
-                        <div class="flex items-center gap-1.5 text-green-600 mb-0.5 z-10">
-                            <div class="flex items-center justify-center w-4 h-4 rounded-full bg-green-100 text-green-600"><i class="ph-bold ph-check text-[10px]"></i></div>
-                            <span class="text-[12px] font-bold">累计认识总数</span>
+                    <div class="bg-[#F0FDF4] border border-[#BBF7D0] rounded-[16px] px-3 md:px-4 py-3.5 flex items-center justify-between relative overflow-hidden group transition-all hover:shadow-md h-full w-full">
+                        <div class="flex items-center gap-2 text-green-700 z-10 shrink-0">
+                            <div class="w-[38px] h-[32px] rounded-[10px] bg-white text-green-500 flex items-center justify-center shadow-sm border border-green-100 shrink-0"><i class="ph-bold ph-check text-[18px]"></i></div>
+                            <span class="text-[13px] font-bold hidden sm:inline">累计认识</span>
                         </div>
-                        <span class="text-[26px] font-extrabold text-green-700 leading-none tracking-tight font-mono z-10 mt-1" id="statKnownTotal">1280</span>
+                        <div class="flex items-baseline gap-1 z-10 whitespace-nowrap">
+                            <span class="text-[24px] font-extrabold text-green-700 leading-none tracking-tight font-mono" id="statKnownTotal">1280</span><span class="text-[12px] font-bold text-green-600/70">词</span>
+                        </div>
                     </div>
-
-                    <div class="bg-[#FEF2F2] border border-[#FECACA] rounded-[16px] p-3 flex flex-col justify-center relative overflow-hidden group transition-all hover:shadow-md h-full">
-                        <div class="flex items-center gap-1.5 text-red-600 mb-0.5 z-10">
-                            <div class="flex items-center justify-center w-4 h-4 rounded-full bg-red-100 text-red-600"><i class="ph-bold ph-x text-[10px]"></i></div>
-                            <span class="text-[12px] font-bold">累计生词总数</span>
+                    <div class="bg-[#FEF2F2] border border-[#FECACA] rounded-[16px] px-3 md:px-4 py-3.5 flex items-center justify-between relative overflow-hidden group transition-all hover:shadow-md h-full w-full">
+                        <div class="flex items-center gap-2 text-red-700 z-10 shrink-0">
+                            <div class="w-[38px] h-[32px] rounded-[10px] bg-white text-red-500 flex items-center justify-center shadow-sm border border-red-100 shrink-0"><i class="ph-bold ph-x text-[18px]"></i></div>
+                            <span class="text-[13px] font-bold hidden sm:inline">累计生词</span>
                         </div>
-                        <span class="text-[26px] font-extrabold text-red-700 leading-none tracking-tight font-mono z-10 mt-1" id="statUnknownTotal">450</span>
+                        <div class="flex items-baseline gap-1 z-10 whitespace-nowrap">
+                            <span class="text-[24px] font-extrabold text-red-700 leading-none tracking-tight font-mono" id="statUnknownTotal">450</span><span class="text-[12px] font-bold text-red-600/70">词</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- 下层：交互训练分布 (分割线等分通栏) -->
-                <div class="grid grid-cols-3 divide-x divide-gray-200/80 bg-[#F8FAFC] rounded-[16px] border border-gray-200/80 py-2 shrink-0 shadow-[inset_0_2px_4px_rgba(0,0,0,0.01)]">
-                    
-                    <div class="flex items-center justify-center gap-2.5 px-2">
-                        <div class="w-9 h-9 rounded-[10px] bg-white shadow-sm border border-blue-100 flex items-center justify-center text-blue-500 shrink-0">
-                            <i class="ph-fill ph-microphone-stage text-[18px]"></i>
-                        </div>
-                        <div class="flex flex-col">
-                            <span class="text-[10px] font-bold text-gray-500 mb-0.5">跟读次数</span>
-                            <span class="text-[16px] font-extrabold text-gray-800 leading-none font-mono" id="statReadTotal">1200</span>
+                <div class="grid grid-cols-3 divide-x divide-gray-200/80 bg-[#F8FAFC] rounded-[16px] border border-gray-200/80 py-2.5 shrink-0 shadow-[inset_0_2px_4px_rgba(0,0,0,0.01)]">
+                    <div class="flex items-center justify-center gap-2 md:gap-2.5 px-1">
+                        <div class="w-8 h-8 rounded-[10px] bg-white shadow-sm border border-blue-100 flex items-center justify-center text-blue-500 shrink-0 hidden lg:flex"><i class="ph-fill ph-microphone-stage text-[16px]"></i></div>
+                        <div class="flex items-baseline gap-1 whitespace-nowrap">
+                            <span class="text-[12px] font-bold text-gray-500 mr-0.5">跟读</span><span class="text-[20px] font-extrabold text-gray-800 leading-none font-mono" id="statReadTotal">1200</span><span class="text-[11px] font-semibold text-gray-400">次</span>
                         </div>
                     </div>
-
-                    <div class="flex items-center justify-center gap-2.5 px-2">
-                        <div class="w-9 h-9 rounded-[10px] bg-white shadow-sm border border-cyan-100 flex items-center justify-center text-cyan-600 shrink-0">
-                            <i class="ph-fill ph-headphones text-[18px]"></i>
-                        </div>
-                        <div class="flex flex-col">
-                            <span class="text-[10px] font-bold text-gray-500 mb-0.5">音记次数</span>
-                            <span class="text-[16px] font-extrabold text-gray-800 leading-none font-mono" id="statMemoTotal">1100</span>
+                    <div class="flex items-center justify-center gap-2 md:gap-2.5 px-1">
+                        <div class="w-8 h-8 rounded-[10px] bg-white shadow-sm border border-cyan-100 flex items-center justify-center text-cyan-600 shrink-0 hidden lg:flex"><i class="ph-fill ph-headphones text-[16px]"></i></div>
+                        <div class="flex items-baseline gap-1 whitespace-nowrap">
+                            <span class="text-[12px] font-bold text-gray-500 mr-0.5">音记</span><span class="text-[20px] font-extrabold text-gray-800 leading-none font-mono" id="statMemoTotal">1100</span><span class="text-[11px] font-semibold text-gray-400">次</span>
                         </div>
                     </div>
-
-                    <div class="flex items-center justify-center gap-2.5 px-2">
-                        <div class="w-9 h-9 rounded-[10px] bg-white shadow-sm border border-rose-100 flex items-center justify-center text-rose-500 shrink-0">
-                            <i class="ph-fill ph-pencil-simple text-[18px]"></i>
-                        </div>
-                        <div class="flex flex-col">
-                            <span class="text-[10px] font-bold text-gray-500 mb-0.5">听写次数</span>
-                            <span class="text-[16px] font-extrabold text-gray-800 leading-none font-mono" id="statDictTotal">1050</span>
+                    <div class="flex items-center justify-center gap-2 md:gap-2.5 px-1">
+                        <div class="w-8 h-8 rounded-[10px] bg-white shadow-sm border border-rose-100 flex items-center justify-center text-rose-500 shrink-0 hidden lg:flex"><i class="ph-fill ph-pencil-simple text-[16px]"></i></div>
+                        <div class="flex items-baseline gap-1 whitespace-nowrap">
+                            <span class="text-[12px] font-bold text-gray-500 mr-0.5">听写</span><span class="text-[20px] font-extrabold text-gray-800 leading-none font-mono" id="statDictTotal">1050</span><span class="text-[11px] font-semibold text-gray-400">次</span>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
 
-        <!-- 2. 中下部主体：左侧生词本 vs 右侧AI中枢 -->
-        <div class="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[1.1fr_1.5fr] gap-5 md:gap-6 mt-1">
-            
-            <!-- 【左侧】：生词本 -->
-            <div class="bg-[#FFFDF8] rounded-[24px] shadow-premium flex flex-col h-full min-h-0 border border-[#FDE68A] relative overflow-hidden">
-                <div class="flex items-center justify-between px-5 pt-5 pb-3 shrink-0 border-b border-[#FDE68A]/40">
-                    <h2 class="text-[18px] font-bold text-gray-800 flex items-center gap-1.5">
-                        生词本
-                    </h2>
-                </div>
+        <!-- Dashboard Main Hub -->
+        <div class="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-5 md:gap-6 mt-1">
+            <div class="bg-[#FFFDF8] rounded-[24px] shadow-premium p-6 flex flex-col h-full min-h-0 border border-[#FDE68A] relative overflow-hidden justify-center items-center text-center group cursor-pointer hover:border-orange-300 transition-all" onclick="switchView('view-vocab')">
+                <div class="absolute -right-4 -top-4 w-24 h-24 bg-orange-100/50 rounded-full blur-xl group-hover:bg-orange-200/50 transition-colors pointer-events-none"></div>
+                <div class="absolute -left-4 -bottom-4 w-20 h-20 bg-yellow-100/50 rounded-full blur-lg group-hover:bg-yellow-200/50 transition-colors pointer-events-none"></div>
 
-                <!-- 数据呈现+筛选的大一统控制栏 (无冗余背景，全由JS渲染) -->
-                <div class="flex items-center gap-2 px-4 py-3 border-b border-[#FDE68A]/30 shrink-0 overflow-x-auto hide-scrollbar">
-                    <button onclick="setVocabFilter('all')" id="filter-all"></button>
-                    <button onclick="setVocabFilter('new')" id="filter-new"></button>
-                    <button onclick="setVocabFilter('old')" id="filter-old"></button>
+                <div class="w-16 h-16 bg-gradient-to-br from-orange-100 to-orange-50 rounded-[18px] flex items-center justify-center text-orange-500 mb-4 group-hover:-translate-y-1 group-hover:shadow-md transition-all relative z-10 border border-orange-200">
+                    <i class="ph-fill ph-books text-[32px]"></i>
                 </div>
-                
-                <div class="flex-1 min-h-0 flex flex-col relative z-10 p-3">
-                    <div id="inlineVocabList" class="flex-1 overflow-y-auto hide-scrollbar flex flex-col gap-2 pr-1">
-                        <!-- JS 动态渲染内部列表 -->
-                    </div>
-                </div>
+                <h2 class="text-[20px] font-extrabold text-gray-800 mb-1.5 relative z-10">我的生词本</h2>
+                <p class="text-[13px] text-gray-500 mb-5 relative z-10">已累计生词: <span id="dashVocabCount" class="font-extrabold text-orange-500 text-[15px]">0</span> 词</p>
+                <button class="bg-white text-orange-500 border border-orange-200 px-5 py-2.5 rounded-[12px] font-bold text-[13px] group-hover:bg-orange-500 group-hover:text-white transition-colors shadow-sm relative z-10 flex items-center gap-1.5">
+                    进入详情 <i class="ph-bold ph-arrow-right"></i>
+                </button>
             </div>
 
-            <!-- 【右侧】：全融合无界 AI 学习中枢 -->
             <div class="bg-white rounded-[24px] shadow-premium p-4 md:p-5 flex flex-col justify-between gap-4 h-full min-h-0 relative">
-                
-                <!-- 【第一层】置顶横向：关卡引擎 -->
                 <div class="bg-gray-50/60 rounded-[16px] border border-gray-100 p-3 shrink-0 relative overflow-hidden h-[80px] flex flex-col justify-center">
                     
-                    <div id="hubIdleState" class="absolute inset-0 flex flex-row items-center justify-center gap-2.5 opacity-50 pointer-events-none transition-opacity">
-                        <i class="ph-bold ph-check-circle text-[22px] text-gray-400"></i>
-                        <span class="text-[14px] font-bold text-gray-500">生词暂未集满，暂未生成关卡</span>
+                    <div id="hubIdleState" class="absolute inset-0 flex flex-row items-center justify-center transition-opacity opacity-100 gap-2">
+                        <div class="flex items-center gap-1.5">
+                            <i class="ph-fill ph-info text-[18px] text-gray-400"></i>
+                            <span class="text-[13px] font-bold text-gray-500 tracking-wide">生词本暂未集满</span>
+                        </div>
+                        <span class="text-[13px] font-bold text-gray-300 mx-1">或</span>
+                        <button onclick="promptManualGenerate()" class="group flex items-center gap-0.5 text-orange-500 hover:text-orange-600 bg-orange-50 hover:bg-orange-100 px-3 py-1 rounded-full transition-all active:scale-95 font-bold text-[13px] shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)] border border-orange-100/50">
+                            主动生成 <i class="ph-bold ph-caret-right text-[12px] group-hover:translate-x-0.5 transition-transform duration-200"></i>
+                        </button>
                     </div>
 
                     <div id="hubActiveState" class="hidden absolute inset-0 bg-[#FFF5F5] border-[2px] border-[#FECACA] flex-row items-center justify-between p-3 z-20 pulse-alert-light rounded-[16px] gap-3">
                         <div class="flex flex-col shrink-0">
-                            <h3 class="font-extrabold text-[15px] text-red-600 flex items-center gap-1"><i class="ph-fill ph-warning-circle"></i> 阻断关卡</h3>
-                            <span class="text-[10px] font-bold text-red-500 mt-1">待消灭 <span id="hubLevelCount" class="text-[12px]">0</span> 词</span>
+                            <h3 class="font-extrabold text-[15px] text-red-600 flex items-center gap-1"><i class="ph-fill ph-warning-circle"></i> 专属强化关卡</h3>
+                            <span class="text-[10px] font-bold text-red-500 mt-1">待强化 <span id="hubLevelCount" class="text-[12px]">0</span> 词</span>
                         </div>
-                        
-                        <div class="flex-1 flex flex-row items-center justify-center gap-1 md:gap-2 overflow-hidden px-2" id="hubStepsContainer">
-                            <!-- 由 JS 动态渲染 -->
-                        </div>
-                        
-                        <button onclick="simulateNextStep()" class="shrink-0 bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 px-4 rounded-[12px] shadow-sm active:scale-95 transition-all text-[13px] flex items-center justify-center gap-1.5">
+                        <div class="flex-1 flex flex-row items-center justify-center gap-1 md:gap-2 overflow-hidden px-2" id="hubStepsContainer"></div>
+                        <button onclick="enterScoringView()" class="shrink-0 bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 px-4 rounded-[12px] shadow-sm active:scale-95 transition-all text-[13px] flex items-center justify-center gap-1.5">
                             攻坚解锁 <i class="ph-bold ph-arrow-right"></i>
                         </button>
                     </div>
                 </div>
 
-                <!-- 【第二层】中间引擎区：学新词 & 复习旧词 -->
                 <div class="grid grid-cols-2 gap-4 h-[90px] shrink-0">
-                    <button id="btnNew" onclick="startPassing('new', '学习新词')" class="w-full h-full">
-                        <!-- JS 动态填充 -->
-                    </button>
-                    <button id="btnOld" onclick="startPassing('old', '复习旧词')" class="w-full h-full">
-                        <!-- JS 动态填充 -->
-                    </button>
+                    <button id="btnNew" onclick="startPassing('new', '学习新词')" class="w-full h-full"></button>
+                    <button id="btnOld" onclick="startPassing('old', '复习旧词')" class="w-full h-full"></button>
                 </div>
 
-                <!-- 【第三层】置底纵向列表：老师指定任务 -->
                 <div class="bg-gray-50/60 rounded-[16px] border border-gray-100 p-3 shrink-0 flex flex-col relative overflow-hidden flex-1 min-h-[150px]">
                     <div class="flex items-center gap-1.5 mb-2 px-1 shrink-0 text-slate-700">
                         <i class="ph-fill ph-chalkboard-teacher text-indigo-500 text-[16px]"></i>
                         <span class="text-[14px] font-bold">老师指定任务</span>
                     </div>
-                    
-                    <div id="assignedTaskContainer" class="w-full overflow-y-auto hide-scrollbar flex flex-col gap-2 pb-1 relative z-10">
-                        <!-- JS 动态垂直插入 -->
-                    </div>
-                    
+                    <div id="assignedTaskContainer" class="w-full overflow-y-auto hide-scrollbar flex flex-col gap-2 pb-1 relative z-10"></div>
                     <div id="noAssignedTaskBox" class="absolute inset-0 flex flex-col items-center justify-center text-center opacity-50 pointer-events-none z-0 mt-4">
                         <i class="ph-fill ph-coffee text-[32px] text-gray-400 mb-1"></i>
                         <p class="text-[12px] font-bold text-gray-500 mt-1">暂未发布指定任务</p>
                     </div>
                 </div>
-
             </div>
+        </div>
+    </div>
+    <!-- ================= 视图：我的生词本 ================= -->
+    <div id="view-vocab" class="view-section flex-col w-full h-full max-w-[1300px] mx-auto p-4 md:p-5 overflow-hidden gap-4">
+        <div class="flex items-center justify-between shrink-0 mb-2 px-2">
+            <div class="flex items-center gap-4">
+                <button onclick="switchView('view-dashboard')" class="w-11 h-11 bg-white hover:bg-gray-50 rounded-[14px] shadow-sm flex items-center justify-center transition-colors text-slate-600 active:scale-95 border border-gray-100">
+                    <i class="ph-bold ph-caret-left text-[22px]"></i>
+                </button>
+                <h2 class="font-extrabold text-[32px] text-gray-900 tracking-tight leading-none">我的生词本</h2>
+            </div>
+            <!-- 恢复之前清透高亮的暖橙色渐变 -->
+            <button onclick="promptManualGenerate()" class="bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white pl-2 pr-4 py-1.5 rounded-[14px] font-bold text-[14px] shadow-md shadow-orange-500/20 active:scale-95 transition-all flex items-center gap-2 group border border-orange-400/50">
+                <div class="bg-white/25 backdrop-blur-sm rounded-[10px] w-8 h-8 flex items-center justify-center shadow-[inset_0_1px_3px_rgba(255,255,255,0.4)] border border-white/20 group-hover:rotate-12 transition-transform duration-300">
+                    <i class="ph-fill ph-magic-wand text-yellow-50 text-[18px]"></i>
+                </div>
+                一键生成关卡
+            </button>
+        </div>
 
+        <div class="bg-white rounded-[24px] shadow-premium flex flex-col flex-1 min-h-0 border border-gray-100 relative overflow-hidden">
+            <div class="flex justify-between items-center px-5 py-4 border-b border-gray-100 bg-gray-50/50 shrink-0">
+                <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar" id="vocab-filters-full">
+                    <button onclick="setVocabFilterFull('all')" id="full-filter-all"></button>
+                    <button onclick="setVocabFilterFull('new')" id="full-filter-new"></button>
+                    <button onclick="setVocabFilterFull('old')" id="full-filter-old"></button>
+                </div>
+                <div class="text-[13px] text-gray-500 font-medium">共 <span id="fullVocabCount">0</span> 词</div>
+            </div>
+            <div class="flex-1 min-h-0 overflow-y-auto px-5 py-4 hide-scrollbar bg-gray-50/30">
+                <div id="fullVocabList" class="flex flex-col gap-4 content-start"></div>
+            </div>
         </div>
     </div>
 
 
-    <!-- ================= 视图 2：全新过词界面 (无底部栏，完美还原胶囊头) ================= -->
-    <div id="view-passing" class="view-section flex-col w-full h-full p-4 md:p-5 overflow-hidden max-w-[1200px] mx-auto gap-4">
-        
-        <!-- 还原极简标题栏 -->
-        <div class="flex items-center gap-4 shrink-0 mb-3 px-2">
-            <button onclick="switchView('view-dashboard')" class="w-11 h-11 bg-[#F1F5F9] hover:bg-[#E2E8F0] rounded-[14px] flex items-center justify-center transition-colors text-slate-600 shadow-sm active:scale-95">
-                <i class="ph-bold ph-caret-left text-[22px]"></i>
-            </button>
-            <h2 class="font-extrabold text-[32px] text-gray-900 tracking-tight leading-none" id="passingTitle">学习新词</h2>
+    <div id="view-passing" class="view-section flex-col w-full h-full p-4 md:p-5 overflow-hidden max-w-[1300px] mx-auto gap-4">
+        <div class="flex items-center justify-between shrink-0 mb-3 px-2">
+            <div class="flex items-center gap-4">
+                <button onclick="switchView('view-dashboard')" class="w-11 h-11 bg-[#F1F5F9] hover:bg-[#E2E8F0] rounded-[14px] flex items-center justify-center transition-colors text-slate-600 shadow-sm active:scale-95">
+                    <i class="ph-bold ph-caret-left text-[22px]"></i>
+                </button>
+                <h2 class="font-extrabold text-[32px] text-gray-900 tracking-tight leading-none" id="passingTitle">学习新词</h2>
+            </div>
         </div>
 
-        <!-- 核心过词区域 -->
-        <div class="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[1fr_2.5fr] gap-5">
-            
-            <!-- 【左侧】：生词收集篮 -->
-            <div class="bg-[#FFFDF8] border border-[#FDE68A] rounded-[24px] shadow-premium p-4 flex flex-col min-h-0 relative">
-                <div class="flex flex-col mb-3 px-1 shrink-0 gap-2">
-                    <h2 class="text-[16px] font-bold text-gray-800 flex items-center gap-1.5">
-                        <i class="ph-fill ph-book-bookmark text-orange-500 text-[18px]"></i> 生词本
-                    </h2>
-                    <div class="w-full flex">
-                        <!-- 大一统进度显示 -->
-                        <span id="basketProgressBadge" class="text-[10px] text-orange-500 bg-orange-50 px-2 py-0.5 rounded-[4px] border border-orange-100 font-bold transition-colors">新词关卡进度: 0/5</span>
-                    </div>
-                </div>
-                
-                <div id="queueList" class="flex-1 overflow-y-auto hide-scrollbar flex flex-col gap-2 pr-1">
-                    <!-- JS 动态渲染 -->
+        <div class="flex-1 min-h-0 flex flex-col bg-white rounded-[24px] shadow-premium relative overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 shrink-0">
+                <span class="text-[13px] text-gray-500 font-medium">共 <span id="totalPassCount">10</span> 词</span>
+                <div class="flex items-center bg-gray-200/60 p-1 rounded-[12px] gap-1 shrink-0">
+                    <button id="pass-filter-all" onclick="setPassFilter('all')" class="px-3 py-1.5 rounded-[10px] bg-white shadow-sm text-gray-800 text-[13px] font-bold transition-all">全部 <span id="statAllCount">0</span></button>
+                    <button id="pass-filter-known" onclick="setPassFilter('known')" class="px-3 py-1.5 rounded-[10px] text-gray-500 hover:text-gray-700 text-[13px] font-bold transition-all flex items-center gap-1"><div class="w-1.5 h-1.5 rounded-full bg-[#10B981]"></div>认识 <span id="statKnown">0</span></button>
+                    <button id="pass-filter-unknown" onclick="setPassFilter('unknown')" class="px-3 py-1.5 rounded-[10px] text-gray-500 hover:text-gray-700 text-[13px] font-bold transition-all flex items-center gap-1"><div class="w-1.5 h-1.5 rounded-full bg-[#EF4444]"></div>不认识 <span id="statUnknown">0</span></button>
                 </div>
             </div>
+            <div id="wordListContainer" class="flex-1 min-h-0 overflow-y-auto px-5 py-4 flex flex-col gap-4 pb-24 hide-scrollbar bg-gray-50/30 content-start"></div>
+            <div class="absolute bottom-0 left-0 w-full bg-white border-t border-gray-100 px-6 py-4 flex justify-between items-center z-10 shadow-[0_-4px_20px_rgba(0,0,0,0.03)] shrink-0">
+                <div class="flex items-center gap-1.5 text-[#F97316] text-[15px] font-medium cursor-pointer active:opacity-70 transition-all whitespace-nowrap" onclick="scrollToFirstUnanswered()">
+                    <i class="ph-fill ph-warning-circle text-[22px]"></i>
+                    <span>剩余待完成：<span id="statRemaining" class="text-[22px] font-extrabold px-1 leading-none">10</span> 题</span>
+                    <i class="ph-bold ph-caret-right text-[16px] ml-0.5"></i>
+                </div>
+                <button id="submitLevelBtn" onclick="submitPassResults()" class="bg-[#F1F5F9] text-[#94A3B8] font-bold py-3 px-10 text-[16px] rounded-[14px] transition-all cursor-not-allowed whitespace-nowrap shrink-0">提 交</button>
+            </div>
+        </div>
+    </div>
 
-            <!-- 【右侧】：过词列表页 (底部添加了专属控制栏) -->
-            <div class="flex-1 min-h-0 flex flex-col bg-white rounded-[24px] shadow-premium relative overflow-hidden">
-                <div class="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 shrink-0">
-                    <span class="text-[13px] text-gray-500 font-medium">共 <span id="totalPassCount">10</span> 词</span>
-                    <div class="flex items-center gap-4 text-[13px] font-bold">
-                        <div class="flex items-center gap-1.5 text-gray-700"><div class="w-2.5 h-2.5 rounded-[4px] bg-[#10B981]"></div>认识: <span id="statKnown">0</span></div>
-                        <div class="flex items-center gap-1.5 text-gray-700"><div class="w-2.5 h-2.5 rounded-[4px] bg-[#EF4444]"></div>不认识: <span id="statUnknown">0</span></div>
+
+    <div id="view-scoring" class="view-section flex-col w-full h-full absolute inset-0 z-[60] bg-gradient-to-br from-[#EFF6FF] to-[#DFE7FF] text-gray-700 select-none overflow-hidden">
+        
+        <!-- 【绝对正中心】全局流水线 Stepper -->
+        <div class="absolute left-1/2 top-8 transform -translate-x-1/2 flex items-center space-x-1 z-[70] pointer-events-auto" id="nav-stepper-container"></div>
+
+        <div class="absolute inset-0 pt-[32px] p-8 flex pointer-events-none">
+            <!-- 左侧面板 (还原回 50% 等分比例) -->
+            <div class="flex-1 h-full flex flex-col pointer-events-auto pr-6 pb-0 shrink-0 min-w-0">
+                
+                <!-- 头部：返回按钮(左) + 进度标(右) -->
+                <div class="flex items-center h-[40px] mb-4 shrink-0 w-full space-x-3">
+                    <div class="flex items-center cursor-pointer group pointer-events-auto" onclick="showModal('退出提示', '<div class=\'mt-1 font-medium\'>确定要退出当前关卡吗？未提交的进度将不会保留。</div>', () => switchView('view-dashboard'), true)">
+                        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-gray-600 shrink-0 mr-3 group-hover:shadow-md transition-all">
+                            <i data-lucide="chevron-left" class="w-6 h-6 -ml-0.5"></i>
+                        </div>
                     </div>
+                    <div id="score-progress" class="bg-[#1F5FFF]/10 text-[#1F5FFF] font-bold px-4 py-1.5 rounded-full text-[14px] shrink-0 pointer-events-auto">1/11</div>
                 </div>
 
-                <div id="wordListContainer" class="flex-1 min-h-0 overflow-y-auto px-5 py-4 flex flex-col gap-3 pb-24 hide-scrollbar">
-                    <!-- 动态插入单词列表 -->
-                </div>
+                <ul id="queue-words-list" class="flex-1 overflow-y-auto px-1 -mx-1 space-y-[6px] scroll-smooth no-scrollbar relative"></ul>
+                <div id="queue-submit-bar" class="mt-4 pt-4 border-t border-gray-300/30 flex items-center justify-between px-2 shrink-0 h-[72px]"></div>
+            </div>
 
-                <!-- 悬浮底部操作栏：包含剩余题数提示与纯手动确认提交按钮 -->
-                <div class="absolute bottom-0 left-0 w-full bg-white border-t border-gray-100 px-6 py-4 flex justify-between items-center z-10 shadow-[0_-4px_20px_rgba(0,0,0,0.03)] shrink-0">
-                    <div class="flex items-center gap-1.5 text-[#F97316] text-[15px] font-medium cursor-pointer active:opacity-70 transition-all" onclick="scrollToFirstUnanswered()">
-                        <i class="ph-fill ph-warning-circle text-[22px]"></i>
-                        <span>剩余待完成：<span id="statRemaining" class="text-[22px] font-extrabold px-1">10</span> 题</span>
-                        <i class="ph-bold ph-caret-right text-[16px] ml-0.5"></i>
+            <!-- 分割线 -->
+            <div class="w-px bg-gray-200/80 mt-16 mb-8 mx-2 shrink-0 rounded-full shadow-sm pointer-events-auto"></div>
+
+            <!-- 右侧面板 (还原回 50% 等分比例) -->
+            <div class="flex-1 h-full flex flex-col relative pointer-events-auto pl-6 min-w-0 shrink-0">
+                
+                <!-- 头部：状态胶囊(基于右区居中) + 自动播放(靠右) -->
+                <div class="w-full flex items-center justify-between h-[40px] relative z-20 mb-4 shrink-0 pointer-events-auto">
+                    <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
+                        <div id="scoring-status-pill" class="flex items-center space-x-1.5 bg-white/80 backdrop-blur-md px-6 py-2.5 rounded-full border border-white text-[14px] font-medium text-gray-500 transition-colors shadow-sm pointer-events-auto whitespace-nowrap">等待开始...</div>
                     </div>
-                    <button id="submitLevelBtn" onclick="submitPassResults()" class="bg-[#F1F5F9] text-[#94A3B8] font-bold py-3 px-10 text-[16px] rounded-[14px] transition-all cursor-not-allowed">
-                        提 交
+                    <div></div><!-- 占位，确保自动播放按钮靠右 -->
+                    <button id="autoplay-toggle-btn" onclick="toggleAutoPlay()" class="h-9 flex items-center px-4 rounded-full border-[1.5px] font-bold text-[13px] transition-all bg-[#eff6ff] border-[#bfdbfe] text-[#3B82F6] hover:bg-[#dbeafe] shadow-sm shrink-0 whitespace-nowrap relative z-10">
+                        <i data-lucide="repeat" class="w-4 h-4 mr-1.5"></i><span id="autoplay-toggle-text">自动下一个</span>
                     </button>
                 </div>
+
+                <!-- 发音信息区 -->
+                <div class="flex-1 flex flex-col items-center justify-center text-center px-4 pointer-events-none min-w-0 w-full space-y-12">
+                    <div id="score-word-en" class="text-gray-800 tracking-wide font-bold leading-tight drop-shadow-md max-w-full break-words break-all pointer-events-auto w-full text-[40px] transition-all duration-300">afternoon</div>
+                    <div id="score-word-phon" class="text-gray-800 font-bold font-serif tracking-widest drop-shadow-sm pointer-events-auto transition-all duration-300 break-words break-all max-w-full w-full text-[40px] leading-tight">/ˌa:ftə'nu:n/</div>
+                    <div id="score-word-cn" class="text-gray-800 font-bold tracking-widest pointer-events-auto leading-tight transition-all duration-300 max-w-full break-words w-full text-[40px]">下午</div>
+                </div>
+
+                <div class="w-full flex flex-col items-center shrink-0 mt-auto relative z-50 pointer-events-auto">
+                    <div id="mic-container" class="mb-6 h-[84px] flex items-center justify-end w-full transition-opacity duration-300 pr-2 pointer-events-auto">
+                        <button id="score-action-btn" class="w-[84px] h-[84px] bg-[#3B82F6] text-white rounded-full flex items-center justify-center shadow-[0_8px_24px_rgba(59,130,246,0.4)] hover:bg-[#2563EB] transition-all focus:outline-none select-none group relative z-[100] overflow-hidden transform cursor-pointer">
+                            <i data-lucide="mic" class="w-9 h-9 pointer-events-none transition-transform group-active:scale-90 shrink-0"></i>
+                        </button>
+                    </div>
+
+                    <div id="control-capsule" class="w-full flex items-center justify-between bg-white/90 backdrop-blur-2xl px-5 h-[72px] rounded-[36px] shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-white/60 pointer-events-auto">
+                        
+                        <div class="flex items-center space-x-6 pl-6 pr-8 border-r border-gray-200/80 shrink-0">
+                            <div class="flex flex-col items-center justify-center space-y-0.5">
+                                <span class="text-[11px] text-[#94a3b8] font-bold tracking-wide">音频间隔</span>
+                                <div class="bg-[#f1f5f9] text-[#475569] pl-2 pr-1 py-0.5 rounded flex items-center focus-within:ring-1 focus-within:ring-blue-300 transition-shadow">
+                                    <input id="audio-gap" type="number" step="0.1" value="1.0" class="bg-transparent text-[12px] font-mono font-bold leading-tight w-6 text-center outline-none">
+                                    <span class="text-[10px] opacity-70 font-bold ml-px mr-1">秒</span>
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-center justify-center space-y-0.5">
+                                <span class="text-[11px] text-[#94a3b8] font-bold tracking-wide">单词间隔</span>
+                                <div class="bg-[#f1f5f9] text-[#475569] pl-2 pr-1 py-0.5 rounded flex items-center focus-within:ring-1 focus-within:ring-blue-300 transition-shadow">
+                                    <input id="word-gap" type="number" step="0.1" value="1.0" class="bg-transparent text-[12px] font-mono font-bold leading-tight w-6 text-center outline-none">
+                                    <span class="text-[10px] opacity-70 font-bold ml-px mr-1">秒</span>
+                                </div>
+                            </div>
+                            
+                            <!-- 自定义倍速下拉菜单 -->
+                            <div class="flex flex-col items-center justify-center space-y-0.5 relative" id="speed-dropdown-container">
+                                <span class="text-[11px] text-[#94a3b8] font-bold tracking-wide">倍速</span>
+                                <div id="speed-trigger" class="bg-[#f1f5f9] text-[#475569] px-2 py-0.5 rounded text-[12px] font-mono font-bold leading-tight min-w-[36px] text-center cursor-pointer hover:bg-[#e2e8f0] transition-colors relative select-none">
+                                    <span id="speed-display">1x</span>
+                                </div>
+                                
+                                <div id="speed-menu" class="hidden absolute bottom-[calc(100%+8px)] left-1/2 transform -translate-x-1/2 bg-white/95 backdrop-blur-xl rounded-[14px] shadow-[0_4px_24px_rgba(0,0,0,0.12)] border border-white/80 py-1.5 w-[68px] z-[100] origin-bottom transition-all duration-200 opacity-0 scale-95 flex flex-col gap-0.5">
+                                    <div class="speed-option px-0 py-1.5 text-[12px] font-mono font-bold text-center cursor-pointer text-gray-500 hover:bg-gray-100/80 transition-colors rounded-[8px] mx-1.5" data-value="0.75">0.75x</div>
+                                    <div class="speed-option px-0 py-1.5 text-[12px] font-mono font-bold text-center cursor-pointer bg-blue-50 text-[#3B82F6] transition-colors rounded-[8px] mx-1.5" data-value="1">1x</div>
+                                    <div class="speed-option px-0 py-1.5 text-[12px] font-mono font-bold text-center cursor-pointer text-gray-500 hover:bg-gray-100/80 transition-colors rounded-[8px] mx-1.5" data-value="1.25">1.25x</div>
+                                    <div class="speed-option px-0 py-1.5 text-[12px] font-mono font-bold text-center cursor-pointer text-gray-500 hover:bg-gray-100/80 transition-colors rounded-[8px] mx-1.5" data-value="1.5">1.5x</div>
+                                    <div class="speed-option px-0 py-1.5 text-[12px] font-mono font-bold text-center cursor-pointer text-gray-500 hover:bg-gray-100/80 transition-colors rounded-[8px] mx-1.5" data-value="1.75">1.75x</div>
+                                    <div class="speed-option px-0 py-1.5 text-[12px] font-mono font-bold text-center cursor-pointer text-gray-500 hover:bg-gray-100/80 transition-colors rounded-[8px] mx-1.5" data-value="10">2x</div>
+                                </div>
+                                <input type="hidden" id="playback-speed" value="1">
+                            </div>
+                        </div>
+
+                        <!-- 翻页控制操作区：彻底分布两端 -->
+                        <div class="flex-1 flex justify-between items-center pl-4 pr-0 relative w-full">
+                            <button id="prev-btn" class="flex items-center justify-center text-[#3B82F6] hover:text-[#2563EB] transition-colors font-medium text-[14px] sm:text-[15px] py-2 px-2 rounded-full cursor-pointer hover:bg-blue-50 whitespace-nowrap shrink-0" onclick="prevScoreWord()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-[16px] h-[16px] sm:w-[18px] sm:h-[18px] mr-1 sm:mr-1.5"><line x1="5" y1="19" x2="5" y2="5"></line><polygon points="19 20 9 12 19 4 19 20"></polygon></svg>上一题
+                            </button>
+                            
+                            <button id="system-play-btn" class="absolute left-1/2 transform -translate-x-1/2 w-[46px] h-[46px] shrink-0 bg-transparent text-[#3B82F6] border-[1.5px] border-[#3B82F6]/40 rounded-full flex items-center justify-center shadow-sm hover:bg-blue-50 transition-all active:scale-95 focus:outline-none" onclick="playSystemAudio()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 ml-1"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                            </button>
+                            
+                            <button id="next-btn" class="flex items-center justify-center text-[#3B82F6] hover:text-[#2563EB] transition-colors font-medium text-[14px] sm:text-[15px] py-2 px-2 rounded-full cursor-pointer hover:bg-blue-50 whitespace-nowrap shrink-0 ml-auto" onclick="nextScoreWord()">下一题
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-[16px] h-[16px] sm:w-[18px] sm:h-[18px] ml-1 sm:ml-1.5"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line></svg>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 视图 5: 听写打分页 ================= -->
+    <div id="view-grading" class="view-section flex-col w-full h-full max-w-[1300px] mx-auto p-4 md:p-5 overflow-hidden gap-4 bg-[#F8FAFC]">
+        <div class="flex items-center justify-between shrink-0 mb-3 px-2">
+            <div class="flex items-center gap-4">
+                <button onclick="switchView('view-scoring')" class="w-11 h-11 bg-white hover:bg-gray-50 rounded-[14px] shadow-sm flex items-center justify-center transition-colors text-slate-600 active:scale-95 border border-gray-100">
+                    <i data-lucide="chevron-left" class="w-6 h-6 -ml-0.5"></i>
+                </button>
+                <h2 class="font-extrabold text-[32px] text-gray-900 tracking-tight leading-none">标记不熟的</h2>
+            </div>
+            <div class="flex items-center bg-white px-4 py-2 rounded-[14px] border border-gray-200 shadow-sm">
+                <span class="text-gray-500 font-bold text-[14px] mr-2">听写得分:</span>
+                <span id="final-score-display" class="text-[#3B82F6] font-black text-[22px] font-mono leading-none">10</span>
+                <span class="text-gray-400 font-bold text-[14px] ml-1">/ <span id="final-score-total">10</span></span>
+            </div>
+        </div>
+
+        <div class="flex-1 min-h-0 flex flex-col bg-white rounded-[24px] shadow-premium relative overflow-hidden">
+            <div class="flex-1 min-h-0 overflow-y-auto px-5 py-6 hide-scrollbar bg-gray-50/30">
+                <div id="gradingListContainer" class="grid grid-cols-2 gap-4 content-start"></div>
+            </div>
+
+            <!-- 底部操作栏 -->
+            <div class="absolute bottom-0 left-0 w-full bg-white border-t border-gray-100 px-6 py-4 flex justify-between items-center z-10 shadow-[0_-4px_20px_rgba(0,0,0,0.03)] shrink-0">
+                <div class="flex items-center gap-4">
+                    <button id="take-photo-btn" onclick="simulateTakePhoto()" class="flex items-center justify-center bg-orange-50 hover:bg-orange-100 text-orange-500 border border-orange-200 transition-all font-bold text-[14px] px-5 py-2.5 rounded-[12px] shadow-sm active:scale-95 gap-2">
+                        <i data-lucide="camera" class="w-5 h-5"></i> 拍照凭证
+                    </button>
+                    <div id="photo-thumbnail-container" class="hidden flex items-center gap-3">
+                        <div class="relative w-12 h-12 rounded-[8px] overflow-hidden border-2 border-orange-300 shadow-sm group cursor-pointer" onclick="simulateTakePhoto()">
+                            <!-- Simulated captured photo -->
+                            <img src="https://placehold.co/100x100/eeeeee/999999?text=IMG" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i data-lucide="refresh-cw" class="w-4 h-4 text-white"></i>
+                            </div>
+                        </div>
+                        <span class="text-[12px] font-bold text-gray-500">已传凭证</span>
+                    </div>
+                </div>
+                <!-- 移除了内部 icon 并统一颜色样式 -->
+                <button id="finishLevelBtn" onclick="finishScoringLevel()" class="bg-[#1F5FFF] hover:bg-[#004ce6] shadow-[0_4px_12px_rgba(31,95,255,0.3)] hover:shadow-[0_6px_16px_rgba(31,95,255,0.4)] text-white font-bold py-3 px-10 text-[16px] rounded-[14px] active:scale-95 transition-all">
+                    完成关卡
+                </button>
             </div>
         </div>
     </div>
 
 
-    <!-- ================= 视图 3: 学习关卡 (仅直驱模拟器) ================= -->
-    <div id="view-learning" class="view-section flex-col items-center justify-center w-full h-full p-4 bg-gray-900/80 backdrop-blur-md z-50 fixed inset-0">
-        <div class="bg-white w-full max-w-sm rounded-[24px] shadow-2xl p-7 relative flex flex-col modal-enter items-center text-center">
-            <button onclick="switchView('view-dashboard')" class="absolute top-5 right-5 text-gray-400 hover:text-gray-700 bg-gray-50 p-2 rounded-[12px] active:scale-90 transition-transform">
-                <i class="ph-bold ph-x text-[16px]"></i>
-            </button>
-
-            <div class="w-14 h-14 bg-red-50 rounded-[14px] flex items-center justify-center text-red-500 mb-4 mt-2">
-                <i class="ph-bold ph-fire text-[28px]"></i>
-            </div>
-            
-            <h2 class="text-[20px] font-extrabold text-gray-900 mb-1" id="learningTitle">强制攻坚中</h2>
-            <p class="text-[13px] text-gray-500 mb-6">正在执行底层关卡任务模拟</p>
-            
-            <div class="w-full bg-gray-50 rounded-[16px] p-3 mb-6 border border-gray-100 flex flex-col gap-2 relative" id="learningStepsContainerModal">
-                <!-- 垂直时间轴由 JS 动态渲染 -->
-            </div>
-            
-            <button id="stepActionBtn" onclick="simulateNextStep()" class="w-full py-3.5 rounded-[14px] bg-red-500 hover:bg-red-600 text-white font-bold text-[15px] shadow-sm active:scale-95 transition-all">
-                点击模拟进度 +1
-            </button>
-        </div>
-    </div>
-
-
-    <!-- Javascript 逻辑控制 -->
     <script>
-        function showModal(title, msg, onConfirm = null) {
+        // Global variables for generation popup
+        let selectedGenType = 'new';
+        window.selectGenType = function(type) {
+            selectedGenType = type;
+            const newCount = state.vocabBook.filter(w => w.type === 'new').length;
+            const oldCount = state.vocabBook.filter(w => w.type === 'old').length;
+
+            const newEl = document.getElementById('gen-card-new');
+            const oldEl = document.getElementById('gen-card-old');
+            const btn = document.getElementById('modal-btn');
+            
+            if (newEl) {
+                newEl.className = `flex-1 border ${newCount===0?'opacity-50 cursor-not-allowed border-gray-100 bg-gray-50':'cursor-pointer border-blue-100 bg-blue-50 hover:bg-blue-100'} rounded-[14px] py-3 flex flex-col items-center justify-center shadow-sm transition-all ${type==='new' && newCount>0 ? 'ring-2 ring-blue-500 bg-blue-100 scale-105':''}`;
+            }
+            if (oldEl) {
+                oldEl.className = `flex-1 border ${oldCount===0?'opacity-50 cursor-not-allowed border-gray-100 bg-gray-50':'cursor-pointer border-emerald-100 bg-emerald-50 hover:bg-emerald-100'} rounded-[14px] py-3 flex flex-col items-center justify-center shadow-sm transition-all ${type==='old' && oldCount>0 ? 'ring-2 ring-emerald-500 bg-emerald-100 scale-105':''}`;
+            }
+            
+            if ((type === 'new' && newCount === 0) || (type === 'old' && oldCount === 0)) {
+                if(btn) {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+            } else {
+                if(btn) {
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            }
+        };
+
+        window.executeManualGenerate = function() {
+            const filteredWords = state.vocabBook.filter(w => w.type === selectedGenType);
+            if(filteredWords.length === 0) return; // safeguard
+
+            state.activeLevel = { 
+                title: '专属强化关卡', 
+                wordCount: filteredWords.length, 
+                words: [...filteredWords], 
+                steps: [{ id: 'read', name: '跟读', target: 2, current: 0 }, { id: 'memo', name: '音记', target: 2, current: 0 }, { id: 'dict', name: '听写', target: 1, current: 0 }] 
+            };
+            showModal('一键生成成功', `<div class="mt-1 font-medium text-gray-600">已生成包含 <b class="text-orange-500 text-[18px] px-0.5">${filteredWords.length}</b> 个生词的关卡！<br>学习入口已锁定，请先完成专属强化。</div>`, () => switchView('view-dashboard'));
+        };
+
+        function showModal(title, msg, onConfirm = null, isConfirm = false) {
             const titleEl = document.getElementById('modal-title');
             const msgEl = document.getElementById('modal-msg');
             const modal = document.getElementById('native-modal');
             const btn = document.getElementById('modal-btn');
-            
+            const cancelBtn = document.getElementById('modal-cancel-btn');
             if(titleEl) titleEl.innerText = title;
-            if(msgEl) msgEl.innerText = msg;
-            
+            if(msgEl) msgEl.innerHTML = msg;
             if (modal) {
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
                 setTimeout(() => modal.classList.replace('opacity-0', 'opacity-100'), 10);
             }
-            if (btn) {
+            const hideModal = () => {
+                if (modal) modal.classList.replace('opacity-100', 'opacity-0');
+                setTimeout(() => {
+                    if (modal) {
+                        modal.classList.add('hidden');
+                        modal.classList.remove('flex');
+                    }
+                }, 300);
+            };
+            if (isConfirm) {
+                cancelBtn.classList.remove('hidden');
+                cancelBtn.classList.add('block');
+                btn.innerText = '确认';
+                cancelBtn.onclick = hideModal;
                 btn.onclick = () => {
-                    if (modal) modal.classList.replace('opacity-100', 'opacity-0');
-                    setTimeout(() => {
-                        if (modal) {
-                            modal.classList.add('hidden');
-                            modal.classList.remove('flex');
-                        }
-                        if (onConfirm) onConfirm();
-                    }, 300);
+                    hideModal();
+                    if (onConfirm) setTimeout(onConfirm, 300);
+                };
+            } else {
+                cancelBtn.classList.add('hidden');
+                cancelBtn.classList.remove('block');
+                btn.innerText = '我知道了';
+                btn.onclick = () => {
+                    hideModal();
+                    if (onConfirm) setTimeout(onConfirm, 300);
                 };
             }
         }
@@ -397,7 +556,6 @@
             { word: "fascinate", phonetic: "/ˈfæsɪneɪt/", meaning: "深深吸引", type: "new" },
             { word: "lucrative", phonetic: "/ˈluːkrətɪv/", meaning: "赚大钱的", type: "new" },
             { word: "meticulous", phonetic: "/mɪˈtɪkjələs/", meaning: "一丝不苟的", type: "new" },
-            
             { word: "phenomenon", phonetic: "/fəˈnɑːmɪnən/", meaning: "现象，杰出的人", type: "old" },
             { word: "evaluate", phonetic: "/ɪˈvæljueɪt/", meaning: "评估，评价", type: "old" },
             { word: "extraordinary", phonetic: "/ɪkˈstrɔːrdəneri/", meaning: "非凡的并且超出寻常的", type: "old" },
@@ -419,13 +577,13 @@
                 { word: "ambitious", phonetic: "/æmˈbɪʃəs/", meaning: "有野心的", type: "new" },
                 { word: "vulnerable", phonetic: "/ˈvʌlnərəbl/", meaning: "脆弱的，易受伤害的", type: "new" },
                 { word: "symptom", phonetic: "/ˈsɪmptəm/", meaning: "症状，征兆", type: "new" },
-
                 { word: "phenomenon", phonetic: "/fəˈnɑːmɪnən/", meaning: "现象，杰出的人", type: "old" },
                 { word: "evaluate", phonetic: "/ɪˈvæljueɪt/", meaning: "评估，评价", type: "old" },
                 { word: "extraordinary", phonetic: "/ɪkˈstrɔːrdəneri/", meaning: "非凡的并且超出寻常的", type: "old" },
                 { word: "anonymous", phonetic: "/əˈnɑːnɪməs/", meaning: "匿名的，无名的", type: "old" }
             ], 
             vocabFilter: 'all', 
+            passFilter: 'all',
             passingStats: { known: 0, unknown: 0, remaining: 0, answered: 0 },
             currentActionType: '', 
             currentTaskId: null,
@@ -439,14 +597,7 @@
             for (let i = 0; i < count; i++) {
                 const rawIndex = (state.wordOffset + i) % rawWordsData.length;
                 const baseWord = rawWordsData[rawIndex];
-                testWords.push({ 
-                    id: state.wordOffset + i, 
-                    word: baseWord.word, 
-                    phonetic: baseWord.phonetic, 
-                    meaning: baseWord.meaning, 
-                    type: baseWord.type, 
-                    status: null 
-                });
+                testWords.push({ id: state.wordOffset + i, word: baseWord.word, phonetic: baseWord.phonetic, meaning: baseWord.meaning, type: baseWord.type, status: null });
             }
             state.wordOffset += count;
             TOTAL_WORDS = count;
@@ -457,351 +608,233 @@
             const targetView = document.getElementById(viewId);
             if (targetView) targetView.classList.add('active');
             if(viewId === 'view-dashboard') renderDashboardUI();
+            if(viewId === 'view-vocab') renderVocabBookFull();
         }
 
-        function getTodayDateString() {
-            return new Date().toDateString(); 
-        }
+        function getTodayDateString() { return new Date().toDateString(); }
 
         function toggleTeacherTasks() {
             if (state.assignedTasks.length > 0) {
                 state.assignedTasks = [];
-                showModal('重置任务', '模拟：已清空老师下发的指定任务。', renderDashboardUI);
+                showModal('重置任务', '<div class="mt-1 font-medium">已清空老师下发的指定任务。</div>', renderDashboardUI);
             } else {
                 state.assignedTasks = [
                     { id: 101, title: "高二核心易错词冲刺", count: 10, target: 3, current: 0, lastDone: null },
                     { id: 102, title: "阅读长难句高频词", count: 15, target: 1, current: 0, lastDone: null },
                     { id: 103, title: "高考大纲提分包", count: 20, target: 2, current: 0, lastDone: null }
                 ];
-                showModal('任务送达', '模拟：已下发 3 个指定批次任务！\n请在下方的列表中查看。', renderDashboardUI);
+                showModal('任务送达', '<div class="mt-1 font-medium">已下发 <b class="text-gray-900 text-[18px] px-0.5">3</b> 个指定批次任务！<br>请在下方的列表中查看。</div>', renderDashboardUI);
             }
         }
 
-        function setVocabFilter(type) {
-            state.vocabFilter = type;
-            renderVocabBookInline();
+        function setVocabFilterFull(type) { state.vocabFilter = type; renderVocabBookFull(); }
+
+        function setPassFilter(filter) {
+            state.passFilter = filter;
+            ['all', 'known', 'unknown'].forEach(f => {
+                const btn = document.getElementById(`pass-filter-${f}`);
+                if (!btn) return;
+                if (f === filter) {
+                    btn.classList.add('bg-white', 'shadow-sm', 'text-gray-800');
+                    btn.classList.remove('text-gray-500', 'hover:text-gray-700', 'bg-transparent');
+                } else {
+                    btn.classList.remove('bg-white', 'shadow-sm', 'text-gray-800');
+                    btn.classList.add('text-gray-500', 'hover:text-gray-700', 'bg-transparent');
+                }
+            });
+            testWords.forEach(w => {
+                const row = document.getElementById(`word-row-${w.id}`);
+                if (!row) return;
+                if (filter === 'all') row.style.display = 'flex';
+                else if (filter === 'known') row.style.display = w.status === 'known' ? 'flex' : 'none';
+                else if (filter === 'unknown') row.style.display = w.status === 'unknown' ? 'flex' : 'none';
+            });
         }
 
         function renderDataDashboard() {
-            const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; }; // 彻底去除 .toLocaleString()，无逗号
-            
+            const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; }; 
             const total = dataStore.stats.totalTarget;
             const known = dataStore.stats.known;
             const unknown = dataStore.stats.unknown;
             const unlearned = dataStore.stats.unlearned;
             const learnedSum = known + unknown;
-            
-            // 左侧更新
             setVal('statTotalTarget', total);
             setVal('statLearnedSum', learnedSum);
             setVal('statUnlearned', unlearned);
-            
-            // 计算环形进度
             const ringPct = Math.round((learnedSum / total) * 100) || 0;
             const ringEl = document.getElementById('targetProgressRing');
             const ringText = document.getElementById('targetProgressText');
             if (ringText) ringText.innerText = ringPct + '%';
-            if (ringEl) {
-                // 175.9 是 r=28 的圆周长 (2 * PI * 28)
-                const offset = 175.9 - (ringPct / 100) * 175.9;
-                ringEl.style.strokeDashoffset = offset;
-            }
-
-            // 右上：纯数据更新
+            if (ringEl) ringEl.style.strokeDashoffset = 175.9 - (ringPct / 100) * 175.9;
             setVal('statKnownTotal', known);
             setVal('statUnknownTotal', unknown);
-
-            // 右下：交互数据更新
             setVal('statReadTotal', dataStore.stats.read);
             setVal('statMemoTotal', dataStore.stats.memo);
             setVal('statDictTotal', dataStore.stats.dict);
         }
 
-        function renderVocabBookInline() {
-            const container = document.getElementById('inlineVocabList');
+        function renderVocabBookFull() {
+            const container = document.getElementById('fullVocabList');
             if (!container) return;
             container.innerHTML = '';
-            
-            const validVocab = state.vocabBook.filter(item => item.type !== 'assigned');
-            
+            const validVocab = state.vocabBook; 
             const newCount = validVocab.filter(w => w.type === 'new').length;
             const oldCount = validVocab.filter(w => w.type === 'old').length;
             const allCount = validVocab.length;
-
             const themes = {
-                all: {
-                    lightBg: 'bg-gray-100', lightBorder: 'border-gray-200', hoverBg: 'bg-gray-200',
-                    darkText: 'text-gray-700', lightIconText: 'text-gray-400', lightIconBg: 'bg-gray-200/80',
-                    solidBg: 'bg-gray-800'
-                },
-                new: {
-                    lightBg: 'bg-blue-50', lightBorder: 'border-blue-100', hoverBg: 'bg-blue-100',
-                    darkText: 'text-blue-600', lightIconText: 'text-blue-400', lightIconBg: 'bg-blue-100/80',
-                    solidBg: 'bg-[#1F5FFF]'
-                },
-                old: {
-                    lightBg: 'bg-emerald-50', lightBorder: 'border-emerald-100', hoverBg: 'bg-emerald-100',
-                    darkText: 'text-emerald-600', lightIconText: 'text-emerald-400', lightIconBg: 'bg-emerald-100/80',
-                    solidBg: 'bg-[#10B981]'
-                }
+                all: { lightBg: 'bg-gray-100', lightBorder: 'border-gray-200', hoverBg: 'bg-gray-200', darkText: 'text-gray-700', lightIconText: 'text-gray-400', lightIconBg: 'bg-gray-200/80', solidBg: 'bg-gray-800' },
+                new: { lightBg: 'bg-blue-50', lightBorder: 'border-blue-100', hoverBg: 'bg-blue-100', darkText: 'text-blue-600', lightIconText: 'text-blue-400', lightIconBg: 'bg-blue-100/80', solidBg: 'bg-[#1F5FFF]' },
+                old: { lightBg: 'bg-emerald-50', lightBorder: 'border-emerald-100', hoverBg: 'bg-emerald-100', darkText: 'text-emerald-600', lightIconText: 'text-emerald-400', lightIconBg: 'bg-emerald-100/80', solidBg: 'bg-[#10B981]' }
             };
-
             const updateTab = (id, label, iconClass, count, typeKey) => {
                 const btn = document.getElementById(id);
                 if (!btn) return;
                 const isActive = state.vocabFilter === typeKey;
                 const isFull = typeKey !== 'all' && count >= VOCAB_THRESHOLD;
                 const theme = themes[typeKey];
-                
                 let contentHtml = '';
-
                 if (isActive) {
-                    let badgeHtml = '';
-                    if (typeKey === 'all') {
-                        badgeHtml = `<span class="bg-white/20 text-white px-1.5 py-0.5 rounded-[6px] font-mono text-[10px] ml-1.5">${count}</span>`;
-                    } else {
-                        if (isFull) {
-                            badgeHtml = `<span class="bg-red-500 text-white border border-red-400 font-extrabold animate-pulse ml-1.5 px-1.5 py-0.5 rounded-[6px] leading-none text-[10px] shadow-sm">${count}/${VOCAB_THRESHOLD}</span>`;
-                        } else {
-                            badgeHtml = `<span class="bg-white/20 text-white px-1.5 py-0.5 rounded-[6px] font-mono text-[10px] ml-1.5">${count}/${VOCAB_THRESHOLD}</span>`;
-                        }
-                    }
-
-                    contentHtml = `
-                        <div class="bg-white ${theme.darkText} w-5 h-5 rounded-[6px] flex items-center justify-center mr-1.5 shadow-sm shrink-0">
-                            <i class="${iconClass} text-[12px]"></i>
-                        </div>
-                        <span class="text-white whitespace-nowrap">${label}</span>
-                        ${badgeHtml}
-                    `;
-                    btn.className = `text-[12px] font-bold pr-2 pl-1.5 py-1.5 rounded-[10px] shadow-md transition-all duration-300 flex items-center shrink-0 ${theme.solidBg} border border-transparent transform scale-[1.02]`;
+                    let badgeHtml = typeKey === 'all' ? `<span class="bg-white/20 text-white px-1.5 py-0.5 rounded-[6px] font-mono text-[10px] ml-1.5">${count}</span>` : (isFull ? `<span class="bg-red-500 text-white border border-red-400 font-extrabold animate-pulse ml-1.5 px-1.5 py-0.5 rounded-[6px] leading-none text-[10px] shadow-sm">${count}/${VOCAB_THRESHOLD}</span>` : `<span class="bg-white/20 text-white px-1.5 py-0.5 rounded-[6px] font-mono text-[10px] ml-1.5">${count}/${VOCAB_THRESHOLD}</span>`);
+                    contentHtml = `<div class="bg-white ${theme.darkText} w-5 h-5 rounded-[6px] flex items-center justify-center mr-1.5 shadow-sm shrink-0"><i class="${iconClass} text-[12px]"></i></div><span class="text-white whitespace-nowrap">${label}</span>${badgeHtml}`;
+                    btn.className = `text-[13px] font-bold pr-2.5 pl-2 py-2 rounded-[12px] shadow-md transition-all duration-300 flex items-center shrink-0 ${theme.solidBg} border border-transparent transform scale-[1.02]`;
                 } else {
-                    let badgeHtml = '';
-                    if (typeKey === 'all') {
-                        badgeHtml = `<span class="${theme.lightIconBg} ${theme.darkText} opacity-70 px-1.5 py-0.5 rounded-[6px] font-mono text-[10px] ml-1.5">${count}</span>`;
-                    } else {
-                        if (isFull) {
-                            badgeHtml = `<span class="bg-red-100 text-red-600 border border-red-200 font-extrabold animate-pulse ml-1.5 px-1.5 py-0.5 rounded-[6px] leading-none text-[10px]">${count}/${VOCAB_THRESHOLD}</span>`;
-                        } else {
-                            badgeHtml = `<span class="${theme.lightIconBg} ${theme.darkText} opacity-70 px-1.5 py-0.5 rounded-[6px] font-mono text-[10px] ml-1.5">${count}/${VOCAB_THRESHOLD}</span>`;
-                        }
-                    }
-
-                    contentHtml = `
-                        <i class="${iconClass} ${theme.lightIconText} text-[16px] mr-1 shrink-0"></i>
-                        <span class="${theme.darkText} whitespace-nowrap">${label}</span>
-                        ${badgeHtml}
-                    `;
-                    btn.className = `text-[12px] font-bold pr-2.5 pl-2 py-1.5 rounded-[10px] transition-all duration-300 flex items-center shrink-0 ${theme.lightBg} border ${theme.lightBorder} hover:${theme.hoverBg}`;
+                    let badgeHtml = typeKey === 'all' ? `<span class="${theme.lightIconBg} ${theme.darkText} opacity-70 px-1.5 py-0.5 rounded-[6px] font-mono text-[10px] ml-1.5">${count}</span>` : (isFull ? `<span class="bg-red-100 text-red-600 border border-red-200 font-extrabold animate-pulse ml-1.5 px-1.5 py-0.5 rounded-[6px] leading-none text-[10px]">${count}/${VOCAB_THRESHOLD}</span>` : `<span class="${theme.lightIconBg} ${theme.darkText} opacity-70 px-1.5 py-0.5 rounded-[6px] font-mono text-[10px] ml-1.5">${count}/${VOCAB_THRESHOLD}</span>`);
+                    contentHtml = `<i class="${iconClass} ${theme.lightIconText} text-[18px] mr-1 shrink-0"></i><span class="${theme.darkText} whitespace-nowrap">${label}</span>${badgeHtml}`;
+                    btn.className = `text-[13px] font-bold pr-3 pl-2.5 py-2 rounded-[12px] transition-all duration-300 flex items-center shrink-0 ${theme.lightBg} border ${theme.lightBorder} hover:${theme.hoverBg}`;
                 }
                 btn.innerHTML = contentHtml;
             };
-
-            updateTab('filter-all', '全部', 'ph-bold ph-list-dashes', allCount, 'all');
-            updateTab('filter-new', '新词', 'ph-bold ph-rocket', newCount, 'new');
-            updateTab('filter-old', '旧词', 'ph-bold ph-arrows-clockwise', oldCount, 'old');
-
+            updateTab('full-filter-all', '全部', 'ph-bold ph-list-dashes', allCount, 'all');
+            updateTab('full-filter-new', '新词', 'ph-bold ph-rocket', newCount, 'new');
+            updateTab('full-filter-old', '旧词', 'ph-bold ph-arrows-clockwise', oldCount, 'old');
             const filteredList = validVocab.filter(item => state.vocabFilter === 'all' || item.type === state.vocabFilter);
-
+            const countEl = document.getElementById('fullVocabCount');
+            if (countEl) countEl.innerText = filteredList.length;
             if (filteredList.length === 0) {
-                container.innerHTML = `
-                    <div class="flex flex-col items-center justify-center h-full text-center opacity-40 m-auto py-6">
-                        <i class="ph-fill ph-book-bookmark text-[32px] text-gray-400 mb-1"></i>
-                        <p class="text-[13px] font-bold text-gray-500">生词将自动记录在此</p>
-                    </div>`;
+                container.innerHTML = `<div class="flex flex-col items-center justify-center h-48 text-center opacity-40 py-10 w-full"><i class="ph-fill ph-book-bookmark text-[48px] text-gray-400 mb-3"></i><p class="text-[14px] font-bold text-gray-500">空空如也，暂无生词</p></div>`;
             } else {
-                [...filteredList].reverse().forEach(item => {
-                    const typeTag = item.type === 'new' 
-                        ? `<span class="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded-[4px] font-bold shrink-0">新词</span>` 
-                        : `<span class="text-[10px] bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded-[4px] font-bold shrink-0">旧词</span>`;
-
-                    container.innerHTML += `
-                        <div class="flex items-center w-full bg-gradient-to-r from-[#FFFDF0] to-white p-2.5 rounded-[12px] shadow-sm border border-[#FDE68A]/50 hover:border-[#FDE68A] hover:from-[#FFFBEB] transition-colors z-10 shrink-0 gap-3">
-                            <div class="shrink-0 flex items-baseline gap-2 text-gray-800 font-extrabold text-[15px] font-mono tracking-tight">
-                                <span>${item.word}</span>
-                                <span class="ml-1">${item.phonetic}</span>
-                            </div>
-                            <div class="flex-1 min-w-0 text-gray-600 px-1 truncate text-left">
-                                <span class="text-[13px]">${item.meaning}</span>
-                            </div>
-                            ${typeTag}
-                        </div>
-                    `;
+                [...filteredList].reverse().forEach((item, index) => {
+                    let typeTag = item.type === 'assigned' ? `<span class="text-[11px] bg-purple-50 border border-purple-100 text-purple-600 px-2.5 py-0.5 rounded-[6px] font-bold shadow-sm">指定</span>` : (item.type === 'new' ? `<span class="text-[11px] bg-blue-50 border border-blue-100 text-blue-600 px-2.5 py-0.5 rounded-[6px] font-bold shadow-sm">新词</span>` : `<span class="text-[11px] bg-emerald-50 border border-emerald-100 text-emerald-600 px-2.5 py-0.5 rounded-[6px] font-bold shadow-sm">旧词</span>`);
+                    container.innerHTML += `<div class="flex items-center w-full p-4 rounded-[20px] shadow-sm border border-[#FDE68A]/50 bg-gradient-to-r from-[#FFFDF0] to-white hover:border-[#FDE68A] transition-colors duration-300 z-10 shrink-0"><div class="flex items-baseline gap-3 flex-1 overflow-hidden pr-2"><span class="font-mono text-[15px] text-gray-400 font-bold shrink-0 w-6">${index + 1}.</span><span class="font-extrabold text-[18px] font-mono tracking-tight text-gray-800 shrink-0">${item.word}</span><span class="font-extrabold text-[18px] font-mono tracking-tight text-gray-800 shrink-0">${item.phonetic}</span><span class="text-[14px] text-gray-500 truncate flex-1 min-w-0 ml-2">${item.meaning}</span></div><div class="shrink-0 flex items-center justify-end ml-2">${typeTag}</div></div>`;
                 });
             }
         }
 
+        function promptManualGenerate() {
+            if(state.vocabBook.length === 0) { showModal('无法生成', '<div class="mt-1 font-medium text-gray-600">生词本空空如也，<br>快去「学习新词」或「复习旧词」收集生词吧！</div>'); return; }
+            if (state.activeLevel !== null) { showModal('暂不可用', '<div class="mt-1 font-medium">当前存在未完成的关卡，<br>请先将其通关！</div>'); return; }
+            
+            const newCount = state.vocabBook.filter(w => w.type === 'new').length;
+            const oldCount = state.vocabBook.filter(w => w.type === 'old').length;
+            
+            selectedGenType = newCount > 0 ? 'new' : 'old'; // default
+            
+            const msgHtml = `
+                <div class="flex flex-col items-center w-full mt-1">
+                    <div class="text-[14px] text-gray-500 mb-3">请选择本次生成的词汇类型（单选）：</div>
+                    <div class="flex gap-3 justify-center w-full mb-4">
+                        <div id="gen-card-new" onclick="selectGenType('new')" class="flex-1 border rounded-[14px] py-3 flex flex-col items-center justify-center shadow-sm transition-all">
+                            <span class="text-[12px] text-blue-500 font-bold mb-0.5">新词</span>
+                            <div class="flex items-baseline gap-0.5"><span class="text-[28px] font-black text-blue-600 font-mono leading-none drop-shadow-sm">${newCount}</span><span class="text-[12px] text-blue-500 font-bold ml-0.5">词</span></div>
+                        </div>
+                        <div id="gen-card-old" onclick="selectGenType('old')" class="flex-1 border rounded-[14px] py-3 flex flex-col items-center justify-center shadow-sm transition-all">
+                            <span class="text-[12px] text-emerald-500 font-bold mb-0.5">旧词</span>
+                            <div class="flex items-baseline gap-0.5"><span class="text-[28px] font-black text-[#10B981] font-mono leading-none drop-shadow-sm">${oldCount}</span><span class="text-[12px] text-emerald-500 font-bold ml-0.5">词</span></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            showModal('生成专属强化关卡', msgHtml, () => { executeManualGenerate(); }, true);
+
+            // Execute selection update after modal renders
+            setTimeout(() => {
+                if (newCount === 0) selectedGenType = 'old';
+                if (oldCount === 0) selectedGenType = 'new';
+                if (newCount > 0 && oldCount > 0) selectedGenType = 'new';
+                window.selectGenType(selectedGenType);
+            }, 50);
+        }
+
+        function executeManualGenerate() {
+            const filteredWords = state.vocabBook.filter(w => w.type === selectedGenType);
+            if(filteredWords.length === 0) return; // safeguard
+
+            state.activeLevel = { 
+                title: '专属强化关卡', 
+                wordCount: filteredWords.length, 
+                words: [...filteredWords], 
+                steps: [{ id: 'read', name: '跟读', target: 2, current: 0 }, { id: 'memo', name: '音记', target: 2, current: 0 }, { id: 'dict', name: '听写', target: 1, current: 0 }] 
+            };
+            showModal('一键生成成功', `<div class="mt-1 font-medium text-gray-600">已生成包含 <b class="text-orange-500 text-[18px] px-0.5">${filteredWords.length}</b> 个生词的关卡！<br>学习入口已锁定，请先完成专属强化。</div>`, () => switchView('view-dashboard'));
+        }
+
         function renderDashboardUI() {
             renderDataDashboard();
-            renderVocabBookInline();
-            
+            const dashVocabCount = document.getElementById('dashVocabCount');
+            if (dashVocabCount) dashVocabCount.innerText = state.vocabBook.length;
             const hasBlocker = state.activeLevel !== null;
-            const hasAssignedTask = state.assignedTasks.length > 0;
             const today = getTodayDateString();
-
             const taskContainer = document.getElementById('assignedTaskContainer');
             const noTaskBox = document.getElementById('noAssignedTaskBox');
             if (taskContainer && noTaskBox) {
-                if (hasAssignedTask) {
-                    taskContainer.classList.remove('hidden');
-                    noTaskBox.classList.add('hidden');
-                    taskContainer.innerHTML = '';
+                if (state.assignedTasks.length > 0) {
+                    taskContainer.classList.remove('hidden'); noTaskBox.classList.add('hidden'); taskContainer.innerHTML = '';
                     state.assignedTasks.forEach(task => {
                         const isDoneToday = task.lastDone === today;
-                        const btnClass = isDoneToday 
-                            ? 'opacity-70 cursor-not-allowed bg-gradient-to-r from-gray-50 to-white border border-gray-100' 
-                            : 'bg-gradient-to-r from-[#F0F5FF] to-white active:scale-95 border border-blue-100 hover:border-blue-300 cursor-pointer shadow-sm';
-
-                        const statusBadgeHtml = isDoneToday
-                            ? `<span class="text-green-600 bg-green-50 border border-green-200 px-2.5 py-1 rounded-[6px] flex items-center gap-1"><i class="ph-fill ph-check-circle"></i> 今日已完成</span>`
-                            : `<span class="text-orange-500 bg-orange-50 border border-orange-200 px-2.5 py-1 rounded-[6px] flex items-center gap-1"><i class="ph-fill ph-sparkle"></i> 今日待打卡</span>`;
-
-                        taskContainer.innerHTML += `
-                            <button onclick="${isDoneToday ? '' : `startPassing('assigned', '老师指定任务', ${task.id}, ${task.count})`}" class="w-full p-3.5 rounded-[14px] transition-colors flex justify-between items-center text-left relative overflow-hidden ${btnClass}">
-                                <div class="flex flex-col gap-1 w-full pr-4">
-                                    <h3 class="font-bold text-[14px] ${isDoneToday ? 'text-gray-500' : 'text-gray-900'} truncate w-full">${task.title}</h3>
-                                    <div class="text-[11px] font-bold ${isDoneToday ? 'text-gray-500' : 'text-blue-600'} font-mono mt-0.5">进度 ${task.current}/${task.target}</div>
-                                </div>
-                                <div class="shrink-0 text-[12px] font-bold">
-                                    ${statusBadgeHtml}
-                                </div>
-                            </button>
-                        `;
+                        taskContainer.innerHTML += `<button onclick="${isDoneToday ? '' : `startPassing('assigned', '老师指定任务', ${task.id}, ${task.count})`}" class="w-full p-3.5 rounded-[14px] transition-colors flex justify-between items-center text-left relative overflow-hidden ${isDoneToday ? 'opacity-70 cursor-not-allowed bg-gradient-to-r from-gray-50 to-white border border-gray-100' : 'bg-gradient-to-r from-[#F0F5FF] to-white active:scale-95 border border-blue-100 hover:border-blue-300 cursor-pointer shadow-sm'}"><div class="flex flex-col gap-1 w-full pr-4"><h3 class="font-bold text-[14px] ${isDoneToday ? 'text-gray-500' : 'text-gray-900'} truncate w-full">${task.title}</h3><div class="text-[11px] font-bold ${isDoneToday ? 'text-gray-500' : 'text-blue-600'} font-mono mt-0.5">进度 ${task.current}/${task.target}</div></div><div class="shrink-0 text-[12px] font-bold">${isDoneToday ? `<span class="text-green-600 bg-green-50 border border-green-200 px-2.5 py-1 rounded-[6px] flex items-center gap-1"><i class="ph-fill ph-check-circle"></i> 今日已完成</span>` : `<span class="text-orange-500 bg-orange-50 border border-orange-200 px-2.5 py-1 rounded-[6px] flex items-center gap-1"><i class="ph-fill ph-sparkle"></i> 今日待打卡</span>`}</div></button>`;
                     });
-                } else {
-                    taskContainer.classList.add('hidden');
-                    noTaskBox.classList.remove('hidden');
-                }
+                } else { taskContainer.classList.add('hidden'); noTaskBox.classList.remove('hidden'); }
             }
-
             const btnNew = document.getElementById('btnNew');
             const btnOld = document.getElementById('btnOld');
-            const hubIdleState = document.getElementById('hubIdleState');
-            const hubActiveState = document.getElementById('hubActiveState');
-            const hubStepsContainer = document.getElementById('hubStepsContainer');
-            const hubLevelCount = document.getElementById('hubLevelCount');
-
+            
             if (hasBlocker) {
-                if(btnNew) {
-                    btnNew.className = "bg-[#F8FAFC] border border-blue-100 rounded-[16px] flex flex-col items-center justify-center text-center relative pointer-events-none transition-all h-full w-full shadow-sm";
+                if(btnNew) { 
+                    btnNew.className = "bg-gradient-to-r from-[#508BFF] to-[#3B66FF] rounded-[16px] shadow-sm flex flex-col items-center justify-center text-center relative overflow-hidden h-full w-full cursor-not-allowed opacity-70 grayscale-[20%]"; 
                     btnNew.innerHTML = `
-                        <i class="ph-fill ph-lock-key text-gray-400 text-[26px] mb-2"></i>
-                        <span class="text-[11px] text-gray-500 font-bold bg-gray-100 px-3 py-1 rounded-[6px]">请通关后继续</span>
-                    `;
-                }
-                if(btnOld) {
-                    btnOld.className = "bg-[#F4FBF7] border border-emerald-100 rounded-[16px] flex flex-col items-center justify-center text-center relative pointer-events-none transition-all h-full w-full shadow-sm";
-                    btnOld.innerHTML = `
-                        <i class="ph-fill ph-lock-key text-gray-400 text-[26px] mb-2"></i>
-                        <span class="text-[11px] text-gray-500 font-bold bg-gray-100 px-3 py-1 rounded-[6px]">请通关后继续</span>
-                    `;
-                }
-
-                if(hubIdleState) hubIdleState.classList.add('hidden');
-                if(hubActiveState) {
-                    hubActiveState.classList.remove('hidden');
-                    hubActiveState.classList.add('flex');
-                }
-                if(hubLevelCount) hubLevelCount.innerText = state.activeLevel.wordCount;
-
-                if(hubStepsContainer) {
-                    let stepsHtml = '<div class="flex items-center justify-center gap-1 md:gap-2 w-full">';
-                    state.activeLevel.steps.forEach((step, idx) => {
-                        const isDone = step.current >= step.target;
-                        const isCurrent = !isDone && (idx === 0 || state.activeLevel.steps[idx-1].current >= state.activeLevel.steps[idx-1].target);
-                        let icon = '', textClass = '', boxClass = '';
-
-                        if (isDone) {
-                            icon = '<i class="ph-bold ph-check text-green-500 text-[12px]"></i>';
-                            textClass = 'text-green-600 line-through';
-                            boxClass = 'bg-green-50/50 border-green-200';
-                        } else if (isCurrent) {
-                            icon = '<i class="ph-bold ph-hourglass-high text-brand text-[12px] animate-pulse"></i>';
-                            textClass = 'text-brand font-bold';
-                            boxClass = 'bg-blue-50 border-blue-200 shadow-sm';
-                        } else {
-                            icon = '<i class="ph-fill ph-lock-key text-gray-300 text-[12px]"></i>';
-                            textClass = 'text-gray-400';
-                            boxClass = 'bg-transparent border-gray-100';
-                        }
-
-                        stepsHtml += `
-                            <div class="flex items-center gap-1.5 px-2 py-1.5 rounded-[8px] border ${boxClass} transition-colors shrink-0">
-                                <div class="w-5 h-5 rounded-[6px] bg-white flex items-center justify-center z-10 shrink-0 border border-gray-100 shadow-sm">
-                                    ${icon}
-                                </div>
-                                <div class="flex flex-col text-left">
-                                    <span class="text-[11px] leading-tight ${textClass}">${step.name}</span>
-                                    <span class="text-[9px] font-bold opacity-80 leading-none mt-[1px] ${textClass} font-mono">${step.current}/${step.target}</span>
-                                </div>
-                            </div>
-                        `;
-                        if (idx < state.activeLevel.steps.length - 1) {
-                            stepsHtml += `<i class="ph-bold ph-caret-right text-red-300 text-[12px] shrink-0"></i>`;
-                        }
-                    });
-                    stepsHtml += '</div>';
-                    hubStepsContainer.innerHTML = stepsHtml;
-                }
-            } else {
-                if(btnNew) {
-                    btnNew.className = "bg-gradient-to-r from-[#508BFF] to-[#3B66FF] rounded-[16px] shadow-sm flex flex-col items-center justify-center text-center active:scale-95 transition-all relative group overflow-hidden h-full w-full cursor-pointer";
-                    btnNew.innerHTML = `
-                        <div class="absolute top-2.5 right-2.5 bg-white/20 backdrop-blur-md text-white text-[11px] font-bold px-2 py-0.5 rounded-[6px] border border-white/20 transition-opacity">
-                            待学新词 <span id="badgeUnlearnedNew">${dataStore.stats.unlearnedNew}</span>
+                        <div class="absolute top-2.5 left-2.5 bg-black/10 backdrop-blur-sm text-white px-2 py-0.5 rounded-[6px] flex items-center border border-white/10 z-20">
+                            <i class="ph-fill ph-lock-key text-[10px] mr-1"></i>
+                            <span class="text-[10px] font-bold tracking-wide">请先完成专属关卡</span>
                         </div>
-                        <i class="ph-bold ph-rocket text-white text-[28px] mb-1 group-hover:-translate-y-1 transition-transform duration-300 relative z-0"></i>
-                        <h3 class="font-bold text-[15px] text-white relative z-0 tracking-wide mt-0.5">学习新词</h3>
-                    `;
+                        <div class="absolute top-2.5 right-2.5 bg-white/20 backdrop-blur-md text-white text-[11px] font-bold px-2 py-0.5 rounded-[6px] border border-white/20 transition-opacity z-20">待学新词 <span id="badgeUnlearnedNew">${dataStore.stats.unlearnedNew}</span></div>
+                        <i class="ph-bold ph-rocket text-white/90 text-[28px] mb-1 relative z-0"></i>
+                        <h3 class="font-bold text-[15px] text-white/90 relative z-0 tracking-wide mt-0.5">学习新词</h3>`; 
                 }
-                if(btnOld) {
-                    btnOld.className = "bg-gradient-to-r from-[#44D99B] to-[#12A772] rounded-[16px] shadow-sm flex flex-col items-center justify-center text-center active:scale-95 transition-all relative group overflow-hidden h-full w-full cursor-pointer";
+                if(btnOld) { 
+                    btnOld.className = "bg-gradient-to-r from-[#44D99B] to-[#12A772] rounded-[16px] shadow-sm flex flex-col items-center justify-center text-center relative overflow-hidden h-full w-full cursor-not-allowed opacity-70 grayscale-[20%]"; 
                     btnOld.innerHTML = `
-                        <i class="ph-bold ph-arrows-clockwise text-white text-[28px] mb-1 group-hover:-rotate-90 transition-transform duration-300 relative z-0"></i>
-                        <h3 class="font-bold text-[15px] text-white relative z-0 tracking-wide mt-0.5">复习旧词</h3>
-                    `;
+                        <div class="absolute top-2.5 left-2.5 bg-black/10 backdrop-blur-sm text-white px-2 py-0.5 rounded-[6px] flex items-center border border-white/10 z-20">
+                            <i class="ph-fill ph-lock-key text-[10px] mr-1"></i>
+                            <span class="text-[10px] font-bold tracking-wide">请先完成专属关卡</span>
+                        </div>
+                        <i class="ph-bold ph-arrows-clockwise text-white/90 text-[28px] mb-1 relative z-0"></i>
+                        <h3 class="font-bold text-[15px] text-white/90 relative z-0 tracking-wide mt-0.5">复习旧词</h3>`; 
                 }
-
-                if(hubIdleState) {
-                    hubIdleState.classList.remove('hidden');
-                    hubIdleState.classList.add('flex');
-                }
-                if(hubActiveState) {
-                    hubActiveState.classList.add('hidden');
-                    hubActiveState.classList.remove('flex');
-                }
-            }
-        }
-
-        function simulateNextStep() {
-            if (!state.activeLevel) return;
-            const currentStep = state.activeLevel.steps.find(s => s.current < s.target);
-            if (currentStep) {
-                currentStep.current++;
-                renderDashboardUI(); 
-                if (document.getElementById('view-learning').classList.contains('active')) {
-                    renderLearningStepsModal();
-                }
-                
-                const allDone = state.activeLevel.steps.every(s => s.current >= s.target);
-                if (allDone) {
-                    setTimeout(() => {
-                        state.activeLevel = null;
-                        state.vocabBook = []; 
-                        showModal('关卡完美攻克', '恭喜！您已成功完成全部学习任务。\n中枢锁定已解除，生词本已清空，可继续探索。', () => switchView('view-dashboard'));
-                    }, 300);
-                }
+                document.getElementById('hubIdleState').classList.add('hidden'); document.getElementById('hubActiveState').classList.remove('hidden'); document.getElementById('hubActiveState').classList.add('flex');
+                document.getElementById('hubLevelCount').innerText = state.activeLevel.wordCount;
+                let stepsHtml = '<div class="flex items-center justify-center gap-1 md:gap-2 w-full">';
+                state.activeLevel.steps.forEach((step, idx) => {
+                    const isDone = step.current >= step.target; const isCurrent = !isDone && (idx === 0 || state.activeLevel.steps[idx-1].current >= state.activeLevel.steps[idx-1].target);
+                    stepsHtml += `<div class="flex items-center gap-1.5 px-2 py-1.5 rounded-[8px] border ${isDone ? 'bg-green-50/50 border-green-200' : (isCurrent ? 'bg-blue-50 border-blue-200 shadow-sm' : 'bg-transparent border-gray-100')} transition-colors shrink-0"><div class="w-5 h-5 rounded-[6px] bg-white flex items-center justify-center z-10 shrink-0 border border-gray-100 shadow-sm">${isDone ? '<i class="ph-bold ph-check text-green-500 text-[12px]"></i>' : (isCurrent ? '<i class="ph-bold ph-hourglass-high text-brand text-[12px] animate-pulse"></i>' : '<i class="ph-fill ph-lock-key text-gray-300 text-[12px]"></i>')}</div><div class="flex flex-col text-left"><span class="text-[11px] leading-tight ${isDone ? 'text-green-600 line-through' : (isCurrent ? 'text-brand font-bold' : 'text-gray-400')}">${step.name}</span><span class="text-[9px] font-bold opacity-80 leading-none mt-[1px] ${isDone ? 'text-green-600' : (isCurrent ? 'text-brand' : 'text-gray-400')} font-mono">${step.current}/${step.target}</span></div></div>`;
+                    if (idx < state.activeLevel.steps.length - 1) stepsHtml += `<i class="ph-bold ph-caret-right text-red-300 text-[12px] shrink-0"></i>`;
+                });
+                document.getElementById('hubStepsContainer').innerHTML = stepsHtml + '</div>';
+            } else {
+                if(btnNew) { btnNew.className = "bg-gradient-to-r from-[#508BFF] to-[#3B66FF] rounded-[16px] shadow-sm flex flex-col items-center justify-center text-center active:scale-95 transition-all relative group overflow-hidden h-full w-full cursor-pointer"; btnNew.innerHTML = `<div class="absolute top-2.5 right-2.5 bg-white/20 backdrop-blur-md text-white text-[11px] font-bold px-2 py-0.5 rounded-[6px] border border-white/20 transition-opacity">待学新词 <span id="badgeUnlearnedNew">${dataStore.stats.unlearnedNew}</span></div><i class="ph-bold ph-rocket text-white text-[28px] mb-1 group-hover:-translate-y-1 transition-transform duration-300 relative z-0"></i><h3 class="font-bold text-[15px] text-white relative z-0 tracking-wide mt-0.5">学习新词</h3>`; }
+                if(btnOld) { btnOld.className = "bg-gradient-to-r from-[#44D99B] to-[#12A772] rounded-[16px] shadow-sm flex flex-col items-center justify-center text-center active:scale-95 transition-all relative group overflow-hidden h-full w-full cursor-pointer"; btnOld.innerHTML = `<i class="ph-bold ph-arrows-clockwise text-white text-[28px] mb-1 group-hover:-rotate-90 transition-transform duration-300 relative z-0"></i><h3 class="font-bold text-[15px] text-white relative z-0 tracking-wide mt-0.5">复习旧词</h3>`; }
+                document.getElementById('hubIdleState').classList.remove('hidden'); document.getElementById('hubIdleState').classList.add('flex'); document.getElementById('hubActiveState').classList.add('hidden');
             }
         }
 
         function startPassing(typeKey, typeName, taskId = null, wordCount = 10) {
             if(state.activeLevel !== null && typeKey !== 'assigned') return; 
-            
             initData(wordCount);
             state.currentActionType = typeKey;
             state.currentTaskId = taskId;
             state.passingStats = { known: 0, unknown: 0, remaining: TOTAL_WORDS, answered: 0 };
             state._tempUnknowns = []; 
+            state.passFilter = 'all'; // 重置过滤状态
             
             const titleEl = document.getElementById('passingTitle');
             if (titleEl) titleEl.innerText = typeName;
@@ -811,7 +844,7 @@
             
             renderWordList();
             updatePassingStats();
-            renderBasket(); 
+            setPassFilter('all'); // 初始化显示全部
             switchView('view-passing');
         }
 
@@ -821,27 +854,26 @@
             container.innerHTML = '';
             
             testWords.forEach((item, index) => {
-                const isAnswered = item.status !== null;
                 const div = document.createElement('div');
                 div.id = `word-row-${item.id}`;
-                div.className = `flex justify-between items-center p-3.5 rounded-[16px] border border-gray-100 shadow-sm bg-white transition-colors duration-300 shrink-0`;
+                div.className = `flex justify-between items-center p-4 rounded-[20px] shadow-sm border border-[#FDE68A]/50 bg-gradient-to-r from-[#FFFDF0] to-white transition-colors duration-300 shrink-0`;
                 
                 div.innerHTML = `
                     <div class="flex items-baseline gap-2 flex-1 overflow-hidden pr-2">
-                        <span class="font-mono text-[14px] text-gray-400 font-bold shrink-0 w-6">${index + 1}.</span>
-                        <div class="shrink-0 flex items-baseline gap-1.5">
-                            <span id="word-text-${item.id}" class="font-extrabold text-[15px] font-mono tracking-tight text-gray-800">${item.word}</span>
-                            <span id="word-phonetic-${item.id}" class="font-extrabold text-[15px] font-mono tracking-tight text-gray-800">
+                        <span class="font-mono text-[16px] text-gray-400 font-bold shrink-0 w-7">${index + 1}.</span>
+                        <div class="shrink-0 flex items-baseline gap-2 flex-wrap xl:flex-nowrap">
+                            <span id="word-text-${item.id}" class="font-extrabold text-[18px] font-mono tracking-tight text-gray-800">${item.word}</span>
+                            <span id="word-phonetic-${item.id}" class="font-extrabold text-[18px] font-mono tracking-tight text-gray-800">
                                 ${item.phonetic}
                             </span>
                         </div>
-                        <span id="word-desc-${item.id}" class="text-[13px] text-gray-500 truncate flex-1 min-w-0 ml-1.5">
+                        <span id="word-desc-${item.id}" class="text-[14px] text-gray-500 truncate flex-1 min-w-0 ml-2">
                             ${item.meaning}
                         </span>
                     </div>
-                    <div class="flex gap-2 shrink-0">
-                        <button id="btn-x-${item.id}" onclick="judgeWord(${item.id}, 'unknown')" class="judge-btn w-[48px] h-[36px] rounded-[10px] bg-gray-50 text-gray-400 flex items-center justify-center text-[16px] hover:bg-red-50 hover:text-red-500 active:scale-90 transition-all"><i class="ph-bold ph-x"></i></button>
-                        <button id="btn-c-${item.id}" onclick="judgeWord(${item.id}, 'known')" class="judge-btn w-[48px] h-[36px] rounded-[10px] bg-gray-50 text-gray-400 flex items-center justify-center text-[16px] hover:bg-green-50 hover:text-green-500 active:scale-90 transition-all"><i class="ph-bold ph-check"></i></button>
+                    <div class="flex gap-2 shrink-0 ml-2">
+                        <button id="btn-x-${item.id}" onclick="judgeWord(${item.id}, 'unknown')" class="judge-btn w-[56px] h-[44px] rounded-[14px] bg-gray-50 text-gray-400 flex items-center justify-center text-[22px] hover:bg-red-50 hover:text-red-500 active:scale-90 transition-all"><i class="ph-bold ph-x"></i></button>
+                        <button id="btn-c-${item.id}" onclick="judgeWord(${item.id}, 'known')" class="judge-btn w-[56px] h-[44px] rounded-[14px] bg-gray-50 text-gray-400 flex items-center justify-center text-[22px] hover:bg-green-50 hover:text-green-500 active:scale-90 transition-all"><i class="ph-bold ph-check"></i></button>
                     </div>`;
                 container.appendChild(div);
             });
@@ -855,13 +887,13 @@
             if (rowElement) {
                 rowElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 rowElement.classList.add('bg-[#FFF7ED]', 'border-[#F97316]');
-                rowElement.classList.remove('bg-white', 'border-gray-100', 'shadow-sm');
+                rowElement.classList.remove('bg-white', 'border-gray-100', 'shadow-sm', 'bg-gradient-to-r', 'from-[#FFFDF0]', 'to-white');
                 
                 setTimeout(() => {
                     const currentWord = testWords.find(w => w.id === firstUnanswered.id);
                     if (rowElement) rowElement.classList.remove('bg-[#FFF7ED]', 'border-[#F97316]');
                     if (currentWord && currentWord.status === null && rowElement) {
-                        rowElement.classList.add('bg-white', 'border-gray-100', 'shadow-sm');
+                        rowElement.classList.add('bg-gradient-to-r', 'from-[#FFFDF0]', 'to-white', 'border-[#FDE68A]/50', 'shadow-sm');
                     }
                 }, 1000);
             }
@@ -903,9 +935,9 @@
             const wordDesc = document.getElementById(`word-desc-${id}`);
 
             if (row && btnX && btnC) {
-                row.className = `flex justify-between items-center p-3.5 rounded-[16px] border transition-colors duration-300 shrink-0`;
-                btnX.className = `judge-btn w-[48px] h-[36px] rounded-[10px] flex items-center justify-center text-[16px] hover:bg-red-50 hover:text-red-500 active:scale-90 transition-all`;
-                btnC.className = `judge-btn w-[48px] h-[36px] rounded-[10px] flex items-center justify-center text-[16px] hover:bg-green-50 hover:text-green-500 active:scale-90 transition-all`;
+                row.className = `flex justify-between items-center p-4 rounded-[20px] shadow-sm border transition-colors duration-300 shrink-0`;
+                btnX.className = `judge-btn w-[56px] h-[44px] rounded-[14px] flex items-center justify-center text-[22px] hover:bg-red-50 hover:text-red-500 active:scale-90 transition-all`;
+                btnC.className = `judge-btn w-[56px] h-[44px] rounded-[14px] flex items-center justify-center text-[22px] hover:bg-green-50 hover:text-green-500 active:scale-90 transition-all`;
                 wordSpan.classList.remove('text-gray-400', 'text-gray-500', 'text-gray-800');
                 wordPhonetic.classList.remove('text-gray-400', 'text-gray-500', 'text-gray-800');
                 wordDesc.classList.remove('opacity-60', 'opacity-80');
@@ -926,7 +958,7 @@
             }
 
             updatePassingStats();
-            renderBasket(); 
+            setPassFilter(state.passFilter);
         }
 
         function updatePassingStats() {
@@ -934,65 +966,22 @@
             if (elKnown) elKnown.innerText = state.passingStats.known;
             const elUnknown = document.getElementById('statUnknown');
             if (elUnknown) elUnknown.innerText = state.passingStats.unknown;
+            const elAllCount = document.getElementById('statAllCount');
+            if (elAllCount) elAllCount.innerText = TOTAL_WORDS;
+            
             const elRemaining = document.getElementById('statRemaining');
             if (elRemaining) elRemaining.innerText = state.passingStats.remaining;
 
             const submitBtn = document.getElementById('submitLevelBtn');
             if (submitBtn) {
                 if (state.passingStats.remaining === 0) {
-                    submitBtn.className = 'bg-brand hover-bg-brand text-white font-bold py-3 px-10 text-[16px] rounded-[14px] shadow-sm active:scale-95 transition-all';
+                    submitBtn.className = 'bg-brand hover-bg-brand text-white font-bold py-3 px-10 text-[16px] rounded-[14px] shadow-sm active:scale-95 transition-all whitespace-nowrap shrink-0';
                     submitBtn.disabled = false;
                 } else {
-                    submitBtn.className = 'bg-[#F1F5F9] text-[#94A3B8] font-bold py-3 px-10 text-[16px] rounded-[14px] transition-all cursor-not-allowed';
+                    submitBtn.className = 'bg-[#F1F5F9] text-[#94A3B8] font-bold py-3 px-10 text-[16px] rounded-[14px] transition-all cursor-not-allowed whitespace-nowrap shrink-0';
                     submitBtn.disabled = true;
                 }
             }
-        }
-
-        function renderBasket() {
-            const queueList = document.getElementById('queueList');
-            const badge = document.getElementById('basketProgressBadge');
-            
-            let typeLabel = '指定';
-            if (state.currentActionType === 'old') typeLabel = '旧词';
-            if (state.currentActionType === 'new') typeLabel = '新词';
-
-            const baseCount = state.vocabBook.filter(w => w.type === state.currentActionType).length;
-            const currentTotal = baseCount + state._tempUnknowns.length;
-
-            if (badge) {
-                badge.innerText = `${typeLabel}关卡进度: ${currentTotal}/${VOCAB_THRESHOLD}`;
-                if (currentTotal >= VOCAB_THRESHOLD) {
-                    badge.className = "text-[11px] text-red-600 bg-red-50 border border-red-200 px-2.5 py-0.5 rounded-[6px] font-bold shadow-sm transition-colors animate-pulse";
-                } else {
-                    badge.className = "text-[11px] text-orange-500 bg-orange-50 border border-orange-100 px-2.5 py-0.5 rounded-[6px] font-bold transition-colors";
-                }
-            }
-
-            if(!queueList) return;
-            
-            if(state._tempUnknowns.length === 0) {
-                queueList.innerHTML = `
-                    <div class="flex flex-col items-center justify-center h-full text-center opacity-40 m-auto py-10">
-                        <i class="ph-fill ph-book-bookmark text-[36px] text-gray-400 mb-2"></i>
-                        <p class="text-[12px] font-bold text-gray-500">生词将自动记录在此</p>
-                    </div>`;
-                return;
-            }
-
-            queueList.innerHTML = '';
-            [...state._tempUnknowns].reverse().forEach(item => {
-                const div = document.createElement('div');
-                div.className = `flex flex-col p-2.5 rounded-[12px] bg-orange-50/80 border border-orange-100 shrink-0`;
-                div.innerHTML = `
-                    <div class="flex items-baseline gap-2 w-full flex-wrap text-orange-600 font-extrabold text-[15px] font-mono tracking-tight">
-                        <span>${item.word}</span>
-                        <span class="ml-1">${item.phonetic}</span>
-                    </div>
-                    <span class="text-gray-500 font-medium text-[12px] truncate mt-0.5">${item.meaning}</span>
-                `;
-                queueList.appendChild(div);
-            });
         }
 
         function submitPassResults() {
@@ -1008,7 +997,7 @@
             if (state._tempUnknowns.length > 0) {
                 state._tempUnknowns.forEach(w => {
                     if(!state.vocabBook.find(ex => ex.word === w.word)) {
-                        w.type = state.currentActionType; 
+                        w.type = state.currentActionType === 'assigned' ? w.type : state.currentActionType; 
                         state.vocabBook.push(w);
                     }
                 });
@@ -1019,7 +1008,7 @@
             
             const isLevelTriggered = (newCount >= VOCAB_THRESHOLD && oldCount >= VOCAB_THRESHOLD);
 
-            if (isLevelTriggered) {
+            if (isLevelTriggered && state.activeLevel === null) {
                 state.activeLevel = { 
                     title: '生词专属关卡', 
                     wordCount: state.vocabBook.length, 
@@ -1041,77 +1030,495 @@
                         state.assignedTasks = state.assignedTasks.filter(t => t.id !== task.id);
                     }
                 }
+            }
+            
+            if (isLevelTriggered) {
+                showModal('生词本已达标', '<div class="mt-1 font-medium text-gray-600">系统已自动为您生成专属强化关卡！<br>请返回主页进行攻坚。</div>', () => switchView('view-dashboard'));
+            } else if (state._tempUnknowns.length > 0) {
+                showModal('提交成功', `<div class="mt-1 text-[15px] font-medium text-gray-600">已将发现的 <b class="text-[20px] text-orange-500 font-mono px-0.5">${state._tempUnknowns.length}</b> 个生词加入生词本！</div><div class="text-[12px] text-gray-400 mt-4 pt-3 border-t border-gray-100 w-full text-center">💡 新旧生词各满 ${VOCAB_THRESHOLD} 词时将自动生成关卡。</div>`, () => switchView('view-dashboard'));
+            } else {
+                showModal('完美掌握', '<div class="mt-1 font-medium text-gray-600">太棒了！<br>本次打卡全对，没有产生任何盲点！</div>', () => switchView('view-dashboard'));
+            }
+        }
 
-                if (isLevelTriggered) {
-                    showModal('双轨收集完毕！', `生词本已达触发条件！\n系统已为您生成专属学习关卡，在攻坚解锁之前，AI中枢已锁定。`, () => switchView('view-dashboard'));
-                } else if (state._tempUnknowns.length > 0) {
-                    showModal('今日任务打卡成功', `进度 +1，并且发现了 ${state._tempUnknowns.length} 个盲点，已存入生词本。\n(注：需新旧词均达${VOCAB_THRESHOLD}个方可触发关卡)`, () => switchView('view-dashboard'));
-                } else {
-                    showModal('今日任务打卡成功', `进度 +1，本批次单词全部认识！`, () => switchView('view-dashboard'));
+        // ====== 沉浸式评分视图与核心逻辑 ======
+        let scoringData = [];
+        const sysConfig = { gendu: { target: 2 }, yinji: { target: 2 }, tingxie: { target: 1 } };
+        let currentMode = 'gendu'; let currentScoreIdx = 0; let modeRound = { gendu: 0, yinji: 0, tingxie: 0 };
+        let isRecording = false; let isPlayingSystem = false; let systemAudioTimeout = null; let isAutoPlay = true; 
+        let autoAdvanceTimeout = null;
+
+        function refreshIcons() { if (typeof lucide !== 'undefined') lucide.createIcons(); }
+
+        function initPressEvents() {
+            const btn = document.getElementById('score-action-btn');
+            if(!btn) return;
+            const startRecord = (e) => {
+                if (e.type === 'touchstart') e.preventDefault(); 
+                if (isRecording) return;
+                if (isPlayingSystem) { isPlayingSystem = false; clearTimeout(systemAudioTimeout); }
+                isRecording = true;
+                const statusPill = document.getElementById('scoring-status-pill');
+                statusPill.innerHTML = `<div class="w-2.5 h-2.5 rounded-full bg-red-500 mr-2 animate-pulse"></div><span class="font-bold">录音中</span>`;
+                statusPill.className = "flex items-center bg-red-50/90 backdrop-blur-md text-red-600 px-5 py-1.5 rounded-full border border-red-200 text-[14px] transition-colors shadow-sm whitespace-nowrap pointer-events-auto";
+                
+                // Active state
+                btn.className = "w-[84px] h-[84px] bg-red-500 text-white rounded-full flex items-center justify-center shadow-[0_8px_24px_rgba(239,68,68,0.4)] hover:bg-red-600 transition-all focus:outline-none select-none group relative z-[100] overflow-hidden transform scale-95 cursor-pointer pointer-events-auto";
+                btn.innerHTML = `<i data-lucide="mic" class="w-9 h-9 animate-pulse pointer-events-none shrink-0"></i>`;
+                refreshIcons(); updateQueueList();
+            };
+            const endRecord = (e) => {
+                if (!isRecording) return; isRecording = false;
+                const currWord = scoringData[currentScoreIdx]; const randomScore = Math.floor(Math.random() * 61) + 40;
+                currWord.score = randomScore;
+                
+                const icons = {
+                    red: `<svg class="w-[16px] h-[16px] mr-1.5 text-red-500" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.3 12.89l-1.41 1.41L12 13.41l-2.89 2.89-1.41-1.41L10.59 12 7.7 9.11l1.41-1.41L12 10.59l2.89-2.89 1.41 1.41L13.41 12l2.89 2.89z"/></svg>`,
+                    orange: `<svg class="w-[16px] h-[16px] mr-1.5 text-orange-500" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 13a3 3 0 110-6 3 3 0 010 6z"/></svg>`,
+                    green: `<svg class="w-[16px] h-[16px] mr-1.5 text-green-500" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`
+                };
+                
+                let feedback = randomScore < 60 ? { c: "bg-red-50 text-red-600 border-red-200", i: icons.red, f: "需努力" } : (randomScore <= 70 ? { c: "bg-orange-50 text-orange-600 border-orange-200", i: icons.orange, f: "还不错" } : { c: "bg-green-50 text-green-600 border-green-200", i: icons.green, f: "非常好" });
+                
+                const statusPill = document.getElementById('scoring-status-pill');
+                statusPill.innerHTML = `${feedback.i} <span class="font-bold">${feedback.f} &nbsp;${randomScore}分</span>`;
+                statusPill.className = `flex items-center px-4 py-1.5 rounded-full border text-[14px] transition-colors backdrop-blur-md shadow-sm whitespace-nowrap pointer-events-auto ${feedback.c}`;
+                triggerActionComplete();
+            };
+            btn.addEventListener('mousedown', startRecord); btn.addEventListener('touchstart', startRecord, { passive: false });
+            window.addEventListener('mouseup', endRecord); window.addEventListener('touchend', endRecord);
+        }
+
+        function enterScoringView() {
+            if (!state.activeLevel) return;
+            scoringData = state.activeLevel.words.map(w => ({ en: w.word, phon: w.phonetic, cn: w.meaning, score: null, genduProgress: 0, yinjiProgress: 0, tingxieProgress: 0 }));
+            sysConfig.gendu.target = state.activeLevel.steps[0].target; sysConfig.yinji.target = state.activeLevel.steps[1].target; sysConfig.tingxie.target = state.activeLevel.steps[2].target;
+            currentMode = 'gendu'; currentScoreIdx = 0; modeRound = { gendu: state.activeLevel.steps[0].current || 0, yinji: state.activeLevel.steps[1].current || 0, tingxie: state.activeLevel.steps[2].current || 0 };
+            isRecording = false; isPlayingSystem = false; isAutoPlay = true; 
+            clearTimeout(systemAudioTimeout); clearTimeout(window.autoPlayTimer); clearTimeout(autoAdvanceTimeout);
+            switchView('view-scoring');
+            setTimeout(() => {
+                refreshIcons();
+                if (!window.__pressEventsBound) { initPressEvents(); window.__pressEventsBound = true; }
+                updateScoringUI();
+            }, 50);
+        }
+
+        function toggleAutoPlay() {
+            isAutoPlay = !isAutoPlay; const btn = document.getElementById('autoplay-toggle-btn'); const text = document.getElementById('autoplay-toggle-text');
+            if (isAutoPlay) {
+                btn.className = "h-9 flex items-center px-4 rounded-full border-[1.5px] font-bold text-[13px] transition-all bg-[#eff6ff] border-[#bfdbfe] text-[#3B82F6] hover:bg-[#dbeafe] shadow-sm shrink-0 whitespace-nowrap relative z-10"; text.innerText = "自动下一个";
+                const targetProgress = modeRound[currentMode] + 1; const unfinishedCount = scoringData.filter(item => item[currentMode + 'Progress'] < targetProgress).length;
+                if (!isPlayingSystem && !isRecording && unfinishedCount > 0) {
+                    clearTimeout(window.autoPlayTimer); 
+                    const speedSelect = document.getElementById('playback-speed');
+                    const speedMultiplier = speedSelect ? parseFloat(speedSelect.value) : 1;
+                    const wordGapInput = document.getElementById('word-gap');
+                    const wordGap = (wordGapInput ? parseFloat(wordGapInput.value) * 1000 : 1000) / speedMultiplier;
+                    window.autoPlayTimer = setTimeout(() => playSystemAudio(), wordGap);
                 }
             } else {
-                if (isLevelTriggered) {
-                    showModal('双轨收集完毕！', `生词本已达触发条件！\n系统已为您生成专属学习关卡，在攻坚解锁之前，AI中枢已锁定。`, () => switchView('view-dashboard'));
-                } else if (state._tempUnknowns.length > 0) {
-                    showModal('生词已收集', `本次打卡发现了 ${state._tempUnknowns.length} 个盲点，已存入生词本。\n进度：新词 ${newCount}/${VOCAB_THRESHOLD}，旧词 ${oldCount}/${VOCAB_THRESHOLD}。\n(注：需新旧词均达${VOCAB_THRESHOLD}个方可触发关卡)`, () => switchView('view-dashboard'));
-                } else {
-                    showModal('完美掌握', `本批次单词您全部认识，记忆曲线已更新！\n本次未产生生词。`, () => switchView('view-dashboard'));
+                btn.className = "h-9 flex items-center px-4 rounded-full border-[1.5px] font-bold text-[13px] transition-all bg-white border-gray-300 text-gray-500 hover:bg-gray-50 shadow-sm shrink-0 whitespace-nowrap relative z-10"; text.innerText = "手动下一个"; clearTimeout(window.autoPlayTimer);
+            }
+        }
+
+        function switchMode(mode) {
+            if (isRecording || isPlayingSystem) return;
+            currentMode = mode; const targetProgress = modeRound[mode] + 1; const nextIdx = scoringData.findIndex(item => item[currentMode + 'Progress'] < targetProgress);
+            currentScoreIdx = nextIdx !== -1 ? nextIdx : 0;
+            updateScoringUI();
+        }
+
+        function checkGlobalProgressAndMove() {
+            if (currentMode === 'gendu' && modeRound.gendu >= sysConfig.gendu.target) { setTimeout(() => switchMode('yinji'), 400); return; } 
+            else if (currentMode === 'yinji' && modeRound.yinji >= sysConfig.yinji.target) { setTimeout(() => switchMode('tingxie'), 400); return; }
+            else if (currentMode === 'tingxie' && modeRound.tingxie >= sysConfig.tingxie.target) { updateScoringUI(); return; }
+            const targetProgress = modeRound[currentMode] + 1; const nextIdx = scoringData.findIndex(item => item[currentMode + 'Progress'] < targetProgress);
+            currentScoreIdx = nextIdx !== -1 ? nextIdx : 0; updateScoringUI();
+        }
+
+        function triggerActionComplete() {
+            const currWord = scoringData[currentScoreIdx]; const targetProgress = modeRound[currentMode] + 1;
+            if (currWord[currentMode + 'Progress'] < targetProgress) currWord[currentMode + 'Progress']++;
+            const unfinishedItems = scoringData.filter(item => item[currentMode + 'Progress'] < targetProgress);
+            if (unfinishedItems.length === 0) updateScoringUI();
+            else { 
+                if(isAutoPlay) {
+                    setTimeout(() => { const nextIdx = scoringData.findIndex(w => w[currentMode + 'Progress'] < targetProgress); if (nextIdx !== -1) currentScoreIdx = nextIdx; updateScoringUI(); }, 400);
                 }
             }
         }
 
-        function renderLearningStepsModal() {
-            const container = document.getElementById('learningStepsContainerModal');
-            if (!container) return;
-            
-            let html = '<div class="flex flex-col relative py-2 w-full text-left">';
-            html += '<div class="absolute left-[20px] top-6 bottom-6 w-[2px] bg-gray-200 z-0"></div>';
+        // ==== Grading View Logic ====
+        let gradingScore = 0;
+        let gradingMarked = new Set();
 
-            state.activeLevel.steps.forEach((step, idx) => {
-                const isDone = step.current >= step.target;
-                const isCurrent = !isDone && (idx === 0 || state.activeLevel.steps[idx-1].current >= state.activeLevel.steps[idx-1].target);
-                
-                let icon = '', textClass = '', boxClass = '', borderClass = '';
-                
-                if (isDone) {
-                    icon = '<i class="ph-bold ph-check text-green-500 text-[16px]"></i>';
-                    textClass = 'text-green-600 line-through';
-                    borderClass = 'border-green-200 bg-white';
-                    boxClass = 'bg-green-50/50 border-green-100';
-                } else if (isCurrent) {
-                    icon = '<i class="ph-bold ph-hourglass-high text-brand text-[16px] animate-pulse"></i>';
-                    textClass = 'text-brand font-bold';
-                    borderClass = 'border-brand bg-white border-2 shadow-sm';
-                    boxClass = 'bg-blue-50 border-blue-100 shadow-sm';
-                } else {
-                    icon = '<i class="ph-fill ph-lock-key text-gray-400 text-[16px]"></i>';
-                    textClass = 'text-gray-400';
-                    borderClass = 'border-gray-200 bg-gray-50';
-                    boxClass = 'bg-gray-50 border-transparent';
-                }
+        function enterGradingView() {
+            switchView('view-grading');
+            gradingMarked.clear();
+            gradingScore = scoringData.length;
+            document.getElementById('final-score-total').innerText = scoringData.length;
+            updateGradingScore();
+            renderGradingList();
+        }
 
-                html += `
-                    <div class="flex items-center gap-3 mb-3 last:mb-0 relative z-10 w-full">
-                        <div class="w-10 h-10 rounded-[10px] flex items-center justify-center shrink-0 z-10 ${borderClass}">
-                            ${icon}
-                        </div>
-                        <div class="flex-1 flex items-center justify-between p-3 rounded-[12px] border ${boxClass} transition-colors">
-                            <span class="text-[14px] ${textClass}">${step.name}</span>
-                            <span class="text-[12px] font-bold ${textClass} font-mono">${step.current}/${step.target}</span>
+        function renderGradingList() {
+            const container = document.getElementById('gradingListContainer');
+            container.innerHTML = '';
+            scoringData.forEach((item, index) => {
+                const isMarked = gradingMarked.has(index);
+                const bgClass = isMarked 
+                    ? 'bg-[#FEF2F2] border-[#FECACA] text-red-600 shadow-sm' 
+                    : 'bg-gradient-to-r from-[#FFFDF0] to-white border-[#FDE68A]/50 text-gray-800 shadow-sm hover:border-[#FDE68A]';
+                
+                container.innerHTML += `
+                    <div onclick="toggleGradingMark(${index})" class="flex items-center p-4 rounded-[20px] border transition-colors duration-300 cursor-pointer active:scale-95 group shrink-0 ${bgClass}">
+                        <div class="flex items-baseline space-x-3 overflow-hidden pr-2 w-full">
+                            <span class="text-[14px] font-mono font-bold shrink-0 opacity-40">${index + 1}.</span>
+                            <span class="font-extrabold text-[16px] font-mono transition-colors shrink-0">${item.en}</span>
+                            <span class="text-[13px] font-serif shrink-0 opacity-60">${item.phon}</span>
+                            <span class="text-[14px] font-medium truncate flex-1 min-w-0 ${isMarked ? '' : 'text-gray-500'}">${item.cn}</span>
                         </div>
                     </div>
                 `;
             });
-            html += '</div>';
-            container.innerHTML = html;
+        }
 
-            const actionBtn = document.getElementById('stepActionBtn');
-            const currentStep = state.activeLevel.steps.find(s => s.current < s.target);
-            if (currentStep) {
-                actionBtn.innerText = `点击执行 [${currentStep.name}] (模拟 +1)`;
+        function toggleGradingMark(index) {
+            if (gradingMarked.has(index)) {
+                gradingMarked.delete(index);
+                gradingScore++;
+            } else {
+                gradingMarked.add(index);
+                gradingScore--;
+            }
+            updateGradingScore();
+            renderGradingList();
+        }
+
+        function updateGradingScore() {
+            document.getElementById('final-score-display').innerText = gradingScore;
+        }
+
+        function simulateTakePhoto() {
+            document.getElementById('take-photo-btn').classList.add('hidden');
+            document.getElementById('photo-thumbnail-container').classList.remove('hidden');
+            document.getElementById('photo-thumbnail-container').classList.add('flex');
+        }
+
+        function finishScoringLevel() {
+            state.activeLevel = null;
+            state.vocabBook = []; 
+            
+            const msgHtml = `
+                <div class="flex flex-col items-center justify-center w-full mt-1">
+                    <div class="w-14 h-14 bg-gradient-to-br from-green-400 to-emerald-500 rounded-[16px] flex items-center justify-center text-white mb-4 shadow-lg shadow-green-500/30 transform transition-transform hover:scale-105">
+                        <i class="ph-bold ph-check text-[28px]"></i>
+                    </div>
+                    <span class="text-[17px] text-gray-800 font-extrabold mb-1">听写打分已完成！</span>
+                    <span class="text-[13px] text-gray-500 font-medium leading-relaxed px-2">您已成功消灭本次专属关卡的所有盲点</span>
+                    <div class="mt-5 bg-[#F8FAFC] border border-gray-100 rounded-[14px] px-3 py-3 w-full shadow-[inset_0_2px_4px_rgba(0,0,0,0.01)]">
+                        <span class="text-[12px] font-bold text-gray-400 flex items-center justify-center gap-1.5"><i class="ph-fill ph-broom text-[16px]"></i> 生词本已自动清空，可开启新征程</span>
+                    </div>
+                </div>
+            `;
+            
+            showModal('关卡完美攻克', msgHtml, () => {
+                document.getElementById('take-photo-btn').classList.remove('hidden');
+                document.getElementById('photo-thumbnail-container').classList.add('hidden');
+                document.getElementById('photo-thumbnail-container').classList.remove('flex');
+                switchView('view-dashboard');
+            });
+        }
+
+        function submitRound() {
+            if (currentMode === 'gendu') scoringData.forEach(item => item.score = null);
+            modeRound[currentMode]++;
+            if (currentMode === 'gendu') state.activeLevel.steps[0].current = modeRound.gendu;
+            if (currentMode === 'yinji') state.activeLevel.steps[1].current = modeRound.yinji;
+            if (currentMode === 'tingxie') state.activeLevel.steps[2].current = modeRound.tingxie;
+            
+            if (modeRound.gendu >= sysConfig.gendu.target && modeRound.yinji >= sysConfig.yinji.target && modeRound.tingxie >= sysConfig.tingxie.target) {
+                // 如果全部完成，自动转入全新的听写打分页面
+                enterGradingView();
+                return;
+            }
+            checkGlobalProgressAndMove();
+        }
+
+        function playSystemAudio() {
+            if (isRecording || isPlayingSystem) return;
+            isPlayingSystem = true; 
+            clearTimeout(autoAdvanceTimeout);
+            
+            const statusPill = document.getElementById('scoring-status-pill');
+            statusPill.innerHTML = `<span class="relative flex h-3 w-3 mr-2.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span></span><span class="font-bold text-[#1F5FFF]">系统发音中</span>`;
+            statusPill.className = "flex items-center bg-[#1F5FFF]/10 backdrop-blur-md px-6 py-2.5 rounded-full border border-[#1F5FFF]/20 text-[14px] transition-colors shadow-sm whitespace-nowrap pointer-events-auto"; refreshIcons();
+            
+            // 真实映射音频流转时长与倍率
+            const speedSelect = document.getElementById('playback-speed');
+            const speedMultiplier = speedSelect ? parseFloat(speedSelect.value) : 1;
+            const audioGapInput = document.getElementById('audio-gap');
+            const baseDuration = audioGapInput ? parseFloat(audioGapInput.value) * 1000 : 1000;
+            const actualDuration = baseDuration / speedMultiplier;
+            
+            clearTimeout(systemAudioTimeout);
+            systemAudioTimeout = setTimeout(() => { 
+                isPlayingSystem = false; 
+                if (!isRecording) { 
+                    if (currentMode === 'gendu') {
+                        statusPill.innerHTML = `<i data-lucide="mic" class="w-[14px] h-[14px] mr-1.5 text-blue-500"></i><span class="text-blue-600 font-bold">请按住录音</span>`;
+                        statusPill.className = "flex items-center bg-blue-50/90 backdrop-blur-md px-4 py-1.5 rounded-full border border-blue-200 text-[13px] transition-colors shadow-sm whitespace-nowrap pointer-events-auto";
+                    } else if (currentMode === 'yinji') {
+                        statusPill.innerHTML = `<i data-lucide="pencil" class="w-[14px] h-[14px] mr-1.5 text-orange-500"></i><span class="text-orange-600 font-bold">请记下当前单词</span>`;
+                        statusPill.className = "flex items-center bg-orange-50/90 backdrop-blur-md px-4 py-1.5 rounded-full border border-orange-200 text-[13px] transition-colors shadow-sm whitespace-nowrap pointer-events-auto";
+                    } else if (currentMode === 'tingxie') {
+                        statusPill.innerHTML = `<i data-lucide="brain" class="w-[14px] h-[14px] mr-1.5 text-orange-500"></i><span class="text-orange-600 font-bold">请默写当前单词</span>`;
+                        statusPill.className = "flex items-center bg-orange-50/90 backdrop-blur-md px-4 py-1.5 rounded-full border border-orange-200 text-[13px] transition-colors shadow-sm whitespace-nowrap pointer-events-auto";
+                    }
+                    refreshIcons();
+
+                    if (currentMode !== 'gendu') { 
+                        autoAdvanceTimeout = setTimeout(() => {
+                            triggerActionComplete(); 
+                        }, 1500 / speedMultiplier); 
+                    }
+                } 
+            }, actualDuration);
+        }
+
+        function updateTopNav() {
+            const locked = { gendu: false, yinji: modeRound.gendu < sysConfig.gendu.target, tingxie: modeRound.yinji < sysConfig.yinji.target };
+            const container = document.getElementById('nav-stepper-container'); container.innerHTML = '';
+            ['gendu', 'yinji', 'tingxie'].forEach((mode, index) => {
+                const names = { gendu: '跟读', yinji: '音记', tingxie: '听写' };
+                const btn = document.createElement('div');
+                if (modeRound[mode] >= sysConfig[mode].target) {
+                    btn.className = "flex items-center bg-[#ecfdf5] border-[1.5px] border-[#bbf7d0] rounded-[14px] px-2 py-1.5 min-w-[76px] shadow-sm";
+                    btn.innerHTML = `<div class="bg-white rounded-[6px] p-1 mr-1.5 shadow-sm shrink-0 flex items-center justify-center border border-green-200"><i data-lucide="check" class="w-3.5 h-3.5 text-green-500"></i></div><div class="flex flex-col items-start justify-center"><span class="text-[12px] font-bold text-green-600 leading-none mb-1 whitespace-nowrap">${names[mode]}</span><span class="text-[10px] font-mono text-green-500 font-bold leading-none line-through whitespace-nowrap">${sysConfig[mode].target}/${sysConfig[mode].target}</span></div>`;
+                } else if (currentMode === mode) {
+                    btn.className = "flex items-center bg-[#f0f4ff] border-[1.5px] border-[#bfdbfe] rounded-[14px] px-2 py-1.5 min-w-[76px] shadow-sm";
+                    btn.innerHTML = `<div class="bg-white rounded-[6px] p-1 mr-1.5 shadow-sm shrink-0 flex items-center justify-center border border-blue-100"><i data-lucide="hourglass" class="w-3.5 h-3.5 text-[#3B82F6]"></i></div><div class="flex flex-col items-start justify-center"><span class="text-[12px] font-bold text-[#3B82F6] leading-none mb-1 whitespace-nowrap">${names[mode]}</span><span class="text-[10px] font-mono text-[#3B82F6] font-bold leading-none whitespace-nowrap">${modeRound[mode]}/${sysConfig[mode].target}</span></div>`;
+                } else {
+                    btn.className = `flex items-center bg-white border-[1.5px] border-transparent rounded-[14px] px-2 py-1.5 min-w-[76px] shadow-sm ${locked[mode] ? 'opacity-80' : 'hover:bg-gray-50 cursor-pointer'}`;
+                    btn.innerHTML = `<div class="bg-gray-100 rounded-[6px] p-1 mr-1.5 shrink-0 flex items-center justify-center">${locked[mode] ? '<i data-lucide="lock" class="w-3.5 h-3.5 text-gray-400"></i>' : '<i data-lucide="hourglass" class="w-3.5 h-3.5 text-gray-500"></i>'}</div><div class="flex flex-col items-start justify-center"><span class="text-[12px] font-bold ${locked[mode] ? 'text-gray-500' : 'text-gray-600'} leading-none mb-1 whitespace-nowrap">${names[mode]}</span><span class="text-[10px] font-mono ${locked[mode] ? 'text-gray-400' : 'text-gray-500'} font-bold leading-none whitespace-nowrap">${modeRound[mode]}/${sysConfig[mode].target}</span></div>`;
+                    if (!locked[mode]) btn.onclick = () => switchMode(mode);
+                }
+                container.appendChild(btn);
+                if (index < 2) { const sep = document.createElement('i'); sep.setAttribute('data-lucide', 'chevron-right'); sep.className = "w-3 h-3 text-gray-300 mx-0.5 shrink-0"; container.appendChild(sep); }
+            });
+            refreshIcons();
+        }
+
+        function updateScoringUI() {
+            if(!scoringData.length) return;
+            const currWord = scoringData[currentScoreIdx]; 
+            const progressEl = document.getElementById('score-progress');
+            if (progressEl) progressEl.innerText = `${currentScoreIdx + 1}/${scoringData.length}`;
+            
+            const wordEnEl = document.getElementById('score-word-en'); const wordCnEl = document.getElementById('score-word-cn'); const phonEl = document.getElementById('score-word-phon');
+            wordEnEl.classList.remove('fade-in'); void wordEnEl.offsetWidth; 
+            
+            const baseClasses = "font-bold drop-shadow-md max-w-full break-words break-all pointer-events-auto w-full text-[40px] transition-all duration-300 leading-tight ";
+            
+            if (currentMode === 'tingxie') {
+                wordEnEl.innerText = '***'; wordEnEl.className = 'text-gray-300 tracking-wide ' + baseClasses;
+                wordCnEl.innerText = '***'; wordCnEl.className = 'text-gray-300 tracking-widest ' + baseClasses;
+                phonEl.innerText = '***'; phonEl.className = 'text-gray-300 tracking-widest font-serif ' + baseClasses;
+            } else {
+                // gendu 和 yinji 右侧均正常显示
+                wordEnEl.innerText = currWord.en; wordEnEl.className = `text-gray-800 tracking-wide ` + baseClasses;
+                wordCnEl.innerText = currWord.cn; wordCnEl.className = 'text-gray-800 tracking-widest ' + baseClasses;
+                phonEl.innerText = currWord.phon; phonEl.className = 'text-gray-800 tracking-widest font-serif ' + baseClasses;
+            }
+            
+            const prevBtn = document.getElementById('prev-btn'); const nextBtn = document.getElementById('next-btn');
+            prevBtn.disabled = currentScoreIdx === 0; prevBtn.className = currentScoreIdx === 0 ? "flex items-center text-gray-300 font-medium text-[14px] py-1.5 px-3 rounded-full cursor-not-allowed opacity-50 whitespace-nowrap shrink-0" : "flex items-center text-[#3B82F6] hover:text-[#2563EB] transition-colors font-medium text-[14px] py-1.5 px-3 rounded-full cursor-pointer hover:bg-blue-50 whitespace-nowrap shrink-0";
+            nextBtn.disabled = currentScoreIdx === scoringData.length - 1; nextBtn.className = currentScoreIdx === scoringData.length - 1 ? "flex items-center text-gray-300 font-medium text-[14px] py-1.5 px-3 rounded-full cursor-not-allowed opacity-50 whitespace-nowrap shrink-0" : "flex items-center text-[#3B82F6] hover:text-[#2563EB] transition-colors font-medium text-[14px] py-1.5 px-3 rounded-full cursor-pointer hover:bg-blue-50 whitespace-nowrap shrink-0";
+            
+            // --- 动效核心逻辑 ---
+            const micContainer = document.getElementById('mic-container');
+            if (currentMode === 'gendu') {
+                // 显示录音按钮容器
+                micContainer.style.display = 'flex';
+            } else {
+                // 音记、听写模式下，彻底隐藏录音按钮容器，操作栏始终保持原有宽度
+                micContainer.style.display = 'none';
+            }
+
+            updateTopNav(); updateQueueList(); resetScoringState();
+            const targetProgress = modeRound[currentMode] + 1; const unfinishedCount = scoringData.filter(item => item[currentMode + 'Progress'] < targetProgress).length;
+            if (isAutoPlay && unfinishedCount > 0) { 
+                clearTimeout(window.autoPlayTimer); 
+                const speedSelect = document.getElementById('playback-speed');
+                const speedMultiplier = speedSelect ? parseFloat(speedSelect.value) : 1;
+                const wordGapInput = document.getElementById('word-gap');
+                const wordGap = (wordGapInput ? parseFloat(wordGapInput.value) * 1000 : 1000) / speedMultiplier;
+                window.autoPlayTimer = setTimeout(() => playSystemAudio(), wordGap); 
+            } else if (!isAutoPlay && unfinishedCount > 0 && document.getElementById('scoring-status-pill').innerText === '等待开始...') {
+                // 手动模式下，如果切换单词，重置为系统发音中再让用户听
+                playSystemAudio();
             }
         }
 
+        function updateQueueList() {
+            const listContainer = document.getElementById('queue-words-list'); 
+            if (!listContainer) return;
+            
+            listContainer.style.paddingTop = listContainer.style.paddingBottom = 'calc(50% - 34px)'; 
+            listContainer.innerHTML = '';
+            
+            scoringData.forEach((item, index) => {
+                const li = document.createElement('li'); li.id = `queue-item-${index}`;
+                let statusHtml = ''; const targetProgress = modeRound[currentMode] + 1;
+                
+                if (isRecording && index === currentScoreIdx) statusHtml = `<div class="text-[13px] text-red-600 bg-red-100/90 px-3 py-1.5 rounded-xl font-bold flex items-center border border-red-200 backdrop-blur-md transition-colors"><span class="relative flex h-2.5 w-2.5 mr-1.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span></span>录音中</div>`;
+                else if (currentMode === 'gendu' && item.score !== null) { let colorClass = item.score < 60 ? 'text-red-600 bg-red-100/80 border-red-200' : (item.score <= 70 ? 'text-orange-600 bg-orange-100/80 border-orange-200' : 'text-green-600 bg-green-100/80 border-green-200'); statusHtml = `<div class="text-[13px] ${colorClass} px-3 py-1.5 rounded-xl font-bold border backdrop-blur-md">${item.score}分</div>`; }
+                else if (index === currentScoreIdx) statusHtml = `<div class="text-[13px] text-[#1F5FFF] bg-[#1F5FFF]/15 px-4 py-1.5 rounded-xl font-bold flex items-center border border-[#1F5FFF]/20 backdrop-blur-md transition-colors">当前</div>`;
+                else if (item[currentMode + 'Progress'] >= targetProgress) statusHtml = `<div class="text-[13px] text-green-600 bg-green-50/80 px-4 py-1.5 rounded-xl font-bold border border-green-200/50 backdrop-blur-md flex items-center">已播</div>`;
+                else statusHtml = `<div class="text-[13px] ${index < currentScoreIdx ? 'text-gray-400' : 'text-gray-500 bg-gray-200/50 rounded-xl'} px-4 py-1.5 backdrop-blur-md">${index < currentScoreIdx ? '已跳过' : '即将'}</div>`;
+                
+                // 【核心修改】听写和音记模式下，左侧列表信息全部隐藏防作弊
+                const isHiddenInList = currentMode === 'tingxie' || currentMode === 'yinji';
+                const displayEn = isHiddenInList ? '***' : item.en;
+                const displayPhon = isHiddenInList ? '***' : item.phon;
+                const displayCn = isHiddenInList ? '***' : item.cn;
+
+                // 压缩单行的 pr-4，避免和滚动条区域（右边界）冲突被裁剪阴影
+                li.className = `${index === currentScoreIdx ? 'bg-white/95 backdrop-blur-xl opacity-100 scale-100 z-10 relative shadow-[0_8px_24px_rgba(0,0,0,0.08)] border-white' : 'bg-white/50 backdrop-blur-md opacity-70 scale-[0.98] border-white/40'} pl-4 pr-4 py-3.5 rounded-[16px] border flex justify-between items-center transition-all duration-300 min-h-[68px] cursor-pointer`;
+                
+                // 压缩 pr-2 并统一字号为 17px
+                li.innerHTML = `
+                    <div class="flex-1 flex items-baseline space-x-3 overflow-hidden pr-2 min-w-0">
+                        <span class="text-[15px] font-mono text-gray-400 font-bold shrink-0">${index + 1}.</span>
+                        <span class="font-extrabold text-[17px] ${index === currentScoreIdx ? 'text-[#2563EB]' : 'text-[#334155]'} transition-colors truncate shrink min-w-0 max-w-[40%]">${displayEn}</span>
+                        <span class="text-[17px] text-gray-400 font-serif shrink-0">${displayPhon}</span>
+                        <span class="text-[17px] ${index === currentScoreIdx ? 'text-[#475569]' : 'text-gray-500'} truncate font-medium shrink min-w-0 flex-1">${displayCn}</span>
+                    </div>
+                    <div class="flex-shrink-0">${statusHtml}</div>
+                `;
+                
+                li.onclick = () => { if (!isRecording && scoringData.filter(item => item[currentMode + 'Progress'] < targetProgress).length > 0) { currentScoreIdx = index; updateScoringUI(); } };
+                listContainer.appendChild(li);
+            });
+            setTimeout(() => { const curr = document.getElementById(`queue-item-${currentScoreIdx}`); if (curr) listContainer.scrollTo({ top: curr.offsetTop + (curr.clientHeight / 2) - listContainer.clientHeight / 2, behavior: 'smooth' }); }, 100);
+            updateSubmitBar(); refreshIcons();
+        }
+
+        function updateSubmitBar() {
+            const targetProgress = modeRound[currentMode] + 1; 
+            const unfinished = scoringData.filter(item => item[currentMode + 'Progress'] < targetProgress).length;
+            const bar = document.getElementById('queue-submit-bar'); 
+            
+            // 跟读/听写 -> 提交本轮，音记 -> 拍照凭证
+            let btnText = currentMode === 'yinji' ? '拍照凭证' : '提交本轮'; 
+            let btnIcon = currentMode === 'yinji' ? '<i data-lucide="camera" class="w-4 h-4 mr-1.5"></i>' : '';
+            let activeBg = currentMode === 'yinji' 
+                ? 'bg-[#f97316] hover:bg-[#ea580c] shadow-[0_4px_12px_rgba(249,115,22,0.3)] hover:shadow-[0_6px_16px_rgba(249,115,22,0.4)] animate-pulse' 
+                : 'bg-[#1F5FFF] hover:bg-[#004ce6] shadow-[0_4px_12px_rgba(31,95,255,0.3)] hover:shadow-[0_6px_16px_rgba(31,95,255,0.4)]';
+
+            if (modeRound[currentMode] >= sysConfig[currentMode].target) {
+                bar.innerHTML = `<div class="flex items-center shrink-0"><div class="w-7 h-7 rounded-full bg-[#dcfce7] flex items-center justify-center text-[#10b981] mr-2 shadow-sm shrink-0"><i data-lucide="check-circle-2" class="w-4 h-4"></i></div><span class="text-[#10b981] font-bold text-[16px] whitespace-nowrap">所有题目都已完成</span></div><div class="flex items-center space-x-5 shrink-0"><button class="bg-[#e2e8f0] text-[#94a3b8] font-bold py-2.5 px-6 rounded-xl text-[15px] cursor-not-allowed whitespace-nowrap flex items-center shrink-0">${btnIcon} ${btnText} (已完成)</button></div>`;
+            } else if (unfinished > 0) {
+                bar.innerHTML = `<div class="flex items-center cursor-pointer group shrink-0" onclick="scrollToFirstUnfinished()"><div class="w-6 h-6 rounded-full bg-[#eef2ff] border border-[#c7d2fe] flex items-center justify-center text-[#6366f1] mr-2 shrink-0"><span class="font-bold text-[13px] -mt-px">!</span></div><span class="text-[#6366f1] font-medium text-[15px] flex items-center whitespace-nowrap">剩余待完成: <span class="font-bold text-[22px] mx-1.5 leading-none">${unfinished}</span> 题 <i data-lucide="chevron-right" class="w-4 h-4 ml-0.5 opacity-70"></i></span></div><div class="flex items-center space-x-5 shrink-0"><button class="bg-[#e2e8f0] text-[#94a3b8] font-bold py-2.5 px-6 rounded-xl text-[15px] cursor-not-allowed whitespace-nowrap flex items-center shrink-0">${btnIcon} ${btnText}</button></div>`;
+            } else {
+                bar.innerHTML = `<div class="flex items-center shrink-0"><div class="w-7 h-7 rounded-full bg-[#dcfce7] flex items-center justify-center text-[#10b981] mr-2 shadow-sm shrink-0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="text-[#10b981] font-bold text-[16px] whitespace-nowrap">本轮已结束，请提交</span></div><div class="flex items-center space-x-5 shrink-0"><button onclick="submitRound()" class="flex items-center text-white font-bold py-2.5 px-6 rounded-xl text-[15px] transition-all active:scale-95 whitespace-nowrap shrink-0 flex items-center ${activeBg} shadow-sm">${btnIcon} ${btnText}</button></div>`;
+            }
+            refreshIcons();
+        }
+
+        function scrollToFirstUnfinished() {
+            if (isRecording) return; 
+            const idx = scoringData.findIndex(item => item[currentMode + 'Progress'] < modeRound[currentMode] + 1);
+            if (idx !== -1) { currentScoreIdx = idx; updateScoringUI(); setTimeout(() => { const el = document.getElementById(`queue-item-${idx}`); if (el) { el.classList.add('!border-[#818cf8]', 'shadow-[0_0_0_2px_rgba(129,140,248,0.4)]', '!bg-[#eef2ff]'); setTimeout(() => el.classList.remove('!border-[#818cf8]', 'shadow-[0_0_0_2px_rgba(129,140,248,0.4)]', '!bg-[#eef2ff]'), 1200); } }, 150); }
+        }
+
+        function prevScoreWord() { if (!isRecording && currentScoreIdx > 0) { currentScoreIdx--; updateScoringUI(); } }
+        function nextScoreWord() { if (!isRecording && currentScoreIdx < scoringData.length - 1) { currentScoreIdx++; updateScoringUI(); } }
+
+        function resetScoringState() {
+            isRecording = false; isPlayingSystem = false;
+            
+            const statusPill = document.getElementById('scoring-status-pill');
+            const targetProgress = modeRound[currentMode] + 1;
+            const unfinishedCount = scoringData.filter(item => item[currentMode + 'Progress'] < targetProgress).length;
+            
+            if (unfinishedCount === 0) {
+                statusPill.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 mr-1.5 text-green-500"></i><span class="text-green-600 font-bold">本轮已结束，请提交</span>`;
+                statusPill.className = "flex items-center bg-green-50/90 backdrop-blur-md px-5 py-1.5 rounded-full border border-green-200 text-[14px] transition-colors shadow-sm whitespace-nowrap pointer-events-auto";
+            } else {
+                // Initialize default waiting state, let playSystemAudio() override when it kicks in
+                statusPill.innerHTML = `<span class="text-gray-500 font-medium">等待开始...</span>`;
+                statusPill.className = "flex items-center bg-white/80 backdrop-blur-md px-5 py-1.5 rounded-full border border-gray-200 text-[14px] transition-colors shadow-sm whitespace-nowrap pointer-events-auto";
+            }
+
+            const btnEl = document.getElementById('score-action-btn');
+            if (btnEl && currentMode === 'gendu') {
+                btnEl.className = "w-[84px] h-[84px] bg-[#3B82F6] text-white rounded-full flex items-center justify-center shadow-[0_8px_24px_rgba(59,130,246,0.4)] hover:bg-[#2563EB] transition-all duration-500 ease-in-out focus:outline-none select-none group relative z-[100] overflow-hidden transform scale-100 cursor-pointer pointer-events-auto";
+                btnEl.innerHTML = `<i data-lucide="mic" class="w-9 h-9 pointer-events-none transition-transform group-active:scale-90 shrink-0"></i>`;
+            }
+            updateTopNav(); refreshIcons();
+        }
+
+        // ====== 新增：自定义倍速下拉菜单逻辑 ======
+        function initCustomSpeedDropdown() {
+            const trigger = document.getElementById('speed-trigger');
+            const menu = document.getElementById('speed-menu');
+            const display = document.getElementById('speed-display');
+            const hiddenInput = document.getElementById('playback-speed');
+            const options = document.querySelectorAll('.speed-option');
+
+            if (!trigger || !menu) return;
+
+            const closeMenu = () => {
+                if (!menu.classList.contains('hidden')) {
+                    menu.classList.remove('opacity-100', 'scale-100');
+                    menu.classList.add('opacity-0', 'scale-95');
+                    setTimeout(() => {
+                        menu.classList.add('hidden');
+                    }, 200);
+                }
+            };
+
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (menu.classList.contains('hidden')) {
+                    menu.classList.remove('hidden');
+                    void menu.offsetWidth; // 触发回流
+                    menu.classList.remove('opacity-0', 'scale-95');
+                    menu.classList.add('opacity-100', 'scale-100');
+                } else {
+                    closeMenu();
+                }
+            });
+
+            options.forEach(opt => {
+                opt.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const val = opt.getAttribute('data-value');
+                    const text = opt.innerText;
+
+                    // 更新显示文本和隐藏的真实值
+                    display.innerText = text;
+                    hiddenInput.value = val;
+
+                    // 更新选中状态的 UI
+                    options.forEach(o => {
+                        o.classList.remove('bg-blue-50', 'text-[#3B82F6]');
+                        o.classList.add('text-gray-500', 'hover:bg-gray-100/80');
+                    });
+                    opt.classList.remove('text-gray-500', 'hover:bg-gray-100/80');
+                    opt.classList.add('bg-blue-50', 'text-[#3B82F6]');
+
+                    closeMenu();
+                });
+            });
+
+            document.addEventListener('click', closeMenu);
+        }
+
+        // 初始化
+        initCustomSpeedDropdown();
         renderDashboardUI();
     </script>
 </body>
