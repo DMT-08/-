@@ -6,7 +6,7 @@
     <title>AI 记词 - 极致原生体验</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@phosphor-icons/web@2.0.3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.0.3"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -57,19 +57,17 @@
         input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type="number"] { -moz-appearance: textfield; }
 
+        /* 序列项目拖拽样式与自适应防溢出 */
         .sequence-item { transition: box-shadow 0.2s; }
         .sequence-item.dragging { opacity: 0.5; box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3); z-index: 50; }
         
-        /* 统一原生下拉框样式 */
-        .native-select {
-            appearance: none;
-            -webkit-appearance: none;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%2394A3B8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
-            background-repeat: no-repeat;
-            background-position: right 6px center;
-            background-size: 12px;
-            padding-right: 24px !important;
-        }
+        /* 定制化原生选择器 UI：绝对限制 4.5 个条目高度 */
+        .custom-select-dropdown { max-height: 144px; overflow-y: auto; }
+        .custom-select-dropdown .select-item { height: 32px; flex-shrink: 0; }
+        
+        .custom-select-dropdown::-webkit-scrollbar { width: 4px; }
+        .custom-select-dropdown::-webkit-scrollbar-track { background: transparent; }
+        .custom-select-dropdown::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
     </style>
 </head>
 <body class="flex flex-col h-screen">
@@ -79,7 +77,7 @@
         <div class="bg-white rounded-[24px] p-6 md:p-7 w-[90%] max-sm:max-w-[320px] max-w-sm shadow-2xl flex flex-col items-center text-center modal-enter" id="native-modal-content">
             <h3 id="modal-title" class="text-[20px] font-extrabold text-gray-900 mb-2 w-full text-center">提示</h3>
             <div id="modal-msg" class="text-[15px] text-gray-600 mb-6 leading-relaxed w-full flex flex-col items-center justify-center text-center"></div>
-            <div class="flex gap-3 w-full">
+            <div class="flex gap-3 w-full mt-2">
                 <button id="modal-cancel-btn" class="hidden flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold text-[15px] py-3.5 rounded-[16px] transition-all active:scale-95">取消</button>
                 <button id="modal-btn" class="flex-1 bg-brand hover-bg-brand text-white font-bold text-[15px] py-3.5 rounded-[16px] shadow-sm active:scale-95 transition-all">我知道了</button>
             </div>
@@ -135,7 +133,7 @@
 
             <div class="flex-1 bg-white/90 backdrop-blur-xl rounded-[24px] shadow-premium p-3 flex flex-col gap-2 min-w-0">
                 
-                <!-- 【网格更新】完美三列等分：白色方块底座，无边框空心圆 -->
+                <!-- 【网格更新】完美还原截图：保留白底+带色边框+无框圆圈/对错 -->
                 <div class="grid grid-cols-3 gap-3 flex-1 min-h-0">
                     <div class="bg-[#F0FDF4] border border-[#BBF7D0] rounded-[16px] px-4 py-3.5 flex items-center justify-between relative overflow-hidden group transition-all hover:shadow-md h-full w-full">
                         <div class="flex items-center gap-1.5 text-green-600 z-10 shrink-0">
@@ -161,6 +159,7 @@
                     </div>
                     <div class="bg-[#EFF6FF] border border-[#BFDBFE] rounded-[16px] px-4 py-3.5 flex items-center justify-between relative overflow-hidden group transition-all hover:shadow-md h-full w-full">
                         <div class="flex items-center gap-1.5 text-blue-600 z-10 shrink-0">
+                            <!-- 未知单词：使用空心圆，匹配对错符号 -->
                             <div class="w-[28px] h-[28px] rounded-[8px] bg-white flex items-center justify-center shrink-0">
                                 <i class="ph-bold ph-circle text-[18px]"></i>
                             </div>
@@ -205,7 +204,6 @@
                 </div>
                 <h2 class="text-[20px] font-extrabold text-gray-800 mb-1.5 relative z-10">我的生词本</h2>
                 <p class="text-[13px] text-gray-500 mb-5 relative z-10">已累计生词: <span id="dashVocabCount" class="font-extrabold text-orange-500 text-[15px]">0</span> 词</p>
-                <!-- 恢复为进入详情 -->
                 <button class="bg-white text-orange-500 border border-orange-200 px-5 py-2.5 rounded-[12px] font-bold text-[13px] group-hover:bg-orange-500 group-hover:text-white transition-colors shadow-sm relative z-10 flex items-center gap-1.5" onclick="event.stopPropagation(); window.switchView('view-vocab')">
                     进入详情 <i class="ph-bold ph-arrow-right"></i>
                 </button>
@@ -231,7 +229,7 @@
                         </button>
                     </div>
 
-                    <!-- 专属强化关卡激活态 (重构：绝对单行显示防溢出) -->
+                    <!-- 专属强化关卡激活态 -->
                     <div id="hubActiveState" class="hidden bg-[#FFF5F5] border-[2px] border-[#FECACA] flex-row items-center justify-between p-2.5 lg:p-3 z-20 pulse-alert-light rounded-[16px] gap-2 lg:gap-3 w-full">
                         <div class="flex flex-col shrink-0 text-left pl-1">
                             <h3 class="font-extrabold text-[14px] lg:text-[15px] text-red-600 flex items-center gap-1"><i class="ph-fill ph-warning-circle"></i> 专属强化关卡</h3>
@@ -304,6 +302,11 @@
                 </button>
                 <h2 class="font-extrabold text-[32px] text-gray-900 tracking-tight leading-none" id="passingTitle">学习新词</h2>
             </div>
+            <!-- 过词页面的学习时长计时器 -->
+            <div class="flex items-center bg-white rounded-full px-4 py-1.5 shadow-sm border border-gray-100 gap-1.5 pointer-events-auto">
+                <i class="ph-bold ph-clock text-[16px] text-gray-400"></i>
+                <span id="passing-timer" class="font-mono font-bold text-[14px] text-gray-600 tracking-wide">00:00</span>
+            </div>
         </div>
 
         <div class="flex-1 min-h-0 flex flex-col bg-white rounded-[24px] shadow-premium relative overflow-hidden">
@@ -336,13 +339,13 @@
         <div class="absolute inset-0 pt-[32px] p-8 flex pointer-events-none">
             <div class="flex-1 h-full flex flex-col pointer-events-auto pr-6 pb-0 shrink-0 min-w-0">
                 
-                <div class="flex items-center h-[40px] mb-4 shrink-0 w-full">
+                <div class="flex items-center h-[40px] mb-4 shrink-0 w-full justify-between">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-gray-600 shrink-0 cursor-pointer hover:shadow-md transition-all pointer-events-auto" onclick="window.showModal('退出提示', '<div class=\'mt-1 font-medium\'>确定要退出当前关卡吗？未提交的进度将不会保留。</div>', () => window.switchView('view-dashboard'), true)">
                             <i class="ph-bold ph-caret-left text-[20px] -ml-0.5"></i>
                         </div>
                         <div id="score-progress" class="bg-[#1F5FFF]/10 text-[#1F5FFF] font-bold px-4 py-1.5 rounded-full text-[14px] shrink-0 pointer-events-auto">1/11</div>
-                        <!-- 将计时器移动到进度数字的右侧，彻底防遮挡 -->
+                        <!-- 学习时长统计仪 -->
                         <div class="flex items-center bg-white rounded-full px-3 py-1.5 shadow-sm border border-gray-100 gap-1.5 pointer-events-auto ml-1">
                             <i class="ph-bold ph-clock text-[15px] text-gray-400"></i>
                             <span id="scoring-timer" class="font-mono font-bold text-[13px] text-gray-600 tracking-wide">00:00</span>
@@ -481,7 +484,7 @@
     </div>
 
 
-    <!-- ================= 视图：系统偏好设置 ================= -->
+    <!-- ================= 视图：系统偏好设置 (重构版) ================= -->
     <div id="view-settings" class="view-section flex-col w-full h-full max-w-[1300px] mx-auto p-4 md:p-5 overflow-hidden gap-4">
         <!-- 头部 -->
         <div class="flex items-center justify-between shrink-0 mb-2 px-2">
@@ -493,7 +496,7 @@
             </div>
         </div>
 
-        <div class="flex-1 min-h-0 overflow-y-auto hide-scrollbar pb-10 px-1">
+        <div class="flex-1 min-h-0 overflow-y-auto hide-scrollbar pb-10 px-1 relative z-10">
             
             <!-- ====== 模块 1：流转规则 ====== -->
             <div class="mb-4 mt-2 flex items-center justify-between">
@@ -501,7 +504,6 @@
                     <div class="w-1.5 h-5 bg-orange-500 rounded-full"></div>
                     <h3 class="font-extrabold text-[20px] text-gray-900 tracking-tight">流转规则</h3>
                 </div>
-                <!-- 纯展示的自动保存状态指示，去除占位的保存按钮 -->
                 <span class="text-[13px] text-gray-500 font-bold bg-white px-3.5 py-1.5 rounded-full border border-gray-200 shadow-sm flex items-center gap-1.5">
                     <i class="ph-fill ph-check-circle text-green-500 text-[16px]"></i> 修改已实时保存
                 </span>
@@ -517,7 +519,7 @@
                             <h3 class="font-extrabold text-[17px] text-gray-800">关卡触发与上限</h3>
                         </div>
                     </div>
-                    <div class="p-6 flex flex-col gap-5 flex-1">
+                    <div class="p-6 flex flex-col gap-6 flex-1">
                         <div class="flex items-center justify-between">
                             <span class="text-[14px] font-bold text-gray-600">新词每关单词数</span>
                             <div class="flex items-center bg-gray-50 border border-gray-200 rounded-[8px] px-2 py-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]"><input type="number" value="20" class="w-10 text-center bg-transparent text-[14px] font-bold outline-none text-gray-700"><span class="text-[12px] text-gray-400">个</span></div>
@@ -602,21 +604,22 @@
             <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start" id="playback-profiles-grid">
                 
                 <!-- 卡片 1: 跟读模式 -->
-                <div class="bg-white rounded-[24px] shadow-premium flex flex-col border border-gray-100 overflow-hidden relative group playback-card">
-                    <div class="px-5 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                <div class="bg-white rounded-[24px] shadow-premium flex flex-col border border-gray-100 relative group playback-card">
+                    <div class="px-5 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center rounded-t-[24px]">
                         <div class="flex items-center gap-2 relative w-[200px]">
                             <div class="w-8 h-8 rounded-[10px] bg-blue-100 text-blue-600 border-blue-200/50 flex items-center justify-center shadow-sm border card-icon-container transition-colors duration-300">
                                 <i class="ph-fill ph-microphone-stage text-[16px] card-icon transition-colors duration-300"></i>
                             </div>
-                            <select class="native-select font-extrabold text-[17px] text-gray-800 bg-transparent outline-none cursor-pointer pr-6 relative z-10 w-full" onchange="window.updateCardType(this)">
+                            <select class="native-select font-extrabold text-[17px] text-gray-800 bg-transparent outline-none cursor-pointer pr-6 relative z-10 w-full" 
+                                    onchange="window.updateCardType(this)">
                                 <option value="read" selected>跟读模式</option>
                                 <option value="memo">音记模式</option>
                                 <option value="dict">听写模式</option>
                             </select>
                         </div>
-                        <button onclick="this.closest('.playback-card').remove()" class="text-gray-400 hover:text-red-500 transition-colors"><i class="ph-bold ph-trash text-[18px]"></i></button>
+                        <button onclick="window.confirmDeleteCard(this)" class="text-gray-400 hover:text-red-500 transition-colors"><i class="ph-bold ph-trash text-[18px]"></i></button>
                     </div>
-                    <div class="p-6 flex flex-col gap-4 flex-1">
+                    <div class="p-6 flex flex-col gap-5 flex-1">
                         <div class="flex items-center justify-between mt-2">
                             <span class="text-[14px] font-bold text-gray-500">模式名称</span>
                             <input type="text" value="002班播放模式" class="text-[14px] font-bold text-gray-800 bg-transparent border-b border-gray-200 w-[140px] text-right focus:border-blue-500 outline-none transition-colors pb-0.5">
@@ -627,7 +630,7 @@
                                 <div class="flex items-center gap-2">
                                     <span class="text-[13px] font-bold text-gray-600">播报题号</span>
                                     <label class="flex items-center gap-1 cursor-pointer">
-                                        <input type="checkbox" checked class="accent-[#3B82F6] w-4 h-4" onchange="window.toggleSeqGroup(this)">
+                                        <input type="checkbox" checked class="accent-blue-600 w-4 h-4" onchange="window.toggleSeqGroup(this)">
                                         <span class="text-[13px] font-bold text-gray-700">启用</span>
                                     </label>
                                 </div>
@@ -642,47 +645,52 @@
                                         <span class="text-gray-400 cursor-pointer px-2 py-1 text-[16px] font-bold hover:text-gray-600" onclick="var inp=this.previousElementSibling; inp.value=(parseFloat(inp.value)+0.5).toFixed(1)">+</span>
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-1.5">
+                                <div class="flex items-center gap-1.5 relative z-50">
                                     <span class="text-[12px] text-gray-500 font-medium">音频版本</span>
-                                    <select class="native-select border border-gray-200 rounded-[8px] text-[12px] py-1.5 px-2 bg-white outline-none text-gray-700 cursor-pointer shadow-sm w-[100px] custom-select-popup">
-                                        <option>请选择</option>
-                                        <option selected>标准发音</option>
-                                        <option>外教女生版</option>
-                                        <option>测试0409</option>
-                                        <option>听写专版</option>
-                                        <option>备用模版一</option>
-                                        <option>备用模版二</option>
-                                    </select>
+                                    <div class="relative custom-select-wrapper" onclick="window.toggleCustomSelect(this, event)">
+                                        <div class="border border-gray-200 rounded-[8px] text-[12px] py-1.5 pl-2 pr-6 bg-white text-gray-700 cursor-pointer shadow-sm w-[100px] flex items-center justify-between" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
+                                            <span class="select-text truncate">标准发音</span>
+                                            <i class="ph-bold ph-caret-down text-gray-400 absolute right-2 pointer-events-none text-[10px]"></i>
+                                        </div>
+                                        <div class="absolute right-0 top-[calc(100%+4px)] w-[120px] bg-white border border-gray-200 rounded-[8px] shadow-xl z-[9999] hidden flex-col custom-select-dropdown py-1" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
+                                            <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '标准发音', event)">标准发音</div>
+                                            <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '外教原声', event)">外教原声</div>
+                                            <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '测试0409', event)">测试0409</div>
+                                            <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '听写专版', event)">听写专版</div>
+                                            <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '备用模版一', event)">备用模版一</div>
+                                            <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '备用模版二', event)">备用模版二</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="bg-white border border-blue-100 rounded-[16px] p-4 flex flex-col gap-3 mt-1 shadow-sm">
+                        <div class="bg-white border border-blue-100 rounded-[16px] p-4 flex flex-col gap-3 mt-1 shadow-sm relative z-40">
                             <div class="flex flex-col gap-2">
                                 <span class="text-[12px] font-bold text-gray-400">点击添加播放内容：</span>
                                 <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-2">
-                                    <button onclick="window.addSeqItem('seq-read', '英文')" class="shrink-0 bg-[#3B82F6] hover:bg-blue-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">英文</button>
-                                    <button onclick="window.addSeqItem('seq-read', '中文')" class="shrink-0 bg-[#EC4899] hover:bg-pink-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">中文</button>
-                                    <button onclick="window.addSeqItem('seq-read', '音标')" class="shrink-0 bg-[#8B5CF6] hover:bg-purple-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">音标</button>
-                                    <button onclick="window.addSeqItem('seq-read', '分音节')" class="shrink-0 bg-[#14B8A6] hover:bg-teal-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">分音节</button>
-                                    <button onclick="window.addSeqItem('seq-read', '英文句子')" class="shrink-0 bg-[#F59E0B] hover:bg-orange-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">英文句子</button>
-                                    <button onclick="window.addSeqItem('seq-read', '中文句子')" class="shrink-0 bg-[#10B981] hover:bg-emerald-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">中文句子</button>
-                                    <button onclick="window.addSeqItem('seq-read', '词性')" class="shrink-0 bg-[#84CC16] hover:bg-lime-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">词性</button>
-                                    <button onclick="window.addSeqItem('seq-read', '详细意思')" class="shrink-0 bg-[#22C55E] hover:bg-green-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">详细意思</button>
-                                    <button onclick="window.addSeqItem('seq-read', '音标分音节')" class="shrink-0 bg-[#22C55E] hover:bg-green-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">音标分音节</button>
-                                    <button onclick="window.addSeqItem('seq-read', '快读')" class="shrink-0 bg-[#22C55E] hover:bg-green-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">快读</button>
-                                    <button onclick="window.addSeqItem('seq-read', '图片')" class="shrink-0 bg-[#22C55E] hover:bg-green-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">图片</button>
-                                    <button onclick="window.addSeqItem('seq-read', '视频')" class="shrink-0 bg-[#22C55E] hover:bg-green-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">视频</button>
-                                    <button onclick="window.addSeqItem('seq-read', '频率')" class="shrink-0 bg-[#22C55E] hover:bg-green-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">频率</button>
+                                    <button onclick="window.addSeqItem('seq-read-1', '英文')" class="shrink-0 bg-[#3B82F6] hover:bg-blue-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">英文</button>
+                                    <button onclick="window.addSeqItem('seq-read-1', '中文')" class="shrink-0 bg-[#EC4899] hover:bg-pink-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">中文</button>
+                                    <button onclick="window.addSeqItem('seq-read-1', '音标')" class="shrink-0 bg-[#8B5CF6] hover:bg-purple-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">音标</button>
+                                    <button onclick="window.addSeqItem('seq-read-1', '分音节')" class="shrink-0 bg-[#14B8A6] hover:bg-teal-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">分音节</button>
+                                    <button onclick="window.addSeqItem('seq-read-1', '英文句子')" class="shrink-0 bg-[#F59E0B] hover:bg-orange-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">英文句子</button>
+                                    <button onclick="window.addSeqItem('seq-read-1', '中文句子')" class="shrink-0 bg-[#10B981] hover:bg-emerald-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">中文句子</button>
+                                    <button onclick="window.addSeqItem('seq-read-1', '词性')" class="shrink-0 bg-[#84CC16] hover:bg-lime-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">词性</button>
+                                    <button onclick="window.addSeqItem('seq-read-1', '详细意思')" class="shrink-0 bg-[#6366F1] hover:bg-indigo-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">详细意思</button>
+                                    <button onclick="window.addSeqItem('seq-read-1', '音标分音节')" class="shrink-0 bg-[#06B6D4] hover:bg-cyan-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">音标分音节</button>
+                                    <button onclick="window.addSeqItem('seq-read-1', '快读')" class="shrink-0 bg-[#F43F5E] hover:bg-rose-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">快读</button>
+                                    <button onclick="window.addSeqItem('seq-read-1', '图片')" class="shrink-0 bg-[#D946EF] hover:bg-fuchsia-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">图片</button>
+                                    <button onclick="window.addSeqItem('seq-read-1', '视频')" class="shrink-0 bg-[#EAB308] hover:bg-yellow-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">视频</button>
+                                    <button onclick="window.addSeqItem('seq-read-1', '频率')" class="shrink-0 bg-[#64748B] hover:bg-slate-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">频率</button>
                                 </div>
                             </div>
                             <div class="h-px bg-gray-100 w-full my-0.5"></div>
-                            <div class="flex flex-col gap-2">
-                                <div class="flex items-center justify-between">
+                            
+                            <div id="seq-wrapper-seq-read-1" class="flex flex-col gap-2 transition-all">
+                                <div class="flex items-center justify-between drag-hint">
                                     <span class="text-[12px] font-bold text-gray-400"><i class="ph-bold ph-hand-swipe-right"></i> 长按拖拽可排序</span>
                                 </div>
-                                <div id="seq-read" class="flex flex-col gap-2 min-h-[40px] sequence-container">
-                                    <!-- Dynamic List -->
+                                <div id="seq-read-1" class="flex flex-col gap-2 min-h-[40px] sequence-container">
                                 </div>
                             </div>
                         </div>
@@ -690,8 +698,8 @@
                 </div>
 
                 <!-- 卡片 2: 音记模式 -->
-                <div class="bg-white rounded-[24px] shadow-premium flex flex-col border border-gray-100 overflow-hidden relative group playback-card">
-                    <div class="px-5 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                <div class="bg-white rounded-[24px] shadow-premium flex flex-col border border-gray-100 relative group playback-card">
+                    <div class="px-5 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center rounded-t-[24px]">
                         <div class="flex items-center gap-2 relative w-[200px]">
                             <div class="w-8 h-8 rounded-[10px] bg-cyan-100 text-cyan-600 border-cyan-200/50 flex items-center justify-center shadow-sm border card-icon-container transition-colors duration-300">
                                 <i class="ph-fill ph-headphones text-[16px] card-icon transition-colors duration-300"></i>
@@ -702,7 +710,7 @@
                                 <option value="dict">听写模式</option>
                             </select>
                         </div>
-                        <button onclick="this.closest('.playback-card').remove()" class="text-gray-400 hover:text-red-500 transition-colors"><i class="ph-bold ph-trash text-[18px]"></i></button>
+                        <button onclick="window.confirmDeleteCard(this)" class="text-gray-400 hover:text-red-500 transition-colors"><i class="ph-bold ph-trash text-[18px]"></i></button>
                     </div>
                     <div class="p-6 flex flex-col gap-4 flex-1">
                         <div class="flex items-center justify-between mt-2">
@@ -710,12 +718,12 @@
                             <input type="text" value="0014" class="text-[14px] font-bold text-gray-800 bg-transparent border-b border-gray-200 w-[140px] text-right focus:border-cyan-500 outline-none transition-colors pb-0.5">
                         </div>
                         
-                        <div class="flex flex-col gap-3 mt-1 bg-gray-50 p-4 rounded-[16px] border border-gray-100 shadow-[inset_0_1px_2px_rgba(0,0,0,0.01)] transition-all">
+                        <div class="flex flex-col gap-3 mt-1 bg-gray-50 p-4 rounded-[16px] border border-gray-100 shadow-[inset_0_1px_2px_rgba(0,0,0,0.01)] transition-all toggle-container">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
                                     <span class="text-[13px] font-bold text-gray-600">播报题号</span>
                                     <label class="flex items-center gap-1 cursor-pointer">
-                                        <input type="checkbox" checked class="accent-[#3B82F6] w-4 h-4" onchange="window.toggleSeqGroup(this)">
+                                        <input type="checkbox" checked class="accent-blue-600 w-4 h-4" onchange="window.toggleSeqGroup(this)">
                                         <span class="text-[13px] font-bold text-gray-700">启用</span>
                                     </label>
                                 </div>
@@ -730,43 +738,51 @@
                                         <span class="text-gray-400 cursor-pointer px-2 py-1 text-[16px] font-bold hover:text-gray-600" onclick="var inp=this.previousElementSibling; inp.value=(parseFloat(inp.value)+0.5).toFixed(1)">+</span>
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-1.5">
+                                <div class="flex items-center gap-1.5 relative z-50">
                                     <span class="text-[12px] text-gray-500 font-medium">音频版本</span>
-                                    <select class="native-select border border-gray-200 rounded-[8px] text-[12px] py-1.5 px-2 bg-white outline-none text-gray-700 cursor-pointer shadow-sm w-[100px] custom-select-popup">
-                                        <option>请选择</option>
-                                        <option selected>标准发音</option>
-                                        <option>外教原声</option>
-                                        <option>测试0409</option>
-                                    </select>
+                                    <div class="relative custom-select-wrapper" onclick="window.toggleCustomSelect(this, event)">
+                                        <div class="border border-gray-200 rounded-[8px] text-[12px] py-1.5 pl-2 pr-6 bg-white text-gray-700 cursor-pointer shadow-sm w-[100px] flex items-center justify-between" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
+                                            <span class="select-text truncate">标准发音</span>
+                                            <i class="ph-bold ph-caret-down text-gray-400 absolute right-2 pointer-events-none text-[10px]"></i>
+                                        </div>
+                                        <div class="absolute right-0 top-[calc(100%+4px)] w-[120px] bg-white border border-gray-200 rounded-[8px] shadow-xl z-[9999] hidden flex-col custom-select-dropdown py-1" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
+                                            <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '标准发音', event)">标准发音</div>
+                                            <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '外教原声', event)">外教原声</div>
+                                            <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '测试0409', event)">测试0409</div>
+                                            <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '听写专版', event)">听写专版</div>
+                                            <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '备用模版一', event)">备用模版一</div>
+                                            <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '备用模版二', event)">备用模版二</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="bg-white border border-cyan-100 rounded-[16px] p-4 flex flex-col gap-3 mt-1 shadow-sm">
+                        <div class="bg-white border border-cyan-100 rounded-[16px] p-4 flex flex-col gap-3 mt-1 shadow-sm relative z-40">
                             <div class="flex flex-col gap-2">
                                 <span class="text-[12px] font-bold text-gray-400">点击添加内容：</span>
                                 <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-2">
-                                    <button onclick="window.addSeqItem('seq-memo', '英文')" class="shrink-0 bg-[#3B82F6] hover:bg-blue-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">英文</button>
-                                    <button onclick="window.addSeqItem('seq-memo', '中文')" class="shrink-0 bg-[#EC4899] hover:bg-pink-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">中文</button>
-                                    <button onclick="window.addSeqItem('seq-memo', '音标')" class="shrink-0 bg-[#8B5CF6] hover:bg-purple-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">音标</button>
-                                    <button onclick="window.addSeqItem('seq-memo', '分音节')" class="shrink-0 bg-[#14B8A6] hover:bg-teal-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">分音节</button>
-                                    <button onclick="window.addSeqItem('seq-memo', '英文句子')" class="shrink-0 bg-[#F59E0B] hover:bg-orange-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">英文句子</button>
-                                    <button onclick="window.addSeqItem('seq-memo', '中文句子')" class="shrink-0 bg-[#10B981] hover:bg-emerald-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">中文句子</button>
-                                    <button onclick="window.addSeqItem('seq-memo', '词性')" class="shrink-0 bg-[#84CC16] hover:bg-lime-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">词性</button>
-                                    <button onclick="window.addSeqItem('seq-memo', '详细意思')" class="shrink-0 bg-[#22C55E] hover:bg-green-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">详细意思</button>
-                                    <button onclick="window.addSeqItem('seq-memo', '音标分音节')" class="shrink-0 bg-[#22C55E] hover:bg-green-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">音标分音节</button>
-                                    <button onclick="window.addSeqItem('seq-memo', '快读')" class="shrink-0 bg-[#22C55E] hover:bg-green-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">快读</button>
-                                    <button onclick="window.addSeqItem('seq-memo', '图片')" class="shrink-0 bg-[#22C55E] hover:bg-green-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">图片</button>
-                                    <button onclick="window.addSeqItem('seq-memo', '视频')" class="shrink-0 bg-[#22C55E] hover:bg-green-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">视频</button>
-                                    <button onclick="window.addSeqItem('seq-memo', '频率')" class="shrink-0 bg-[#22C55E] hover:bg-green-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">频率</button>
+                                    <button onclick="window.addSeqItem('seq-memo-1', '英文')" class="shrink-0 bg-[#3B82F6] hover:bg-blue-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">英文</button>
+                                    <button onclick="window.addSeqItem('seq-memo-1', '中文')" class="shrink-0 bg-[#EC4899] hover:bg-pink-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">中文</button>
+                                    <button onclick="window.addSeqItem('seq-memo-1', '音标')" class="shrink-0 bg-[#8B5CF6] hover:bg-purple-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">音标</button>
+                                    <button onclick="window.addSeqItem('seq-memo-1', '分音节')" class="shrink-0 bg-[#14B8A6] hover:bg-teal-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">分音节</button>
+                                    <button onclick="window.addSeqItem('seq-memo-1', '英文句子')" class="shrink-0 bg-[#F59E0B] hover:bg-orange-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">英文句子</button>
+                                    <button onclick="window.addSeqItem('seq-memo-1', '中文句子')" class="shrink-0 bg-[#10B981] hover:bg-emerald-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">中文句子</button>
+                                    <button onclick="window.addSeqItem('seq-memo-1', '词性')" class="shrink-0 bg-[#84CC16] hover:bg-lime-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">词性</button>
+                                    <button onclick="window.addSeqItem('seq-memo-1', '详细意思')" class="shrink-0 bg-[#6366F1] hover:bg-indigo-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">详细意思</button>
+                                    <button onclick="window.addSeqItem('seq-memo-1', '音标分音节')" class="shrink-0 bg-[#06B6D4] hover:bg-cyan-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">音标分音节</button>
+                                    <button onclick="window.addSeqItem('seq-memo-1', '快读')" class="shrink-0 bg-[#F43F5E] hover:bg-rose-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">快读</button>
+                                    <button onclick="window.addSeqItem('seq-memo-1', '图片')" class="shrink-0 bg-[#D946EF] hover:bg-fuchsia-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">图片</button>
+                                    <button onclick="window.addSeqItem('seq-memo-1', '视频')" class="shrink-0 bg-[#EAB308] hover:bg-yellow-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">视频</button>
+                                    <button onclick="window.addSeqItem('seq-memo-1', '频率')" class="shrink-0 bg-[#64748B] hover:bg-slate-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">频率</button>
                                 </div>
                             </div>
-                            <div class="h-px bg-gray-100 w-full my-0.5"></div>
-                            <div class="flex flex-col gap-2">
-                                <div class="flex items-center justify-between">
+                            <div class="h-px bg-gray-100 w-full my-1"></div>
+                            <div id="seq-wrapper-seq-memo-1" class="flex flex-col gap-2 transition-all">
+                                <div class="flex items-center justify-between drag-hint">
                                     <span class="text-[12px] font-bold text-gray-400"><i class="ph-bold ph-hand-swipe-right"></i> 长按拖拽可排序</span>
                                 </div>
-                                <div id="seq-memo" class="flex flex-col gap-2 min-h-[40px] sequence-container">
+                                <div id="seq-memo-1" class="flex flex-col gap-2 min-h-[40px] sequence-container">
                                 </div>
                             </div>
                         </div>
@@ -774,8 +790,8 @@
                 </div>
 
                 <!-- 卡片 3: 听写模式 -->
-                <div class="bg-white rounded-[24px] shadow-premium flex flex-col border border-gray-100 overflow-hidden relative group playback-card">
-                    <div class="px-5 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                <div class="bg-white rounded-[24px] shadow-premium flex flex-col border border-gray-100 relative group playback-card">
+                    <div class="px-5 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center rounded-t-[24px]">
                         <div class="flex items-center gap-2 relative w-[200px]">
                             <div class="w-8 h-8 rounded-[10px] bg-rose-100 text-rose-500 border-rose-200/50 flex items-center justify-center shadow-sm border card-icon-container transition-colors duration-300">
                                 <i class="ph-fill ph-pencil-simple text-[16px] card-icon transition-colors duration-300"></i>
@@ -786,7 +802,7 @@
                                 <option value="dict" selected>听写模式</option>
                             </select>
                         </div>
-                        <button onclick="this.closest('.playback-card').remove()" class="text-gray-400 hover:text-red-500 transition-colors"><i class="ph-bold ph-trash text-[18px]"></i></button>
+                        <button onclick="window.confirmDeleteCard(this)" class="text-gray-400 hover:text-red-500 transition-colors"><i class="ph-bold ph-trash text-[18px]"></i></button>
                     </div>
                     <div class="p-6 flex flex-col gap-4 flex-1">
                         <div class="flex items-center justify-between mt-2">
@@ -794,12 +810,12 @@
                             <input type="text" value="584" class="text-[14px] font-bold text-gray-800 bg-transparent border-b border-gray-200 w-[140px] text-right focus:border-rose-500 outline-none transition-colors pb-0.5">
                         </div>
                         
-                        <div class="flex flex-col gap-3 mt-1 bg-gray-50 p-4 rounded-[16px] border border-gray-100 shadow-[inset_0_1px_2px_rgba(0,0,0,0.01)] transition-all">
+                        <div class="flex flex-col gap-3 mt-1 bg-gray-50 p-4 rounded-[16px] border border-gray-100 shadow-[inset_0_1px_2px_rgba(0,0,0,0.01)] transition-all toggle-container">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
                                     <span class="text-[13px] font-bold text-gray-600">播报题号</span>
                                     <label class="flex items-center gap-1 cursor-pointer">
-                                        <input type="checkbox" checked class="accent-[#3B82F6] w-4 h-4" onchange="window.toggleSeqGroup(this)">
+                                        <input type="checkbox" checked class="accent-blue-600 w-4 h-4" onchange="window.toggleSeqGroup(this)">
                                         <span class="text-[13px] font-bold text-gray-700">启用</span>
                                     </label>
                                 </div>
@@ -814,43 +830,51 @@
                                         <span class="text-gray-400 cursor-pointer px-2 py-1 text-[16px] font-bold hover:text-gray-600" onclick="var inp=this.previousElementSibling; inp.value=(parseFloat(inp.value)+0.5).toFixed(1)">+</span>
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-1.5">
+                                <div class="flex items-center gap-1.5 relative z-50">
                                     <span class="text-[12px] text-gray-500 font-medium">音频版本</span>
-                                    <select class="native-select border border-gray-200 rounded-[8px] text-[12px] py-1.5 px-2 bg-white outline-none text-gray-700 cursor-pointer shadow-sm w-[100px] custom-select-popup">
-                                        <option>请选择</option>
-                                        <option selected>标准发音</option>
-                                        <option>外教原声</option>
-                                        <option>测试0409</option>
-                                    </select>
+                                    <div class="relative custom-select-wrapper" onclick="window.toggleCustomSelect(this, event)">
+                                        <div class="border border-gray-200 rounded-[8px] text-[12px] py-1.5 pl-2 pr-6 bg-white text-gray-700 cursor-pointer shadow-sm w-[100px] flex items-center justify-between" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
+                                            <span class="select-text truncate">标准发音</span>
+                                            <i class="ph-bold ph-caret-down text-gray-400 absolute right-2 pointer-events-none text-[10px]"></i>
+                                        </div>
+                                        <div class="absolute right-0 top-[calc(100%+4px)] w-[120px] bg-white border border-gray-200 rounded-[8px] shadow-xl z-[9999] hidden flex-col custom-select-dropdown py-1" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
+                                            <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '标准发音', event)">标准发音</div>
+                                            <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '外教原声', event)">外教原声</div>
+                                            <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '测试0409', event)">测试0409</div>
+                                            <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '听写专版', event)">听写专版</div>
+                                            <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '备用模版一', event)">备用模版一</div>
+                                            <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '备用模版二', event)">备用模版二</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="bg-white border border-rose-100 rounded-[16px] p-4 flex flex-col gap-3 mt-1 shadow-sm">
+                        <div class="bg-white border border-rose-100 rounded-[16px] p-4 flex flex-col gap-3 mt-1 shadow-sm relative z-40">
                             <div class="flex flex-col gap-2">
                                 <span class="text-[12px] font-bold text-gray-400">点击添加内容：</span>
                                 <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-2">
-                                    <button onclick="window.addSeqItem('seq-dict', '英文')" class="shrink-0 bg-[#3B82F6] hover:bg-blue-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">英文</button>
-                                    <button onclick="window.addSeqItem('seq-dict', '中文')" class="shrink-0 bg-[#EC4899] hover:bg-pink-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">中文</button>
-                                    <button onclick="window.addSeqItem('seq-dict', '音标')" class="shrink-0 bg-[#8B5CF6] hover:bg-purple-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">音标</button>
-                                    <button onclick="window.addSeqItem('seq-dict', '分音节')" class="shrink-0 bg-[#14B8A6] hover:bg-teal-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">分音节</button>
-                                    <button onclick="window.addSeqItem('seq-dict', '英文句子')" class="shrink-0 bg-[#F59E0B] hover:bg-orange-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">英文句子</button>
-                                    <button onclick="window.addSeqItem('seq-dict', '中文句子')" class="shrink-0 bg-[#10B981] hover:bg-emerald-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">中文句子</button>
-                                    <button onclick="window.addSeqItem('seq-dict', '词性')" class="shrink-0 bg-[#84CC16] hover:bg-lime-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">词性</button>
-                                    <button onclick="window.addSeqItem('seq-dict', '详细意思')" class="shrink-0 bg-[#6366F1] hover:bg-indigo-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">详细意思</button>
-                                    <button onclick="window.addSeqItem('seq-dict', '音标分音节')" class="shrink-0 bg-[#06B6D4] hover:bg-cyan-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">音标分音节</button>
-                                    <button onclick="window.addSeqItem('seq-dict', '快读')" class="shrink-0 bg-[#F43F5E] hover:bg-rose-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">快读</button>
-                                    <button onclick="window.addSeqItem('seq-dict', '图片')" class="shrink-0 bg-[#D946EF] hover:bg-fuchsia-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">图片</button>
-                                    <button onclick="window.addSeqItem('seq-dict', '视频')" class="shrink-0 bg-[#EAB308] hover:bg-yellow-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">视频</button>
-                                    <button onclick="window.addSeqItem('seq-dict', '频率')" class="shrink-0 bg-[#64748B] hover:bg-slate-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">频率</button>
+                                    <button onclick="window.addSeqItem('seq-dict-1', '英文')" class="shrink-0 bg-[#3B82F6] hover:bg-blue-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">英文</button>
+                                    <button onclick="window.addSeqItem('seq-dict-1', '中文')" class="shrink-0 bg-[#EC4899] hover:bg-pink-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">中文</button>
+                                    <button onclick="window.addSeqItem('seq-dict-1', '音标')" class="shrink-0 bg-[#8B5CF6] hover:bg-purple-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">音标</button>
+                                    <button onclick="window.addSeqItem('seq-dict-1', '分音节')" class="shrink-0 bg-[#14B8A6] hover:bg-teal-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">分音节</button>
+                                    <button onclick="window.addSeqItem('seq-dict-1', '英文句子')" class="shrink-0 bg-[#F59E0B] hover:bg-orange-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">英文句子</button>
+                                    <button onclick="window.addSeqItem('seq-dict-1', '中文句子')" class="shrink-0 bg-[#10B981] hover:bg-emerald-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">中文句子</button>
+                                    <button onclick="window.addSeqItem('seq-dict-1', '词性')" class="shrink-0 bg-[#84CC16] hover:bg-lime-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">词性</button>
+                                    <button onclick="window.addSeqItem('seq-dict-1', '详细意思')" class="shrink-0 bg-[#6366F1] hover:bg-indigo-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">详细意思</button>
+                                    <button onclick="window.addSeqItem('seq-dict-1', '音标分音节')" class="shrink-0 bg-[#06B6D4] hover:bg-cyan-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">音标分音节</button>
+                                    <button onclick="window.addSeqItem('seq-dict-1', '快读')" class="shrink-0 bg-[#F43F5E] hover:bg-rose-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">快读</button>
+                                    <button onclick="window.addSeqItem('seq-dict-1', '图片')" class="shrink-0 bg-[#D946EF] hover:bg-fuchsia-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">图片</button>
+                                    <button onclick="window.addSeqItem('seq-dict-1', '视频')" class="shrink-0 bg-[#EAB308] hover:bg-yellow-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">视频</button>
+                                    <button onclick="window.addSeqItem('seq-dict-1', '频率')" class="shrink-0 bg-[#64748B] hover:bg-slate-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">频率</button>
                                 </div>
                             </div>
-                            <div class="h-px bg-gray-100 w-full my-0.5"></div>
-                            <div class="flex flex-col gap-2">
-                                <div class="flex items-center justify-between">
+                            <div class="h-px bg-gray-100 w-full my-1"></div>
+                            <div id="seq-wrapper-seq-dict-1" class="flex flex-col gap-2 transition-all">
+                                <div class="flex items-center justify-between drag-hint">
                                     <span class="text-[12px] font-bold text-gray-400"><i class="ph-bold ph-hand-swipe-right"></i> 长按拖拽可排序</span>
                                 </div>
-                                <div id="seq-dict" class="flex flex-col gap-2 min-h-[40px] sequence-container">
+                                <div id="seq-dict-1" class="flex flex-col gap-2 min-h-[40px] sequence-container">
                                 </div>
                             </div>
                         </div>
@@ -863,6 +887,7 @@
 
 
     <script>
+        // 完全使用安全的匿名闭包与var声明，彻底解决全局变量冲突
         (function() {
             var selectedGenType = 'new';
             
@@ -880,10 +905,13 @@
                 clearInterval(learningTimerInterval);
                 learningSeconds = 0;
                 var timerEl = document.getElementById('scoring-timer');
+                var passingTimerEl = document.getElementById('passing-timer');
                 if (timerEl) timerEl.innerText = '00:00';
+                if (passingTimerEl) passingTimerEl.innerText = '00:00';
                 learningTimerInterval = setInterval(function() {
                     learningSeconds++;
                     if (timerEl) timerEl.innerText = formatTime(learningSeconds);
+                    if (passingTimerEl) passingTimerEl.innerText = formatTime(learningSeconds);
                 }, 1000);
             }
             
@@ -976,6 +1004,35 @@
                     };
                 }
             };
+            
+            // 全局删除确认绑定
+            window.confirmDeleteSeqItem = function(btn, containerId) {
+                window.showModal('确认删除', '<div class="mt-2 text-gray-600 font-medium">确定要从播放列表中删除该项吗？</div>', function() {
+                    btn.closest('.sequence-item').remove();
+                    checkSequenceEmpty(containerId);
+                }, true);
+            };
+
+            window.confirmDeleteCard = function(btn) {
+                window.showModal('确认删除', '<div class="mt-2 text-gray-600 font-medium">确定要删除整个播放模式配置吗？</div>', function() {
+                    btn.closest('.playback-card').remove();
+                }, true);
+            };
+            
+            function checkSequenceEmpty(containerId) {
+                var container = document.getElementById(containerId);
+                if (container) {
+                    var wrapper = container.parentElement;
+                    var hint = wrapper.querySelector('.drag-hint');
+                    if (hint) {
+                        if (container.children.length === 0) {
+                            hint.style.display = 'none';
+                        } else {
+                            hint.style.display = 'flex';
+                        }
+                    }
+                }
+            }
 
             var dataStore = {
                 stats: { 
@@ -1099,7 +1156,6 @@
                 var learnedSum = known + unknown;
                 setVal('statTotalTarget', total);
                 setVal('statLearnedSum', learnedSum);
-                setVal('statUnlearned', unlearned);
                 var ringPct = Math.round((learnedSum / total) * 100) || 0;
                 var ringEl = document.getElementById('targetProgressRing');
                 var ringText = document.getElementById('targetProgressText');
@@ -1141,7 +1197,7 @@
                         btn.className = `text-[13px] font-bold pr-2.5 pl-2 py-2 rounded-[12px] shadow-md transition-all duration-300 flex items-center shrink-0 ${theme.solidBg} border border-transparent transform scale-[1.02]`;
                     } else {
                         var badgeHtml = typeKey === 'all' ? `<span class="${theme.lightIconBg} ${theme.darkText} opacity-70 px-1.5 py-0.5 rounded-[6px] font-mono text-[10px] ml-1.5">${count}</span>` : (isFull ? `<span class="bg-red-100 text-red-600 border border-red-200 font-extrabold animate-pulse ml-1.5 px-1.5 py-0.5 rounded-[6px] leading-none text-[10px]">${count}/${VOCAB_THRESHOLD}</span>` : `<span class="${theme.lightIconBg} ${theme.darkText} opacity-70 px-1.5 py-0.5 rounded-[6px] font-mono text-[10px] ml-1.5">${count}/${VOCAB_THRESHOLD}</span>`);
-                        contentHtml = `<i class="${iconClass} ${theme.lightIconText} text-[18px] mr-1 shrink-0"></i><span class="${theme.darkText} whitespace-nowrap">${label}</span>${badgeHtml}`;
+                        contentHtml = `<i class="${iconClass} text-[18px] mr-1 shrink-0"></i><span class="${theme.darkText} whitespace-nowrap">${label}</span>${badgeHtml}`;
                         btn.className = `text-[13px] font-bold pr-3 pl-2.5 py-2 rounded-[12px] transition-all duration-300 flex items-center shrink-0 ${theme.lightBg} border ${theme.lightBorder} hover:${theme.hoverBg}`;
                     }
                     btn.innerHTML = contentHtml;
@@ -1259,8 +1315,8 @@
                                     <i class="ph-bold ${iconName} text-[14px]"></i>
                                 </div>
                                 <div class="flex flex-col text-left justify-center pr-1">
-                                    <span class="text-[12px] font-bold leading-none mb-1 ${textColorClass}">${step.name}</span>
-                                    <span class="text-[10px] font-mono font-bold leading-none ${progressColorClass}">${step.current}/${step.target}</span>
+                                    <span class="text-[12px] font-bold leading-none mb-[2px] ${textColorClass}">${step.name}</span>
+                                    <span class="text-[10px] font-bold font-mono leading-none ${progressColorClass}">${step.current}/${step.target}</span>
                                 </div>
                             </div>
                         `;
@@ -1296,7 +1352,6 @@
                 window.setPassFilter('all'); 
                 window.switchView('view-passing');
                 
-                // 开始过词计时
                 startLearningTimer();
             };
 
@@ -1549,7 +1604,6 @@
                 clearTimeout(systemAudioTimeout); clearTimeout(window.autoPlayTimer); clearTimeout(autoAdvanceTimeout);
                 window.switchView('view-scoring');
                 
-                // 启动学习计时器
                 startLearningTimer();
                 
                 setTimeout(() => {
@@ -1746,14 +1800,14 @@
                     var names = { gendu: '跟读', yinji: '音记', tingxie: '听写' };
                     var btn = document.createElement('div');
                     if (modeRound[mode] >= sysConfig[mode].target) {
-                        btn.className = "flex items-center bg-[#ecfdf5] border-[1.5px] border-[#bbf7d0] rounded-[14px] px-2 py-1.5 min-w-[76px] shadow-sm";
-                        btn.innerHTML = `<div class="bg-white rounded-[6px] p-1 mr-1.5 shadow-sm shrink-0 flex items-center justify-center border border-green-200"><i class="ph-bold ph-check text-[14px] text-green-500"></i></div><div class="flex flex-col items-start justify-center"><span class="text-[12px] font-bold text-green-600 leading-none mb-1 whitespace-nowrap">${names[mode]}</span><span class="text-[10px] font-mono text-green-500 font-bold leading-none line-through whitespace-nowrap">${sysConfig[mode].target}/${sysConfig[mode].target}</span></div>`;
+                        btn.className = "flex items-center bg-white border border-green-200 shadow-sm rounded-[12px] px-2.5 py-1.5 shrink-0";
+                        btn.innerHTML = `<div class="w-[26px] h-[26px] rounded-[8px] flex items-center justify-center shrink-0 bg-green-50 text-green-500 mr-1.5"><i class="ph-bold ph-check text-[14px]"></i></div><div class="flex flex-col text-left justify-center"><span class="text-[12px] font-bold leading-none mb-[2px] text-green-600">${names[mode]}</span><span class="text-[10px] font-bold font-mono leading-none text-green-400 line-through">${sysConfig[mode].target}/${sysConfig[mode].target}</span></div>`;
                     } else if (currentMode === mode) {
-                        btn.className = "flex items-center bg-[#f0f4ff] border-[1.5px] border-[#bfdbfe] rounded-[14px] px-2 py-1.5 min-w-[76px] shadow-sm";
-                        btn.innerHTML = `<div class="bg-white rounded-[6px] p-1 mr-1.5 shadow-sm shrink-0 flex items-center justify-center border border-blue-100"><i class="ph-bold ph-hourglass-high animate-pulse text-[14px] text-[#3B82F6]"></i></div><div class="flex flex-col items-start justify-center"><span class="text-[12px] font-bold text-[#3B82F6] leading-none mb-1 whitespace-nowrap">${names[mode]}</span><span class="text-[10px] font-mono text-[#3B82F6] font-bold leading-none whitespace-nowrap">${modeRound[mode]}/${sysConfig[mode].target}</span></div>`;
+                        btn.className = "flex items-center bg-white border border-blue-200 shadow-sm rounded-[12px] px-2.5 py-1.5 shrink-0";
+                        btn.innerHTML = `<div class="w-[26px] h-[26px] rounded-[8px] flex items-center justify-center shrink-0 bg-blue-50 border border-blue-100 text-[#3B82F6] mr-1.5"><i class="ph-bold ph-hourglass-high animate-pulse text-[14px]"></i></div><div class="flex flex-col text-left justify-center"><span class="text-[12px] font-bold leading-none mb-[2px] text-blue-600">${names[mode]}</span><span class="text-[10px] font-bold font-mono leading-none text-blue-400">${modeRound[mode]}/${sysConfig[mode].target}</span></div>`;
                     } else {
-                        btn.className = `flex items-center bg-white border-[1.5px] border-transparent rounded-[14px] px-2 py-1.5 min-w-[76px] shadow-sm ${locked[mode] ? 'opacity-80' : 'hover:bg-gray-50 cursor-pointer'}`;
-                        btn.innerHTML = `<div class="bg-white rounded-[6px] p-1 mr-1.5 shrink-0 flex items-center justify-center">${locked[mode] ? '<i class="ph-fill ph-lock-key text-[14px] text-gray-400"></i>' : '<i class="ph-bold ph-hourglass text-[14px] text-gray-500"></i>'}</div><div class="flex flex-col items-start justify-center"><span class="text-[12px] font-bold ${locked[mode] ? 'text-gray-500' : 'text-gray-600'} leading-none mb-1 whitespace-nowrap">${names[mode]}</span><span class="text-[10px] font-mono ${locked[mode] ? 'text-gray-400' : 'text-gray-500'} font-bold leading-none whitespace-nowrap">${modeRound[mode]}/${sysConfig[mode].target}</span></div>`;
+                        btn.className = `flex items-center bg-white border border-gray-100 opacity-70 rounded-[12px] px-2.5 py-1.5 shrink-0 ${locked[mode] ? '' : 'hover:bg-gray-50 cursor-pointer'}`;
+                        btn.innerHTML = `<div class="w-[26px] h-[26px] rounded-[8px] flex items-center justify-center shrink-0 bg-gray-100 text-gray-400 mr-1.5"><i class="ph-bold ph-lock-key text-[14px]"></i></div><div class="flex flex-col text-left justify-center"><span class="text-[12px] font-bold leading-none mb-[2px] text-gray-500">${names[mode]}</span><span class="text-[10px] font-bold font-mono leading-none text-gray-400">${modeRound[mode]}/${sysConfig[mode].target}</span></div>`;
                         if (!locked[mode]) btn.onclick = () => switchMode(mode);
                     }
                     container.appendChild(btn);
@@ -1973,6 +2027,18 @@
                 }
             };
 
+            window.toggleSeqGroup = function(checkboxEl) {
+                var card = checkboxEl.closest('.bg-gray-50');
+                var group = card.querySelector('.seq-group');
+                if(checkboxEl.checked) {
+                    group.classList.remove('hidden');
+                    group.classList.add('flex');
+                } else {
+                    group.classList.remove('flex');
+                    group.classList.add('hidden');
+                }
+            };
+
             var tagColors = {
                 '英文': 'bg-[#3B82F6]',
                 '中文': 'bg-[#EC4899]',
@@ -1984,9 +2050,9 @@
                 '详细意思': 'bg-[#6366F1]',
                 '音标分音节': 'bg-[#06B6D4]',
                 '快读': 'bg-[#F43F5E]',
-                '图片': 'bg-[#8B5CF6]',
-                '视频': 'bg-[#D946EF]',
-                '频率': 'bg-[#0EA5E9]'
+                '图片': 'bg-[#D946EF]',
+                '视频': 'bg-[#EAB308]',
+                '频率': 'bg-[#64748B]'
             };
 
             window.addSeqItem = function(containerId, tagName) {
@@ -1995,41 +2061,89 @@
                 var color = tagColors[tagName] || 'bg-gray-500';
                 
                 var el = document.createElement('div');
-                el.className = 'sequence-item flex flex-wrap xl:flex-nowrap items-center justify-between bg-white border border-gray-200 rounded-lg p-2.5 mt-2 gap-2 shadow-sm relative pr-2';
+                // 解决溢出的终极解法: 使用 flex-wrap 让右侧在极窄屏幕上自动换行
+                el.className = 'sequence-item flex flex-wrap items-center justify-between bg-white border border-gray-200 rounded-lg px-2 py-2 mt-2 gap-x-2 gap-y-2 shadow-sm relative';
                 el.draggable = true;
                 
                 var html = `
-                    <div class="flex items-center gap-2 shrink-0">
-                        <i class="ph-bold ph-list text-gray-400 cursor-grab text-[18px] hover:text-blue-500 active:cursor-grabbing transition-colors mr-1 drag-handle" title="按住拖拽排序"></i>
-                        <div class="flex items-center justify-center ${color} text-white px-1 py-1 rounded-[6px] text-[12px] font-bold shadow-sm w-[72px] shrink-0 text-center">
+                    <div class="flex items-center gap-1 shrink-0">
+                        <i class="ph-bold ph-list text-gray-400 cursor-grab text-[18px] hover:text-blue-500 active:cursor-grabbing transition-colors drag-handle" title="按住拖拽排序"></i>
+                        <div class="flex items-center justify-center ${color} text-white px-1 py-1.5 rounded-[6px] text-[12px] font-bold shadow-sm w-[88px] shrink-0 text-center tracking-wide">
                             ${tagName}
                         </div>
                     </div>
-                    
-                    <div class="flex-1"></div>
 
-                    <div class="flex items-center gap-2 shrink-0 ml-auto flex-wrap justify-end">
-                        <div class="flex items-center gap-1.5 hidden sm:flex">
-                            <span class="text-[12px] text-gray-500 font-medium">音频间隔</span>
-                            <div class="flex items-center bg-gray-50 border border-gray-200 rounded-[6px] px-1 shadow-sm">
-                                <span class="text-gray-400 cursor-pointer px-1.5 py-0.5 text-[14px] font-bold hover:text-gray-600" onclick="var inp=this.nextElementSibling; if(inp.value>0) inp.value=(parseFloat(inp.value)-0.5).toFixed(1)">-</span>
-                                <input type="number" value="1.0" min="0" step="0.5" class="w-8 text-center text-[12px] font-bold outline-none bg-transparent text-gray-700">
-                                <span class="text-gray-400 cursor-pointer px-1.5 py-0.5 text-[14px] font-bold hover:text-gray-600" onclick="var inp=this.previousElementSibling; inp.value=(parseFloat(inp.value)+0.5).toFixed(1)">+</span>
+                    <div class="flex items-center gap-1.5 shrink-0 ml-auto flex-nowrap justify-end">
+                        <div class="flex items-center gap-1 shrink-0">
+                            <span class="text-[12px] text-gray-500 font-medium hidden md:inline">音频间隔</span>
+                            <div class="flex items-center bg-gray-50 border border-gray-200 rounded-[6px] px-1 shadow-sm" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
+                                <span class="text-gray-400 cursor-pointer px-1.5 py-0.5 text-[14px] font-bold hover:text-gray-600" onclick="var inp=this.nextElementSibling; if(inp.value>0) inp.value=(parseFloat(inp.value)-0.5).toFixed(1); event.stopPropagation();">-</span>
+                                <input type="number" value="1.0" min="0" step="0.5" class="w-8 text-center text-[12px] font-bold outline-none bg-transparent text-gray-700 pointer-events-auto" onclick="event.stopPropagation();">
+                                <span class="text-gray-400 cursor-pointer px-1.5 py-0.5 text-[14px] font-bold hover:text-gray-600" onclick="var inp=this.previousElementSibling; inp.value=(parseFloat(inp.value)+0.5).toFixed(1); event.stopPropagation();">+</span>
                             </div>
                         </div>
-                        <div class="flex items-center gap-1">
-                            <select class="native-select border border-gray-200 rounded-[6px] text-[12px] py-1 pl-2 pr-6 bg-gray-50 outline-none text-gray-700 cursor-pointer shadow-sm w-[85px] appearance-none">
-                                <option>请选择</option>
-                                <option selected>标准音频</option>
-                                <option>外教原声</option>
-                            </select>
-                            <i class="ph-bold ph-x cursor-pointer ml-1 text-gray-400 hover:text-red-500 text-[18px] transition-colors shrink-0" onclick="this.closest('.sequence-item').remove()"></i>
+                        <div class="flex items-center gap-1 relative shrink-0">
+                            <div class="relative custom-select-wrapper shrink-0" onclick="window.toggleCustomSelect(this, event)" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
+                                <div class="border border-gray-200 rounded-[6px] text-[12px] py-1 pl-2 pr-6 bg-gray-50 text-gray-700 cursor-pointer shadow-sm w-[80px] flex items-center justify-between">
+                                    <span class="select-text truncate">标准发音</span>
+                                    <i class="ph-bold ph-caret-down text-gray-400 absolute right-1.5 pointer-events-none text-[10px]"></i>
+                                </div>
+                                <div class="absolute right-0 top-[calc(100%+4px)] w-[110px] bg-white border border-gray-200 rounded-[8px] shadow-2xl z-[9999] hidden flex-col custom-select-dropdown py-1" style="max-height: 144px; overflow-y: auto;">
+                                    <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '标准发音', event)">标准发音</div>
+                                    <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '外教原声', event)">外教原声</div>
+                                    <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '测试0409', event)">测试0409</div>
+                                    <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '听写专版', event)">听写专版</div>
+                                    <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '备用模版一', event)">备用模版一</div>
+                                    <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '备用模版二', event)">备用模版二</div>
+                                </div>
+                            </div>
+                            <button class="flex items-center justify-center p-1.5 rounded-[6px] bg-red-50/50 hover:bg-red-50 text-red-400 hover:text-red-500 transition-colors shrink-0" onclick="window.confirmDeleteSeqItem(this, '${containerId}'); event.stopPropagation();" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
+                                <i class="ph-bold ph-trash text-[16px]"></i>
+                            </button>
                         </div>
                     </div>
                 `;
                 el.innerHTML = html;
                 container.appendChild(el);
+                checkSequenceEmpty(containerId);
             };
+
+            window.toggleCustomSelect = function(wrapper, e) {
+                e.preventDefault();
+                e.stopPropagation();
+                document.querySelectorAll('.custom-select-dropdown').forEach(dropdown => {
+                    if(dropdown !== wrapper.querySelector('.custom-select-dropdown')) {
+                        dropdown.classList.add('hidden');
+                        dropdown.classList.remove('flex');
+                    }
+                });
+                var dropdown = wrapper.querySelector('.custom-select-dropdown');
+                if (dropdown.classList.contains('hidden')) {
+                    dropdown.classList.remove('hidden');
+                    dropdown.classList.add('flex');
+                } else {
+                    dropdown.classList.add('hidden');
+                    dropdown.classList.remove('flex');
+                }
+            };
+
+            window.selectOption = function(optionEl, value, e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var wrapper = optionEl.closest('.custom-select-wrapper');
+                var textSpan = wrapper.querySelector('.select-text');
+                textSpan.innerText = value;
+                var dropdown = wrapper.querySelector('.custom-select-dropdown');
+                dropdown.classList.add('hidden');
+                dropdown.classList.remove('flex');
+            };
+
+            document.addEventListener('click', function() {
+                document.querySelectorAll('.custom-select-dropdown').forEach(dropdown => {
+                    dropdown.classList.add('hidden');
+                    dropdown.classList.remove('flex');
+                });
+            });
 
             function initDragAndDrop() {
                 var dragEl = null;
@@ -2066,12 +2180,21 @@
             }
 
             function initDefaultSequences() {
-                window.addSeqItem('seq-read', '中文');
-                window.addSeqItem('seq-read', '英文');
-                window.addSeqItem('seq-memo', '中文');
-                window.addSeqItem('seq-memo', '英文');
-                window.addSeqItem('seq-dict', '中文');
-                window.addSeqItem('seq-dict', '英文');
+                ['seq-read-1', 'seq-memo-1', 'seq-dict-1'].forEach(id => {
+                    var container = document.getElementById(id);
+                    if (container) container.innerHTML = '';
+                });
+
+                window.addSeqItem('seq-read-1', '中文');
+                window.addSeqItem('seq-read-1', '英文');
+                window.addSeqItem('seq-memo-1', '中文');
+                window.addSeqItem('seq-memo-1', '英文');
+                window.addSeqItem('seq-dict-1', '中文');
+                window.addSeqItem('seq-dict-1', '英文');
+                
+                ['seq-read-1', 'seq-memo-1', 'seq-dict-1'].forEach(id => {
+                    checkSequenceEmpty(id);
+                });
             }
 
             window.addPlaybackProfile = function() {
@@ -2081,11 +2204,11 @@
                 var seqContainerId = `seq-new-${newId}`;
                 
                 var cardHtml = `
-                    <div class="bg-white rounded-[24px] shadow-premium flex flex-col border border-gray-100 overflow-hidden relative group playback-card modal-enter">
-                        <div class="px-5 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                    <div class="bg-white rounded-[24px] shadow-premium flex flex-col border border-gray-100 relative group playback-card modal-enter">
+                        <div class="px-5 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center rounded-t-[24px]">
                             <div class="flex items-center gap-2 relative w-[200px]">
-                                <div class="w-8 h-8 rounded-[10px] bg-blue-100 text-blue-600 border-blue-200/50 flex items-center justify-center shadow-sm border card-icon-container transition-colors duration-300">
-                                    <i class="ph-fill ph-microphone-stage text-[16px] card-icon transition-colors duration-300"></i>
+                                <div class="w-8 h-8 rounded-[10px] bg-gray-100 text-gray-600 border-gray-200/50 flex items-center justify-center shadow-sm border card-icon-container transition-colors duration-300">
+                                    <i class="ph-fill ph-speaker-high text-[16px] card-icon transition-colors duration-300"></i>
                                 </div>
                                 <select class="native-select font-extrabold text-[17px] text-gray-800 bg-transparent outline-none cursor-pointer pr-6 relative z-10 w-full" 
                                         onchange="window.updateCardType(this)">
@@ -2094,7 +2217,7 @@
                                     <option value="dict">听写模式</option>
                                 </select>
                             </div>
-                            <button onclick="this.closest('.playback-card').remove()" class="text-gray-400 hover:text-red-500 transition-colors"><i class="ph-bold ph-trash text-[18px]"></i></button>
+                            <button onclick="window.confirmDeleteCard(this)" class="text-gray-400 hover:text-red-500 transition-colors"><i class="ph-bold ph-trash text-[18px]"></i></button>
                         </div>
                         <div class="p-6 flex flex-col gap-5 flex-1">
                             <div class="flex items-center justify-between mt-2">
@@ -2122,24 +2245,30 @@
                                             <span class="text-gray-400 cursor-pointer px-2 py-1 text-[16px] font-bold hover:text-gray-600" onclick="var inp=this.previousElementSibling; inp.value=(parseFloat(inp.value)+0.5).toFixed(1)">+</span>
                                         </div>
                                     </div>
-                                    <div class="flex items-center gap-1.5">
+                                    <div class="flex items-center gap-1.5 relative z-50">
                                         <span class="text-[12px] text-gray-500 font-medium">音频版本</span>
-                                        <select class="native-select border border-gray-200 rounded-[8px] text-[12px] py-1.5 px-2 bg-white outline-none text-gray-700 cursor-pointer shadow-sm w-[100px] custom-select-popup">
-                                            <option>请选择</option>
-                                            <option selected>标准发音</option>
-                                            <option>外教女生版</option>
-                                            <option>测试0409</option>
-                                            <option>听写专版</option>
-                                            <option>备用模版一</option>
-                                            <option>备用模版二</option>
-                                        </select>
+                                        <div class="relative custom-select-wrapper" onclick="window.toggleCustomSelect(this, event)">
+                                            <div class="border border-gray-200 rounded-[8px] text-[12px] py-1.5 pl-2 pr-6 bg-white text-gray-700 cursor-pointer shadow-sm w-[100px] flex items-center justify-between" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
+                                                <span class="select-text truncate">标准发音</span>
+                                                <i class="ph-bold ph-caret-down text-gray-400 absolute right-2 pointer-events-none text-[10px]"></i>
+                                            </div>
+                                            <div class="absolute right-0 top-[calc(100%+4px)] w-[120px] bg-white border border-gray-200 rounded-[8px] shadow-xl z-[9999] hidden flex-col custom-select-dropdown py-1" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
+                                                <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '标准发音', event)">标准发音</div>
+                                                <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '外教原声', event)">外教原声</div>
+                                                <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '测试0409', event)">测试0409</div>
+                                                <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '听写专版', event)">听写专版</div>
+                                                <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '备用模版一', event)">备用模版一</div>
+                                                <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '备用模版二', event)">备用模版二</div>
+                                                <div class="select-item hover:bg-blue-50 text-[12px] cursor-pointer text-gray-700 flex items-center px-3" onclick="window.selectOption(this, '备用模版三', event)">备用模版三</div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             
-                            <div class="bg-white border border-blue-100 rounded-[16px] p-4 flex flex-col gap-3 mt-1 shadow-sm">
+                            <div class="bg-white border border-blue-100 rounded-[16px] p-4 flex flex-col gap-3 mt-1 shadow-sm relative z-40">
                                 <div class="flex flex-col gap-2">
-                                    <span class="text-[12px] font-bold text-gray-400">点击添加内容：</span>
+                                    <span class="text-[12px] font-bold text-gray-400">点击添加播放内容：</span>
                                     <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-2">
                                         <button onclick="window.addSeqItem('${seqContainerId}', '英文')" class="shrink-0 bg-[#3B82F6] hover:bg-blue-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">英文</button>
                                         <button onclick="window.addSeqItem('${seqContainerId}', '中文')" class="shrink-0 bg-[#EC4899] hover:bg-pink-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">中文</button>
@@ -2148,17 +2277,17 @@
                                         <button onclick="window.addSeqItem('${seqContainerId}', '英文句子')" class="shrink-0 bg-[#F59E0B] hover:bg-orange-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">英文句子</button>
                                         <button onclick="window.addSeqItem('${seqContainerId}', '中文句子')" class="shrink-0 bg-[#10B981] hover:bg-emerald-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">中文句子</button>
                                         <button onclick="window.addSeqItem('${seqContainerId}', '词性')" class="shrink-0 bg-[#84CC16] hover:bg-lime-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">词性</button>
-                                        <button onclick="window.addSeqItem('${seqContainerId}', '详细意思')" class="shrink-0 bg-[#22C55E] hover:bg-green-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">详细意思</button>
-                                        <button onclick="window.addSeqItem('${seqContainerId}', '音标分音节')" class="shrink-0 bg-[#22C55E] hover:bg-green-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">音标分音节</button>
-                                        <button onclick="window.addSeqItem('${seqContainerId}', '快读')" class="shrink-0 bg-[#22C55E] hover:bg-green-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">快读</button>
-                                        <button onclick="window.addSeqItem('${seqContainerId}', '图片')" class="shrink-0 bg-[#22C55E] hover:bg-green-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">图片</button>
-                                        <button onclick="window.addSeqItem('${seqContainerId}', '视频')" class="shrink-0 bg-[#22C55E] hover:bg-green-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">视频</button>
-                                        <button onclick="window.addSeqItem('${seqContainerId}', '频率')" class="shrink-0 bg-[#22C55E] hover:bg-green-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">频率</button>
+                                        <button onclick="window.addSeqItem('${seqContainerId}', '详细意思')" class="shrink-0 bg-[#6366F1] hover:bg-indigo-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">详细意思</button>
+                                        <button onclick="window.addSeqItem('${seqContainerId}', '音标分音节')" class="shrink-0 bg-[#06B6D4] hover:bg-cyan-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">音标分音节</button>
+                                        <button onclick="window.addSeqItem('${seqContainerId}', '快读')" class="shrink-0 bg-[#F43F5E] hover:bg-rose-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">快读</button>
+                                        <button onclick="window.addSeqItem('${seqContainerId}', '图片')" class="shrink-0 bg-[#D946EF] hover:bg-fuchsia-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">图片</button>
+                                        <button onclick="window.addSeqItem('${seqContainerId}', '视频')" class="shrink-0 bg-[#EAB308] hover:bg-yellow-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">视频</button>
+                                        <button onclick="window.addSeqItem('${seqContainerId}', '频率')" class="shrink-0 bg-[#64748B] hover:bg-slate-600 text-white text-[12px] font-bold px-2.5 py-1.5 rounded-[6px] shadow-sm transition-all active:scale-95">频率</button>
                                     </div>
                                 </div>
                                 <div class="h-px bg-gray-100 w-full my-0.5"></div>
-                                <div class="flex flex-col gap-2">
-                                    <div class="flex items-center justify-between">
+                                <div id="seq-wrapper-${seqContainerId}" class="flex flex-col gap-2 transition-all">
+                                    <div class="drag-hint flex items-center justify-between">
                                         <span class="text-[12px] font-bold text-gray-400"><i class="ph-bold ph-hand-swipe-right"></i> 长按拖拽可排序</span>
                                     </div>
                                     <div id="${seqContainerId}" class="flex flex-col gap-2 min-h-[40px] sequence-container">
