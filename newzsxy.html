@@ -24,38 +24,101 @@
             
             --border-line: rgba(0,0,0,0.06);
 
-            --icon-bg-blue: rgba(59, 130, 246, 0.15); --icon-color-blue: #3B82F6;
-            --icon-bg-purple: rgba(139, 92, 246, 0.15); --icon-color-purple: #8B5CF6;
-            --icon-bg-pink: rgba(236, 72, 153, 0.15); --icon-color-pink: #EC4899;
-            --icon-bg-orange: rgba(249, 115, 22, 0.15); --icon-color-orange: #F97316;
-            --icon-bg-teal: rgba(20, 184, 166, 0.15); --icon-color-teal: #14B8A6;               
+            /* 马卡龙糖果色系标签 */
+            --tag-eng-bg: rgba(244, 114, 182, 0.15); 
+            --tag-eng-text: #DB2777;                 
+            --tag-chi-bg: rgba(245, 158, 11, 0.15);  
+            --tag-chi-text: #D97706;                 
+            --tag-math-bg: rgba(16, 185, 129, 0.15); 
+            --tag-math-text: #059669;                
+            --tag-type-bg: rgba(59, 130, 246, 0.12); 
+            --tag-type-text: #2563EB; 
+
+            /* 图标背景色 - 马卡龙 */
+            --icon-bg-blue: rgba(59, 130, 246, 0.15);
+            --icon-color-blue: #3B82F6;
+            --icon-bg-purple: rgba(139, 92, 246, 0.15);
+            --icon-color-purple: #8B5CF6;
+            --icon-bg-pink: rgba(236, 72, 153, 0.15);
+            --icon-color-pink: #EC4899;
+            --icon-bg-orange: rgba(249, 115, 22, 0.15);
+            --icon-color-orange: #F97316;
+            --icon-bg-teal: rgba(20, 184, 166, 0.15);
+            --icon-color-teal: #14B8A6;               
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif; background-color: #E2E8F0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background-color: #E2E8F0;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+        }
 
-        .device-simulator { width: 375px; height: 812px; background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%); position: relative; overflow: hidden; border-radius: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.15); display: flex; flex-direction: column; }
-        .device-simulator::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 40px; box-shadow: inset 0 0 0 8px #FFFFFF; pointer-events: none; z-index: 1000; }
+        .device-simulator {
+            width: 375px; height: 812px;
+            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+            position: relative; overflow: hidden; border-radius: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15); 
+            display: flex; flex-direction: column;
+        }
+        
+        .device-simulator::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 40px; 
+            box-shadow: inset 0 0 0 8px #FFFFFF;
+            pointer-events: none; z-index: 1000;
+        }
 
-        .wrapper-main { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; }
-        .tab-view { position: absolute; top: 0; left: 0; right: 0; bottom: 80px; display: none; flex-direction: column; }
+        /* --- 架构：主页面包裹器与子页面包裹器 --- */
+        .wrapper-main {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            display: flex; flex-direction: column;
+        }
+
+        .tab-view {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 80px; 
+            display: none; flex-direction: column;
+        }
         .tab-view.active { display: flex; pointer-events: auto; }
-        .page-view { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; z-index: 200; transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1); background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%); }
+
+        .page-view {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            display: flex; flex-direction: column; z-index: 200;
+            transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+        }
         .page-view.hidden-left { transform: translateX(-100%); pointer-events: none; }
         .page-view.hidden-right { transform: translateX(100%); pointer-events: none; }
         .page-view.active { transform: translateX(0); pointer-events: auto; }
 
-        .nav-bar { padding: 48px 20px 12px; display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 10; flex-shrink: 0; }
+        /* --- 导航栏 --- */
+        .nav-bar {
+            padding: 48px 20px 12px; display: flex; align-items: center; justify-content: space-between;
+            position: relative; z-index: 10; flex-shrink: 0;
+        }
         .nav-bar.main-nav { justify-content: center; } 
         .nav-title-group { display: flex; flex-direction: column; align-items: center; }
         .nav-title { font-size: 18px; font-weight: 800; color: var(--text-title); letter-spacing: 0.5px;}
         .icon-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-title); }
 
-        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 0 20px 20px 20px; scrollbar-width: none; padding-bottom: 30px; }
+        .main-content {
+            flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 0 20px 20px 20px; scrollbar-width: none;
+            padding-bottom: 30px; 
+        }
         .main-content::-webkit-scrollbar { display: none; }
 
-        .tab-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 84px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.6); display: flex; justify-content: space-around; align-items: flex-start; padding-top: 10px; z-index: 100; }
-        .tab-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94A3B8; cursor: pointer; width: 60px; transition: all 0.3s; }
+        /* --- 底部 Tab Bar --- */
+        .tab-bar {
+            position: absolute; bottom: 0; left: 0; right: 0; height: 84px;
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.6);
+            display: flex; justify-content: space-around; align-items: flex-start; padding-top: 10px; z-index: 100;
+        }
+        .tab-item {
+            display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94A3B8; cursor: pointer;
+            width: 60px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
         .tab-item:active { transform: scale(0.9); }
         .tab-item.active { color: var(--primary-color); }
         .tab-icon { position: relative; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; }
@@ -63,95 +126,352 @@
         .tab-item.active .tab-icon svg { stroke-width: 2.5; }
         .tab-label { font-size: 11px; font-weight: 700; letter-spacing: 0.2px;}
 
-        /* 通用与玻璃态 */
-        .glass-card { background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 20px; box-shadow: 0 8px 24px rgba(31, 95, 255, 0.05); }
+        /* --- 通用组件 --- */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(31, 95, 255, 0.05);
+        }
+        
         .search-container { position: relative; width: 100%; margin-bottom: 16px; flex-shrink: 0;}
         .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #9CA3AF; }
-        .search-input { width: 100%; padding: 12px 14px 12px 38px; border-radius: 14px; background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(255, 255, 255, 0.8); font-size: 14px; font-weight: 500; color: var(--text-title); outline: none; transition: all 0.2s; }
+        .search-input {
+            width: 100%; padding: 12px 14px 12px 38px; border-radius: 14px;
+            background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(255, 255, 255, 0.8);
+            font-size: 14px; font-weight: 500; color: var(--text-title); outline: none; transition: all 0.2s ease;
+        }
         .search-input:focus { background: rgba(255, 255, 255, 0.9); border-color: rgba(31, 95, 255, 0.3); box-shadow: 0 0 0 2px var(--primary-light); }
+        .search-input::placeholder { color: #9CA3AF; }
+
+        /* 组合搜索框 (带左侧下拉菜单) */
+        .search-bar-combo { position: relative; display: flex; align-items: center; background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 14px; padding: 0 14px; transition: all 0.2s ease; margin-bottom: 16px; flex-shrink: 0; z-index: 50;}
+        .search-bar-combo:focus-within { background: rgba(255, 255, 255, 0.9); border-color: rgba(31, 95, 255, 0.3); box-shadow: 0 0 0 2px var(--primary-light); }
+        .combo-dropdown { display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 700; color: var(--primary-color); cursor: pointer; padding: 12px 10px 12px 0; border-right: 1px solid var(--border-line); margin-right: 10px; white-space: nowrap; position: relative;}
+        .combo-dropdown svg { width: 14px; height: 14px; color: var(--primary-color); transition: transform 0.2s;}
+        .combo-dropdown.open svg { transform: rotate(180deg); }
+        .combo-input-wrap { flex: 1; display: flex; align-items: center; gap: 8px;}
+        .combo-input-wrap svg { width: 16px; height: 16px; color: #9CA3AF; flex-shrink: 0;}
+        .combo-input { flex: 1; background: transparent; border: none; font-size: 14px; color: var(--text-title); outline: none; padding: 12px 0; width: 100%;}
         
-        /* 角色与学期全局切换器 */
-        .global-semester-bar { display:flex; justify-content: space-between; align-items:center; background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); padding: 10px 16px; border-radius: 14px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.9); box-shadow: 0 4px 12px rgba(0,0,0,0.03); flex-shrink:0; position: sticky; top: -5px; z-index: 50;}
-        .semester-select { border:none; background:transparent; font-size:14px; font-weight:800; color:var(--primary-color); outline:none; appearance:none; -webkit-appearance:none; padding-right:20px; cursor: pointer; width: 100%;}
-        
+        .combo-menu { position: absolute; top: 100%; left: 0; margin-top: 8px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.9); border-radius: 12px; box-shadow: 0 10px 30px rgba(31, 95, 255, 0.1); opacity: 0; pointer-events: none; transform: translateY(-10px); transition: all 0.2s; min-width: 120px; overflow: hidden;}
+        .combo-menu.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+        .combo-option { padding: 12px 16px; font-size: 13px; font-weight: 600; color: var(--text-main); cursor: pointer; border-bottom: 1px solid var(--border-line); transition: background 0.2s;}
+        .combo-option:last-child { border-bottom: none; }
+        .combo-option:active { background: rgba(31, 95, 255, 0.1); }
+        .combo-option.selected { color: var(--primary-color); background: rgba(31, 95, 255, 0.05); }
+
         .section-title { font-size: 16px; font-weight: 800; color: var(--text-title); margin: 20px 0 12px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;}
         .section-title span.sub { font-size: 13px; font-weight: 600; color: var(--primary-color); cursor: pointer; }
 
         .grid-menu { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 8px; padding: 16px 12px; }
         .grid-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; }
         .grid-item:active { opacity: 0.7; }
-        .grid-icon-wrap { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.6); }
+        .grid-icon-wrap {
+            width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+            border: 1px solid rgba(255,255,255,0.6);
+        }
         .grid-icon-wrap svg { width: 22px; height: 22px; }
         .grid-label { font-size: 12px; font-weight: 600; color: var(--text-main); text-align: center; line-height: 1.2; word-break: break-all;}
 
-        /* 分段控件与横向滚动 */
-        .segmented-control { display: flex; background: rgba(255, 255, 255, 0.5); border-radius: 12px; padding: 4px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.8); flex-shrink: 0; }
-        .segment-btn { flex: 1; padding: 8px 0; text-align: center; font-size: 14px; font-weight: 700; color: var(--text-secondary); border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        /* 分段控件 */
+        .segmented-control {
+            display: flex; background: rgba(255, 255, 255, 0.5); border-radius: 12px; padding: 4px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.8); flex-shrink: 0;
+        }
+        .segment-btn {
+            flex: 1; padding: 8px 0; text-align: center; font-size: 14px; font-weight: 700; color: var(--text-secondary);
+            border-radius: 8px; cursor: pointer; transition: 0.3s;
+        }
         .segment-btn.active { background: white; color: var(--primary-color); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+
+        /* 横向滚动胶囊 */
         .pill-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; margin-bottom: 16px; flex-shrink: 0; }
         .pill-scroll::-webkit-scrollbar { display: none; }
-        .pill { padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; white-space: nowrap; cursor: pointer; background: rgba(255,255,255,0.6); color: var(--text-secondary); border: 1px solid rgba(255,255,255,0.8); transition: 0.2s; }
+        .pill { 
+            padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; white-space: nowrap; cursor: pointer;
+            background: rgba(255,255,255,0.6); color: var(--text-secondary); border: 1px solid rgba(255,255,255,0.8); transition: 0.2s;
+        }
         .pill.active { background: var(--primary-color); color: white; border-color: var(--primary-color); box-shadow: 0 4px 12px rgba(31,95,255,0.2); }
 
-        /* 列表卡片与状态标签 */
-        .list-card { padding: 16px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
-        .list-card:active { transform: scale(0.98); background: rgba(255, 255, 255, 0.85); }
+        /* 列表卡片通用 */
+        .list-card {
+            padding: 16px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0;
+            cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .list-card:active { transform: scale(0.97); background: rgba(255, 255, 255, 0.85); box-shadow: 0 4px 12px rgba(31, 95, 255, 0.08); }
         .card-row-between { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-        .card-title { font-size: 15px; font-weight: 800; color: var(--text-title); line-height: 1.4; display:flex; align-items:center; gap:6px;}
-        .card-desc { font-size: 12px; color: var(--text-secondary); display: flex; gap: 8px; align-items: center; font-weight: 500;}
+        .card-title { font-size: 15px; font-weight: 700; color: var(--text-title); line-height: 1.4; }
+        .card-desc { font-size: 12px; color: var(--text-secondary); display: flex; gap: 8px; align-items: center;}
         
-        .badge-dot { width: 8px; height: 8px; border-radius: 50%; background-color: var(--danger-color); box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15); flex-shrink: 0; margin-top: 4px; }
-        .badge-tag { padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; white-space: nowrap; border: 1px solid transparent; }
-        .tag-primary { background: var(--primary-light); color: var(--primary-color); }
-        .tag-warning { background: var(--warning-light); color: var(--warning-color); border-color: var(--warning-color); }
-        .tag-success { background: var(--success-color); color: white; box-shadow: 0 2px 8px rgba(16,185,129,0.3); }
-        .tag-gray { background: rgba(0,0,0,0.05); color: var(--text-secondary); border-color: var(--text-secondary); }
-
-        /* CRM 专属业务组件 */
-        .card-actions { display: flex; gap: 8px; margin-top: 4px; padding-top: 12px; border-top: 1px dashed rgba(0,0,0,0.08); align-items:center;}
-        .btn-xs { background: rgba(31,95,255,0.1); color: var(--primary-color); border:none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 800; cursor:pointer; transition:0.2s;}
-        .btn-xs:active { transform: scale(0.95); }
-        .btn-xs.outline { background: transparent; border: 1px solid var(--primary-color); }
-        .icon-log-btn { margin-left:auto; color: #9CA3AF; padding:4px; display:flex; align-items:center; justify-content:center; border-radius:6px; transition:0.2s;}
-        .icon-log-btn:active { background: rgba(0,0,0,0.05); color: var(--primary-color); }
-
-        .step-container { display: flex; align-items: center; justify-content: space-between; margin: 12px 0 16px; position: relative;}
-        .step-container::before { content:''; position:absolute; top: 12px; left: 10%; right: 10%; height: 2px; background: rgba(0,0,0,0.08); z-index: 0;}
-        .step-item { display: flex; flex-direction: column; align-items: center; gap: 6px; z-index: 1; position:relative; padding: 0 4px; border-radius: 12px;}
-        .step-circle { width: 24px; height: 24px; border-radius: 50%; background: #E2E8F0; color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; border: 2px solid white; box-shadow:0 2px 4px rgba(0,0,0,0.05);}
-        .step-item.active .step-circle { background: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-light), 0 2px 4px rgba(0,0,0,0.05); border-color: transparent;}
-        .step-item.done .step-circle { background: var(--success-color); border-color: transparent;}
-        .step-label { font-size: 10px; font-weight: 800; color: #94A3B8; }
-        .step-item.active .step-label { color: var(--primary-color); }
-        .step-item.done .step-label { color: var(--success-color); }
-
-        .stats-banner { display:flex; justify-content:space-between; background:white; padding:12px 16px; border-radius:14px; margin-bottom:12px; box-shadow:0 4px 12px rgba(0,0,0,0.02); text-align:center;}
-        .stats-banner-item { display:flex; flex-direction:column; gap:4px; flex:1; border-right:1px solid var(--border-line);}
-        .stats-banner-item:last-child { border-right:none;}
-        .stats-num { font-size:16px; font-weight:800; color:var(--text-title);}
-        .stats-label { font-size:10px; font-weight:700; color:var(--text-secondary);}
-
-        .warning-banner { background: #FEF3C7; color: #D97706; padding: 10px 16px; border-radius: 12px; font-size: 12px; font-weight: 600; display:flex; align-items:center; gap:8px; margin-bottom:16px; box-shadow:inset 0 0 0 1px #FDE68A;}
-
+        /* 红点标识 */
+        .badge-dot { 
+            width: 8px; height: 8px; border-radius: 50%; background-color: var(--danger-color); 
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15); flex-shrink: 0; margin-top: 4px;
+        }
+        .badge-outline { border: 1px solid var(--primary-color); color: var(--primary-color); padding: 2px 6px; border-radius: 6px; font-size: 10px; font-weight: 700; white-space: nowrap;}
+        .badge-outline.warning { border-color: var(--warning-color); color: var(--warning-color); }
+        .badge-outline.success { border-color: var(--success-color); color: var(--success-color); }
+        .badge-outline.gray { border-color: var(--text-secondary); color: var(--text-secondary); }
+        
+        /* 新增：归档日志专用时间线样式 */
         .log-timeline-item { border-left: 2px solid var(--primary-light); padding-left: 16px; margin-left: 8px; position: relative; padding-bottom: 16px; }
         .log-timeline-item::before { content: ''; position: absolute; left: -5px; top: 0; width: 8px; height: 8px; border-radius: 50%; background: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-light); }
         .log-timeline-item:last-child { border-left-color: transparent; padding-bottom: 0; }
 
-        .copy-btn { display:inline-flex; align-items:center; gap:2px; color:var(--primary-color); font-size:10px; font-weight:800; padding:2px 6px; border-radius:4px; background:rgba(31,95,255,0.05); cursor:pointer;}
+        /* --- 课件页专属媒体卡片 --- */
+        .course-card { display: flex; gap: 14px; padding: 14px; margin-bottom: 12px; align-items: stretch; flex-shrink: 0; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .course-card:active { transform: scale(0.97); background: rgba(255, 255, 255, 0.85); box-shadow: 0 4px 12px rgba(31, 95, 255, 0.08); }
+        .course-cover-wrap { position: relative; width: 110px; flex-shrink: 0; border-radius: 12px; overflow: hidden; background: linear-gradient(135deg, #E2E8F0, #CBD5E1); box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05); }
+        .course-cover-img { width: 100%; height: 100%; object-fit: cover; position: absolute; top:0; left:0; }
+        .course-play-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 28px; height: 28px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        .course-play-btn svg { width: 13px; height: 13px; margin-left: 2px; }
+        .course-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 6px; min-width: 0; }
+        .course-title { font-size: 14px; font-weight: 800; color: var(--text-title); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .course-stats { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+        .file-tag { font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 6px; white-space: nowrap;}
+        .file-tag.doc { background: rgba(59, 130, 246, 0.15); color: #2563EB; }
+        .file-tag.ppt { background: rgba(249, 115, 22, 0.15); color: #EA580C; }
+        .file-tag.tv { background: rgba(16, 185, 129, 0.15); color: #059669; }
+        .course-meta { font-size: 11px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .course-meta .dot { font-size: 12px; opacity: 0.5; }
 
-        /* 系统消息提示 */
-        .toast { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.75); color: white; padding: 12px 24px; border-radius: 12px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 500; backdrop-filter: blur(4px); font-weight: 600; text-align: center;}
+        /* --- 教师页表格与课表 --- */
+        .schedule-card { padding: 16px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; }
+        .schedule-item { display: flex; gap: 12px; align-items: flex-start; }
+        .schedule-time { display: flex; flex-direction: column; align-items: center; font-size: 12px; font-weight: 700; color: var(--text-secondary); width: 40px; flex-shrink: 0; line-height: 1.4;}
+        .schedule-time span.end { font-size: 10px; color: #9CA3AF; }
+        .schedule-content { flex: 1; background: var(--primary-light); border-left: 3px solid var(--primary-color); padding: 10px 12px; border-radius: 0 8px 8px 0; }
+        .schedule-content .sc-title { font-size: 14px; font-weight: 800; color: var(--primary-color); margin-bottom: 4px; }
+        .schedule-content .sc-loc { font-size: 11px; color: var(--text-secondary); font-weight: 600; }
+
+        .glass-table-wrapper {
+            background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 16px; overflow: hidden;
+            box-shadow: 0 8px 24px rgba(31, 95, 255, 0.05); margin-bottom: 24px; flex-shrink: 0;
+        }
+        .glass-table { width: 100%; border-collapse: collapse; }
+        .glass-table th { background: rgba(31, 95, 255, 0.05); padding: 12px; text-align: left; font-size: 13px; color: var(--text-secondary); font-weight: 700; border-bottom: 1px solid var(--border-line); }
+        .glass-table td { padding: 14px 12px; border-bottom: 1px solid var(--border-line); font-size: 14px; color: var(--text-main); line-height: 1.5;}
+        .glass-table tr:last-child td { border-bottom: none; }
+        .glass-table td:first-child { font-weight: 700; color: var(--text-title); vertical-align: top; width: 35%;}
+
+        .teacher-stats-top { display: flex; flex-direction: column; align-items: stretch; gap: 12px; margin-bottom: 16px; padding: 0 4px; flex-shrink: 0;}
+        .teacher-stat-text { font-size: 14px; font-weight: 800; color: var(--text-secondary); }
+        .teacher-alert-pill { background: rgba(255, 255, 255, 0.8); border: 1px solid var(--danger-light); padding: 6px 12px; border-radius: 12px; display: flex; gap: 16px; font-size: 13px; font-weight: 600; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.05); }
+        .alert-item { display: flex; align-items: center; gap: 4px; color: var(--text-main); }
+        .alert-item span { color: var(--danger-color); font-weight: 800; }
+
+        /* --- 我的页面专属 --- */
+        .profile-card { display: flex; align-items: center; gap: 16px; padding: 20px; margin-bottom: 24px; flex-shrink: 0;}
+        .avatar { width: 60px; height: 60px; border-radius: 20px; background: linear-gradient(135deg, var(--primary-light), var(--bg-end)); border: 2px solid white; display: flex; align-items: center; justify-content: center; color: var(--primary-color);}
+        .avatar svg { width: 32px; height: 32px; }
+        .profile-info { flex: 1; }
+        .profile-name { font-size: 20px; font-weight: 800; color: var(--text-title); margin-bottom: 4px; }
+        .profile-dept { font-size: 13px; font-weight: 600; color: var(--text-secondary); background: rgba(255,255,255,0.5); padding: 2px 8px; border-radius: 8px; display: inline-block;}
+
+        .settings-list { padding: 8px 0; flex-shrink: 0;}
+        .settings-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border-line); cursor: pointer; }
+        .settings-item:last-child { border-bottom: none; }
+        .settings-item:active { background: rgba(31, 95, 255, 0.05); }
+        .settings-left { display: flex; align-items: center; gap: 12px; font-size: 15px; font-weight: 600; color: var(--text-title); }
+        .settings-icon { color: var(--text-secondary); display: flex; align-items: center; justify-content: center;}
+        
+        .qr-section { display: flex; gap: 16px; margin-bottom: 24px; flex-shrink: 0;}
+        .qr-card { flex: 1; background: rgba(255,255,255,0.65); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.8); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; align-items: center; gap: 12px;}
+        .qr-box { width: 80px; height: 80px; background: white; border-radius: 12px; border: 1px dashed #CBD5E1; display: flex; align-items: center; justify-content: center; color: #9CA3AF; }
+        .qr-label { font-size: 13px; font-weight: 700; color: var(--text-main); }
+
+        .logout-btn {
+            width: 100%; padding: 14px; border-radius: 16px; background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.8); color: var(--danger-color); font-size: 15px; font-weight: 700;
+            cursor: pointer; margin-top: 24px; transition: 0.2s; flex-shrink: 0;
+        }
+        .logout-btn:active { transform: scale(0.98); background: var(--danger-light); }
+
+        /* 公告详情 */
+        .notice-header { margin-bottom: 20px; border-bottom: 1px dashed var(--border-line); padding-bottom: 20px; }
+        .notice-h1 { font-size: 22px; font-weight: 800; color: var(--text-title); line-height: 1.4; margin-bottom: 12px; }
+        .notice-meta { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+        .notice-body { font-size: 15px; color: var(--text-main); line-height: 1.8; }
+        .notice-body p { margin-bottom: 16px; text-align: justify; }
+        
+        /* 官方公章样式 */
+        .notice-seal {
+            width: 110px; height: 110px; border: 4px solid #EF4444; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; text-align: center;
+            color: #EF4444; font-size: 13px; font-weight: 800; letter-spacing: 2px; line-height: 1.4;
+            opacity: 0.85; transform: rotate(-15deg); margin-left: auto; margin-right: 20px;
+            margin-top: 10px; margin-bottom: 20px;
+            box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.3); position: relative;
+        }
+        .notice-seal::after {
+            content: '★'; position: absolute; top: 18px; font-size: 24px;
+        }
+        .notice-seal .seal-inner { margin-top: 18px; }
+        
+        .notice-footer-page { text-align: center; margin-top: 20px; padding-top: 20px; font-size: 13px; color: #9CA3AF; letter-spacing: 2px; }
+
+        /* --- 登录页专属样式 --- */
+        #page-login { justify-content: center; padding: 30px 24px; z-index: 300; background: linear-gradient(135deg, #F8FAFC 0%, var(--bg-end) 100%); }
+        .login-logo { width: 96px; height: 96px; background: rgba(255,255,255,0.85); border: 3px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 16px 40px rgba(31,95,255,0.15); margin: 0 auto 20px; color: var(--primary-color); backdrop-filter: blur(10px); }
+        .login-logo svg { width: 48px; height: 48px; }
+        .login-title { text-align: center; font-size: 24px; font-weight: 800; color: var(--text-title); margin-bottom: 50px; letter-spacing: 1px; text-shadow: 0 2px 10px rgba(255,255,255,0.5); }
+        .login-form .search-container { margin-bottom: 20px; }
+        .login-form .search-input { padding-top: 14px; padding-bottom: 14px; font-size: 15px; border-radius: 16px; background: rgba(255,255,255,0.7); }
+        .login-form .search-input:focus { background: rgba(255,255,255,0.95); }
+        .privacy-check-wrap { display: flex; align-items: center; justify-content: flex-end; gap: 8px; font-size: 13px; color: var(--text-secondary); margin-bottom: 30px; margin-top: -4px;}
+        .privacy-check-wrap input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--primary-color); cursor: pointer;}
+        .privacy-check-wrap a { color: var(--primary-color); text-decoration: none; font-weight: 700; cursor: pointer; }
+        
+        /* 校区下拉框 */
+        .campus-dropdown-wrap { position: relative; width: 100%; margin-bottom: 20px; z-index: 100; }
+        .campus-dropdown { position: absolute; top: 100%; left: 0; right: 0; margin-top: 8px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.9); border-radius: 16px; box-shadow: 0 10px 30px rgba(31, 95, 255, 0.1); opacity: 0; pointer-events: none; transform: translateY(-10px); transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); overflow: hidden; max-height: 250px; overflow-y: auto; }
+        .campus-dropdown.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+        .campus-option { padding: 14px 20px; font-size: 14px; font-weight: 600; color: var(--text-main); cursor: pointer; transition: background 0.2s; border-bottom: 1px solid var(--border-line); }
+        .campus-option:last-child { border-bottom: none; }
+        .campus-option:active { background: rgba(31, 95, 255, 0.08); }
+        .campus-option.selected { color: var(--primary-color); background: rgba(31, 95, 255, 0.05); font-weight: 800; }
+
+        /* ================= 音记校对的遗留样式 ================= */
+        .version-list-container { display: flex; flex-direction: column; gap: 16px; padding-bottom: 40px; }
+        .version-card { background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 20px; padding: 18px 20px; cursor: pointer; box-shadow: 0 8px 24px rgba(31, 95, 255, 0.05); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+        .version-card:active { transform: scale(0.97); background: rgba(255, 255, 255, 0.85); box-shadow: 0 4px 12px rgba(31, 95, 255, 0.08); }
+        .version-info { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+        .version-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+        .version-title { font-size: 17px; font-weight: 800; color: var(--text-title); line-height: 1.4; letter-spacing: 0.2px; }
+        .tag { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 700; letter-spacing: 0.3px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.7); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02); }
+        .tag-subject-english { background: var(--tag-eng-bg); color: var(--tag-eng-text); }
+        .tag-subject-chinese { background: var(--tag-chi-bg); color: var(--tag-chi-text); }
+        .tag-subject-math { background: var(--tag-math-bg); color: var(--tag-math-text); }
+        .tag-type { background: var(--tag-type-bg); color: var(--tag-type-text); }
+        .version-arrow-container { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: rgba(255, 255, 255, 0.5); color: var(--text-secondary); transition: all 0.2s ease; }
+        .version-card:active .version-arrow-container { background: rgba(31, 95, 255, 0.1); color: var(--primary-color); transform: translateX(4px); }
+        .field-list-container { display: flex; flex-direction: column; gap: 14px; padding: 12px 0 40px; }
+        .field-card { background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 18px; padding: 18px 20px; cursor: pointer; box-shadow: 0 6px 20px rgba(31, 95, 255, 0.04); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; justify-content: space-between; align-items: center; }
+        .field-card:active { transform: scale(0.97); background: rgba(255, 255, 255, 0.85); box-shadow: 0 4px 12px rgba(31, 95, 255, 0.08); }
+        .field-card-title { font-size: 16px; font-weight: 700; color: var(--text-title); letter-spacing: 0.2px; }
+        .stats-card { border-radius: 16px; padding: 14px 16px; display: flex; justify-content: space-between; margin-bottom: 12px; flex-shrink: 0; }
+        .stat-item { text-align: center; flex: 1; position: relative; }
+        .stat-item:not(:last-child)::after { content: ''; position: absolute; right: 0; top: 15%; height: 70%; width: 1px; background: rgba(0,0,0,0.06); }
+        .stat-value { font-size: 22px; font-weight: 800; margin-bottom: 2px; }
+        .stat-label { font-size: 11px; color: var(--text-secondary); font-weight: 600; }
+        .sticky-toolbar { position: sticky; top: -1px; z-index: 20; margin: 0 -20px 12px; padding: 10px 20px 12px; background: rgba(239, 246, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.5); display: flex; flex-direction: column; gap: 10px; }
+        
+        .toolbar-row-1 { display: flex; gap: 10px; align-items: center; }
+        .toolbar-row-1 .search-container { flex: 1; margin-bottom: 0; }
+        
+        .custom-filter-container { position: relative; width: 104px; flex-shrink: 0; z-index: 30; }
+        .custom-filter-trigger { height: 38px; background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(255, 255, 255, 0.9); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; font-size: 13px; font-weight: 700; color: var(--primary-color); cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.02); transition: all 0.2s; }
+        .custom-filter-trigger:active { background: rgba(255, 255, 255, 0.95); }
+        .custom-filter-trigger svg { width: 14px; height: 14px; transition: transform 0.3s; color: var(--primary-color);}
+        .custom-filter-trigger.open svg { transform: rotate(180deg); }
+        .custom-filter-dropdown { position: absolute; top: 100%; left: 0; right: 0; margin-top: 6px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.9); border-radius: 12px; box-shadow: 0 10px 24px rgba(31, 95, 255, 0.08); opacity: 0; pointer-events: none; transform: translateY(-10px); transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); overflow: hidden; }
+        .custom-filter-dropdown.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+        .filter-option { padding: 12px 14px; font-size: 13px; font-weight: 600; color: var(--text-title); cursor: pointer; transition: background 0.2s, color 0.2s; border-bottom: 1px solid var(--border-line); }
+        .filter-option:last-child { border-bottom: none; }
+        .filter-option:active { background: rgba(31, 95, 255, 0.1); }
+        .filter-option.selected { color: var(--primary-color); background: rgba(31, 95, 255, 0.05); }
+        .toolbar-row-2 { display: flex; justify-content: space-between; align-items: stretch; gap: 8px; }
+        .batch-pill { display: flex; align-items: center; flex: 1; background: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.9); border-radius: 12px; padding: 4px 6px 4px 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.03); min-width: 0; justify-content: space-between; }
+        .batch-pill-text { font-size: 12px; color: var(--text-secondary); font-weight: 600; margin-right: 2px; white-space: nowrap;}
+        .batch-pill-input { width: 28px; text-align: center; border: none; background: transparent; font-size: 14px; font-weight: 800; color: var(--text-title); outline: none; padding: 0;}
+        .batch-pill-btn { background: var(--primary-light); color: var(--primary-color); border: none; padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 2px; flex-shrink: 0; white-space: nowrap; }
+        .btn-action-primary { display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: var(--primary-color); color: #fff; border: none; padding: 0 14px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(31, 95, 255, 0.25); transition: transform 0.2s; white-space: nowrap; flex-shrink: 0; }
+        .btn-action-primary:active { transform: scale(0.95); }
+        .table-container { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.9); border-radius: 16px; box-shadow: 0 8px 24px rgba(31, 95, 255, 0.04); margin-bottom: 80px; display: flex; flex-direction: column; height: auto; flex-shrink: 0;}
+        .table-row { display: flex; align-items: stretch; border-bottom: 1px solid var(--border-line); transition: background 0.2s; scroll-margin-top: 140px; flex-shrink: 0; }
+        .table-row:last-child { border-bottom: none; }
+        .table-row.focused { background: rgba(31, 95, 255, 0.08); }
+        .row-index-col { width: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-right: 1px solid var(--border-line); flex-shrink: 0; padding: 12px 4px; gap: 6px; }
+        .row-index { font-size: 15px; font-weight: 800; color: var(--text-secondary); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+        .badge { display: inline-flex; padding: 2px 6px; border-radius: 6px; font-size: 10px; font-weight: 700; white-space: nowrap; text-align: center; }
+        .badge-success { background: var(--success-light); color: var(--success-color); }
+        .badge-warning { background: var(--warning-light); color: var(--warning-color); }
+        .row-content-col { flex: 1; display: flex; align-items: center; justify-content: space-between; padding: 16px 14px 16px 12px; min-width: 0; gap: 12px; }
+        .row-left-content { flex: 1; min-width: 0; line-height: 1.5; }
+        .row-text { font-size: 15px; font-weight: 500; color: var(--text-main); word-break: break-word; vertical-align: middle; }
+        .inline-speaker { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; border: none; outline: none; background: var(--primary-light); color: var(--primary-color); cursor: pointer; transition: all 0.2s; vertical-align: middle; margin-left: 6px; margin-top: -2px; flex-shrink: 0; }
+        .inline-speaker svg { width: 13px; height: 13px; fill: currentColor; }
+        .inline-speaker:disabled { background: transparent; color: #CBD5E1; cursor: not-allowed; }
+        .inline-speaker.playing-ai { background: var(--primary-color); color: white; animation: pulse-blue 1.5s infinite; }
+        .row-right-action { flex-shrink: 0; display: flex; align-items: center;}
+        .btn-record { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); background: linear-gradient(135deg, #FF4B4B 0%, #E11D48 100%); color: white; box-shadow: 0 4px 10px rgba(225, 29, 72, 0.25); user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+        .btn-record svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .btn-record.recording { background: #E11D48; transform: scale(1.15); box-shadow: 0 0 0 6px rgba(225, 29, 72, 0.15); }
+        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; text-align: center; color: var(--text-secondary); }
+        .empty-state svg { width: 64px; height: 64px; color: #CBD5E1; margin-bottom: 16px; }
+        .empty-state h3 { font-size: 16px; font-weight: 700; color: var(--text-title); margin-bottom: 8px; }
+        .empty-state p { font-size: 13px; line-height: 1.5; }
+        @keyframes pulse-blue { 0% { box-shadow: 0 0 0 0 rgba(31, 95, 255, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(31, 95, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(31, 95, 255, 0); } }
+        .floating-player { position: absolute; bottom: 30px; left: 20px; right: 20px; background: rgba(31, 95, 255, 0.95); backdrop-filter: blur(16px); border-radius: 20px; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 12px 32px rgba(31, 95, 255, 0.3); transform: translateY(150%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 250; }
+        .floating-player.show { transform: translateY(0); }
+        .fp-info { color: white; display: flex; flex-direction: column; gap: 4px; flex: 1; overflow: hidden; white-space: nowrap;}
+        .fp-title { font-size: 16px; font-weight: 700; text-overflow: ellipsis; overflow: hidden;}
+        .fp-subtitle { font-size: 12px; opacity: 0.8; }
+        .fp-controls { display: flex; align-items: center; gap: 12px; flex-shrink: 0;}
+        .fp-btn { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.2); color: white; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; transition: all 0.2s;}
+        .fp-btn:active { transform: scale(0.9); }
+        .fp-btn svg { width: 16px; height: 16px; fill: currentColor; stroke: currentColor;}
+        .fp-btn-close { width: 28px; height: 28px; background: transparent; padding:0; color: white;}
+        .toast { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.75); color: white; padding: 12px 24px; border-radius: 12px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 500; backdrop-filter: blur(4px); }
         .toast.show { opacity: 1; }
     </style>
 </head>
 <body>
 
 <div class="device-simulator">
+    
+    <!-- ================== 登录页面 ================== -->
+    <div id="page-login" class="page-view active">
+        <div class="login-logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+        </div>
+        <div class="login-title">校园综合管理系统</div>
+
+        <div class="login-form">
+            <div class="campus-dropdown-wrap" id="campusDropdownContainer">
+                <div class="search-container" onclick="toggleCampusDropdown(event)" style="cursor: pointer; margin-bottom: 0;">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><path d="M9 22v-4h6v4"></path><path d="M8 6h.01"></path><path d="M16 6h.01"></path><path d="M12 6h.01"></path><path d="M12 10h.01"></path><path d="M12 14h.01"></path><path d="M16 10h.01"></path><path d="M16 14h.01"></path><path d="M8 10h.01"></path><path d="M8 14h.01"></path></svg>
+                    <input type="text" id="campusInput" class="search-input" placeholder="请选择校区" readonly style="pointer-events: none; padding-right: 40px;">
+                    <svg id="campusArrow" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #9CA3AF; width: 18px; height: 18px; transition: transform 0.3s;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+                <div class="campus-dropdown" id="campusDropdown">
+                    <div class="campus-option" onclick="selectCampus('深圳奋达职业技术学校坪山校区', this, event)">深圳奋达职业技术学校坪山校区</div>
+                    <div class="campus-option" onclick="selectCampus('潮州市潮安职校', this, event)">潮州市潮安职校</div>
+                    <div class="campus-option" onclick="selectCampus('深圳市宝民技工学校', this, event)">深圳市宝民技工学校</div>
+                    <div class="campus-option" onclick="selectCampus('湖南东安全桥学校', this, event)">湖南东安全桥学校</div>
+                    <div class="campus-option" onclick="selectCampus('广州市理工职业技术学校', this, event)">广州市理工职业技术学校</div>
+                </div>
+            </div>
+
+            <div class="search-container">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <input type="text" id="usernameInput" class="search-input" placeholder="用户名" value="尹娣">
+            </div>
+
+            <div class="search-container">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                <input type="password" id="passwordInput" class="search-input" placeholder="密码">
+            </div>
+
+            <div class="privacy-check-wrap">
+                <input type="checkbox" id="privacyCheck">
+                <label for="privacyCheck">同意</label>
+                <a onclick="showToast('正在打开隐私协议')">隐私协议</a>
+            </div>
+
+            <button class="btn-action-primary" style="width: 100%; height: 48px; font-size: 16px; border-radius: 16px; box-shadow: 0 8px 20px rgba(31,95,255,0.25);" onclick="doLogin()">登 录</button>
+        </div>
+    </div>
+
     <!-- ================== 壳子：主包裹器 ================== -->
     <div class="wrapper-main">
         
         <!-- 1. 通告页面 -->
-        <div id="tab-notices" class="tab-view active">
+        <div id="tab-notices" class="tab-view">
             <div class="nav-bar main-nav">
                 <div class="nav-title">通告</div>
             </div>
@@ -173,12 +493,20 @@
                         </div>
                         <div class="card-desc"><span>校长办公室</span><span>2026-04-28</span></div>
                     </div>
+                    
                     <div class="list-card glass-card" onclick="viewNotice(this, 'page-notice-detail')">
                         <div class="card-row-between">
                             <div class="card-title">关于召开2026年春季学期全体教职工大会的通知</div>
                             <div class="badge-dot" id="dot-2"></div>
                         </div>
                         <div class="card-desc"><span>校务处</span><span>2026-04-25</span></div>
+                    </div>
+                    
+                    <div class="list-card glass-card" onclick="viewNotice(this, 'page-notice-detail')">
+                        <div class="card-row-between">
+                            <div class="card-title">校园网络设备升级停机维护公告</div>
+                        </div>
+                        <div class="card-desc"><span>信息中心</span><span>2026-04-12</span></div>
                     </div>
                 </div>
 
@@ -188,19 +516,212 @@
             </div>
         </div>
 
-        <!-- 4. 学校页面 (综合管理核心) -->
-        <div id="tab-school" class="tab-view">
-            <div class="nav-bar main-nav" style="padding-bottom:8px;">
-                <div class="nav-title">学校管理</div>
+        <!-- 2. 课件页面 -->
+        <div id="tab-courseware" class="tab-view">
+            <div class="nav-bar main-nav">
+                <div class="nav-title">课件</div>
             </div>
             <div class="main-content">
-                
-                <!-- 核心：角色视图切换器 -->
-                <div class="segmented-control" style="background:var(--bg-end); margin-bottom: 20px;">
-                    <div class="segment-btn active" id="role-teacher" onclick="switchRoleView('teacher')">招生老师视图</div>
-                    <div class="segment-btn" id="role-admin" onclick="switchRoleView('admin')">管理员视图</div>
+                <div class="search-bar-combo" id="course-combo-wrap">
+                    <div class="combo-dropdown" onclick="toggleCourseDrop(event)">
+                        <span id="course-combo-label">我的课件</span>
+                        <svg id="course-combo-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        <div class="combo-menu" id="course-combo-menu">
+                            <div class="combo-option selected" onclick="selectCourseCat('我的课件', this, event)">我的课件</div>
+                            <div class="combo-option" onclick="selectCourseCat('热门课件', this, event)">热门课件</div>
+                            <div class="combo-option" onclick="selectCourseCat('模范课件', this, event)">模范课件</div>
+                            <div class="combo-option" onclick="selectCourseCat('我班课件', this, event)">我班课件</div>
+                            <div class="combo-option" onclick="selectCourseCat('常用课件', this, event)">常用课件</div>
+                        </div>
+                    </div>
+                    <div class="combo-input-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" class="combo-input" placeholder="搜索教研课件...">
+                    </div>
                 </div>
 
+                <div class="course-card glass-card" onclick="showToast('查看课件详情')">
+                    <div class="course-cover-wrap">
+                        <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=200&q=80" alt="Cover" class="course-cover-img">
+                        <div class="course-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                    </div>
+                    <div class="course-info">
+                        <div class="course-title">2026年春季教师教学比武公开课现场录播</div>
+                        <div class="course-stats">
+                            <span class="file-tag doc">DOC 0</span>
+                            <span class="file-tag ppt">PPT 12</span>
+                            <span class="file-tag tv">TV 102</span>
+                        </div>
+                        <div class="course-meta">
+                            <span>教学比武</span><span class="dot">•</span><span>张雪峰</span><span class="dot">•</span><span>05-10</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card glass-card" onclick="showToast('查看课件详情')">
+                    <div class="course-cover-wrap">
+                        <img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&w=200&q=80" alt="Cover" class="course-cover-img">
+                        <div class="course-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                    </div>
+                    <div class="course-info">
+                        <div class="course-title">移动端界面设计规范与实战案例拆解</div>
+                        <div class="course-stats">
+                            <span class="file-tag doc">DOC 5</span>
+                            <span class="file-tag ppt">PPT 19</span>
+                            <span class="file-tag tv">TV 45</span>
+                        </div>
+                        <div class="course-meta">
+                            <span>UI设计</span><span class="dot">•</span><span>李华</span><span class="dot">•</span><span>05-08</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card glass-card" onclick="showToast('查看课件详情')">
+                    <div class="course-cover-wrap">
+                        <img src="https://images.unsplash.com/photo-1546410531-ee4cb12b22d5?auto=format&fit=crop&w=200&q=80" alt="Cover" class="course-cover-img">
+                        <div class="course-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                    </div>
+                    <div class="course-info">
+                        <div class="course-title">高一英语必修一 Unit1 核心词汇精讲与句型</div>
+                        <div class="course-stats">
+                            <span class="file-tag doc">DOC 18</span>
+                            <span class="file-tag ppt">PPT 2</span>
+                            <span class="file-tag tv">TV 8</span>
+                        </div>
+                        <div class="course-meta">
+                            <span>英语</span><span class="dot">•</span><span>尹娣</span><span class="dot">•</span><span>05-01</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card glass-card" onclick="showToast('查看课件详情')">
+                    <div class="course-cover-wrap">
+                        <img src="https://images.unsplash.com/photo-1572044162444-ad60f128bdea?auto=format&fit=crop&w=200&q=80" alt="Cover" class="course-cover-img">
+                        <div class="course-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                    </div>
+                    <div class="course-info">
+                        <div class="course-title">Photoshop基础操作与高级图像处理技巧</div>
+                        <div class="course-stats">
+                            <span class="file-tag doc">DOC 2</span>
+                            <span class="file-tag ppt">PPT 8</span>
+                            <span class="file-tag tv">TV 236</span>
+                        </div>
+                        <div class="course-meta">
+                            <span>PS专栏</span><span class="dot">•</span><span>王刚</span><span class="dot">•</span><span>04-20</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 教师页面 -->
+        <div id="tab-teacher" class="tab-view active">
+            <div class="nav-bar main-nav">
+                <div class="nav-title">教师</div>
+            </div>
+            <div class="main-content">
+                <div class="section-title" style="margin-top: 0;">今日排班 & 课表</div>
+                <div class="teacher-stats-top" style="margin-bottom: 8px;">
+                    <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                        <div class="teacher-stat-text">个人排班：暂无巡查、暂时无课</div>
+                    </div>
+                    <div class="teacher-alert-pill" style="width: 100%;">
+                        <div class="alert-item">未点名 <span>2</span></div>
+                        <div class="alert-item">未设课件 <span>1</span></div>
+                    </div>
+                </div>
+
+                <div class="schedule-card glass-card">
+                    <div class="schedule-item">
+                        <div class="schedule-time">
+                            <span>08:00</span>
+                            <span class="end">08:45</span>
+                        </div>
+                        <div class="schedule-content">
+                            <div class="sc-title">高一(3)班 英语</div>
+                            <div class="sc-loc">教学楼 A栋 301室</div>
+                        </div>
+                    </div>
+                    <div class="schedule-item">
+                        <div class="schedule-time">
+                            <span>09:00</span>
+                            <span class="end">09:45</span>
+                        </div>
+                        <div class="schedule-content" style="background: rgba(245, 158, 11, 0.1); border-left-color: var(--warning-color);">
+                            <div class="sc-title" style="color: var(--warning-color);">高一(4)班 英语</div>
+                            <div class="sc-loc">教学楼 A栋 302室</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-card grid-menu" style="margin-bottom: 24px;">
+                    <div class="grid-item">
+                        <div class="grid-icon-wrap" style="background: var(--icon-bg-blue); color: var(--icon-color-blue);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
+                        <div class="grid-label">我的课时</div>
+                    </div>
+                    <div class="grid-item">
+                        <div class="grid-icon-wrap" style="background: var(--icon-bg-orange); color: var(--icon-color-orange);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></div>
+                        <div class="grid-label">我的评分</div>
+                    </div>
+                    <div class="grid-item">
+                        <div class="grid-icon-wrap" style="background: var(--icon-bg-teal); color: var(--icon-color-teal);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg></div>
+                        <div class="grid-label">我的报修</div>
+                    </div>
+                    <div class="grid-item">
+                        <div class="grid-icon-wrap" style="background: var(--icon-bg-purple); color: var(--icon-color-purple);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
+                        <div class="grid-label">学生搜索</div>
+                    </div>
+                    <div class="grid-item">
+                        <div class="grid-icon-wrap" style="background: var(--icon-bg-pink); color: var(--icon-color-pink);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div>
+                        <div class="grid-label">教师请假</div>
+                    </div>
+                    <div class="grid-item">
+                        <div class="grid-icon-wrap" style="background: var(--icon-bg-blue); color: var(--icon-color-blue);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></div>
+                        <div class="grid-label">作业管理</div>
+                    </div>
+                    <div class="grid-item" onclick="openSubPage('page-versions')">
+                        <div class="grid-icon-wrap" style="background: var(--primary-color); color: white; border:none; box-shadow: 0 4px 12px rgba(31, 95, 255, 0.3);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg></div>
+                        <div class="grid-label" style="color: var(--primary-color); font-weight: 800;">音记校对</div>
+                    </div>
+                </div>
+
+                <div class="section-title">部门工作列表</div>
+                <div class="glass-table-wrapper">
+                    <table class="glass-table">
+                        <thead>
+                            <tr>
+                                <th>区域/模块</th>
+                                <th>功能说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>常规工作</td>
+                                <td>
+                                    完成高一年级期中考卷阅卷及分数录入<br>
+                                    <span style="display:inline-block; margin-top:4px; font-size:12px; color:var(--warning-color); font-weight:600;">状态：进行中</span><br>
+                                    <button class="btn-action-primary" style="margin-top:10px; padding:6px 12px; font-size:12px;" onclick="showToast('提交工作总结')">提交工作总结</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>重点工作</td>
+                                <td>
+                                    组织校园春季运动会前期场地规划<br>
+                                    <span style="display:inline-block; margin-top:4px; font-size:12px; color:var(--text-secondary); font-weight:600;">状态：已取消</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. 学校页面 -->
+        <div id="tab-school" class="tab-view">
+            <div class="nav-bar main-nav">
+                <div class="nav-title">学校</div>
+            </div>
+            <div class="main-content">
                 <div class="search-container">
                     <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     <input type="text" class="search-input" placeholder="全局搜索校内功能...">
@@ -209,56 +730,159 @@
                 <div class="glass-card" style="margin-bottom: 16px;">
                     <div style="padding: 12px 16px 0; font-size: 15px; font-weight: 800; color: var(--text-title); display:flex; justify-content:space-between; align-items:center;">
                         常用功能
-                        <span style="font-size:12px; font-weight:600; color:var(--primary-color); cursor:pointer;" onclick="showToast('进入功能配置模式')">管理</span>
+                        <span style="font-size:12px; font-weight:600; color:var(--primary-color); cursor:pointer;" onclick="showToast('进入功能编辑模式')">管理</span>
                     </div>
                     <div class="grid-menu" style="padding-top:12px;" id="school-grid-common"></div>
+                </div>
+
+                <div class="glass-card" style="margin-bottom: 16px;">
+                    <div style="padding: 12px 16px 0; font-size: 15px; font-weight: 800; color: var(--text-title);">办公</div>
+                    <div class="grid-menu" style="padding-top:12px;" id="school-grid-1"></div>
+                </div>
+
+                <div class="glass-card" style="margin-bottom: 16px;">
+                    <div style="padding: 12px 16px 0; font-size: 15px; font-weight: 800; color: var(--text-title);">学生管理</div>
+                    <div class="grid-menu" style="padding-top:12px;" id="school-grid-2"></div>
+                </div>
+
+                <div class="glass-card" style="margin-bottom: 16px;">
+                    <div style="padding: 12px 16px 0; font-size: 15px; font-weight: 800; color: var(--text-title);">双百分考核</div>
+                    <div class="grid-menu" style="padding-top:12px;" id="school-grid-3"></div>
+                </div>
+
+                <div class="glass-card" style="margin-bottom: 16px;">
+                    <div style="padding: 12px 16px 0; font-size: 15px; font-weight: 800; color: var(--text-title);">教务管理</div>
+                    <div class="grid-menu" style="padding-top:12px;" id="school-grid-4"></div>
                 </div>
 
                 <div class="glass-card" style="margin-bottom: 16px;">
                     <div style="padding: 12px 16px 0; font-size: 15px; font-weight: 800; color: var(--text-title);">招生管理</div>
                     <div class="grid-menu" style="padding-top:12px;" id="school-grid-5"></div>
                 </div>
+            </div>
+        </div>
 
-                <!-- 以下模块在【招生老师视图】下会被自动隐藏 -->
-                <div id="admin-only-modules" style="display:none;">
-                    <div class="glass-card" style="margin-bottom: 16px;">
-                        <div style="padding: 12px 16px 0; font-size: 15px; font-weight: 800; color: var(--text-title);">办公</div>
-                        <div class="grid-menu" style="padding-top:12px;" id="school-grid-1"></div>
+        <!-- 5. 我的页面 -->
+        <div id="tab-mine" class="tab-view">
+            <div class="nav-bar main-nav">
+                <div class="nav-title">我的</div>
+            </div>
+            <div class="main-content">
+                <div class="profile-card glass-card">
+                    <div class="avatar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                     </div>
-                    <div class="glass-card" style="margin-bottom: 16px;">
-                        <div style="padding: 12px 16px 0; font-size: 15px; font-weight: 800; color: var(--text-title);">学生管理</div>
-                        <div class="grid-menu" style="padding-top:12px;" id="school-grid-2"></div>
-                    </div>
-                    <div class="glass-card" style="margin-bottom: 16px;">
-                        <div style="padding: 12px 16px 0; font-size: 15px; font-weight: 800; color: var(--text-title);">双百分考核</div>
-                        <div class="grid-menu" style="padding-top:12px;" id="school-grid-3"></div>
-                    </div>
-                    <div class="glass-card" style="margin-bottom: 16px;">
-                        <div style="padding: 12px 16px 0; font-size: 15px; font-weight: 800; color: var(--text-title);">教务管理</div>
-                        <div class="grid-menu" style="padding-top:12px;" id="school-grid-4"></div>
+                    <div class="profile-info">
+                        <div class="profile-name">尹娣</div>
+                        <div class="profile-dept">总务处</div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- 底部全局导航栏 -->
-        <div class="tab-bar">
-            <div class="tab-item active" onclick="switchTab('tab-notices', this)">
-                <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></div>
-                <div class="tab-label">通告</div>
+                <div class="section-title" style="margin-top:0;">系统功能</div>
+                <div class="glass-card settings-list">
+                    <div class="settings-item" onclick="showToast('吐槽专区建设中')">
+                        <div class="settings-left">
+                            <svg class="settings-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                            吐槽专区
+                        </div>
+                        <div class="settings-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+                    </div>
+                    <div class="settings-item" onclick="showToast('已是最新版本')">
+                        <div class="settings-left">
+                            <svg class="settings-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M3 22v-6h6"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path></svg>
+                            版本更新
+                        </div>
+                        <div style="font-size:13px; color:var(--text-secondary); font-weight:700;">v2.3.11</div>
+                    </div>
+                    <div class="settings-item" onclick="showToast('关于校园管理系统')">
+                        <div class="settings-left">
+                            <svg class="settings-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                            关于
+                        </div>
+                        <div class="settings-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+                    </div>
+                </div>
+
+                <div class="section-title">APP 下载入口</div>
+                <div class="qr-section">
+                    <div class="qr-card">
+                        <div class="qr-box"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><rect x="7" y="7" width="3" height="3"></rect><rect x="14" y="7" width="3" height="3"></rect><rect x="7" y="14" width="3" height="3"></rect><rect x="14" y="14" width="3" height="3"></rect></svg></div>
+                        <span class="qr-label">教师端APP</span>
+                    </div>
+                    <div class="qr-card">
+                        <div class="qr-box"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><rect x="7" y="7" width="3" height="3"></rect><rect x="14" y="7" width="3" height="3"></rect><rect x="7" y="14" width="3" height="3"></rect><rect x="14" y="14" width="3" height="3"></rect></svg></div>
+                        <span class="qr-label">学生端APP</span>
+                    </div>
+                </div>
+
+                <div class="glass-card" style="padding: 16px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                <div style="font-size: 14px; font-weight: 700; color: var(--text-title);">平台登录外网地址</div>
+                <div style="font-size: 12px; color: var(--text-secondary); user-select: all;">http://120.196.125.38:6778/kc_sms</div>
             </div>
-            <!-- 省略了课件、教师、我的 的HTML结构，以聚焦在核心学校管理业务上，保持代码清爽可运行 -->
-            <div class="tab-item" onclick="switchTab('tab-school', this)">
-                <div class="tab-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
-                <div class="tab-label">学校</div>
-            </div>
+
+            <button class="logout-btn" onclick="doLogout()">退出登录账号</button>
         </div>
     </div>
+
+    <!-- 底部全局导航栏 -->
+    <div class="tab-bar">
+        <div class="tab-item active" onclick="switchTab('tab-notices', this)">
+            <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></div>
+            <div class="tab-label">通告</div>
+        </div>
+        <div class="tab-item" onclick="switchTab('tab-courseware', this)">
+            <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></div>
+            <div class="tab-label">课件</div>
+        </div>
+        <div class="tab-item" onclick="switchTab('tab-teacher', this)">
+            <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg></div>
+            <div class="tab-label">教师</div>
+        </div>
+        <div class="tab-item" onclick="switchTab('tab-school', this)">
+            <div class="tab-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
+            <div class="tab-label">学校</div>
+        </div>
+        <div class="tab-item" onclick="switchTab('tab-mine', this)">
+            <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
+            <div class="tab-label">我的</div>
+        </div>
+    </div>
+</div>
 
 
     <!-- ================== 子页面集群 ================== -->
 
-    <!-- SUB PAGE: 招生管理高度拟真动态工作台 -->
+    <!-- SUB PAGE: 公告详情页 -->
+    <div id="page-notice-detail" class="page-view sub-page hidden-right">
+        <div class="nav-bar">
+            <div class="icon-btn" style="margin-left: -8px;" onclick="closeSubPage('page-notice-detail')">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </div>
+            <div class="nav-title-group"><div class="nav-title">公告详情</div></div>
+            <div class="icon-btn"></div>
+        </div>
+        <div class="main-content glass-card" style="margin: 0 20px 20px; padding: 20px; border-radius: 20px;">
+            <div class="notice-header">
+                <div class="notice-h1">五一劳动节放假安排及安全注意事项须知</div>
+                <div class="notice-meta">
+                    <span>发布部门：校长办公室</span>
+                    <span>发布时间：2026-04-28</span>
+                </div>
+            </div>
+            <div class="notice-body">
+                <p>各职能部门、全体师生：</p>
+                <p>根据《国务院办公厅关于2026年部分节假日安排的通知》精神，结合我校实际情况，现将五一劳动节放假安排及相关安全注意事项通知如下：</p>
+                <p><strong>一、放假时间</strong><br>2026年5月1日（星期五）至5月5日（星期二）放假调休，共5天。4月26日（星期日）、5月9日（星期六）照常上班上课。</p>
+                <p><strong>二、安全注意事项</strong><br>1. 假前安全检查：各部门须在节前进行全面安全排查，切断非必要电源，锁好门窗。<br>2. 师生出行安全：放假期间外出游玩需注意交通及人身财产安全，尽量避免前往人员密集场所。<br>3. 留校学生管理：各班主任需准确统计留校学生名单，总务处需做好留校期间的后勤保障工作。</p>
+                <p>祝全体师生度过一个平安、愉快的假期！</p>
+                <div class="notice-seal"><div class="seal-inner">实验中学<br>校长办公室</div></div>
+            </div>
+            <div class="notice-footer-page">- 1 -</div>
+        </div>
+    </div>
+
+    <!-- SUB PAGE: 招生管理动态工作台（模拟真实使用场景） -->
     <div id="page-enrollment-sub" class="page-view sub-page hidden-right">
         <div class="nav-bar">
             <div class="icon-btn" style="margin-left: -8px;" onclick="closeSubPage('page-enrollment-sub')">
@@ -267,29 +891,150 @@
             <div class="nav-title-group"><div class="nav-title" id="enrollment-sub-title">业务加载中</div></div>
             <div class="icon-btn"></div>
         </div>
-        
         <div class="main-content">
-            <!-- 优化点：全生命周期全局学期切换器 -->
-            <div class="global-semester-bar">
-                <span style="font-size:13px; font-weight:800; color:var(--text-title); flex-shrink:0;">数据视图：</span>
-                <div style="position:relative; display:flex; align-items:center; flex:1; margin-left: 12px;">
-                    <select class="semester-select">
-                        <option>2026年秋季学期 (当前)</option>
-                        <option>2026年春季学期</option>
-                        <option>2025年秋季学期</option>
-                    </select>
-                    <svg style="position:absolute; right:0; width:16px; height:16px; color:var(--primary-color); pointer-events:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </div>
+            <div class="search-container">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" class="search-input" placeholder="检索当前业务数据...">
             </div>
-
-            <!-- 动态生成的业务区域 -->
-            <div id="enrollment-dynamic-header"></div>
+            <!-- 动态生成的横向 Tab 导航 -->
             <div class="pill-scroll" id="enrollment-sub-tabs"></div>
-            <div id="enrollment-sub-data" style="display:flex; flex-direction:column;"></div>
+            <!-- 动态生成的工作台数据卡片区 -->
+            <div id="enrollment-sub-data"></div>
         </div>
     </div>
 
-    <!-- 通用提示框 -->
+    <!-- ============================================================== -->
+    <!-- 下方为原“音记校对”的三个页面，已作为子页面完美接入 -->
+    <!-- ============================================================== -->
+
+    <!-- AUDIO PAGE 1: 版本选择 -->
+    <div id="page-versions" class="page-view sub-page hidden-right">
+        <div class="nav-bar">
+            <div class="icon-btn" style="margin-left: -8px;" onclick="closeSubPage('page-versions')">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </div>
+            <div class="nav-title-group">
+                <div class="nav-title" id="version-nav-title">选择音记版本</div>
+            </div>
+            <div class="icon-btn"></div>
+        </div>
+        
+        <div class="main-content">
+            <div class="version-list-container" id="versionList" style="padding-top: 10px;">
+                <!-- 由 JS 渲染卡片式列表 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- AUDIO PAGE 2: 动态字段选择 -->
+    <div id="page-fields" class="page-view sub-page hidden-right">
+        <div class="nav-bar">
+            <div class="icon-btn" style="margin-left: -8px;" onclick="goBackToVersions()">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </div>
+            <div class="nav-title-group">
+                <div class="nav-title">选择字段</div>
+            </div>
+            <div class="icon-btn"></div>
+        </div>
+        
+        <div class="main-content">
+            <div class="field-list-container" id="fieldListContainer"></div>
+        </div>
+    </div>
+
+    <!-- AUDIO PAGE 3: 录音工作台 -->
+    <div id="page-workspace" class="page-view sub-page hidden-right">
+        <div class="nav-bar">
+            <div class="icon-btn" onclick="goBackToFields()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </div>
+            <div class="nav-title-group">
+                <div class="nav-title" id="ws-nav-title">音记校对</div>
+            </div>
+            <div class="icon-btn"></div>
+        </div>
+
+        <div class="main-content">
+            <div class="stats-card glass-card">
+                <div class="stat-item">
+                    <div class="stat-value" style="color: var(--text-title);" id="stat-total">0</div>
+                    <div class="stat-label">总项数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" style="color: var(--success-color);" id="stat-recorded">0</div>
+                    <div class="stat-label">已录音</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" style="color: var(--warning-color);" id="stat-unrecorded">0</div>
+                    <div class="stat-label">未录音</div>
+                </div>
+            </div>
+
+            <div class="sticky-toolbar">
+                <div class="toolbar-row-1">
+                    <div class="custom-filter-container" id="filterContainer">
+                        <div class="custom-filter-trigger" id="filterTrigger" onclick="toggleCustomFilter(event)">
+                            <span id="filterLabel">未录音</span>
+                            <svg class="filter-icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="custom-filter-dropdown" id="filterDropdown">
+                            <div class="filter-option" onclick="selectFilter('全部', event)">全部</div>
+                            <div class="filter-option selected" id="opt-unrecorded" onclick="selectFilter('未录音', event)">未录音</div>
+                            <div class="filter-option" onclick="selectFilter('已录音', event)">已录音</div>
+                            <div class="filter-option" onclick="selectFilter('需重录', event)">需重录</div>
+                        </div>
+                    </div>
+                    
+                    <div class="search-container">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" id="searchInput" class="search-input" placeholder="输入关键字搜索..." oninput="handleSearch()">
+                    </div>
+                </div>
+
+                <div class="toolbar-row-2">
+                    <div class="batch-pill">
+                        <span class="batch-pill-text">提取</span>
+                        <input type="number" id="batchSizeInput" class="batch-pill-input" value="10" min="1" max="100">
+                        <span class="batch-pill-text">项</span>
+                        <button class="batch-pill-btn" onclick="fetchNextBatch()">
+                            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                            换一批
+                        </button>
+                    </div>
+                    <button class="btn-action-primary" onclick="startAutoPlay()">
+                        <svg class="icon-sm" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                        连播 <span id="listCountStr" style="font-weight:500; opacity:0.9; margin-left:2px;">(1-10)</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-container" id="wordListContainer"></div>
+            
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <h3>无匹配数据</h3>
+                <p>当前筛选条件下暂无需要校对的词汇</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部连播浮窗 -->
+    <div class="floating-player" id="floatingPlayer">
+        <div class="fp-info">
+            <div class="fp-title" id="fpTitle">Apple</div>
+            <div class="fp-subtitle" id="fpSubtitle">自动连播中...</div>
+        </div>
+        <div class="fp-controls">
+            <button class="fp-btn" id="fpPauseBtn" onclick="togglePauseAutoPlay()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+            </button>
+            <button class="fp-btn fp-btn-close" onclick="closeAutoPlay()">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+    </div>
+
     <div class="toast" id="sys-toast"></div>
 </div>
 
@@ -297,21 +1042,93 @@
     // ================= 统一启动入口与全局数据挂载 =================
     window.onload = function() {
         initSchoolGrids(); // 批量渲染学校首页的所有版块
-        
-        // 渲染制度列表
-        const rules = [
-            '教职工仪容仪表规定', '学校人员招聘管理制度及流程', '会议室使用管理制度', '会议室使用登记表',
-            '教职工考勤制度', '教职工考核制度', '学校消防安全管理制度', '学生请假制度',
-            '学生违纪违规处理意见', '学生重大违纪处罚条例'
-        ];
-        document.getElementById('rule-content-wrapper').innerHTML = rules.map((label, i) => {
-            return `<div class="glass-card" onclick="showToast('查看制度详情')" style="padding: 16px 20px; cursor:pointer;">
-                        <div style="font-size:15px; font-weight:600; color:var(--text-title);">
-                            <span style="color:var(--primary-color); font-weight:800; margin-right:8px; display:inline-block; min-width: 18px;">${i+1}.</span>${label}
-                        </div>
-                    </div>`;
-        }).join('');
+        renderVersions();  // 渲染音记校对内容
     };
+
+    // ================= 登录页逻辑 =================
+    function toggleCampusDropdown(e) {
+        if(e) e.stopPropagation();
+        const dropdown = document.getElementById('campusDropdown');
+        const arrow = document.getElementById('campusArrow');
+        dropdown.classList.toggle('show');
+        if (dropdown.classList.contains('show')) {
+            arrow.style.transform = 'translateY(-50%) rotate(180deg)';
+        } else {
+            arrow.style.transform = 'translateY(-50%) rotate(0deg)';
+        }
+    }
+
+    function selectCampus(name, el, e) {
+        if(e) e.stopPropagation();
+        document.getElementById('campusInput').value = name;
+        document.querySelectorAll('.campus-option').forEach(opt => opt.classList.remove('selected'));
+        if(el) el.classList.add('selected');
+        const dropdown = document.getElementById('campusDropdown');
+        const arrow = document.getElementById('campusArrow');
+        dropdown.classList.remove('show');
+        arrow.style.transform = 'translateY(-50%) rotate(0deg)';
+    }
+    
+    function doLogin() {
+        const campus = document.getElementById('campusInput').value;
+        const user = document.getElementById('usernameInput').value;
+        const pass = document.getElementById('passwordInput').value;
+        const privacy = document.getElementById('privacyCheck').checked;
+
+        if(!campus) return showToast('请选择校区');
+        if(!user) return showToast('请输入用户名');
+        if(!pass) return showToast('请输入密码');
+        if(!privacy) return showToast('请阅读并同意隐私协议');
+
+        showToast('登录成功');
+        setTimeout(() => {
+            document.getElementById('page-login').classList.replace('active', 'hidden-left');
+            const tabs = document.querySelectorAll('.tab-item');
+            if (tabs.length > 0) tabs[0].click();
+        }, 600);
+    }
+
+    function doLogout() {
+        document.getElementById('passwordInput').value = '';
+        document.getElementById('privacyCheck').checked = false;
+        document.getElementById('page-login').classList.replace('hidden-left', 'active');
+        showToast('已退出登录');
+    }
+
+    // ================= 全局下拉框及事件点击关闭处理 =================
+    document.addEventListener('click', function(event) {
+        const safeCloseDropdown = (containerId, dropdownId, arrowId) => {
+            const container = document.getElementById(containerId);
+            const dropdown = document.getElementById(dropdownId);
+            const arrow = document.getElementById(arrowId);
+            if (container && !container.contains(event.target) && dropdown && dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+                if (arrow) arrow.style.transform = arrowId === 'campusArrow' ? 'translateY(-50%) rotate(0deg)' : 'rotate(0)';
+            }
+        };
+        safeCloseDropdown('campusDropdownContainer', 'campusDropdown', 'campusArrow');
+        safeCloseDropdown('course-combo-wrap', 'course-combo-menu', 'course-combo-arrow');
+        safeCloseDropdown('filterContainer', 'filterDropdown', 'filterTrigger');
+    });
+
+    // ================= 课件页下拉筛选控制 =================
+    function toggleCourseDrop(e) {
+        if(e) e.stopPropagation();
+        const menu = document.getElementById('course-combo-menu');
+        const arrow = document.getElementById('course-combo-arrow');
+        menu.classList.toggle('show');
+        arrow.style.transform = menu.classList.contains('show') ? 'rotate(180deg)' : 'rotate(0)';
+    }
+
+    function selectCourseCat(label, el, e) {
+        if(e) e.stopPropagation();
+        document.getElementById('course-combo-label').innerText = label;
+        document.querySelectorAll('.combo-option').forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+        document.getElementById('course-combo-menu').classList.remove('show');
+        document.getElementById('course-combo-arrow').style.transform = 'rotate(0)';
+        showToast('已筛选分类：' + label);
+    }
 
     // ================= 主架构壳子逻辑 =================
     function switchTab(tabId, el) {
@@ -335,25 +1152,10 @@
         }
     }
 
-    function switchRoleView(role) {
-        document.getElementById('role-teacher').classList.remove('active');
-        document.getElementById('role-admin').classList.remove('active');
-        document.getElementById('role-' + role).classList.add('active');
-        
-        const adminModules = document.getElementById('admin-only-modules');
-        if(role === 'admin') {
-            adminModules.style.display = 'block';
-            showToast('已切换至管理员视角，展示全部教务及后勤配置模块');
-        } else {
-            adminModules.style.display = 'none';
-            showToast('已切换至招生老师视角，聚焦核心高频业务');
-        }
-    }
-
     function viewNotice(el, pageId) {
         let dot = el.querySelector('.badge-dot');
         if (dot) dot.style.display = 'none';
-        showToast('打开公告详情页');
+        openSubPage(pageId);
     }
 
     function openSubPage(pageId) {
@@ -370,17 +1172,33 @@
         setTimeout(() => toast.classList.remove('show'), duration);
     }
 
-    // ================= 学校管理首页网格注入 =================
+    // ================= 学校管理首页网格与底层数据注入 =================
     function renderGridItems(items, startIndexOffset, actionType = 'toast') {
         const massiveIcons = [
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>', 
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>', 
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>', 
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>', 
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>', 
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>', 
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>', 
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>', 
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>', 
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>', 
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>', 
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>', 
-            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>'
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>', 
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>', 
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>', 
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>', 
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>', 
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>', 
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>', 
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>', 
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>', 
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg>', 
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>', 
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>'
         ];
         const colors = [
             {bg: 'var(--icon-bg-blue)', color: 'var(--icon-color-blue)'},
@@ -394,6 +1212,7 @@
             let index = i + startIndexOffset;
             let icon = massiveIcons[(index * 7) % massiveIcons.length]; 
             let color = colors[index % colors.length];
+            // 路由策略：如果是招生管理子集，则进入二级真实页面
             let onClickAction = actionType === 'enrollment' ? `openEnrollmentSub('${label}')` : `showToast('${label}')`;
 
             return `<div class="grid-item" onclick="${onClickAction}">
@@ -405,271 +1224,203 @@
 
     function initSchoolGrids() {
         let commonHtml = renderGridItems(['课表查询','审批管理','工作汇报','学生假条'], 0);
-        commonHtml += `<div class="grid-item" onclick="showToast('进入功能配置模式')">
+        commonHtml += `<div class="grid-item" onclick="showToast('添加常用功能')">
                         <div class="grid-icon-wrap" style="background: rgba(0,0,0,0.03); color: #9CA3AF; border-style: dashed;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></div>
                         <div class="grid-label">添加</div>
                     </div>`;
         document.getElementById('school-grid-common').innerHTML = commonHtml;
-        document.getElementById('school-grid-1').innerHTML = renderGridItems(['添加汇报','通讯录','执勤安排','校园执勤','教师考核','审批假条','会议管理','需求管理'], 0);
-        document.getElementById('school-grid-2').innerHTML = renderGridItems(['留宿查看','班主任考核','宿舍排名','出操排名','实时统计','宿舍信息','学生假条','点到安排'], 1);
-        document.getElementById('school-grid-3').innerHTML = renderGridItems(['班级违纪','班级奖励','学生违纪','学生奖励','考核排名'], 2);
-        document.getElementById('school-grid-4').innerHTML = renderGridItems(['班级课时','评教查看','教师汇总','综合课表','课堂统计','评分统计','特长班','班级信息','期末成绩'], 3);
-        // 核心：招生配置一级菜单
+        document.getElementById('school-grid-1').innerHTML = renderGridItems(['添加汇报','工作汇报','通讯录','执勤安排','校园执勤','教师考核','考核统计','故障查看','审批假条','部门职能','部门工作','会议管理','会议查看','需求管理','需求提报'], 0);
+        document.getElementById('school-grid-2').innerHTML = renderGridItems(['留宿查看','班主任考核统计','班主任考核','宿舍排名','教官管理','出操排名','留宿点名','实时统计','回家统计','返校统计','在校人数','两会管理','宿舍信息','行为统计','指标统计','学生假条','点到安排'], 1);
+        document.getElementById('school-grid-3').innerHTML = renderGridItems(['班级处理','班级违纪','班级奖励','学生违纪','学生奖励','考核排名'], 2);
+        document.getElementById('school-grid-4').innerHTML = renderGridItems(['班级课时统计','报考审计','评教查看','教师汇总','课程安排','综合课表','课时操作','日志统计','课堂统计','评分统计','上课统计','特长班','班级信息','班级就业','学生就业','历史班级','特长成绩','期末成绩','专业信息','评教项管理','评教安排'], 3);
+        // 招生管理指向二级页面
         document.getElementById('school-grid-5').innerHTML = renderGridItems(['招生配置', '线索管理', '跟进到访', '报名录取', '报到交接', '生源学校', '归档审计'], 4, 'enrollment');
     }
 
-    // ================= 招生管理：高度拟真的动态二级工作台 =================
-    // 复用 SVG 图标片段
-    const svgLog = `<svg class="icon-log-btn" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" onclick="event.stopPropagation();showToast('查看全生命周期日志')"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
-    const svgCopy = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
-
-    const enrollmentSubDataConfig = {
+    // ================= 招生管理：高度拟真的动态二级工作台 (深度还原业务逻辑) =================
+    const enrollmentSubData = {
         '招生配置': {
             tabs: ['招生学期', '招生人员'],
-            header: '',
             renderMockData: () => `
                 <div class="list-card glass-card">
                     <div class="card-row-between">
-                        <div class="card-title">2026年秋季招生计划执行大盘</div>
-                        <div class="badge-tag tag-success">数据收集中</div>
+                        <div class="card-title">2026年秋季招生计划指标</div>
+                        <div class="badge-outline success">招生中</div>
                     </div>
-                    <div class="card-desc"><span>系统自动绑定于：26年秋季学期</span></div>
-                    
-                    <div style="font-size:12px; color:var(--text-main); margin-top:8px; display:flex; flex-direction:column; gap:8px;">
-                        <div style="background:white; padding:10px 12px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.02);">
-                            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-                                <span style="font-weight:700;">专业分班剩余配额</span><span style="color:var(--primary-color); font-weight:800;">540 / 1200人</span>
-                            </div>
-                            <div style="width:100%; height:6px; background:rgba(0,0,0,0.05); border-radius:3px; overflow:hidden;">
-                                <div style="width:45%; height:100%; background:var(--primary-color); border-radius:3px;"></div>
-                            </div>
+                    <div class="card-desc"><span>招生学期绑定: 26年秋季</span><span>状态: 核心配置完成</span></div>
+                    <div style="font-size:12px; color:var(--text-main); margin-top:8px; display:flex; flex-direction:column; gap:6px;">
+                        <div style="display:flex; justify-content:space-between; background:rgba(0,0,0,0.02); padding:6px 8px; border-radius:6px;">
+                            <span>专业计划</span><span style="font-weight:700;">8个专业已开设</span>
                         </div>
-                        <div style="background:white; padding:10px 12px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.02);">
-                            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-                                <span style="font-weight:700;">人员招生指标达成率</span><span style="color:var(--warning-color); font-weight:800;">32% (38/120名额)</span>
-                            </div>
-                            <div style="width:100%; height:6px; background:rgba(0,0,0,0.05); border-radius:3px; overflow:hidden;">
-                                <div style="width:32%; height:100%; background:var(--warning-color); border-radius:3px;"></div>
-                            </div>
+                        <div style="display:flex; justify-content:space-between; background:rgba(0,0,0,0.02); padding:6px 8px; border-radius:6px;">
+                            <span>分班计划</span><span style="font-weight:700;">共1200人配额</span>
                         </div>
-                    </div>
-                    <div class="card-actions">
-                        <button class="btn-xs">调整名额配置</button>
-                        <button class="btn-xs outline">查看配置变更审计</button>
-                        ${svgLog}
+                        <div style="display:flex; justify-content:space-between; background:rgba(0,0,0,0.02); padding:6px 8px; border-radius:6px;">
+                            <span>人员计划 (招生办)</span><span style="font-weight:700;">120人分配名额</span>
+                        </div>
                     </div>
                 </div>
             `
         },
         '线索管理': {
-            tabs: ['全部线索', '公海线索', '个人线索', '线下登记'],
-            header: `
-                <div style="display:flex; gap:10px; margin-bottom:12px; padding: 0 4px;">
-                    <div style="flex:1; background:rgba(255,255,255,0.7); border:1px solid white; border-radius:10px; padding:8px 12px; font-size:13px; font-weight:700; color:var(--text-title); display:flex; justify-content:space-between;">全部状态 <span style="color:#9CA3AF">▼</span></div>
-                    <div style="flex:1; background:rgba(255,255,255,0.7); border:1px solid white; border-radius:10px; padding:8px 12px; font-size:13px; font-weight:700; color:var(--text-title); display:flex; justify-content:space-between;">线索来源 <span style="color:#9CA3AF">▼</span></div>
-                </div>
-            `,
+            tabs: ['营销线索', '公海线索', '个人线索', '线下登记'],
             renderMockData: () => `
                 <div class="list-card glass-card">
                     <div class="card-row-between">
-                        <div class="card-title">李明 (男, 初三意向)</div>
-                        <div class="badge-tag tag-primary">个人池 - 待首联</div>
+                        <div class="card-title">李明 (初三毕业生)</div>
+                        <div class="badge-outline warning">待跟进</div>
                     </div>
-                    <div class="card-desc"><span>☎ 138****8888</span><span>源自: 线下招办地推登记</span></div>
-                    <div class="card-actions">
-                        <button class="btn-xs" onclick="event.stopPropagation();showToast('发起电话/微信跟进')">发起跟进</button>
-                        <button class="btn-xs outline" onclick="event.stopPropagation();showToast('已退回公海池')">转公海</button>
-                        ${svgLog}
+                    <div class="card-desc"><span>来源: 线下登记</span><span>归属: 默认指派登记人(尹娣)</span></div>
+                    <div style="font-size:12px; color:var(--text-main); margin-top:4px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:8px;">
+                        <strong style="color:var(--primary-color);">流转状态:</strong> 已入个人池，等待首次电话/微信跟进以生成记录。
                     </div>
                 </div>
-
                 <div class="list-card glass-card">
                     <div class="card-row-between">
-                        <div class="card-title">王嘉瑜 (女, 成绩中等)</div>
-                        <div class="badge-tag tag-warning">公海 - 已超时回收</div>
+                        <div class="card-title">王嘉瑜 (初三毕业生)</div>
+                        <div class="badge-outline gray">已回收 (公海)</div>
                     </div>
-                    <div class="card-desc"><span>☎ 139****1234</span><span>触发规则: 个人超时24h未跟进</span></div>
-                    <div class="card-actions">
-                        <button class="btn-xs" style="background:var(--warning-light); color:var(--warning-color);" onclick="event.stopPropagation();showToast('成功领取线索至个人池')">重新领取</button>
-                        ${svgLog}
+                    <div class="card-desc"><span>来源: 第三方平台API导入</span><span>超时未跟进</span></div>
+                    <div style="font-size:12px; color:var(--text-main); margin-top:4px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:8px;">
+                        <strong style="color:var(--danger-color);">回收规则触发:</strong> 超过24小时未响应，系统已自动回收至公海，并记录日志。
+                    </div>
+                </div>
+                <div class="list-card glass-card">
+                    <div class="card-row-between">
+                        <div class="card-title">张浩然 (高一复读意向)</div>
+                        <div class="badge-outline success">个人线索</div>
+                    </div>
+                    <div class="card-desc"><span>来源: 公海分配</span><span>分配人: 招办主任</span></div>
+                    <div style="font-size:12px; color:var(--text-main); margin-top:4px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:8px;">
+                        <strong style="color:var(--primary-color);">最新日志:</strong> 将线索分配给个人(尹娣)。
                     </div>
                 </div>
             `
         },
         '跟进到访': {
-            tabs: ['跟进记录', '邀约预约', '到访记录'],
-            header: '',
+            tabs: ['跟进记录', '到访预约', '到访记录'],
             renderMockData: () => `
                 <div class="list-card glass-card">
                     <div class="card-row-between">
-                        <div class="card-title">刘子涵家长 - A级高意向</div>
-                        <div class="badge-tag tag-success">邀约成功</div>
+                        <div class="card-title">李明家长 - 首次电话跟进</div>
+                        <div class="badge-success badge">跟进完成</div>
                     </div>
-                    <div class="card-desc"><span>微信沟通于 今天 10:30</span><span>负责老师: 尹娣</span></div>
-                    <div style="font-size:13px; color:var(--text-main); margin-top:6px; background:rgba(255,255,255,0.5); padding:10px; border-radius:10px;">
-                        <strong>沟通提炼：</strong>家长非常认可学校软件工程专业的实训设备，已明确周末带孩子到校考察。
-                    </div>
-                    <div class="card-actions">
-                        <button class="btn-xs">转入到访核销</button>
-                        <button class="btn-xs outline" style="color:var(--text-secondary); border-color:var(--border-line);">取消预约</button>
-                        ${svgLog}
+                    <div class="card-desc"><span>跟进方式: 电话沟通</span><span>时间: 今天 10:30</span></div>
+                    <div style="font-size:12px; color:var(--text-main); margin-top:4px; background:rgba(31,95,255,0.05); padding:8px; border-radius:8px;">
+                        家长咨询了软件工程专业的就业前景，初步意向较高，已抛出本周末的校园开放日邀约。
                     </div>
                 </div>
-                
                 <div class="list-card glass-card">
                     <div class="card-row-between">
-                        <div class="card-title">赵宇豪 - 已到访完成考察</div>
-                        <div class="badge-tag tag-success">已到访</div>
+                        <div class="card-title">陈思雨 - 校园到访记录</div>
+                        <div class="badge-success badge">已到访</div>
                     </div>
-                    <div class="card-desc"><span>到访时间: 昨天 14:00</span><span>接待结论: 准备下定金</span></div>
-                    <div class="card-actions">
-                        <button class="btn-xs" style="background:var(--success-light); color:var(--success-color);">一键生成预定记录</button>
-                        ${svgLog}
+                    <div class="card-desc"><span>接待人: 尹娣</span><span>生成跟进记录(原班班主任)</span></div>
+                    <div style="font-size:12px; color:var(--text-main); margin-top:4px; background:rgba(31,95,255,0.05); padding:8px; border-radius:8px;">
+                        学生及父母实地参观了实训楼，对硬件设施非常满意，已准备进入预定环节。
                     </div>
                 </div>
             `
         },
         '报名录取': {
             tabs: ['预定记录', '录取记录'],
-            header: '',
             renderMockData: () => `
                 <div class="list-card glass-card">
                     <div class="card-row-between">
-                        <div class="card-title">陈思雨 (预报：计算机网络)</div>
-                        <div class="badge-tag tag-primary">已交预定金</div>
+                        <div class="card-title">陈思雨 - 交定位费</div>
+                        <div class="badge-outline success">已预定</div>
                     </div>
-                    <div class="card-desc"><span>定金: ￥2000</span><span class="copy-btn" onclick="event.stopPropagation();showToast('单号已复制')">单号: R2608129 ${svgCopy}</span></div>
-                    
-                    <div class="step-container">
-                        <div class="step-item done"><div class="step-circle">✓</div><div class="step-label">预定</div></div>
-                        <div class="step-item active"><div class="step-circle">2</div><div class="step-label">审核材料</div></div>
-                        <div class="step-item"><div class="step-circle">3</div><div class="step-label">发录取书</div></div>
-                        <div class="step-item"><div class="step-circle">4</div><div class="step-label">新生报到</div></div>
-                    </div>
-                    
-                    <div class="card-actions">
-                        <button class="btn-xs">提交录取申请</button>
-                        <button class="btn-xs outline" style="color:var(--danger-color); border-color:var(--danger-light);">退定作废</button>
-                        ${svgLog}
+                    <div class="card-desc"><span>操作: 缴纳预定金 ￥2000</span><span>收据单号: R2608129</span></div>
+                    <div style="font-size:12px; color:var(--text-main); margin-top:4px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:8px;">
+                        <strong style="color:var(--primary-color);">状态联动:</strong> 已锁定计算机网络技术专业名额。
                     </div>
                 </div>
-                
                 <div class="list-card glass-card">
                     <div class="card-row-between">
-                        <div class="card-title">张浩然 (预定名额生效)</div>
-                        <div class="badge-tag tag-success">正式录取</div>
+                        <div class="card-title">张浩然 - 学校审核</div>
+                        <div class="badge-success badge" style="background:#10B981; color:white;">正式录取</div>
                     </div>
-                    <div class="card-desc"><span>该专业剩余名额: 14人</span><span>审核结果: 资质合规通过</span></div>
-                    <div class="card-actions">
-                        <button class="btn-xs" style="background:var(--success-light); color:var(--success-color);">生成专属报到凭证</button>
-                        ${svgLog}
+                    <div class="card-desc"><span>环节: 学校材料审核通过</span><span>身份标记: 准新生</span></div>
+                    <div style="font-size:12px; color:var(--text-main); margin-top:4px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:8px;">
+                        <strong style="color:var(--primary-color);">下一阶段:</strong> 提供报到凭证及学费核销指南。
                     </div>
                 </div>
             `
         },
         '报到交接': {
-            tabs: ['报到记录', '预分班与转班', '入学包物资交接'],
-            header: `
-                <div class="stats-banner">
-                    <div class="stats-banner-item"><span class="stats-num">145</span><span class="stats-label">已实地报到</span></div>
-                    <div class="stats-banner-item"><span class="stats-num" style="color:var(--warning-color);">23</span><span class="stats-label">已录取未报到</span></div>
-                    <div class="stats-banner-item"><span class="stats-num" style="color:var(--primary-color);">8</span><span class="stats-label">今日预计到校</span></div>
-                </div>
-                <div class="warning-banner">⚠️ 提示：预分班系统仅作报到当天引导分流之用，开学建档前可自由进行预转班调整。</div>
-            `,
+            tabs: ['报到记录', '预分班', '预分班转班', '入学包交接'],
             renderMockData: () => `
                 <div class="list-card glass-card">
                     <div class="card-row-between">
-                        <div class="card-title">刘鑫 (准新生档案: #0921)</div>
-                        <div class="badge-tag tag-warning">待报到 (已预分班)</div>
+                        <div class="card-title">陈思雨 (新生档案: 0921)</div>
+                        <div class="badge-success badge" style="background:#10B981; color:white;">正式入学 (已报到)</div>
                     </div>
-                    <div class="card-desc"><span>预分班级: 26级软件3班</span><span>指导老师: 王建国</span></div>
-                    <div class="card-actions">
-                        <button class="btn-xs" onclick="event.stopPropagation();showToast('弹出预分班调整弹窗')">微调预分班</button>
-                        <button class="btn-xs outline">标记物资交接</button>
-                        ${svgLog}
+                    <div class="card-desc"><span>报到日期: 8月20日</span><span>状态: 入学包交接完成</span></div>
+                    <div style="font-size:12px; color:var(--text-main); margin-top:4px; background:var(--bg-end); padding:8px; border-radius:8px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                            <span style="font-weight:700;">基础信息系统异步对接</span><span style="color:#10B981;">● 同步成功</span>
+                        </div>
+                        <span style="color:var(--text-secondary);">已建立正式学生档案，新生转化流程闭环。</span>
                     </div>
                 </div>
-
                 <div class="list-card glass-card">
                     <div class="card-row-between">
-                        <div class="card-title">陈思雨 (新生转化完成)</div>
-                        <div class="badge-tag tag-success">正式入学报到</div>
+                        <div class="card-title">刘鑫 (预分班配置)</div>
+                        <div class="badge-outline warning">待生效</div>
                     </div>
-                    <div class="card-desc"><span>基础信息系统同步结果：</span><span style="color:var(--success-color); font-weight:800;">异步对接成功</span></div>
-                    <div class="card-actions">
-                        <button class="btn-xs outline" style="color:var(--text-secondary); border-color:var(--border-line);">查看学籍对接API日志</button>
-                        ${svgLog}
+                    <div class="card-desc"><span>预分班级: 26级软件3班</span><span>当前状态: 等待实际报到</span></div>
+                    <div style="font-size:12px; color:var(--text-main); margin-top:4px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:8px;">
+                        <strong style="color:var(--warning-color);">预分班规则:</strong> 仅用于报到当天引导秩序，开学前可随时调整，实际报到后转为正式班级。
                     </div>
                 </div>
             `
         },
         '生源学校': {
-            tabs: ['生源学校候选库', '生源学校责任人制'],
-            header: '',
+            tabs: ['生源学校候选', '生源学校责任'],
             renderMockData: () => `
                 <div class="list-card glass-card">
                     <div class="card-row-between">
-                        <div class="card-title">深圳市坪山实验初级中学</div>
-                        <div class="badge-tag tag-success">稳定输出渠道</div>
+                        <div class="card-title">深圳市坪山实验学校</div>
+                        <div class="badge-success badge" style="background:#10B981; color:white;">正式生源学校</div>
                     </div>
-                    <div class="card-desc"><span>我方专属对接人: 尹娣</span><span>历史输送生源总数: 145人</span></div>
-                    <div class="card-actions">
-                        <button class="btn-xs outline">变更责任人</button>
-                        <button class="btn-xs outline">查招生漏斗</button>
-                        ${svgLog}
+                    <div class="card-desc"><span>转化记录: 由候选转为正式</span><span>责任人: 王主任</span></div>
+                    <div style="font-size:12px; color:var(--text-main); margin-top:4px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:8px;">
+                        <strong style="color:var(--primary-color);">流转日志:</strong> 候选生源校通过评估，系统建立合并记录，已确立长期合作输送关系。
                     </div>
                 </div>
                 <div class="list-card glass-card">
                     <div class="card-row-between">
                         <div class="card-title">广州白云区第三中学</div>
-                        <div class="badge-tag tag-gray">候选评估池</div>
+                        <div class="badge-outline gray">候选学校</div>
                     </div>
-                    <div class="card-desc"><span>来源: 线索登记数据带出挖掘</span><span>状态: 待实地考察建立关系</span></div>
-                    <div class="card-actions">
-                        <button class="btn-xs">分配拓展责任人</button>
-                        <button class="btn-xs outline" style="color:var(--warning-color); border-color:var(--warning-light);">去重合并检测</button>
-                        ${svgLog}
-                    </div>
+                    <div class="card-desc"><span>来源记录: 线索登记带出</span><span>状态: 待回访考察</span></div>
                 </div>
             `
         },
         '归档审计': {
-            tabs: ['全周期追踪', '线索扭转审计', '配置变更审计'],
-            header: `
-                <div style="display:flex; gap:10px; margin-bottom:12px; padding: 0 4px;">
-                    <div style="flex:1; background:rgba(255,255,255,0.7); border:1px solid white; border-radius:10px; padding:8px 12px; font-size:13px; font-weight:700; color:var(--text-title); display:flex; justify-content:space-between;">筛选动作类型 <span style="color:#9CA3AF">▼</span></div>
-                    <div style="background:var(--primary-color); color:white; border-radius:10px; padding:8px 14px; font-size:13px; font-weight:700; display:flex; align-items:center; cursor:pointer;" onclick="showToast('导出为Excel或PDF')">数据导出</div>
-                </div>
-            `,
+            tabs: ['入池日志', '分配日志', '阶段日志'],
             renderMockData: () => `
                 <div class="glass-card" style="padding:16px;">
-                    <div style="font-size:14px; font-weight:800; color:var(--text-title); margin-bottom:16px;">招生系统全生命周期流水</div>
-                    
+                    <div style="font-size:14px; font-weight:800; color:var(--text-title); margin-bottom:12px;">全生命周期追溯日志</div>
                     <div class="log-timeline-item">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                            <div style="font-size:13px; font-weight:800; color:var(--text-title);">[预分班调整] 修改学生归属</div>
-                            <span style="font-size:11px; color:var(--primary-color); cursor:pointer;" onclick="showToast('查看详情对比')">详情 ></span>
-                        </div>
-                        <div style="font-size:11px; color:var(--text-main); margin-top:4px; font-weight:500;">旧值: 软件3班 ➔ 新值: 软件1班</div>
-                        <div style="font-size:10px; color:var(--text-secondary); margin-top:4px;">操作人: 尹娣 | 今天 14:30</div>
+                        <div style="font-size:13px; font-weight:700; color:var(--text-title);">[录取/报到] 异步同步学生档案至基础系统</div>
+                        <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">触发节点: 陈思雨实地报到完成 | 今天 14:30</div>
                     </div>
-                    
                     <div class="log-timeline-item">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                            <div style="font-size:13px; font-weight:800; color:var(--text-title);">[线索系统回收] 规则执行</div>
-                            <span style="font-size:11px; color:var(--primary-color); cursor:pointer;" onclick="showToast('查看详情对比')">详情 ></span>
-                        </div>
-                        <div style="font-size:11px; color:var(--danger-color); margin-top:4px; font-weight:500;">原因: 个人线索池超过24小时未响应，退回公海。</div>
-                        <div style="font-size:10px; color:var(--text-secondary); margin-top:4px;">系统自动执行 (System) | 今天 09:00</div>
+                        <div style="font-size:13px; font-weight:700; color:var(--text-title);">[预定阶段] 生成定位记录凭证单</div>
+                        <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">触发节点: 家长缴纳定位费 | 昨天 16:15</div>
                     </div>
-                    
                     <div class="log-timeline-item">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                            <div style="font-size:13px; font-weight:800; color:var(--text-title);">[预定阶段] 生成定位记录凭证单</div>
-                        </div>
-                        <div style="font-size:11px; color:var(--text-main); margin-top:4px; font-weight:500;">触发节点: 家长缴纳定位费 ￥2000，单号 R2608129</div>
-                        <div style="font-size:10px; color:var(--text-secondary); margin-top:4px;">操作人: 招生财务处 | 昨天 16:15</div>
+                        <div style="font-size:13px; font-weight:700; color:var(--text-title);">[线索回收] 触发自动判定至公海机制</div>
+                        <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">触发节点: "王嘉瑜"超24h未跟进 | 昨天 09:00</div>
+                    </div>
+                    <div class="log-timeline-item">
+                        <div style="font-size:13px; font-weight:700; color:var(--text-title);">[线索分配] 招办组长下发线索至个人</div>
+                        <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">操作人: 张主任 分配给 尹娣 | 05-12 10:20</div>
+                    </div>
+                    <div class="log-timeline-item">
+                        <div style="font-size:13px; font-weight:700; color:var(--text-title);">[线索入池] 第三方API批量接入意向名单</div>
+                        <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">系统动作: 新增24条数据入公海池 | 05-12 08:00</div>
                     </div>
                 </div>
             `
@@ -678,19 +1429,14 @@
 
     function openEnrollmentSub(category) {
         document.getElementById('enrollment-sub-title').innerText = category;
-        const config = enrollmentSubDataConfig[category];
+        const config = enrollmentSubData[category];
         if(!config) return;
 
-        // 渲染专属头部区域（如统计、搜索增强、警告栏等）
-        document.getElementById('enrollment-dynamic-header').innerHTML = config.header || '';
-
-        // 渲染切换 Tab
         let tabsHtml = config.tabs.map((tab, i) => {
             return `<div class="pill ${i===0?'active':''}" onclick="switchEnrollSubTab(this)">${tab}</div>`;
         }).join('');
         document.getElementById('enrollment-sub-tabs').innerHTML = tabsHtml;
 
-        // 渲染对应业务卡片
         document.getElementById('enrollment-sub-data').innerHTML = config.renderMockData();
         openSubPage('page-enrollment-sub');
     }
@@ -698,7 +1444,444 @@
     function switchEnrollSubTab(el) {
         document.querySelectorAll('#enrollment-sub-tabs .pill').forEach(p => p.classList.remove('active'));
         el.classList.add('active');
-        showToast('您点击了子视图：' + el.innerText);
+        showToast('查看数据：' + el.innerText);
+    }
+
+    // ================= 音记校对核心逻辑 (保持不变) =================
+    const iconMic = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>`;
+    const iconPlay = `<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 19 12 6 20 6 4"></polygon></svg>`;
+    const iconPause = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`;
+    const iconInlineSpeaker = `<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>`;
+    const iconArrowRight = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+
+    const fieldConfig = {
+        'english': [
+            { id: 'en_word', name: '英文' },
+            { id: 'en_zh', name: '中文' },
+            { id: 'en_sentence', name: '英文句子' }
+        ],
+        'chinese': [
+            { id: 'zh_word', name: '词语' },
+            { id: 'zh_pinyin', name: '拼音' },
+            { id: 'zh_meaning', name: '意思' }
+        ],
+        'math': [
+            { id: 'math_name', name: '名称' },
+            { id: 'math_formula', name: '公式' }
+        ]
+    };
+
+    const versions = [
+        { id: 'v1', subject: 'english', title: '高一英语必修一核心词库', typeName: '英文词汇' },
+        { id: 'v1_1', subject: 'english', title: '剑桥雅思核心1000词', typeName: '英文词汇' },
+        { id: 'v1_2', subject: 'english', title: '托福听力场景必背词汇', typeName: '英文句子' },
+        { id: 'v1_3', subject: 'english', title: '专四核心词组搭配', typeName: '中英对照' },
+        { id: 'v1_4', subject: 'english', title: '考研英语历年真题长难句', typeName: '长难句' },
+        { id: 'v2', subject: 'chinese', title: '人教版初二语文古诗词', typeName: '古诗词' },
+        { id: 'v2_1', subject: 'chinese', title: '高中必背文言文大全', typeName: '文言文' },
+        { id: 'v2_2', subject: 'chinese', title: '现代汉语常用词语表', typeName: '现代汉语' },
+        { id: 'v3', subject: 'math', title: '高考理科综合：数学必背长公式', typeName: '数学公式' }, 
+        { id: 'v3_1', subject: 'math', title: '微积分导数与积分常用表', typeName: '微积分' }, 
+        { id: 'v3_2', subject: 'math', title: '解析几何定理推导集合', typeName: '解析几何' }
+    ];
+
+    const subjectNames = { 'english': '英语', 'chinese': '语文', 'math': '数学' };
+
+    let activeVersion = null;
+    let activeFieldId = null; 
+    let activeFieldName = null;
+    let allWordsInField = []; 
+    let currentBatchOffset = 0; 
+    let currentFilteredView = []; 
+    let renderedItems = []; 
+    let activeFilterValue = '未录音';
+
+    const mockContentDict = {
+        'english': {
+            'en_word': ["Apple", "Photosynthesis", "Incomprehensibilities"],
+            'en_zh': ["苹果", "光合作用", "不可理解的事物"],
+            'en_sentence': ["I eat an apple.", "Photosynthesis is a process.", "The sheer incomprehensibilities..."]
+        },
+        'chinese': {
+            'zh_word': ["落霞", "踌躇满志", "魑魅魍魉"],
+            'zh_pinyin': ["luò xiá", "chóu chú mǎn zhì", "chī mèi wǎng liǎng"],
+            'zh_meaning': ["落日的彩霞。", "形容对自己的现状或取得的成就非常得意。", "指传说中害人的鬼怪。"]
+        },
+        'math': {
+            'math_name': ["勾股定理", "泰勒展开式", "高斯-博内定理"],
+            'math_formula': ["a² + b² = c²", "f(x) = f(a) + f'(a)(x-a) + ...", "∫∫_M K dA + ∫_∂M k_g ds = 2πχ(M)"]
+        }
+    };
+
+    function renderVersions() {
+        const listEl = document.getElementById('versionList');
+        listEl.innerHTML = '';
+        versions.forEach(v => {
+            const card = document.createElement('div');
+            card.className = 'version-card';
+            card.onclick = () => openFieldSelection(v.id);
+            const subjectLabel = subjectNames[v.subject] || '通用';
+            const subjectClass = `tag-subject-${v.subject}`;
+            card.innerHTML = `
+                <div class="version-info">
+                    <div class="version-tags">
+                        <span class="tag ${subjectClass}">${subjectLabel}</span>
+                        <span class="tag tag-type">${v.typeName}</span>
+                    </div>
+                    <div class="version-title">${v.title}</div>
+                </div>
+                <div class="version-arrow-container">${iconArrowRight}</div>
+            `;
+            listEl.appendChild(card);
+        });
+    }
+
+    function openFieldSelection(vId) {
+        activeVersion = versions.find(v => v.id === vId);
+        renderFieldsForSubject(activeVersion.subject);
+        document.getElementById('page-versions').classList.replace('active', 'hidden-left');
+        document.getElementById('page-fields').classList.replace('hidden-right', 'active');
+    }
+
+    function renderFieldsForSubject(subjectKey) {
+        const fieldListEl = document.getElementById('fieldListContainer');
+        fieldListEl.innerHTML = '';
+        const fields = fieldConfig[subjectKey];
+        fields.forEach(f => {
+            const card = document.createElement('div');
+            card.className = 'field-card';
+            card.onclick = () => openWorkspace(f.id, f.name);
+            card.innerHTML = `
+                <div class="field-card-title">${f.name}</div>
+                <div class="version-arrow-container" style="background: rgba(31, 95, 255, 0.05);">${iconArrowRight}</div>
+            `;
+            fieldListEl.appendChild(card);
+        });
+    }
+
+    function goBackToVersions() {
+        document.getElementById('page-fields').classList.replace('active', 'hidden-right');
+        document.getElementById('page-versions').classList.replace('hidden-left', 'active');
+    }
+
+    function openWorkspace(fieldKey, fieldName) {
+        activeFieldId = fieldKey;
+        activeFieldName = fieldName;
+        document.getElementById('ws-nav-title').innerText = `${fieldName}音记校对`;
+        generateWordsForField(activeVersion.subject, fieldKey);
+        updateStatsBoard();
+        document.getElementById('searchInput').value = '';
+        selectFilter('未录音', null); 
+        currentBatchOffset = 0;
+        document.getElementById('page-fields').classList.replace('active', 'hidden-left');
+        document.getElementById('page-workspace').classList.replace('hidden-right', 'active');
+        applyFiltersAndRender();
+    }
+
+    function goBackToFields() {
+        closeAutoPlay();
+        document.getElementById('page-workspace').classList.replace('active', 'hidden-right');
+        document.getElementById('page-fields').classList.replace('hidden-left', 'active');
+    }
+
+    function toggleCustomFilter(e) {
+        if(e) e.stopPropagation();
+        const dropdown = document.getElementById('filterDropdown');
+        const trigger = document.getElementById('filterTrigger');
+        dropdown.classList.toggle('show');
+        trigger.classList.toggle('open');
+    }
+
+    function selectFilter(value, e) {
+        if(e) e.stopPropagation();
+        activeFilterValue = value;
+        document.getElementById('filterLabel').innerText = value;
+        document.querySelectorAll('.filter-option').forEach(opt => {
+            if(opt.innerText === value) opt.classList.add('selected');
+            else opt.classList.remove('selected');
+        });
+        document.getElementById('filterDropdown').classList.remove('show');
+        document.getElementById('filterTrigger').classList.remove('open');
+        currentBatchOffset = 0; 
+        applyFiltersAndRender(); 
+        closeAutoPlay();
+    }
+
+    function generateWordsForField(subjectKey, fieldId) {
+        allWordsInField = [];
+        let dataPool = mockContentDict[subjectKey][fieldId];
+        if(!dataPool) dataPool = ["模拟数据1", "模拟数据2"];
+        const totalToGen = 50; 
+        const recordedCount = 15; 
+        for(let i=0; i<totalToGen; i++) {
+            let text = dataPool[i % dataPool.length];
+            if(i > dataPool.length) text += ` (测试长文本自动换行 ${i})`;
+            let status = i < recordedCount ? 'recorded' : 'unrecorded';
+            allWordsInField.push({ id: `item_${i}`, text: text, status: status });
+        }
+    }
+
+    function updateStatsBoard() {
+        let total = allWordsInField.length;
+        let recorded = allWordsInField.filter(w => w.status === 'recorded').length;
+        let unrecorded = total - recorded; 
+        document.getElementById('stat-total').innerText = total;
+        document.getElementById('stat-recorded').innerText = recorded;
+        document.getElementById('stat-unrecorded').innerText = unrecorded;
+    }
+
+    function handleSearch() {
+        currentBatchOffset = 0; 
+        applyFiltersAndRender();
+        closeAutoPlay();
+    }
+
+    function fetchNextBatch() {
+        let batchSize = parseInt(document.getElementById('batchSizeInput').value) || 10;
+        currentBatchOffset += batchSize;
+        if (currentBatchOffset >= currentFilteredView.length) {
+            currentBatchOffset = 0;
+            showToast('已循环至开头');
+        } else {
+            showToast('已加载下一批');
+        }
+        closeAutoPlay();
+        renderCurrentBatch();
+    }
+
+    function applyFiltersAndRender() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+        if (activeFilterValue === '需重录') {
+            document.getElementById('wordListContainer').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'flex';
+            document.getElementById('listCountStr').innerText = '(0)';
+            renderedItems = [];
+            return;
+        } else {
+            document.getElementById('wordListContainer').style.display = 'flex';
+            document.getElementById('emptyState').style.display = 'none';
+        }
+        currentFilteredView = allWordsInField.filter(w => {
+            let matchFilter = true;
+            if (activeFilterValue === '未录音') matchFilter = w.status === 'unrecorded';
+            else if (activeFilterValue === '已录音') matchFilter = w.status === 'recorded';
+            let matchSearch = true;
+            if (searchTerm !== '') matchSearch = w.text.toLowerCase().includes(searchTerm);
+            return matchFilter && matchSearch;
+        });
+        if(currentBatchOffset >= currentFilteredView.length) currentBatchOffset = 0;
+        renderCurrentBatch();
+    }
+
+    function renderCurrentBatch() {
+        const container = document.getElementById('wordListContainer');
+        container.innerHTML = '';
+        let batchSize = parseInt(document.getElementById('batchSizeInput').value) || 10;
+        renderedItems = currentFilteredView.slice(currentBatchOffset, currentBatchOffset + batchSize);
+        document.getElementById('listCountStr').innerText = renderedItems.length > 0 ? `(1-${renderedItems.length})` : '(0)';
+
+        if(renderedItems.length === 0) {
+            document.getElementById('wordListContainer').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'flex';
+            return;
+        } else {
+            document.getElementById('wordListContainer').style.display = 'flex';
+            document.getElementById('emptyState').style.display = 'none';
+        }
+
+        renderedItems.forEach((item, index) => {
+            let displayIndex = index + 1; 
+            let badgeHTML = '';
+            let speakerDisabled = '';
+            if (item.status === 'unrecorded') {
+                badgeHTML = `<span class="badge badge-warning">待录音</span>`;
+                speakerDisabled = 'disabled';
+            } else {
+                badgeHTML = `<span class="badge badge-success">已录音</span>`;
+            }
+            const pressEvents = `
+                onmousedown="handlePressStart(this, '${item.id}', event)"
+                onmouseup="handlePressEnd(this, '${item.id}', true, event)"
+                onmouseleave="handlePressEnd(this, '${item.id}', false, event)"
+                ontouchstart="handlePressStart(this, '${item.id}', event)"
+                ontouchend="handlePressEnd(this, '${item.id}', true, event)"
+                ontouchcancel="handlePressEnd(this, '${item.id}', false, event)"
+            `;
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'table-row';
+            itemDiv.id = `item-el-${item.id}`;
+            itemDiv.innerHTML = `
+                <div class="row-index-col">
+                    <span class="row-index">${displayIndex}</span>
+                    <div class="word-meta" id="meta-${item.id}">${badgeHTML}</div>
+                </div>
+                <div class="row-content-col">
+                    <div class="row-left-content">
+                        <span class="row-text">${item.text}</span>
+                        <button class="inline-speaker" id="play-${item.id}" onclick="handleInlinePlay(this, '${item.id}')" ${speakerDisabled}>${iconInlineSpeaker}</button>
+                    </div>
+                    <div class="row-right-action">
+                        <button class="btn-record" ${pressEvents}>${iconMic}</button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(itemDiv);
+        });
+    }
+
+    function handlePressStart(btn, itemId, e) {
+        if(e.type === 'touchstart') { if (e.cancelable) e.preventDefault(); }
+        if(isAutoPlaying) togglePauseAutoPlay();
+        if (btn.dataset.recording === 'true') return;
+        btn.dataset.recording = 'true';
+        btn.classList.add('recording');
+        const itemEl = document.getElementById(`item-el-${itemId}`);
+        document.querySelectorAll('.table-row').forEach(el => el.classList.remove('focused'));
+        itemEl.classList.add('focused');
+        showToast('正在录音，松开保存...', 800);
+    }
+
+    function handlePressEnd(btn, itemId, saveRecord, e) {
+        if(e.type === 'touchend' && e.cancelable) e.preventDefault();
+        if (btn.dataset.recording !== 'true') return;
+        btn.dataset.recording = 'false';
+        btn.classList.remove('recording');
+        const itemEl = document.getElementById(`item-el-${itemId}`);
+        itemEl.classList.remove('focused');
+
+        if (saveRecord) {
+            showToast('保存成功');
+            setTimeout(() => {
+                let item = allWordsInField.find(w => w.id === itemId);
+                if(item) {
+                    item.status = 'recorded';
+                    updateStatsBoard();
+                    let metaDiv = itemEl.querySelector(`#meta-${item.id}`);
+                    metaDiv.innerHTML = `<span class="badge badge-success">已录音</span>`;
+                    let speakerBtn = document.getElementById(`play-${item.id}`);
+                    if (speakerBtn) speakerBtn.disabled = false;
+                }
+            }, 200);
+        } else {
+            showToast('已取消录音');
+        }
+    }
+
+    let currentlyPlayingBtn = null;
+    let manualPlayTimer = null;
+
+    function handleInlinePlay(btn, itemId) {
+        if (btn.disabled) return;
+        if(isAutoPlaying) {
+            clearTimeout(autoPlayTimer);
+            let newIndex = renderedItems.findIndex(w => w.id === itemId);
+            if (newIndex !== -1) {
+                autoPlayIndex = newIndex;
+                isAutoPlayPaused = false;
+                document.getElementById('fpPauseBtn').innerHTML = iconPause;
+                document.getElementById('fpSubtitle').innerText = '当前批次连播中...';
+                playNextInBatch();
+            }
+            return;
+        }
+        if (btn.classList.contains('playing-ai')) {
+            clearTimeout(manualPlayTimer);
+            btn.classList.remove('playing-ai');
+            currentlyPlayingBtn = null;
+            return;
+        }
+        if (currentlyPlayingBtn && currentlyPlayingBtn !== btn) {
+            clearTimeout(manualPlayTimer);
+            currentlyPlayingBtn.classList.remove('playing-ai');
+        }
+        currentlyPlayingBtn = btn;
+        btn.classList.add('playing-ai');
+        manualPlayTimer = setTimeout(() => {
+            if (currentlyPlayingBtn === btn) {
+                btn.classList.remove('playing-ai');
+                currentlyPlayingBtn = null;
+            }
+        }, 2000);
+    }
+
+    let isAutoPlaying = false;
+    let isAutoPlayPaused = false;
+    let autoPlayIndex = 0;       
+    let autoPlayTimer = null;
+
+    function startAutoPlay() {
+        if(renderedItems.length === 0) return showToast('当前批次无可播内容');
+        const hasRecordedItem = renderedItems.some(item => item.status === 'recorded');
+        if (!hasRecordedItem) return showToast('当前批次无录音文件可播');
+
+        if (currentlyPlayingBtn) {
+            clearTimeout(manualPlayTimer);
+            currentlyPlayingBtn.classList.remove('playing-ai');
+            currentlyPlayingBtn = null;
+        }
+        document.getElementById('floatingPlayer').classList.add('show');
+        isAutoPlaying = true;
+        isAutoPlayPaused = false;
+        autoPlayIndex = 0;
+        document.getElementById('fpPauseBtn').innerHTML = iconPause;
+        document.getElementById('fpSubtitle').innerText = '当前批次连播中...';
+        playNextInBatch();
+    }
+    
+    function playNextInBatch() {
+        if(!isAutoPlaying || isAutoPlayPaused) return;
+
+        let foundValid = false;
+        while(autoPlayIndex < renderedItems.length) {
+            let item = renderedItems[autoPlayIndex];
+            if (item.status === 'recorded') { foundValid = true; break; }
+            autoPlayIndex++;
+        }
+
+        if(!foundValid || autoPlayIndex >= renderedItems.length) {
+            closeAutoPlay();
+            return showToast('批次连播已完成');
+        }
+
+        let item = renderedItems[autoPlayIndex];
+        let displaySeq = autoPlayIndex + 1; 
+        let shortText = item.text.length > 15 ? item.text.substring(0, 15) + '...' : item.text;
+        document.getElementById('fpTitle').innerText = `${displaySeq}. ${shortText}`;
+
+        let itemEl = document.getElementById(`item-el-${item.id}`);
+        if(itemEl) {
+            itemEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.querySelectorAll('.inline-speaker.playing-ai').forEach(btn => btn.classList.remove('playing-ai'));
+            let targetPlayBtn = document.getElementById(`play-${item.id}`);
+            if(targetPlayBtn) targetPlayBtn.classList.add('playing-ai');
+        }
+
+        autoPlayTimer = setTimeout(() => {
+            autoPlayIndex++;      
+            playNextInBatch();
+        }, 2000);
+    }
+
+    function togglePauseAutoPlay() {
+        if(!isAutoPlaying) return;
+        isAutoPlayPaused = !isAutoPlayPaused;
+        document.getElementById('fpPauseBtn').innerHTML = isAutoPlayPaused ? iconPlay : iconPause;
+        document.getElementById('fpSubtitle').innerText = isAutoPlayPaused ? '已暂停连播' : '当前批次连播中...';
+        
+        if (isAutoPlayPaused) {
+            clearTimeout(autoPlayTimer);
+            document.querySelectorAll('.inline-speaker.playing-ai').forEach(btn => btn.classList.remove('playing-ai'));
+        } else {
+            playNextInBatch();
+        }
+    }
+    
+    function closeAutoPlay() {
+        if(!isAutoPlaying) return;
+        document.getElementById('floatingPlayer').classList.remove('show');
+        isAutoPlaying = false;
+        clearTimeout(autoPlayTimer);
+        document.querySelectorAll('.inline-speaker.playing-ai').forEach(btn => btn.classList.remove('playing-ai'));
     }
 </script>
 </body>
