@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>校园综合管理系统 - 独立版</title>
+    <style>
+        :root {
+            --primary-color: #1F5FFF; 
+            --primary-light: rgba(31, 95, 255, 0.1);
+            --bg-start: #EFF6FF;
+            --bg-end: #DFE7FF;
+            
+            --text-title: #111827;
+            --text-main: #334155;
+            --text-secondary: #64748B;
+            
+            --danger-color: #EF4444;
+            --danger-light: rgba(239, 68, 68, 0.1);
+            --success-color: #10B981;
+            --success-light: rgba(16, 185, 129, 0.1);
+            --warning-color: #F59E0B;
+            --warning-light: rgba(245, 158, 11, 0.1);
+            
+            --border-line: rgba(0,0,0,0.06);
+
+            /* 扩充后的马卡龙色系 */
+            --icon-bg-blue: rgba(96, 165, 250, 0.15); --icon-color-blue: #3B82F6;
+            --icon-bg-purple: rgba(167, 139, 250, 0.15); --icon-color-purple: #8B5CF6;
+            --icon-bg-pink: rgba(244, 114, 182, 0.15); --icon-color-pink: #EC4899;
+            --icon-bg-orange: rgba(251, 146, 60, 0.15); --icon-color-orange: #F97316;
+            --icon-bg-teal: rgba(52, 211, 153, 0.15); --icon-color-teal: #10B981;
+            --icon-bg-yellow: rgba(251, 191, 36, 0.15); --icon-color-yellow: #D97706;
+            --icon-bg-cyan: rgba(34, 211, 238, 0.15); --icon-color-cyan: #0891B2;
+            --icon-bg-rose: rgba(251, 113, 133, 0.15); --icon-color-rose: #E11D48;
+            --icon-bg-indigo: rgba(129, 140, 248, 0.15); --icon-color-indigo: #4F46E5;
+            --icon-bg-emerald: rgba(16, 185, 129, 0.15); --icon-color-emerald: #059669;
+            --icon-bg-sky: rgba(56, 189, 248, 0.15); --icon-color-sky: #0284C7;
+            --icon-bg-lime: rgba(163, 230, 53, 0.15); --icon-color-lime: #65A30D;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif; background-color: #E2E8F0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+
+        .device-simulator { width: 375px; height: 812px; background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%); position: relative; overflow: hidden; border-radius: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.15); display: flex; flex-direction: column; }
+        .device-simulator::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 40px; box-shadow: inset 0 0 0 8px #FFFFFF; pointer-events: none; z-index: 1000; }
+
+        .wrapper-main { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; }
+        .tab-view { position: absolute; top: 0; left: 0; right: 0; bottom: 80px; display: none; flex-direction: column; }
+        .tab-view.active { display: flex; pointer-events: auto; }
+        
+        /* 子页面过渡 */
+        .page-view { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; z-index: 200; transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1); background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%); }
+        .page-view.hidden-left { transform: translateX(-100%); pointer-events: none; }
+        .page-view.hidden-right { transform: translateX(100%); pointer-events: none; }
+        .page-view.active { transform: translateX(0); pointer-events: auto; }
+
+        .nav-bar { padding: 48px 20px 12px; display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 10; flex-shrink: 0; }
+        .nav-bar.main-nav { justify-content: center; } 
+        .nav-title-group { display: flex; flex-direction: column; align-items: center; }
+        .nav-title { font-size: 18px; font-weight: 800; color: var(--text-title); letter-spacing: 0.5px;}
+        .icon-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-title); }
+
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 0 20px 20px 20px; scrollbar-width: none; padding-bottom: 30px; }
+        .main-content::-webkit-scrollbar { display: none; }
+
+        /* 底部 Tab Bar */
+        .tab-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 84px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.6); display: flex; justify-content: space-around; align-items: flex-start; padding-top: 10px; z-index: 100; }
+        .tab-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94A3B8; cursor: pointer; width: 60px; transition: all 0.3s; }
+        .tab-item:active { transform: scale(0.9); }
+        .tab-item.active { color: var(--primary-color); }
+        .tab-icon { position: relative; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; }
+        .tab-icon svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+        .tab-item.active .tab-icon svg { stroke-width: 2.5; }
+        .tab-label { font-size: 11px; font-weight: 700; letter-spacing: 0.2px;}
+
+        /* 通用玻璃卡片 - 调整为更白净的风格 */
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 24px; box-shadow: 0 8px 24px rgba(31, 95, 255, 0.04); }
+        
+        .global-semester-bar { display:flex; justify-content: space-between; align-items:center; background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); padding: 10px 16px; border-radius: 14px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.9); box-shadow: 0 4px 12px rgba(0,0,0,0.03); flex-shrink:0; position: sticky; top: -5px; z-index: 50;}
+        .semester-select { border:none; background:transparent; font-size:14px; font-weight:800; color:var(--primary-color); outline:none; appearance:none; padding-right:20px; cursor: pointer; width: 100%;}
+        
+        /* 网格菜单 */
+        .grid-menu { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 8px; padding: 16px 12px; }
+        .grid-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: transform 0.2s; position: relative; }
+        .grid-item:active { transform: scale(0.95); opacity: 0.8; }
+        /* 玻璃质感升级：加入磨砂模糊、白边和柔和阴影 */
+        .grid-icon-wrap { width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.9); box-shadow: 0 4px 12px rgba(0,0,0,0.03), inset 0 2px 8px rgba(255,255,255,0.6); }
+        .grid-icon-wrap svg { width: 24px; height: 24px; }
+        .grid-label { font-size: 12px; font-weight: 600; color: var(--text-main); text-align: center; line-height: 1.2; word-break: break-all;}
+
+        /* 横向滚动胶囊标签 */
+        .pill-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; margin-bottom: 16px; flex-shrink: 0; }
+        .pill-scroll::-webkit-scrollbar { display: none; }
+        .pill { padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; white-space: nowrap; cursor: pointer; background: rgba(255,255,255,0.6); color: var(--text-secondary); border: 1px solid rgba(255,255,255,0.8); transition: 0.2s; }
+        .pill.active { background: var(--primary-color); color: white; border-color: var(--primary-color); box-shadow: 0 4px 12px rgba(31,95,255,0.2); }
+
+        /* 列表卡片与状态标签 */
+        .list-card { padding: 16px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
+        .list-card:active { transform: scale(0.98); background: rgba(255, 255, 255, 0.85); }
+        .card-row-between { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+        .card-title { font-size: 15px; font-weight: 800; color: var(--text-title); line-height: 1.4; display:flex; align-items:center; gap:6px;}
+        .card-desc { font-size: 12px; color: var(--text-secondary); display: flex; gap: 8px; align-items: center; font-weight: 500;}
+        
+        .badge-tag { padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; white-space: nowrap; border: 1px solid transparent; }
+        .tag-primary { background: var(--primary-light); color: var(--primary-color); }
+        .tag-warning { background: var(--warning-light); color: var(--warning-color); border-color: var(--warning-color); }
+        .tag-success { background: var(--success-color); color: white; box-shadow: 0 2px 8px rgba(16,185,129,0.3); }
+        .tag-gray { background: rgba(0,0,0,0.05); color: var(--text-secondary); border-color: var(--text-secondary); }
+        .badge-outline { border: 1px solid var(--primary-color); color: var(--primary-color); padding: 2px 6px; border-radius: 6px; font-size: 10px; font-weight: 700; white-space: nowrap;}
+        .badge-outline.warning { border-color: var(--warning-color); color: var(--warning-color); }
+        .badge-outline.success { border-color: var(--success-color); color: var(--success-color); }
+        .badge-outline.gray { border-color: var(--text-secondary); color: var(--text-secondary); }
+
+        /* CRM 专属操作区与进度条 */
+        .card-actions { display: flex; gap: 8px; margin-top: 4px; padding-top: 12px; border-top: 1px dashed rgba(0,0,0,0.08); align-items:center;}
+        .btn-xs { background: rgba(31,95,255,0.1); color: var(--primary-color); border:none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 800; cursor:pointer; transition:0.2s;}
+        .btn-xs:active { transform: scale(0.95); }
+        .btn-xs.outline { background: transparent; border: 1px solid var(--primary-color); }
+        .icon-log-btn { margin-left:auto; color: #9CA3AF; padding:4px; display:flex; align-items:center; justify-content:center; border-radius:6px; transition:0.2s;}
+        .icon-log-btn:active { background: rgba(0,0,0,0.05); color: var(--primary-color); }
+
+        .step-container { display: flex; align-items: center; justify-content: space-between; margin: 12px 0 16px; position: relative;}
+        .step-container::before { content:''; position:absolute; top: 12px; left: 10%; right: 10%; height: 2px; background: rgba(0,0,0,0.08); z-index: 0;}
+        .step-item { display: flex; flex-direction: column; align-items: center; gap: 6px; z-index: 1; position:relative; padding: 0 4px; border-radius: 12px;}
+        .step-circle { width: 24px; height: 24px; border-radius: 50%; background: #E2E8F0; color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; border: 2px solid white; box-shadow:0 2px 4px rgba(0,0,0,0.05);}
+        .step-item.active .step-circle { background: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-light), 0 2px 4px rgba(0,0,0,0.05); border-color: transparent;}
+        .step-item.done .step-circle { background: var(--success-color); border-color: transparent;}
+        .step-label { font-size: 10px; font-weight: 800; color: #94A3B8; }
+        .step-item.active .step-label { color: var(--primary-color); }
+        .step-item.done .step-label { color: var(--success-color); }
+
+        .stats-banner { display:flex; justify-content:space-between; background:white; padding:12px 16px; border-radius:14px; margin-bottom:12px; box-shadow:0 4px 12px rgba(0,0,0,0.02); text-align:center;}
+        .stats-banner-item { display:flex; flex-direction:column; gap:4px; flex:1; border-right:1px solid var(--border-line);}
+        .stats-banner-item:last-child { border-right:none;}
+        .stats-num { font-size:16px; font-weight:800; color:var(--text-title);}
+        .stats-label { font-size:10px; font-weight:700; color:var(--text-secondary);}
+
+        .log-timeline-item { border-left: 2px solid var(--primary-light); padding-left: 16px; margin-left: 8px; position: relative; padding-bottom: 16px; }
+        .log-timeline-item::before { content: ''; position: absolute; left: -5px; top: 0; width: 8px; height: 8px; border-radius: 50%; background: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-light); }
+        .log-timeline-item:last-child { border-left-color: transparent; padding-bottom: 0; }
+        .copy-btn { display:inline-flex; align-items:center; gap:2px; color:var(--primary-color); font-size:10px; font-weight:800; padding:2px 6px; border-radius:4px; background:rgba(31,95,255,0.05); cursor:pointer;}
+
+        /* --- 教师排班表格专属样式 --- */
+        .timetable-wrapper { background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 16px; overflow: hidden; box-shadow: 0 8px 24px rgba(31, 95, 255, 0.05); margin-bottom: 24px; flex-shrink: 0; }
+        .timetable { width: 100%; border-collapse: collapse; text-align: center; }
+        .timetable th { background: rgba(31, 95, 255, 0.05); padding: 10px 4px; font-size: 12px; color: var(--text-secondary); font-weight: 700; border-bottom: 1px solid var(--border-line); }
+        .timetable td { padding: 12px 4px; border-bottom: 1px solid var(--border-line); font-size: 13px; color: var(--text-main); }
+        .timetable tr:last-child td { border-bottom: none; }
+        .timetable td.period { font-weight: 700; color: var(--text-title); width: 40px; }
+        .timetable td.time { font-size: 11px; color: var(--text-secondary); width: 80px; line-height: 1.4; }
+        .timetable td.class-info { text-align: left; padding-left: 12px; line-height: 1.4;}
+        .timetable td .course-name { font-weight: 800; color: var(--primary-color); display: block; margin-bottom: 2px;}
+        .timetable td .course-loc { font-size: 11px; color: var(--text-secondary); }
+        .timetable tr.empty-slot td { background: rgba(0,0,0,0.02); color: #9CA3AF; }
+        .timetable tr.empty-slot td.class-info { text-align: center; padding-left: 4px; font-weight: 600; color: #9CA3AF;}
+
+        .teacher-stats-top { display: flex; flex-direction: column; align-items: stretch; gap: 12px; margin-bottom: 16px; padding: 0 4px; flex-shrink: 0;}
+        .teacher-stat-text { font-size: 14px; font-weight: 800; color: var(--text-secondary); }
+        .teacher-alert-pill { background: rgba(255, 255, 255, 0.8); border: 1px solid var(--danger-light); padding: 6px 12px; border-radius: 12px; display: flex; gap: 16px; font-size: 13px; font-weight: 600; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.05); }
+
+        .toast { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.75); color: white; padding: 12px 24px; border-radius: 12px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 500; backdrop-filter: blur(4px); font-weight: 600; text-align: center;}
+        .toast.show { opacity: 1; }
+
+        /* ==================== 新增页面重构样式 ==================== */
+        
+        /* 胶囊状搜索栏 */
+        .search-input-pill { width: 100%; padding: 14px 14px 14px 44px; border-radius: 100px; background: rgba(255,255,255,0.9); border: none; font-size: 14px; font-weight: 600; color: var(--text-title); outline: none; box-shadow: 0 4px 16px rgba(31, 95, 255, 0.05); transition: all 0.2s; }
+        .search-input-pill:focus { background: white; box-shadow: 0 4px 20px rgba(31, 95, 255, 0.12); }
+        .search-icon-pill { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: #9CA3AF; z-index: 10; }
+
+        /* 标题头区域 */
+        .section-header { display: flex; justify-content: space-between; align-items: center; padding: 0 6px 12px; margin-top: 16px;}
+        .section-title { font-size: 18px; font-weight: 800; color: var(--text-title); letter-spacing: 0.5px;}
+        .manage-btn { font-size: 14px; font-weight: 600; color: var(--primary-color); cursor: pointer; transition: 0.2s; padding: 4px 8px; border-radius: 8px;}
+        .manage-btn:active { background: rgba(31, 95, 255, 0.1); }
+
+        /* 功能目录二级切换标签 */
+        .dir-tabs { display: flex; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid rgba(0,0,0,0.03); padding: 4px 12px 0; }
+        .dir-tabs::-webkit-scrollbar { display: none; }
+        .dir-tab { padding: 14px 14px; font-size: 14px; font-weight: 600; color: var(--text-secondary); cursor: pointer; white-space: nowrap; position: relative; transition: 0.2s; }
+        .dir-tab.active { color: var(--primary-color); font-weight: 800; }
+        .dir-tab.active::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 24px; height: 3px; background: var(--primary-color); border-radius: 2px 2px 0 0; }
+
+        /* 徽标（删除 / 添加 / 已加） */
+        .delete-badge { position: absolute; top: -4px; right: -4px; width: 20px; height: 20px; background: var(--danger-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; line-height: 1; border: 2px solid white; z-index: 10; box-shadow: 0 2px 6px rgba(239,68,68,0.3); cursor: pointer;}
+        .add-badge { position: absolute; top: -4px; right: -4px; width: 20px; height: 20px; background: var(--success-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; z-index: 10; box-shadow: 0 2px 6px rgba(16,185,129,0.3); cursor: pointer; }
+        .added-badge { position: absolute; top: -4px; right: -4px; width: 20px; height: 20px; background: #9CA3AF; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; z-index: 10; cursor: not-allowed; }
+        
+        /* 编辑模式下的动画 */
+        @keyframes shake-wobble {
+            0% { transform: rotate(-2deg); }
+            50% { transform: rotate(2deg); }
+            100% { transform: rotate(-2deg); }
+        }
+        .shake-anim { animation: shake-wobble 0.25s infinite linear; }
+    </style>
+</head>
+<body>
+
+<div class="device-simulator">
+    <div class="wrapper-main">
+        
+        <!-- 核心业务：学校管理页面 (重构区域) -->
+        <div id="tab-school" class="tab-view active">
+            <div class="nav-bar main-nav" style="padding-bottom:16px;">
+                <div class="nav-title" style="font-size: 20px;">学校管理</div>
+            </div>
+            <div class="main-content">
+                <!-- 顶部智能搜索 -->
+                <div style="position: relative; margin-bottom: 8px;">
+                    <svg class="search-icon-pill" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" class="search-input-pill" placeholder="全局搜索功能/拼音首字母">
+                </div>
+
+                <!-- 高频功能区 -->
+                <div class="section-header">
+                    <div class="section-title">高频功能</div>
+                    <!-- 右侧编辑管理按钮 -->
+                    <div class="manage-btn" onclick="toggleManage()" id="manage-btn-text">管理</div>
+                </div>
+                <div class="glass-card" style="margin-bottom: 12px; padding-bottom: 8px;">
+                    <div class="grid-menu" style="padding-top:16px;" id="high-freq-grid"></div>
+                </div>
+
+                <!-- 功能目录树状切换区 -->
+                <div class="section-header">
+                    <div class="section-title">功能目录</div>
+                </div>
+                <div class="glass-card" style="margin-bottom: 16px;">
+                    <!-- 横向分类标签 -->
+                    <div class="dir-tabs" id="dir-tabs"></div>
+                    <!-- 动态网格数据 -->
+                    <div class="grid-menu" style="padding-top:16px; padding-bottom:16px;" id="dir-grid"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 补充模块：教师页面 (用于展示课表修复 - 未作改动) -->
+        <div id="tab-teacher" class="tab-view">
+            <div class="nav-bar main-nav">
+                <div class="nav-title">教师</div>
+            </div>
+            <div class="main-content">
+                <div style="font-size: 16px; font-weight: 800; color: var(--text-title); margin: 0 0 12px; flex-shrink: 0;">今日排班 & 课表</div>
+                <div class="teacher-stats-top" style="margin-bottom: 12px;">
+                    <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                        <div class="teacher-stat-text">个人排班：暂无巡查、暂时无课</div>
+                    </div>
+                    <div class="teacher-alert-pill" style="width: 100%;">
+                        <div style="display:flex; align-items:center; gap:4px; color:var(--text-main);">未点名 <span style="color:var(--danger-color); font-weight:800;">2</span></div>
+                        <div style="display:flex; align-items:center; gap:4px; color:var(--text-main);">未设课件 <span style="color:var(--danger-color); font-weight:800;">1</span></div>
+                    </div>
+                </div>
+
+                <!-- 课表表格设计 -->
+                <div class="timetable-wrapper">
+                    <table class="timetable">
+                        <thead>
+                            <tr>
+                                <th>节次</th>
+                                <th>时间</th>
+                                <th style="text-align: left; padding-left: 12px;">课程/安排</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="period">1</td>
+                                <td class="time">08:00<br>08:45</td>
+                                <td class="class-info">
+                                    <span class="course-name">高一(3)班 英语</span>
+                                    <span class="course-loc">教学楼 A栋 301室</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="period">2</td>
+                                <td class="time">09:00<br>09:45</td>
+                                <td class="class-info">
+                                    <span class="course-name" style="color: var(--warning-color);">高一(4)班 英语</span>
+                                    <span class="course-loc">教学楼 A栋 302室</span>
+                                </td>
+                            </tr>
+                            <tr class="empty-slot">
+                                <td class="period">3</td>
+                                <td class="time">10:00<br>10:45</td>
+                                <td class="class-info">暂时无课</td>
+                            </tr>
+                            <tr class="empty-slot">
+                                <td class="period">4</td>
+                                <td class="time">11:00<br>11:45</td>
+                                <td class="class-info">暂时无课</td>
+                            </tr>
+                            <tr class="empty-slot" style="background: rgba(31, 95, 255, 0.05);">
+                                <td class="period" style="font-size: 11px; color: var(--primary-color);">午休</td>
+                                <td class="time" style="color: var(--primary-color);">12:00<br>14:00</td>
+                                <td class="class-info" style="color: var(--primary-color);">暂无巡查</td>
+                            </tr>
+                            <tr>
+                                <td class="period">5</td>
+                                <td class="time">14:10<br>14:55</td>
+                                <td class="class-info">
+                                    <span class="course-name" style="color: var(--success-color);">高一英语教研会</span>
+                                    <span class="course-loc">行政楼 综合会议室</span>
+                                </td>
+                            </tr>
+                            <tr class="empty-slot">
+                                <td class="period">6</td>
+                                <td class="time">15:05<br>15:50</td>
+                                <td class="class-info">暂时无课</td>
+                            </tr>
+                            <tr class="empty-slot">
+                                <td class="period">7</td>
+                                <td class="time">16:00<br>16:45</td>
+                                <td class="class-info">暂时无课</td>
+                            </tr>
+                            <tr>
+                                <td class="period">8</td>
+                                <td class="time">16:55<br>17:40</td>
+                                <td class="class-info">
+                                    <span class="course-name" style="color: var(--icon-color-purple);">高一(3)班 辅导</span>
+                                    <span class="course-loc">教学楼 A栋 301室</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部全局导航栏（未作改动） -->
+        <div class="tab-bar">
+            <div class="tab-item" onclick="showToast('该模块暂不跳转')">
+                <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></div>
+                <div class="tab-label">通告</div>
+            </div>
+            <div class="tab-item" onclick="showToast('该模块暂不跳转')">
+                <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></div>
+                <div class="tab-label">课件</div>
+            </div>
+            <div class="tab-item" onclick="switchTab('tab-teacher', this)">
+                <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg></div>
+                <div class="tab-label">教师</div>
+            </div>
+            <div class="tab-item active" onclick="switchTab('tab-school', this)">
+                <div class="tab-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
+                <div class="tab-label">学校</div>
+            </div>
+            <div class="tab-item" onclick="showToast('该模块暂不跳转')">
+                <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
+                <div class="tab-label">我的</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================== 子页面：招生管理动态工作台 (未作改动) ================== -->
+    <div id="page-enrollment-sub" class="page-view sub-page hidden-right">
+        <div class="nav-bar">
+            <div class="icon-btn" style="margin-left: -8px;" onclick="closeSubPage('page-enrollment-sub')">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </div>
+            <div class="nav-title-group"><div class="nav-title" id="enrollment-sub-title">业务加载中</div></div>
+            <div class="icon-btn"></div>
+        </div>
+        <div class="main-content">
+            <div class="global-semester-bar">
+                <span style="font-size:13px; font-weight:800; color:var(--text-title); flex-shrink:0;">数据视图：</span>
+                <div style="position:relative; display:flex; align-items:center; flex:1; margin-left: 12px;">
+                    <select class="semester-select">
+                        <option>2026年秋季学期 (当前)</option>
+                        <option>2026年春季学期</option>
+                        <option>2025年秋季学期</option>
+                    </select>
+                    <svg style="position:absolute; right:0; width:16px; height:16px; color:var(--primary-color); pointer-events:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+            </div>
+            <div id="enrollment-dynamic-header"></div>
+            <div class="pill-scroll" id="enrollment-sub-tabs"></div>
+            <div id="enrollment-sub-data" style="display:flex; flex-direction:column;"></div>
+        </div>
+    </div>
+
+    <!-- 系统提示 -->
+    <div class="toast" id="sys-toast"></div>
+</div>
+
+<script>
+    // ================= 公共逻辑 =================
+    function showToast(msg, duration = 1500) {
+        let toast = document.getElementById('sys-toast');
+        toast.innerText = msg; toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), duration);
+    }
+
+    function switchTab(tabId, el) {
+        document.querySelectorAll('.tab-item').forEach(item => item.classList.remove('active'));
+        el.classList.add('active');
+        document.querySelectorAll('.tab-view').forEach(view => view.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+    }
+
+    function openSubPage(pageId) {
+        document.getElementById(pageId).classList.replace('hidden-right', 'active');
+    }
+
+    function closeSubPage(pageId) {
+        document.getElementById(pageId).classList.replace('active', 'hidden-right');
+    }
+
+
+    // ================= 核心重构逻辑：高频管理与目录系统 =================
+
+    // 原数据结构保留，整合为字典格式以便进行 Tab 切换渲染
+    const dirData = {
+        '招生管理': ['招生配置', '线索管理', '跟进到访', '报名录取', '报到交接', '生源学校', '归档审计'],
+        '办公': ['添加汇报','通讯录','执勤安排','校园执勤','教师考核','审批假条','会议管理','需求管理'],
+        '学生管理': ['留宿查看','班主任考核','宿舍排名','出操排名','实时统计','宿舍信息','学生假条','点到安排'],
+        '双百分考核': ['班级违纪','班级奖励','学生违纪','学生奖励','考核排名'],
+        '教务管理': ['班级课时','评教查看','教师汇总','综合课表','课堂统计','评分统计','特长班','班级信息','期末成绩']
+    };
+
+    // 默认高频功能（原封不动）
+    let origHighFreq = ['课表查询','审批管理','工作汇报','学生假条'];
+    let isManaging = false;      // 编辑状态标识
+    let currentDirTab = '招生管理'; // 当前默认展开的目录 Tab
+
+    // 扩充至 25+ 种独立图标和 12 种配色，极大降低重复率
+    const massiveIcons = [
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>', // Users群组
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>', // 日历日程
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>', // 文本文件
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>', // 确认审核
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>', // 盾牌安全
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>', // 时钟考勤
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>', // 文件夹
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>', // 柱状图统计
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>', // 层级堆叠
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>', // 六边形模块
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>', // 面板布局
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>', // 剪贴板
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>', // 书籍/教案
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>', // 展开的书籍
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>', // 设置齿轮
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>', // 消息通知
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>', // 动态波纹
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>', // 地球网络
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>', // 收藏星标
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>', // 钢笔编辑
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>', // 公文包
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>', // 响铃提醒
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>', // 奖牌荣誉
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>', // 费用财务
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>' // 定位线索
+    ];
+    const colors = [
+        {bg: 'var(--icon-bg-blue)', color: 'var(--icon-color-blue)'},
+        {bg: 'var(--icon-bg-orange)', color: 'var(--icon-color-orange)'},
+        {bg: 'var(--icon-bg-teal)', color: 'var(--icon-color-teal)'},
+        {bg: 'var(--icon-bg-purple)', color: 'var(--icon-color-purple)'},
+        {bg: 'var(--icon-bg-pink)', color: 'var(--icon-color-pink)'},
+        {bg: 'var(--icon-bg-yellow)', color: 'var(--icon-color-yellow)'},
+        {bg: 'var(--icon-bg-cyan)', color: 'var(--icon-color-cyan)'},
+        {bg: 'var(--icon-bg-rose)', color: 'var(--icon-color-rose)'},
+        {bg: 'var(--icon-bg-indigo)', color: 'var(--icon-color-indigo)'},
+        {bg: 'var(--icon-bg-emerald)', color: 'var(--icon-color-emerald)'},
+        {bg: 'var(--icon-bg-sky)', color: 'var(--icon-color-sky)'},
+        {bg: 'var(--icon-bg-lime)', color: 'var(--icon-color-lime)'}
+    ];
+
+    // 工具函数：根据字符串计算稳定的Hash索引，保证同一名称的图标颜色永久不变
+    function getStableIndex(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        return Math.abs(hash);
+    }
+
+    // 切换管理/完成状态
+    function toggleManage() {
+        isManaging = !isManaging;
+        document.getElementById('manage-btn-text').innerText = isManaging ? '完成' : '管理';
+        if (isManaging) showToast('点击 - 移除，点击下方目录 + 添加');
+        renderHighFreq();
+        renderDirContent();
+    }
+
+    // 从高频中移除
+    function removeHighFreq(index, event) {
+        if(event) event.stopPropagation();
+        origHighFreq.splice(index, 1);
+        renderHighFreq();
+        if (isManaging) renderDirContent(); // 刷新下方的状态角标
+    }
+
+    // 添加至高频中
+    function addToHighFreq(label, event) {
+        if(event) event.stopPropagation();
+        if (origHighFreq.includes(label)) return;
+        if (origHighFreq.length >= 10) {
+            showToast('高频功能最多添加10个');
+            return;
+        }
+        origHighFreq.push(label);
+        renderHighFreq();
+        if (isManaging) renderDirContent(); // 刷新状态角标为已添加
+    }
+
+    // 统一生成网格功能的函数
+    function generateGridItem(label, isHighFreq = false, hfIndex = -1) {
+        let stableIdx = getStableIndex(label);
+        let icon = massiveIcons[(stableIdx * 7) % massiveIcons.length]; 
+        let color = colors[stableIdx % colors.length];
+
+        // 识别是否是招生管理内的模块（确保原跳转逻辑生效）
+        let isEnrollmentItem = dirData['招生管理'].includes(label);
+        let actionType = isEnrollmentItem ? 'enrollment' : 'toast';
+
+        let onClickStr = '';
+        let badgeHtml = '';
+        let animClass = '';
+
+        if (isManaging) {
+             // 管理模式
+             if (isHighFreq) {
+                 // 顶部区域显示移除按钮，自身禁用点击跳转，开启抖动动画
+                 animClass = 'shake-anim';
+                 badgeHtml = `<div class="delete-badge" onclick="removeHighFreq(${hfIndex}, event)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></div>`;
+             } else {
+                 // 底部目录显示添加逻辑
+                 if(!origHighFreq.includes(label)) {
+                     badgeHtml = `<div class="add-badge" onclick="addToHighFreq('${label}', event)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></div>`;
+                     onClickStr = `addToHighFreq('${label}', event)`; // 点击整体也可以添加
+                 } else {
+                     badgeHtml = `<div class="added-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></div>`;
+                 }
+             }
+        } else {
+             // 正常模式
+             onClickStr = actionType === 'enrollment' ? `openEnrollmentSub('${label}')` : `showToast('${label}')`;
+        }
+
+        return `<div class="grid-item ${animClass}" ${onClickStr ? `onclick="${onClickStr}"` : ''}>
+                    <div style="position:relative;">
+                        <div class="grid-icon-wrap" style="background: ${color.bg}; color: ${color.color};">${icon}</div>
+                        ${badgeHtml}
+                    </div>
+                    <div class="grid-label">${label}</div>
+                </div>`;
+    }
+
+    // 渲染上方高频功能区
+    function renderHighFreq() {
+        const container = document.getElementById('high-freq-grid');
+        let html = '';
+        origHighFreq.forEach((label, i) => {
+            html += generateGridItem(label, true, i);
+        });
+        
+        // 追加“添加”固定按钮（为了视觉统一，不论模式均展示）
+        let addClick = isManaging ? `showToast('请从下方点击 + 号添加')` : `toggleManage()`;
+        let addAnim = isManaging ? `shake-anim` : ``;
+        html += `<div class="grid-item ${addAnim}" onclick="${addClick}">
+                    <div style="position:relative;">
+                        <div class="grid-icon-wrap" style="background: rgba(255,255,255,0.4); color: var(--primary-color); border: 2px dashed rgba(31, 95, 255, 0.3);">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        </div>
+                    </div>
+                    <div class="grid-label" style="color: var(--primary-color);">添加</div>
+                 </div>`;
+        container.innerHTML = html;
+    }
+
+    // 渲染下方目录 Tab
+    function renderDirTabs() {
+        const container = document.getElementById('dir-tabs');
+        let html = '';
+        Object.keys(dirData).forEach(key => {
+            let active = key === currentDirTab ? 'active' : '';
+            html += `<div class="dir-tab ${active}" onclick="switchDirTab('${key}')">${key}</div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    // 切换目录 Tab
+    function switchDirTab(key) {
+        currentDirTab = key;
+        renderDirTabs();
+        renderDirContent();
+    }
+
+    // 渲染当前所选目录内容
+    function renderDirContent() {
+        const container = document.getElementById('dir-grid');
+        let items = dirData[currentDirTab];
+        let html = '';
+        items.forEach((label) => {
+            html += generateGridItem(label, false, -1);
+        });
+        container.innerHTML = html;
+    }
+
+    // 入口初始化：替代原有的 initSchoolGrids
+    function initSchoolGrids() {
+        renderHighFreq();
+        renderDirTabs();
+        renderDirContent();
+    }
+
+    // ================= 原招生管理二级业务逻辑（完全保留） =================
+    const svgLog = `<svg class="icon-log-btn" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" onclick="event.stopPropagation();showToast('查看全生命周期日志')"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
+    const svgCopy = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+
+    const enrollmentSubDataConfig = {
+        '招生配置': {
+            tabs: ['招生学期', '招生人员'],
+            header: '',
+            renderMockData: () => `
+                <div class="list-card glass-card">
+                    <div class="card-row-between">
+                        <div class="card-title">2026年秋季招生计划指标</div>
+                        <div class="badge-tag tag-success">招生中</div>
+                    </div>
+                    <div class="card-desc"><span>招生学期绑定: 26年秋季</span><span>状态: 核心配置完成</span></div>
+                    <div style="font-size:12px; color:var(--text-main); margin-top:8px; display:flex; flex-direction:column; gap:6px;">
+                        <div style="display:flex; justify-content:space-between; background:rgba(0,0,0,0.02); padding:6px 8px; border-radius:6px;">
+                            <span>专业计划</span><span style="font-weight:700;">8个专业已开设</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; background:rgba(0,0,0,0.02); padding:6px 8px; border-radius:6px;">
+                            <span>分班计划</span><span style="font-weight:700;">共1200人配额</span>
+                        </div>
+                    </div>
+                </div>
+            `
+        },
+        '线索管理': {
+            tabs: ['营销线索', '公海线索', '个人线索', '线下登记'],
+            header: `<div style="display:flex; gap:10px; margin-bottom:12px; padding: 0 4px;"><div style="flex:1; background:rgba(255,255,255,0.7); border:1px solid white; border-radius:10px; padding:8px 12px; font-size:13px; font-weight:700; color:var(--text-title); display:flex; justify-content:space-between;">全部状态 <span style="color:#9CA3AF">▼</span></div></div>`,
+            renderMockData: () => `
+                <div class="list-card glass-card">
+                    <div class="card-row-between">
+                        <div class="card-title">李明 (初三毕业生)</div>
+                        <div class="badge-outline warning">待跟进</div>
+                    </div>
+                    <div class="card-desc"><span>来源: 线下登记</span><span>归属: 默认指派登记人(尹娣)</span></div>
+                    <div class="card-actions">
+                        <button class="btn-xs" onclick="event.stopPropagation();showToast('发起电话/微信跟进')">发起跟进</button>
+                        ${svgLog}
+                    </div>
+                </div>
+            `
+        },
+        '跟进到访': {
+            tabs: ['跟进记录', '到访预约', '到访记录'],
+            header: '',
+            renderMockData: () => `
+                <div class="list-card glass-card">
+                    <div class="card-row-between">
+                        <div class="card-title">刘子涵家长 - A级高意向</div>
+                        <div class="badge-tag tag-success">邀约成功</div>
+                    </div>
+                    <div class="card-desc"><span>微信沟通于 今天 10:30</span><span>负责老师: 尹娣</span></div>
+                    <div class="card-actions">
+                        <button class="btn-xs">转入到访核销</button>
+                        ${svgLog}
+                    </div>
+                </div>
+            `
+        },
+        '报名录取': {
+            tabs: ['预定记录', '录取记录'],
+            header: '',
+            renderMockData: () => `
+                <div class="list-card glass-card">
+                    <div class="card-row-between">
+                        <div class="card-title">陈思雨 (预报：计算机网络)</div>
+                        <div class="badge-tag tag-primary">已交预定金</div>
+                    </div>
+                    <div class="card-desc"><span>定金: ￥2000</span><span class="copy-btn" onclick="event.stopPropagation();showToast('单号已复制')">单号: R2608129 ${svgCopy}</span></div>
+                    <div class="step-container">
+                        <div class="step-item done"><div class="step-circle">✓</div><div class="step-label">预定</div></div>
+                        <div class="step-item active"><div class="step-circle">2</div><div class="step-label">审核材料</div></div>
+                        <div class="step-item"><div class="step-circle">3</div><div class="step-label">发录取书</div></div>
+                        <div class="step-item"><div class="step-circle">4</div><div class="step-label">新生报到</div></div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-xs">提交录取申请</button>
+                        ${svgLog}
+                    </div>
+                </div>
+            `
+        },
+        '报到交接': {
+            tabs: ['报到记录', '预分班', '预分班转班', '入学包交接'],
+            header: `
+                <div class="stats-banner">
+                    <div class="stats-banner-item"><span class="stats-num">145</span><span class="stats-label">已实地报到</span></div>
+                    <div class="stats-banner-item"><span class="stats-num" style="color:var(--warning-color);">23</span><span class="stats-label">已录取未报到</span></div>
+                </div>
+                <div class="warning-banner" style="font-size:12px; color:var(--warning-color); padding:0 8px;">⚠️ 提示：预分班系统仅作报到当天引导分流之用，开学建档前可自由进行预转班调整。</div>
+            `,
+            renderMockData: () => `
+                <div class="list-card glass-card">
+                    <div class="card-row-between">
+                        <div class="card-title">刘鑫 (准新生档案: #0921)</div>
+                        <div class="badge-tag tag-warning">待报到 (已预分班)</div>
+                    </div>
+                    <div class="card-desc"><span>预分班级: 26级软件3班</span><span>指导老师: 王建国</span></div>
+                    <div class="card-actions">
+                        <button class="btn-xs" onclick="event.stopPropagation();showToast('弹出预分班调整弹窗')">微调预分班</button>
+                        ${svgLog}
+                    </div>
+                </div>
+            `
+        },
+        '生源学校': {
+            tabs: ['生源学校候选', '生源学校责任'],
+            header: '',
+            renderMockData: () => `
+                <div class="list-card glass-card">
+                    <div class="card-row-between">
+                        <div class="card-title">深圳市坪山实验初级中学</div>
+                        <div class="badge-tag tag-success">正式生源学校</div>
+                    </div>
+                    <div class="card-desc"><span>我方专属对接人: 尹娣</span><span>历史输送生源总数: 145人</span></div>
+                    <div class="card-actions">
+                        <button class="btn-xs outline">变更责任人</button>
+                        ${svgLog}
+                    </div>
+                </div>
+            `
+        },
+        '归档审计': {
+            tabs: ['入池日志', '分配日志', '阶段日志'],
+            header: `<div style="display:flex; gap:10px; margin-bottom:12px; padding: 0 4px;"><div style="background:var(--primary-color); color:white; border-radius:10px; padding:8px 14px; font-size:13px; font-weight:700; cursor:pointer;" onclick="showToast('导出为Excel或PDF')">数据导出</div></div>`,
+            renderMockData: () => `
+                <div class="glass-card" style="padding:16px;">
+                    <div style="font-size:14px; font-weight:800; color:var(--text-title); margin-bottom:16px;">招生系统全生命周期流水</div>
+                    <div class="log-timeline-item">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <div style="font-size:13px; font-weight:800; color:var(--text-title);">[预分班调整] 修改学生归属</div>
+                            <span style="font-size:11px; color:var(--primary-color); cursor:pointer;" onclick="showToast('查看详情对比')">详情 ></span>
+                        </div>
+                        <div style="font-size:11px; color:var(--text-main); margin-top:4px; font-weight:500;">旧值: 软件3班 ➔ 新值: 软件1班</div>
+                        <div style="font-size:10px; color:var(--text-secondary); margin-top:4px;">操作人: 尹娣 | 今天 14:30</div>
+                    </div>
+                </div>
+            `
+        }
+    };
+
+    function openEnrollmentSub(category) {
+        // 防止编辑状态下误触
+        if (isManaging) return; 
+        document.getElementById('enrollment-sub-title').innerText = category;
+        const config = enrollmentSubDataConfig[category];
+        if(!config) return;
+        document.getElementById('enrollment-dynamic-header').innerHTML = config.header || '';
+        let tabsHtml = config.tabs.map((tab, i) => {
+            return `<div class="pill ${i===0?'active':''}" onclick="switchEnrollSubTab(this)">${tab}</div>`;
+        }).join('');
+        document.getElementById('enrollment-sub-tabs').innerHTML = tabsHtml;
+        document.getElementById('enrollment-sub-data').innerHTML = config.renderMockData();
+        openSubPage('page-enrollment-sub');
+    }
+
+    function switchEnrollSubTab(el) {
+        document.querySelectorAll('#enrollment-sub-tabs .pill').forEach(p => p.classList.remove('active'));
+        el.classList.add('active');
+        showToast('您点击了子视图：' + el.innerText);
+    }
+
+    window.onload = initSchoolGrids;
+</script>
+</body>
+</html>
