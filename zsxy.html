@@ -76,17 +76,16 @@
         .nav-title { font-size: 17px; font-weight: 800; color: var(--text-title); letter-spacing: 0.5px;}
         .icon-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-title); }
 
-        /* 新增：顶部栏专用的药丸按钮通用样式 */
+        .header-actions { display: flex; gap: 6px; align-items: center; }
         .header-pill-btn {
-            display: inline-flex; align-items: center; justify-content: center; gap: 4px;
-            height: 28px; padding: 0 10px; border-radius: 10px; border: 1px solid transparent;
-            font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            display: inline-flex; align-items: center; justify-content: center; gap: 3px;
+            height: 26px; padding: 0 8px; border-radius: 8px; border: 1px solid transparent;
+            font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
             white-space: nowrap; user-select: none;
         }
         .header-pill-btn:active { transform: scale(0.95); }
-        .header-pill-btn svg { width: 14px; height: 14px; stroke-width: 2.5; }
+        .header-pill-btn svg { width: 13px; height: 13px; stroke-width: 2.5; }
         
-        /* 药丸按钮的四种状态主题 */
         .hp-primary { background: var(--primary-light); color: var(--primary-color); border-color: rgba(31, 95, 255, 0.15); }
         .hp-success { background: var(--success-light); color: var(--success-color); border-color: rgba(16, 185, 129, 0.15); }
         .hp-warning { background: var(--warning-light); color: var(--warning-color); border-color: rgba(245, 158, 11, 0.15); }
@@ -130,27 +129,11 @@
         .task-title { font-size: 16px; font-weight: 800; color: var(--text-title); }
         .task-desc { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
 
-        .task-progress-wrapper { margin-top: 4px; width: 100%; }
-        .task-progress-text { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-secondary); margin-bottom: 4px; font-weight: 600; }
-        .task-progress-bg { height: 6px; background: rgba(0,0,0,0.06); border-radius: 3px; overflow: hidden; }
-        .task-progress-fill { height: 100%; border-radius: 3px; transition: width 0.3s ease; }
-
-        /* 新增：任务页面的顶部筛选和搜索 */
         .task-toolbar {
             position: sticky; top: -1px; z-index: 20; margin: 0 -20px 12px; padding: 10px 20px 12px;
             background: rgba(239, 246, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255,255,255,0.5); display: flex; flex-direction: column; gap: 12px;
         }
-        .task-filter-chips {
-            display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px;
-        }
-        .task-filter-chips::-webkit-scrollbar { display: none; }
-        .chip {
-            padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 700; cursor: pointer;
-            background: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.9); color: var(--text-secondary);
-            white-space: nowrap; transition: all 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-        }
-        .chip.active { background: var(--primary-color); color: white; border-color: var(--primary-color); box-shadow: 0 4px 10px rgba(31,95,255,0.2); }
 
         .tag {
             display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 8px; 
@@ -175,7 +158,7 @@
             border-radius: 16px; padding: 14px 12px; display: flex; justify-content: space-between;
             margin-bottom: 12px; flex-shrink: 0;
         }
-        .stat-item { text-align: center; flex: 1; position: relative; }
+        .stat-item { text-align: center; flex: 1; position: relative; transition: all 0.3s ease; }
         .stat-item:not(:last-child)::after { content: ''; position: absolute; right: 0; top: 15%; height: 70%; width: 1px; background: rgba(0,0,0,0.06); }
         .stat-value { font-size: 18px; font-weight: 800; margin-bottom: 2px; }
         .stat-label { font-size: 11px; color: var(--text-secondary); font-weight: 600; }
@@ -275,7 +258,6 @@
         .row-content-col { flex: 1; display: flex; align-items: center; justify-content: space-between; padding: 16px 14px 16px 12px; min-width: 0; gap: 12px; }
         .row-left-content { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px;}
         
-        /* 针对英文特定布局 */
         .en-display { display: flex; flex-direction: column; gap: 3px; }
         .en-word-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap;}
         .en-text { font-size: 16px; font-weight: 700; color: var(--text-title); word-break: break-word; }
@@ -294,12 +276,12 @@
 
         .row-right-action { flex-shrink: 0; display: flex; align-items: center; gap: 8px;}
         
-        .review-actions { display: flex; flex-direction: column; gap: 6px; }
-        .btn-review { width: 28px; height: 28px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s, background 0.2s; }
+        .review-actions { display: flex; gap: 10px; align-items: center; }
+        .btn-review { width: 34px; height: 34px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s, background 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .btn-review:active { transform: scale(0.9); }
-        .btn-approve { background: var(--success-light); color: var(--success-color); }
+        .btn-approve { background: var(--success-light); color: var(--success-color); border: 1px solid rgba(16, 185, 129, 0.2); }
         .btn-approve:active { background: var(--success-color); color: white; }
-        .btn-reject { background: var(--danger-light); color: var(--danger-color); }
+        .btn-reject { background: var(--danger-light); color: var(--danger-color); border: 1px solid rgba(239, 68, 68, 0.2); }
         .btn-reject:active { background: var(--danger-color); color: white; }
 
         .btn-record {
@@ -349,11 +331,8 @@
             <div class="nav-title-group">
                 <div class="nav-title" id="version-nav-title">选择音记版本</div>
             </div>
-            <!-- 修改：应用全新的 header-pill-btn 样式结构 -->
-            <div class="header-pill-btn hp-success" id="roleTrigger" onclick="toggleRole()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                <span>执行视角</span>
-            </div>
+            <!-- 修改：将角色切换移动到了第四页，这里用一个占位撑开布局 -->
+            <div class="icon-btn"></div>
         </div>
         
         <div class="main-content">
@@ -376,14 +355,11 @@
         </div>
         
         <div class="main-content">
-            <!-- 新增：任务页面的工具栏 -->
+            <!-- 修改：任务页面的工具栏，去掉复杂筛选，仅保留搜索 -->
             <div class="task-toolbar">
                 <div class="search-container">
                     <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input type="text" id="taskSearchInput" class="search-input" placeholder="搜索任务分包..." oninput="handleTaskSearch()">
-                </div>
-                <div class="task-filter-chips" id="taskFilterChips">
-                    <!-- 由 JS 渲染 -->
+                    <input type="text" id="taskSearchInput" class="search-input" placeholder="搜索人名、任务名称..." oninput="handleTaskSearch()">
                 </div>
             </div>
 
@@ -394,7 +370,7 @@
             <div id="taskEmptyState" class="empty-state" style="display: none;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                 <h3>无匹配任务</h3>
-                <p>当前筛选条件下暂无任务</p>
+                <p>当前搜索条件下暂无任务</p>
             </div>
         </div>
     </div>
@@ -421,38 +397,30 @@
     <!-- PAGE 4: 录音工作台 -->
     <div id="page-workspace" class="page-view hidden-right" style="display:none;">
         <div class="nav-bar">
-            <div class="icon-btn" onclick="goBackToFields()">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            <div class="icon-btn" onclick="goBackToFields()" style="flex-shrink: 0; margin-left: -8px;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
             </div>
-            <div class="nav-title-group">
+            <div class="nav-title-group" style="flex: 1;">
                 <div class="nav-title" id="ws-nav-title">音频校对</div>
             </div>
-            <!-- 修改：移除 emoji 和内联样式，应用全新规范的 header-pill-btn 结构 -->
-            <div class="header-pill-btn hp-primary" id="autoListenToggle" onclick="toggleAutoListen()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
-                <span>自动试听</span>
+            
+            <!-- 修改：将角色切换按钮与自动试听紧凑并列 -->
+            <div class="header-actions" style="flex-shrink: 0;">
+                <div class="header-pill-btn hp-primary" id="autoListenToggle" onclick="toggleAutoListen()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
+                    <span>试听:开</span>
+                </div>
+                <div class="header-pill-btn hp-success" id="roleTrigger" onclick="toggleRole()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <span>执行</span>
+                </div>
             </div>
         </div>
 
         <div class="main-content">
-            <!-- 顶部统计板 -->
-            <div class="stats-card glass-card">
-                <div class="stat-item">
-                    <div class="stat-value" style="color: var(--text-title);" id="stat-total">0</div>
-                    <div class="stat-label">总数</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" style="color: var(--warning-color);" id="stat-unrecorded">0</div>
-                    <div class="stat-label">未录</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" style="color: var(--pending-color);" id="stat-pending">0</div>
-                    <div class="stat-label">待审</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" style="color: var(--danger-color);" id="stat-rejected">0</div>
-                    <div class="stat-label">需重录</div>
-                </div>
+            <!-- 修改：顶部统计板通过 JS 动态生成内容 -->
+            <div class="stats-card glass-card" id="statsBoardContainer">
+                <!-- 由 JS 渲染 -->
             </div>
 
             <div class="sticky-toolbar">
@@ -464,7 +432,7 @@
                         </div>
                         <div class="custom-filter-dropdown" id="filterDropdown">
                             <div class="filter-option" onclick="selectFilter('全部', event)">全部</div>
-                            <div class="filter-option selected" id="opt-unrecorded" onclick="selectFilter('未录音', event)">未录音</div>
+                            <div class="filter-option" id="opt-unrecorded" onclick="selectFilter('未录音', event)">未录音</div>
                             <div class="filter-option" onclick="selectFilter('待审核', event)">待审核</div>
                             <div class="filter-option" onclick="selectFilter('已通过', event)">已通过</div>
                             <div class="filter-option" onclick="selectFilter('需重录', event)">需重录</div>
@@ -531,10 +499,9 @@
     const iconPause = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`;
     const iconInlineSpeaker = `<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>`;
     const iconArrowRight = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
-    const iconCheck = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-    const iconCross = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+    const iconCheck = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+    const iconCross = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
     
-    // 新增：顶部按键专用 SVG
     const iconSoundOn = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>`;
     const iconSoundOff = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="1" x2="1" y2="23"></line><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`;
     const iconUser = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`;
@@ -573,12 +540,10 @@
     let activeTaskName = null;
     let currentUserRole = 'executor'; 
     
-    // 新增：全局自动试听开关
     let isAutoListenEnabled = true;
 
-    // 新增：任务列表全局状态
+    // 修改：去除了复杂的认领机制变量
     let allTasks = [];
-    let currentTaskFilter = '全部';
 
     let allWordsInField = []; 
     let currentBatchOffset = 0; 
@@ -656,68 +621,20 @@
         activeVersion = versions.find(v => v.id === vId);
         document.getElementById('task-nav-title').innerText = '选任务';
         
-        // 1. 模拟生成 50 个任务包，分配不同的进度和状态
+        // 修改：简化任务生成，不再涉及进度和强制分配
         allTasks = [];
-        for(let i = 1; i <= 50; i++) {
+        for(let i = 1; i <= 15; i++) {
             let taskCount = 100; 
+            let creatorName = ['张老师', '李老师', '王老师'][Math.floor(Math.random()*3)];
             
-            let rand = Math.random();
-            let completedCount = 0;
-            let statusTag = '未开始'; 
-            
-            // 新增：模拟认领状态 (unclaimed, me, other)
-            let claimStatus = 'unclaimed';
-            let claimerName = '';
-            let randClaim = Math.random();
-
-            // 为了演示，分配一定的认领比例
-            if (randClaim < 0.3) {
-                claimStatus = 'me';
-            } else if (randClaim < 0.6) {
-                claimStatus = 'other';
-                claimerName = ['员工张', '员工李', '员工王'][Math.floor(Math.random()*3)];
-            } else {
-                claimStatus = 'unclaimed';
-            }
-            
-            // 依据认领状态调整任务进度
-            if (claimStatus === 'unclaimed') {
-                completedCount = 0;
-                statusTag = '未开始';
-            } else {
-                if (rand < 0.2) {
-                    completedCount = 100;
-                    statusTag = '已完成';
-                } else if (rand < 0.4) {
-                    completedCount = Math.floor(Math.random() * 80) + 10;
-                    statusTag = Math.random() > 0.5 ? '有驳回' : '进行中';
-                } else if (rand < 0.5 && currentUserRole === 'reviewer') {
-                    completedCount = 100;
-                    statusTag = '待审核';
-                } else {
-                    completedCount = 0;
-                    statusTag = '未开始';
-                }
-            }
-
             allTasks.push({
                 id: `task_${i}`,
                 name: `任务分包 ${i}`,
                 total: taskCount,
-                completed: completedCount,
-                status: statusTag,
-                claimStatus: claimStatus,     // 加入认领属性
-                claimerName: claimerName
+                creatorName: creatorName
             });
         }
 
-        // 修改：根据角色赋予不同的默认筛选状态
-        currentTaskFilter = currentUserRole === 'reviewer' ? '待审核' : '待认领';
-
-        // 2. 渲染顶部 Chips
-        renderTaskFilterChips();
-
-        // 3. 渲染列表
         document.getElementById('taskSearchInput').value = '';
         applyTaskFiltersAndRender();
 
@@ -725,32 +642,6 @@
         document.getElementById('page-versions').classList.replace('active', 'hidden-left');
         document.getElementById('page-tasks').classList.replace('hidden-right', 'active');
         setTimeout(() => { document.getElementById('page-versions').style.display = 'none'; }, 400);
-    }
-
-    function renderTaskFilterChips() {
-        const chipContainer = document.getElementById('taskFilterChips');
-        chipContainer.innerHTML = '';
-        
-        // 根据角色设定不同的过滤器选项
-        let filters = [];
-        if (currentUserRole === 'reviewer') {
-            filters = ['全部', '待审核', '已完成'];
-        } else {
-            // 修改：加入认领相关的专属标签
-            filters = ['全部', '待认领', '我的任务', '进行中', '有驳回', '已完成'];
-        }
-
-        filters.forEach(f => {
-            const chip = document.createElement('div');
-            chip.className = `chip ${f === currentTaskFilter ? 'active' : ''}`;
-            chip.innerText = f;
-            chip.onclick = () => {
-                currentTaskFilter = f;
-                renderTaskFilterChips(); // 重新渲染更新 active 样式
-                applyTaskFiltersAndRender();
-            };
-            chipContainer.appendChild(chip);
-        });
     }
 
     function handleTaskSearch() {
@@ -764,18 +655,10 @@
         
         taskListEl.innerHTML = '';
 
+        // 修改：精简的搜索逻辑（搜索人名、任务名）
         let filteredTasks = allTasks.filter(task => {
-            let matchSearch = task.name.toLowerCase().includes(searchTerm);
-            let matchFilter = true;
-            
-            // 修改：处理认领机制相关的复杂筛选逻辑
-            if (currentTaskFilter !== '全部') {
-                if (currentTaskFilter === '待认领') matchFilter = task.claimStatus === 'unclaimed';
-                else if (currentTaskFilter === '我的任务') matchFilter = task.claimStatus === 'me';
-                else matchFilter = task.status === currentTaskFilter && task.claimStatus !== 'unclaimed';
-            }
-            
-            return matchSearch && matchFilter;
+            let searchTarget = `${task.name} ${task.creatorName}`.toLowerCase();
+            return searchTarget.includes(searchTerm);
         });
 
         if (filteredTasks.length === 0) {
@@ -787,67 +670,19 @@
             emptyStateEl.style.display = 'none';
         }
 
+        // 修改：极简的任务卡片，仅标题、总数、创建人
         filteredTasks.forEach(task => {
-            let progressPercent = Math.round((task.completed / task.total) * 100);
-            let fillColor = progressPercent === 100 ? 'var(--success-color)' : 'var(--primary-color)';
-            
-            // 如果是有驳回，进度条变红，吸引注意力
-            if (task.status === '有驳回') fillColor = 'var(--danger-color)';
-
-            // 新增：根据状态生成认领徽章 (Badge) 和透明度
-            let claimBadge = '';
-            let opacityStyle = '';
-            
-            if (task.claimStatus === 'unclaimed') {
-                claimBadge = `<span class="tag" style="padding:2px 6px; font-size:10px; background:var(--primary-light); color:var(--primary-color); border:none;">待认领</span>`;
-            } else if (task.claimStatus === 'me') {
-                claimBadge = `<span class="tag" style="padding:2px 6px; font-size:10px; background:var(--success-light); color:var(--success-color); border:none;">我的任务</span>`;
-            } else {
-                claimBadge = `<span class="tag" style="padding:2px 6px; font-size:10px; background:rgba(0,0,0,0.05); color:var(--text-secondary); border:none;">${task.claimerName}</span>`;
-                // 执行者视角看被锁定的任务时，显示半透明不可点击状
-                if (currentUserRole === 'executor') opacityStyle = 'opacity: 0.6;'; 
-            }
-
             const card = document.createElement('div');
             card.className = 'list-card';
-            card.style = opacityStyle;
             
-            // 修改：拦截点击操作，处理认领逻辑
             card.onclick = () => {
-                if (currentUserRole === 'executor' && task.claimStatus === 'other') {
-                    showToast(`该任务已被 ${task.claimerName} 锁定领取`);
-                    return;
-                }
-                
-                if (task.claimStatus === 'unclaimed') {
-                    task.claimStatus = 'me';
-                    task.status = '未开始'; 
-                    showToast('认领成功！已加入"我的任务"');
-                    applyTaskFiltersAndRender(); // 刷新列表以显示"我的任务"标签
-                }
-                
                 openFieldSelection(task.id, task.name, task.total);
             };
             
             card.innerHTML = `
                 <div class="task-info">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <div class="task-title">${task.name}</div>
-                            ${claimBadge}
-                        </div>
-                        <span class="tag" style="padding:2px 6px; font-size:10px; background:rgba(0,0,0,0.05); color:var(--text-secondary); border:none;">${task.status}</span>
-                    </div>
-                    <div class="task-desc" style="margin-top:6px;">共 ${task.total} 项待处理词条</div>
-                    <div class="task-progress-wrapper">
-                        <div class="task-progress-text">
-                            <span>已完成 ${task.completed}/${task.total}</span>
-                            <span>${progressPercent}%</span>
-                        </div>
-                        <div class="task-progress-bg">
-                            <div class="task-progress-fill" style="width: ${progressPercent}%; background: ${fillColor};"></div>
-                        </div>
-                    </div>
+                    <div class="task-title">${task.name}</div>
+                    <div class="task-desc" style="margin-top:4px;">共 ${task.total} 项待处理词条 · 创建人: ${task.creatorName}</div>
                 </div>
                 <div class="version-arrow-container" style="background: rgba(31, 95, 255, 0.05);">${iconArrowRight}</div>
             `;
@@ -891,7 +726,6 @@
         activeFieldId = fieldId;
         activeFieldName = fieldName;
         
-        /* 修改3：标题改为 {字段}音频校对，例如“英文音频校对” */
         document.getElementById('ws-nav-title').innerText = `${fieldName}音频校对`;
         
         generateWordsForTask(activeVersion.subject, activeFieldId, totalCount);
@@ -945,18 +779,17 @@
         setTimeout(() => { document.getElementById('page-workspace').style.display = 'none'; }, 400);
     }
 
-    // 新增：自动试听的开关控制逻辑更新
     function toggleAutoListen() {
         isAutoListenEnabled = !isAutoListenEnabled;
         const trigger = document.getElementById('autoListenToggle');
         
         if(isAutoListenEnabled) {
             trigger.className = 'header-pill-btn hp-primary';
-            trigger.innerHTML = `${iconSoundOn} <span>自动试听</span>`;
+            trigger.innerHTML = `${iconSoundOn} <span>试听:开</span>`;
             showToast('已开启录音后自动试听');
         } else {
             trigger.className = 'header-pill-btn hp-neutral';
-            trigger.innerHTML = `${iconSoundOff} <span>自动试听</span>`;
+            trigger.innerHTML = `${iconSoundOff} <span>试听:关</span>`;
             showToast('已关闭自动试听');
         }
     }
@@ -967,13 +800,19 @@
         
         if(currentUserRole === 'reviewer') {
             trigger.className = 'header-pill-btn hp-warning';
-            trigger.innerHTML = `${iconShield} <span>审核视角</span>`;
+            trigger.innerHTML = `${iconShield} <span>审核</span>`;
             showToast('已切换至审核视图');
+            selectFilter('待审核', null);
         } else {
             trigger.className = 'header-pill-btn hp-success';
-            trigger.innerHTML = `${iconUser} <span>执行视角</span>`;
+            trigger.innerHTML = `${iconUser} <span>执行</span>`;
             showToast('已切换至执行视图');
+            selectFilter('未录音', null);
         }
+        
+        // 刷新看板和列表
+        updateStatsBoard();
+        applyFiltersAndRender();
     }
 
     function generateWordsForTask(subjectKey, fieldId, totalCount) {
@@ -981,14 +820,11 @@
         let dataPool = mockContentDict[subjectKey][fieldId];
         if(!dataPool) dataPool = [{ text: "模拟数据", en: "Mock", ph: "/mɒk/", zh: "模拟" }];
 
-        /* 修改4：系统性确保4个状态都有模拟数据，不显示空状态 */
         const statuses = ['unrecorded', 'pending', 'approved', 'rejected'];
 
         for(let i=0; i<totalCount; i++) {
             let itemData = dataPool[i % dataPool.length];
             let isEnglish = subjectKey === 'english';
-            
-            // 循环赋予不同状态，保证每个过滤器至少有数据 (100数据下每类大约25个)
             let initialStatus = statuses[i % statuses.length];
             
             let obj = { id: `item_${i}`, status: initialStatus };
@@ -1005,16 +841,56 @@
         }
     }
 
+    // 修改：根据不同角色身份，动态渲染不同的看板指标
     function updateStatsBoard() {
         let total = allWordsInField.length;
         let unrecorded = allWordsInField.filter(w => w.status === 'unrecorded').length;
         let pending = allWordsInField.filter(w => w.status === 'pending').length;
+        let approved = allWordsInField.filter(w => w.status === 'approved').length;
         let rejected = allWordsInField.filter(w => w.status === 'rejected').length;
         
-        document.getElementById('stat-total').innerText = total;
-        document.getElementById('stat-unrecorded').innerText = unrecorded;
-        document.getElementById('stat-pending').innerText = pending;
-        document.getElementById('stat-rejected').innerText = rejected;
+        const container = document.getElementById('statsBoardContainer');
+        
+        if (currentUserRole === 'reviewer') {
+            container.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-value" style="color: var(--text-title);">${total}</div>
+                    <div class="stat-label">总数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" style="color: var(--pending-color);">${pending}</div>
+                    <div class="stat-label">待审</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" style="color: var(--success-color);">${approved}</div>
+                    <div class="stat-label">通过</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" style="color: var(--danger-color);">${rejected}</div>
+                    <div class="stat-label">需重录</div>
+                </div>
+            `;
+        } else {
+            let recorded = pending + approved; // 已录音包含待审核和已通过的
+            container.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-value" style="color: var(--text-title);">${total}</div>
+                    <div class="stat-label">总数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" style="color: var(--success-color);">${recorded}</div>
+                    <div class="stat-label">已录</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" style="color: var(--warning-color);">${unrecorded}</div>
+                    <div class="stat-label">未录</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" style="color: var(--danger-color);">${rejected}</div>
+                    <div class="stat-label">需重录</div>
+                </div>
+            `;
+        }
     }
 
     function toggleCustomFilter(e) {
@@ -1139,29 +1015,26 @@
                 `;
             }
 
-            const pressEvents = `
-                onmousedown="handlePressStart(this, '${item.id}', event)"
-                onmouseup="handlePressEnd(this, '${item.id}', true, event)"
-                onmouseleave="handlePressEnd(this, '${item.id}', false, event)"
-                ontouchstart="handlePressStart(this, '${item.id}', event)"
-                ontouchend="handlePressEnd(this, '${item.id}', true, event)"
-                ontouchcancel="handlePressEnd(this, '${item.id}', false, event)"
-            `;
-
             let actionHTML = '';
-            const recordBtnHTML = `<button class="btn-record" ${pressEvents}>${iconMic}</button>`;
             
-            /* 修改2：审核者视角增加包含了执行者的录音按钮，与审核按钮并列 */
+            /* 修改：审核视角下仅显示通过/驳回按钮，排版横置以维持优美布局 */
             if (currentUserRole === 'reviewer') {
                 actionHTML = `
                     <div class="review-actions">
                         <button class="btn-review btn-approve" onclick="handleReview('${item.id}', 'approved')" title="通过审核">${iconCheck}</button>
                         <button class="btn-review btn-reject" onclick="handleReview('${item.id}', 'rejected')" title="需重录">${iconCross}</button>
                     </div>
-                    ${recordBtnHTML}
                 `;
             } else {
-                actionHTML = recordBtnHTML;
+                const pressEvents = `
+                    onmousedown="handlePressStart(this, '${item.id}', event)"
+                    onmouseup="handlePressEnd(this, '${item.id}', true, event)"
+                    onmouseleave="handlePressEnd(this, '${item.id}', false, event)"
+                    ontouchstart="handlePressStart(this, '${item.id}', event)"
+                    ontouchend="handlePressEnd(this, '${item.id}', true, event)"
+                    ontouchcancel="handlePressEnd(this, '${item.id}', false, event)"
+                `;
+                actionHTML = `<button class="btn-record" ${pressEvents}>${iconMic}</button>`;
             }
 
             const itemDiv = document.createElement('div');
@@ -1211,7 +1084,6 @@
         itemEl.classList.remove('focused');
 
         if (saveRecord) {
-            // 修改：只有在开启自动试听时才显示对应文案
             if (isAutoListenEnabled) {
                 showToast('已保存，自动试听中...');
             } else {
@@ -1228,7 +1100,6 @@
                     let speakerBtn = document.getElementById(`play-${item.id}`);
                     if (speakerBtn) {
                         speakerBtn.disabled = false;
-                        // 修改：受自动试听全局变量管控
                         if (isAutoListenEnabled) {
                             handleInlinePlay(speakerBtn, item.id);
                         }
