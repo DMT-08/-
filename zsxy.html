@@ -76,7 +76,7 @@
         .nav-title { font-size: 17px; font-weight: 800; color: var(--text-title); letter-spacing: 0.5px;}
         .icon-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-title); }
 
-        .header-actions { display: flex; gap: 6px; align-items: center; }
+        /* 顶部导航栏药丸按钮样式 (恢复到顶部栏右侧使用) */
         .header-pill-btn {
             display: inline-flex; align-items: center; justify-content: center; gap: 3px;
             height: 26px; padding: 0 8px; border-radius: 8px; border: 1px solid transparent;
@@ -210,26 +210,53 @@
         .search-input:focus { background: rgba(255, 255, 255, 0.9); border-color: rgba(31, 95, 255, 0.3); box-shadow: 0 0 0 2px var(--primary-light); }
         .search-input::placeholder { color: #9CA3AF; }
 
-        .toolbar-row-2 { display: flex; justify-content: space-between; align-items: stretch; gap: 8px; }
+        /* 修复：移除 space-between，让右侧通过 margin-left: auto 自动对齐贴边，释放中间空间 */
+        .toolbar-row-2 { display: flex; align-items: center; gap: 6px; }
+        
+        /* 优化：允许向右侧延展占领部分空隙，并使其两端自然排版 */
         .batch-pill {
-            display: flex; align-items: center; flex: 1; background: rgba(255,255,255,0.7);
-            border: 1px solid rgba(255,255,255,0.9); border-radius: 12px; padding: 4px 6px 4px 10px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.03); min-width: 0; justify-content: space-between;
+            display: flex; align-items: center; background: rgba(255,255,255,0.7);
+            border: 1px solid rgba(255,255,255,0.9); border-radius: 12px; padding: 4px 4px 4px 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03); 
+            flex: 1; /* 允许向右侧延展占领部分空隙 */
+            max-width: 115px; /* 精确设定的舒适最大宽度 */
+            height: 34px;
+            justify-content: space-between; /* 数量和刷新按钮分布两端，视觉比例更匀称 */
         }
-        .batch-pill-text { font-size: 12px; color: var(--text-secondary); font-weight: 600; margin-right: 2px; white-space: nowrap;}
-        .batch-pill-input { width: 28px; text-align: center; border: none; background: transparent; font-size: 14px; font-weight: 800; color: var(--text-title); outline: none; padding: 0;}
+        .batch-pill-text { font-size: 13px; color: var(--text-secondary); font-weight: 600; white-space: nowrap;}
+        
+        /* 修复：隐藏 number 原生的上下箭头，微调宽度防止挤压 */
+        .batch-pill-input { width: 36px; text-align: center; border: none; background: transparent; font-size: 15px; font-weight: 800; color: var(--text-title); outline: none; padding: 0; -moz-appearance: textfield; }
+        .batch-pill-input::-webkit-outer-spin-button,
+        .batch-pill-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        
         .batch-pill-btn {
             background: var(--primary-light); color: var(--primary-color); border: none;
-            padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: 700;
-            cursor: pointer; display: flex; align-items: center; gap: 2px; flex-shrink: 0; white-space: nowrap;
+            width: 24px; height: 24px; border-radius: 8px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-left: 6px;
+        }
+
+        /* 新增：次要操作按钮样式，用于试听开关 */
+        .btn-action-secondary {
+            display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+            background: rgba(31, 95, 255, 0.1); color: var(--primary-color);
+            border: 1px solid rgba(31, 95, 255, 0.2); border-radius: 12px;
+            height: 34px; padding: 0 10px;
+            font-size: 13px; font-weight: 700; cursor: pointer;
+            transition: all 0.2s; white-space: nowrap; flex-shrink: 0;
+        }
+        .btn-action-secondary:active { transform: scale(0.95); background: rgba(31, 95, 255, 0.15); }
+        .btn-action-secondary.off {
+            background: rgba(0,0,0,0.05); color: var(--text-secondary); border-color: rgba(0,0,0,0.08);
         }
 
         .btn-action-primary {
             display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: var(--primary-color); color: #fff;
-            border: none; padding: 0 14px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer;
+            border: none; border-radius: 12px; height: 34px; padding: 0 14px; font-size: 13px; font-weight: 700; cursor: pointer;
             box-shadow: 0 4px 12px rgba(31, 95, 255, 0.25); transition: transform 0.2s; white-space: nowrap; flex-shrink: 0;
         }
         .btn-action-primary:active { transform: scale(0.95); }
+        .btn-action-primary svg, .btn-action-secondary svg { width: 14px; height: 14px; }
 
         .table-container {
             background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
@@ -331,7 +358,6 @@
             <div class="nav-title-group">
                 <div class="nav-title" id="version-nav-title">选择音记版本</div>
             </div>
-            <!-- 修改：将角色切换移动到了第四页，这里用一个占位撑开布局 -->
             <div class="icon-btn"></div>
         </div>
         
@@ -355,7 +381,6 @@
         </div>
         
         <div class="main-content">
-            <!-- 修改：任务页面的工具栏，去掉复杂筛选，仅保留搜索 -->
             <div class="task-toolbar">
                 <div class="search-container">
                     <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -397,28 +422,20 @@
     <!-- PAGE 4: 录音工作台 -->
     <div id="page-workspace" class="page-view hidden-right" style="display:none;">
         <div class="nav-bar">
-            <div class="icon-btn" onclick="goBackToFields()" style="flex-shrink: 0; margin-left: -8px;">
+            <div class="icon-btn" onclick="goBackToFields()" style="margin-left: -8px;">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
             </div>
-            <div class="nav-title-group" style="flex: 1;">
+            <div class="nav-title-group">
                 <div class="nav-title" id="ws-nav-title">音频校对</div>
             </div>
-            
-            <!-- 修改：将角色切换按钮与自动试听紧凑并列 -->
-            <div class="header-actions" style="flex-shrink: 0;">
-                <div class="header-pill-btn hp-primary" id="autoListenToggle" onclick="toggleAutoListen()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
-                    <span>试听:开</span>
-                </div>
-                <div class="header-pill-btn hp-success" id="roleTrigger" onclick="toggleRole()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                    <span>执行</span>
-                </div>
+            <div class="header-pill-btn hp-success" id="roleTrigger" onclick="toggleRole()" style="margin-right: -8px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
+                <span>录音视图</span>
             </div>
         </div>
 
         <div class="main-content">
-            <!-- 修改：顶部统计板通过 JS 动态生成内容 -->
+            <!-- 顶部统计板 -->
             <div class="stats-card glass-card" id="statsBoardContainer">
                 <!-- 由 JS 渲染 -->
             </div>
@@ -447,18 +464,26 @@
 
                 <div class="toolbar-row-2">
                     <div class="batch-pill">
-                        <span class="batch-pill-text">提取</span>
-                        <input type="number" id="batchSizeInput" class="batch-pill-input" value="10" min="1" max="100">
-                        <span class="batch-pill-text">项</span>
-                        <button class="batch-pill-btn" onclick="fetchNextBatch()">
-                            <svg class="icon-sm" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-                            换一批
+                        <div style="display: flex; align-items: center;">
+                            <input type="number" id="batchSizeInput" class="batch-pill-input" value="10" min="1" max="100">
+                            <span class="batch-pill-text">项</span>
+                        </div>
+                        <button class="batch-pill-btn" onclick="fetchNextBatch()" title="换一批">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
                         </button>
                     </div>
-                    <button class="btn-action-primary" onclick="startAutoPlay()">
-                        <svg class="icon-sm" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                        连播 <span id="listCountStr" style="font-weight:500; opacity:0.9; margin-left:2px;">(1-10)</span>
-                    </button>
+                    
+                    <!-- 修复：通过 margin-left: auto 将控制区稳稳推至最右侧 -->
+                    <div style="display: flex; gap: 6px; flex-shrink: 0; margin-left: auto;">
+                        <button class="btn-action-secondary" id="autoListenToggle" onclick="toggleAutoListen()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
+                            自动播
+                        </button>
+                        <button class="btn-action-primary" onclick="startAutoPlay()">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                            连播 <span id="listCountStr" style="font-weight:500; opacity:0.9; margin-left:2px;">(1-10)</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -485,7 +510,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
             </button>
             <button class="fp-btn fp-btn-close" onclick="closeAutoPlay()">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
     </div>
@@ -504,7 +529,7 @@
     
     const iconSoundOn = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>`;
     const iconSoundOff = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="1" x2="1" y2="23"></line><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`;
-    const iconUser = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`;
+    const iconMicSm = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>`;
     const iconShield = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`;
 
     const fieldConfig = {
@@ -541,10 +566,7 @@
     let currentUserRole = 'executor'; 
     
     let isAutoListenEnabled = true;
-
-    // 修改：去除了复杂的认领机制变量
     let allTasks = [];
-
     let allWordsInField = []; 
     let currentBatchOffset = 0; 
     let currentFilteredView = []; 
@@ -621,7 +643,6 @@
         activeVersion = versions.find(v => v.id === vId);
         document.getElementById('task-nav-title').innerText = '选任务';
         
-        // 修改：简化任务生成，不再涉及进度和强制分配
         allTasks = [];
         for(let i = 1; i <= 15; i++) {
             let taskCount = 100; 
@@ -655,7 +676,6 @@
         
         taskListEl.innerHTML = '';
 
-        // 修改：精简的搜索逻辑（搜索人名、任务名）
         let filteredTasks = allTasks.filter(task => {
             let searchTarget = `${task.name} ${task.creatorName}`.toLowerCase();
             return searchTarget.includes(searchTerm);
@@ -670,7 +690,6 @@
             emptyStateEl.style.display = 'none';
         }
 
-        // 修改：极简的任务卡片，仅标题、总数、创建人
         filteredTasks.forEach(task => {
             const card = document.createElement('div');
             card.className = 'list-card';
@@ -682,7 +701,10 @@
             card.innerHTML = `
                 <div class="task-info">
                     <div class="task-title">${task.name}</div>
-                    <div class="task-desc" style="margin-top:4px;">共 ${task.total} 项待处理词条 · 创建人: ${task.creatorName}</div>
+                    <div class="task-desc" style="margin-top:6px; display:flex; align-items:center; gap:8px;">
+                        <span style="background:rgba(31,95,255,0.08); color:var(--primary-color); padding:2px 8px; border-radius:4px; font-weight:700;">${task.total} 词条</span>
+                        <span style="color:var(--text-secondary); opacity:0.8;">创建人: ${task.creatorName}</span>
+                    </div>
                 </div>
                 <div class="version-arrow-container" style="background: rgba(31, 95, 255, 0.05);">${iconArrowRight}</div>
             `;
@@ -784,12 +806,12 @@
         const trigger = document.getElementById('autoListenToggle');
         
         if(isAutoListenEnabled) {
-            trigger.className = 'header-pill-btn hp-primary';
-            trigger.innerHTML = `${iconSoundOn} <span>试听:开</span>`;
+            trigger.className = 'btn-action-secondary';
+            trigger.innerHTML = `${iconSoundOn} 自动播`;
             showToast('已开启录音后自动试听');
         } else {
-            trigger.className = 'header-pill-btn hp-neutral';
-            trigger.innerHTML = `${iconSoundOff} <span>试听:关</span>`;
+            trigger.className = 'btn-action-secondary off';
+            trigger.innerHTML = `${iconSoundOff} 手动播`;
             showToast('已关闭自动试听');
         }
     }
@@ -800,17 +822,16 @@
         
         if(currentUserRole === 'reviewer') {
             trigger.className = 'header-pill-btn hp-warning';
-            trigger.innerHTML = `${iconShield} <span>审核</span>`;
+            trigger.innerHTML = `${iconShield} <span>审核视图</span>`;
             showToast('已切换至审核视图');
             selectFilter('待审核', null);
         } else {
             trigger.className = 'header-pill-btn hp-success';
-            trigger.innerHTML = `${iconUser} <span>执行</span>`;
-            showToast('已切换至执行视图');
+            trigger.innerHTML = `${iconMicSm} <span>录音视图</span>`;
+            showToast('已切换至录音视图');
             selectFilter('未录音', null);
         }
         
-        // 刷新看板和列表
         updateStatsBoard();
         applyFiltersAndRender();
     }
@@ -841,7 +862,6 @@
         }
     }
 
-    // 修改：根据不同角色身份，动态渲染不同的看板指标
     function updateStatsBoard() {
         let total = allWordsInField.length;
         let unrecorded = allWordsInField.filter(w => w.status === 'unrecorded').length;
@@ -863,7 +883,7 @@
                 </div>
                 <div class="stat-item">
                     <div class="stat-value" style="color: var(--success-color);">${approved}</div>
-                    <div class="stat-label">通过</div>
+                    <div class="stat-label">已通过</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-value" style="color: var(--danger-color);">${rejected}</div>
@@ -871,7 +891,7 @@
                 </div>
             `;
         } else {
-            let recorded = pending + approved; // 已录音包含待审核和已通过的
+            let recorded = pending + approved;
             container.innerHTML = `
                 <div class="stat-item">
                     <div class="stat-value" style="color: var(--text-title);">${total}</div>
@@ -995,7 +1015,7 @@
             }
 
             let contentHTML = '';
-            if (activeVersion.subject === 'english') {
+            if (activeFieldId === 'en_word') {
                 contentHTML = `
                     <div class="en-display">
                         <div class="en-word-row">
@@ -1007,9 +1027,16 @@
                     </div>
                 `;
             } else {
+                let displayStr = item.text;
+                if (activeVersion.subject === 'english') {
+                    if (activeFieldId === 'en_zh') displayStr = item.zh;
+                    else if (activeFieldId === 'en_sentence') displayStr = item.en;
+                    else displayStr = item.en || item.text;
+                }
+                
                 contentHTML = `
                     <div class="en-word-row">
-                        <span class="row-text">${item.text}</span>
+                        <span class="row-text">${displayStr}</span>
                         <button class="inline-speaker" id="play-${item.id}" onclick="handleInlinePlay(this, '${item.id}')" ${speakerDisabled}>${iconInlineSpeaker}</button>
                     </div>
                 `;
@@ -1017,7 +1044,6 @@
 
             let actionHTML = '';
             
-            /* 修改：审核视角下仅显示通过/驳回按钮，排版横置以维持优美布局 */
             if (currentUserRole === 'reviewer') {
                 actionHTML = `
                     <div class="review-actions">
@@ -1224,7 +1250,13 @@
         let item = renderedItems[autoPlayIndex];
         let displaySeq = autoPlayIndex + 1; 
         
-        let textToDisplay = activeVersion.subject === 'english' ? item.en : item.text;
+        let textToDisplay = item.text;
+        if (activeVersion.subject === 'english') {
+            if (activeFieldId === 'en_zh') textToDisplay = item.zh;
+            else if (activeFieldId === 'en_sentence' || activeFieldId === 'en_word') textToDisplay = item.en;
+            else textToDisplay = item.en || item.text;
+        }
+
         let shortText = textToDisplay.length > 15 ? textToDisplay.substring(0, 15) + '...' : textToDisplay;
         document.getElementById('fpTitle').innerText = `${displaySeq}. ${shortText}`;
 
