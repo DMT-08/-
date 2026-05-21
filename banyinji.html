@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI 记词 & 班级学习大盘 - 极致原生体验</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.0.3"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #EFF6FF 0%, #DFE7FF 100%);
+            background-attachment: fixed;
+            color: #1f2937;
+            overflow: hidden; 
+            overscroll-behavior-y: none;
+        }
+
+        .bg-brand { background-color: #1F5FFF; }
+        .text-brand { color: #1F5FFF; }
+        .border-brand { border-color: #1F5FFF; }
+        .hover-bg-brand:hover { background-color: #004ce6; }
+
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .view-section { display: none; opacity: 0; }
+        .view-section.active { display: flex; opacity: 1; }
+
+        .shadow-premium {
+            box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.03), 0 2px 8px -2px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+        }
+
+        .modal-enter { animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .judge-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        @keyframes pulse-red-light {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.15); }
+            50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+        }
+        .pulse-alert-light { animation: pulse-red-light 2s infinite; }
+        
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type="number"] { -moz-appearance: textfield; }
+
+        .sequence-item { transition: box-shadow 0.2s; }
+        .sequence-item.dragging { opacity: 0.5; box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3); z-index: 50; }
+        
+        /* 定制化选择器 UI：绝对限制 4.5 个条目高度 */
+        .custom-select-dropdown { max-height: 144px; overflow-y: auto; }
+        .custom-select-dropdown .select-item { height: 32px; flex-shrink: 0; display: flex; align-items: center; padding-left: 12px; padding-right: 12px; }
+        
+        .custom-select-dropdown::-webkit-scrollbar { width: 4px; }
+        .custom-select-dropdown::-webkit-scrollbar-track { background: transparent; }
+        .custom-select-dropdown::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+        
+        .native-select {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%239CA3AF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+            background-repeat: no-repeat;
+            background-position: right 6px center;
+            background-size: 12px;
+            padding-right: 24px !important;
+        }
+        
+        /* 保存按钮激活态增强 */
+        .save-btn.active {
+            background-color: #1F5FFF;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(31, 95, 255, 0.3);
+        }
+        .save-btn.active:hover {
+            background-color: #004ce6;
+            box-shadow: 0 6px 16px rgba(31, 95, 255, 0.4);
+        }
+        .save-btn.active:active {
+            transform: scale(0.95);
+        }
+
+        .rank-crown-1 { color: #F59E0B; text-shadow: 0 2px 4px rgba(245, 158, 11, 0.3); } 
+        .rank-crown-2 { color: #94A3B8; text-shadow: 0 2px 4px rgba(148, 163, 184, 0.3); } 
+        .rank-crown-3 { color: #B45309; text-shadow: 0 2px 4px rgba(180, 83, 9, 0.3); } 
+
+        .rank-grid {
+            display: grid;
+            grid-template-columns: 50px 80px repeat(6, minmax(65px, 1fr));
+            gap: 8px;
+            min-width: 650px; 
+        }
+
+        .view-section {
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen relative">
+
+    <div id="native-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-gray-900/40 backdrop-blur-sm transition-opacity duration-300 opacity-0">
+        <div class="bg-white rounded-[24px] p-6 md:p-7 w-[90%] max-sm:max-w-[320px] max-w-sm shadow-2xl flex flex-col items-center text-center modal-enter" id="native-modal-content">
+            <h3 id="modal-title" class="text-[20px] font-extrabold text-gray-900 mb-2 w-full text-center">提示</h3>
+            <div id="modal-msg" class="text-[15px] text-gray-600 mb-6 leading-relaxed w-full flex flex-col items-center justify-center text-center"></div>
+            <div class="flex gap-3 w-full mt-2">
+                <button id="modal-cancel-btn" class="hidden flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold text-[15px] py-3.5 rounded-[16px] transition-all active:scale-95">取消</button>
+                <button id="modal-btn" class="flex-1 bg-brand hover-bg-brand text-white font-bold text-[15px] py-3.5 rounded-[16px] shadow-sm active:scale-95 transition-all">我知道了</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-class-dashboard" class="view-section active flex-col w-full h-full overflow-hidden">
+        <header class="flex justify-between items-center w-full max-w-[1300px] mx-auto p-4 md:p-5 shrink-0">
+            <div class="flex items-center gap-4">
+                <button class="w-10 h-10 bg-white rounded-[14px] flex items-center justify-center shadow-premium active:scale-90 transition-transform text-slate-700 cursor-pointer" onclick="showToast('已经是大盘页啦', 'info')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mr-0.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <h1 class="text-[28px] md:text-[32px] font-extrabold text-gray-900 tracking-tight leading-none">班级学习大盘</h1>
+            </div>
+            
+            <div class="flex items-center gap-3 md:gap-4">
+                <div class="flex items-center bg-white px-3 md:px-4 py-2 rounded-[12px] shadow-sm border border-gray-100">
+                    <div class="w-7 h-7 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mr-2 shrink-0"><i class="ph-bold ph-user text-[14px]"></i></div>
+                    <div class="text-[13px] font-bold text-gray-500 hidden sm:block truncate max-w-[150px]">庞胜材 <i class="ph-bold ph-caret-right text-[10px] mx-0.5"></i> <span class="text-gray-900">陈鑫朵</span></div>
+                    <div class="text-[14px] font-extrabold text-gray-900 sm:hidden">陈鑫朵</div>
+                </div>
+                <button class="w-10 h-10 bg-white rounded-[14px] flex items-center justify-center shadow-premium border border-gray-100 text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-95 cursor-pointer" onclick="openSettingsModal()">
+                    <i class="ph-fill ph-gear text-[22px]"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Optimized scorecard/看板 using identical AI 记词 styling -->
+        <section class="w-full max-w-[1300px] mx-auto px-4 md:px-5 mb-5 shrink-0">
+            <div class="bg-white/90 backdrop-blur-md rounded-[24px] p-4 md:p-5 shadow-premium border border-white flex flex-col md:flex-row items-stretch gap-4 md:gap-5">
+                <!-- Target Card with progress ring -->
+                <div class="md:w-1/3 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[24px] p-4 flex items-center justify-between shadow-lg shadow-blue-500/20 shrink-0 relative overflow-hidden min-h-[110px]">
+                    <i class="ph-fill ph-target absolute left-4 top-1/2 -translate-y-1/2 text-[100px] text-white opacity-[0.03] transform -translate-x-1/4 pointer-events-none"></i>
+                    <div class="flex flex-col relative z-10 justify-center h-full text-white">
+                        <span class="text-[13px] font-bold text-white/80 mb-1">总学习目标</span>
+                        <div class="flex items-baseline gap-1 drop-shadow-sm mt-1">
+                            <span class="text-[36px] font-extrabold text-white tracking-tight leading-none" id="class-goal-text">3000</span>
+                            <span class="text-[14px] font-bold text-white/80 ml-0.5">词</span>
+                        </div>
+                        <div class="mt-2 bg-white/10 px-3 py-1.5 rounded-[8px] backdrop-blur-sm border border-white/10 flex items-center gap-2 w-max">
+                            <div class="flex items-baseline gap-1.5"><span class="text-[11px] text-white/70 font-medium">已学</span><span id="class-learned-text" class="text-[14px] font-bold text-white font-mono leading-none">1730</span></div>
+                        </div>
+                    </div>
+                    <div class="relative w-[72px] h-[72px] flex items-center justify-center z-10 shrink-0 drop-shadow-md">
+                        <svg class="w-full h-full transform -rotate-90">
+                            <circle cx="36" cy="36" r="28" stroke="rgba(255,255,255,0.15)" stroke-width="7" fill="none" />
+                            <circle id="class-progress-ring" cx="36" cy="36" r="28" stroke="white" stroke-width="7" fill="none" stroke-dasharray="175.9" stroke-dashoffset="90" stroke-linecap="round" class="transition-all duration-1000 ease-out" />
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                            <span class="text-[15px] font-extrabold text-white leading-none font-mono" id="class-progress-text">57%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right details grid matching AI word memorization layout -->
+                <div class="flex-1 flex flex-col gap-2 min-w-0 justify-between">
+                    <div class="grid grid-cols-3 gap-2 lg:gap-3 flex-1 min-h-0">
+                        <div class="bg-green-50 border border-green-200 rounded-[16px] px-3 py-3.5 flex items-center justify-between hover:shadow-md transition-all">
+                            <div class="flex items-center gap-1.5 text-green-700 shrink-0 min-w-0">
+                                <div class="w-[28px] h-[28px] rounded-[8px] bg-white flex items-center justify-center shadow-sm border border-green-100">
+                                    <i class="ph-bold ph-check text-[16px] text-green-500"></i>
+                                </div>
+                                <span class="text-[12px] lg:text-[13px] font-bold whitespace-nowrap">累计认识</span>
+                            </div>
+                            <div class="flex items-baseline gap-1 ml-1 shrink-0">
+                                <span class="text-[20px] lg:text-[24px] font-extrabold text-green-700 font-mono" id="class-known-text">1280</span><span class="text-[11px] font-bold text-green-600/70">词</span>
+                            </div>
+                        </div>
+                        <div class="bg-red-50 border border-red-200 rounded-[16px] px-3 py-3.5 flex items-center justify-between hover:shadow-md transition-all">
+                            <div class="flex items-center gap-1.5 text-red-700 shrink-0 min-w-0">
+                                <div class="w-[28px] h-[28px] rounded-[8px] bg-white flex items-center justify-center shadow-sm border border-red-100">
+                                    <i class="ph-bold ph-x text-[16px] text-red-500"></i>
+                                </div>
+                                <span class="text-[12px] lg:text-[13px] font-bold whitespace-nowrap">累计生词</span>
+                            </div>
+                            <div class="flex items-baseline gap-1 ml-1 shrink-0">
+                                <span class="text-[20px] lg:text-[24px] font-extrabold text-red-700 font-mono" id="class-newwords-text">450</span><span class="text-[11px] font-bold text-red-600/70">词</span>
+                            </div>
+                        </div>
+                        <div class="bg-blue-50 border border-blue-200 rounded-[16px] px-3 py-3.5 flex items-center justify-between hover:shadow-md transition-all">
+                            <div class="flex items-center gap-1.5 text-blue-700 shrink-0 min-w-0">
+                                <div class="w-[28px] h-[28px] rounded-[8px] bg-white flex items-center justify-center shadow-sm border border-blue-100">
+                                    <i class="ph-bold ph-circle text-[16px] text-blue-500"></i>
+                                </div>
+                                <span class="text-[12px] lg:text-[13px] font-bold whitespace-nowrap">未知单词</span>
+                            </div>
+                            <div class="flex items-baseline gap-1 ml-1 shrink-0">
+                                <span class="text-[20px] lg:text-[24px] font-extrabold text-blue-700 font-mono" id="class-unknown-text">1270</span><span class="text-[11px] font-bold text-blue-600/70">词</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 divide-x divide-gray-200/80 bg-[#F8FAFC] rounded-[16px] border border-gray-200/80 py-2.5 shrink-0 shadow-[inset_0_2px_4px_rgba(0,0,0,0.01)]">
+                        <div class="flex items-center justify-center gap-2 px-1">
+                            <span class="text-[12px] font-bold text-gray-500">跟读</span><span class="text-[20px] font-extrabold text-gray-800 font-mono" id="class-mic-text">1200</span><span class="text-[11px] text-gray-400">次</span>
+                        </div>
+                        <div class="flex items-center justify-center gap-2 px-1">
+                            <span class="text-[12px] font-bold text-gray-500">听记</span><span class="text-[20px] font-extrabold text-gray-800 font-mono" id="class-listen-text">1100</span><span class="text-[11px] text-gray-400">次</span>
+                        </div>
+                        <div class="flex items-center justify-center gap-2 px-1">
+                            <span class="text-[12px] font-bold text-gray-500">听写</span><span class="text-[20px] font-extrabold text-gray-800 font-mono" id="class-dictate-text">1050</span><span class="text-[11px] text-gray-400">次</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <main class="flex-1 w-full max-w-[1300px] mx-auto px-4 md:px-5 pb-6 overflow-hidden min-h-0">
+            <div class="flex flex-col lg:flex-row gap-5 md:gap-6 h-full">
+                <!-- Left: Leaderboard Grid -->
+                <div class="lg:w-3/5 bg-white rounded-[24px] shadow-premium flex flex-col overflow-hidden relative border border-gray-100 h-full min-h-[300px]">
+                    <div class="px-5 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center shrink-0">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-[10px] bg-yellow-100 text-yellow-600 flex items-center justify-center shadow-sm border border-yellow-200/50"><i class="ph-fill ph-trophy text-[16px]"></i></div>
+                            <h3 class="font-extrabold text-[17px] text-gray-800">英语实验1班排名</h3>
+                        </div>
+                        <div class="text-[12px] font-bold text-gray-400 bg-white px-3 py-1.5 rounded-[8px] shadow-sm border border-gray-100">
+                            排位基准: <span class="text-green-600">通过数</span>
+                        </div>
+                    </div>
+                    <div class="flex-1 overflow-x-auto hide-scrollbar overflow-y-auto relative bg-white">
+                        <div class="min-w-max pb-[68px]">
+                            <div class="rank-grid px-5 py-3 bg-white/95 backdrop-blur-sm border-b border-gray-100 text-[12px] font-extrabold text-gray-400 sticky top-0 z-20">
+                                <div class="text-center">排名</div>
+                                <div>姓名</div>
+                                <div class="text-right">总词库</div>
+                                <div class="text-right text-gray-600">通过</div>
+                                <div class="text-right">未通过</div>
+                                <div class="text-right">未学</div>
+                                <div class="text-right">昨日增加</div>
+                                <div class="text-right pr-2">今天增加</div>
+                            </div>
+                            <div class="flex flex-col relative z-0">
+                                <div class="rank-grid px-5 py-3.5 items-center border-b border-gray-50 hover:bg-blue-50/30 transition-colors bg-gradient-to-r from-yellow-50/30 to-transparent">
+                                    <div class="flex justify-center relative">
+                                        <i class="ph-fill ph-crown text-[28px] rank-crown-1 absolute -top-[10px]"></i>
+                                        <span class="text-white font-extrabold text-[12px] relative z-10 font-mono">1</span>
+                                    </div>
+                                    <div class="font-extrabold text-[14px] text-gray-800 truncate">鲁梦妍</div>
+                                    <div class="text-right font-mono font-bold text-[14px] text-gray-600">2450</div>
+                                    <div class="text-right font-mono font-black text-[16px] text-gray-900">1890</div>
+                                    <div class="text-right font-mono text-[14px] text-red-400">120</div>
+                                    <div class="text-right font-mono text-[14px] text-gray-400">440</div>
+                                    <div class="text-right font-mono font-bold text-[13px] text-[#10B981]">+164</div>
+                                    <div class="text-right font-mono text-[13px] text-gray-400 pr-2">0</div>
+                                </div>
+                                <div class="rank-grid px-5 py-3.5 items-center border-b border-gray-50 hover:bg-blue-50/30 transition-colors bg-gradient-to-r from-gray-50/50 to-transparent">
+                                    <div class="flex justify-center relative">
+                                        <i class="ph-fill ph-crown text-[28px] rank-crown-2 absolute -top-[10px]"></i>
+                                        <span class="text-white font-extrabold text-[12px] relative z-10 font-mono">2</span>
+                                    </div>
+                                    <div class="font-extrabold text-[14px] text-gray-800 truncate">李官蓬</div>
+                                    <div class="text-right font-mono font-bold text-[14px] text-gray-600">1800</div>
+                                    <div class="text-right font-mono font-black text-[16px] text-gray-900">1420</div>
+                                    <div class="text-right font-mono text-[14px] text-red-400">80</div>
+                                    <div class="text-right font-mono text-[14px] text-gray-400">300</div>
+                                    <div class="text-right font-mono font-bold text-[13px] text-[#10B981]">+100</div>
+                                    <div class="text-right font-mono text-[13px] text-gray-400 pr-2">0</div>
+                                </div>
+                                <div class="rank-grid px-5 py-3.5 items-center border-b border-gray-50 hover:bg-blue-50/30 transition-colors bg-gradient-to-r from-orange-50/30 to-transparent">
+                                    <div class="flex justify-center relative">
+                                        <i class="ph-fill ph-crown text-[28px] rank-crown-3 absolute -top-[10px]"></i>
+                                        <span class="text-white font-extrabold text-[12px] relative z-10 font-mono">3</span>
+                                    </div>
+                                    <div class="font-extrabold text-[14px] text-gray-800 truncate">沈鹏林</div>
+                                    <div class="text-right font-mono font-bold text-[14px] text-gray-600">1200</div>
+                                    <div class="text-right font-mono font-black text-[16px] text-gray-900">950</div>
+                                    <div class="text-right font-mono text-[14px] text-red-400">150</div>
+                                    <div class="text-right font-mono text-[14px] text-gray-400">100</div>
+                                    <div class="text-right font-mono font-bold text-[13px] text-[#10B981]">+99</div>
+                                    <div class="text-right font-mono text-[13px] text-gray-400 pr-2">0</div>
+                                </div>
+                                <div class="rank-grid px-5 py-3 items-center hover:bg-gray-50 transition-colors">
+                                    <div class="text-center font-mono font-extrabold text-[14px] text-gray-400">4</div>
+                                    <div class="font-bold text-[14px] text-gray-700 truncate">武文华</div>
+                                    <div class="text-right font-mono text-[14px] text-gray-500">1050</div>
+                                    <div class="text-right font-mono font-bold text-[14px] text-gray-800">890</div>
+                                    <div class="text-right font-mono text-[14px] text-gray-400">60</div>
+                                    <div class="text-right font-mono text-[14px] text-gray-400">100</div>
+                                    <div class="text-right font-mono text-[13px] text-gray-400">0</div>
+                                    <div class="text-right font-mono text-[13px] text-gray-400 pr-2">0</div>
+                                </div>
+                                <div class="rank-grid px-5 py-3 items-center hover:bg-gray-50 transition-colors">
+                                    <div class="text-center font-mono font-extrabold text-[14px] text-gray-400">5</div>
+                                    <div class="font-bold text-[14px] text-gray-700 truncate">黄紫柔</div>
+                                    <div class="text-right font-mono text-[14px] text-gray-500">980</div>
+                                    <div class="text-right font-mono font-bold text-[14px] text-gray-800">720</div>
+                                    <div class="text-right font-mono text-[14px] text-gray-400">100</div>
+                                    <div class="text-right font-mono text-[14px] text-gray-400">160</div>
+                                    <div class="text-right font-mono font-bold text-[13px] text-[#10B981]">+37</div>
+                                    <div class="text-right font-mono text-[13px] text-gray-400 pr-2">0</div>
+                                </div>
+                                <div class="mt-2 mb-2 flex items-center justify-center">
+                                    <div class="h-px bg-gray-100 flex-1"></div>
+                                    <span class="text-[12px] text-gray-300 font-bold px-3">•••</span>
+                                    <div class="h-px bg-gray-100 flex-1"></div>
+                                </div>
+                                <div class="rank-grid px-5 py-3.5 items-center bg-blue-50/50 border-y border-blue-100">
+                                    <div class="text-center font-mono font-extrabold text-[15px] text-[#1F5FFF]">23</div>
+                                    <div class="font-extrabold text-[14px] text-[#1F5FFF] truncate">陈鑫朵</div>
+                                    <div class="text-right font-mono font-bold text-[14px] text-gray-700">671</div>
+                                    <div class="text-right font-mono font-black text-[15px] text-[#1F5FFF]">253</div>
+                                    <div class="text-right font-mono text-[14px] text-red-400">0</div>
+                                    <div class="text-right font-mono text-[14px] text-gray-500">418</div>
+                                    <div class="text-right font-mono font-bold text-[13px] text-[#10B981]">+12</div>
+                                    <div class="text-right font-mono text-[13px] text-gray-400 pr-2">0</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="absolute bottom-0 left-0 w-full bg-white border-t border-gray-100 px-6 py-3.5 flex justify-between items-center z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.03)] pointer-events-none">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center border border-blue-200"><i class="ph-bold ph-user text-[14px]"></i></div>
+                            <span class="font-extrabold text-[14px] text-gray-800">陈鑫朵</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[13px] text-gray-500 font-bold">当前班级排名 <span class="font-mono font-black text-[18px] text-[#1F5FFF] mx-0.5">23</span></span>
+                            <i class="ph-fill ph-trend-up text-[18px] text-[#10B981]"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side: Unified Action Launchers and Vocab tasks -->
+                <div class="lg:w-2/5 flex flex-col gap-5 min-h-0 h-full">
+                    <!-- Giant interactive button leading directly into the integrated AI Word Memorization view! -->
+                    <button onclick="goToAI()" class="relative w-full shrink-0 overflow-hidden bg-gradient-to-br from-[#1F5FFF] to-[#004ce6] rounded-[24px] p-6 shadow-[0_8px_30px_rgba(31,95,255,0.22)] group hover:shadow-[0_12px_40px_rgba(31,95,255,0.35)] hover:scale-[1.01] transition-all active:scale-[0.98] border border-blue-400/30 flex flex-col items-center justify-center min-h-[150px]">
+                        <div class="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-2xl transform translate-x-1/3 -translate-y-1/3 group-hover:scale-110 transition-transform duration-500 pointer-events-none"></div>
+                        <div class="absolute bottom-0 left-0 w-32 h-32 bg-[#4ade80]/20 rounded-full blur-2xl transform -translate-x-1/2 translate-y-1/2 group-hover:scale-125 transition-transform duration-500 pointer-events-none"></div>
+                        <div class="bg-white/20 p-3.5 rounded-[20px] backdrop-blur-sm border border-white/20 mb-3 shadow-[inset_0_1px_4px_rgba(255,255,255,0.3)]">
+                            <i class="ph-fill ph-sparkle text-white text-[38px] animate-pulse"></i>
+                        </div>
+                        <div class="flex flex-col items-center relative z-10">
+                            <span class="font-black text-[24px] text-white tracking-widest drop-shadow-md">进入 AI 记词</span>
+                        </div>
+                    </button>
+
+                    <div class="grid grid-cols-2 gap-3 shrink-0">
+                        <button onclick="simulateNormalLearn('正向过词')" class="bg-white border border-gray-100 hover:border-blue-200 hover:bg-blue-50/50 text-gray-700 hover:text-blue-600 rounded-[18px] p-3 shadow-premium transition-all flex items-center justify-center gap-2 group active:scale-95">
+                            <div class="w-8 h-8 rounded-full bg-gray-50 group-hover:bg-blue-100 flex items-center justify-center transition-colors"><i class="ph-fill ph-book-open text-[16px] text-gray-400 group-hover:text-blue-500 transition-colors"></i></div>
+                            <span class="font-extrabold text-[13px] md:text-[14px]">正向过词</span>
+                        </button>
+                        <button onclick="simulateNormalLearn('逆向过词')" class="bg-white border border-gray-100 hover:border-purple-200 hover:bg-purple-50/50 text-gray-700 hover:text-purple-600 rounded-[18px] p-3 shadow-premium transition-all flex items-center justify-center gap-2 group active:scale-95">
+                            <div class="w-8 h-8 rounded-full bg-gray-50 group-hover:bg-purple-100 flex items-center justify-center transition-colors"><i class="ph-fill ph-arrows-left-right text-[16px] text-gray-400 group-hover:text-purple-500 transition-colors"></i></div>
+                            <span class="font-extrabold text-[13px] md:text-[14px]">逆向过词</span>
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-[24px] shadow-premium flex flex-col flex-1 min-h-0 border border-gray-100 relative overflow-hidden">
+                        <div class="px-5 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center shrink-0">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-[10px] bg-red-100 text-red-500 flex items-center justify-center shadow-sm border border-red-200/50"><i class="ph-fill ph-push-pin text-[16px]"></i></div>
+                                <div class="flex flex-col">
+                                    <h3 class="font-extrabold text-[16px] text-gray-800 leading-tight">未完成任务</h3>
+                                </div>
+                            </div>
+                            <span id="task-badge-count" class="bg-red-500 text-white text-[12px] font-mono font-bold px-2 py-0.5 rounded-full shadow-sm">2</span>
+                        </div>
+                        <div id="tasks-container" class="flex-1 overflow-y-auto hide-scrollbar p-4 flex flex-col gap-3 bg-gray-50/30">
+                            <div onclick="clickTask('单元音多音节')" class="bg-white border border-gray-200 hover:border-blue-300 hover:shadow-md rounded-[16px] p-3.5 flex justify-between items-center cursor-pointer transition-all group active:scale-[0.98]">
+                                <div class="flex items-center gap-3 overflow-hidden">
+                                    <div class="w-10 h-10 rounded-[12px] bg-gradient-to-br from-pink-500 to-rose-600 text-white flex items-center justify-center font-black text-[15px] shrink-0 shadow-md shadow-pink-500/10 border border-white/20">英</div>
+                                    <div class="flex flex-col pr-2">
+                                        <span class="font-extrabold text-gray-800 text-[14px] truncate">单元音多音节</span>
+                                        <span class="text-[11px] font-bold text-gray-400 mt-0.5">词汇量: 50 | 分组闯关</span>
+                                    </div>
+                                </div>
+                                <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors shrink-0">
+                                    <i class="ph-bold ph-arrow-right text-[14px]"></i>
+                                </div>
+                            </div>
+                            <div onclick="clickTask('单元音单音节（新）')" class="bg-white border border-gray-200 hover:border-blue-300 hover:shadow-md rounded-[16px] p-3.5 flex justify-between items-center cursor-pointer transition-all group active:scale-[0.98]">
+                                <div class="flex items-center gap-3 overflow-hidden">
+                                    <div class="w-10 h-10 rounded-[12px] bg-gradient-to-br from-purple-600 to-indigo-700 text-white flex items-center justify-center font-black text-[15px] shrink-0 shadow-md shadow-purple-500/10 border border-white/20">英</div>
+                                    <div class="flex flex-col pr-2">
+                                        <span class="font-extrabold text-gray-800 text-[14px] truncate">单元音单音节（新）</span>
+                                        <span class="text-[11px] font-bold text-gray-400 mt-0.5">词汇量: 30 | 分组闯关</span>
+                                    </div>
+                                </div>
+                                <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors shrink-0">
+                                    <i class="ph-bold ph-arrow-right text-[14px]"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="view-ai-dashboard" class="view-section flex-col w-full h-full max-w-[1300px] mx-auto p-4 md:p-5 overflow-hidden gap-4">
+        <header class="flex justify-between items-center shrink-0">
+            <div class="flex items-center gap-4">
+                <button class="w-10 h-10 bg-white rounded-[14px] flex items-center justify-center shadow-premium active:scale-90 transition-transform text-slate-700 cursor-pointer" onclick="goToHome()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mr-0.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <h1 class="text-[32px] font-extrabold text-gray-900 tracking-tight leading-none">AI 记词</h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="window.switchView('view-settings')" class="bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 px-3.5 py-2 rounded-[10px] font-bold text-[13px] shadow-sm active:scale-95 transition-transform flex items-center gap-1.5">
+                    <i class="ph-bold ph-sliders text-[16px]"></i> 系统偏好设置
+                </button>
+                <button onclick="window.toggleTeacherTasks()" class="bg-white text-brand border border-blue-100 px-3.5 py-2 rounded-[10px] font-bold text-[13px] shadow-sm active:scale-95 transition-transform flex items-center gap-1.5">
+                    <i class="ph-bold ph-gear text-[16px]"></i> 模拟下发任务
+                </button>
+            </div>
+        </header>
+
+        <!-- Dynamic sync scoreboard (Exactly identical styling) -->
+        <div class="flex shrink-0 gap-4 max-md:flex-col">
+            <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[24px] p-4 flex items-center justify-between w-[280px] md:w-[320px] max-md:w-full shadow-lg shadow-blue-500/20 shrink-0 relative overflow-hidden">
+                <i class="ph-fill ph-target absolute left-4 top-1/2 -translate-y-1/2 text-[100px] text-white opacity-[0.03] transform -translate-x-1/4 pointer-events-none"></i>
+                <div class="flex flex-col relative z-10 justify-center h-full text-white">
+                    <span class="text-[13px] font-bold text-white/80 mb-1">总学习目标</span>
+                    <div class="flex items-baseline gap-1 drop-shadow-sm mt-1">
+                        <span class="text-[40px] font-extrabold text-white tracking-tight leading-none" id="statTotalTarget">3000</span>
+                        <span class="text-[14px] font-bold text-white/80 ml-0.5">词</span>
+                    </div>
+                    <div class="mt-2 bg-white/10 px-3 py-1.5 rounded-[8px] backdrop-blur-sm border border-white/10 flex items-center gap-2 w-max">
+                        <div class="flex items-baseline gap-1.5"><span class="text-[11px] text-white/70 font-medium">已学</span><span id="statLearnedSum" class="text-[14px] font-bold text-white font-mono leading-none">1730</span></div>
+                    </div>
+                </div>
+                <div class="relative w-[72px] h-[72px] flex items-center justify-center z-10 shrink-0 drop-shadow-md">
+                    <svg class="w-full h-full transform -rotate-90">
+                        <circle cx="36" cy="36" r="28" stroke="rgba(255,255,255,0.15)" stroke-width="7" fill="none" />
+                        <circle id="targetProgressRing" cx="36" cy="36" r="28" stroke="white" stroke-width="7" fill="none" stroke-dasharray="175.9" stroke-dashoffset="90" stroke-linecap="round" class="transition-all duration-1000 ease-out" />
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <span class="text-[16px] font-extrabold text-white leading-none font-mono" id="targetProgressText">57%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex-1 bg-white/90 backdrop-blur-xl rounded-[24px] shadow-premium p-3 flex flex-col gap-2 min-w-0">
+                <div class="grid grid-cols-3 gap-2 lg:gap-3 flex-1 min-h-0">
+                    <div class="bg-green-50/80 border border-green-200 rounded-[16px] px-3 lg:px-4 py-3.5 flex items-center justify-between relative overflow-hidden group transition-all hover:shadow-md h-full w-full">
+                        <div class="flex items-center gap-1.5 lg:gap-2 text-green-700 z-10 shrink-0 min-w-0">
+                            <div class="w-[28px] h-[28px] rounded-[8px] bg-white flex items-center justify-center shadow-sm shrink-0 border border-green-100">
+                                <i class="ph-bold ph-check text-[16px] text-green-500"></i>
+                            </div>
+                            <span class="text-[12px] lg:text-[13px] font-bold whitespace-nowrap">累计认识</span>
+                        </div>
+                        <div class="flex items-baseline gap-1 z-10 whitespace-nowrap ml-1 shrink-0">
+                            <span class="text-[20px] lg:text-[24px] font-extrabold text-green-700 leading-none tracking-tight font-mono" id="statKnownTotal">1280</span><span class="text-[11px] font-bold text-green-600/70">词</span>
+                        </div>
+                    </div>
+                    <div class="bg-red-50/80 border border-red-200 rounded-[16px] px-3 lg:px-4 py-3.5 flex items-center justify-between relative overflow-hidden group transition-all hover:shadow-md h-full w-full">
+                        <div class="flex items-center gap-1.5 lg:gap-2 text-red-700 z-10 shrink-0 min-w-0">
+                            <div class="w-[28px] h-[28px] rounded-[8px] bg-white flex items-center justify-center shadow-sm shrink-0 border border-red-100">
+                                <i class="ph-bold ph-x text-[16px] text-red-500"></i>
+                            </div>
+                            <span class="text-[12px] lg:text-[13px] font-bold whitespace-nowrap">累计生词</span>
+                        </div>
+                        <div class="flex items-baseline gap-1 z-10 whitespace-nowrap ml-1 shrink-0">
+                            <span class="text-[20px] lg:text-[24px] font-extrabold text-red-700 leading-none tracking-tight font-mono" id="statUnknownTotal">450</span><span class="text-[11px] font-bold text-red-600/70">词</span>
+                        </div>
+                    </div>
+                    <div class="bg-blue-50/80 border border-blue-200 rounded-[16px] px-3 lg:px-4 py-3.5 flex items-center justify-between relative overflow-hidden group transition-all hover:shadow-md h-full w-full">
+                        <div class="flex items-center gap-1.5 lg:gap-2 text-blue-700 z-10 shrink-0 min-w-0">
+                            <div class="w-[28px] h-[28px] rounded-[8px] bg-white flex items-center justify-center shadow-sm shrink-0 border border-blue-100">
+                                <i class="ph-bold ph-circle text-[16px] text-blue-500"></i>
+                            </div>
+                            <span class="text-[12px] lg:text-[13px] font-bold whitespace-nowrap">未知单词</span>
+                        </div>
+                        <div class="flex items-baseline gap-1 z-10 whitespace-nowrap ml-1 shrink-0">
+                            <span class="text-[20px] lg:text-[24px] font-extrabold text-blue-700 leading-none tracking-tight font-mono" id="statUnlearnedGrid">1270</span><span class="text-[11px] font-bold text-blue-600/70">词</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 divide-x divide-gray-200/80 bg-[#F8FAFC] rounded-[16px] border border-gray-200/80 py-2.5 shrink-0 shadow-[inset_0_2px_4px_rgba(0,0,0,0.01)] mt-1">
+                    <div class="flex items-center justify-center gap-2 md:gap-2.5 px-1">
+                        <div class="w-8 h-8 rounded-[10px] bg-white shadow-sm border border-blue-100 flex items-center justify-center text-blue-500 shrink-0 hidden lg:flex"><i class="ph-fill ph-microphone-stage text-[16px]"></i></div>
+                        <div class="flex items-baseline gap-1 whitespace-nowrap">
+                            <span class="text-[12px] font-bold text-gray-500 mr-0.5">跟读</span><span class="text-[20px] font-extrabold text-gray-800 leading-none font-mono" id="statReadTotal">1200</span><span class="text-[11px] font-semibold text-gray-400">次</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-center gap-2 md:gap-2.5 px-1">
+                        <div class="w-8 h-8 rounded-[10px] bg-white shadow-sm border border-cyan-100 flex items-center justify-center text-cyan-600 shrink-0 hidden lg:flex"><i class="ph-fill ph-headphones text-[16px]"></i></div>
+                        <div class="flex items-baseline gap-1 whitespace-nowrap">
+                            <span class="text-[12px] font-bold text-gray-500 mr-0.5">音记</span><span class="text-[20px] font-extrabold text-gray-800 leading-none font-mono" id="statMemoTotal">1100</span><span class="text-[11px] font-semibold text-gray-400">次</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-center gap-2 md:gap-2.5 px-1">
+                        <div class="w-8 h-8 rounded-[10px] bg-white shadow-sm border border-rose-100 flex items-center justify-center text-rose-500 shrink-0 hidden lg:flex"><i class="ph-fill ph-pencil-simple text-[16px]"></i></div>
+                        <div class="flex items-baseline gap-1 whitespace-nowrap">
+                            <span class="text-[12px] font-bold text-gray-500 mr-0.5">听写</span><span class="text-[20px] font-extrabold text-gray-800 leading-none font-mono" id="statDictTotal">1050</span><span class="text-[11px] font-semibold text-gray-400">次</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vocab entry cards, and study progress -->
+        <div class="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-5 md:gap-6 mt-1">
+            <div class="bg-[#FFFDF8] rounded-[24px] shadow-premium p-6 flex flex-col h-full min-h-0 border border-[#FDE68A] relative overflow-hidden justify-center items-center text-center group cursor-pointer hover:border-orange-300 transition-all" onclick="window.switchView('view-vocab')">
+                <div class="absolute -right-4 -top-4 w-24 h-24 bg-orange-100/50 rounded-full blur-xl group-hover:bg-orange-200/50 transition-colors pointer-events-none"></div>
+                <div class="absolute -left-4 -bottom-4 w-20 h-20 bg-yellow-100/50 rounded-full blur-lg group-hover:bg-yellow-200/50 transition-colors pointer-events-none"></div>
+
+                <div class="w-16 h-16 bg-gradient-to-br from-orange-100 to-orange-50 rounded-[18px] flex items-center justify-center text-orange-500 mb-4 group-hover:-translate-y-1 group-hover:shadow-md transition-all relative z-10 border border-orange-200">
+                    <i class="ph-fill ph-books text-[32px]"></i>
+                </div>
+                <h2 class="text-[20px] font-extrabold text-gray-800 mb-1.5 relative z-10">我的生词本</h2>
+                <p class="text-[13px] text-gray-500 mb-5 relative z-10">已累计生词: <span id="dashVocabCount" class="font-extrabold text-orange-500 text-[15px]">0</span> 词</p>
+                <button class="bg-white text-orange-500 border border-orange-200 px-5 py-2.5 rounded-[12px] font-bold text-[13px] group-hover:bg-orange-500 group-hover:text-white transition-colors shadow-sm relative z-10 flex items-center gap-1.5" onclick="event.stopPropagation(); window.switchView('view-vocab')">
+                    进入详情 <i class="ph-bold ph-arrow-right"></i>
+                </button>
+            </div>
+
+            <div class="bg-white rounded-[24px] shadow-premium p-4 md:p-5 flex flex-col justify-between gap-4 h-full min-h-0 relative">
+                <div class="grid grid-cols-2 gap-4 h-[90px] shrink-0">
+                    <button id="btnNew" onclick="window.startPassing('new', '学习新词')" class="w-full h-full"></button>
+                    <button id="btnOld" onclick="window.startPassing('old', '复戏旧词')" class="w-full h-full"></button>
+                </div>
+
+                <div class="bg-gray-50/60 rounded-[16px] border border-gray-100 p-3 shrink-0 relative overflow-hidden min-h-[80px] flex flex-col justify-center transition-all">
+                    <div id="hubIdleState" class="flex flex-row items-center justify-center gap-2 transition-opacity h-full">
+                        <button onclick="window.promptManualGenerate()" class="w-full flex items-center justify-center gap-1.5 text-orange-500 hover:text-orange-600 bg-orange-50 hover:bg-orange-100 py-3 rounded-[12px] transition-all active:scale-95 font-bold text-[14px] shadow-sm border border-orange-100/50">
+                            <i class="ph-bold ph-magic-wand text-[18px]"></i> 一键生成专属强化关卡
+                        </button>
+                    </div>
+
+                    <div id="hubActiveState" class="hidden bg-[#FFF5F5] border-[2px] border-[#FECACA] flex-row items-center justify-between p-2.5 lg:p-3 z-20 pulse-alert-light rounded-[16px] gap-2 lg:gap-3 w-full">
+                        <div class="flex flex-col shrink-0 text-left pl-1">
+                            <h3 class="font-extrabold text-[14px] lg:text-[15px] text-red-600 flex items-center gap-1"><i class="ph-fill ph-warning-circle"></i> 专属强化关卡</h3>
+                            <span class="text-[11px] font-bold text-red-500 mt-0.5">待强化 <span id="hubLevelCount" class="text-[13px] font-mono">0</span> 词</span>
+                        </div>
+                        <div class="flex-1 flex flex-row items-center justify-center gap-1 overflow-x-auto hide-scrollbar px-1" id="hubStepsContainer"></div>
+                        <button onclick="window.enterScoringView()" class="shrink-0 bg-[#EF4444] hover:bg-red-600 text-white font-bold py-2 px-3 lg:px-4 rounded-[10px] shadow-sm active:scale-95 transition-all text-[12px] lg:text-[13px] flex items-center justify-center gap-1 whitespace-nowrap">
+                            攻坚解锁 <i class="ph-bold ph-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white/60 rounded-[16px] border border-gray-100 p-3 shrink-0 flex flex-col relative overflow-hidden flex-1 min-h-[150px]">
+                    <div class="flex items-center gap-1.5 mb-2 px-1 shrink-0 text-slate-700">
+                        <i class="ph-fill ph-chalkboard-teacher text-indigo-500 text-[16px]"></i>
+                        <span class="text-[14px] font-bold">老师指定任务</span>
+                    </div>
+                    <div id="assignedTaskContainer" class="w-full overflow-y-auto hide-scrollbar flex flex-col gap-2 pb-1 relative z-10"></div>
+                    <div id="noAssignedTaskBox" class="absolute inset-0 flex flex-col items-center justify-center text-center opacity-50 pointer-events-none z-0 mt-4">
+                        <i class="ph-fill ph-coffee text-[32px] text-gray-400 mb-1"></i>
+                        <p class="text-[12px] font-bold text-gray-500 mt-1">暂未发布指定任务</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-vocab" class="view-section flex-col w-full h-full max-w-[1300px] mx-auto p-4 md:p-5 overflow-hidden gap-4">
+        <div class="flex items-center justify-between shrink-0 mb-2 px-2">
+            <div class="flex items-center gap-4">
+                <button onclick="window.switchView('view-ai-dashboard')" class="w-11 h-11 bg-white hover:bg-gray-50 rounded-[14px] shadow-sm flex items-center justify-center transition-colors text-slate-600 active:scale-95 border border-gray-100">
+                    <i class="ph-bold ph-caret-left text-[22px]"></i>
+                </button>
+                <h2 class="font-extrabold text-[32px] text-gray-900 tracking-tight leading-none">我的生词本</h2>
+            </div>
+            <button onclick="window.promptManualGenerate()" class="bg-gradient-to-b from-[#FF9845] to-[#F3631A] hover:from-[#FFA55A] hover:to-[#E55A15] text-white pl-1.5 pr-4 py-1.5 rounded-[12px] font-bold text-[14px] shadow-[0_4px_12px_rgba(243,99,26,0.3)] active:scale-95 transition-all flex items-center gap-1.5 border border-white/20 relative z-10">
+                <div class="bg-white/25 rounded-[8px] w-7 h-7 flex items-center justify-center shadow-[inset_0_1px_2px_rgba(255,255,255,0.4)]">
+                    <i class="ph-bold ph-magic-wand text-white text-[16px]"></i>
+                </div>
+                一键生成关卡
+            </button>
+        </div>
+
+        <div class="bg-white rounded-[24px] shadow-premium flex flex-col flex-1 min-h-0 border border-gray-100 relative overflow-hidden">
+            <div class="flex justify-between items-center px-5 py-4 border-b border-gray-100 bg-gray-50/50 shrink-0">
+                <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar" id="vocab-filters-full">
+                    <button onclick="window.setVocabFilterFull('all')" id="full-filter-all"></button>
+                    <button onclick="window.setVocabFilterFull('new')" id="full-filter-new"></button>
+                    <button onclick="window.setVocabFilterFull('old')" id="full-filter-old"></button>
+                </div>
+                <div class="text-[13px] text-gray-500 font-medium">共 <span id="fullVocabCount">0</span> 词</div>
+            </div>
+            <div class="flex-1 min-h-0 overflow-y-auto px-5 py-4 hide-scrollbar bg-gray-50/30">
+                <div id="fullVocabList" class="flex flex-col gap-4 content-start"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-passing" class="view-section flex-col w-full h-full p-4 md:p-5 overflow-hidden max-w-[1300px] mx-auto gap-4">
+        <div class="flex items-center justify-between shrink-0 mb-3 px-2">
+            <div class="flex items-center gap-4">
+                <button onclick="window.switchView('view-ai-dashboard')" class="w-11 h-11 bg-[#F1F5F9] hover:bg-[#E2E8F0] rounded-[14px] flex items-center justify-center transition-colors text-slate-600 shadow-sm active:scale-95">
+                    <i class="ph-bold ph-caret-left text-[22px]"></i>
+                </button>
+                <h2 class="font-extrabold text-[32px] text-gray-900 tracking-tight leading-none" id="passingTitle">学习新词</h2>
+            </div>
+        </div>
+
+        <div class="flex-1 min-h-0 flex flex-col bg-white rounded-[24px] shadow-premium relative overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 shrink-0">
+                <span class="text-[13px] text-gray-500 font-medium">共 <span id="totalPassCount">10</span> 词</span>
+                <div class="flex items-center bg-gray-200/60 p-1 rounded-[12px] gap-1 shrink-0">
+                    <button id="pass-filter-all" onclick="window.setPassFilter('all')" class="px-3 py-1.5 rounded-[10px] bg-white shadow-sm text-gray-800 text-[13px] font-bold transition-all">全部 <span id="statAllCount">0</span></button>
+                    <button id="pass-filter-known" onclick="window.setPassFilter('known')" class="px-3 py-1.5 rounded-[10px] text-gray-500 hover:text-gray-700 text-[13px] font-bold transition-all flex items-center gap-1"><div class="w-1.5 h-1.5 rounded-full bg-[#10B981]"></div>认识 <span id="statKnown">0</span></button>
+                    <button id="pass-filter-unknown" onclick="window.setPassFilter('unknown')" class="px-3 py-1.5 rounded-[10px] text-gray-500 hover:text-gray-700 text-[13px] font-bold transition-all flex items-center gap-1"><div class="w-1.5 h-1.5 rounded-full bg-[#EF4444]"></div>不认识 <span id="statUnknown">0</span></button>
+                </div>
+            </div>
+            <div id="wordListContainer" class="flex-1 min-h-0 overflow-y-auto px-5 py-4 flex flex-col gap-4 pb-24 hide-scrollbar bg-gray-50/30 content-start"></div>
+            <div class="absolute bottom-0 left-0 w-full bg-white border-t border-gray-100 px-6 py-4 flex justify-between items-center z-10 shadow-[0_-4px_20px_rgba(0,0,0,0.03)] shrink-0">
+                <div class="flex items-center gap-1.5 text-[#F97316] text-[15px] font-medium cursor-pointer active:opacity-70 transition-all whitespace-nowrap" onclick="window.scrollToFirstUnanswered()">
+                    <i class="ph-fill ph-warning-circle text-[22px]"></i>
+                    <span>剩余待完成：<span id="statRemaining" class="text-[22px] font-extrabold px-1 leading-none">10</span> 题</span>
+                    <i class="ph-bold ph-caret-right text-[16px] ml-0.5"></i>
+                </div>
+                <button id="submitLevelBtn" onclick="window.submitPassResults()" class="bg-[#F1F5F9] text-[#94A3B8] font-bold py-3 px-10 text-[16px] rounded-[14px] transition-all cursor-not-allowed whitespace-nowrap shrink-0">提 交</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-scoring" class="view-section flex-col w-full h-full absolute inset-0 z-[60] bg-gradient-to-br from-[#EFF6FF] to-[#DFE7FF] text-gray-700 select-none overflow-hidden">
+        <div class="absolute left-1/2 top-8 transform -translate-x-1/2 flex items-center space-x-1 z-[70] pointer-events-auto" id="nav-stepper-container"></div>
+
+        <div class="absolute inset-0 pt-[32px] p-8 flex pointer-events-none">
+            <div class="flex-1 h-full flex flex-col pointer-events-auto pr-6 pb-0 shrink-0 min-w-0">
+                <div class="flex items-center h-[40px] mb-4 shrink-0 w-full justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-gray-600 shrink-0 cursor-pointer hover:shadow-md transition-all pointer-events-auto" onclick="window.showModal('退出提示', '<div class=\'mt-1 font-medium\'>确定要退出当前关卡吗？未提交的进度将不会保留。</div>', () => window.switchView('view-ai-dashboard'), true)">
+                            <i class="ph-bold ph-caret-left text-[20px] -ml-0.5"></i>
+                        </div>
+                        <div id="score-progress" class="bg-[#1F5FFF]/10 text-[#1F5FFF] font-bold px-4 py-1.5 rounded-full text-[14px] shrink-0 pointer-events-auto">1/11</div>
+                        <div class="flex items-center bg-white rounded-full px-3 py-1.5 shadow-sm border border-gray-100 gap-1.5 pointer-events-auto ml-1">
+                            <i class="ph-bold ph-clock text-[15px] text-gray-400"></i>
+                            <span id="scoring-timer" class="font-mono font-bold text-[13px] text-gray-600 tracking-wide">00:00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <ul id="queue-words-list" class="flex-1 overflow-y-auto px-1 -mx-1 space-y-[6px] scroll-smooth no-scrollbar relative"></ul>
+                <div id="queue-submit-bar" class="mt-4 pt-4 border-t border-gray-300/30 flex items-center justify-between px-2 shrink-0 h-[72px]"></div>
+            </div>
+
+            <div class="w-px bg-gray-200/80 mt-16 mb-8 mx-2 shrink-0 rounded-full shadow-sm pointer-events-auto"></div>
+
+            <div class="flex-1 h-full flex flex-col relative pointer-events-auto pl-6 min-w-0 shrink-0">
+                <div class="w-full flex items-center justify-between h-[40px] relative z-20 mb-4 shrink-0 pointer-events-auto">
+                    <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
+                        <div id="scoring-status-pill" class="flex items-center space-x-1.5 bg-white/80 backdrop-blur-md px-6 py-2.5 rounded-full border border-white text-[14px] font-medium text-gray-500 transition-colors shadow-sm pointer-events-auto whitespace-nowrap">等待开始...</div>
+                    </div>
+                    <div></div>
+                    <button id="autoplay-toggle-btn" onclick="window.toggleAutoPlay()" class="h-9 flex items-center px-4 rounded-full border-[1.5px] font-bold text-[13px] transition-all bg-[#eff6ff] border-[#bfdbfe] text-[#3B82F6] hover:bg-[#dbeafe] shadow-sm shrink-0 whitespace-nowrap relative z-10">
+                        <i class="ph-bold ph-arrows-clockwise text-[16px] mr-1.5"></i><span id="autoplay-toggle-text">自动下一个</span>
+                    </button>
+                </div>
+
+                <div class="flex-1 flex flex-col items-center justify-center text-center px-4 pointer-events-none min-w-0 w-full space-y-12">
+                    <div id="score-word-en" class="text-gray-800 tracking-wide font-bold leading-tight drop-shadow-md max-w-full break-words break-all pointer-events-auto w-full text-[40px] transition-all duration-300">afternoon</div>
+                    <div id="score-word-phon" class="text-gray-800 font-bold font-serif tracking-widest drop-shadow-sm pointer-events-auto transition-all duration-300 break-words break-all max-w-full w-full text-[40px] leading-tight">/ˌa:ftə'nu:n/</div>
+                    <div id="score-word-cn" class="text-gray-800 font-bold tracking-widest pointer-events-auto leading-tight transition-all duration-300 max-w-full break-words w-full text-[40px]">下午</div>
+                </div>
+
+                <div class="w-full flex flex-col items-center shrink-0 mt-auto relative z-50 pointer-events-auto">
+                    <div id="mic-container" class="mb-6 h-[84px] flex items-center justify-end w-full transition-opacity duration-300 pr-2 pointer-events-auto">
+                        <button id="score-action-btn" class="w-[84px] h-[84px] bg-[#3B82F6] text-white rounded-full flex items-center justify-center shadow-[0_8px_24px_rgba(59,130,246,0.4)] hover:bg-[#2563EB] transition-all focus:outline-none select-none group relative z-[100] overflow-hidden transform cursor-pointer">
+                            <i class="ph-bold ph-microphone text-[32px] pointer-events-none transition-transform group-active:scale-90 shrink-0"></i>
+                        </button>
+                    </div>
+
+                    <div id="control-capsule" class="w-full flex items-center justify-between bg-white/90 backdrop-blur-2xl px-5 h-[72px] rounded-[36px] shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-white/60 pointer-events-auto">
+                        <div class="flex items-center space-x-6 pl-6 pr-8 border-r border-gray-200/80 shrink-0">
+                            <div class="flex flex-col items-center justify-center space-y-0.5">
+                                <span class="text-[11px] text-[#94a3b8] font-bold tracking-wide">音频间隔</span>
+                                <div class="bg-[#f1f5f9] text-[#475569] pl-2 pr-1 py-0.5 rounded flex items-center focus-within:ring-1 focus-within:ring-blue-300 transition-shadow">
+                                    <input id="audio-gap" type="number" step="0.1" value="1.0" class="bg-transparent text-[12px] font-mono font-bold leading-tight w-6 text-center outline-none">
+                                    <span class="text-[10px] opacity-70 font-bold ml-px mr-1">秒</span>
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-center justify-center space-y-0.5">
+                                <span class="text-[11px] text-[#94a3b8] font-bold tracking-wide">单词间隔</span>
+                                <div class="bg-[#f1f5f9] text-[#475569] pl-2 pr-1 py-0.5 rounded flex items-center focus-within:ring-1 focus-within:ring-blue-300 transition-shadow">
+                                    <input id="word-gap" type="number" step="0.1" value="1.0" class="bg-transparent text-[12px] font-mono font-bold leading-tight w-6 text-center outline-none">
+                                    <span class="text-[10px] opacity-70 font-bold ml-px mr-1">秒</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex flex-col items-center justify-center space-y-0.5 relative" id="speed-dropdown-container">
+                                <span class="text-[11px] text-[#94a3b8] font-bold tracking-wide">倍速</span>
+                                <div id="speed-trigger" class="bg-[#f1f5f9] text-[#475569] px-2 py-0.5 rounded text-[12px] font-mono font-bold leading-tight min-w-[36px] text-center cursor-pointer hover:bg-[#e2e8f0] transition-colors relative select-none">
+                                    <span id="speed-display">1x</span>
+                                </div>
+                                <div id="speed-menu" class="hidden absolute bottom-[calc(100%+8px)] left-1/2 transform -translate-x-1/2 bg-white/95 backdrop-blur-xl rounded-[14px] shadow-[0_4px_24px_rgba(0,0,0,0.12)] border border-white/80 py-1.5 w-[68px] z-[100] origin-bottom transition-all duration-200 opacity-0 scale-95 flex flex-col gap-0.5">
+                                    <div class="speed-option px-0 py-1.5 text-[12px] font-mono font-bold text-center cursor-pointer text-gray-500 hover:bg-gray-100/80 transition-colors rounded-[8px] mx-1.5" data-value="0.75">0.75x</div>
+                                    <div class="speed-option px-0 py-1.5 text-[12px] font-mono font-bold text-center cursor-pointer bg-blue-50 text-[#3B82F6] transition-colors rounded-[8px] mx-1.5" data-value="1">1x</div>
+                                    <div class="speed-option px-0 py-1.5 text-[12px] font-mono font-bold text-center cursor-pointer text-gray-500 hover:bg-gray-100/80 transition-colors rounded-[8px] mx-1.5" data-value="1.25">1.25x</div>
+                                    <div class="speed-option px-0 py-1.5 text-[12px] font-mono font-bold text-center cursor-pointer text-gray-500 hover:bg-gray-100/80 transition-colors rounded-[8px] mx-1.5" data-value="1.5">1.5x</div>
+                                    <div class="speed-option px-0 py-1.5 text-[12px] font-mono font-bold text-center cursor-pointer text-gray-500 hover:bg-gray-100/80 transition-colors rounded-[8px] mx-1.5" data-value="1.75">1.75x</div>
+                                    <div class="speed-option px-0 py-1.5 text-[12px] font-mono font-bold text-center cursor-pointer text-gray-500 hover:bg-gray-100/80 transition-colors rounded-[8px] mx-1.5" data-value="10">2x</div>
+                                </div>
+                                <input type="hidden" id="playback-speed" value="1">
+                            </div>
+                        </div>
+
+                        <div class="flex-1 flex justify-between items-center pl-4 pr-0 relative w-full">
+                            <button id="prev-btn" class="flex items-center justify-center text-[#3B82F6] hover:text-[#2563EB] transition-colors font-medium text-[14px] sm:text-[15px] py-2 px-2 rounded-full cursor-pointer hover:bg-blue-50 whitespace-nowrap shrink-0" onclick="window.prevScoreWord()">
+                                <i class="ph-bold ph-caret-left text-[16px] mr-1"></i>上一题
+                            </button>
+                            
+                            <button id="system-play-btn" class="absolute left-1/2 transform -translate-x-1/2 w-[46px] h-[46px] shrink-0 bg-transparent text-[#3B82F6] border-[1.5px] border-[#3B82F6]/40 rounded-full flex items-center justify-center shadow-sm hover:bg-blue-50 transition-all active:scale-95 focus:outline-none" onclick="window.playSystemAudio()">
+                                <i class="ph-fill ph-play text-[20px] ml-1"></i>
+                            </button>
+                            
+                            <button id="next-btn" class="flex items-center justify-center text-[#3B82F6] hover:text-[#2563EB] transition-colors font-medium text-[14px] sm:text-[15px] py-2 px-2 rounded-full cursor-pointer hover:bg-blue-50 whitespace-nowrap shrink-0 ml-auto" onclick="window.nextScoreWord()">下一题
+                                <i class="ph-bold ph-caret-right text-[16px] ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-grading" class="view-section flex-col w-full h-full max-w-[1300px] mx-auto p-4 md:p-5 overflow-hidden gap-4 bg-[#F8FAFC]">
+        <div class="flex items-center justify-between shrink-0 mb-3 px-2">
+            <div class="flex items-center gap-4">
+                <button onclick="window.switchView('view-scoring')" class="w-11 h-11 bg-white hover:bg-gray-50 rounded-[14px] shadow-sm flex items-center justify-center transition-colors text-slate-600 active:scale-95 border border-gray-100">
+                    <i class="ph-bold ph-caret-left text-[22px] -ml-0.5"></i>
+                </button>
+                <h2 class="font-extrabold text-[32px] text-gray-900 tracking-tight leading-none">标记不熟的</h2>
+            </div>
+            <div class="flex items-center bg-white px-4 py-2 rounded-[14px] border border-gray-200 shadow-sm">
+                <span class="text-gray-500 font-bold text-[14px] mr-2">听写得分:</span>
+                <span id="final-score-display" class="text-[#3B82F6] font-black text-[22px] font-mono leading-none">10</span>
+                <span class="text-gray-400 font-bold text-[14px] ml-1">/ <span id="final-score-total">10</span></span>
+            </div>
+        </div>
+
+        <div class="flex-1 min-h-0 flex flex-col bg-white rounded-[24px] shadow-premium relative overflow-hidden">
+            <div class="flex-1 min-h-0 overflow-y-auto px-5 py-6 hide-scrollbar bg-gray-50/30">
+                <div id="gradingListContainer" class="grid grid-cols-2 gap-4 content-start"></div>
+            </div>
+
+            <div class="absolute bottom-0 left-0 w-full bg-white border-t border-gray-100 px-6 py-4 flex justify-between items-center z-10 shadow-[0_-4px_20px_rgba(0,0,0,0.03)] shrink-0">
+                <div class="flex items-center gap-4">
+                    <button id="take-photo-btn" onclick="window.simulateTakePhoto()" class="flex items-center justify-center bg-orange-50 hover:bg-orange-100 text-orange-500 border border-orange-200 transition-all font-bold text-[14px] px-5 py-2.5 rounded-[12px] shadow-sm active:scale-95 gap-2">
+                        <i class="ph-bold ph-camera text-[20px]"></i> 拍照凭证
+                    </button>
+                    <div id="photo-thumbnail-container" class="hidden flex items-center gap-3">
+                        <div class="relative w-12 h-12 rounded-[8px] overflow-hidden border-2 border-orange-300 shadow-sm group cursor-pointer" onclick="window.simulateTakePhoto()">
+                            <img src="https://placehold.co/100x100/eeeeee/999999?text=IMG" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="ph-bold ph-arrows-clockwise text-white text-[20px]"></i>
+                            </div>
+                        </div>
+                        <span class="text-[12px] font-bold text-gray-500">已传凭证</span>
+                    </div>
+                </div>
+                <button id="finishLevelBtn" onclick="window.finishScoringLevel()" class="bg-[#1F5FFF] hover:bg-[#004ce6] shadow-[0_4px_12px_rgba(31,95,255,0.3)] hover:shadow-[0_6px_16px_rgba(31,95,255,0.4)] text-white font-bold py-3 px-10 text-[16px] rounded-[14px] active:scale-95 transition-all">
+                    完成关卡
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-settings" class="view-section flex-col w-full h-full max-w-[1300px] mx-auto p-4 md:p-5 overflow-hidden gap-4">
+        <div class="flex items-center justify-between shrink-0 mb-2 px-2">
+            <div class="flex items-center gap-4">
+                <button onclick="window.switchView('view-ai-dashboard')" class="w-11 h-11 bg-white hover:bg-gray-50 rounded-[14px] shadow-sm flex items-center justify-center transition-colors text-slate-600 active:scale-95 border border-gray-100">
+                    <i class="ph-bold ph-caret-left text-[22px]"></i>
+                </button>
+                <h2 class="font-extrabold text-[32px] text-gray-900 tracking-tight leading-none">系统偏好设置</h2>
+            </div>
+        </div>
+
+        <div class="flex-1 min-h-0 overflow-y-auto hide-scrollbar pb-10 px-1 relative z-10">
+            <div class="mb-4 mt-2 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-1.5 h-5 bg-orange-500 rounded-full"></div>
+                    <h3 class="font-extrabold text-[20px] text-gray-900 tracking-tight">流转规则</h3>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start mb-10">
+                <div class="settings-card bg-white rounded-[24px] shadow-premium flex flex-col border border-gray-100 overflow-hidden relative group">
+                    <div class="px-6 py-5 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-[10px] bg-blue-100 text-blue-600 flex items-center justify-center shadow-sm border border-blue-200/50"><i class="ph-fill ph-rocket text-[16px]"></i></div>
+                            <h3 class="font-extrabold text-[17px] text-gray-800">新词过关标准</h3>
+                        </div>
+                    </div>
+                    <div class="p-6 flex flex-col gap-6 flex-1">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[14px] font-bold text-gray-600">跟读通关次数</span>
+                            <div class="flex items-center bg-gray-50 border border-gray-200 rounded-[8px] px-2 py-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]"><input type="number" value="2" class="w-10 text-center bg-transparent text-[14px] font-bold outline-none text-gray-700"><span class="text-[12px] text-gray-400">次</span></div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-[14px] font-bold text-gray-600">音记通关次数</span>
+                            <div class="flex items-center bg-gray-50 border border-gray-200 rounded-[8px] px-2 py-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]"><input type="number" value="2" class="w-10 text-center bg-transparent text-[14px] font-bold outline-none text-gray-700"><span class="text-[12px] text-gray-400">次</span></div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-[14px] font-bold text-gray-600">听写通关次数</span>
+                            <div class="flex items-center bg-gray-50 border border-gray-200 rounded-[8px] px-2 py-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]"><input type="number" value="2" class="w-10 text-center bg-transparent text-[14px] font-bold outline-none text-gray-700"><span class="text-[12px] text-gray-400">次</span></div>
+                        </div>
+                        <div class="mt-auto pt-4 border-t border-gray-100/50 flex justify-end w-full">
+                            <button class="save-btn px-5 py-2 rounded-[12px] font-bold text-[13px] transition-all bg-gray-100 text-gray-400 cursor-not-allowed flex items-center justify-center gap-1.5 w-max ml-auto" disabled onclick="window.saveCard(this)"><i class="ph-bold ph-floppy-disk text-[16px]"></i> <span>保存修改</span></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-card bg-white rounded-[24px] shadow-premium flex flex-col border border-gray-100 overflow-hidden relative group">
+                    <div class="px-6 py-5 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-[10px] bg-emerald-100 text-emerald-600 flex items-center justify-center shadow-sm border border-emerald-200/50"><i class="ph-fill ph-arrows-clockwise text-[16px]"></i></div>
+                            <h3 class="font-extrabold text-[17px] text-gray-800">旧词过关标准</h3>
+                        </div>
+                    </div>
+                    <div class="p-6 flex flex-col gap-6 flex-1">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[14px] font-bold text-gray-600">跟读通关次数</span>
+                            <div class="flex items-center bg-gray-50 border border-gray-200 rounded-[8px] px-2 py-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]"><input type="number" value="1" class="w-10 text-center bg-transparent text-[14px] font-bold outline-none text-gray-700"><span class="text-[12px] text-gray-400">次</span></div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-[14px] font-bold text-gray-600">音记通关次数</span>
+                            <div class="flex items-center bg-gray-50 border border-gray-200 rounded-[8px] px-2 py-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]"><input type="number" value="1" class="w-10 text-center bg-transparent text-[14px] font-bold outline-none text-gray-700"><span class="text-[12px] text-gray-400">次</span></div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-[14px] font-bold text-gray-600">听写通关次数</span>
+                            <div class="flex items-center bg-gray-50 border border-gray-200 rounded-[8px] px-2 py-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]"><input type="number" value="1" class="w-10 text-center bg-transparent text-[14px] font-bold outline-none text-gray-700"><span class="text-[12px] text-gray-400">次</span></div>
+                        </div>
+                        <div class="mt-auto pt-4 border-t border-gray-100/50 flex justify-end w-full">
+                            <button class="save-btn px-5 py-2 rounded-[12px] font-bold text-[13px] transition-all bg-gray-100 text-gray-400 cursor-not-allowed flex items-center justify-center gap-1.5 w-max ml-auto" disabled onclick="window.saveCard(this)"><i class="ph-bold ph-floppy-disk text-[16px]"></i> <span>保存修改</span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4 mt-6 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-1.5 h-5 bg-blue-500 rounded-full"></div>
+                    <h3 class="font-extrabold text-[20px] text-gray-900 tracking-tight">播放模式</h3>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch pb-6" id="playback-profiles-grid">
+                <div id="add-profile-placeholder" class="border-2 border-dashed border-blue-200 bg-blue-50/40 hover:bg-blue-50/80 rounded-[24px] flex flex-col items-center justify-center text-blue-500 cursor-pointer transition-all active:scale-95 min-h-[460px] h-full shadow-sm" onclick="window.addPlaybackProfile()">
+                    <div class="w-14 h-14 rounded-full bg-white flex items-center justify-center shadow-md mb-4 text-blue-500">
+                        <i class="ph-bold ph-plus text-[28px]"></i>
+                    </div>
+                    <span class="font-bold text-[16px] text-blue-600 tracking-wide">新增播放模式</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm hidden opacity-0 transition-all duration-300">
+        <div class="bg-white rounded-[24px] w-full max-w-[480px] shadow-2xl border border-gray-100 overflow-hidden transform scale-95 transition-all duration-300">
+            <div class="px-6 py-4.5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                <h3 class="font-extrabold text-[18px] text-gray-800">关卡个性化设置</h3>
+                <button onclick="closeSettingsModal()" class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="ph-bold ph-x text-[18px]"></i>
+                </button>
+            </div>
+            <div class="p-6 flex flex-col gap-4">
+                <div class="flex justify-between items-center pb-4 border-b border-gray-100">
+                    <div>
+                        <span class="font-extrabold text-[15px] text-gray-800">生效设置</span>
+                        <p class="text-[11px] text-gray-400 font-bold mt-0.5">默认设置使用班级统一参数</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span id="toggle-label" class="text-[13px] font-black text-gray-400">默认设置</span>
+                        <button id="toggle-switch" onclick="toggleSettingsActive()" class="w-12 h-6 bg-slate-200 rounded-full p-0.5 transition-colors duration-300 relative focus:outline-none cursor-pointer">
+                            <div class="w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-300 transform translate-x-0"></div>
+                        </button>
+                    </div>
+                </div>
+                <div id="settings-fields" class="flex flex-col gap-4 opacity-50 pointer-events-none transition-all duration-300">
+                    <div class="flex justify-between items-center">
+                        <span class="font-extrabold text-[14px] text-gray-700">每关词数</span>
+                        <div class="flex items-center gap-3">
+                            <input type="number" id="input-words-per-gate" min="1" max="200" value="50" oninput="validateThreshold()" class="w-20 px-3 py-1.5 border border-gray-200 rounded-[10px] text-center font-mono font-extrabold text-gray-800 focus:outline-none focus:border-blue-500">
+                            <span class="text-[12px] text-gray-400 font-bold w-16 text-right">1 到 200</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-extrabold text-[14px] text-gray-700">每关分组数</span>
+                        <div class="flex items-center gap-3">
+                            <input type="number" id="input-groups-per-gate" min="0" max="30" value="3" class="w-20 px-3 py-1.5 border border-gray-200 rounded-[10px] text-center font-mono font-extrabold text-gray-800 focus:outline-none focus:border-blue-500">
+                            <span class="text-[12px] text-gray-400 font-bold w-16 text-right">0 到 30</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <div class="flex justify-between items-center">
+                            <span class="font-extrabold text-[14px] text-gray-700">通关单词门槛</span>
+                            <div class="flex items-center gap-3">
+                                <input type="number" id="input-threshold" value="20" oninput="validateThreshold()" class="w-20 px-3 py-1.5 border border-gray-200 rounded-[10px] text-center font-mono font-extrabold text-gray-800 focus:outline-none focus:border-blue-500">
+                                <span id="threshold-limit-desc" class="text-[12px] text-gray-400 font-bold w-16 text-right">推荐: 25</span>
+                            </div>
+                        </div>
+                        <span id="threshold-warning" class="text-right text-[11px] text-red-500 font-black hidden">不能小于每关词数的1/2</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-extrabold text-[14px] text-gray-700">音频间隔</span>
+                        <div class="flex items-center gap-3">
+                            <input type="number" id="input-audio-interval" step="0.1" min="0" max="30" value="0.00" class="w-20 px-3 py-1.5 border border-gray-200 rounded-[10px] text-center font-mono font-extrabold text-gray-800 focus:outline-none focus:border-blue-500">
+                            <span class="text-[12px] text-gray-400 font-bold w-16 text-right">0 到 30</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-extrabold text-[14px] text-gray-700">单词间隔</span>
+                        <div class="flex items-center gap-3">
+                            <input type="number" id="input-word-interval" step="0.1" min="1" max="30" value="1.00" class="w-20 px-3 py-1.5 border border-gray-200 rounded-[10px] text-center font-mono font-extrabold text-gray-800 focus:outline-none focus:border-blue-500">
+                            <span class="text-[12px] text-gray-400 font-bold w-16 text-right">1 到 30</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex gap-3 justify-end">
+                <button onclick="closeSettingsModal()" class="px-5 py-2.5 border border-gray-200 hover:bg-gray-100 text-gray-500 font-extrabold text-[14px] rounded-[14px] transition-all active:scale-95">取消</button>
+                <button id="btn-submit-settings" onclick="saveSettings()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-[14px] rounded-[14px] transition-all active:scale-95 shadow-md shadow-blue-500/10">提交</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <script>
+        (function() {
+            var selectedGenType = 'new';
+            var learningTimerInterval = null;
+            var learningSeconds = 0;
+            
+            // ============== Safe DOM Setter Helpers to prevent any uncaught TypeErrors ==============
+            function safeSetText(id, value) {
+                var el = document.getElementById(id);
+                if (el) el.innerText = value;
+            }
+
+            function safeSetValue(id, value) {
+                var el = document.getElementById(id);
+                if (el) el.value = value;
+            }
+
+            function safeSetAttribute(id, attr, value) {
+                var el = document.getElementById(id);
+                if (el) el.setAttribute(attr, value);
+            }
+
+            function safeSetClass(id, className) {
+                var el = document.getElementById(id);
+                if (el) el.className = className;
+            }
+
+            // ============== Timer Module ==============
+            function formatTime(sec) {
+                var m = Math.floor(sec / 60).toString().padStart(2, '0');
+                var s = (sec % 60).toString().padStart(2, '0');
+                return m + ':' + s;
+            }
+            
+            function startLearningTimer() {
+                clearInterval(learningTimerInterval);
+                learningSeconds = 0;
+                safeSetText('scoring-timer', '00:00');
+                learningTimerInterval = setInterval(function() {
+                    learningSeconds++;
+                    safeSetText('scoring-timer', formatTime(learningSeconds));
+                }, 1000);
+            }
+            
+            function stopLearningTimer() {
+                clearInterval(learningTimerInterval);
+            }
+
+            // ====== Global Dialog and Switch View ======
+            window.showModal = function(title, msg, onConfirm = null, isConfirm = false) {
+                var modal = document.getElementById('native-modal');
+                var cancelBtn = document.getElementById('modal-cancel-btn');
+                var btn = document.getElementById('modal-btn');
+                
+                safeSetText('modal-title', title);
+                var msgEl = document.getElementById('modal-msg');
+                if(msgEl) msgEl.innerHTML = msg;
+                
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    setTimeout(() => modal.classList.replace('opacity-0', 'opacity-100'), 10);
+                }
+
+                var hideModal = () => {
+                    if (modal) modal.classList.replace('opacity-100', 'opacity-0');
+                    setTimeout(() => {
+                        if (modal) {
+                            modal.classList.add('hidden');
+                            modal.classList.remove('flex');
+                        }
+                    }, 300);
+                };
+
+                if (isConfirm) {
+                    if (cancelBtn) {
+                        cancelBtn.classList.remove('hidden');
+                        cancelBtn.classList.add('block');
+                    }
+                    if (btn) btn.innerText = '确认';
+                    if (cancelBtn) {
+                        cancelBtn.onclick = () => { hideModal(); if (title === '退出提示') stopLearningTimer(); };
+                    }
+                    if (btn) {
+                        btn.onclick = () => {
+                            hideModal();
+                            if (title === '退出提示') stopLearningTimer();
+                            if (onConfirm) setTimeout(onConfirm, 300);
+                        };
+                    }
+                } else {
+                    if (cancelBtn) {
