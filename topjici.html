@@ -458,14 +458,11 @@
 
                         <!-- 底部强引导入口 -->
                         <button class="w-full relative overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white py-3.5 rounded-[16px] shadow-[0_4px_14px_rgba(37,99,235,0.25)] transition-all active:scale-[0.98] group flex items-center justify-center">
-                            <div class="flex items-center gap-2.5 relative z-10">
-                                <div class="bg-white/20 px-2 py-0.5 rounded-[6px] backdrop-blur-md border border-white/10 flex items-center shadow-sm">
-                                    <span class="text-white/90 text-[11px] font-extrabold tracking-wider">英语单词</span>
-                                </div>
-                                <div class="flex items-center text-white">
-                                    <span class="text-[17px] font-black tracking-wide leading-none">AI 学习</span>
-                                    <i class="ph-bold ph-arrow-right text-[18px] ml-1 group-hover:translate-x-1.5 transition-transform duration-300"></i>
-                                </div>
+                            <div class="flex items-center relative z-10">
+                                <span class="text-white text-[17.5px] font-black tracking-wide leading-none">英语单词</span>
+                                <span class="text-white/40 text-[16px] font-light mx-3">|</span>
+                                <span class="text-white text-[17.5px] font-black tracking-wide leading-none">AI 学习</span>
+                                <i class="ph-bold ph-arrow-right text-[18px] ml-1.5 group-hover:translate-x-1.5 transition-transform duration-300"></i>
                             </div>
                         </button>
                     </div>
@@ -639,33 +636,58 @@
                         
                         if (mainTaskBadge) mainTaskBadge.innerText = state.assignedTasks.length;
                         
-                        // 生成精致简约列表表头
+                        // 生成带内部网格线的表格，加高行高、去最外侧垂直线、进入按钮改圆+箭头
                         let html = `
-                            <div class="flex items-center px-6 py-2.5 border-b border-gray-100 bg-white/95 backdrop-blur-sm sticky top-0 z-10 text-[11px] font-extrabold text-gray-400 uppercase tracking-wider">
-                                <div class="w-[30px] text-center shrink-0">序号</div>
-                                <div class="flex-1 text-left pl-3">任务名称</div>
-                                <div class="w-[45px] text-right shrink-0">词数</div>
-                                <div class="w-[60px] text-right shrink-0">进度</div>
-                            </div>
-                            <div class="flex flex-col relative z-0">
+                            <div class="w-full border-t border-gray-200 overflow-hidden bg-white mt-1">
+                                <table class="w-full text-left border-collapse" style="table-layout: fixed;">
+                                    <thead class="bg-gray-50/80 text-[12px] font-extrabold text-gray-500 tracking-wider">
+                                        <tr>
+                                            <th class="w-[50px] py-3 text-center border-b border-r border-gray-200">序号</th>
+                                            <th class="py-3 pl-4 border-b border-r border-gray-200 truncate">任务名称</th>
+                                            <th class="w-[60px] py-3 text-center border-b border-r border-gray-200">词数</th>
+                                            <th class="w-[80px] py-3 text-center border-b border-r border-gray-200">进度</th>
+                                            <th class="w-[60px] py-3 text-center border-b border-gray-200">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
                         `;
                         
                         // 生成列表行
                         state.assignedTasks.forEach((task, index) => {
                             var isDoneToday = task.lastDone === today;
                             var numStr = (index + 1).toString().padStart(2, '0');
+                            
+                            var trClass = isDoneToday ? 'bg-gray-50/40' : 'hover:bg-blue-50/30 transition-colors cursor-pointer group';
+                            var titleColor = isDoneToday ? 'text-gray-400' : 'text-gray-700 group-hover:text-blue-700';
+                            var progressColor = isDoneToday ? 'text-emerald-500' : 'text-gray-800';
+                            
+                            var btnHtml = isDoneToday 
+                                ? `<button class="w-8 h-8 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center cursor-not-allowed shadow-inner transition-all mx-auto" title="已完成">
+                                       <i class="ph-bold ph-check text-[15px]"></i>
+                                   </button>` 
+                                : `<button class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 group-hover:bg-blue-500 group-hover:text-white flex items-center justify-center transition-all shadow-sm mx-auto active:scale-95" onclick="window.showToast('进入任务: ${task.title}')" title="进入任务">
+                                       <i class="ph-bold ph-arrow-right text-[15px]"></i>
+                                   </button>`;
+
                             html += `
-                            <div class="flex items-center px-6 py-[12px] border-b border-gray-50 last:border-0 ${isDoneToday ? 'opacity-50 bg-gray-50/30' : 'hover:bg-blue-50/40 cursor-pointer'} transition-colors group">
-                                <div class="w-[30px] text-[13px] font-mono font-bold text-gray-300 group-hover:text-blue-400 transition-colors text-center shrink-0">${numStr}</div>
-                                <div class="flex-1 text-[13px] font-bold ${isDoneToday ? 'text-gray-500' : 'text-gray-700 group-hover:text-blue-700'} transition-colors truncate pl-3">${task.title}</div>
-                                <div class="w-[45px] text-[12px] font-mono font-medium text-gray-400 text-right shrink-0">${task.count}</div>
-                                <div class="w-[60px] text-[13px] font-mono font-black ${isDoneToday ? 'text-emerald-500' : 'text-gray-800'} text-right shrink-0 flex items-center justify-end gap-1">
-                                    ${task.current}
-                                    ${isDoneToday ? '<i class="ph-fill ph-check-circle text-[14px] text-emerald-500 ml-0.5"></i>' : ''}
-                                </div>
-                            </div>`;
+                                <tr class="${trClass}">
+                                    <td class="py-3.5 text-center border-b border-r border-gray-200 text-[13px] font-mono font-bold text-gray-400">${numStr}</td>
+                                    <td class="py-3.5 pl-4 border-b border-r border-gray-200 text-[14px] font-bold ${titleColor} truncate transition-colors" title="${task.title}">${task.title}</td>
+                                    <td class="py-3.5 text-center border-b border-r border-gray-200 text-[13px] font-mono font-medium text-gray-500">${task.count}</td>
+                                    <td class="py-3.5 text-center border-b border-r border-gray-200 text-[14px] font-mono font-black ${progressColor}">
+                                        ${task.current}/${task.count}
+                                    </td>
+                                    <td class="py-3.5 text-center border-b border-gray-200">
+                                        ${btnHtml}
+                                    </td>
+                                </tr>
+                            `;
                         });
-                        html += `</div>`;
+                        html += `
+                                    </tbody>
+                                </table>
+                            </div>
+                        `;
                         taskContainer.innerHTML = html;
                     } else { 
                         taskContainer.classList.add('hidden'); 
