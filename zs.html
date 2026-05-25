@@ -38,7 +38,7 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif; background-color: #E2E8F0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif; background-color: #E2E8F0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
 
         .device-simulator { width: 375px; height: 812px; background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%); position: relative; overflow: hidden; border-radius: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.15); display: flex; flex-direction: column; }
         .device-simulator::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 40px; box-shadow: inset 0 0 0 8px #FFFFFF; pointer-events: none; z-index: 1000; }
@@ -59,11 +59,11 @@
         .icon-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-title); transition: 0.2s;}
         .icon-btn:active { opacity: 0.6; }
 
-        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 0 20px 20px 20px; scrollbar-width: none; padding-bottom: 30px; }
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 0 20px 20px 20px; scrollbar-width: none; padding-bottom: 30px; -webkit-overflow-scrolling: touch;}
         .main-content::-webkit-scrollbar { display: none; }
 
-        /* 一级 & 二级底部导航通用 */
-        .tab-bar, .sub-tab-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 84px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.6); display: flex; justify-content: space-around; align-items: flex-start; padding-top: 10px; z-index: 100; }
+        /* 底部导航通用 */
+        .tab-bar, .sub-tab-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 84px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.6); display: flex; justify-content: space-around; align-items: flex-start; padding-top: 10px; z-index: 100; padding-bottom: 20px; }
         .tab-item, .sub-tab-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94A3B8; cursor: pointer; width: 60px; transition: all 0.3s; }
         .tab-item:active, .sub-tab-item:active { transform: scale(0.9); }
         .tab-item.active, .sub-tab-item.active { color: var(--primary-color); }
@@ -73,16 +73,17 @@
         .tab-label { font-size: 11px; font-weight: 700; letter-spacing: 0.2px;}
 
         /* 二级页面内部视图 */
-        .sub-view { display: none; flex-direction: column; flex: 1; padding-bottom: 84px; overflow-y: auto; scrollbar-width: none;}
+        .sub-view { position: absolute; top: 0; left: 0; right: 0; bottom: 0; padding: 0 20px 100px; display: none; flex-direction: column; overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
         .sub-view::-webkit-scrollbar { display: none; }
-        .sub-view.active { display: flex; }
+        .sub-view.active { display: flex; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 20px; box-shadow: 0 8px 24px rgba(31, 95, 255, 0.04); }
         
-        .global-semester-bar { display:flex; justify-content: space-between; align-items:center; background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); padding: 10px 16px; border-radius: 14px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.9); box-shadow: 0 4px 12px rgba(0,0,0,0.03); flex-shrink:0; position: sticky; top: -5px; z-index: 50;}
+        .global-semester-bar { display:flex; justify-content: space-between; align-items:center; background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); padding: 10px 16px; border-radius: 14px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.9); box-shadow: 0 4px 12px rgba(0,0,0,0.03); flex-shrink:0; position: relative; z-index: 50;}
         .semester-select { border:none; background:transparent; font-size:14px; font-weight:800; color:var(--primary-color); outline:none; appearance:none; padding-right:20px; cursor: pointer; width: 100%;}
         
-        /* 恢复的网格菜单样式 */
+        /* 网格菜单 */
         .grid-menu { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 8px; padding: 16px 12px; }
         .grid-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: transform 0.2s; position: relative; }
         .grid-item:active { transform: scale(0.95); opacity: 0.8; }
@@ -90,23 +91,18 @@
         .grid-icon-wrap svg { width: 24px; height: 24px; }
         .grid-label { font-size: 12px; font-weight: 600; color: var(--text-main); text-align: center; line-height: 1.2; word-break: break-all;}
 
-        .dir-tabs { display: flex; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid rgba(0,0,0,0.03); padding: 4px 12px 0; }
+        .dir-tabs { display: flex; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid rgba(0,0,0,0.03); padding: 4px 12px 0; -webkit-overflow-scrolling: touch;}
         .dir-tabs::-webkit-scrollbar { display: none; }
-        .dir-tab { padding: 14px 14px; font-size: 14px; font-weight: 600; color: var(--text-secondary); cursor: pointer; white-space: nowrap; position: relative; transition: 0.2s; }
+        .dir-tab { flex-shrink: 0; padding: 14px 14px; font-size: 14px; font-weight: 600; color: var(--text-secondary); cursor: pointer; white-space: nowrap; position: relative; transition: 0.2s; }
         .dir-tab.active { color: var(--primary-color); font-weight: 800; }
         .dir-tab.active::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 24px; height: 3px; background: var(--primary-color); border-radius: 2px 2px 0 0; }
 
-        .delete-badge { position: absolute; top: -4px; right: -4px; width: 20px; height: 20px; background: var(--danger-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; line-height: 1; border: 2px solid white; z-index: 10; box-shadow: 0 2px 6px rgba(239,68,68,0.3); cursor: pointer;}
-        .add-badge { position: absolute; top: -4px; right: -4px; width: 20px; height: 20px; background: var(--success-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; z-index: 10; box-shadow: 0 2px 6px rgba(16,185,129,0.3); cursor: pointer; }
-        .added-badge { position: absolute; top: -4px; right: -4px; width: 20px; height: 20px; background: #9CA3AF; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; z-index: 10; cursor: not-allowed; }
-        @keyframes shake-wobble { 0% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } 100% { transform: rotate(-2deg); } }
-        .shake-anim { animation: shake-wobble 0.25s infinite linear; }
-
-        /* 横向滚动胶囊标签 */
-        .pill-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; margin-bottom: 12px; flex-shrink: 0; }
+        /* 横向滚动胶囊标签联动修复 */
+        .pill-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; margin-bottom: 12px; flex-shrink: 0; -webkit-overflow-scrolling: touch;}
         .pill-scroll::-webkit-scrollbar { display: none; }
-        .pill { padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; white-space: nowrap; cursor: pointer; background: rgba(255,255,255,0.6); color: var(--text-secondary); border: 1px solid rgba(255,255,255,0.8); transition: 0.2s; }
-        .pill.active { background: var(--primary-color); color: white; border-color: var(--primary-color); box-shadow: 0 4px 12px rgba(31,95,255,0.2); }
+        .pill { flex-shrink: 0; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; white-space: nowrap; cursor: pointer; background: rgba(255,255,255,0.6); color: var(--text-secondary); border: 1px solid rgba(255,255,255,0.8); transition: 0.2s; }
+        .pill:hover { background: rgba(255,255,255,0.9); }
+        .pill.active { background: var(--primary-color); color: white; border-color: var(--primary-color); box-shadow: 0 4px 12px rgba(31,95,255,0.2); transform: scale(1.02);}
 
         /* 列表卡片 */
         .list-card { padding: 16px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; cursor: pointer; transition: all 0.3s; position: relative; }
@@ -137,10 +133,10 @@
 
         .card-actions { display: flex; gap: 8px; margin-top: 4px; padding-top: 12px; border-top: 1px dashed rgba(0,0,0,0.08); align-items:center;}
         .btn-xs { background: rgba(31,95,255,0.1); color: var(--primary-color); border:none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 800; cursor:pointer; transition:0.2s;}
-        .btn-xs:active { transform: scale(0.95); }
+        .btn-xs:active, .btn-xs:hover { transform: scale(0.95); opacity: 0.9; }
         .btn-xs.outline { background: transparent; border: 1px solid var(--primary-color); }
         .btn-xs.danger { background: var(--danger-light); color: var(--danger-color); }
-        .icon-log-btn { margin-left:auto; color: #9CA3AF; padding:4px; display:flex; align-items:center; justify-content:center; border-radius:6px; transition:0.2s;}
+        .icon-log-btn { margin-left:auto; color: #9CA3AF; padding:4px; display:flex; align-items:center; justify-content:center; border-radius:6px; transition:0.2s; cursor: pointer;}
         .icon-log-btn:active { background: rgba(0,0,0,0.05); color: var(--primary-color); }
         
         .search-input-pill { width: 100%; padding: 14px 14px 14px 44px; border-radius: 100px; background: rgba(255,255,255,0.9); border: none; font-size: 14px; font-weight: 600; color: var(--text-title); outline: none; box-shadow: 0 4px 16px rgba(31, 95, 255, 0.05); transition: all 0.2s; }
@@ -149,17 +145,71 @@
 
         .section-header { display: flex; justify-content: space-between; align-items: center; padding: 0 6px 12px; margin-top: 16px;}
         .section-title { font-size: 18px; font-weight: 800; color: var(--text-title); letter-spacing: 0.5px;}
-        .manage-btn { font-size: 14px; font-weight: 600; color: var(--primary-color); cursor: pointer; transition: 0.2s; padding: 4px 8px; border-radius: 8px;}
-        .manage-btn:active { background: rgba(31, 95, 255, 0.1); }
 
-        .toast { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.75); color: white; padding: 12px 24px; border-radius: 12px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 500; backdrop-filter: blur(4px); font-weight: 600; text-align: center;}
+        /* Toast 居中偏上，防止被底部导航遮挡 */
+        .toast { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); background: rgba(17, 24, 39, 0.85); color: white; padding: 14px 24px; border-radius: 14px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 2000; backdrop-filter: blur(8px); font-weight: 600; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 8px; justify-content: center;}
         .toast.show { opacity: 1; }
 
         /* 大按键统一集成样式 */
-        .primary-action-btn { background: var(--primary-color); color: white; padding: 16px; border-radius: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 24px rgba(31, 95, 255, 0.3); cursor: pointer; transition: 0.2s; margin-bottom: 16px;}
+        .primary-action-btn { background: var(--primary-color); color: white; padding: 16px; border-radius: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 24px rgba(31, 95, 255, 0.3); cursor: pointer; transition: 0.2s; margin-bottom: 16px; flex-shrink: 0;}
         .primary-action-btn:active { transform: scale(0.98); opacity: 0.9;}
         .primary-action-btn svg { width: 22px; height: 22px; }
         .primary-action-btn span { font-size: 16px; font-weight: 800; letter-spacing: 0.5px;}
+
+        /* ================= 交互底座规范 (Overlay, BottomSheet, Dialog) ================= */
+        .modal-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; backdrop-filter: blur(2px);}
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+        .bottom-sheet { position: absolute; bottom: 0; left: 0; right: 0; background: #fff; border-radius: 24px 24px 0 0; padding: 24px 20px 34px; z-index: 1001; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 0 -10px 40px rgba(0,0,0,0.1); display: flex; flex-direction: column; max-height: 85%;}
+        .bottom-sheet.active { transform: translateY(0); }
+        .sheet-indicator { width: 40px; height: 4px; background: #E2E8F0; border-radius: 2px; margin: 0 auto 20px; flex-shrink: 0;}
+        .sheet-title { font-size: 18px; font-weight: 800; color: var(--text-title); text-align: center; margin-bottom: 24px; flex-shrink: 0;}
+        
+        .dialog-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); background: #fff; border-radius: 20px; width: 80%; padding: 24px 20px; z-index: 1001; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.15);}
+        .dialog-box.active { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
+        .dialog-title { font-size: 18px; font-weight: 800; color: var(--text-title); margin-bottom: 12px; margin-top: 12px;}
+        .dialog-desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5; padding: 0 10px;}
+        .dialog-actions { display: flex; gap: 12px; width: 100%;}
+        .dialog-btn { flex: 1; padding: 14px; font-size: 15px; font-weight: 800; border-radius: 14px; cursor: pointer; text-align: center; transition: 0.2s;}
+        .dialog-btn:active { transform: scale(0.96); }
+        .dialog-btn.cancel { background: #F1F5F9; color: var(--text-secondary);}
+        .dialog-btn.confirm { background: var(--primary-color); color: white; box-shadow: 0 4px 12px rgba(31, 95, 255, 0.2);}
+
+        /* 表单样式 */
+        .form-group { margin-bottom: 16px; text-align: left; width: 100%;}
+        .form-label { font-size: 13px; font-weight: 800; color: var(--text-title); margin-bottom: 8px; display: block; }
+        .form-control { width: 100%; padding: 14px 16px; border-radius: 14px; border: 1px solid rgba(0,0,0,0.06); background: #F8FAFC; font-size: 14px; color: var(--text-title); outline: none; transition: 0.2s; font-family: inherit;}
+        .form-control:focus { border-color: var(--primary-color); background: #fff; box-shadow: 0 0 0 3px var(--primary-light); }
+        textarea.form-control { resize: none; height: 100px; }
+        
+        .submit-btn { width: 100%; padding: 16px; border-radius: 16px; background: var(--primary-color); color: white; font-size: 16px; font-weight: 800; text-align: center; cursor: pointer; transition: 0.2s; margin-top: 8px; border: none;}
+        .submit-btn:active { transform: scale(0.98); opacity: 0.9; }
+
+        /* Sheet内部滚动区 */
+        .sheet-scroll-area { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; width: 100%; max-height: 50vh; padding: 0 4px;}
+        .sheet-scroll-area::-webkit-scrollbar { display: none; }
+        
+        /* 日志流转时间线 */
+        .log-timeline { margin-top: 8px; padding-left: 12px; border-left: 2px solid var(--primary-light); }
+        .log-item { position: relative; padding-bottom: 24px; padding-left: 16px; }
+        .log-item::before { content: ''; position: absolute; left: -21px; top: 2px; width: 10px; height: 10px; border-radius: 50%; background: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-light); }
+        .log-item:last-child { padding-bottom: 0; }
+        .log-time { font-size: 11px; color: var(--text-secondary); margin-bottom: 4px; font-weight: 600;}
+        .log-content { font-size: 14px; color: var(--text-title); font-weight: 700; margin-bottom: 4px;}
+        .log-detail { font-size: 12px; color: var(--text-main); line-height: 1.4; background: #F8FAFC; padding: 8px 12px; border-radius: 8px; margin-top: 6px;}
+
+        /* Sheet 网格 & 列表 */
+        .sheet-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 10px; margin-bottom: 10px;}
+        .sheet-list-item { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: #F8FAFC; border-radius: 16px; cursor: pointer; transition: 0.2s; border: 1px solid transparent; margin-bottom: 12px;}
+        .sheet-list-item:active { background: #EFF6FF; border-color: rgba(31, 95, 255, 0.2); }
+        
+        /* 骨架屏动画 */
+        .skeleton { background: #E2E8F0; border-radius: 8px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+
+        /* Icon Wrapper (Dialog) */
+        .dialog-icon-wrap { width: 56px; height: 56px; border-radius: 50%; background: var(--primary-light); color: var(--primary-color); display: flex; align-items: center; justify-content: center; margin-bottom: 8px;}
+        .dialog-icon-wrap svg { width: 28px; height: 28px; }
     </style>
 </head>
 <body>
@@ -173,13 +223,11 @@
                 <div class="nav-title" style="font-size: 20px;">学校管理</div>
             </div>
             <div class="main-content">
-                <!-- 顶部智能搜索 -->
                 <div style="position: relative; margin-bottom: 8px;">
                     <svg class="search-icon-pill" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     <input type="text" class="search-input-pill" placeholder="全局搜索功能/拼音首字母">
                 </div>
 
-                <!-- 完整保留：高频功能区 -->
                 <div class="section-header">
                     <div class="section-title">高频功能</div>
                     <div class="manage-btn" onclick="toggleManage()" id="manage-btn-text">管理</div>
@@ -188,7 +236,6 @@
                     <div class="grid-menu" style="padding-top:16px;" id="high-freq-grid"></div>
                 </div>
 
-                <!-- 完整保留：功能目录树状切换区 -->
                 <div class="section-header">
                     <div class="section-title">功能目录</div>
                 </div>
@@ -208,7 +255,6 @@
             </div>
         </div>
 
-        <!-- 一级底部全局导航栏 -->
         <div class="tab-bar">
             <div class="tab-item" onclick="showToast('该模块暂不跳转')">
                 <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></div>
@@ -233,8 +279,7 @@
         </div>
     </div>
 
-    <!-- ================== 二级界面：招生智能工作台 (清爽高效整合版) ================== -->
-    <!-- 统一全局背景渐变约束 -->
+    <!-- ================== 二级界面：招生智能工作台 ================== -->
     <div id="workspace-enrollment" class="page-view hidden-right" style="background: linear-gradient(135deg, #EFF6FF 0%, #DFE7FF 100%);">
         <div class="nav-bar">
             <div class="icon-btn" style="margin-left: -8px;" onclick="closeEnrollmentWorkspace()">
@@ -244,7 +289,6 @@
             <div class="icon-btn"></div>
         </div>
 
-        <!-- 顶部统一学期筛选 -->
         <div style="padding: 0 20px;">
             <div class="global-semester-bar">
                 <span style="font-size:13px; font-weight:800; color:var(--text-title); flex-shrink:0;">数据视图：</span>
@@ -258,20 +302,18 @@
             </div>
         </div>
 
-        <!-- 内容区域包裹 -->
-        <div style="flex:1; position:relative;">
+        <div style="flex:1; position:relative; overflow: hidden;">
 
-            <!-- 1. 工作台 (数据大盘与新手快捷操作) -->
-            <div id="sub-view-dashboard" class="sub-view active" style="padding: 0 20px;">
+            <!-- 1. 工作台 (数据大盘) -->
+            <div id="sub-view-dashboard" class="sub-view active">
                 
-                <!-- 精简整合：将原来的新建按钮合并为1个极致的高效操作入口 -->
-                <div class="primary-action-btn" onclick="showToast('唤起底部弹窗：包含录入线索/到访签到/快捷录取等')">
+                <!-- 办理新业务入口 -->
+                <div class="primary-action-btn" onclick="showModal('sheet-new-business')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                     <span>办理新业务</span>
                 </div>
 
                 <div class="section-header" style="margin-top: 4px;"><div class="section-title">待办与预警</div></div>
-                <!-- 集中呈现全景异常与待办，去除 Emoji -->
                 <div class="list-card glass-card">
                     <div class="card-row-between">
                         <div class="card-title">
@@ -282,7 +324,7 @@
                     </div>
                     <div class="card-desc">您有 <strong style="color:var(--warning-color)">3</strong> 条公海线索分配后超过 24 小时未产生跟进记录。</div>
                     <div class="card-actions">
-                        <button class="btn-xs outline" onclick="showToast('跳转超时列表')">立即处理</button>
+                        <button class="btn-xs outline" onclick="switchEnrollmentTab('sub-view-leads', document.getElementById('tab-btn-leads')); simulateDataLoad('leads-list-container');">立即处理</button>
                     </div>
                 </div>
                 <div class="list-card glass-card">
@@ -295,12 +337,12 @@
                     </div>
                     <div class="card-desc">张晓明同学的基础学生档案同步失败(网络异常)，需重试。</div>
                     <div class="card-actions">
-                        <button class="btn-xs danger" onclick="showToast('触发 Outbox 重试')">执行系统重试</button>
+                        <button class="btn-xs danger" onclick="simulateSubmit('触发 Outbox 重试', true, '任务已进入重试队列')">执行系统重试</button>
                     </div>
                 </div>
 
                 <div class="section-header"><div class="section-title">全链路转化漏斗大盘</div></div>
-                <div class="glass-card" style="padding: 16px; margin-bottom: 24px;">
+                <div class="glass-card" style="padding: 16px; margin-bottom: 12px;">
                     <div style="display:flex; flex-direction:column; gap: 14px;">
                         <div>
                             <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700; margin-bottom:6px;"><span>1. 入池线索总数</span><span>1,250</span></div>
@@ -320,81 +362,123 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- 已折叠展示 交互点 -->
+                <div class="list-card glass-card" style="opacity: 0.8;" onclick="showModal('sheet-history-data')">
+                    <div class="card-row-between">
+                        <div class="card-title">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                            往期学期数据归档
+                        </div>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </div>
+                    <div class="card-desc">已折叠展示，请点击查看更多历史汇总数据...</div>
+                </div>
             </div>
 
-            <!-- 2. 线索池 -->
-            <div id="sub-view-leads" class="sub-view" style="padding: 0 20px;">
-                <div class="pill-scroll">
-                    <div class="pill active">公海线索</div>
-                    <div class="pill">我的线索</div>
-                    <div class="pill">线索导入</div>
-                    <div class="pill">回收站</div>
+            <!-- 2. 线索池 (修复横滑联动与数据更新) -->
+            <div id="sub-view-leads" class="sub-view">
+                <div class="pill-scroll" id="pills-leads">
+                    <div class="pill active" onclick="switchPillTab(this, 'pills-leads', 'leads-list-container')">公海线索</div>
+                    <div class="pill" onclick="switchPillTab(this, 'pills-leads', 'leads-list-container')">我的线索</div>
+                    <div class="pill" onclick="switchPillTab(this, 'pills-leads', 'leads-list-container')">今日新增</div>
+                    <div class="pill" onclick="switchPillTab(this, 'pills-leads', 'leads-list-container')">线索导入</div>
+                    <div class="pill" onclick="switchPillTab(this, 'pills-leads', 'leads-list-container')">异常数据</div>
+                    <div class="pill" onclick="switchPillTab(this, 'pills-leads', 'leads-list-container')">回收站</div>
                 </div>
-                <div class="list-card glass-card">
-                    <div class="card-row-between">
-                        <div class="card-title">李明 (意向专业: 计算机网络)</div>
-                        <div class="badge-tag tag-primary">新线索入池</div>
+                
+                <!-- 数据承载容器，用于模拟联动刷新 -->
+                <div id="leads-list-container">
+                    <div class="list-card glass-card">
+                        <div class="card-row-between">
+                            <div class="card-title">李明 (意向专业: 计算机网络)</div>
+                            <div class="badge-tag tag-primary">新线索入池</div>
+                        </div>
+                        <div class="card-desc"><span>来源: 营销投放 / 第三方接入</span></div>
+                        <div class="step-container">
+                            <div class="step-item active"><div class="step-circle">1</div><div class="step-label">公海</div></div>
+                            <div class="step-item"><div class="step-circle">2</div><div class="step-label">跟进</div></div>
+                            <div class="step-item"><div class="step-circle">3</div><div class="step-label">邀约</div></div>
+                            <div class="step-item"><div class="step-circle">4</div><div class="step-label">到访</div></div>
+                            <div class="step-item"><div class="step-circle">5</div><div class="step-label">预定</div></div>
+                            <div class="step-item"><div class="step-circle">6</div><div class="step-label">录取</div></div>
+                            <div class="step-item"><div class="step-circle">7</div><div class="step-label">交接</div></div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-xs" onclick="showModal('sheet-assign')">单条分配</button>
+                            <button class="btn-xs outline" onclick="showModal('dialog-claim')">直接认领</button>
+                        </div>
                     </div>
-                    <div class="card-desc"><span>来源: 营销投放 / 第三方接入</span></div>
-                    <div class="step-container">
-                        <div class="step-item active"><div class="step-circle">1</div><div class="step-label">公海</div></div>
-                        <div class="step-item"><div class="step-circle">2</div><div class="step-label">跟进</div></div>
-                        <div class="step-item"><div class="step-circle">3</div><div class="step-label">邀约</div></div>
-                        <div class="step-item"><div class="step-circle">4</div><div class="step-label">到访</div></div>
-                        <div class="step-item"><div class="step-circle">5</div><div class="step-label">预定</div></div>
-                        <div class="step-item"><div class="step-circle">6</div><div class="step-label">录取</div></div>
-                        <div class="step-item"><div class="step-circle">7</div><div class="step-label">交接</div></div>
-                    </div>
-                    <div class="card-actions">
-                        <button class="btn-xs" onclick="showToast('执行批量或单条线索分配')">单条分配</button>
-                        <button class="btn-xs outline" onclick="showToast('认领至我的线索')">直接认领</button>
+
+                    <div class="list-card glass-card">
+                        <div class="card-row-between">
+                            <div class="card-title">王雨萌 (初三毕业生)</div>
+                            <div class="badge-tag tag-primary">新线索入池</div>
+                        </div>
+                        <div class="card-desc"><span>来源: 线下自主登记</span></div>
+                        <div class="step-container">
+                            <div class="step-item active"><div class="step-circle">1</div><div class="step-label">公海</div></div>
+                            <div class="step-item"><div class="step-circle">2</div><div class="step-label">跟进</div></div>
+                            <div class="step-item"><div class="step-circle">3</div><div class="step-label">邀约</div></div>
+                            <div class="step-item"><div class="step-circle">4</div><div class="step-label">到访</div></div>
+                            <div class="step-item"><div class="step-circle">5</div><div class="step-label">预定</div></div>
+                            <div class="step-item"><div class="step-circle">6</div><div class="step-label">录取</div></div>
+                            <div class="step-item"><div class="step-circle">7</div><div class="step-label">交接</div></div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-xs" onclick="showModal('sheet-assign')">单条分配</button>
+                            <button class="btn-xs outline" onclick="showModal('dialog-claim')">直接认领</button>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- 3. 转化审批 -->
-            <div id="sub-view-conversion" class="sub-view" style="padding: 0 20px;">
-                <div class="pill-scroll">
-                    <div class="pill active">到访确认</div>
-                    <div class="pill">意向预定</div>
-                    <div class="pill">报名录取</div>
+            <div id="sub-view-conversion" class="sub-view">
+                <div class="pill-scroll" id="pills-conv">
+                    <div class="pill active" onclick="switchPillTab(this, 'pills-conv', 'conv-list-container')">意向预定</div>
+                    <div class="pill" onclick="switchPillTab(this, 'pills-conv', 'conv-list-container')">到访确认</div>
+                    <div class="pill" onclick="switchPillTab(this, 'pills-conv', 'conv-list-container')">报名录取</div>
+                    <div class="pill" onclick="switchPillTab(this, 'pills-conv', 'conv-list-container')">退费审核</div>
                 </div>
-                <div class="list-card glass-card">
-                    <div class="card-row-between">
-                        <div class="card-title">刘子涵家长 - A级高意向</div>
-                        <div class="badge-tag tag-success">已预定</div>
-                    </div>
-                    <div class="card-desc"><span>动态: 交意向金 ￥2000</span> <span>负责顾问: 尹娣</span></div>
-                    <div class="step-container">
-                        <div class="step-item done"><div class="step-circle">✓</div><div class="step-label">公海</div></div>
-                        <div class="step-item done"><div class="step-circle">✓</div><div class="step-label">跟进</div></div>
-                        <div class="step-item done"><div class="step-circle">✓</div><div class="step-label">邀约</div></div>
-                        <div class="step-item done"><div class="step-circle">✓</div><div class="step-label">到访</div></div>
-                        <div class="step-item active"><div class="step-circle">5</div><div class="step-label">预定</div></div>
-                        <div class="step-item"><div class="step-circle">6</div><div class="step-label">录取</div></div>
-                        <div class="step-item"><div class="step-circle">7</div><div class="step-label">交接</div></div>
-                    </div>
-                    <div class="card-actions">
-                        <button class="btn-xs" onclick="showToast('从预定推进至正式录取')">转录取</button>
-                        <button class="btn-xs outline" onclick="showToast('继续录入沟通记录')">写跟进</button>
+                <div id="conv-list-container">
+                    <div class="list-card glass-card">
+                        <div class="card-row-between">
+                            <div class="card-title">刘子涵家长 - A级高意向</div>
+                            <div class="badge-tag tag-success">已预定</div>
+                        </div>
+                        <div class="card-desc"><span>动态: 交意向金 ￥2000</span> <span>负责顾问: 尹娣</span></div>
+                        <div class="step-container">
+                            <div class="step-item done"><div class="step-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="step-label">公海</div></div>
+                            <div class="step-item done"><div class="step-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="step-label">跟进</div></div>
+                            <div class="step-item done"><div class="step-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="step-label">邀约</div></div>
+                            <div class="step-item done"><div class="step-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="step-label">到访</div></div>
+                            <div class="step-item active"><div class="step-circle">5</div><div class="step-label">预定</div></div>
+                            <div class="step-item"><div class="step-circle">6</div><div class="step-label">录取</div></div>
+                            <div class="step-item"><div class="step-circle">7</div><div class="step-label">交接</div></div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-xs" onclick="showModal('dialog-confirm-enroll')">转录取</button>
+                            <button class="btn-xs outline" onclick="showModal('sheet-follow-up')">写跟进</button>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- 4. 配置/工具 -->
-            <div id="sub-view-tools" class="sub-view" style="padding: 0 20px;">
+            <div id="sub-view-tools" class="sub-view">
                 <div class="section-header" style="margin-top: 0;"><div class="section-title">招生资源管理</div></div>
                 <div class="glass-card" style="margin-bottom: 16px;">
                     <div class="grid-menu" style="padding-top:16px; padding-bottom:16px;">
-                        <div class="grid-item" onclick="showToast('候选学校确认/分配')">
+                        <div class="grid-item" onclick="simulateSubmit('加载生源库...', true, '已加载 14 所候选学校')">
                             <div class="grid-icon-wrap" style="background: var(--icon-bg-blue); color: var(--icon-color-blue);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
                             <div class="grid-label">生源学校库</div>
                         </div>
-                        <div class="grid-item" onclick="showToast('查看详细顾问流转日志')">
+                        <div class="grid-item" onclick="showModal('sheet-log-details')">
                             <div class="grid-icon-wrap" style="background: var(--icon-bg-emerald); color: var(--icon-color-emerald);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div>
                             <div class="grid-label">日志审计</div>
                         </div>
-                        <div class="grid-item" onclick="showToast('学期计划约束配置')">
+                        <div class="grid-item" onclick="simulateSubmit('加载学期计划配置...', true, '进入底层配置中心')">
                             <div class="grid-icon-wrap" style="background: var(--icon-bg-purple); color: var(--icon-color-purple);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></div>
                             <div class="grid-label">底层配置</div>
                         </div>
@@ -404,39 +488,362 @@
 
         </div>
 
-        <!-- 内部专属二级导航：将相关业务沉淀到这里 -->
         <div class="sub-tab-bar">
-            <div class="sub-tab-item active" onclick="switchEnrollmentTab('sub-view-dashboard', this)">
+            <div class="sub-tab-item active" id="tab-btn-dash" onclick="switchEnrollmentTab('sub-view-dashboard', this)">
                 <div class="tab-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
                 <div class="tab-label">工作台</div>
             </div>
-            <div class="sub-tab-item" onclick="switchEnrollmentTab('sub-view-leads', this)">
+            <div class="sub-tab-item" id="tab-btn-leads" onclick="switchEnrollmentTab('sub-view-leads', this)">
                 <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
                 <div class="tab-label">线索池</div>
             </div>
-            <div class="sub-tab-item" onclick="switchEnrollmentTab('sub-view-conversion', this)">
+            <div class="sub-tab-item" id="tab-btn-conv" onclick="switchEnrollmentTab('sub-view-conversion', this)">
                 <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
                 <div class="tab-label">转化审批</div>
             </div>
-            <div class="sub-tab-item" onclick="switchEnrollmentTab('sub-view-tools', this)">
+            <div class="sub-tab-item" id="tab-btn-tools" onclick="switchEnrollmentTab('sub-view-tools', this)">
                 <div class="tab-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></div>
-                <div class="tab-label">资源/工具</div>
+                <div class="tab-label">资源管理</div>
             </div>
         </div>
     </div>
 
-    <!-- 系统提示 -->
-    <div class="toast" id="sys-toast"></div>
+    <!-- ================== 交互底座：覆盖层与所有弹窗 (修复与补全) ================== -->
+    <!-- 统一遮罩 -->
+    <div id="modal-overlay" class="modal-overlay" onclick="closeAllModals()"></div>
+
+    <!-- 弹窗 1：办理新业务 (BottomSheet 三级入口) -->
+    <div id="sheet-new-business" class="bottom-sheet">
+        <div class="sheet-indicator"></div>
+        <div class="sheet-title">办理新业务</div>
+        <div class="sheet-grid">
+            <div class="grid-item" onclick="showModal('sheet-add-lead')">
+                <div class="grid-icon-wrap" style="background:var(--icon-bg-blue); color:var(--icon-color-blue);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg></div>
+                <div class="grid-label">录入线索</div>
+            </div>
+            <div class="grid-item" onclick="simulateSubmit('相机调用中...', true, '扫码成功：张伟已签到')">
+                <div class="grid-icon-wrap" style="background:var(--icon-bg-emerald); color:var(--icon-color-emerald);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div>
+                <div class="grid-label">到访签到</div>
+            </div>
+            <div class="grid-item" onclick="showModal('sheet-quick-enroll')">
+                <div class="grid-icon-wrap" style="background:var(--icon-bg-purple); color:var(--icon-color-purple);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
+                <div class="grid-label">快捷录取</div>
+            </div>
+            <div class="grid-item" onclick="showModal('dialog-handover')">
+                <div class="grid-icon-wrap" style="background:var(--icon-bg-orange); color:var(--icon-color-orange);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div>
+                <div class="grid-label">报到交接</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 弹窗 2：录入线索表单 (BottomSheet) -->
+    <div id="sheet-add-lead" class="bottom-sheet">
+        <div class="sheet-indicator"></div>
+        <div class="sheet-title">录入新线索</div>
+        <div class="sheet-scroll-area">
+            <div class="form-group">
+                <label class="form-label">学生姓名</label>
+                <input type="text" class="form-control" placeholder="请输入姓名">
+            </div>
+            <div class="form-group">
+                <label class="form-label">联系电话</label>
+                <input type="tel" class="form-control" placeholder="请输入手机号">
+            </div>
+            <div class="form-group">
+                <label class="form-label">线索来源</label>
+                <select class="form-control">
+                    <option>线下自主登记</option>
+                    <option>渠道转介</option>
+                    <option>生源学校直推</option>
+                </select>
+            </div>
+            <button class="submit-btn" onclick="simulateSubmit('数据提交中...', true, '线索录入成功')">提交保存</button>
+        </div>
+    </div>
+
+    <!-- 弹窗 3：快捷录取通道 (BottomSheet) -->
+    <div id="sheet-quick-enroll" class="bottom-sheet">
+        <div class="sheet-indicator"></div>
+        <div class="sheet-title">发起直接录取</div>
+        <div class="sheet-scroll-area">
+            <div class="form-group">
+                <label class="form-label">关联意向学生</label>
+                <input type="text" class="form-control" placeholder="搜索公海或我的线索...">
+            </div>
+            <div class="form-group">
+                <label class="form-label">录取专业</label>
+                <select class="form-control">
+                    <option>计算机网络技术</option>
+                    <option>学前教育</option>
+                    <option>新能源汽车工程</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">定金/定位费 (元)</label>
+                <input type="number" class="form-control" placeholder="请输入实收金额">
+            </div>
+            <button class="submit-btn" onclick="simulateSubmit('生成录取记录...', true, '录取成功，已推进流转阶段')">确认录取</button>
+        </div>
+    </div>
+
+    <!-- 弹窗 4：写跟进 / 沟通记录 (BottomSheet) -->
+    <div id="sheet-follow-up" class="bottom-sheet">
+        <div class="sheet-indicator"></div>
+        <div class="sheet-title">写跟进</div>
+        <div class="sheet-scroll-area">
+            <div style="display:flex; gap:12px; margin-bottom: 16px;">
+                <div class="form-group" style="margin-bottom:0;">
+                    <label class="form-label">沟通方式</label>
+                    <select class="form-control"><option>电话沟通</option><option>微信联络</option><option>面谈</option></select>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label class="form-label">意向评估</label>
+                    <select class="form-control"><option>A级 - 极高意向</option><option>B级 - 观望对比</option><option>C级 - 意向较弱</option></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">跟进详情纪要</label>
+                <textarea class="form-control" placeholder="请输入本次沟通的核心痛点与结论..."></textarea>
+            </div>
+            <button class="submit-btn" onclick="simulateSubmit('记录保存中...', true, '跟进记录保存成功')">完成跟进</button>
+        </div>
+    </div>
+
+    <!-- 弹窗 5：历史学期归档数据 (BottomSheet) -->
+    <div id="sheet-history-data" class="bottom-sheet">
+        <div class="sheet-indicator"></div>
+        <div class="sheet-title">往期学期汇总</div>
+        <div class="sheet-scroll-area">
+            <div class="sheet-list-item">
+                <div>
+                    <div style="font-size: 15px; font-weight: 800; color: var(--text-title); margin-bottom:4px;">2025年秋季学期 (已归档)</div>
+                    <div style="font-size: 12px; color: var(--text-secondary);">入池线索 3,420 | 最终录取 840 人</div>
+                </div>
+                <button class="btn-xs outline">查看简报</button>
+            </div>
+            <div class="sheet-list-item">
+                <div>
+                    <div style="font-size: 15px; font-weight: 800; color: var(--text-title); margin-bottom:4px;">2025年春季学期 (已归档)</div>
+                    <div style="font-size: 12px; color: var(--text-secondary);">入池线索 1,100 | 最终录取 320 人</div>
+                </div>
+                <button class="btn-xs outline">查看简报</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 弹窗 6：流转日志审计时间线 (BottomSheet) -->
+    <div id="sheet-log-details" class="bottom-sheet">
+        <div class="sheet-indicator"></div>
+        <div class="sheet-title">顾问流转与操作审计</div>
+        <div class="sheet-scroll-area">
+            <div class="log-timeline">
+                <div class="log-item">
+                    <div class="log-time">今天 10:30 | 尹娣 (组长)</div>
+                    <div class="log-content">阶段自动推进至 [已邀约]</div>
+                    <div class="log-detail">触发动作：业务员为该学生创建了本周末的到访预约单，系统自动触发状态翻转。</div>
+                </div>
+                <div class="log-item">
+                    <div class="log-time">昨天 09:15 | 系统管理员</div>
+                    <div class="log-content">线索手动分配建立</div>
+                    <div class="log-detail">动作：管理员从公海池强力分配该线索给顾问尹娣，进入承接考核倒计时。</div>
+                </div>
+                <div class="log-item">
+                    <div class="log-time">前天 14:00 | 系统自动API</div>
+                    <div class="log-content">新线索入池 (第三方下发)</div>
+                    <div class="log-detail">来源标识：今日头条信息流投放表单。</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 弹窗 7：分配顾问 (BottomSheet) -->
+    <div id="sheet-assign" class="bottom-sheet">
+        <div class="sheet-indicator"></div>
+        <div class="sheet-title">分配至指定顾问</div>
+        <div class="sheet-scroll-area">
+            <div class="sheet-list-item" onclick="simulateSubmit('执行分配逻辑...', true, '已成功分配给 尹娣')">
+                <div class="sheet-user-info">
+                    <div class="sheet-avatar">尹</div>
+                    <div style="display:flex; flex-direction:column; gap:2px;">
+                        <span style="font-size:15px; font-weight:800; color:var(--text-title);">尹娣 (招生组长)</span>
+                        <span style="font-size:12px; color:var(--text-secondary);">当前负荷: 12 条待处理</span>
+                    </div>
+                </div>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+            <div class="sheet-list-item" onclick="simulateSubmit('执行分配逻辑...', true, '已成功分配给 张伟')">
+                <div class="sheet-user-info">
+                    <div class="sheet-avatar" style="background:var(--icon-bg-emerald); color:var(--icon-color-emerald);">张</div>
+                    <div style="display:flex; flex-direction:column; gap:2px;">
+                        <span style="font-size:15px; font-weight:800; color:var(--text-title);">张伟 (招生专员)</span>
+                        <span style="font-size:12px; color:var(--text-secondary);">当前负荷: 5 条待处理</span>
+                    </div>
+                </div>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- 对话框 1：确认直接认领 (Dialog) -->
+    <div id="dialog-claim" class="dialog-box">
+        <div class="dialog-icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        </div>
+        <div class="dialog-title">确认认领该线索？</div>
+        <div class="dialog-desc">认领后，该公海线索将转入您的“我的线索”池中，请及时跟进以免超时。</div>
+        <div class="dialog-actions">
+            <div class="dialog-btn cancel" onclick="closeAllModals()">取消</div>
+            <div class="dialog-btn confirm" onclick="simulateSubmit('认领执行中...', true, '认领成功，请及时跟进')">确认认领</div>
+        </div>
+    </div>
+
+    <!-- 对话框 2：正式录取确认 (Dialog) -->
+    <div id="dialog-confirm-enroll" class="dialog-box">
+        <div class="dialog-icon-wrap" style="background:var(--success-light); color:var(--success-color);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        </div>
+        <div class="dialog-title">转为正式录取？</div>
+        <div class="dialog-desc">推进至正式录取后，学生将进入待报到名单，系统将自动核销预定金占位。</div>
+        <div class="dialog-actions">
+            <div class="dialog-btn cancel" onclick="closeAllModals()">再看看</div>
+            <div class="dialog-btn confirm" onclick="simulateSubmit('流转状态...', true, '成功转入录取名单')" style="background:var(--success-color); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);">确认转换</div>
+        </div>
+    </div>
+
+    <!-- 对话框 3：报到交接确认 (Dialog) -->
+    <div id="dialog-handover" class="dialog-box">
+        <div class="dialog-icon-wrap" style="background:var(--icon-bg-orange); color:var(--icon-color-orange);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        </div>
+        <div class="dialog-title">确认发送入学包？</div>
+        <div class="dialog-desc">该操作将生成异步 Outbox 任务，向基础学籍系统发送该学生的完整档案用以分班。</div>
+        <div class="dialog-actions">
+            <div class="dialog-btn cancel" onclick="closeAllModals()">取消</div>
+            <div class="dialog-btn confirm" onclick="simulateSubmit('生成 Outbox 任务...', true, '已加入异步交接队列')">立即发送</div>
+        </div>
+    </div>
+
+    <!-- 系统提示 Toast -->
+    <div class="toast" id="sys-toast">
+        <svg id="toast-icon-success" style="display:none; flex-shrink:0;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--success-color)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        <span id="sys-toast-msg"></span>
+    </div>
 </div>
 
 <script>
-    // ================= 公共逻辑 =================
-    function showToast(msg, duration = 1500) {
+    // ================= 公共 Toast 逻辑 =================
+    function showToast(msg, isSuccess = false, duration = 1500) {
         let toast = document.getElementById('sys-toast');
-        toast.innerText = msg; toast.classList.add('show');
+        let msgSpan = document.getElementById('sys-toast-msg');
+        let successIcon = document.getElementById('toast-icon-success');
+        
+        msgSpan.innerText = msg;
+        successIcon.style.display = isSuccess ? 'block' : 'none';
+        
+        toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), duration);
     }
 
+    // ================= 弹窗交互控制中枢 =================
+    function showModal(modalId) {
+        document.getElementById('modal-overlay').classList.add('active');
+        document.getElementById(modalId).classList.add('active');
+    }
+
+    function closeAllModals() {
+        document.getElementById('modal-overlay').classList.remove('active');
+        document.querySelectorAll('.bottom-sheet, .dialog-box').forEach(el => {
+            el.classList.remove('active');
+        });
+    }
+
+    // 通用异步提交反馈闭环模拟
+    function simulateSubmit(loadingMsg, isSuccess, finalMsg) {
+        closeAllModals();
+        showToast(loadingMsg, false, 800);
+        setTimeout(() => {
+            showToast(finalMsg, isSuccess, 2000);
+        }, 900);
+    }
+
+    // ================= 二级与三级标签栏联动引擎 (核心修复) =================
+    // 处理线索池、审批池的 Pill Tabs 滑动点击与下方数据刷新
+    function switchPillTab(el, scrollContainerId, listContainerId) {
+        // 1. 切换 Tab 样式状态
+        const container = document.getElementById(scrollContainerId);
+        container.querySelectorAll('.pill').forEach(pill => pill.classList.remove('active'));
+        el.classList.add('active');
+
+        // 2. 交互细节：自动将点击的元素滚动到视野可见的中间区域
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+
+        // 3. 数据联动刷新：展示骨架屏 -> 加载新数据
+        const listContainer = document.getElementById(listContainerId);
+        
+        // 渲染骨架屏模拟加载
+        listContainer.innerHTML = `
+            <div class="list-card glass-card" style="border:none; box-shadow:none;">
+                <div class="card-row-between">
+                    <div class="skeleton" style="width: 150px; height: 18px;"></div>
+                    <div class="skeleton" style="width: 60px; height: 18px; border-radius: 6px;"></div>
+                </div>
+                <div class="skeleton" style="width: 200px; height: 14px; margin-top: 8px;"></div>
+                <div class="step-container" style="margin: 20px 0;"><div class="skeleton" style="width: 100%; height: 20px;"></div></div>
+                <div class="card-actions"><div class="skeleton" style="width: 80px; height: 28px; border-radius: 8px;"></div></div>
+            </div>
+        `;
+        
+        // 延时呈现对应的虚拟数据
+        setTimeout(() => {
+            const tabName = el.innerText;
+            if (tabName === '回收站' || tabName === '异常数据') {
+                listContainer.innerHTML = `<div style="text-align:center; padding: 40px 0; color:var(--text-secondary); font-size:13px; font-weight:600;">暂无相关【${tabName}】数据记录</div>`;
+            } else {
+                // 生成复用结构，只改变文字来展示联动效果
+                listContainer.innerHTML = `
+                    <div class="list-card glass-card">
+                        <div class="card-row-between">
+                            <div class="card-title">系统演示数据 - 归属: ${tabName}</div>
+                            <div class="badge-tag tag-primary">实时刷新</div>
+                        </div>
+                        <div class="card-desc"><span>系统已根据您选择的【${tabName}】标签完成了数据联动拉取。</span></div>
+                        <div class="step-container">
+                            <div class="step-item active"><div class="step-circle">1</div><div class="step-label">当前节点</div></div>
+                            <div class="step-item"><div class="step-circle">2</div><div class="step-label">待推进</div></div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-xs" onclick="showModal('sheet-assign')">重新分配</button>
+                            <button class="btn-xs outline" onclick="showModal('sheet-follow-up')">写跟进</button>
+                        </div>
+                    </div>
+                `;
+            }
+        }, 500); // 500ms 模拟网络延迟
+    }
+
+    function simulateDataLoad(listContainerId) {
+        const listContainer = document.getElementById(listContainerId);
+        listContainer.innerHTML = `
+            <div class="list-card glass-card" style="border:none; box-shadow:none;"><div class="skeleton" style="width: 100%; height: 100px;"></div></div>
+        `;
+        setTimeout(() => {
+            showToast('数据已自动更新到最新状态', true);
+            listContainer.innerHTML = `
+                <div class="list-card glass-card">
+                    <div class="card-row-between">
+                        <div class="card-title" style="color:var(--danger-color);">张峰 (超时 32 小时)</div>
+                        <div class="badge-outline warning">待紧急处理</div>
+                    </div>
+                    <div class="card-desc"><span>来源: 线下自主登记</span></div>
+                    <div class="card-actions">
+                        <button class="btn-xs" onclick="showModal('sheet-follow-up')">马上写跟进</button>
+                    </div>
+                </div>
+            `;
+        }, 600);
+    }
+
+    // ================= 主干视图切换逻辑 =================
     function switchTab(tabId, el) {
         document.querySelectorAll('.tab-bar .tab-item').forEach(item => item.classList.remove('active'));
         el.classList.add('active');
@@ -444,9 +851,24 @@
         document.getElementById(tabId).classList.add('active');
     }
 
-    // ================= 核心渲染逻辑：功能网格（完全保留之前架构，仅在数据上做精简） =================
+    function openEnrollmentWorkspace() {
+        document.getElementById('workspace-enrollment').classList.replace('hidden-right', 'active');
+    }
+    
+    function closeEnrollmentWorkspace() {
+        document.getElementById('workspace-enrollment').classList.replace('active', 'hidden-right');
+    }
+    
+    function switchEnrollmentTab(viewId, el) {
+        document.querySelectorAll('.sub-tab-item').forEach(item => item.classList.remove('active'));
+        el.classList.add('active');
+        document.querySelectorAll('.sub-view').forEach(view => view.classList.remove('active'));
+        document.getElementById(viewId).classList.add('active');
+    }
+
+    // ================= 第一层级：原校区高频/目录渲染逻辑 =================
     const dirData = {
-        '招生管理': ['招生工作台'], // 原 8 个入口被精简整合为这 1 个超级入口
+        '招生管理': ['招生工作台'], 
         '办公': ['添加汇报','通讯录','执勤安排','校园执勤','教师考核','审批假条','会议管理','需求管理'],
         '学生管理': ['留宿查看','班主任考核','宿舍排名','出操排名','实时统计','宿舍信息','学生假条','点到安排'],
         '双百分考核': ['班级违纪','班级奖励','学生违纪','学生奖励','考核排名'],
@@ -526,7 +948,6 @@
                  }
              }
         } else {
-             // 唯一特殊的入口逻辑，指向全新设计的工作台
              if (label === '招生工作台') {
                  onClickStr = `openEnrollmentWorkspace()`;
              } else {
@@ -581,26 +1002,6 @@
         renderDirTabs();
         renderDirContent();
     };
-
-    // ========== 极简招生工作台 导航与事件逻辑 ==========
-    
-    function openEnrollmentWorkspace() {
-        document.getElementById('workspace-enrollment').classList.replace('hidden-right', 'active');
-    }
-    
-    function closeEnrollmentWorkspace() {
-        document.getElementById('workspace-enrollment').classList.replace('active', 'hidden-right');
-    }
-    
-    function switchEnrollmentTab(viewId, el) {
-        document.querySelectorAll('.sub-tab-item').forEach(item => item.classList.remove('active'));
-        el.classList.add('active');
-        document.querySelectorAll('.sub-view').forEach(view => view.classList.remove('active'));
-        document.getElementById(viewId).classList.add('active');
-        
-        if(viewId === 'sub-view-leads') showToast('已切换至线索池，支持下钻和认领');
-        if(viewId === 'sub-view-conversion') showToast('已切换至转化管理，处理到访与录取');
-    }
 </script>
 </body>
 </html>
