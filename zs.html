@@ -6,54 +6,51 @@
     <title>校园综合管理系统 - 独立版</title>
     <style>
         :root {
-            --primary-color: #1F5FFF; 
-            --primary-light: rgba(31, 95, 255, 0.1);
+            --primary-color: #1F5FFF;
+            --primary-light: rgba(31, 95, 255, 0.12);
             --bg-start: #EFF6FF;
             --bg-end: #DFE7FF;
-            
-            --text-title: #111827;
+            --surface-white: rgba(255, 255, 255, 0.92);
+            --surface-strong: rgba(255, 255, 255, 0.94);
+
+            --text-title: #14213D;
             --text-main: #334155;
             --text-secondary: #64748B;
-            
-            --danger-color: #EF4444;
-            --danger-light: rgba(239, 68, 68, 0.1);
-            --success-color: #10B981;
-            --success-light: rgba(16, 185, 129, 0.1);
-            --warning-color: #F59E0B;
-            --warning-light: rgba(245, 158, 11, 0.1);
-            
-            --border-line: rgba(0,0,0,0.06);
 
-            /* 马卡龙色系 */
-            --icon-bg-blue: rgba(96, 165, 250, 0.15); --icon-color-blue: #3B82F6;
-            --icon-bg-purple: rgba(167, 139, 250, 0.15); --icon-color-purple: #8B5CF6;
-            --icon-bg-pink: rgba(244, 114, 182, 0.15); --icon-color-pink: #EC4899;
-            --icon-bg-orange: rgba(251, 146, 60, 0.15); --icon-color-orange: #F97316;
-            --icon-bg-teal: rgba(52, 211, 153, 0.15); --icon-color-teal: #10B981;
-            --icon-bg-yellow: rgba(251, 191, 36, 0.15); --icon-color-yellow: #D97706;
-            --icon-bg-cyan: rgba(34, 211, 238, 0.15); --icon-color-cyan: #0891B2;
-            --icon-bg-rose: rgba(251, 113, 133, 0.15); --icon-color-rose: #E11D48;
-            --icon-bg-indigo: rgba(129, 140, 248, 0.15); --icon-color-indigo: #4F46E5;
-            --icon-bg-emerald: rgba(16, 185, 129, 0.15); --icon-color-emerald: #059669;
+            --danger-color: #EF4444;
+            --danger-light: rgba(239, 68, 68, 0.14);
+            --success-color: #10B981;
+            --success-light: rgba(16, 185, 129, 0.14);
+            --warning-color: #F59E0B;
+            --warning-light: rgba(245, 158, 11, 0.16);
+
+            --border-line: rgba(31, 95, 255, 0.08);
+
+            --icon-bg-blue: rgba(96, 165, 250, 0.18); --icon-color-blue: #3B82F6;
+            --icon-bg-purple: rgba(167, 139, 250, 0.18); --icon-color-purple: #8B5CF6;
+            --icon-bg-pink: rgba(244, 114, 182, 0.18); --icon-color-pink: #EC4899;
+            --icon-bg-orange: rgba(251, 146, 60, 0.18); --icon-color-orange: #F97316;
+            --icon-bg-teal: rgba(45, 212, 191, 0.18); --icon-color-teal: #0D9488;
+            --icon-bg-emerald: rgba(16, 185, 129, 0.18); --icon-color-emerald: #059669;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif; background-color: #E2E8F0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif; background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%); display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
 
-        .device-simulator { width: 375px; height: 812px; background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%); position: relative; overflow: hidden; border-radius: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.15); display: flex; flex-direction: column; }
-        .device-simulator::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 40px; box-shadow: inset 0 0 0 8px #FFFFFF; pointer-events: none; z-index: 1000; }
+        .device-simulator { width: 375px; height: 812px; background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%); position: relative; overflow: hidden; border-radius: 42px; box-shadow: 0 26px 60px rgba(31, 95, 255, 0.18); display: flex; flex-direction: column; }
+        .device-simulator::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 42px; box-shadow: inset 0 0 0 8px rgba(255,255,255,0.92); pointer-events: none; z-index: 1000; }
 
         .wrapper-main { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; }
         .tab-view { position: absolute; top: 0; left: 0; right: 0; bottom: 80px; display: none; flex-direction: column; }
         .tab-view.active { display: flex; pointer-events: auto; }
-        
-        .page-view { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; z-index: 200; transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1); background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%); }
+
+        .page-view { position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: 100%; display: flex; flex-direction: column; z-index: 200; transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1); background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%); }
         .page-view.hidden-left { transform: translateX(-100%); pointer-events: none; }
         .page-view.hidden-right { transform: translateX(100%); pointer-events: none; }
         .page-view.active { transform: translateX(0); pointer-events: auto; }
 
         .nav-bar { padding: 48px 20px 12px; display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 10; flex-shrink: 0; }
-        .nav-bar.main-nav { justify-content: center; } 
+        .nav-bar.main-nav { justify-content: center; }
         .nav-title-group { display: flex; flex-direction: column; align-items: center; }
         .nav-title { font-size: 18px; font-weight: 800; color: var(--text-title); letter-spacing: 0.5px;}
         .icon-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-title); transition: 0.2s;}
@@ -62,162 +59,192 @@
         .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 0 20px 20px 20px; scrollbar-width: none; padding-bottom: 30px; -webkit-overflow-scrolling: touch;}
         .main-content::-webkit-scrollbar { display: none; }
 
-        /* 底部导航通用 */
-        .tab-bar, .sub-tab-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 84px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.6); display: flex; justify-content: space-around; align-items: flex-start; padding-top: 10px; z-index: 100; padding-bottom: 20px; }
+        .tab-bar, .sub-tab-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 84px; background: rgba(255, 255, 255, 0.82); backdrop-filter: blur(24px); border-top: 1px solid rgba(255, 255, 255, 0.88); display: flex; justify-content: space-around; align-items: flex-start; padding-top: 10px; z-index: 100; padding-bottom: 20px; box-shadow: 0 -10px 30px rgba(31, 95, 255, 0.08); }
         .tab-item, .sub-tab-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94A3B8; cursor: pointer; width: 60px; transition: all 0.3s; }
-        .tab-item:active, .sub-tab-item:active { transform: scale(0.9); }
         .tab-item.active, .sub-tab-item.active { color: var(--primary-color); }
         .tab-icon { position: relative; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; }
-        .tab-icon svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
-        .tab-item.active .tab-icon svg, .sub-tab-item.active .tab-icon svg { stroke-width: 2.5; }
+        .tab-icon svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
         .tab-label { font-size: 11px; font-weight: 700; letter-spacing: 0.2px;}
 
-        /* 二级页面内部视图 */
         .sub-view { position: absolute; top: 0; left: 0; right: 0; bottom: 0; padding: 0 20px 100px; display: none; flex-direction: column; overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
         .sub-view::-webkit-scrollbar { display: none; }
         .sub-view.active { display: flex; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 20px; box-shadow: 0 8px 24px rgba(31, 95, 255, 0.04); }
-        
-        .global-semester-bar { display:flex; justify-content: space-between; align-items:center; background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); padding: 10px 16px; border-radius: 14px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.9); box-shadow: 0 4px 12px rgba(0,0,0,0.03); flex-shrink:0; position: relative; z-index: 50;}
+        .glass-card { background: var(--surface-white); backdrop-filter: blur(22px); border: 1px solid rgba(255, 255, 255, 0.92); border-radius: 26px; box-shadow: 0 14px 34px rgba(31, 95, 255, 0.08), inset 0 1px 0 rgba(255,255,255,0.7); }
+        .global-semester-bar { display:flex; justify-content: space-between; align-items:center; background: rgba(255,255,255,0.82); backdrop-filter: blur(14px); padding: 11px 16px; border-radius: 18px; margin-bottom: 18px; border: 1px solid rgba(255,255,255,0.94); box-shadow: 0 8px 20px rgba(31, 95, 255, 0.06); flex-shrink:0; position: relative; z-index: 50;}
         .semester-select { border:none; background:transparent; font-size:14px; font-weight:800; color:var(--primary-color); outline:none; appearance:none; padding-right:20px; cursor: pointer; width: 100%;}
-        
-        /* 网格菜单 */
+
         .grid-menu { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 8px; padding: 16px 12px; }
         .grid-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: transform 0.2s; position: relative; }
-        .grid-item:active { transform: scale(0.95); opacity: 0.8; }
-        .grid-icon-wrap { width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.9); box-shadow: 0 4px 12px rgba(0,0,0,0.03), inset 0 2px 8px rgba(255,255,255,0.6); }
-        .grid-icon-wrap svg { width: 24px; height: 24px; }
-        .grid-label { font-size: 12px; font-weight: 600; color: var(--text-main); text-align: center; line-height: 1.2; word-break: break-all;}
+        .grid-icon-wrap { width: 52px; height: 52px; border-radius: 18px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.92); box-shadow: 0 10px 20px rgba(148, 169, 214, 0.08), inset 0 1px 0 rgba(255,255,255,0.72); }
+        .grid-icon-wrap svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.85; stroke-linecap: round; stroke-linejoin: round; }
+        .grid-label { font-size: 12px; font-weight: 700; color: var(--text-main); text-align: center; line-height: 1.35; }
+        .grid-item.manage-mode .grid-icon-wrap { border-style: dashed; }
+        .grid-item.manage-mode::after { content: attr(data-manage-label); position: absolute; top: -6px; right: 6px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 999px; background: var(--danger-color); color: white; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
 
         .dir-tabs { display: flex; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid rgba(0,0,0,0.03); padding: 4px 12px 0; -webkit-overflow-scrolling: touch;}
         .dir-tabs::-webkit-scrollbar { display: none; }
         .dir-tab { flex-shrink: 0; padding: 14px 14px; font-size: 14px; font-weight: 600; color: var(--text-secondary); cursor: pointer; white-space: nowrap; position: relative; transition: 0.2s; }
         .dir-tab.active { color: var(--primary-color); font-weight: 800; }
         .dir-tab.active::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 24px; height: 3px; background: var(--primary-color); border-radius: 2px 2px 0 0; }
+        .manage-btn { font-size: 13px; font-weight: 700; color: var(--primary-color); cursor: pointer; }
 
-        /* 横向滚动胶囊标签联动修复 */
         .pill-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; margin-bottom: 12px; flex-shrink: 0; -webkit-overflow-scrolling: touch;}
         .pill-scroll::-webkit-scrollbar { display: none; }
-        .pill { flex-shrink: 0; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; white-space: nowrap; cursor: pointer; background: rgba(255,255,255,0.6); color: var(--text-secondary); border: 1px solid rgba(255,255,255,0.8); transition: 0.2s; }
+        .pill { flex-shrink: 0; padding: 9px 16px; border-radius: 999px; font-size: 13px; font-weight: 700; white-space: nowrap; cursor: pointer; background: rgba(255,255,255,0.84); color: var(--text-secondary); border: 1px solid rgba(255,255,255,0.9); transition: 0.2s; display: flex; align-items: center; gap:4px; box-shadow: 0 6px 18px rgba(31, 95, 255, 0.06);}
         .pill:hover { background: rgba(255,255,255,0.9); }
-        .pill.active { background: var(--primary-color); color: white; border-color: var(--primary-color); box-shadow: 0 4px 12px rgba(31,95,255,0.2); transform: scale(1.02);}
+        .pill.active { background: linear-gradient(135deg, #3f7aff 0%, var(--primary-color) 100%); color: white; border-color: transparent; box-shadow: 0 10px 22px rgba(31, 95, 255, 0.24); transform: scale(1.02);}
 
-        /* 列表卡片 */
-        .list-card { padding: 16px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; cursor: pointer; transition: all 0.3s; position: relative; }
-        .list-card:active { transform: scale(0.98); background: rgba(255, 255, 255, 0.85); }
+        .list-card { padding: 18px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; cursor: pointer; transition: all 0.3s; position: relative; background: rgba(255, 255, 255, 0.86);}
+        .list-card:active { transform: scale(0.985); background: rgba(255, 255, 255, 0.98); }
+        .list-card.invalid { opacity: 0.72; filter: saturate(0.7); cursor: default; }
         .card-row-between { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
         .card-title { font-size: 15px; font-weight: 800; color: var(--text-title); line-height: 1.4; display:flex; align-items:center; gap:6px;}
         .card-desc { font-size: 12px; color: var(--text-secondary); display: flex; gap: 8px; align-items: center; font-weight: 500; flex-wrap: wrap;}
-        
-        .badge-tag { padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; white-space: nowrap; border: 1px solid transparent; }
+
+        .checkbox-wrap { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border: 2px solid #CBD5E1; border-radius: 6px; cursor: pointer; transition: 0.2s; background: white;}
+        .checkbox-wrap.checked { background: var(--primary-color); border-color: var(--primary-color); }
+        .checkbox-wrap svg { width: 14px; height: 14px; stroke: white; opacity: 0; transition: 0.2s;}
+        .checkbox-wrap.checked svg { opacity: 1; }
+
+        .badge-tag { padding: 4px 9px; border-radius: 999px; font-size: 10px; font-weight: 800; white-space: nowrap; border: 1px solid transparent; }
         .tag-primary { background: var(--primary-light); color: var(--primary-color); }
         .tag-warning { background: var(--warning-light); color: var(--warning-color); border-color: var(--warning-color); }
-        .tag-success { background: var(--success-color); color: white; box-shadow: 0 2px 8px rgba(16,185,129,0.3); }
+        .tag-success { background: var(--success-color); color: white; }
         .tag-danger { background: var(--danger-light); color: var(--danger-color); }
         .badge-outline { border: 1px solid var(--primary-color); color: var(--primary-color); padding: 2px 6px; border-radius: 6px; font-size: 10px; font-weight: 700; white-space: nowrap;}
         .badge-outline.warning { border-color: var(--warning-color); color: var(--warning-color); }
         .badge-outline.danger { border-color: var(--danger-color); color: var(--danger-color); }
 
-        /* 进度条 */
         .step-container { display: flex; align-items: center; justify-content: space-between; margin: 12px 0 16px; position: relative; width: 100%;}
         .step-container::before { content:''; position:absolute; top: 10px; left: 5%; right: 5%; height: 2px; background: rgba(0,0,0,0.08); z-index: 0;}
-        .step-item { display: flex; flex-direction: column; align-items: center; gap: 6px; z-index: 1; position:relative; padding: 0 2px; border-radius: 12px;}
-        .step-circle { width: 20px; height: 20px; border-radius: 50%; background: #E2E8F0; color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; border: 2px solid white; box-shadow:0 2px 4px rgba(0,0,0,0.05);}
-        .step-item.active .step-circle { background: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-light), 0 2px 4px rgba(0,0,0,0.05); border-color: transparent;}
+        .step-item { display: flex; flex-direction: column; align-items: center; gap: 6px; z-index: 1; position:relative; padding: 0 2px; border-radius: 12px; flex: 1;}
+        .step-circle { width: 20px; height: 20px; border-radius: 50%; background: #E2E8F0; color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; border: 2px solid white; box-shadow:0 2px 4px rgba(0,0,0,0.05); transition: 0.3s;}
+        .step-item.active .step-circle { background: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-light), 0 2px 4px rgba(0,0,0,0.05); border-color: transparent; animation: nodePulse 0.46s ease both;}
         .step-item.done .step-circle { background: var(--success-color); border-color: transparent;}
         .step-label { font-size: 9px; font-weight: 800; color: #94A3B8; text-align: center; white-space: nowrap;}
         .step-item.active .step-label { color: var(--primary-color); }
         .step-item.done .step-label { color: var(--success-color); }
 
-        .card-actions { display: flex; gap: 8px; margin-top: 4px; padding-top: 12px; border-top: 1px dashed rgba(0,0,0,0.08); align-items:center;}
-        .btn-xs { background: rgba(31,95,255,0.1); color: var(--primary-color); border:none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 800; cursor:pointer; transition:0.2s;}
+        .card-actions { display: flex; gap: 8px; margin-top: 6px; padding-top: 12px; border-top: 1px dashed rgba(126, 147, 190, 0.18); align-items:center; flex-wrap: wrap;}
+        .btn-xs { background: rgba(31,95,255,0.1); color: var(--primary-color); border:none; padding: 7px 13px; border-radius: 999px; font-size: 12px; font-weight: 800; cursor:pointer; transition:0.2s;}
         .btn-xs:active, .btn-xs:hover { transform: scale(0.95); opacity: 0.9; }
         .btn-xs.outline { background: transparent; border: 1px solid var(--primary-color); }
         .btn-xs.danger { background: var(--danger-light); color: var(--danger-color); }
-        .icon-log-btn { margin-left:auto; color: #9CA3AF; padding:4px; display:flex; align-items:center; justify-content:center; border-radius:6px; transition:0.2s; cursor: pointer;}
-        .icon-log-btn:active { background: rgba(0,0,0,0.05); color: var(--primary-color); }
-        
-        .search-input-pill { width: 100%; padding: 14px 14px 14px 44px; border-radius: 100px; background: rgba(255,255,255,0.9); border: none; font-size: 14px; font-weight: 600; color: var(--text-title); outline: none; box-shadow: 0 4px 16px rgba(31, 95, 255, 0.05); transition: all 0.2s; }
-        .search-input-pill:focus { background: white; box-shadow: 0 4px 20px rgba(31, 95, 255, 0.12); }
-        .search-icon-pill { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: #9CA3AF; z-index: 10; }
+        .btn-xs.disabled { opacity: 0.5; pointer-events: none; }
 
+        .search-input-pill { width: 100%; padding: 14px 14px 14px 44px; border-radius: 999px; background: rgba(255,255,255,0.92); border: 1px solid rgba(255,255,255,0.88); font-size: 14px; font-weight: 600; color: var(--text-title); outline: none; box-shadow: 0 10px 24px rgba(31, 95, 255, 0.06); transition: all 0.2s; }
+        .search-icon-pill { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: #9CA3AF; z-index: 10; }
         .section-header { display: flex; justify-content: space-between; align-items: center; padding: 0 6px 12px; margin-top: 16px;}
         .section-title { font-size: 18px; font-weight: 800; color: var(--text-title); letter-spacing: 0.5px;}
 
-        /* Toast 居中偏上，防止被底部导航遮挡 */
-        .toast { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); background: rgba(17, 24, 39, 0.85); color: white; padding: 14px 24px; border-radius: 14px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 2000; backdrop-filter: blur(8px); font-weight: 600; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 8px; justify-content: center;}
-        .toast.show { opacity: 1; }
+        .toast { position: absolute; top: 20%; left: 50%; transform: translate(-50%, -50%); background: rgba(50, 63, 98, 0.82); color: white; padding: 14px 24px; border-radius: 16px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 2000; backdrop-filter: blur(12px); font-weight: 600; text-align: center; box-shadow: 0 14px 30px rgba(94, 111, 158, 0.22); display: flex; align-items: center; gap: 8px; justify-content: center;}
+        .toast.show { opacity: 1; top: 25%; }
+        .toast-undo-btn { margin-left: 12px; padding: 4px 10px; background: rgba(255,255,255,0.2); border-radius: 6px; cursor: pointer; font-size: 12px; }
 
-        /* 大按键统一集成样式 */
-        .primary-action-btn { background: var(--primary-color); color: white; padding: 16px; border-radius: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 24px rgba(31, 95, 255, 0.3); cursor: pointer; transition: 0.2s; margin-bottom: 16px; flex-shrink: 0;}
+        .primary-action-btn { background: linear-gradient(135deg, #4b82ff 0%, var(--primary-color) 100%); color: white; padding: 12px 16px; min-height: 76px; border-radius: 26px; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 16px 28px rgba(31, 95, 255, 0.24); cursor: pointer; transition: 0.2s; margin-bottom: 14px; flex-shrink: 0;}
+        .primary-action-btn svg { width: 34px; height: 34px; flex-shrink: 0; stroke-width: 1.9; }
+        .primary-action-btn span { font-size: 18px; font-weight: 800; letter-spacing: 0.2px; }
         .primary-action-btn:active { transform: scale(0.98); opacity: 0.9;}
-        .primary-action-btn svg { width: 22px; height: 22px; }
-        .primary-action-btn span { font-size: 16px; font-weight: 800; letter-spacing: 0.5px;}
 
-        /* ================= 交互底座规范 (Overlay, BottomSheet, Dialog) ================= */
         .modal-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; backdrop-filter: blur(2px);}
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
 
-        .bottom-sheet { position: absolute; bottom: 0; left: 0; right: 0; background: #fff; border-radius: 24px 24px 0 0; padding: 24px 20px 34px; z-index: 1001; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 0 -10px 40px rgba(0,0,0,0.1); display: flex; flex-direction: column; max-height: 85%;}
+        .bottom-sheet { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.96); border-radius: 30px 30px 0 0; padding: 24px 20px 34px; z-index: 1001; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 0 -16px 40px rgba(31, 95, 255, 0.1); display: flex; flex-direction: column; max-height: 85%; backdrop-filter: blur(24px);}
         .bottom-sheet.active { transform: translateY(0); }
         .sheet-indicator { width: 40px; height: 4px; background: #E2E8F0; border-radius: 2px; margin: 0 auto 20px; flex-shrink: 0;}
         .sheet-title { font-size: 18px; font-weight: 800; color: var(--text-title); text-align: center; margin-bottom: 24px; flex-shrink: 0;}
-        
-        .dialog-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); background: #fff; border-radius: 20px; width: 80%; padding: 24px 20px; z-index: 1001; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.15);}
+
+        .dialog-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); background: rgba(255,255,255,0.95); border-radius: 28px; width: 80%; padding: 24px 20px; z-index: 1001; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 20px 50px rgba(31, 95, 255, 0.1); backdrop-filter: blur(22px);}
         .dialog-box.active { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
         .dialog-title { font-size: 18px; font-weight: 800; color: var(--text-title); margin-bottom: 12px; margin-top: 12px;}
         .dialog-desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5; padding: 0 10px;}
         .dialog-actions { display: flex; gap: 12px; width: 100%;}
         .dialog-btn { flex: 1; padding: 14px; font-size: 15px; font-weight: 800; border-radius: 14px; cursor: pointer; text-align: center; transition: 0.2s;}
-        .dialog-btn:active { transform: scale(0.96); }
         .dialog-btn.cancel { background: #F1F5F9; color: var(--text-secondary);}
-        .dialog-btn.confirm { background: var(--primary-color); color: white; box-shadow: 0 4px 12px rgba(31, 95, 255, 0.2);}
+        .dialog-btn.confirm { background: var(--primary-color); color: white;}
 
-        /* 表单样式 */
         .form-group { margin-bottom: 16px; text-align: left; width: 100%;}
         .form-label { font-size: 13px; font-weight: 800; color: var(--text-title); margin-bottom: 8px; display: block; }
-        .form-control { width: 100%; padding: 14px 16px; border-radius: 14px; border: 1px solid rgba(0,0,0,0.06); background: #F8FAFC; font-size: 14px; color: var(--text-title); outline: none; transition: 0.2s; font-family: inherit;}
+        .form-label.required::after { content: '*'; color: var(--danger-color); margin-left: 4px; }
+        .form-control { width: 100%; padding: 14px 16px; border-radius: 18px; border: 1px solid rgba(155,169,206,0.14); background: rgba(245,248,255,0.9); font-size: 14px; color: var(--text-title); outline: none; transition: 0.2s; font-family: inherit;}
         .form-control:focus { border-color: var(--primary-color); background: #fff; box-shadow: 0 0 0 3px var(--primary-light); }
+        .form-control:invalid:focus { border-color: var(--danger-color); box-shadow: 0 0 0 3px var(--danger-light); }
         textarea.form-control { resize: none; height: 100px; }
-        
-        .submit-btn { width: 100%; padding: 16px; border-radius: 16px; background: var(--primary-color); color: white; font-size: 16px; font-weight: 800; text-align: center; cursor: pointer; transition: 0.2s; margin-top: 8px; border: none;}
-        .submit-btn:active { transform: scale(0.98); opacity: 0.9; }
 
-        /* Sheet内部滚动区 */
+        .submit-btn { width: 100%; padding: 16px; border-radius: 20px; background: linear-gradient(135deg, #4b82ff 0%, var(--primary-color) 100%); color: white; font-size: 16px; font-weight: 800; text-align: center; cursor: pointer; transition: 0.2s; margin-top: 8px; border: none; box-shadow: 0 12px 24px rgba(31, 95, 255, 0.2);}
+        .submit-btn:disabled { opacity: 0.6; pointer-events: none; }
+
         .sheet-scroll-area { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; width: 100%; max-height: 50vh; padding: 0 4px;}
         .sheet-scroll-area::-webkit-scrollbar { display: none; }
-        
-        /* 日志流转时间线 */
+
         .log-timeline { margin-top: 8px; padding-left: 12px; border-left: 2px solid var(--primary-light); }
-        .log-item { position: relative; padding-bottom: 24px; padding-left: 16px; }
+        .log-item { position: relative; padding-bottom: 24px; padding-left: 16px; animation: fadeInUp 0.32s ease both; }
         .log-item::before { content: ''; position: absolute; left: -21px; top: 2px; width: 10px; height: 10px; border-radius: 50%; background: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-light); }
-        .log-item:last-child { padding-bottom: 0; }
         .log-time { font-size: 11px; color: var(--text-secondary); margin-bottom: 4px; font-weight: 600;}
         .log-content { font-size: 14px; color: var(--text-title); font-weight: 700; margin-bottom: 4px;}
         .log-detail { font-size: 12px; color: var(--text-main); line-height: 1.4; background: #F8FAFC; padding: 8px 12px; border-radius: 8px; margin-top: 6px;}
 
-        /* Sheet 网格 & 列表 */
         .sheet-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 10px; margin-bottom: 10px;}
-        .sheet-list-item { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: #F8FAFC; border-radius: 16px; cursor: pointer; transition: 0.2s; border: 1px solid transparent; margin-bottom: 12px;}
-        .sheet-list-item:active { background: #EFF6FF; border-color: rgba(31, 95, 255, 0.2); }
-        
-        /* 骨架屏动画 */
+        .task-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+        .task-card { padding: 14px; border-radius: 20px; background: rgba(255,255,255,0.92); border: 1px solid rgba(255,255,255,0.9); box-shadow: 0 10px 24px rgba(31,95,255,0.06); cursor: pointer; transition: 0.2s; }
+        .task-card:active { transform: scale(0.98); }
+        .task-card.danger { border-color: rgba(239,68,68,0.22); background: rgba(255,255,255,0.96); }
+        .task-card.warning { border-color: rgba(245,158,11,0.24); background: rgba(255,255,255,0.96); }
+        .task-label { font-size: 12px; color: var(--text-secondary); font-weight: 800; margin-bottom: 8px; }
+        .task-value { font-size: 24px; color: var(--primary-color); font-weight: 900; line-height: 1; animation: numberPop 0.36s ease; }
+        .task-card.danger .task-value { color: var(--danger-color); }
+        .task-card.warning .task-value { color: var(--warning-color); }
+        .filter-panel { position: sticky; top: 0; z-index: 60; padding: 0 0 10px; background: linear-gradient(135deg, rgba(239,246,255,0.96) 0%, rgba(223,231,255,0.96) 100%); backdrop-filter: blur(12px); }
+        .filter-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+        .mini-search { flex: 1; min-width: 0; height: 38px; border: 1px solid rgba(255,255,255,0.88); border-radius: 999px; padding: 0 14px; background: rgba(255,255,255,0.9); outline: none; color: var(--text-title); font-weight: 700; }
+        .filter-btn { height: 38px; padding: 0 14px; border: 1px solid rgba(31,95,255,0.16); border-radius: 999px; background: rgba(255,255,255,0.86); color: var(--primary-color); font-size: 12px; font-weight: 900; cursor: pointer; }
+        .meta-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 4px; }
+        .meta-item { padding: 8px 10px; border-radius: 12px; background: rgba(31,95,255,0.06); color: var(--text-main); font-size: 11px; font-weight: 700; line-height: 1.35; }
+        .next-action { padding: 10px 12px; border-radius: 14px; background: var(--primary-light); color: var(--primary-color); font-size: 12px; font-weight: 900; }
+        .lead-main { cursor: pointer; display: flex; flex-direction: column; gap: 8px; min-width: 0; flex: 1; }
+        .lead-status { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+        .focus-note { font-size: 11px; color: var(--text-secondary); font-weight: 800; line-height: 1.35; }
+        .detail-summary-grid { display: grid; gap: 10px; margin-bottom: 14px; }
+        .detail-summary { padding: 14px; border-radius: 18px; background: rgba(255,255,255,0.9); border: 1px solid rgba(255,255,255,0.88); }
+        .detail-summary-title { font-size: 12px; color: var(--text-secondary); font-weight: 900; margin-bottom: 8px; }
+        .detail-summary-body { font-size: 13px; color: var(--text-main); font-weight: 700; line-height: 1.5; }
+        .funnel-subtitle { margin: -6px 6px 12px; color: var(--text-secondary); font-size: 12px; font-weight: 800; }
+        .funnel-metric { padding: 14px 16px; border-radius: 20px; background: rgba(255,255,255,0.92); border: 1px solid rgba(255,255,255,0.9); box-shadow: 0 10px 24px rgba(31,95,255,0.08), inset 0 1px 0 rgba(255,255,255,0.5); animation: fadeInUp 0.32s ease both; }
+        .funnel-topline { display:flex; justify-content:space-between; gap:12px; font-size:12px; font-weight:800; color:var(--text-main); margin-bottom:8px; }
+        .funnel-track { width:100%; height:10px; border-radius:999px; background: rgba(31,95,255,0.14); overflow:hidden; }
+        .funnel-bar { height:100%; border-radius:999px; transform-origin: left center; animation: fillLine 0.45s ease both; }
+        .funnel-grid { display:grid; gap:10px; }
+        .funnel-note { margin-top: 12px; padding: 10px 12px; border-radius: 16px; background: rgba(31,95,255,0.06); color: var(--text-secondary); font-size: 11px; font-weight: 700; line-height: 1.55; }
+        .sheet-list-item { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: rgba(245,248,255,0.9); border-radius: 20px; cursor: pointer; transition: 0.2s; border: 1px solid rgba(255,255,255,0.7); margin-bottom: 12px;}
+
         .skeleton { background: #E2E8F0; border-radius: 8px; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+        @keyframes fillLine { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+        @keyframes numberPop { 0% { transform: scale(0.92); opacity: 0.7; } 65% { transform: scale(1.08); } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes nodePulse { 0% { transform: scale(0.86); } 60% { transform: scale(1.12); } 100% { transform: scale(1); } }
 
-        /* Icon Wrapper (Dialog) */
-        .dialog-icon-wrap { width: 56px; height: 56px; border-radius: 50%; background: var(--primary-light); color: var(--primary-color); display: flex; align-items: center; justify-content: center; margin-bottom: 8px;}
-        .dialog-icon-wrap svg { width: 28px; height: 28px; }
+        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; text-align: center;}
+        .empty-state svg { width: 64px; height: 64px; stroke: #CBD5E1; margin-bottom: 16px;}
+        .empty-state p { font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5;}
+
+        #page-lead-detail { z-index: 300; background: #F8FAFC; }
+        .detail-header { background: rgba(255,255,255,0.92); padding: 24px 20px; border-bottom: 1px solid var(--border-line); backdrop-filter: blur(18px); }
+        .detail-tabs { display: flex; border-bottom: 1px solid var(--border-line); background: rgba(255,255,255,0.9); padding: 0 20px; backdrop-filter: blur(18px);}
+        .detail-tab { padding: 16px 0; margin-right: 24px; font-size: 14px; font-weight: 600; color: var(--text-secondary); cursor: pointer; position: relative;}
+        .detail-tab.active { color: var(--primary-color); font-weight: 800; }
+        .detail-tab.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--primary-color); border-radius: 2px 2px 0 0; }
+
+        .batch-action-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 80px; background: rgba(255,255,255,0.94); box-shadow: 0 -8px 24px rgba(31, 95, 255, 0.08); z-index: 150; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; transform: translateY(100%); transition: 0.3s; backdrop-filter: blur(18px);}
+        .batch-action-bar.active { transform: translateY(0); }
     </style>
 </head>
 <body>
 
 <div class="device-simulator">
     <div class="wrapper-main">
-        
-        <!-- ================== 原有系统：完整保留高频功能、功能目录 ================== -->
         <div id="tab-school" class="tab-view active">
             <div class="nav-bar main-nav" style="padding-bottom:16px;">
                 <div class="nav-title" style="font-size: 20px;">学校管理</div>
@@ -247,39 +274,19 @@
         </div>
 
         <div id="tab-teacher" class="tab-view">
-            <div class="nav-bar main-nav">
-                <div class="nav-title">教师</div>
-            </div>
-            <div class="main-content" style="display:flex; justify-content:center; align-items:center; color: var(--text-secondary); font-weight:bold;">
-                该模块暂未加载
-            </div>
+            <div class="nav-bar main-nav"><div class="nav-title">教师</div></div>
+            <div class="main-content" style="display:flex; justify-content:center; align-items:center; color: var(--text-secondary); font-weight:bold;">模块开发中...</div>
         </div>
 
         <div class="tab-bar">
-            <div class="tab-item" onclick="showToast('该模块暂不跳转')">
-                <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></div>
-                <div class="tab-label">通告</div>
-            </div>
-            <div class="tab-item" onclick="showToast('该模块暂不跳转')">
-                <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></div>
-                <div class="tab-label">课件</div>
-            </div>
-            <div class="tab-item" onclick="switchTab('tab-teacher', this)">
-                <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg></div>
-                <div class="tab-label">教师</div>
-            </div>
-            <div class="tab-item active" onclick="switchTab('tab-school', this)">
-                <div class="tab-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
-                <div class="tab-label">学校</div>
-            </div>
-            <div class="tab-item" onclick="showToast('该模块暂不跳转')">
-                <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
-                <div class="tab-label">我的</div>
-            </div>
+            <div class="tab-item" onclick="showToast('该模块暂不跳转')"><div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></div><div class="tab-label">通告</div></div>
+            <div class="tab-item" onclick="showToast('该模块暂不跳转')"><div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></div><div class="tab-label">课件</div></div>
+            <div class="tab-item" onclick="switchTab('tab-teacher', this)"><div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg></div><div class="tab-label">教师</div></div>
+            <div class="tab-item active" onclick="switchTab('tab-school', this)"><div class="tab-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div><div class="tab-label">学校</div></div>
+            <div class="tab-item" onclick="showToast('该模块暂不跳转')"><div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div><div class="tab-label">我的</div></div>
         </div>
     </div>
 
-    <!-- ================== 二级界面：招生智能工作台 ================== -->
     <div id="workspace-enrollment" class="page-view hidden-right" style="background: linear-gradient(135deg, #EFF6FF 0%, #DFE7FF 100%);">
         <div class="nav-bar">
             <div class="icon-btn" style="margin-left: -8px;" onclick="closeEnrollmentWorkspace()">
@@ -295,7 +302,6 @@
                 <div style="position:relative; display:flex; align-items:center; flex:1; margin-left: 12px;">
                     <select class="semester-select">
                         <option>2026年秋季学期 (当前)</option>
-                        <option>2026年春季学期</option>
                     </select>
                     <svg style="position:absolute; right:0; width:16px; height:16px; color:var(--primary-color); pointer-events:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </div>
@@ -303,72 +309,29 @@
         </div>
 
         <div style="flex:1; position:relative; overflow: hidden;">
-
-            <!-- 1. 工作台 (数据大盘) -->
             <div id="sub-view-dashboard" class="sub-view active">
-                
-                <!-- 办理新业务入口 -->
-                <div class="primary-action-btn" onclick="showModal('sheet-new-business')">
+                <div class="primary-action-btn" id="btn-new-business" onclick="showModal('sheet-new-business')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    <span>办理新业务</span>
+                    <span>快速操作</span>
                 </div>
 
-                <div class="section-header" style="margin-top: 4px;"><div class="section-title">待办与预警</div></div>
-                <div class="list-card glass-card">
-                    <div class="card-row-between">
-                        <div class="card-title">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--warning-color)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                            超时未跟进预警
-                        </div>
-                        <div class="badge-outline warning">待分配/处理</div>
-                    </div>
-                    <div class="card-desc">您有 <strong style="color:var(--warning-color)">3</strong> 条公海线索分配后超过 24 小时未产生跟进记录。</div>
-                    <div class="card-actions">
-                        <button class="btn-xs outline" onclick="switchEnrollmentTab('sub-view-leads', document.getElementById('tab-btn-leads')); simulateDataLoad('leads-list-container');">立即处理</button>
-                    </div>
-                </div>
-                <div class="list-card glass-card">
-                    <div class="card-row-between">
-                        <div class="card-title">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--danger-color)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
-                            报到交接任务失败
-                        </div>
-                        <div class="badge-outline danger">系统异常</div>
-                    </div>
-                    <div class="card-desc">张晓明同学的基础学生档案同步失败(网络异常)，需重试。</div>
-                    <div class="card-actions">
-                        <button class="btn-xs danger" onclick="simulateSubmit('触发 Outbox 重试', true, '任务已进入重试队列')">执行系统重试</button>
-                    </div>
+                <div class="section-header" style="margin-top: 4px;"><div class="section-title">今日待办</div></div>
+                <div class="task-grid">
+                    <div class="task-card warning" onclick="handleDashboardJump('overdue')"><div class="task-label">超时未跟进</div><div class="task-value" id="overdue-count">0</div></div>
+                    <div class="task-card" onclick="handleDashboardJump('unassigned')"><div class="task-label">待分配线索</div><div class="task-value" id="unassigned-count">0</div></div>
+                    <div class="task-card" onclick="handleDashboardJump('visit')"><div class="task-label">待到访确认</div><div class="task-value" id="visit-count">0</div></div>
+                    <div class="task-card danger" onclick="handleDashboardJump('syncFailed')"><div class="task-label">入学交接异常</div><div class="task-value" id="sync-failed-count">0</div></div>
                 </div>
 
-                <div class="section-header"><div class="section-title">汇总数据</div></div>
-                <div class="glass-card" style="padding: 16px; margin-bottom: 12px;">
-                    <div style="display:flex; flex-direction:column; gap: 14px;">
-                        <div>
-                            <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700; margin-bottom:6px;"><span>1. 入池线索总数</span><span>1,250</span></div>
-                            <div style="width:100%; height:8px; background:var(--primary-light); border-radius:4px;"><div style="width:100%; height:100%; background:var(--primary-color); border-radius:4px;"></div></div>
-                        </div>
-                        <div>
-                            <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700; margin-bottom:6px;"><span>2. 跟进意向与邀约 (分配率95%)</span><span>850</span></div>
-                            <div style="width:100%; height:8px; background:var(--primary-light); border-radius:4px;"><div style="width:68%; height:100%; background:var(--primary-color); border-radius:4px;"></div></div>
-                        </div>
-                        <div>
-                            <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700; margin-bottom:6px;"><span>3. 到访签到 (到访率60%)</span><span>510</span></div>
-                            <div style="width:100%; height:8px; background:var(--warning-light); border-radius:4px;"><div style="width:40%; height:100%; background:var(--warning-color); border-radius:4px;"></div></div>
-                        </div>
-                        <div>
-                            <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700; margin-bottom:6px;"><span>4. 预定与录取 (预定率75%)</span><span>382</span></div>
-                            <div style="width:100%; height:8px; background:var(--success-light); border-radius:4px;"><div style="width:30%; height:100%; background:var(--success-color); border-radius:4px;"></div></div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- 已折叠展示 交互点 -->
-                <div class="list-card glass-card" style="opacity: 0.8;" onclick="showModal('sheet-history-data')">
+                <div class="section-header"><div class="section-title">本学期招生转化分析</div></div>
+                <div class="funnel-subtitle">线索 → 跟进 → 到访 → 录取 → 交接</div>
+                <div class="glass-card" style="padding: 16px; margin-bottom: 12px;" id="funnel-container"></div>
+
+                <div class="list-card glass-card" style="opacity: 0.92;" onclick="showModal('sheet-history-data')">
                     <div class="card-row-between">
                         <div class="card-title">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                            往期学期数据归档
+                            历史招生数据
                         </div>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </div>
@@ -376,474 +339,960 @@
                 </div>
             </div>
 
-            <!-- 2. 线索池 (修复横滑联动与数据更新) -->
             <div id="sub-view-leads" class="sub-view">
-                <div class="pill-scroll" id="pills-leads">
-                    <div class="pill active" onclick="switchPillTab(this, 'pills-leads', 'leads-list-container')">公海线索</div>
-                    <div class="pill" onclick="switchPillTab(this, 'pills-leads', 'leads-list-container')">我的线索</div>
-                    <div class="pill" onclick="switchPillTab(this, 'pills-leads', 'leads-list-container')">今日新增</div>
-                    <div class="pill" onclick="switchPillTab(this, 'pills-leads', 'leads-list-container')">线索导入</div>
-                    <div class="pill" onclick="switchPillTab(this, 'pills-leads', 'leads-list-container')">异常数据</div>
-                    <div class="pill" onclick="switchPillTab(this, 'pills-leads', 'leads-list-container')">回收站</div>
-                </div>
-                
-                <!-- 数据承载容器，用于模拟联动刷新 -->
-                <div id="leads-list-container">
-                    <div class="list-card glass-card">
-                        <div class="card-row-between">
-                            <div class="card-title">李明 (意向专业: 计算机网络)</div>
-                            <div class="badge-tag tag-primary">新线索入池</div>
-                        </div>
-                        <div class="card-desc"><span>来源: 营销投放 / 第三方接入</span></div>
-                        <div class="step-container">
-                            <div class="step-item active"><div class="step-circle">1</div><div class="step-label">公海</div></div>
-                            <div class="step-item"><div class="step-circle">2</div><div class="step-label">跟进</div></div>
-                            <div class="step-item"><div class="step-circle">3</div><div class="step-label">邀约</div></div>
-                            <div class="step-item"><div class="step-circle">4</div><div class="step-label">到访</div></div>
-                            <div class="step-item"><div class="step-circle">5</div><div class="step-label">预定</div></div>
-                            <div class="step-item"><div class="step-circle">6</div><div class="step-label">录取</div></div>
-                            <div class="step-item"><div class="step-circle">7</div><div class="step-label">交接</div></div>
-                        </div>
-                        <div class="card-actions">
-                            <button class="btn-xs" onclick="showModal('sheet-assign')">单条分配</button>
-                            <button class="btn-xs outline" onclick="showModal('dialog-claim')">直接认领</button>
-                        </div>
+                <div class="filter-panel">
+                    <div class="filter-row">
+                        <input class="mini-search" id="leads-search" placeholder="搜索姓名/手机号/来源/负责人" oninput="rerenderActiveList('leads')">
+                        <button class="filter-btn" onclick="showToast('来源、专业、负责人、创建时间已收纳到高级筛选')">筛选</button>
                     </div>
-
-                    <div class="list-card glass-card">
-                        <div class="card-row-between">
-                            <div class="card-title">王雨萌 (初三毕业生)</div>
-                            <div class="badge-tag tag-primary">新线索入池</div>
-                        </div>
-                        <div class="card-desc"><span>来源: 线下自主登记</span></div>
-                        <div class="step-container">
-                            <div class="step-item active"><div class="step-circle">1</div><div class="step-label">公海</div></div>
-                            <div class="step-item"><div class="step-circle">2</div><div class="step-label">跟进</div></div>
-                            <div class="step-item"><div class="step-circle">3</div><div class="step-label">邀约</div></div>
-                            <div class="step-item"><div class="step-circle">4</div><div class="step-label">到访</div></div>
-                            <div class="step-item"><div class="step-circle">5</div><div class="step-label">预定</div></div>
-                            <div class="step-item"><div class="step-circle">6</div><div class="step-label">录取</div></div>
-                            <div class="step-item"><div class="step-circle">7</div><div class="step-label">交接</div></div>
-                        </div>
-                        <div class="card-actions">
-                            <button class="btn-xs" onclick="showModal('sheet-assign')">单条分配</button>
-                            <button class="btn-xs outline" onclick="showModal('dialog-claim')">直接认领</button>
-                        </div>
+                    <div class="pill-scroll" id="pills-leads">
+                        <div class="pill active" onclick="switchFilter(this, 'leads', '全部')">全部</div>
+                        <div class="pill" onclick="switchFilter(this, 'leads', '待分配')">待分配</div>
+                        <div class="pill" onclick="switchFilter(this, 'leads', '我的')">我的</div>
+                        <div class="pill" onclick="switchFilter(this, 'leads', '超时待办')">超时待办</div>
                     </div>
                 </div>
+                <div id="leads-list-container"></div>
             </div>
 
-            <!-- 3. 转化审批 -->
             <div id="sub-view-conversion" class="sub-view">
-                <div class="pill-scroll" id="pills-conv">
-                    <div class="pill active" onclick="switchPillTab(this, 'pills-conv', 'conv-list-container')">意向预定</div>
-                    <div class="pill" onclick="switchPillTab(this, 'pills-conv', 'conv-list-container')">到访确认</div>
-                    <div class="pill" onclick="switchPillTab(this, 'pills-conv', 'conv-list-container')">报名录取</div>
-                    <div class="pill" onclick="switchPillTab(this, 'pills-conv', 'conv-list-container')">退费审核</div>
-                </div>
-                <div id="conv-list-container">
-                    <div class="list-card glass-card">
-                        <div class="card-row-between">
-                            <div class="card-title">刘子涵家长 - A级高意向</div>
-                            <div class="badge-tag tag-success">已预定</div>
-                        </div>
-                        <div class="card-desc"><span>动态: 交意向金 ￥2000</span> <span>负责顾问: 尹娣</span></div>
-                        <div class="step-container">
-                            <div class="step-item done"><div class="step-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="step-label">公海</div></div>
-                            <div class="step-item done"><div class="step-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="step-label">跟进</div></div>
-                            <div class="step-item done"><div class="step-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="step-label">邀约</div></div>
-                            <div class="step-item done"><div class="step-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="step-label">到访</div></div>
-                            <div class="step-item active"><div class="step-circle">5</div><div class="step-label">预定</div></div>
-                            <div class="step-item"><div class="step-circle">6</div><div class="step-label">录取</div></div>
-                            <div class="step-item"><div class="step-circle">7</div><div class="step-label">交接</div></div>
-                        </div>
-                        <div class="card-actions">
-                            <button class="btn-xs" onclick="showModal('dialog-confirm-enroll')">转录取</button>
-                            <button class="btn-xs outline" onclick="showModal('sheet-follow-up')">写跟进</button>
-                        </div>
+                <div class="filter-panel">
+                    <div class="filter-row">
+                        <input class="mini-search" id="conv-search" placeholder="搜索姓名/手机号/来源/负责人" oninput="rerenderActiveList('conv')">
+                        <button class="filter-btn" onclick="showToast('到访时间、专业、材料状态已收纳到高级筛选')">筛选</button>
+                    </div>
+                    <div class="pill-scroll" id="pills-conv">
+                        <div class="pill active" onclick="switchFilter(this, 'conv', '推进中')">推进中</div>
+                        <div class="pill" onclick="switchFilter(this, 'conv', '到访')">到访</div>
+                        <div class="pill" onclick="switchFilter(this, 'conv', '预定')">预定</div>
+                        <div class="pill" onclick="switchFilter(this, 'conv', '录取')">录取</div>
+                        <div class="pill" onclick="switchFilter(this, 'conv', '交接')">交接</div>
                     </div>
                 </div>
+                <div id="conv-list-container"></div>
             </div>
 
-            <!-- 4. 配置/工具 -->
             <div id="sub-view-tools" class="sub-view">
-                <div class="section-header" style="margin-top: 0;"><div class="section-title">招生资源管理</div></div>
-                <div class="glass-card" style="margin-bottom: 16px;">
-                    <div class="grid-menu" style="padding-top:16px; padding-bottom:16px;">
-                        <div class="grid-item" onclick="simulateSubmit('加载生源库...', true, '已加载 14 所候选学校')">
-                            <div class="grid-icon-wrap" style="background: var(--icon-bg-blue); color: var(--icon-color-blue);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
-                            <div class="grid-label">生源学校库</div>
-                        </div>
-                        <div class="grid-item" onclick="showModal('sheet-log-details')">
-                            <div class="grid-icon-wrap" style="background: var(--icon-bg-emerald); color: var(--icon-color-emerald);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div>
-                            <div class="grid-label">日志审计</div>
-                        </div>
-                        <div class="grid-item" onclick="simulateSubmit('加载学期计划配置...', true, '进入底层配置中心')">
-                            <div class="grid-icon-wrap" style="background: var(--icon-bg-purple); color: var(--icon-color-purple);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></div>
-                            <div class="grid-label">底层配置</div>
-                        </div>
+                <div class="section-header" style="margin-top: 0;"><div class="section-title">招生配置</div></div>
+                <div class="glass-card" style="margin-bottom: 16px; padding-bottom: 8px;">
+                    <div class="section-header" style="margin-top: 12px;"><div class="section-title" style="font-size:15px;">招生配置</div></div>
+                    <div class="grid-menu" style="padding-top:0;">
+                        <div class="grid-item" onclick="showToast('查看招生学期')"><div class="grid-icon-wrap" style="background: var(--icon-bg-blue); color: var(--icon-color-blue);"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M8 3v4M16 3v4M4 10h16"></path></svg></div><div class="grid-label">招生学期</div></div>
+                        <div class="grid-item" onclick="showToast('查看招生专业')"><div class="grid-icon-wrap" style="background: var(--icon-bg-purple); color: var(--icon-color-purple);"><svg viewBox="0 0 24 24"><path d="M4 19.5V5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-1.5z"></path><path d="M8 7h6M8 11h8"></path></svg></div><div class="grid-label">招生专业</div></div>
+                        <div class="grid-item" onclick="showToast('查看招生分组')"><div class="grid-icon-wrap" style="background: var(--icon-bg-pink); color: var(--icon-color-pink);"><svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"></circle><circle cx="16" cy="8" r="3"></circle><path d="M4 20a4 4 0 0 1 8 0M12 20a4 4 0 0 1 8 0"></path></svg></div><div class="grid-label">招生分组</div></div>
+                        <div class="grid-item" onclick="showToast('查看招生人员')"><div class="grid-icon-wrap" style="background: var(--icon-bg-emerald); color: var(--icon-color-emerald);"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"></circle><path d="M3 21v-2a6 6 0 0 1 12 0v2"></path><path d="M17 11l2 2 4-4"></path></svg></div><div class="grid-label">招生人员</div></div>
+                        <div class="grid-item" onclick="showToast('查看学期计划')"><div class="grid-icon-wrap" style="background: var(--icon-bg-orange); color: var(--icon-color-orange);"><svg viewBox="0 0 24 24"><path d="M4 19V5"></path><path d="M4 19h16"></path><path d="M8 15l3-4 3 2 4-6"></path></svg></div><div class="grid-label">学期计划</div></div>
+                    </div>
+                </div>
+                <div class="glass-card" style="margin-bottom: 16px; padding-bottom: 8px;">
+                    <div class="section-header" style="margin-top: 12px;"><div class="section-title" style="font-size:15px;">生源学校</div></div>
+                    <div class="grid-menu" style="padding-top:0;">
+                        <div class="grid-item" onclick="showToast('查看候选学校')"><div class="grid-icon-wrap" style="background: var(--icon-bg-blue); color: var(--icon-color-blue);"><svg viewBox="0 0 24 24"><path d="M3 21h18"></path><path d="M5 21V7l7-4 7 4v14"></path><path d="M9 21v-7h6v7"></path></svg></div><div class="grid-label">候选学校</div></div>
+                        <div class="grid-item" onclick="simulateAction(null, '加载学校库...', '已加载本市 120 所候选初中数据', true)"><div class="grid-icon-wrap" style="background: var(--icon-bg-emerald); color: var(--icon-color-emerald);"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path><path d="M7 4v16M17 4v16"></path></svg></div><div class="grid-label">学校库</div></div>
+                        <div class="grid-item" onclick="showToast('查看学校联系人')"><div class="grid-icon-wrap" style="background: var(--icon-bg-teal); color: var(--icon-color-teal);"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"></path><circle cx="10" cy="7" r="4"></circle><path d="M19 8v6M22 11h-6"></path></svg></div><div class="grid-label">联系人</div></div>
+                        <div class="grid-item" onclick="showToast('查看责任归属')"><div class="grid-icon-wrap" style="background: var(--icon-bg-orange); color: var(--icon-color-orange);"><svg viewBox="0 0 24 24"><path d="M12 2v20"></path><path d="M5 7h14"></path><path d="M7 7l-3 6h6L7 7zM17 7l-3 6h6l-3-6z"></path></svg></div><div class="grid-label">责任归属</div></div>
+                    </div>
+                </div>
+                <div class="glass-card" style="margin-bottom: 16px; padding-bottom: 8px;">
+                    <div class="section-header" style="margin-top: 12px;"><div class="section-title" style="font-size:15px;">审计与同步</div></div>
+                    <div class="grid-menu" style="padding-top:0;">
+                        <div class="grid-item" onclick="showModal('sheet-log-details')"><div class="grid-icon-wrap" style="background: var(--icon-bg-purple); color: var(--icon-color-purple);"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6M8 13h8M8 17h6"></path></svg></div><div class="grid-label">操作日志</div></div>
+                        <div class="grid-item" onclick="showToast('查看同步监控')"><div class="grid-icon-wrap" style="background: var(--icon-bg-blue); color: var(--icon-color-blue);"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 1-15.5 6.2"></path><path d="M3 12A9 9 0 0 1 18.5 5.8"></path><path d="M18 3v5h-5M6 21v-5h5"></path></svg></div><div class="grid-label">同步监控</div></div>
+                        <div class="grid-item" onclick="handleDashboardJump('syncFailed')"><div class="grid-icon-wrap" style="background: var(--danger-light); color: var(--danger-color);"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v6M12 17h.01"></path></svg></div><div class="grid-label">失败重试</div></div>
                     </div>
                 </div>
             </div>
 
+            <div class="batch-action-bar" id="batch-bar">
+                <div style="font-size:14px; font-weight:700;"><span id="batch-summary">已选 0 项</span></div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-xs outline" onclick="executeBatch('invalid')">批量作废</button>
+                    <button class="btn-xs" onclick="showModal('sheet-assign')">批量分配</button>
+                </div>
+            </div>
         </div>
 
         <div class="sub-tab-bar">
             <div class="sub-tab-item active" id="tab-btn-dash" onclick="switchEnrollmentTab('sub-view-dashboard', this)">
                 <div class="tab-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
-                <div class="tab-label">工作台</div>
+                <div class="tab-label">今日待办</div>
             </div>
             <div class="sub-tab-item" id="tab-btn-leads" onclick="switchEnrollmentTab('sub-view-leads', this)">
                 <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
-                <div class="tab-label">线索池</div>
+                <div class="tab-label">线索</div>
             </div>
             <div class="sub-tab-item" id="tab-btn-conv" onclick="switchEnrollmentTab('sub-view-conversion', this)">
                 <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
-                <div class="tab-label">转化审批</div>
+                <div class="tab-label">转化</div>
             </div>
             <div class="sub-tab-item" id="tab-btn-tools" onclick="switchEnrollmentTab('sub-view-tools', this)">
                 <div class="tab-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></div>
-                <div class="tab-label">资源管理</div>
+                <div class="tab-label">配置</div>
             </div>
         </div>
     </div>
 
-    <!-- ================== 交互底座：覆盖层与所有弹窗 (修复与补全) ================== -->
-    <!-- 统一遮罩 -->
+    <div id="page-lead-detail" class="page-view hidden-right" style="z-index: 300; background: #F8FAFC;">
+        <div class="nav-bar" style="background:white;">
+            <div class="icon-btn" style="margin-left: -8px;" onclick="closeLeadDetail()">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </div>
+            <div class="nav-title-group"><div class="nav-title">学生线索详情</div></div>
+            <div class="icon-btn"></div>
+        </div>
+        <div class="detail-header" id="detail-header-info"></div>
+        <div class="detail-tabs">
+            <div class="detail-tab active">时间线与跟进</div>
+            <div class="detail-tab" onclick="showToast('暂无详尽资料')">基础资料</div>
+            <div class="detail-tab" onclick="showToast('暂无更多操作日志')">操作日志</div>
+        </div>
+        <div class="main-content" style="padding-top: 20px;">
+            <div class="glass-card" style="padding: 16px;">
+                <div class="log-timeline" id="detail-timeline"></div>
+            </div>
+        </div>
+        <div style="position:absolute; bottom:0; left:0; right:0; padding:16px 20px; background:white; box-shadow:0 -4px 20px rgba(0,0,0,0.05); display:flex; gap:12px; z-index:310;">
+            <button class="btn-xs outline" style="flex:1; padding:14px; font-size:15px;" onclick="showModal('sheet-follow-up')">写跟进</button>
+            <button class="btn-xs outline" style="flex:1; padding:14px; font-size:15px;" onclick="showToast('已创建到访邀约草稿')">发起邀约</button>
+            <button class="btn-xs" style="flex:1; padding:14px; font-size:15px;" onclick="showModal('dialog-confirm-enroll')">转录取</button>
+        </div>
+    </div>
+
     <div id="modal-overlay" class="modal-overlay" onclick="closeAllModals()"></div>
 
-    <!-- 弹窗 1：办理新业务 (BottomSheet 三级入口) -->
     <div id="sheet-new-business" class="bottom-sheet">
         <div class="sheet-indicator"></div>
-        <div class="sheet-title">办理新业务</div>
+        <div class="sheet-title">快速操作</div>
         <div class="sheet-grid">
             <div class="grid-item" onclick="showModal('sheet-add-lead')">
                 <div class="grid-icon-wrap" style="background:var(--icon-bg-blue); color:var(--icon-color-blue);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg></div>
                 <div class="grid-label">录入线索</div>
             </div>
-            <div class="grid-item" onclick="simulateSubmit('相机调用中...', true, '扫码成功：张伟已签到')">
+            <div class="grid-item" onclick="simulateAction(null, '调用摄像头中...', '扫码成功：张晓明已签到并记录到访', true)">
                 <div class="grid-icon-wrap" style="background:var(--icon-bg-emerald); color:var(--icon-color-emerald);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div>
                 <div class="grid-label">到访签到</div>
             </div>
-            <div class="grid-item" onclick="showModal('sheet-quick-enroll')">
-                <div class="grid-icon-wrap" style="background:var(--icon-bg-purple); color:var(--icon-color-purple);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
-                <div class="grid-label">快捷录取</div>
+            <div class="grid-item" onclick="startQuickFollowUp()">
+                <div class="grid-icon-wrap" style="background:var(--icon-bg-pink); color:var(--icon-color-pink);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>
+                <div class="grid-label">写跟进</div>
             </div>
-            <div class="grid-item" onclick="showModal('dialog-handover')">
-                <div class="grid-icon-wrap" style="background:var(--icon-bg-orange); color:var(--icon-color-orange);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div>
-                <div class="grid-label">报到交接</div>
+            <div class="grid-item" onclick="startQuickEnroll()">
+                <div class="grid-icon-wrap" style="background:var(--icon-bg-purple); color:var(--icon-color-purple);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
+                <div class="grid-label">转正式录取</div>
             </div>
         </div>
     </div>
 
-    <!-- 弹窗 2：录入线索表单 (BottomSheet) -->
     <div id="sheet-add-lead" class="bottom-sheet">
         <div class="sheet-indicator"></div>
         <div class="sheet-title">录入新线索</div>
         <div class="sheet-scroll-area">
-            <div class="form-group">
-                <label class="form-label">学生姓名</label>
-                <input type="text" class="form-control" placeholder="请输入姓名">
-            </div>
-            <div class="form-group">
-                <label class="form-label">联系电话</label>
-                <input type="tel" class="form-control" placeholder="请输入手机号">
-            </div>
-            <div class="form-group">
-                <label class="form-label">线索来源</label>
-                <select class="form-control">
-                    <option>线下自主登记</option>
-                    <option>渠道转介</option>
-                    <option>生源学校直推</option>
-                </select>
-            </div>
-            <button class="submit-btn" onclick="simulateSubmit('数据提交中...', true, '线索录入成功')">提交保存</button>
+            <form onsubmit="event.preventDefault(); submitFormAction(this, 'addLead');">
+                <div class="form-group">
+                    <label class="form-label required">学生姓名</label>
+                    <input type="text" class="form-control" name="name" placeholder="请输入真实姓名" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label required">联系电话</label>
+                    <input type="tel" class="form-control" name="phone" placeholder="11位手机号" pattern="^1[3-9]\d{9}$" required title="请输入正确的手机号码">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">线索来源与批次记录</label>
+                    <select class="form-control" name="source">
+                        <option>线下自主登记 (校区A)</option>
+                        <option>营销广告 (抖音-25秋季批次)</option>
+                        <option>渠道转介 (机构ID: 102)</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-btn">校验并提交入池</button>
+            </form>
         </div>
     </div>
 
-    <!-- 弹窗 3：快捷录取通道 (BottomSheet) -->
     <div id="sheet-quick-enroll" class="bottom-sheet">
         <div class="sheet-indicator"></div>
-        <div class="sheet-title">发起直接录取</div>
+        <div class="sheet-title">转正式录取</div>
         <div class="sheet-scroll-area">
-            <div class="form-group">
-                <label class="form-label">关联意向学生</label>
-                <input type="text" class="form-control" placeholder="搜索公海或我的线索...">
-            </div>
-            <div class="form-group">
-                <label class="form-label">录取专业</label>
-                <select class="form-control">
-                    <option>计算机网络技术</option>
-                    <option>学前教育</option>
-                    <option>新能源汽车工程</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label">定金/定位费 (元)</label>
-                <input type="number" class="form-control" placeholder="请输入实收金额">
-            </div>
-            <button class="submit-btn" onclick="simulateSubmit('生成录取记录...', true, '录取成功，已推进流转阶段')">确认录取</button>
+            <form onsubmit="event.preventDefault(); submitFormAction(this, 'enroll');">
+                <div class="form-group">
+                    <label class="form-label required">选择待录取学生</label>
+                    <select class="form-control" name="enrollLeadId" id="enroll-lead-select" required></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label required">录取班级</label>
+                    <select class="form-control" required>
+                        <option>26级 计算机网络技术 1班 (剩余名额 8)</option>
+                        <option disabled>26级 新能源汽车工程 (满额，禁止分配)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">意向缴费状态</label>
+                    <input type="text" class="form-control" value="未对接在线支付，依赖财务专员人工核销" readonly style="color:var(--success-color); font-weight:bold; background:#fff;">
+                </div>
+                <button type="submit" class="submit-btn">确认转正式录取</button>
+            </form>
         </div>
     </div>
 
-    <!-- 弹窗 4：写跟进 / 沟通记录 (BottomSheet) -->
     <div id="sheet-follow-up" class="bottom-sheet">
         <div class="sheet-indicator"></div>
-        <div class="sheet-title">写跟进</div>
+        <div class="sheet-title">记录沟通跟进</div>
         <div class="sheet-scroll-area">
-            <div style="display:flex; gap:12px; margin-bottom: 16px;">
-                <div class="form-group" style="margin-bottom:0;">
-                    <label class="form-label">沟通方式</label>
-                    <select class="form-control"><option>电话沟通</option><option>微信联络</option><option>面谈</option></select>
+            <form onsubmit="event.preventDefault(); submitFormAction(this, 'followup');">
+                <div style="display:flex; gap:12px; margin-bottom: 16px;">
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label class="form-label required">触达方式</label>
+                        <select class="form-control"><option>电话拨打</option><option>微信联络</option><option>面谈</option></select>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label class="form-label required">转化意向评估</label>
+                        <select class="form-control" required>
+                            <option value="">必须选择评估...</option>
+                            <option>A级 - 极高意向</option>
+                            <option>B级 - 观望中需再联络</option>
+                            <option>C级 - 意向极弱且抗拒</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="form-group" style="margin-bottom:0;">
-                    <label class="form-label">意向评估</label>
-                    <select class="form-control"><option>A级 - 极高意向</option><option>B级 - 观望对比</option><option>C级 - 意向较弱</option></select>
+                <div class="form-group">
+                    <label class="form-label required">本次结果</label>
+                    <select class="form-control" name="followResult" required>
+                        <option value="note">仅记录沟通</option>
+                        <option value="contacted">已有效触达</option>
+                        <option value="invited">已约到访</option>
+                        <option value="visited">已到访</option>
+                        <option value="reserved">转预定</option>
+                        <option value="low">暂无意向</option>
+                        <option value="invalid">标记无效</option>
+                    </select>
                 </div>
-            </div>
-            <div class="form-group">
-                <label class="form-label">跟进详情纪要</label>
-                <textarea class="form-control" placeholder="请输入本次沟通的核心痛点与结论..."></textarea>
-            </div>
-            <button class="submit-btn" onclick="simulateSubmit('记录保存中...', true, '跟进记录保存成功')">完成跟进</button>
+                <div class="form-group">
+                    <label class="form-label required">沟通纪要</label>
+                    <textarea class="form-control" required placeholder="请详细记录本次沟通中的学生痛点及下一步计划..."></textarea>
+                </div>
+                <button type="submit" class="submit-btn">保存跟进记录</button>
+            </form>
         </div>
     </div>
 
-    <!-- 弹窗 5：历史学期归档数据 (BottomSheet) -->
     <div id="sheet-history-data" class="bottom-sheet">
         <div class="sheet-indicator"></div>
-        <div class="sheet-title">往期学期汇总</div>
+        <div class="sheet-title">往期学期结转汇总</div>
         <div class="sheet-scroll-area">
             <div class="sheet-list-item">
                 <div>
-                    <div style="font-size: 15px; font-weight: 800; color: var(--text-title); margin-bottom:4px;">2025年秋季学期 (已归档)</div>
-                    <div style="font-size: 12px; color: var(--text-secondary);">入池线索 3,420 | 最终录取 840 人</div>
+                    <div style="font-size: 15px; font-weight: 800; color: var(--text-title); margin-bottom:4px;">2025年秋季学期 (已封存)</div>
+                    <div style="font-size: 12px; color: var(--text-secondary);">入池线索 3,420 | 最终录取交接 840 人</div>
                 </div>
-                <button class="btn-xs outline">查看简报</button>
+                <button class="btn-xs outline" onclick="showToast('正在生成历史PDF简报')">导出报告</button>
             </div>
             <div class="sheet-list-item">
                 <div>
-                    <div style="font-size: 15px; font-weight: 800; color: var(--text-title); margin-bottom:4px;">2025年春季学期 (已归档)</div>
-                    <div style="font-size: 12px; color: var(--text-secondary);">入池线索 1,100 | 最终录取 320 人</div>
+                    <div style="font-size: 15px; font-weight: 800; color: var(--text-title); margin-bottom:4px;">2025年春季学期 (已封存)</div>
+                    <div style="font-size: 12px; color: var(--text-secondary);">入池线索 1,100 | 最终录取交接 320 人</div>
                 </div>
-                <button class="btn-xs outline">查看简报</button>
+                <button class="btn-xs outline" onclick="showToast('正在生成历史PDF简报')">导出报告</button>
             </div>
         </div>
     </div>
 
-    <!-- 弹窗 6：流转日志审计时间线 (BottomSheet) -->
     <div id="sheet-log-details" class="bottom-sheet">
         <div class="sheet-indicator"></div>
-        <div class="sheet-title">顾问流转与操作审计</div>
+        <div class="sheet-title">操作日志</div>
         <div class="sheet-scroll-area">
             <div class="log-timeline">
                 <div class="log-item">
-                    <div class="log-time">今天 10:30 | 尹娣 (组长)</div>
-                    <div class="log-content">阶段自动推进至 [已邀约]</div>
-                    <div class="log-detail">触发动作：业务员为该学生创建了本周末的到访预约单，系统自动触发状态翻转。</div>
+                    <div class="log-time">10:30:14 | 触发器: 系统流转引擎</div>
+                    <div class="log-content">自动阶段变更为 [已邀约]</div>
+                    <div class="log-detail">规则命中：业务员创建了未来 7 天内的有效到访预约单，系统自动将线索 #1420 状态翻转。</div>
                 </div>
                 <div class="log-item">
-                    <div class="log-time">昨天 09:15 | 系统管理员</div>
-                    <div class="log-content">线索手动分配建立</div>
-                    <div class="log-detail">动作：管理员从公海池强力分配该线索给顾问尹娣，进入承接考核倒计时。</div>
-                </div>
-                <div class="log-item">
-                    <div class="log-time">前天 14:00 | 系统自动API</div>
-                    <div class="log-content">新线索入池 (第三方下发)</div>
-                    <div class="log-detail">来源标识：今日头条信息流投放表单。</div>
+                    <div class="log-time">09:15:22 | 触发器: Admin (管理员)</div>
+                    <div class="log-content">强制分配归属人</div>
+                    <div class="log-detail">管理员利用批量分配功能，将线索从 [公海池] 强指派给顾问 [尹娣]，开启 24 小时响应考核倒计时。</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 弹窗 7：分配顾问 (BottomSheet) -->
     <div id="sheet-assign" class="bottom-sheet">
         <div class="sheet-indicator"></div>
-        <div class="sheet-title">分配至指定顾问</div>
+        <div class="sheet-title">转移至指定顾问池</div>
         <div class="sheet-scroll-area">
-            <div class="sheet-list-item" onclick="simulateSubmit('执行分配逻辑...', true, '已成功分配给 尹娣')">
-                <div class="sheet-user-info">
-                    <div class="sheet-avatar">尹</div>
+            <div class="sheet-list-item" onclick="executeAssign('尹娣')">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="width:40px; height:40px; border-radius:50%; background:var(--primary-light); color:var(--primary-color); display:flex; align-items:center; justify-content:center; font-weight:800;">尹</div>
                     <div style="display:flex; flex-direction:column; gap:2px;">
-                        <span style="font-size:15px; font-weight:800; color:var(--text-title);">尹娣 (招生组长)</span>
-                        <span style="font-size:12px; color:var(--text-secondary);">当前负荷: 12 条待处理</span>
+                        <span style="font-size:15px; font-weight:800; color:var(--text-title);">尹娣 (大区组长)</span>
+                        <span style="font-size:12px; color:var(--text-secondary);">负载状态: 12 条线索待推进</span>
                     </div>
                 </div>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </div>
-            <div class="sheet-list-item" onclick="simulateSubmit('执行分配逻辑...', true, '已成功分配给 张伟')">
-                <div class="sheet-user-info">
-                    <div class="sheet-avatar" style="background:var(--icon-bg-emerald); color:var(--icon-color-emerald);">张</div>
+            <div class="sheet-list-item" onclick="executeAssign('张伟')">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="width:40px; height:40px; border-radius:50%; background:var(--icon-bg-emerald); color:var(--icon-color-emerald); display:flex; align-items:center; justify-content:center; font-weight:800;">张</div>
                     <div style="display:flex; flex-direction:column; gap:2px;">
                         <span style="font-size:15px; font-weight:800; color:var(--text-title);">张伟 (招生专员)</span>
-                        <span style="font-size:12px; color:var(--text-secondary);">当前负荷: 5 条待处理</span>
+                        <span style="font-size:12px; color:var(--text-secondary);">负载状态: 5 条线索待推进</span>
                     </div>
                 </div>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </div>
         </div>
     </div>
 
-    <!-- 对话框 1：确认直接认领 (Dialog) -->
     <div id="dialog-claim" class="dialog-box">
         <div class="dialog-icon-wrap">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
         </div>
-        <div class="dialog-title">确认认领该线索？</div>
-        <div class="dialog-desc">认领后，该公海线索将转入您的“我的线索”池中，请及时跟进以免超时。</div>
+        <div class="dialog-title">确认认领？</div>
+        <div class="dialog-desc">认领后该线索会进入我的线索，并开始计算响应时效。请及时完成首次跟进。</div>
         <div class="dialog-actions">
-            <div class="dialog-btn cancel" onclick="closeAllModals()">取消</div>
-            <div class="dialog-btn confirm" onclick="simulateSubmit('认领执行中...', true, '认领成功，请及时跟进')">确认认领</div>
+            <div class="dialog-btn cancel" onclick="closeAllModals()">暂不处理</div>
+            <div class="dialog-btn confirm" onclick="executeClaim(this)">确认认领</div>
         </div>
     </div>
 
-    <!-- 对话框 2：正式录取确认 (Dialog) -->
     <div id="dialog-confirm-enroll" class="dialog-box">
         <div class="dialog-icon-wrap" style="background:var(--success-light); color:var(--success-color);">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
         </div>
         <div class="dialog-title">转为正式录取？</div>
-        <div class="dialog-desc">推进至正式录取后，学生将进入待报到名单，系统将自动核销预定金占位。</div>
+        <div class="dialog-desc">确认后将生成录取记录，线索阶段更新为已录取，后续等待登记报到和入学交接。</div>
         <div class="dialog-actions">
-            <div class="dialog-btn cancel" onclick="closeAllModals()">再看看</div>
-            <div class="dialog-btn confirm" onclick="simulateSubmit('流转状态...', true, '成功转入录取名单')" style="background:var(--success-color); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);">确认转换</div>
+            <div class="dialog-btn cancel" onclick="closeAllModals()">再核对下</div>
+            <div class="dialog-btn confirm" onclick="executeAdmit(this)" style="background:var(--success-color); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);">确认录取</div>
         </div>
     </div>
 
-    <!-- 对话框 3：报到交接确认 (Dialog) -->
     <div id="dialog-handover" class="dialog-box">
         <div class="dialog-icon-wrap" style="background:var(--icon-bg-orange); color:var(--icon-color-orange);">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
         </div>
-        <div class="dialog-title">确认发送入学包？</div>
-        <div class="dialog-desc">该操作将生成异步 Outbox 任务，向基础学籍系统发送该学生的完整档案用以分班。</div>
+        <div class="dialog-title">发起入学交接？</div>
+        <div class="dialog-desc">系统将生成入学交接任务，并同步学生档案、班级归属和报到信息。失败后可重新提交。</div>
         <div class="dialog-actions">
             <div class="dialog-btn cancel" onclick="closeAllModals()">取消</div>
-            <div class="dialog-btn confirm" onclick="simulateSubmit('生成 Outbox 任务...', true, '已加入异步交接队列')">立即发送</div>
+            <div class="dialog-btn confirm" onclick="simulateAction(this, '正在生成入学交接任务...', '已生成入学交接任务', true)">确认发起</div>
         </div>
     </div>
 
-    <!-- 系统提示 Toast -->
     <div class="toast" id="sys-toast">
         <svg id="toast-icon-success" style="display:none; flex-shrink:0;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--success-color)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
         <span id="sys-toast-msg"></span>
+        <div id="toast-undo" class="toast-undo-btn" style="display:none;" onclick="handleUndo()">撤回操作</div>
     </div>
 </div>
 
 <script>
-    // ================= 公共 Toast 逻辑 =================
-    function showToast(msg, isSuccess = false, duration = 1500) {
-        let toast = document.getElementById('sys-toast');
-        let msgSpan = document.getElementById('sys-toast-msg');
-        let successIcon = document.getElementById('toast-icon-success');
-        
-        msgSpan.innerText = msg;
-        successIcon.style.display = isSuccess ? 'block' : 'none';
-        
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), duration);
+    const origHighFreq = ['招生工作台', '线索管理', '教务排课', '学生档案'];
+    const dirData = {
+        招生管理: ['招生工作台', '线索管理', '跟进到访', '报名录取', '入学交接', '招生配置', '生源学校'],
+        教学管理: ['课表编排', '课堂巡检', '成绩归档', '教师排班'],
+        校园服务: ['宿舍管理', '请假审批', '安全巡检', '家校通知']
+    };
+    const featureMeta = {
+        '招生工作台': { bg: 'var(--icon-bg-blue)', color: 'var(--icon-color-blue)', icon: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>' },
+        '教务排课': { bg: 'var(--icon-bg-purple)', color: 'var(--icon-color-purple)', icon: '<svg viewBox="0 0 24 24"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M3 10h18"></path></svg>' },
+        '学生档案': { bg: 'var(--icon-bg-emerald)', color: 'var(--icon-color-emerald)', icon: '<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
+        '缴费中心': { bg: 'var(--icon-bg-orange)', color: 'var(--icon-color-orange)', icon: '<svg viewBox="0 0 24 24"><path d="M12 1v22"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>' },
+        '线索管理': { bg: 'var(--icon-bg-pink)', color: 'var(--icon-color-pink)', icon: '<svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><path d="M20 8v6"></path><path d="M23 11h-6"></path></svg>' },
+        '跟进到访': { bg: 'var(--icon-bg-emerald)', color: 'var(--icon-color-emerald)', icon: '<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>' },
+        '报名录取': { bg: 'var(--icon-bg-purple)', color: 'var(--icon-color-purple)', icon: '<svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>' },
+        '招生配置': { bg: 'var(--icon-bg-orange)', color: 'var(--icon-color-orange)', icon: '<svg viewBox="0 0 24 24"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h16"></path><circle cx="8" cy="6" r="2"></circle><circle cx="16" cy="12" r="2"></circle><circle cx="10" cy="18" r="2"></circle></svg>' },
+        '生源学校': { bg: 'var(--icon-bg-blue)', color: 'var(--icon-color-blue)', icon: '<svg viewBox="0 0 24 24"><path d="M3 21h18"></path><path d="M5 21V7l8-4 6 4v14"></path><path d="M9 21v-8h6v8"></path></svg>' },
+        '到访签到': { bg: 'var(--icon-bg-emerald)', color: 'var(--icon-color-emerald)', icon: '<svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>' },
+        '入学交接': { bg: 'var(--icon-bg-orange)', color: 'var(--icon-color-orange)', icon: '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>' }
+    };
+
+    let currentDirTab = Object.keys(dirData)[0];
+    let manageMode = false;
+
+    const state = {
+        currentActionLeadId: null,
+        selectedIds: new Set(),
+        leads: [
+            { id: 101, name: '李明', phone: '138****0001', source: '抖音信息流广告', school: '城南中学', major: '计算机网络技术', semester: '2026年秋季', focus: '就业方向 / 住宿', lastFollow: '暂无', stage: -1, owner: null, isInvalid: false, isOverdue: false },
+            { id: 102, name: '王雨萌', phone: '139****0002', source: '线下校区A登记', school: '实验中学', major: '护理', semester: '2026年秋季', focus: '学费 / 护理实训', lastFollow: '暂无', stage: -1, owner: null, isInvalid: false, isOverdue: false },
+            { id: 103, name: '张峰', phone: '133****1111', source: '渠道(ID:201)转介', school: '东湖中学', major: '新能源汽车', semester: '2026年秋季', focus: '就业方向 / 住宿', lastFollow: '昨天 15:30', stage: 0, owner: '尹娣', isInvalid: false, isOverdue: true },
+            { id: 104, name: '刘小宇', phone: '135****4444', source: '生源中学A直推', school: '生源中学A', major: '计算机网络技术', semester: '2026年秋季', focus: '升学路径 / 班级安排', lastFollow: '今天 09:20', stage: 1, owner: '张伟', isInvalid: false, isOverdue: false },
+            { id: 105, name: '无效线索_空号', phone: '100****0000', source: '未知网页抓取', school: '未知学校', major: '未确认', semester: '2026年秋季', focus: '电话无法接通', lastFollow: '暂无', stage: -1, owner: null, isInvalid: true, isOverdue: false }
+        ],
+        conversions: [
+            { id: 201, name: '刘子涵', phone: '137****0003', source: '营销渠道', school: '城北中学', major: '幼儿保育', semester: '2026年秋季', focus: '住宿 / 报到时间', lastFollow: '今天 11:10', stage: 3, owner: '尹娣', isInvalid: false, handoverStatus: null },
+            { id: 202, name: '赵佳佳', phone: '136****5555', source: '线下校区B', school: '实验中学', major: '计算机网络技术', semester: '2026年秋季', focus: '录取材料 / 学费', lastFollow: '今天 10:05', stage: 4, owner: '尹娣', isInvalid: false, handoverStatus: null },
+            { id: 203, name: '张晓明', phone: '136****0004', source: '机构引流', school: '西城中学', major: '新能源汽车', semester: '2026年秋季', focus: '报到材料缺失', lastFollow: '昨天 18:20', stage: 5, owner: '张伟', isInvalid: false, handoverStatus: 'failed' }
+        ]
+    };
+
+    function getFunnelCounts() {
+        let leadPool = 1250;
+        let followed = 850 + state.leads.filter(l => l.owner && !l.isInvalid).length + state.conversions.length;
+        let visited = 510 + state.conversions.filter(l => l.stage >= 3 && !l.isInvalid).length;
+        let admitted = 382 + state.conversions.filter(l => l.stage >= 4 && !l.isInvalid).length;
+        let handedOver = 126 + state.conversions.filter(l => (l.stage >= 5 || l.handoverStatus) && !l.isInvalid).length;
+        return [leadPool, followed, visited, admitted, handedOver];
     }
 
-    // ================= 弹窗交互控制中枢 =================
+    let toastTimeout;
+    function showToast(msg, isSuccess = false, duration = 1800, showUndo = false) {
+        let toast = document.getElementById('sys-toast');
+        document.getElementById('sys-toast-msg').innerText = msg;
+        document.getElementById('toast-icon-success').style.display = isSuccess ? 'block' : 'none';
+        document.getElementById('toast-undo').style.display = showUndo ? 'block' : 'none';
+
+        toast.classList.add('show');
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => toast.classList.remove('show'), duration);
+    }
+
     function showModal(modalId) {
         document.getElementById('modal-overlay').classList.add('active');
-        document.getElementById(modalId).classList.add('active');
+        const modal = document.getElementById(modalId);
+        if (modal) modal.classList.add('active');
     }
 
     function closeAllModals() {
         document.getElementById('modal-overlay').classList.remove('active');
-        document.querySelectorAll('.bottom-sheet, .dialog-box').forEach(el => {
-            el.classList.remove('active');
+        document.querySelectorAll('.bottom-sheet, .dialog-box').forEach(el => el.classList.remove('active'));
+    }
+
+    function simulateAction(el, loadingMsg, successMsg, isSuccess = true, callback = null) {
+        let isBtn = el && el.tagName === 'BUTTON';
+        let isSubmit = el && el.type === 'submit';
+
+        if (isBtn) {
+            if (el.classList.contains('disabled')) return;
+            el.classList.add('disabled');
+            el.dataset.oldText = el.innerText;
+            el.innerText = '处理中...';
+        } else if (el) {
+            el.style.pointerEvents = 'none';
+            el.style.opacity = '0.7';
+        }
+
+        closeAllModals();
+        showToast(loadingMsg, false, 800);
+
+        setTimeout(() => {
+            if (isBtn) {
+                el.classList.remove('disabled');
+                el.innerText = el.dataset.oldText;
+            } else if (el) {
+                el.style.pointerEvents = 'auto';
+                el.style.opacity = '1';
+            }
+            showToast(successMsg, isSuccess, 2000);
+            if (callback) callback();
+        }, 800);
+    }
+
+    function getStepsHtml(currentStage, mode = 'list') {
+        const labels = mode === 'detail' ? ['入池', '分配', '跟进', '到访', '预定', '录取', '报到', '交接'] : ['线索', '跟进', '到访', '录取', '交接'];
+        const activeIndex = mode === 'detail' ? mapDetailStage(currentStage) : mapListStage(currentStage);
+        let html = '<div class="step-container">';
+        labels.forEach((label, idx) => {
+            let sClass = '';
+            let content = idx + 1;
+            if (activeIndex > idx) {
+                sClass = 'done';
+                content = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+            } else if (activeIndex === idx) {
+                sClass = 'active';
+            }
+            html += '<div class="step-item ' + sClass + '"><div class="step-circle">' + content + '</div><div class="step-label">' + label + '</div></div>';
+        });
+        html += '</div>';
+        return html;
+    }
+
+    function mapListStage(stage) {
+        if (stage < 0) return 0;
+        if (stage <= 2) return 1;
+        if (stage === 3) return 2;
+        if (stage <= 5) return 3;
+        return 4;
+    }
+
+    function mapDetailStage(stage) {
+        if (stage < 0) return 0;
+        if (stage === 0) return 1;
+        if (stage <= 2) return 2;
+        if (stage === 3) return 3;
+        if (stage === 4) return 4;
+        if (stage === 5) return 5;
+        return 7;
+    }
+
+    function getNextAction(lead) {
+        if (lead.isInvalid) return '可在异常无效中恢复';
+        if (lead.handoverStatus === 'failed') return '查看失败原因并重新提交交接';
+        if (!lead.owner) return '分配顾问或认领';
+        if (lead.isOverdue) return '立即写跟进';
+        if (lead.stage <= 0) return '首次联系并记录跟进';
+        if (lead.stage === 1) return '发起到访邀约';
+        if (lead.stage === 2) return '确认到访结果';
+        if (lead.stage === 3) return '评估意向并转预定';
+        if (lead.stage === 4) return '转正式录取';
+        if (lead.stage === 5) return '登记报到或发起入学交接';
+        return '继续推进';
+    }
+
+    function getStageText(stage) {
+        if (stage < 0) return '待分配';
+        return ['已分配', '已联系', '已邀约', '已到访', '已预定', '已录取'][stage] || '待分配';
+    }
+
+    function getSearchValue(type) {
+        const input = document.getElementById(type === 'leads' ? 'leads-search' : 'conv-search');
+        return input ? input.value.trim().toLowerCase() : '';
+    }
+
+    function renderList(containerId, list, listType) {
+        const container = document.getElementById(containerId);
+        if (list.length === 0) {
+            container.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="15"></line><line x1="15" y1="9" x2="9" y2="15"></line></svg><p>该筛选维度下暂无数据<br/>如有需要请尝试录入线索</p></div>';
+            updateBatchBar();
+            return;
+        }
+
+        let html = '';
+        list.forEach(lead => {
+            let invalidCls = lead.isInvalid ? 'invalid' : '';
+            let badge = '';
+            if (lead.isInvalid) badge = '<div class="badge-tag tag-danger">无效线索</div>';
+            else if (lead.owner) badge = '<div class="badge-tag tag-success">负责人: ' + lead.owner + '</div>';
+            else badge = '<div class="badge-tag tag-primary">待分配</div>';
+
+            let checkbox = listType === 'leads' && !lead.isInvalid ? '<div class="checkbox-wrap ' + (state.selectedIds.has(lead.id) ? 'checked' : '') + '" onclick="toggleSelect(' + lead.id + ', event)"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>' : '';
+            let overdueDesc = lead.isOverdue ? '<span style="color:var(--warning-color); font-weight:800;">超时未跟进</span>' : '';
+            let handoverDesc = lead.handoverStatus === 'failed' ? '<span style="color:var(--danger-color); font-weight:800;">入学交接失败：基础信息缺失</span>' : (lead.handoverStatus === 'retrying' ? '<span style="color:var(--primary-color); font-weight:800;">入学交接已重新提交</span>' : '');
+            let nextAction = getNextAction(lead);
+            let meta = '<div class="meta-grid"><div class="meta-item">意向专业：' + (lead.major || '计算机网络技术') + '</div><div class="meta-item">当前阶段：' + getStageText(lead.stage) + '</div><div class="meta-item">最近跟进：' + (lead.lastFollow || '暂无') + '</div><div class="meta-item">家长关注：' + (lead.focus || '就业方向 / 住宿') + '</div></div>';
+
+            let actions = '';
+            if (lead.isInvalid) {
+                actions = '<button class="btn-xs outline" onclick="event.stopPropagation(); simulateAction(this,\'校验中...\',\'已恢复入池\',true,()=>updateData(' + lead.id + ',\'isInvalid\',false))">撤销作废</button>';
+            } else if (listType === 'leads') {
+                if (lead.owner) {
+                    actions = '<button class="btn-xs" onclick="openContextModal(\'sheet-follow-up\', ' + lead.id + ', event)">写跟进</button>';
+                } else {
+                    actions = '<button class="btn-xs" onclick="openContextModal(\'sheet-assign\', ' + lead.id + ', event)">分配顾问</button><button class="btn-xs outline" onclick="openContextModal(\'dialog-claim\', ' + lead.id + ', event)">认领</button>';
+                }
+            } else if (listType === 'conv') {
+                if (lead.handoverStatus === 'failed') {
+                    actions = '<button class="btn-xs danger" onclick="event.stopPropagation(); simulateAction(this,\'正在重新提交交接...\',\'任务已重新提交\',true,()=>updateData(' + lead.id + ',\'handoverStatus\',\'retrying\'))">重新提交交接</button>';
+                } else if (lead.stage === 4) {
+                    actions = '<button class="btn-xs" onclick="openContextModal(\'dialog-confirm-enroll\', ' + lead.id + ', event)">转正式录取</button><button class="btn-xs outline" onclick="openContextModal(\'sheet-follow-up\', ' + lead.id + ', event)">写跟进</button>';
+                } else if (lead.stage === 5) {
+                    actions = '<button class="btn-xs" onclick="openContextModal(\'dialog-handover\', ' + lead.id + ', event)">发起入学交接</button>';
+                } else {
+                    actions = '<button class="btn-xs" onclick="openContextModal(\'sheet-follow-up\', ' + lead.id + ', event)">写跟进</button>';
+                }
+            }
+
+            html += '<div class="list-card glass-card ' + invalidCls + '"><div class="card-row-between"><div class="lead-main" onclick="openLeadDetail(' + lead.id + ')"><div class="card-title">' + checkbox + ' ' + lead.name + '</div><div class="card-desc"><span>来源: ' + lead.source + '</span> ' + overdueDesc + ' ' + handoverDesc + '</div></div><div class="lead-status" onclick="event.stopPropagation()">' + badge + '<div class="focus-note">' + (lead.owner || '待分配') + '</div></div></div><div class="lead-main" onclick="openLeadDetail(' + lead.id + ')">' + getStepsHtml(lead.stage) + '<div class="next-action">' + nextAction + '</div>' + meta + '</div><div class="card-actions" onclick="event.stopPropagation()">' + actions + '</div></div>';
+        });
+        container.innerHTML = html;
+        updateBatchBar();
+    }
+
+    function renderFunnelStep(label, value, ratio, color) {
+        return '<div class="funnel-metric"><div class="funnel-topline"><span>' + label + '</span><span>' + value + '</span></div><div class="funnel-track"><div class="funnel-bar" style="width:' + ratio + '%; background:' + color + ';"></div></div></div>';
+    }
+
+    function renderDashboard() {
+        const counts = getFunnelCounts();
+        const pct = (value, base) => base ? Math.round(value / base * 100) : 0;
+        let ratios = [100, pct(counts[1], counts[0]), pct(counts[2], counts[1]), pct(counts[3], counts[2]), pct(counts[4], counts[3])];
+        const funnelHtml = '<div class="funnel-grid">' +
+            renderFunnelStep('1. 线索入池', counts[0], ratios[0], 'linear-gradient(90deg, #1F5FFF 0%, #5B83FF 100%)') +
+            renderFunnelStep('2. 跟进触达 (有效跟进率' + ratios[1] + '%)', counts[1], ratios[1], 'linear-gradient(90deg, #8B5CF6 0%, #A78BFA 100%)') +
+            renderFunnelStep('3. 到访转化 (到访率' + ratios[2] + '%)', counts[2], ratios[2], 'linear-gradient(90deg, #F59E0B 0%, #FBBF24 100%)') +
+            renderFunnelStep('4. 预定录取 (录取率' + ratios[3] + '%)', counts[3], ratios[3], 'linear-gradient(90deg, #10B981 0%, #34D399 100%)') +
+            renderFunnelStep('5. 报到交接 (交接率' + ratios[4] + '%)', counts[4], ratios[4], 'linear-gradient(90deg, #0D9488 0%, #2DD4BF 100%)') +
+            '</div><div class="funnel-note">统计口径：线索=成功入池；跟进=已分配/认领并有效跟进；到访=已邀约或登记到访；录取=已预定或已录取；交接=已报到并生成入学交接任务。</div>';
+        document.getElementById('funnel-container').innerHTML = funnelHtml;
+        let overdueCount = state.leads.filter(l => l.isOverdue && !l.isInvalid).length;
+        let unassignedCount = state.leads.filter(l => !l.owner && !l.isInvalid).length;
+        let visitCount = state.conversions.filter(l => l.stage === 3 && !l.isInvalid).length;
+        let syncFailedCount = state.conversions.filter(l => l.handoverStatus === 'failed').length;
+        document.getElementById('overdue-count').innerText = overdueCount;
+        document.getElementById('unassigned-count').innerText = unassignedCount;
+        document.getElementById('visit-count').innerText = visitCount;
+        document.getElementById('sync-failed-count').innerText = syncFailedCount;
+    }
+
+    function openContextModal(modalId, leadId, evt) {
+        if (evt) evt.stopPropagation();
+        state.currentActionLeadId = leadId;
+        showModal(modalId);
+    }
+
+    function findLead(id) {
+        return state.leads.find(l => l.id === id) || state.conversions.find(l => l.id === id);
+    }
+
+    function startQuickFollowUp() {
+        closeAllModals();
+        state.currentActionLeadId = null;
+        switchEnrollmentTab('sub-view-leads', document.getElementById('tab-btn-leads'));
+        activatePill('pills-leads', '我的');
+        execFilterRender('leads-list-container', state.leads, 'leads', '我的');
+        showToast('请先选择一条线索，再写跟进');
+    }
+
+    function getEnrollCandidates() {
+        return state.conversions.filter(l => !l.isInvalid && l.stage >= 3);
+    }
+
+    function populateEnrollSelect() {
+        const select = document.getElementById('enroll-lead-select');
+        if (!select) return;
+        const candidates = getEnrollCandidates();
+        select.innerHTML = candidates.map(l => '<option value="' + l.id + '">' + l.name + ' · ' + getStageText(l.stage) + ' · ' + (l.major || '未确认专业') + '</option>').join('');
+    }
+
+    function startQuickEnroll() {
+        state.currentActionLeadId = null;
+        if (getEnrollCandidates().length === 0) {
+            showToast('暂无已到访或已预定学生可录取');
+            return;
+        }
+        populateEnrollSelect();
+        showModal('sheet-quick-enroll');
+    }
+
+    function updateData(id, prop, value) {
+        let isConv = false;
+        let lead = state.leads.find(l => l.id === id);
+        if (!lead) {
+            lead = state.conversions.find(l => l.id === id);
+            isConv = true;
+        }
+        if (lead) {
+            lead[prop] = value;
+            if (prop === 'owner' && value !== null) {
+                lead.stage = Math.max(lead.stage, 0);
+                lead.isOverdue = false;
+            }
+            if (prop === 'stage' && value >= 3 && !isConv) {
+                state.conversions.unshift(lead);
+                state.leads = state.leads.filter(l => l.id !== id);
+            }
+        }
+
+        const activeFilterLeads = document.querySelector('#pills-leads .pill.active').innerText;
+        const activeFilterConv = document.querySelector('#pills-conv .pill.active').innerText;
+        execFilterRender('leads-list-container', state.leads, 'leads', activeFilterLeads);
+        execFilterRender('conv-list-container', state.conversions, 'conv', activeFilterConv);
+        renderDashboard();
+    }
+
+    function submitFormAction(form, type) {
+        if (!form.checkValidity()) {
+            showToast('无法入库：拦截到空缺或错误格式字段');
+            return;
+        }
+        let btn = form.querySelector('button[type="submit"]');
+        if (type === 'followup' && form.followResult && form.followResult.value === 'invalid') {
+            if (!window.confirm('确认将该线索标记为无效？标记后不会进入分配和跟进流程，但可在异常无效中恢复。')) return;
+        }
+        if (type === 'enroll') {
+            if (!window.confirm('确认转为正式录取？确认后将生成录取记录，后续等待报到和入学交接。')) return;
+        }
+
+        simulateAction(btn, '正在校验表单...', type === 'addLead' ? '线索已入池，公海线索 +1' : (type === 'followup' ? '跟进记录已保存，最近跟进时间已更新' : '已生成录取记录，等待报到'), true, () => {
+            if (type === 'addLead') {
+                let newLead = { id: Date.now(), name: form.name.value, phone: form.phone.value, source: form.source.value, school: '待确认学校', major: '待确认专业', semester: '2026年秋季', focus: '待补充', lastFollow: '暂无', stage: -1, owner: null, isInvalid: false, isOverdue: false };
+                state.leads.unshift(newLead);
+                switchEnrollmentTab('sub-view-leads', document.getElementById('tab-btn-leads'));
+                switchFilter(document.getElementById('pills-leads').firstElementChild, 'leads', '全部');
+            } else if (type === 'enroll') {
+                const selectedId = Number(form.enrollLeadId ? form.enrollLeadId.value : state.currentActionLeadId);
+                const selected = findLead(selectedId);
+                if (!selected || selected.stage < 3) {
+                    showToast('当前线索尚未完成到访或预定，暂不可录取');
+                    return;
+                }
+                state.currentActionLeadId = selectedId;
+                updateData(selectedId, 'stage', 5);
+                updateData(selectedId, 'lastFollow', '刚刚');
+                switchEnrollmentTab('sub-view-conversion', document.getElementById('tab-btn-conv'));
+            } else if (type === 'followup') {
+                if (!state.currentActionLeadId) {
+                    showToast('请先选择一条线索');
+                    return;
+                }
+                const wasConversion = state.conversions.some(l => l.id === state.currentActionLeadId);
+                applyFollowupResult(state.currentActionLeadId, form.followResult.value);
+                const nowConversion = wasConversion || state.conversions.some(l => l.id === state.currentActionLeadId);
+                switchEnrollmentTab(nowConversion ? 'sub-view-conversion' : 'sub-view-leads', document.getElementById(nowConversion ? 'tab-btn-conv' : 'tab-btn-leads'));
+            }
+            form.reset();
         });
     }
 
-    // 通用异步提交反馈闭环模拟
-    function simulateSubmit(loadingMsg, isSuccess, finalMsg) {
-        closeAllModals();
-        showToast(loadingMsg, false, 800);
-        setTimeout(() => {
-            showToast(finalMsg, isSuccess, 2000);
-        }, 900);
+    function applyFollowupResult(id, result) {
+        const lead = findLead(id);
+        if (!lead) return;
+        lead.lastFollow = '刚刚';
+        lead.isOverdue = false;
+        if (result === 'contacted') lead.stage = Math.max(lead.stage, 1);
+        else if (result === 'invited') lead.stage = Math.max(lead.stage, 2);
+        else if (result === 'visited') lead.stage = Math.max(lead.stage, 3);
+        else if (result === 'reserved') lead.stage = Math.max(lead.stage, 4);
+        else if (result === 'low') lead.focus = '暂无意向，建议一周后再联系';
+        else if (result === 'invalid') lead.isInvalid = true;
+        if (lead.stage >= 3 && state.leads.some(l => l.id === id)) {
+            state.conversions.unshift(lead);
+            state.leads = state.leads.filter(l => l.id !== id);
+        }
+        rerenderActiveList('leads');
+        rerenderActiveList('conv');
+        renderDashboard();
     }
 
-    // ================= 二级与三级标签栏联动引擎 (核心修复) =================
-    // 处理线索池、审批池的 Pill Tabs 滑动点击与下方数据刷新
-    function switchPillTab(el, scrollContainerId, listContainerId) {
-        // 1. 切换 Tab 样式状态
-        const container = document.getElementById(scrollContainerId);
+    function executeAssign(name) {
+        let btn = event.currentTarget;
+        simulateAction(btn, '正在分配顾问...', '已分配给顾问: ' + name, true, () => {
+            if (state.selectedIds.size > 0) {
+                state.selectedIds.forEach(id => updateData(id, 'owner', name));
+                state.selectedIds.clear();
+            } else if (state.currentActionLeadId) {
+                updateData(state.currentActionLeadId, 'owner', name);
+            }
+            showToast('已分配给 ' + name + '，开始计算响应时效', true, 3000, true);
+        });
+    }
+
+    function executeClaim(btn) {
+        simulateAction(btn, '正在认领线索...', '认领成功，线索已进入我的线索', true, () => {
+            if (state.currentActionLeadId) updateData(state.currentActionLeadId, 'owner', '您自己');
+            showToast('认领成功，线索已进入我的线索', true, 3000, true);
+        });
+    }
+
+    function executeAdmit(btn) {
+        const selected = state.currentActionLeadId ? findLead(state.currentActionLeadId) : null;
+        if (selected && selected.stage < 3) {
+            showToast('当前线索尚未完成到访或预定，暂不可录取');
+            closeAllModals();
+            return;
+        }
+        simulateAction(btn, '正在生成录取记录...', '已生成录取记录，等待报到', true, () => {
+            if (state.currentActionLeadId) updateData(state.currentActionLeadId, 'stage', 5);
+        });
+    }
+
+    function handleUndo() {
+        showToast('系统已拦截上一次流转，数据回溯成功', true);
+        if (state.currentActionLeadId) updateData(state.currentActionLeadId, 'owner', null);
+    }
+
+    function activatePill(containerId, filterName) {
+        const container = document.getElementById(containerId);
+        const pills = Array.from(container.querySelectorAll('.pill'));
+        const target = pills.find(p => p.innerText.trim() === filterName);
+        if (target) {
+            pills.forEach(p => p.classList.remove('active'));
+            target.classList.add('active');
+        }
+        return target;
+    }
+
+    function handleDashboardJump(type) {
+        clearSelection();
+        if (type === 'syncFailed') {
+            switchEnrollmentTab('sub-view-conversion', document.getElementById('tab-btn-conv'));
+            const pill = activatePill('pills-conv', '交接');
+            execFilterRender('conv-list-container', state.conversions, 'conv', pill ? pill.innerText : '交接');
+            showToast('已筛选入学交接异常');
+            return;
+        }
+        switchEnrollmentTab('sub-view-leads', document.getElementById('tab-btn-leads'));
+        const filterMap = { overdue: '超时待办', unassigned: '待分配', visit: '全部' };
+        const filterName = filterMap[type] || '全部';
+        const pill = activatePill('pills-leads', filterName);
+        execFilterRender('leads-list-container', state.leads, 'leads', pill ? pill.innerText : filterName);
+        showToast('已同步筛选：' + filterName);
+    }
+
+    function toggleSelect(id, e) {
+        e.stopPropagation();
+        let box = e.currentTarget;
+        if (state.selectedIds.has(id)) {
+            state.selectedIds.delete(id);
+            box.classList.remove('checked');
+        } else {
+            state.selectedIds.add(id);
+            box.classList.add('checked');
+        }
+        updateBatchBar();
+    }
+
+    function clearSelection() {
+        state.selectedIds.clear();
+        document.querySelectorAll('.checkbox-wrap.checked').forEach(box => box.classList.remove('checked'));
+        updateBatchBar();
+    }
+
+    function updateBatchBar() {
+        const bar = document.getElementById('batch-bar');
+        const names = Array.from(state.selectedIds).map(id => {
+            const lead = state.leads.find(l => l.id === id);
+            return lead ? lead.name : '';
+        }).filter(Boolean);
+        document.getElementById('batch-summary').innerText = state.selectedIds.size > 0 ? '已选 ' + state.selectedIds.size + ' 项：' + names.slice(0, 3).join('、') : '已选 0 项';
+        if (state.selectedIds.size > 0) bar.classList.add('active');
+        else bar.classList.remove('active');
+    }
+
+    function executeBatch(action) {
+        if (action === 'invalid') {
+            const names = Array.from(state.selectedIds).map(id => {
+                const lead = state.leads.find(l => l.id === id);
+                return lead ? lead.name : '';
+            }).filter(Boolean);
+            if (!window.confirm('将作废 ' + state.selectedIds.size + ' 条线索。作废后不会进入分配和跟进流程，但可在异常无效中恢复。')) return;
+            state.selectedIds.forEach(id => updateData(id, 'isInvalid', true));
+            state.selectedIds.clear();
+            showToast('已标记无效：' + names.join('、'));
+            updateBatchBar();
+        }
+    }
+
+    function switchFilter(el, type, filterName) {
+        clearSelection();
+        let containerId = type === 'leads' ? 'pills-leads' : 'pills-conv';
+        const container = document.getElementById(containerId);
         container.querySelectorAll('.pill').forEach(pill => pill.classList.remove('active'));
         el.classList.add('active');
-
-        // 2. 交互细节：自动将点击的元素滚动到视野可见的中间区域
         el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
 
-        // 3. 数据联动刷新：展示骨架屏 -> 加载新数据
+        const listContainerId = type === 'leads' ? 'leads-list-container' : 'conv-list-container';
         const listContainer = document.getElementById(listContainerId);
-        
-        // 渲染骨架屏模拟加载
-        listContainer.innerHTML = `
-            <div class="list-card glass-card" style="border:none; box-shadow:none;">
-                <div class="card-row-between">
-                    <div class="skeleton" style="width: 150px; height: 18px;"></div>
-                    <div class="skeleton" style="width: 60px; height: 18px; border-radius: 6px;"></div>
-                </div>
-                <div class="skeleton" style="width: 200px; height: 14px; margin-top: 8px;"></div>
-                <div class="step-container" style="margin: 20px 0;"><div class="skeleton" style="width: 100%; height: 20px;"></div></div>
-                <div class="card-actions"><div class="skeleton" style="width: 80px; height: 28px; border-radius: 8px;"></div></div>
-            </div>
-        `;
-        
-        // 延时呈现对应的虚拟数据
+        listContainer.innerHTML = '<div class="list-card glass-card" style="border:none; box-shadow:none;"><div class="card-row-between"><div class="skeleton" style="width: 150px; height: 18px;"></div><div class="skeleton" style="width: 60px; height: 18px; border-radius: 6px;"></div></div><div class="skeleton" style="width: 200px; height: 14px; margin-top: 8px;"></div><div class="step-container" style="margin: 20px 0;"><div class="skeleton" style="width: 100%; height: 20px;"></div></div></div>';
+
         setTimeout(() => {
-            const tabName = el.innerText;
-            if (tabName === '回收站' || tabName === '异常数据') {
-                listContainer.innerHTML = `<div style="text-align:center; padding: 40px 0; color:var(--text-secondary); font-size:13px; font-weight:600;">暂无相关【${tabName}】数据记录</div>`;
-            } else {
-                // 生成复用结构，只改变文字来展示联动效果
-                listContainer.innerHTML = `
-                    <div class="list-card glass-card">
-                        <div class="card-row-between">
-                            <div class="card-title">系统演示数据 - 归属: ${tabName}</div>
-                            <div class="badge-tag tag-primary">实时刷新</div>
-                        </div>
-                        <div class="card-desc"><span>系统已根据您选择的【${tabName}】标签完成了数据联动拉取。</span></div>
-                        <div class="step-container">
-                            <div class="step-item active"><div class="step-circle">1</div><div class="step-label">当前节点</div></div>
-                            <div class="step-item"><div class="step-circle">2</div><div class="step-label">待推进</div></div>
-                        </div>
-                        <div class="card-actions">
-                            <button class="btn-xs" onclick="showModal('sheet-assign')">重新分配</button>
-                            <button class="btn-xs outline" onclick="showModal('sheet-follow-up')">写跟进</button>
-                        </div>
-                    </div>
-                `;
-            }
-        }, 500); // 500ms 模拟网络延迟
+            let data = type === 'leads' ? state.leads : state.conversions;
+            execFilterRender(listContainerId, data, type, filterName);
+        }, 300);
     }
 
-    function simulateDataLoad(listContainerId) {
-        const listContainer = document.getElementById(listContainerId);
-        listContainer.innerHTML = `
-            <div class="list-card glass-card" style="border:none; box-shadow:none;"><div class="skeleton" style="width: 100%; height: 100px;"></div></div>
-        `;
-        setTimeout(() => {
-            showToast('数据已自动更新到最新状态', true);
-            listContainer.innerHTML = `
-                <div class="list-card glass-card">
-                    <div class="card-row-between">
-                        <div class="card-title" style="color:var(--danger-color);">张峰 (超时 32 小时)</div>
-                        <div class="badge-outline warning">待紧急处理</div>
-                    </div>
-                    <div class="card-desc"><span>来源: 线下自主登记</span></div>
-                    <div class="card-actions">
-                        <button class="btn-xs" onclick="showModal('sheet-follow-up')">马上写跟进</button>
-                    </div>
-                </div>
-            `;
-        }, 600);
+    function rerenderActiveList(type) {
+        const pill = document.querySelector(type === 'leads' ? '#pills-leads .pill.active' : '#pills-conv .pill.active');
+        const listContainerId = type === 'leads' ? 'leads-list-container' : 'conv-list-container';
+        const data = type === 'leads' ? state.leads : state.conversions;
+        execFilterRender(listContainerId, data, type, pill ? pill.innerText : '全部');
     }
 
-    // ================= 主干视图切换逻辑 =================
+    function execFilterRender(listContainerId, data, type, filterName) {
+        let filtered = [...data];
+        if (filterName === '我的线索' || filterName === '我的') filtered = data.filter(d => d.owner && !d.isInvalid);
+        else if (filterName === '待分配') filtered = data.filter(d => !d.owner && !d.isInvalid);
+        else if (filterName === '超时待办') filtered = data.filter(d => d.isOverdue && !d.isInvalid);
+        else if (filterName === '异常无效') filtered = data.filter(d => d.isInvalid);
+        else if (filterName === '营销线索') filtered = data.filter(d => d.source.includes('营销') || d.source.includes('抖音'));
+        else if (filterName === '全部线索' || filterName === '全部') filtered = data.filter(d => !d.isInvalid);
+        else if (filterName === '到访确认' || filterName === '到访') filtered = data.filter(d => d.stage === 3);
+        else if (filterName === '意向预定' || filterName === '预定') filtered = data.filter(d => d.stage === 4);
+        else if (filterName === '报名录取' || filterName === '录取') filtered = data.filter(d => d.stage === 5);
+        else if (filterName === '入学交接' || filterName === '交接') filtered = data.filter(d => d.handoverStatus !== undefined);
+        else if (filterName === '推进中') filtered = data;
+
+        const query = getSearchValue(type);
+        if (query) {
+            filtered = filtered.filter(d => [d.name, d.phone, d.source, d.owner, d.school, d.major].some(v => String(v || '').toLowerCase().includes(query)));
+        }
+
+        renderList(listContainerId, filtered, type);
+    }
+
+    function openLeadDetail(id) {
+        let lead = state.leads.find(l => l.id === id) || state.conversions.find(l => l.id === id);
+        if (!lead) return;
+        if (lead.isInvalid) {
+            showToast('无效线索仅支持恢复，不进入详情页');
+            return;
+        }
+
+        state.currentActionLeadId = id;
+        let badge = lead.owner ? '<span class="badge-tag tag-success">负责人: ' + lead.owner + '</span>' : '<span class="badge-tag tag-primary">待分配</span>';
+        let riskBadge = lead.isOverdue ? '<span class="badge-tag tag-warning">SLA 超时</span>' : '<span class="badge-tag tag-primary">SLA 正常</span>';
+        let headerHtml = '<div style="font-size:20px; font-weight:800; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between; gap:8px;">' + lead.name + ' <span style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;">' + badge + riskBadge + '</span></div><div style="font-size:13px; color:var(--text-secondary); margin-bottom:16px;">手机号: ' + lead.phone + ' | 来源: ' + lead.source + '</div>' + getStepsHtml(lead.stage, 'detail');
+        document.getElementById('detail-header-info').innerHTML = headerHtml;
+
+        let summaryHtml = '<div class="detail-summary-grid"><div class="detail-summary"><div class="detail-summary-title">当前状态</div><div class="detail-summary-body">阶段：' + getStageText(lead.stage) + '；负责人：' + (lead.owner || '待分配') + '；' + (lead.isOverdue ? '已超时，请优先处理。' : '当前无超时风险。') + '</div></div><div class="detail-summary"><div class="detail-summary-title">下一步建议</div><div class="detail-summary-body">' + getNextAction(lead) + '</div></div><div class="detail-summary"><div class="detail-summary-title">核心资料</div><div class="detail-summary-body">意向专业：' + (lead.major || '计算机网络技术') + '；生源学校：' + (lead.school || '待确认学校') + '；家长关注：' + (lead.focus || '就业方向、住宿安排、录取材料') + '。</div></div></div>';
+        let timelineHtml = summaryHtml + '<div class="log-item"><div class="log-time">刚刚</div><div class="log-content">查看学生线索详情</div></div><div class="log-item"><div class="log-time">' + (lead.lastFollow || '历史记录') + '</div><div class="log-content">最近跟进摘要</div><div class="log-detail">当前处于“' + getStageText(lead.stage) + '”阶段，下一步建议：' + getNextAction(lead) + '。</div></div><div class="log-item"><div class="log-time">线索入池</div><div class="log-content">线索来源已记录</div><div class="log-detail">' + lead.source + '</div></div>';
+        document.getElementById('detail-timeline').innerHTML = timelineHtml;
+        document.getElementById('page-lead-detail').classList.replace('hidden-right', 'active');
+    }
+
+    function closeLeadDetail() {
+        document.getElementById('page-lead-detail').classList.replace('active', 'hidden-right');
+    }
+
+    function handleGridAction(label) {
+        if (manageMode) {
+            showToast('当前为管理模式，可继续调整高频功能');
+            return;
+        }
+        if (['招生工作台', '线索管理', '跟进到访', '报名录取', '入学交接', '招生配置', '生源学校'].includes(label)) {
+            openEnrollmentWorkspace();
+            const routeMap = {
+                '线索管理': ['sub-view-leads', 'tab-btn-leads'],
+                '跟进到访': ['sub-view-conversion', 'tab-btn-conv'],
+                '报名录取': ['sub-view-conversion', 'tab-btn-conv'],
+                '入学交接': ['sub-view-conversion', 'tab-btn-conv'],
+                '招生配置': ['sub-view-tools', 'tab-btn-tools'],
+                '生源学校': ['sub-view-tools', 'tab-btn-tools']
+            };
+            if (routeMap[label]) switchEnrollmentTab(routeMap[label][0], document.getElementById(routeMap[label][1]));
+            return;
+        }
+        showToast(label + ' 模块开发中');
+    }
+
+    function generateGridItem(label, isHighFreq) {
+        const meta = featureMeta[label] || { bg: 'var(--primary-light)', color: 'var(--primary-color)', icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"></circle></svg>' };
+        const manageClass = isHighFreq && manageMode ? 'manage-mode' : '';
+        const manageLabel = isHighFreq && manageMode ? '移除' : '';
+        return '<div class="grid-item ' + manageClass + '" data-manage-label="' + manageLabel + '" onclick="handleGridAction(\'' + label + '\')"><div class="grid-icon-wrap" style="background:' + meta.bg + '; color:' + meta.color + ';">' + meta.icon + '</div><div class="grid-label">' + label + '</div></div>';
+    }
+
+    function toggleManage() {
+        manageMode = !manageMode;
+        document.getElementById('manage-btn-text').innerText = manageMode ? '完成' : '管理';
+        renderHighFreq();
+    }
+
+    function renderHighFreq() {
+        document.getElementById('high-freq-grid').innerHTML = origHighFreq.map(label => generateGridItem(label, true)).join('') + '<div class="grid-item" onclick="toggleManage()"><div style="position:relative;"><div class="grid-icon-wrap" style="background: rgba(255,255,255,0.58); color: var(--primary-color); border: 2px dashed rgba(110, 142, 253, 0.35);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></div></div><div class="grid-label" style="color: var(--primary-color);">配置</div></div>';
+    }
+
+    function renderDirTabs() {
+        document.getElementById('dir-tabs').innerHTML = Object.keys(dirData).map(key => '<div class="dir-tab ' + (key === currentDirTab ? 'active' : '') + '" onclick="switchDirTab(\'' + key + '\')">' + key + '</div>').join('');
+    }
+
+    function switchDirTab(key) {
+        currentDirTab = key;
+        renderDirTabs();
+        renderDirContent();
+    }
+
+    function renderDirContent() {
+        document.getElementById('dir-grid').innerHTML = dirData[currentDirTab].map(label => generateGridItem(label, false)).join('');
+    }
+
+    window.onload = function() {
+        renderHighFreq();
+        renderDirTabs();
+        renderDirContent();
+        renderDashboard();
+        execFilterRender('leads-list-container', state.leads, 'leads', '全部');
+        execFilterRender('conv-list-container', state.conversions, 'conv', '推进中');
+    };
+
     function switchTab(tabId, el) {
         document.querySelectorAll('.tab-bar .tab-item').forEach(item => item.classList.remove('active'));
         el.classList.add('active');
@@ -854,154 +1303,17 @@
     function openEnrollmentWorkspace() {
         document.getElementById('workspace-enrollment').classList.replace('hidden-right', 'active');
     }
-    
+
     function closeEnrollmentWorkspace() {
         document.getElementById('workspace-enrollment').classList.replace('active', 'hidden-right');
     }
-    
+
     function switchEnrollmentTab(viewId, el) {
         document.querySelectorAll('.sub-tab-item').forEach(item => item.classList.remove('active'));
         el.classList.add('active');
         document.querySelectorAll('.sub-view').forEach(view => view.classList.remove('active'));
         document.getElementById(viewId).classList.add('active');
     }
-
-    // ================= 第一层级：原校区高频/目录渲染逻辑 =================
-    const dirData = {
-        '招生管理': ['招生工作台'], 
-        '办公': ['添加汇报','通讯录','执勤安排','校园执勤','教师考核','审批假条','会议管理','需求管理'],
-        '学生管理': ['留宿查看','班主任考核','宿舍排名','出操排名','实时统计','宿舍信息','学生假条','点到安排'],
-        '双百分考核': ['班级违纪','班级奖励','学生违纪','学生奖励','考核排名'],
-        '教务管理': ['班级课时','评教查看','教师汇总','综合课表','课堂统计','评分统计','特长班','班级信息','期末成绩']
-    };
-
-    let origHighFreq = ['招生工作台','审批管理','工作汇报','学生假条'];
-    let isManaging = false;      
-    let currentDirTab = '招生管理'; 
-
-    const massiveIcons = [
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>',
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>',
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>',
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>',
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>',
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>',
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>',
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>'
-    ];
-    const colors = [
-        {bg: 'var(--icon-bg-blue)', color: 'var(--icon-color-blue)'}, {bg: 'var(--icon-bg-orange)', color: 'var(--icon-color-orange)'},
-        {bg: 'var(--icon-bg-teal)', color: 'var(--icon-color-teal)'}, {bg: 'var(--icon-bg-purple)', color: 'var(--icon-color-purple)'},
-        {bg: 'var(--icon-bg-pink)', color: 'var(--icon-color-pink)'}, {bg: 'var(--icon-bg-indigo)', color: 'var(--icon-color-indigo)'},
-        {bg: 'var(--icon-bg-rose)', color: 'var(--icon-color-rose)'}, {bg: 'var(--icon-bg-emerald)', color: 'var(--icon-color-emerald)'}
-    ];
-
-    function getStableIndex(str) {
-        let hash = 0;
-        for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
-        return Math.abs(hash);
-    }
-
-    function toggleManage() {
-        isManaging = !isManaging;
-        document.getElementById('manage-btn-text').innerText = isManaging ? '完成' : '管理';
-        if (isManaging) showToast('点击 - 移除，点击下方目录 + 添加');
-        renderHighFreq();
-        renderDirContent();
-    }
-
-    function removeHighFreq(index, event) {
-        if(event) event.stopPropagation();
-        origHighFreq.splice(index, 1);
-        renderHighFreq();
-        if (isManaging) renderDirContent(); 
-    }
-
-    function addToHighFreq(label, event) {
-        if(event) event.stopPropagation();
-        if (origHighFreq.includes(label)) return;
-        if (origHighFreq.length >= 10) { showToast('高频功能最多添加10个'); return; }
-        origHighFreq.push(label);
-        renderHighFreq();
-        if (isManaging) renderDirContent(); 
-    }
-
-    function generateGridItem(label, isHighFreq = false, hfIndex = -1) {
-        let stableIdx = getStableIndex(label);
-        let icon = massiveIcons[(stableIdx * 3) % massiveIcons.length]; 
-        let color = colors[stableIdx % colors.length];
-
-        let onClickStr = '', badgeHtml = '', animClass = '';
-
-        if (isManaging) {
-             if (isHighFreq) {
-                 animClass = 'shake-anim';
-                 badgeHtml = `<div class="delete-badge" onclick="removeHighFreq(${hfIndex}, event)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></div>`;
-             } else {
-                 if(!origHighFreq.includes(label)) {
-                     badgeHtml = `<div class="add-badge" onclick="addToHighFreq('${label}', event)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></div>`;
-                     onClickStr = `addToHighFreq('${label}', event)`;
-                 } else {
-                     badgeHtml = `<div class="added-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></div>`;
-                 }
-             }
-        } else {
-             if (label === '招生工作台') {
-                 onClickStr = `openEnrollmentWorkspace()`;
-             } else {
-                 onClickStr = `showToast('${label}')`;
-             }
-        }
-
-        return `<div class="grid-item ${animClass}" ${onClickStr ? `onclick="${onClickStr}"` : ''}>
-                    <div style="position:relative;">
-                        <div class="grid-icon-wrap" style="background: ${color.bg}; color: ${color.color};">${icon}</div>
-                        ${badgeHtml}
-                    </div>
-                    <div class="grid-label">${label}</div>
-                </div>`;
-    }
-
-    function renderHighFreq() {
-        const container = document.getElementById('high-freq-grid');
-        let html = origHighFreq.map((label, i) => generateGridItem(label, true, i)).join('');
-        let addClick = isManaging ? `showToast('请从下方点击 + 号添加')` : `toggleManage()`;
-        let addAnim = isManaging ? `shake-anim` : ``;
-        html += `<div class="grid-item ${addAnim}" onclick="${addClick}">
-                    <div style="position:relative;">
-                        <div class="grid-icon-wrap" style="background: rgba(255,255,255,0.4); color: var(--primary-color); border: 2px dashed rgba(31, 95, 255, 0.3);">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                        </div>
-                    </div>
-                    <div class="grid-label" style="color: var(--primary-color);">添加</div>
-                 </div>`;
-        container.innerHTML = html;
-    }
-
-    function renderDirTabs() {
-        const container = document.getElementById('dir-tabs');
-        container.innerHTML = Object.keys(dirData).map(key => {
-            return `<div class="dir-tab ${key === currentDirTab ? 'active' : ''}" onclick="switchDirTab('${key}')">${key}</div>`;
-        }).join('');
-    }
-
-    function switchDirTab(key) {
-        currentDirTab = key;
-        renderDirTabs();
-        renderDirContent();
-    }
-
-    function renderDirContent() {
-        document.getElementById('dir-grid').innerHTML = dirData[currentDirTab].map(label => generateGridItem(label, false, -1)).join('');
-    }
-
-    window.onload = function() {
-        renderHighFreq();
-        renderDirTabs();
-        renderDirContent();
-    };
 </script>
 </body>
 </html>
