@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>校园综合管理系统 - 独立版</title>
+    <style>
+        :root {
+            --primary-color: #1F5FFF;
+            --primary-light: rgba(31, 95, 255, 0.12);
+            --bg-start: #EFF6FF;
+            --bg-end: #DFE7FF;
+            --surface-white: rgba(255, 255, 255, 0.92);
+
+            --text-title: #14213D;
+            --text-main: #334155;
+            --text-secondary: #64748B;
+
+            --danger-color: #EF4444;
+            --danger-light: rgba(239, 68, 68, 0.14);
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --warning-light: rgba(245, 158, 11, 0.16);
+            --border-line: rgba(31, 95, 255, 0.08);
+
+            --icon-bg-blue: rgba(96, 165, 250, 0.18); --icon-color-blue: #3B82F6;
+            --icon-bg-purple: rgba(167, 139, 250, 0.18); --icon-color-purple: #8B5CF6;
+            --icon-bg-pink: rgba(244, 114, 182, 0.18); --icon-color-pink: #EC4899;
+            --icon-bg-orange: rgba(251, 146, 60, 0.18); --icon-color-orange: #F97316;
+            --icon-bg-teal: rgba(45, 212, 191, 0.18); --icon-color-teal: #0D9488;
+            --icon-bg-emerald: rgba(16, 185, 129, 0.18); --icon-color-emerald: #059669;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif; background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%); display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
+
+        .device-simulator { width: 375px; height: 812px; background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%); position: relative; overflow: hidden; border-radius: 42px; box-shadow: 0 26px 60px rgba(31, 95, 255, 0.18); display: flex; flex-direction: column; }
+        .device-simulator::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 42px; box-shadow: inset 0 0 0 8px rgba(255,255,255,0.92); pointer-events: none; z-index: 1000; }
+
+        .wrapper-main { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; }
+        .page-view { position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: 100%; display: flex; flex-direction: column; z-index: 200; transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1); background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%); }
+        .page-view.hidden-right { transform: translateX(100%); pointer-events: none; }
+        .page-view.active { transform: translateX(0); pointer-events: auto; }
+
+        .nav-bar { padding: 48px 20px 12px; display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 10; flex-shrink: 0; }
+        .nav-bar.main-nav { justify-content: center; }
+        .nav-title-group { display: flex; flex-direction: column; align-items: center; }
+        .nav-title { font-size: 18px; font-weight: 800; color: var(--text-title); letter-spacing: 0.5px;}
+        .icon-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-title); transition: 0.2s;}
+        .icon-btn:active { opacity: 0.6; }
+
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 0 20px 20px 20px; scrollbar-width: none; padding-bottom: 30px; -webkit-overflow-scrolling: touch;}
+        .main-content::-webkit-scrollbar { display: none; }
+
+        .sub-tab-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 84px; background: rgba(255, 255, 255, 0.82); backdrop-filter: blur(24px); border-top: 1px solid rgba(255, 255, 255, 0.88); display: flex; justify-content: space-around; align-items: flex-start; padding-top: 10px; z-index: 100; padding-bottom: 20px; box-shadow: 0 -10px 30px rgba(31, 95, 255, 0.08); padding-left: 8px; padding-right: 8px;}
+        .sub-tab-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94A3B8; cursor: pointer; transition: all 0.3s; flex: 0 0 62px; }
+        .sub-tab-item.active { color: var(--primary-color); }
+        .tab-icon { position: relative; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; }
+        .tab-icon svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+        .tab-label { font-size: 11px; font-weight: 700; letter-spacing: 0.2px;}
+
+        .sub-view { position: absolute; top: 0; left: 0; right: 0; bottom: 0; padding: 0 20px 100px; display: none; flex-direction: column; overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .sub-view.active { display: flex; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .glass-card { background: var(--surface-white); backdrop-filter: blur(22px); border: 1px solid rgba(255, 255, 255, 0.92); border-radius: 26px; box-shadow: 0 14px 34px rgba(31, 95, 255, 0.08); }
+        
+        .pill-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; margin-bottom: 12px; flex-shrink: 0; -webkit-overflow-scrolling: touch;}
+        .pill { flex-shrink: 0; padding: 9px 16px; border-radius: 999px; font-size: 13px; font-weight: 700; white-space: nowrap; cursor: pointer; background: rgba(255,255,255,0.84); color: var(--text-secondary); border: 1px solid rgba(255,255,255,0.9); transition: 0.2s; box-shadow: 0 6px 18px rgba(31, 95, 255, 0.06);}
+        .pill.active { background: linear-gradient(135deg, #3f7aff 0%, var(--primary-color) 100%); color: white; border-color: transparent; box-shadow: 0 10px 22px rgba(31, 95, 255, 0.24); transform: scale(1.02);}
+
+        .list-card { padding: 18px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; cursor: pointer; transition: all 0.3s; position: relative; background: rgba(255, 255, 255, 0.86); overflow: hidden;}
+        .card-row-between { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; width: 100%;}
+        .card-title { font-size: 15px; font-weight: 800; color: var(--text-title); line-height: 1.4; display:flex; align-items:center; gap:6px; flex: 1; min-width: 0; white-space: nowrap;}
+        .lead-main { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 0;}
+        .lead-status { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; max-width: 110px;}
+
+        .checkbox-wrap { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border: 2px solid #CBD5E1; border-radius: 6px; cursor: pointer; transition: 0.2s; background: white; flex-shrink: 0;}
+        .checkbox-wrap.checked { background: var(--primary-color); border-color: var(--primary-color); }
+        .checkbox-wrap svg { width: 14px; height: 14px; stroke: white; opacity: 0; transition: 0.2s;}
+        .checkbox-wrap.checked svg { opacity: 1; }
+
+        .badge-tag { padding: 4px 9px; border-radius: 999px; font-size: 10px; font-weight: 800; white-space: nowrap; }
+        .tag-primary { background: var(--primary-light); color: var(--primary-color); }
+        .tag-warning { background: var(--warning-light); color: var(--warning-color); }
+        .tag-success { background: var(--success-light); color: var(--success-color); }
+        .tag-danger { background: var(--danger-light); color: var(--danger-color); }
+        
+        .badge-outline { border: 1px solid var(--primary-color); color: var(--primary-color); padding: 2px 6px; border-radius: 6px; font-size: 10px; font-weight: 800; white-space: nowrap; background: rgba(31,95,255,0.06); flex-shrink: 0;}
+        .badge-outline.warning { border-color: #F59E0B; color: #F59E0B; background: rgba(245,158,11,0.1); }
+
+        .step-container { display: flex; align-items: center; justify-content: space-between; margin: 12px 0 16px; position: relative; width: 100%;}
+        .step-container::before { content:''; position:absolute; top: 10px; left: 5%; right: 5%; height: 2px; background: rgba(0,0,0,0.08); z-index: 0;}
+        .step-item { display: flex; flex-direction: column; align-items: center; gap: 6px; z-index: 1; position:relative; padding: 0 2px; flex: 1;}
+        .step-circle { width: 20px; height: 20px; border-radius: 50%; background: #E2E8F0; color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; border: 2px solid white; box-shadow:0 2px 4px rgba(0,0,0,0.05); transition: 0.3s;}
+        .step-item.active .step-circle { background: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-light); border-color: transparent;}
+        .step-item.done .step-circle { background: var(--success-color); border-color: transparent;}
+        .step-label { font-size: 9px; font-weight: 800; color: #94A3B8; text-align: center; white-space: nowrap;}
+        .step-item.active .step-label { color: var(--primary-color); }
+        .step-item.done .step-label { color: var(--success-color); }
+
+        .card-actions { display: flex; gap: 8px; margin-top: 6px; padding-top: 12px; border-top: 1px dashed rgba(126, 147, 190, 0.18); align-items:center; flex-wrap: wrap;}
+        .btn-xs { background: rgba(31,95,255,0.1); color: var(--primary-color); border:none; padding: 7px 13px; border-radius: 999px; font-size: 12px; font-weight: 800; cursor:pointer; transition:0.2s; white-space: nowrap;}
+        .btn-xs:active { transform: scale(0.95); opacity: 0.9; }
+        .btn-xs.outline { background: transparent; border: 1px solid var(--primary-color); }
+        .btn-xs.danger { background: var(--danger-light); color: var(--danger-color); }
+
+        .section-header { display: flex; justify-content: space-between; align-items: center; padding: 0 6px 12px; margin-top: 16px;}
+        .section-title { font-size: 18px; font-weight: 800; color: var(--text-title); letter-spacing: 0.5px;}
+
+        /* 模态框与底栏 */
+        .modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; backdrop-filter: blur(2px);}
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .bottom-sheet { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.96); border-radius: 30px 30px 0 0; padding: 24px 20px 34px; z-index: 1001; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 0 -16px 40px rgba(31, 95, 255, 0.1); display: flex; flex-direction: column; max-height: 85%; backdrop-filter: blur(24px);}
+        .bottom-sheet.active { transform: translateY(0); }
+        .sheet-indicator { width: 40px; height: 4px; background: #E2E8F0; border-radius: 2px; margin: 0 auto 20px; flex-shrink: 0;}
+        .sheet-title { font-size: 18px; font-weight: 800; text-align: center; margin-bottom: 24px; flex-shrink: 0;}
+        .sheet-scroll-area { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; width: 100%; max-height: 50vh; padding: 0 4px;}
+        .sheet-scroll-area::-webkit-scrollbar { display: none; }
+
+        /* 表单样式 */
+        .form-group { margin-bottom: 16px; text-align: left; width: 100%;}
+        .form-label { font-size: 13px; font-weight: 800; color: var(--text-title); margin-bottom: 8px; display: block; }
+        .form-label.required::after { content: '*'; color: var(--danger-color); margin-left: 4px; }
+        .form-control { width: 100%; padding: 14px 16px; border-radius: 18px; border: 1px solid rgba(155,169,206,0.14); background: rgba(245,248,255,0.9); font-size: 14px; outline: none; transition: 0.2s;}
+        .form-control:focus { border-color: var(--primary-color); background: #fff; box-shadow: 0 0 0 3px var(--primary-light); }
+        .form-section { padding: 14px; margin-bottom: 14px; border-radius: 20px; background: rgba(245,248,255,0.72); border: 1px solid rgba(255,255,255,0.9); }
+        .submit-btn { width: 100%; padding: 16px; border-radius: 20px; background: linear-gradient(135deg, #4b82ff 0%, var(--primary-color) 100%); color: white; font-size: 16px; font-weight: 800; border: none; box-shadow: 0 12px 24px rgba(31, 95, 255, 0.2); cursor: pointer;}
+
+        /* 时间线修复 */
+        .log-timeline { margin-top: 8px; padding-left: 20px; }
+        .log-item { position: relative; padding-bottom: 24px; animation: fadeInUp 0.32s ease both; }
+        .log-item::before { content: ''; position: absolute; left: -24px; top: 2px; width: 10px; height: 10px; border-radius: 50%; background: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-light); z-index: 2; transition: 0.3s; }
+        .log-item::after { content: ''; position: absolute; left: -19px; top: 16px; bottom: -6px; width: 2px; background: var(--primary-light); z-index: 1; }
+        .log-item:last-child::after { display: none; }
+        .log-item.pending::before { background: #CBD5E1; box-shadow: none; border: 2px solid white; }
+        .log-item.pending::after { background: transparent; border-left: 2px dashed #CBD5E1; width: 0; left: -20px; }
+        .log-time { font-size: 11px; color: var(--text-secondary); margin-bottom: 4px; font-weight: 600;}
+        .log-content { font-size: 14px; color: var(--text-title); font-weight: 700; margin-bottom: 4px;}
+        .log-detail { font-size: 12px; color: var(--text-main); line-height: 1.4; background: #F8FAFC; padding: 8px 12px; border-radius: 8px; margin-top: 6px;}
+
+        /* 看板任务卡片 */
+        .task-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+        .task-card { padding: 14px; border-radius: 20px; background: rgba(255,255,255,0.92); border: 1px solid rgba(255,255,255,0.9); box-shadow: 0 10px 24px rgba(31,95,255,0.06); cursor: pointer; transition: 0.2s; }
+        .task-card.danger { border-color: rgba(239,68,68,0.22); background: rgba(255,255,255,0.96); }
+        .task-card.warning { border-color: rgba(245,158,11,0.24); background: rgba(255,255,255,0.96); }
+        .task-label { font-size: 12px; color: var(--text-secondary); font-weight: 800; margin-bottom: 8px; }
+        .task-value { font-size: 24px; color: var(--primary-color); font-weight: 900; line-height: 1; }
+        .task-card.danger .task-value { color: var(--danger-color); }
+        .task-card.warning .task-value { color: var(--warning-color); }
+        
+        .urgent-task-list { display: grid; gap: 10px; margin-bottom: 14px; }
+        .urgent-task-card { padding: 14px; border-radius: 22px; background: rgba(255,255,255,0.92); border: 1px solid rgba(255,255,255,0.9); box-shadow: 0 12px 26px rgba(31,95,255,0.08); }
+        .urgent-task-title { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 14px; font-weight: 900; color: var(--text-title); margin-bottom: 6px; }
+        .urgent-task-desc { font-size: 12px; font-weight: 700; line-height: 1.45; color: var(--text-secondary); margin-bottom: 12px; }
+        .compact-action { padding: 8px 12px; border-radius: 999px; border: 1px solid rgba(31,95,255,0.18); background: rgba(31,95,255,0.08); color: var(--primary-color); font-size: 12px; font-weight: 900; cursor: pointer; }
+
+        .filter-panel { position: sticky; top: 0; z-index: 60; padding: 0 0 10px; background: linear-gradient(135deg, rgba(239,246,255,0.96) 0%, rgba(223,231,255,0.96) 100%); backdrop-filter: blur(12px); }
+        .filter-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+        .mini-search { flex: 1; min-width: 0; height: 38px; border: 1px solid rgba(255,255,255,0.88); border-radius: 999px; padding: 0 14px; background: rgba(255,255,255,0.9); outline: none; color: var(--text-title); font-weight: 700; }
+        
+        .meta-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 4px; }
+        .meta-item { padding: 8px 10px; border-radius: 12px; background: rgba(31,95,255,0.04); color: var(--text-main); font-size: 11px; font-weight: 700; line-height: 1.35; border: 1px solid rgba(0,0,0,0.02); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        
+        .funnel-metric { padding: 14px 16px; border-radius: 20px; background: rgba(255,255,255,0.92); border: 1px solid rgba(255,255,255,0.9); box-shadow: 0 10px 24px rgba(31,95,255,0.08); }
+        .funnel-topline { display:flex; justify-content:space-between; gap:12px; font-size:12px; font-weight:800; color:var(--text-main); margin-bottom:8px; }
+        .funnel-track { width:100%; height:10px; border-radius:999px; background: rgba(31,95,255,0.14); overflow:hidden; }
+        .funnel-bar { height:100%; border-radius:999px; }
+        .funnel-grid { display:grid; gap:10px; }
+
+        .sheet-list-item { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: rgba(245,248,255,0.9); border-radius: 20px; cursor: pointer; transition: 0.2s; border: 1px solid rgba(255,255,255,0.7); margin-bottom: 12px;}
+        .sheet-list-title { font-size: 14px; font-weight: 900; color: var(--text-title); margin-bottom: 4px; }
+        .sheet-list-desc { font-size: 12px; font-weight: 700; color: var(--text-secondary); line-height: 1.45; }
+
+        .toast { position: absolute; top: 20%; left: 50%; transform: translate(-50%, -50%); background: rgba(50, 63, 98, 0.82); color: white; padding: 14px 24px; border-radius: 16px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 2000; backdrop-filter: blur(12px); font-weight: 600; text-align: center; }
+        .toast.show { opacity: 1; top: 25%; }
+
+        /* 修复批量操作底栏逻辑 */
+        .batch-action-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 80px; background: rgba(255,255,255,0.94); box-shadow: 0 -8px 24px rgba(31, 95, 255, 0.08); z-index: 150; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); backdrop-filter: blur(18px);}
+        .batch-action-bar.active { transform: translateY(0); }
+
+        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; text-align: center;}
+        .empty-state p { font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5;}
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="device-simulator">
+    <!-- 主工作台模块 -->
+    <div id="workspace-enrollment" class="page-view active">
+        <div class="nav-bar">
+            <div class="icon-btn" style="margin-left: -8px;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </div>
+            <div class="nav-title-group"><div class="nav-title">招生工作台</div></div>
+            <div class="icon-btn" onclick="showModal('sheet-add-lead')">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </div>
+        </div>
+
+        <div style="flex:1; position:relative; overflow: hidden;">
+            <!-- 看板 -->
+            <div id="sub-view-dashboard" class="sub-view active">
+                <div class="section-header" style="margin-top: 4px;"><div class="section-title">今日最急任务</div></div>
+                <div class="urgent-task-list" id="urgent-task-list"></div>
+
+                <div class="section-header"><div class="section-title">今日待办异常</div></div>
+                <div class="task-grid">
+                    <div class="task-card warning" onclick="handleDashboardJump('overdue')"><div class="task-label">即将回收线索</div><div class="task-value" id="overdue-count">0</div></div>
+                    <div class="task-card danger" onclick="handleDashboardJump('syncFailed')"><div class="task-label">入学交接异常</div><div class="task-value" id="sync-failed-count">0</div></div>
+                </div>
+
+                <div class="section-header"><div class="section-title">转化漏斗</div></div>
+                <div class="glass-card" style="padding: 16px; margin-bottom: 12px;" id="funnel-container"></div>
+            </div>
+
+            <!-- 线索池 -->
+            <div id="sub-view-leads" class="sub-view">
+                <div class="filter-panel">
+                    <div class="filter-row">
+                        <input class="mini-search" id="leads-search" placeholder="搜索姓名/手机号/来源" oninput="rerenderActiveList('leads')">
+                    </div>
+                    <div class="pill-scroll" id="pills-leads">
+                        <div class="pill active" onclick="switchFilter(this, 'leads', '公海线索')">公海线索</div>
+                        <div class="pill" onclick="switchFilter(this, 'leads', '全部线索')">全部线索</div>
+                        <div class="pill" onclick="switchFilter(this, 'leads', '我的线索')">我的线索</div>
+                        <div class="pill" onclick="switchFilter(this, 'leads', '即将回收')">即将回收</div>
+                    </div>
+                </div>
+                <div id="leads-list-container"></div>
+            </div>
+
+            <!-- 跟进视图 -->
+            <div id="sub-view-follow" class="sub-view">
+                <div class="filter-panel" style="padding-top:8px;">
+                    <div class="pill-scroll" id="pills-follow">
+                        <div class="pill active" onclick="switchFilter(this, 'follow', '待跟进')">待跟进</div>
+                        <div class="pill" onclick="switchFilter(this, 'follow', '待到访')">待到访</div>
+                        <div class="pill" onclick="switchFilter(this, 'follow', '到访记录')">到访记录</div>
+                    </div>
+                </div>
+                <div id="follow-list-container"></div>
+            </div>
+
+            <!-- 录取视图 -->
+            <div id="sub-view-reservation" class="sub-view">
+                <div class="filter-panel" style="padding-top:8px;">
+                    <div class="pill-scroll" id="pills-reservation">
+                        <div class="pill active" onclick="switchFilter(this, 'reservation', '待预定')">待办预定</div>
+                        <div class="pill" onclick="switchFilter(this, 'reservation', '待录取')">待转录取</div>
+                    </div>
+                </div>
+                <div id="reservation-list-container"></div>
+            </div>
+
+            <!-- 更多视图 (交接/学校/配置/日志) -->
+            <div id="sub-view-more" class="sub-view">
+                <div class="section-header" style="margin-top: 4px;"><div class="section-title">入学交接异常任务</div></div>
+                <div id="handover-list-container"></div>
+
+                <div class="section-header"><div class="section-title">生源学校 (只读)</div></div>
+                <div class="glass-card" style="padding: 12px; margin-bottom: 16px;">
+                    <div class="sheet-list-item" onclick="showToast('正在打开学校档案...')">
+                        <div><div class="card-title" style="font-weight:800;">学校档案</div><div class="card-desc">120 所学校，A 级重点资源 18 所。</div></div>
+                        <div class="badge-tag tag-primary">查看</div>
+                    </div>
+                    <div class="sheet-list-item" onclick="showToast('正在打开候选学校...')">
+                        <div><div class="card-title" style="font-weight:800;">候选学校归集</div><div class="card-desc">待匹配 6 所，已匹配 114 所。</div></div>
+                        <div class="badge-tag tag-primary">查看</div>
+                    </div>
+                    <div class="sheet-list-item" onclick="showToast('查看责任资源配置...')">
+                        <div><div class="card-title" style="font-weight:800;">责任资源配置</div><div class="card-desc">当前已按招生分组完成责任绑定。</div></div>
+                        <div class="badge-tag tag-success">已配置</div>
+                    </div>
+                </div>
+
+                <div class="section-header"><div class="section-title">招生配置</div></div>
+                <div class="glass-card" style="padding: 16px; margin-bottom: 16px; display:flex; flex-direction:column; gap:10px;">
+                    <div class="meta-item">当前学期：2026年秋季学期</div>
+                    <div class="meta-item">招生专业：8 个 (已配置专业计划)</div>
+                    <div class="meta-item">招生分组：城南招生组、城北招生组</div>
+                    <div class="meta-item">人员状态：32 人在岗</div>
+                </div>
+
+                <div class="section-header"><div class="section-title">日志中心</div></div>
+                <div class="pill-scroll" id="pills-logs">
+                    <div class="pill active" onclick="switchLog('入池日志', event)">入池日志</div>
+                    <div class="pill" onclick="switchLog('分配日志', event)">分配日志</div>
+                    <div class="pill" onclick="switchLog('线索阶段日志', event)">线索阶段日志</div>
+                    <div class="pill" onclick="switchLog('阶段变更日志', event)">阶段变更日志</div>
+                </div>
+                <div class="glass-card" style="padding: 16px; margin-bottom: 12px;">
+                    <div class="log-timeline" id="logs-list-container"></div>
+                </div>
+            </div>
+
+            <!-- 批量分配底栏 -->
+            <div class="batch-action-bar" id="batch-bar">
+                <div style="font-size:14px; font-weight:700;"><span id="batch-summary">已选 0 项</span></div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-xs" style="background:var(--primary-color); color:white; padding: 10px 16px;" onclick="showModal('sheet-assign')">批量分配</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="sub-tab-bar">
+            <div class="sub-tab-item active" id="tab-btn-dash" onclick="switchEnrollmentTab('sub-view-dashboard', this)">
+                <div class="tab-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
+                <div class="tab-label">工作台</div>
+            </div>
+            <div class="sub-tab-item" id="tab-btn-leads" onclick="switchEnrollmentTab('sub-view-leads', this)">
+                <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
+                <div class="tab-label">线索</div>
+            </div>
+            <div class="sub-tab-item" id="tab-btn-follow" onclick="switchEnrollmentTab('sub-view-follow', this)">
+                <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>
+                <div class="tab-label">跟进</div>
+            </div>
+            <div class="sub-tab-item" id="tab-btn-reservation" onclick="switchEnrollmentTab('sub-view-reservation', this)">
+                <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
+                <div class="tab-label">录取</div>
+            </div>
+            <div class="sub-tab-item" id="tab-btn-more" onclick="switchEnrollmentTab('sub-view-more', this)">
+                <div class="tab-icon"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle></svg></div>
+                <div class="tab-label">更多</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 线索详情页 -->
+    <div id="page-lead-detail" class="page-view hidden-right" style="z-index: 300; background: #F8FAFC;">
+        <div class="nav-bar" style="background:rgba(255,255,255,0.92); backdrop-filter: blur(18px);">
+            <div class="icon-btn" style="margin-left: -8px;" onclick="closeLeadDetail()">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </div>
+            <div class="nav-title-group"><div class="nav-title">线索详情</div></div>
+            <div class="icon-btn"></div>
+        </div>
+        <div style="background:rgba(255,255,255,0.92); padding: 0 20px 20px; border-bottom: 1px solid var(--border-line); backdrop-filter: blur(18px);" id="detail-header-info"></div>
+        
+        <div class="main-content" style="padding-top: 20px;">
+            <div class="section-header" style="padding-left:0; margin-top: 4px;"><div class="section-title" style="font-size:16px;">流程时间线</div></div>
+            <div class="glass-card" style="padding: 16px;">
+                <div class="log-timeline" id="detail-timeline"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 全局遮罩 -->
+    <div id="modal-overlay" class="modal-overlay" onclick="closeAllModals()"></div>
+
+    <!-- 级联分配弹窗 -->
+    <div id="sheet-assign" class="bottom-sheet">
+        <div class="sheet-indicator"></div>
+        <div class="sheet-title">转移至指定顾问池</div>
+        <div class="sheet-scroll-area">
+            <div class="form-section">
+                <div class="form-group">
+                    <label class="form-label required">第一步：选择招生学期</label>
+                    <select class="form-control" id="assign-semester" onchange="renderAssignStaff()">
+                        <option value="">请选择学期</option>
+                        <option value="2026年秋季招生">2026 秋季招生</option>
+                        <option value="2026年春季招生">2026 春季招生</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label required">第二步：选择招生分组</label>
+                    <select class="form-control" id="assign-group" onchange="renderAssignStaff()">
+                        <option value="">请选择分组</option>
+                        <option value="汽修组">汽修组</option>
+                        <option value="护理组">护理组</option>
+                        <option value="计算机组">计算机组</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-section-title" style="margin-top:16px; margin-bottom: 8px;">第三步：选择可分配人员</div>
+            <div id="assign-staff-list">
+                <div class="empty-state" style="padding:20px; background:rgba(255,255,255,0.5); border-radius:16px;"><p>请先选择学期和分组联动人员</p></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 写跟进弹窗 -->
+    <div id="sheet-follow-up" class="bottom-sheet">
+        <div class="sheet-indicator"></div>
+        <div class="sheet-title">记录跟进</div>
+        <div class="sheet-scroll-area">
+            <form onsubmit="event.preventDefault(); applyFollowUp();">
+                <div class="form-group"><label class="form-label required">接触结果</label>
+                    <select class="form-control" required><option>沟通顺畅 - 持续跟进</option><option>意向强烈 - 邀约到访</option></select>
+                </div>
+                <div class="form-group"><label class="form-label required">意向等级评估</label>
+                    <select class="form-control" name="intent"><option>高意向</option><option>中意向</option><option>低意向</option></select>
+                </div>
+                <div class="form-group"><label class="form-label">计划下次跟进时间</label><input type="datetime-local" class="form-control" name="nextTime"></div>
+                <div class="form-group"><label class="form-label required">沟通摘要</label><textarea class="form-control" required placeholder="请记录学生关注点..."></textarea></div>
+                <button type="submit" class="submit-btn">保存跟进</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 确认录取弹窗 -->
+    <div id="dialog-confirm-enroll" class="dialog-box">
+        <div class="dialog-title">转为正式录取？</div>
+        <div class="dialog-desc">确认后将生成录取记录，线索阶段更新为已录取，后续等待登记报到和入学交接。</div>
+        <div class="dialog-actions">
+            <div class="dialog-btn cancel" onclick="closeAllModals()">再核对下</div>
+            <div class="dialog-btn confirm" onclick="handleAdmit(state.currentActionLeadId)">确认录取</div>
+        </div>
+    </div>
+
+    <!-- 全局提示 -->
+    <div class="toast" id="sys-toast"><span id="sys-toast-msg">操作成功</span></div>
+</div>
+
+<script>
+    const logData = {
+        '入池日志': [
+            { time: '今天 09:15', content: '原始线索 ID #RAW-1024 已生成公海线索', detail: '动作类型：入池；操作人：系统 API' },
+            { time: '昨天 14:30', content: '批量导入 50 条线索', detail: '动作类型：入池；操作人：管理员 Admin' }
+        ],
+        '分配日志': [
+            { time: '今天 10:00', content: '公海线索 #101 已分配给当前顾问', detail: '分配方式：手动分配；操作人：组长尹娣' },
+            { time: '昨天 16:20', content: '公海线索 #102 已自动分配给张伟', detail: '分配方式：地域属地自动分配规则' }
+        ],
+        '线索阶段日志': [
+            { time: '今天 11:30', content: '记录跟进，意向等级更新为高意向', detail: '阶段：已分配 -> 已联系；操作人：当前顾问' },
+            { time: '昨天 15:40', content: '记录到访预约，预计周六到访', detail: '阶段：已联系 -> 已邀约；操作人：当前顾问' }
+        ],
+        '阶段变更日志': [
+            { time: '今天 14:00', content: '线索 [刘子涵] 从 待到访 变更为 已到访', detail: '触发器：到访预约前台核销' },
+            { time: '昨天 17:15', content: '线索 [赵佳佳] 从 已到访 变更为 预定办理中', detail: '触发器：系统财务确认收款完成' }
+        ]
+    };
+
+    const state = {
+        currentUser: '当前顾问',
+        currentActionLeadId: null,
+        selectedIds: new Set(),
+        leads: [
+            { id: 101, name: '李明', phone: '138****0001', source: '抖音信息流广告', intentLevel: '中意向', stage: -1, owner: null, isInvalid: false, isOverdue: false },
+            { id: 104, name: '陈奕迅', phone: '132****9999', source: '百度搜索', intentLevel: '高意向', stage: -1, owner: null, isInvalid: false, isOverdue: false },
+            { id: 103, name: '张峰', phone: '133****1111', source: '渠道转介', intentLevel: '高意向', nextFollowTime: '今天下午 14:00', stage: 0, owner: '当前顾问', isInvalid: false, isOverdue: true },
+            { id: 102, name: '王雨萌', phone: '139****0002', source: '线下登记', intentLevel: '低意向', nextFollowTime: '明天上午 10:00', stage: 0, owner: '当前顾问', isInvalid: false, isOverdue: false },
+            { id: 105, name: '林俊杰', phone: '135****7777', source: '微信咨询', intentLevel: '中意向', stage: 1, owner: '张伟', isInvalid: false, isOverdue: false } // 待到访
+        ],
+        conversions: [
+            { id: 201, name: '刘小宇', phone: '135****4444', source: '初中直推', intentLevel: '高意向', stage: 2, owner: '张伟', isInvalid: false, handoverStatus: null }, // 到访记录/待预定
+            { id: 202, name: '赵佳佳', phone: '136****5555', source: '线下校区', intentLevel: '高意向', financialStatus: '财务已确认', stage: 3, owner: '尹娣', isInvalid: false, handoverStatus: null }, // 待录取
+            { id: 203, name: '张晓明', phone: '136****0004', source: '机构引流', intentLevel: '高意向', assignedClass: '26秋新能源2班', stage: 4, owner: '张伟', isInvalid: false, handoverStatus: 'failed', missingDocs: '缺毕业证原件 / 照片未提交' }, // 录取交接失败
+            { id: 204, name: '林一', phone: '131****2222', source: '官网咨询', intentLevel: '高意向', assignedClass: '26秋计算机1班', stage: 4, owner: '当前顾问', isInvalid: false, handoverStatus: 'success' } // 录取交接成功
+        ]
+    };
+
+    function switchEnrollmentTab(viewId, el) {
+        document.querySelectorAll('.sub-tab-item').forEach(item => item.classList.remove('active'));
+        el.classList.add('active');
+        document.querySelectorAll('.sub-view').forEach(view => view.classList.remove('active'));
+        document.getElementById(viewId).classList.add('active');
+    }
+
+    function renderDashboard() {
+        let overdueCount = state.leads.filter(l => l.isOverdue && !l.isInvalid && l.owner === state.currentUser).length;
+        let syncFailedCount = state.conversions.filter(l => l.handoverStatus === 'failed').length;
+        document.getElementById('overdue-count').innerText = overdueCount;
+        document.getElementById('sync-failed-count').innerText = syncFailedCount;
+        
+        const container = document.getElementById('urgent-task-list');
+        const tasks = [];
+        
+        const overdueLead = state.leads.find(l => l.isOverdue && l.owner === state.currentUser);
+        if (overdueLead) {
+            tasks.push({
+                tag: '即将回收', title: `${overdueLead.name} 超时未跟进`, desc: `该线索已分配给您，请立即补充沟通记录。`,
+                btn: `<button class="compact-action" style="color:var(--danger-color); border-color:var(--danger-light); background:var(--danger-light);" onclick="openContextModal('sheet-follow-up', ${overdueLead.id})">给 ${overdueLead.name} 写跟进</button>`
+            });
+        }
+        
+        const failedSync = state.conversions.find(l => l.handoverStatus === 'failed');
+        if (failedSync) {
+            tasks.push({
+                tag: '交接异常', title: `${failedSync.name} 入学交接异常`, desc: `异常原因：${failedSync.missingDocs}`,
+                btn: `<button class="compact-action" onclick="retryHandover(${failedSync.id})">重试 ${failedSync.name} 的交接</button>`
+            });
+        }
+
+        if(tasks.length === 0) {
+            container.innerHTML = '<div style="font-size:13px; color:var(--text-secondary); text-align:center; padding:10px;">当前无紧急异常任务。</div>';
+        } else {
+            container.innerHTML = tasks.map(task => `<div class="urgent-task-card"><div class="urgent-task-title"><span>${task.title}</span><span class="badge-tag tag-warning" style="${task.tag==='即将回收'?'background:var(--danger-color);color:white;':''}">${task.tag}</span></div><div class="urgent-task-desc">${task.desc}</div>${task.btn}</div>`).join('');
+        }
+
+        // Funnel
+        const pct = (val, base) => base ? Math.round(val / base * 100) : 0;
+        let leadPool = 1250;
+        let followed = 850;
+        let visited = 510;
+        let admitted = 382;
+        let handedOver = 126;
+        let ratios = [100, pct(followed, leadPool), pct(visited, followed), pct(admitted, visited), pct(handedOver, admitted)];
+        const funnelHtml = `<div class="funnel-grid">
+            <div class="funnel-metric"><div class="funnel-topline"><span>1. 线索入池</span><span>${leadPool}</span></div><div class="funnel-track"><div class="funnel-bar" style="width:${ratios[0]}%; background:linear-gradient(90deg, #3B82F6 0%, #60A5FA 100%);"></div></div></div>
+            <div class="funnel-metric"><div class="funnel-topline"><span>2. 有效跟进</span><span>${followed}</span></div><div class="funnel-track"><div class="funnel-bar" style="width:${ratios[1]}%; background:linear-gradient(90deg, #EC4899 0%, #F472B6 100%);"></div></div></div>
+            <div class="funnel-metric"><div class="funnel-topline"><span>3. 确认到访</span><span>${visited}</span></div><div class="funnel-track"><div class="funnel-bar" style="width:${ratios[2]}%; background:linear-gradient(90deg, #F97316 0%, #FB923C 100%);"></div></div></div>
+            <div class="funnel-metric"><div class="funnel-topline"><span>4. 办理录取</span><span>${admitted}</span></div><div class="funnel-track"><div class="funnel-bar" style="width:${ratios[3]}%; background:linear-gradient(90deg, #8B5CF6 0%, #A78BFA 100%);"></div></div></div>
+            <div class="funnel-metric"><div class="funnel-topline"><span>5. 报到交接</span><span>${handedOver}</span></div><div class="funnel-track"><div class="funnel-bar" style="width:${ratios[4]}%; background:linear-gradient(90deg, #059669 0%, #34D399 100%);"></div></div></div>
+            </div>`;
+        document.getElementById('funnel-container').innerHTML = funnelHtml;
+    }
+
+    function getStageText(stage) {
+        if (stage < 0) return '待分配';
+        return ['跟进中', '待到访', '已到访', '待录取', '报到交接'][stage] || '待分配';
+    }
+
+    function getStepsHtml(stage, mode = 'list') {
+        const labels = mode === 'detail' ? ['入池', '分配', '跟进', '到访', '预定', '录取', '报到', '交接'] : ['线索', '跟进', '到访', '录取', '交接'];
+        const activeIndex = mode === 'detail' ? (stage < 0 ? 0 : stage + 1) : (stage < 0 ? 0 : (stage <= 1 ? 1 : (stage === 2 ? 2 : (stage <= 3 ? 3 : 4))));
+        
+        let html = '<div class="step-container">';
+        labels.forEach((label, idx) => {
+            let sClass = activeIndex > idx ? 'done' : (activeIndex === idx ? 'active' : '');
+            let content = activeIndex > idx ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"></polyline></svg>' : idx + 1;
+            html += `<div class="step-item ${sClass}"><div class="step-circle">${content}</div><div class="step-label">${label}</div></div>`;
+        });
+        html += '</div>';
+        return html;
+    }
+
+    // 防断行、防挤压核心列表渲染
+    function renderList(containerId, list, filterName) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        if (list.length === 0) {
+            container.innerHTML = `<div class="empty-state"><p>该筛选维度下暂无数据</p></div>`;
+            return;
+        }
+
+        let html = '';
+        list.forEach(lead => {
+            let stageBadge = lead.owner ? `<div class="badge-tag tag-success">负责人: ${lead.owner}</div>` : `<div class="badge-tag tag-primary">待分配</div>`;
+            let checkbox = `<div class="checkbox-wrap ${state.selectedIds.has(lead.id) ? 'checked' : ''}" onclick="toggleSelect(${lead.id}, event)"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>`;
+            let intentBadge = lead.intentLevel === '高意向' ? `<span class="badge-outline warning" style="color:#EF4444; border-color:#EF4444; background:rgba(239,68,68,0.1);">高意向</span>` : '';
+            
+            let handoverDesc = lead.handoverStatus === 'failed' ? `<div class="meta-item" style="color:var(--danger-color); font-weight:800; background:var(--danger-light);">异常原因：${lead.missingDocs}</div>` : '';
+            let meta = `<div class="meta-grid">
+                <div class="meta-item">联系电话：${lead.phone}</div>
+                <div class="meta-item">来源渠道：${lead.source}</div>
+                ${lead.nextFollowTime ? `<div class="meta-item" style="color:var(--primary-color);">下次跟进：${lead.nextFollowTime}</div>` : ''}
+                ${handoverDesc}
+            </div>`;
+
+            let actions = '';
+            if (filterName === '到访记录') {
+                actions = `<button class="btn-xs outline" onclick="event.stopPropagation(); openLeadDetail(${lead.id})">查看明细</button>`;
+            } else if (!lead.owner) {
+                actions = `<button class="btn-xs" onclick="event.stopPropagation(); executeClaim(${lead.id})">一键认领</button>`;
+            } else if (lead.isOverdue) {
+                actions = `<button class="btn-xs danger" onclick="openContextModal('sheet-follow-up', ${lead.id}, event)">立即写跟进</button>`;
+            } else if (lead.handoverStatus === 'failed') {
+                actions = `<button class="btn-xs outline" onclick="event.stopPropagation(); retryHandover(${lead.id})">重新提交交接</button>`;
+            } else if (lead.stage <= 0) {
+                actions = `<button class="btn-xs" onclick="openContextModal('sheet-follow-up', ${lead.id}, event)">跟进与转阶段</button>`;
+            } else if (lead.stage === 1) {
+                actions = `<button class="btn-xs" onclick="event.stopPropagation(); confirmVisit(${lead.id})">确认到访核销</button>`;
+            } else if (lead.stage === 2) {
+                actions = `<button class="btn-xs" onclick="event.stopPropagation(); handleReserve(${lead.id})">办理预定</button>`;
+            } else if (lead.stage === 3) {
+                actions = `<button class="btn-xs" onclick="openContextModal('dialog-confirm-enroll', ${lead.id}, event)">转录取单</button>`;
+            }
+
+            html += `<div class="list-card glass-card" onclick="openLeadDetail(${lead.id})">
+                <div class="card-row-between">
+                    <div class="lead-main">
+                        <div class="card-title">${checkbox} <span style="flex-shrink:0;">${lead.name}</span> ${intentBadge}</div>
+                    </div>
+                    <div class="lead-status" onclick="event.stopPropagation()">
+                        ${stageBadge}
+                    </div>
+                </div>
+                ${getStepsHtml(lead.stage)}
+                ${meta}
+                <div class="card-actions" onclick="event.stopPropagation()">${actions}</div>
+            </div>`;
+        });
+        container.innerHTML = html;
+        updateBatchBar();
+    }
+
+    function switchFilter(el, type, filterName) {
+        clearSelection();
+        const container = document.getElementById(`pills-${type}`);
+        if(container) {
+            container.querySelectorAll('.pill').forEach(pill => pill.classList.remove('active'));
+            el.classList.add('active');
+            el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+        rerenderActiveList(type);
+    }
+
+    function rerenderActiveList(type) {
+        const activePill = document.querySelector(`#pills-${type} .pill.active`);
+        let filterName = activePill ? activePill.innerText.trim() : '';
+        let filtered = [];
+        let listContainerId = `${type}-list-container`;
+
+        if (type === 'leads') {
+            if (filterName === '公海线索') filtered = state.leads.filter(d => !d.owner);
+            else if (filterName === '我的线索') filtered = state.leads.filter(d => d.owner === state.currentUser);
+            else if (filterName === '全部线索') filtered = state.leads;
+            else if (filterName === '即将回收') filtered = state.leads.filter(d => d.isOverdue);
+        } else if (type === 'follow') {
+            let combined = state.leads.concat(state.conversions);
+            if (filterName === '待跟进') filtered = combined.filter(d => d.owner && d.stage <= 0);
+            else if (filterName === '待到访') filtered = combined.filter(d => d.owner && d.stage === 1);
+            else if (filterName === '到访记录') filtered = combined.filter(d => d.owner && d.stage >= 2);
+        } else if (type === 'reservation') {
+            if (filterName === '待预定') filtered = state.conversions.filter(d => d.stage === 2);
+            else if (filterName === '待录取') filtered = state.conversions.filter(d => d.stage === 3);
+        } else if (type === 'handover') {
+            if (filterName === '报到记录') filtered = state.conversions.filter(d => d.stage >= 4);
+            else if (filterName === '入学交接任务') filtered = state.conversions.filter(d => d.handoverStatus === 'failed');
+        }
+        
+        renderList(listContainerId, filtered, filterName);
+    }
+
+    function refreshAllModuleLists() {
+        ['leads', 'follow', 'reservation', 'handover'].forEach(type => rerenderActiveList(type));
+        renderDashboard();
+    }
+
+    function switchLog(type, e) {
+        if(e) {
+            document.querySelectorAll('#pills-logs .pill').forEach(p => p.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+        }
+        const logs = logData[type] || logData['入池日志'];
+        const html = logs.map(l => `<div class="log-item"><div class="log-time">${l.time}</div><div class="log-content">${l.content}</div><div class="log-detail">${l.detail}</div></div>`).join('');
+        const container = document.getElementById('logs-list-container');
+        if(container) container.innerHTML = html;
+    }
+
+    // 修复批量操作底栏逻辑
+    function toggleSelect(id, e) {
+        e.stopPropagation();
+        if (state.selectedIds.has(id)) {
+            state.selectedIds.delete(id);
+        } else {
+            state.selectedIds.add(id);
+        }
+        refreshAllModuleLists();
+    }
+
+    function clearSelection() {
+        state.selectedIds.clear();
+        updateBatchBar();
+    }
+
+    function updateBatchBar() {
+        const bar = document.getElementById('batch-bar');
+        if(bar) {
+            document.getElementById('batch-summary').innerText = `已选 ${state.selectedIds.size} 项`;
+            if (state.selectedIds.size > 0) {
+                bar.classList.add('active');
+            } else {
+                bar.classList.remove('active');
+            }
+        }
+    }
+
+    // 三级联动分配
+    function renderAssignStaff() {
+        const sem = document.getElementById('assign-semester').value;
+        const grp = document.getElementById('assign-group').value;
+        const container = document.getElementById('assign-staff-list');
+        
+        if(!sem || !grp) {
+            container.innerHTML = '<div class="empty-state" style="padding:20px; background:rgba(255,255,255,0.5); border-radius:16px;"><p>请先选择学期和分组联动人员</p></div>';
+            return;
+        }
+        
+        container.innerHTML = `
+            <div class="sheet-list-item" onclick="executeAssign('张伟')">
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                    <div style="font-size:15px; font-weight:800; color:var(--text-title);">张伟</div>
+                    <div style="font-size:12px; color:var(--text-secondary);">招生顾问 ｜ 在岗 ｜ 当前 12 条</div>
+                </div>
+                <span class="badge-tag tag-primary" style="padding:6px 12px;">选择</span>
+            </div>
+            <div class="sheet-list-item" onclick="executeAssign('李娜')">
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                    <div style="font-size:15px; font-weight:800; color:var(--text-title);">李娜</div>
+                    <div style="font-size:12px; color:var(--text-secondary);">组长 ｜ 在岗 ｜ 当前 8 条</div>
+                </div>
+                <span class="badge-tag tag-primary" style="padding:6px 12px;">选择</span>
+            </div>
+            <div class="sheet-list-item" style="opacity:0.5; pointer-events:none;">
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                    <div style="font-size:15px; font-weight:800; color:var(--text-title);">王强</div>
+                    <div style="font-size:12px; color:var(--text-secondary);">招生顾问 ｜ 休假 ｜ 不可分配</div>
+                </div>
+                <span class="badge-tag tag-danger" style="padding:6px 12px; background:#E2E8F0; color:#64748B;">休假</span>
+            </div>
+        `;
+    }
+
+    function executeAssign(name) {
+        closeAllModals();
+        showToast('正在批量分配...', false);
+        
+        setTimeout(() => {
+            if (state.selectedIds.size > 0) {
+                const ids = Array.from(state.selectedIds);
+                clearSelection(); 
+                ids.forEach(id => {
+                    let lead = state.leads.find(l => l.id === id);
+                    if(lead) {
+                        lead.owner = name;
+                        lead.stage = Math.max(lead.stage, 0);
+                        lead.isOverdue = false;
+                    }
+                });
+            } else if (state.currentActionLeadId) {
+                let lead = state.leads.find(l => l.id === state.currentActionLeadId);
+                if(lead) {
+                    lead.owner = name;
+                    lead.stage = Math.max(lead.stage, 0);
+                }
+            }
+            refreshAllModuleLists();
+            showToast('分配成功，已流转给: ' + name, true);
+        }, 600);
+    }
+
+    function executeClaim(id) {
+        state.currentActionLeadId = id;
+        executeAssign(state.currentUser);
+    }
+
+    function handleDashboardJump(type) {
+        if (type === 'syncFailed') {
+            switchEnrollmentTab('sub-view-more', document.getElementById('tab-btn-more'));
+            switchFilter(document.querySelector('#pills-handover .pill:last-child'), 'handover', '入学交接任务');
+        } else if (type === 'overdue') {
+            switchEnrollmentTab('sub-view-leads', document.getElementById('tab-btn-leads'));
+            switchFilter(document.querySelector('#pills-leads .pill:last-child'), 'leads', '即将回收');
+        }
+    }
+
+    // 动作流转函数
+    function confirmVisit(id) {
+        let lead = state.leads.find(l => l.id === id) || state.conversions.find(l => l.id === id);
+        if(lead) {
+            lead.stage = 2;
+            if(state.leads.some(l => l.id === id)) {
+                state.conversions.unshift(lead);
+                state.leads = state.leads.filter(l => l.id !== id);
+            }
+            showToast('已确认到访核销', true);
+            refreshAllModuleLists();
+        }
+    }
+
+    function handleReserve(id) {
+        let lead = state.conversions.find(l => l.id === id);
+        if(lead) {
+            lead.stage = 3;
+            showToast('已进入办理预定，等待财务确认', true);
+            refreshAllModuleLists();
+        }
+    }
+
+    function handleAdmit(id) {
+        let lead = state.conversions.find(l => l.id === id);
+        if(lead) {
+            lead.stage = 4;
+            lead.handoverStatus = 'success';
+            showToast('录取单已生成，流程已流转至交接池', true);
+            closeAllModals();
+            refreshAllModuleLists();
+        }
+    }
+
+    function retryHandover(id) {
+        let lead = state.conversions.find(l => l.id === id);
+        if(lead) {
+            showToast(`正在重新提交 ${lead.name} 的入学交接...`, true);
+            setTimeout(() => {
+                lead.handoverStatus = 'success';
+                lead.missingDocs = '';
+                showToast(`${lead.name} 入学交接任务已成功！`, true);
+                refreshAllModuleLists();
+            }, 1000);
+        }
+    }
+
+    function applyFollowUp() {
+        let lead = state.leads.find(l => l.id === state.currentActionLeadId);
+        if (!lead) lead = state.conversions.find(l => l.id === state.currentActionLeadId);
+        if(lead) {
+            lead.isOverdue = false;
+            lead.intentLevel = document.querySelector('[name="intent"]').value;
+            lead.stage = Math.max(lead.stage, 1);
+            showToast('跟进数据已更新', true);
+            closeAllModals();
+            refreshAllModuleLists();
+        }
+    }
+
+    // 时间线
+    function openLeadDetail(id) {
+        let lead = state.leads.find(l => l.id === id) || state.conversions.find(l => l.id === id);
+        if (!lead) return;
+
+        state.currentActionLeadId = id;
+        let badge = lead.owner ? `<span class="badge-tag tag-success">负责人: ${lead.owner}</span>` : `<span class="badge-tag tag-primary">待分配公海</span>`;
+        let headerHtml = `<div style="font-size:20px; font-weight:800; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between;">${lead.name} ${badge}</div><div style="font-size:13px; color:var(--text-secondary);">手机号: ${lead.phone} | 来源: ${lead.source}</div>`;
+        document.getElementById('detail-header-info').innerHTML = headerHtml;
+
+        const steps = [
+            { label: '线索入池', done: true, time: '2026-05-20 10:00', desc: `来源验证通过: ${lead.source}` },
+            { label: '顾问分配', done: lead.owner != null, time: lead.owner ? '2026-05-21 09:30' : '', desc: lead.owner ? `承接人: ${lead.owner}` : '等待分发' },
+            { label: '触达跟进', done: lead.stage >= 0, time: lead.stage >= 0 ? '2026-05-22 14:00' : '', desc: lead.stage >= 0 ? '已有效触达' : '等待联系' },
+            { label: '到访核销', done: lead.stage >= 2, time: lead.stage >= 2 ? '2026-05-24 15:30' : '', desc: lead.stage >= 2 ? '核销成功' : '等待到访' },
+            { label: '意向预定', done: lead.stage >= 3, time: lead.stage >= 3 ? '2026-05-25 09:00' : '', desc: lead.stage >= 3 ? '进入预定池' : '等待预定办理' },
+            { label: '录取交接', done: lead.stage >= 4, time: lead.stage >= 4 ? '2026-05-26 10:00' : '', desc: lead.stage >= 4 ? '交接流转中' : '未触发交接' }
+        ];
+        
+        const timelineHtml = steps.map(s => {
+            let sClass = s.done ? '' : 'pending';
+            let timeHtml = s.time ? `<div class="log-time">${s.time}</div>` : '';
+            return `<div class="log-item ${sClass}">${timeHtml}<div class="log-content">${s.label}</div><div class="log-detail">${s.desc}</div></div>`;
+        }).join('');
+
+        document.getElementById('detail-timeline').innerHTML = timelineHtml;
+        document.getElementById('page-lead-detail').classList.replace('hidden-right', 'active');
+    }
+
+    function closeLeadDetail() {
+        document.getElementById('page-lead-detail').classList.replace('active', 'hidden-right');
+    }
+
+    function openContextModal(modalId, leadId, evt) {
+        if (evt) evt.stopPropagation();
+        state.currentActionLeadId = leadId;
+        showModal(modalId);
+    }
+
+    function showToast(msg, isSuccess = false) {
+        const toast = document.getElementById('sys-toast');
+        document.getElementById('sys-toast-msg').innerText = msg;
+        toast.style.background = isSuccess ? 'rgba(16, 185, 129, 0.95)' : 'rgba(15, 23, 42, 0.85)';
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    function showModal(modalId) {
+        document.getElementById('modal-overlay').classList.add('active');
+        const m = document.getElementById(modalId);
+        if(m) m.classList.add('active');
+    }
+
+    function closeAllModals() {
+        document.getElementById('modal-overlay').classList.remove('active');
+        document.querySelectorAll('.bottom-sheet, .dialog-box').forEach(el => el.classList.remove('active'));
+    }
+
+    window.onload = function() {
+        switchLog('入池日志');
+        refreshAllModuleLists();
+    };
+</script>
+</body>
+</html>
