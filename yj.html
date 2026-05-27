@@ -43,6 +43,46 @@
         }
         
         .judge-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .pass-word-row { will-change: transform; }
+        
+        /* 动态顶位新布局样式 */
+        .pass-content-strip { 
+            margin-left: auto; 
+            width: fit-content; 
+            max-width: 100%; 
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); 
+        }
+        .pass-meaning-container {
+            display: grid;
+            grid-template-columns: 0fr;
+            opacity: 0;
+            transform: translateX(-15px) scale(0.98);
+            transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .pass-meaning-container > div {
+            overflow: hidden;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        .pass-meaning { 
+            width: max-content; 
+            max-width: min(35vw, 360px); 
+            white-space: nowrap; 
+            overflow: hidden;
+            /* 彻底移除 text-overflow: ellipsis; 解决动画过程中出现 "..." 的顿挫感 */
+            text-align: right; 
+        }
+        .pass-content-strip.revealed .pass-meaning-container {
+            grid-template-columns: 1fr;
+            opacity: 1;
+            transform: translateX(0) scale(1);
+        }
 
         @keyframes pulse-red-light {
             0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.15); }
@@ -76,21 +116,6 @@
             background-position: right 6px center;
             background-size: 12px;
             padding-right: 24px !important;
-        }
-        
-        /* 保存按钮激活态增强 */
-        .save-btn.active {
-            background-color: #1F5FFF;
-            color: white;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(31, 95, 255, 0.3);
-        }
-        .save-btn.active:hover {
-            background-color: #004ce6;
-            box-shadow: 0 6px 16px rgba(31, 95, 255, 0.4);
-        }
-        .save-btn.active:active {
-            transform: scale(0.95);
         }
     </style>
 </head>
@@ -152,7 +177,7 @@
             </div>
 
             <div class="flex-1 bg-white/90 backdrop-blur-xl rounded-[24px] shadow-premium p-3 flex flex-col gap-2 min-w-0">
-                <div class="grid grid-cols-3 gap-2 lg:gap-3 flex-1 min-h-0">
+                <div class="grid grid-cols-4 gap-2 lg:gap-3 flex-1 min-h-0">
                     <div class="bg-green-50/80 border border-green-200 rounded-[16px] px-3 lg:px-4 py-3.5 flex items-center justify-between relative overflow-hidden group transition-all hover:shadow-md h-full w-full">
                         <div class="flex items-center gap-1.5 lg:gap-2 text-green-700 z-10 shrink-0 min-w-0">
                             <div class="w-[28px] h-[28px] rounded-[8px] bg-white flex items-center justify-center shadow-sm shrink-0 border border-green-100">
@@ -175,6 +200,17 @@
                             <span class="text-[20px] lg:text-[24px] font-extrabold text-red-700 leading-none tracking-tight font-mono" id="statUnknownTotal">450</span><span class="text-[11px] font-bold text-red-600/70">词</span>
                         </div>
                     </div>
+                    <div class="bg-orange-50/80 border border-orange-200 rounded-[16px] px-3 lg:px-4 py-3.5 flex items-center justify-between relative overflow-hidden group transition-all hover:shadow-md h-full w-full">
+                        <div class="flex items-center gap-1.5 lg:gap-2 text-orange-700 z-10 shrink-0 min-w-0">
+                            <div class="w-[28px] h-[28px] rounded-[8px] bg-white flex items-center justify-center shadow-sm shrink-0 border border-orange-100">
+                                <i class="ph-bold ph-clock text-[16px] text-orange-500"></i>
+                            </div>
+                            <span class="text-[12px] lg:text-[13px] font-bold whitespace-nowrap">待过单词</span>
+                        </div>
+                        <div class="flex items-baseline gap-1 z-10 whitespace-nowrap ml-1 shrink-0">
+                            <span class="text-[20px] lg:text-[24px] font-extrabold text-orange-700 leading-none tracking-tight font-mono" id="statPendingPass">0</span><span class="text-[11px] font-bold text-orange-600/70">词</span>
+                        </div>
+                    </div>
                     <div class="bg-blue-50/80 border border-blue-200 rounded-[16px] px-3 lg:px-4 py-3.5 flex items-center justify-between relative overflow-hidden group transition-all hover:shadow-md h-full w-full">
                         <div class="flex items-center gap-1.5 lg:gap-2 text-blue-700 z-10 shrink-0 min-w-0">
                             <div class="w-[28px] h-[28px] rounded-[8px] bg-white flex items-center justify-center shadow-sm shrink-0 border border-blue-100">
@@ -192,19 +228,19 @@
                     <div class="flex items-center justify-center gap-2 md:gap-2.5 px-1">
                         <div class="w-8 h-8 rounded-[10px] bg-white shadow-sm border border-blue-100 flex items-center justify-center text-blue-500 shrink-0 hidden lg:flex"><i class="ph-fill ph-microphone-stage text-[16px]"></i></div>
                         <div class="flex items-baseline gap-1 whitespace-nowrap">
-                            <span class="text-[12px] font-bold text-gray-500 mr-0.5">跟读</span><span class="text-[20px] font-extrabold text-gray-800 leading-none font-mono" id="statReadTotal">1200</span><span class="text-[11px] font-semibold text-gray-400">次</span>
+                            <span class="text-[12px] font-bold text-gray-500 mr-0.5">跟读</span><span class="text-[20px] font-extrabold text-gray-800 leading-none font-mono" id="statReadTotal">1200</span><span class="text-[11px] font-semibold text-gray-400">词</span>
                         </div>
                     </div>
                     <div class="flex items-center justify-center gap-2 md:gap-2.5 px-1">
                         <div class="w-8 h-8 rounded-[10px] bg-white shadow-sm border border-cyan-100 flex items-center justify-center text-cyan-600 shrink-0 hidden lg:flex"><i class="ph-fill ph-headphones text-[16px]"></i></div>
                         <div class="flex items-baseline gap-1 whitespace-nowrap">
-                            <span class="text-[12px] font-bold text-gray-500 mr-0.5">音记</span><span class="text-[20px] font-extrabold text-gray-800 leading-none font-mono" id="statMemoTotal">1100</span><span class="text-[11px] font-semibold text-gray-400">次</span>
+                            <span class="text-[12px] font-bold text-gray-500 mr-0.5">音记</span><span class="text-[20px] font-extrabold text-gray-800 leading-none font-mono" id="statMemoTotal">1100</span><span class="text-[11px] font-semibold text-gray-400">词</span>
                         </div>
                     </div>
                     <div class="flex items-center justify-center gap-2 md:gap-2.5 px-1">
                         <div class="w-8 h-8 rounded-[10px] bg-white shadow-sm border border-rose-100 flex items-center justify-center text-rose-500 shrink-0 hidden lg:flex"><i class="ph-fill ph-pencil-simple text-[16px]"></i></div>
                         <div class="flex items-baseline gap-1 whitespace-nowrap">
-                            <span class="text-[12px] font-bold text-gray-500 mr-0.5">听写</span><span class="text-[20px] font-extrabold text-gray-800 leading-none font-mono" id="statDictTotal">1050</span><span class="text-[11px] font-semibold text-gray-400">次</span>
+                            <span class="text-[12px] font-bold text-gray-500 mr-0.5">听写</span><span class="text-[20px] font-extrabold text-gray-800 leading-none font-mono" id="statDictTotal">1050</span><span class="text-[11px] font-semibold text-gray-400">词</span>
                         </div>
                     </div>
                 </div>
@@ -229,15 +265,18 @@
             <div class="bg-white rounded-[24px] shadow-premium p-4 md:p-5 flex flex-col justify-between gap-4 h-full min-h-0 relative">
                 
                 <div class="grid grid-cols-2 gap-4 h-[90px] shrink-0">
-                    <button id="btnNew" onclick="window.startPassing('new', '学习新词')" class="w-full h-full"></button>
-                    <button id="btnOld" onclick="window.startPassing('old', '复习旧词')" class="w-full h-full"></button>
+                    <button id="btnNew" onclick="window.startPassing('new', '过新词')" class="w-full h-full"></button>
+                    <button id="btnOld" onclick="window.startPassing('old', '过旧词')" class="w-full h-full"></button>
                 </div>
 
                 <div class="bg-gray-50/60 rounded-[16px] border border-gray-100 p-3 shrink-0 relative overflow-hidden min-h-[80px] flex flex-col justify-center transition-all">
                     
                     <div id="hubIdleState" class="flex flex-row items-center justify-center gap-2 transition-opacity h-full">
-                        <button onclick="window.promptManualGenerate()" class="w-full flex items-center justify-center gap-1.5 text-orange-500 hover:text-orange-600 bg-orange-50 hover:bg-orange-100 py-3 rounded-[12px] transition-all active:scale-95 font-bold text-[14px] shadow-sm border border-orange-100/50">
-                            <i class="ph-bold ph-magic-wand text-[18px]"></i> 一键生成专属强化关卡
+                        <button id="hubLearnNewBtn" onclick="window.generateManualByType('new')" class="flex-1 flex items-center justify-center gap-2 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 py-3 rounded-[12px] transition-all active:scale-95 font-bold text-[14px] shadow-sm border border-blue-100/70">
+                            <i class="ph-bold ph-rocket text-[18px]"></i><span>学新词</span><span class="font-mono text-[13px] bg-white/80 px-2 py-0.5 rounded-[6px]">0 词</span>
+                        </button>
+                        <button id="hubLearnOldBtn" onclick="window.generateManualByType('old')" class="flex-1 flex items-center justify-center gap-2 text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 py-3 rounded-[12px] transition-all active:scale-95 font-bold text-[14px] shadow-sm border border-emerald-100/70">
+                            <i class="ph-bold ph-arrows-clockwise text-[18px]"></i><span>学旧词</span><span class="font-mono text-[13px] bg-white/80 px-2 py-0.5 rounded-[6px]">0 词</span>
                         </button>
                     </div>
 
@@ -302,32 +341,39 @@
 
 
     <div id="view-passing" class="view-section flex-col w-full h-full p-4 md:p-5 overflow-hidden max-w-[1300px] mx-auto gap-4">
-        <div class="flex items-center justify-between shrink-0 mb-3 px-2">
-            <div class="flex items-center gap-4">
-                <button onclick="window.switchView('view-dashboard')" class="w-11 h-11 bg-[#F1F5F9] hover:bg-[#E2E8F0] rounded-[14px] flex items-center justify-center transition-colors text-slate-600 shadow-sm active:scale-95">
+        <div class="flex items-center justify-between shrink-0 mb-3 px-2 gap-4">
+            <div class="flex items-center gap-4 min-w-0">
+                <button onclick="window.switchView('view-dashboard')" class="w-11 h-11 bg-[#F1F5F9] hover:bg-[#E2E8F0] rounded-[14px] flex items-center justify-center transition-colors text-slate-600 shadow-sm active:scale-95 shrink-0">
                     <i class="ph-bold ph-caret-left text-[22px]"></i>
                 </button>
-                <h2 class="font-extrabold text-[32px] text-gray-900 tracking-tight leading-none" id="passingTitle">学习新词</h2>
+                <h2 class="font-extrabold text-[32px] text-gray-900 tracking-tight leading-none truncate" id="passingTitle">过新词</h2>
+            </div>
+            <div class="flex items-center bg-white rounded-full px-3 py-1.5 shadow-sm border border-gray-100 gap-1.5 shrink-0">
+                <i class="ph-bold ph-clock text-[15px] text-gray-400"></i>
+                <span id="passing-timer" class="font-mono font-bold text-[13px] text-gray-600 tracking-wide">00:00</span>
             </div>
         </div>
 
         <div class="flex-1 min-h-0 flex flex-col bg-white rounded-[24px] shadow-premium relative overflow-hidden">
-            <div class="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 shrink-0">
-                <span class="text-[13px] text-gray-500 font-medium">共 <span id="totalPassCount">10</span> 词</span>
-                <div class="flex items-center bg-gray-200/60 p-1 rounded-[12px] gap-1 shrink-0">
-                    <button id="pass-filter-all" onclick="window.setPassFilter('all')" class="px-3 py-1.5 rounded-[10px] bg-white shadow-sm text-gray-800 text-[13px] font-bold transition-all">全部 <span id="statAllCount">0</span></button>
-                    <button id="pass-filter-known" onclick="window.setPassFilter('known')" class="px-3 py-1.5 rounded-[10px] text-gray-500 hover:text-gray-700 text-[13px] font-bold transition-all flex items-center gap-1"><div class="w-1.5 h-1.5 rounded-full bg-[#10B981]"></div>认识 <span id="statKnown">0</span></button>
-                    <button id="pass-filter-unknown" onclick="window.setPassFilter('unknown')" class="px-3 py-1.5 rounded-[10px] text-gray-500 hover:text-gray-700 text-[13px] font-bold transition-all flex items-center gap-1"><div class="w-1.5 h-1.5 rounded-full bg-[#EF4444]"></div>不认识 <span id="statUnknown">0</span></button>
-                </div>
-            </div>
+            <div class="hidden" aria-hidden="true"></div>
             <div id="wordListContainer" class="flex-1 min-h-0 overflow-y-auto px-5 py-4 flex flex-col gap-4 pb-24 hide-scrollbar bg-gray-50/30 content-start"></div>
-            <div class="absolute bottom-0 left-0 w-full bg-white border-t border-gray-100 px-6 py-4 flex justify-between items-center z-10 shadow-[0_-4px_20px_rgba(0,0,0,0.03)] shrink-0">
-                <div class="flex items-center gap-1.5 text-[#F97316] text-[15px] font-medium cursor-pointer active:opacity-70 transition-all whitespace-nowrap" onclick="window.scrollToFirstUnanswered()">
-                    <i class="ph-fill ph-warning-circle text-[22px]"></i>
-                    <span>剩余待完成：<span id="statRemaining" class="text-[22px] font-extrabold px-1 leading-none">10</span> 题</span>
-                    <i class="ph-bold ph-caret-right text-[16px] ml-0.5"></i>
+            <div class="absolute bottom-0 left-0 w-full bg-white border-t border-gray-100 px-6 py-4 flex justify-between items-center z-10 shadow-[0_-4px_20px_rgba(0,0,0,0.03)] shrink-0 gap-4 flex-wrap">
+                <div class="flex items-center gap-4 min-w-0 flex-wrap">
+                    <span class="text-[13px] text-gray-500 font-medium bg-gray-50 border border-gray-100 px-3 py-2 rounded-[12px] whitespace-nowrap">共 <span id="totalPassCount" class="font-mono font-extrabold text-gray-800">10</span> 词</span>
+                    <div class="flex items-center gap-1.5 text-[#F97316] text-[15px] font-medium cursor-pointer active:opacity-70 transition-all whitespace-nowrap" onclick="window.scrollToFirstUnanswered()">
+                        <i class="ph-fill ph-warning-circle text-[22px]"></i>
+                        <span>剩余待完成：<span id="statRemaining" class="text-[22px] font-extrabold px-1 leading-none">10</span> 题</span>
+                        <i class="ph-bold ph-caret-right text-[16px] ml-0.5"></i>
+                    </div>
                 </div>
-                <button id="submitLevelBtn" onclick="window.submitPassResults()" class="bg-[#F1F5F9] text-[#94A3B8] font-bold py-3 px-10 text-[16px] rounded-[14px] transition-all cursor-not-allowed whitespace-nowrap shrink-0">提 交</button>
+                <div class="flex items-center gap-3 shrink-0 flex-wrap justify-end">
+                    <div class="flex items-center bg-gray-200/60 p-1 rounded-[12px] gap-1 shrink-0">
+                        <button id="pass-filter-all" onclick="window.setPassFilter('all')" class="px-3 py-1.5 rounded-[10px] bg-white shadow-sm text-gray-800 text-[13px] font-bold transition-all">全部 <span id="statAllCount">0</span></button>
+                        <button id="pass-filter-known" onclick="window.setPassFilter('known')" class="px-3 py-1.5 rounded-[10px] text-gray-500 hover:text-gray-700 text-[13px] font-bold transition-all flex items-center gap-1"><div class="w-1.5 h-1.5 rounded-full bg-[#10B981]"></div>认识 <span id="statKnown">0</span></button>
+                        <button id="pass-filter-unknown" onclick="window.setPassFilter('unknown')" class="px-3 py-1.5 rounded-[10px] text-gray-500 hover:text-gray-700 text-[13px] font-bold transition-all flex items-center gap-1"><div class="w-1.5 h-1.5 rounded-full bg-[#EF4444]"></div>不认识 <span id="statUnknown">0</span></button>
+                    </div>
+                    <button id="submitLevelBtn" onclick="window.submitPassResults()" class="bg-[#F1F5F9] text-[#94A3B8] font-bold py-3 px-10 text-[16px] rounded-[14px] transition-all cursor-not-allowed whitespace-nowrap shrink-0">提 交</button>
+                </div>
             </div>
         </div>
     </div>
@@ -376,12 +422,6 @@
                 </div>
 
                 <div class="w-full flex flex-col items-center shrink-0 mt-auto relative z-50 pointer-events-auto">
-                    <div id="mic-container" class="mb-6 h-[84px] flex items-center justify-end w-full transition-opacity duration-300 pr-2 pointer-events-auto">
-                        <button id="score-action-btn" class="w-[84px] h-[84px] bg-[#3B82F6] text-white rounded-full flex items-center justify-center shadow-[0_8px_24px_rgba(59,130,246,0.4)] hover:bg-[#2563EB] transition-all focus:outline-none select-none group relative z-[100] overflow-hidden transform cursor-pointer">
-                            <i class="ph-bold ph-microphone text-[32px] pointer-events-none transition-transform group-active:scale-90 shrink-0"></i>
-                        </button>
-                    </div>
-
                     <div id="control-capsule" class="w-full flex items-center justify-between bg-white/90 backdrop-blur-2xl px-5 h-[72px] rounded-[36px] shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-white/60 pointer-events-auto">
                         
                         <div class="flex items-center space-x-6 pl-6 pr-8 border-r border-gray-200/80 shrink-0">
@@ -431,6 +471,11 @@
                             </button>
                         </div>
 
+                    </div>
+                    <div id="mic-container" class="mt-5 h-[84px] flex items-center justify-end w-full transition-opacity duration-300 pr-2 pointer-events-auto">
+                        <button id="score-action-btn" class="w-[84px] h-[84px] bg-[#3B82F6] text-white rounded-full flex items-center justify-center shadow-[0_8px_24px_rgba(59,130,246,0.4)] hover:bg-[#2563EB] transition-all focus:outline-none select-none group relative z-[100] overflow-hidden transform cursor-pointer">
+                            <i class="ph-bold ph-microphone text-[32px] pointer-events-none transition-transform group-active:scale-90 shrink-0"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -497,10 +542,13 @@
                     <div class="w-1.5 h-5 bg-orange-500 rounded-full"></div>
                     <h3 class="font-extrabold text-[20px] text-gray-900 tracking-tight">流转规则</h3>
                 </div>
+                <span class="text-[13px] text-gray-500 font-bold bg-white px-3.5 py-1.5 rounded-full border border-gray-200 shadow-sm flex items-center gap-1.5">
+                    <i class="ph-fill ph-check-circle text-green-500 text-[16px]"></i> 修改已实时保存
+                </span>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start mb-10">
-                <div class="settings-card bg-white rounded-[24px] shadow-premium flex flex-col border border-gray-100 overflow-hidden relative group">
+                <div class="bg-white rounded-[24px] shadow-premium flex flex-col border border-gray-100 overflow-hidden relative group">
                     <div class="px-6 py-5 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
                         <div class="flex items-center gap-2">
                             <div class="w-8 h-8 rounded-[10px] bg-purple-100 text-purple-600 flex items-center justify-center shadow-sm border border-purple-200/50"><i class="ph-fill ph-sliders-horizontal text-[16px]"></i></div>
@@ -516,13 +564,10 @@
                             <span class="text-[14px] font-bold text-gray-600">旧词每关单词数</span>
                             <div class="flex items-center bg-gray-50 border border-gray-200 rounded-[8px] px-2 py-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]"><input type="number" value="20" class="w-10 text-center bg-transparent text-[14px] font-bold outline-none text-gray-700"><span class="text-[12px] text-gray-400">个</span></div>
                         </div>
-                        <div class="mt-auto pt-4 border-t border-gray-100/50 flex justify-end w-full">
-                            <button class="save-btn px-5 py-2 rounded-[12px] font-bold text-[13px] transition-all bg-gray-100 text-gray-400 cursor-not-allowed flex items-center justify-center gap-1.5 w-max ml-auto" disabled onclick="window.saveCard(this)"><i class="ph-bold ph-floppy-disk text-[16px]"></i> <span>保存修改</span></button>
-                        </div>
                     </div>
                 </div>
 
-                <div class="settings-card bg-white rounded-[24px] shadow-premium flex flex-col border border-gray-100 overflow-hidden relative group">
+                <div class="bg-white rounded-[24px] shadow-premium flex flex-col border border-gray-100 overflow-hidden relative group">
                     <div class="px-6 py-5 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
                         <div class="flex items-center gap-2">
                             <div class="w-8 h-8 rounded-[10px] bg-blue-100 text-blue-600 flex items-center justify-center shadow-sm border border-blue-200/50"><i class="ph-fill ph-rocket text-[16px]"></i></div>
@@ -542,13 +587,10 @@
                             <span class="text-[14px] font-bold text-gray-600">听写通关次数</span>
                             <div class="flex items-center bg-gray-50 border border-gray-200 rounded-[8px] px-2 py-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]"><input type="number" value="2" class="w-10 text-center bg-transparent text-[14px] font-bold outline-none text-gray-700"><span class="text-[12px] text-gray-400">次</span></div>
                         </div>
-                        <div class="mt-auto pt-4 border-t border-gray-100/50 flex justify-end w-full">
-                            <button class="save-btn px-5 py-2 rounded-[12px] font-bold text-[13px] transition-all bg-gray-100 text-gray-400 cursor-not-allowed flex items-center justify-center gap-1.5 w-max ml-auto" disabled onclick="window.saveCard(this)"><i class="ph-bold ph-floppy-disk text-[16px]"></i> <span>保存修改</span></button>
-                        </div>
                     </div>
                 </div>
 
-                <div class="settings-card bg-white rounded-[24px] shadow-premium flex flex-col border border-gray-100 overflow-hidden relative group">
+                <div class="bg-white rounded-[24px] shadow-premium flex flex-col border border-gray-100 overflow-hidden relative group">
                     <div class="px-6 py-5 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
                         <div class="flex items-center gap-2">
                             <div class="w-8 h-8 rounded-[10px] bg-emerald-100 text-emerald-600 flex items-center justify-center shadow-sm border border-emerald-200/50"><i class="ph-fill ph-arrows-clockwise text-[16px]"></i></div>
@@ -567,9 +609,6 @@
                         <div class="flex items-center justify-between">
                             <span class="text-[14px] font-bold text-gray-600">听写通关次数</span>
                             <div class="flex items-center bg-gray-50 border border-gray-200 rounded-[8px] px-2 py-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]"><input type="number" value="1" class="w-10 text-center bg-transparent text-[14px] font-bold outline-none text-gray-700"><span class="text-[12px] text-gray-400">次</span></div>
-                        </div>
-                        <div class="mt-auto pt-4 border-t border-gray-100/50 flex justify-end w-full">
-                            <button class="save-btn px-5 py-2 rounded-[12px] font-bold text-[13px] transition-all bg-gray-100 text-gray-400 cursor-not-allowed flex items-center justify-center gap-1.5 w-max ml-auto" disabled onclick="window.saveCard(this)"><i class="ph-bold ph-floppy-disk text-[16px]"></i> <span>保存修改</span></button>
                         </div>
                     </div>
                 </div>
@@ -604,7 +643,9 @@
             var learningTimerInterval = null;
             var learningSeconds = 0;
             
-            // ============== 学习时长计时器模块 ==============
+                        var passingTimerInterval = null;
+            var passingSeconds = 0;
+// ============== 学习时长计时器模块 ==============
             function formatTime(sec) {
                 var m = Math.floor(sec / 60).toString().padStart(2, '0');
                 var s = (sec % 60).toString().padStart(2, '0');
@@ -624,6 +665,21 @@
             
             function stopLearningTimer() {
                 clearInterval(learningTimerInterval);
+            }
+
+            function startPassingTimer() {
+                clearInterval(passingTimerInterval);
+                passingSeconds = 0;
+                var timerEl = document.getElementById('passing-timer');
+                if (timerEl) timerEl.innerText = '00:00';
+                passingTimerInterval = setInterval(function() {
+                    passingSeconds++;
+                    if (timerEl) timerEl.innerText = formatTime(passingSeconds);
+                }, 1000);
+            }
+
+            function stopPassingTimer() {
+                clearInterval(passingTimerInterval);
             }
 
             // ====== 全局挂载基础函数 ======
@@ -680,7 +736,8 @@
                 var targetView = document.getElementById(viewId);
                 if (targetView) targetView.classList.add('active');
                 
-                if(viewId === 'view-dashboard') renderDashboardUI();
+                                if (viewId !== 'view-passing') stopPassingTimer();
+if(viewId === 'view-dashboard') renderDashboardUI();
                 if(viewId === 'view-vocab') renderVocabBookFull();
             };
 
@@ -791,8 +848,30 @@
                 }
             };
 
+            window.generateManualByType = function(type) {
+                if (state.activeLevel !== null) { window.showModal('暂不可用', '<div class="mt-1 font-medium">当前存在未完成的关卡，<br>请先将其通关！</div>'); return; }
+                var typeLabel = type === 'new' ? '新词' : '旧词';
+                var count = state.vocabBook.filter(w => w.type === type).length;
+                if (count === 0) { window.showModal('暂无可学', `<div class="mt-1 font-medium text-gray-600">当前没有可生成的${typeLabel}。</div>`); return; }
+                selectedGenType = type;
+                var msgHtml = `
+                    <div class="flex flex-col items-center w-full mt-1">
+                        <div class="w-12 h-12 rounded-[16px] bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-500 mb-3 shadow-sm">
+                            <i class="ph-bold ph-magic-wand text-[24px]"></i>
+                        </div>
+                        <div class="text-[15px] font-medium text-gray-600 leading-relaxed w-full text-center">
+                            <div>当前已积累${typeLabel} <b class="text-orange-500 text-[24px] font-black font-mono px-1">${count}</b> 个</div>
+                            <div class="mt-2">确认生成专属强化关卡吗？</div>
+                        </div>
+                        <div class="mt-3 bg-orange-50 border border-orange-100 text-orange-600 text-[13px] font-bold px-4 py-2 rounded-[12px] w-full leading-relaxed">
+                            生成关卡后将暂不可过词<br>需完成专属关卡后解锁
+                        </div>
+                    </div>`;
+                window.showModal('确认生成关卡', msgHtml, () => { window.executeManualGenerate(); }, true);
+            };
+
             window.promptManualGenerate = function() {
-                if(state.vocabBook.length === 0) { window.showModal('无法生成', '<div class="mt-1 font-medium text-gray-600">生词本空空如也，<br>快去「学习新词」或「复习旧词」收集生词吧！</div>'); return; }
+                if(state.vocabBook.length === 0) { window.showModal('无法生成', '<div class="mt-1 font-medium text-gray-600">生词本空空如也，<br>快去「过新词」或「过旧词」收集生词吧！</div>'); return; }
                 if (state.activeLevel !== null) { window.showModal('暂不可用', '<div class="mt-1 font-medium">当前存在未完成的关卡，<br>请先将其通关！</div>'); return; }
                 
                 var newCount = state.vocabBook.filter(w => w.type === 'new').length;
@@ -836,7 +915,7 @@
                     words: [...filteredWords], 
                     steps: [{ id: 'read', name: '跟读', target: 2, current: 0 }, { id: 'memo', name: '音记', target: 2, current: 0 }, { id: 'dict', name: '听写', target: 1, current: 0 }] 
                 };
-                window.showModal('一键生成成功', `<div class="mt-1 font-medium text-gray-600">已成功生成包含 <b class="text-orange-500 text-[18px] px-0.5">${filteredWords.length}</b> 个生词的关卡！<br>学习入口已锁定，请先完成专属强化。</div>`, () => window.switchView('view-dashboard'));
+                window.switchView('view-dashboard');
             };
 
             window.setVocabFilterFull = function(type) { state.vocabFilter = type; renderVocabBookFull(); };
@@ -883,6 +962,7 @@
                 setVal('statMemoTotal', dataStore.stats.memo);
                 setVal('statDictTotal', dataStore.stats.dict);
                 
+                setVal('statPendingPass', Math.max(0, total - learnedSum));
                 var unlearnedGrid = document.getElementById('statUnlearnedGrid');
                 if (unlearnedGrid) unlearnedGrid.innerText = unlearned;
             }
@@ -979,6 +1059,10 @@
                 var btnNew = document.getElementById('btnNew');
                 var btnOld = document.getElementById('btnOld');
                 
+                                var hubIdle = document.getElementById('hubIdleState');
+                var hubNewCount = state.vocabBook.filter(w => w.type === 'new').length;
+                var hubOldCount = state.vocabBook.filter(w => w.type === 'old').length;
+                
                 if (hasBlocker) {
                     if(btnNew) { 
                         btnNew.className = "bg-gradient-to-r from-[#508BFF] to-[#3B66FF] rounded-[16px] shadow-sm flex flex-col items-center justify-center text-center relative overflow-hidden h-full w-full cursor-not-allowed opacity-70 grayscale-[20%]"; 
@@ -989,7 +1073,7 @@
                             </div>
                             <div class="absolute top-2.5 right-2.5 bg-white/20 backdrop-blur-md text-white text-[11px] font-bold px-2 py-0.5 rounded-[6px] border border-white/20 transition-opacity z-20">新词 <span id="badgeUnlearnedNew">${dataStore.stats.unlearnedNew}</span></div>
                             <i class="ph-bold ph-rocket text-white/90 text-[28px] mb-1 relative z-0"></i>
-                            <h3 class="font-bold text-[15px] text-white/90 relative z-0 tracking-wide mt-0.5">学习新词</h3>`; 
+                            <h3 class="font-bold text-[15px] text-white/90 relative z-0 tracking-wide mt-0.5">过新词</h3>`; 
                     }
                     if(btnOld) { 
                         btnOld.className = "bg-gradient-to-r from-[#44D99B] to-[#12A772] rounded-[16px] shadow-sm flex flex-col items-center justify-center text-center relative overflow-hidden h-full w-full cursor-not-allowed opacity-70 grayscale-[20%]"; 
@@ -999,7 +1083,7 @@
                                 <span class="text-[10px] font-bold tracking-wide">请先完成专属关卡</span>
                             </div>
                             <i class="ph-bold ph-arrows-clockwise text-white/90 text-[28px] mb-1 relative z-0"></i>
-                            <h3 class="font-bold text-[15px] text-white/90 relative z-0 tracking-wide mt-0.5">复习旧词</h3>`; 
+                            <h3 class="font-bold text-[15px] text-white/90 relative z-0 tracking-wide mt-0.5">过旧词</h3>`; 
                     }
                     document.getElementById('hubIdleState').classList.add('hidden'); document.getElementById('hubIdleState').classList.remove('flex'); document.getElementById('hubActiveState').classList.remove('hidden'); document.getElementById('hubActiveState').classList.add('flex');
                     document.getElementById('hubLevelCount').innerText = state.activeLevel.wordCount;
@@ -1032,8 +1116,17 @@
                     });
                     document.getElementById('hubStepsContainer').innerHTML = stepsHtml;
                 } else {
-                    if(btnNew) { btnNew.className = "bg-gradient-to-r from-[#508BFF] to-[#3B66FF] rounded-[16px] shadow-sm flex flex-col items-center justify-center text-center active:scale-95 transition-all relative group overflow-hidden h-full w-full cursor-pointer"; btnNew.innerHTML = `<div class="absolute top-2.5 right-2.5 bg-white/20 backdrop-blur-md text-white text-[11px] font-bold px-2 py-0.5 rounded-[6px] border border-white/20 transition-opacity">新词 <span id="badgeUnlearnedNew">${dataStore.stats.unlearnedNew}</span></div><i class="ph-bold ph-rocket text-white text-[28px] mb-1 group-hover:-translate-y-1 transition-transform duration-300 relative z-0"></i><h3 class="font-bold text-[15px] text-white relative z-0 tracking-wide mt-0.5">学习新词</h3>`; }
-                    if(btnOld) { btnOld.className = "bg-gradient-to-r from-[#44D99B] to-[#12A772] rounded-[16px] shadow-sm flex flex-col items-center justify-center text-center active:scale-95 transition-all relative group overflow-hidden h-full w-full cursor-pointer"; btnOld.innerHTML = `<i class="ph-bold ph-arrows-clockwise text-white text-[28px] mb-1 group-hover:-rotate-90 transition-transform duration-300 relative z-0"></i><h3 class="font-bold text-[15px] text-white relative z-0 tracking-wide mt-0.5">复习旧词</h3>`; }
+                    if(btnNew) { btnNew.className = "bg-gradient-to-r from-[#508BFF] to-[#3B66FF] rounded-[16px] shadow-sm flex flex-col items-center justify-center text-center active:scale-95 transition-all relative group overflow-hidden h-full w-full cursor-pointer"; btnNew.innerHTML = `<div class="absolute top-2.5 right-2.5 bg-white/20 backdrop-blur-md text-white text-[11px] font-bold px-2 py-0.5 rounded-[6px] border border-white/20 transition-opacity">新词 <span id="badgeUnlearnedNew">${dataStore.stats.unlearnedNew}</span></div><i class="ph-bold ph-rocket text-white text-[28px] mb-1 group-hover:-translate-y-1 transition-transform duration-300 relative z-0"></i><h3 class="font-bold text-[15px] text-white relative z-0 tracking-wide mt-0.5">过新词</h3>`; }
+                    if(btnOld) { btnOld.className = "bg-gradient-to-r from-[#44D99B] to-[#12A772] rounded-[16px] shadow-sm flex flex-col items-center justify-center text-center active:scale-95 transition-all relative group overflow-hidden h-full w-full cursor-pointer"; btnOld.innerHTML = `<i class="ph-bold ph-arrows-clockwise text-white text-[28px] mb-1 group-hover:-rotate-90 transition-transform duration-300 relative z-0"></i><h3 class="font-bold text-[15px] text-white relative z-0 tracking-wide mt-0.5">过旧词</h3>`; }
+                    if (hubIdle) {
+                        hubIdle.innerHTML = `
+                            <button onclick="window.generateManualByType('new')" class="flex-1 flex items-center justify-center gap-2 py-3 rounded-[12px] transition-all font-bold text-[14px] shadow-sm border border-blue-100/70 ${hubNewCount === 0 ? 'bg-gray-50 text-gray-400 cursor-not-allowed opacity-70' : 'text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 active:scale-95'}">
+                                <i class="ph-bold ph-rocket text-[18px]"></i><span>学新词</span><span class="font-mono text-[13px] bg-white/80 px-2 py-0.5 rounded-[6px]">${hubNewCount} 词</span>
+                            </button>
+                            <button onclick="window.generateManualByType('old')" class="flex-1 flex items-center justify-center gap-2 py-3 rounded-[12px] transition-all font-bold text-[14px] shadow-sm border border-emerald-100/70 ${hubOldCount === 0 ? 'bg-gray-50 text-gray-400 cursor-not-allowed opacity-70' : 'text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 active:scale-95'}">
+                                <i class="ph-bold ph-arrows-clockwise text-[18px]"></i><span>学旧词</span><span class="font-mono text-[13px] bg-white/80 px-2 py-0.5 rounded-[6px]">${hubOldCount} 词</span>
+                            </button>`;
+                    }
                     document.getElementById('hubIdleState').classList.remove('hidden'); document.getElementById('hubIdleState').classList.add('flex'); document.getElementById('hubActiveState').classList.add('hidden'); document.getElementById('hubActiveState').classList.remove('flex');
                 }
             }
@@ -1057,6 +1150,7 @@
                 updatePassingStats();
                 window.setPassFilter('all'); 
                 window.switchView('view-passing');
+                startPassingTimer();
             };
 
             function renderWordList() {
@@ -1067,24 +1161,35 @@
                 testWords.forEach((item, index) => {
                     var div = document.createElement('div');
                     div.id = `word-row-${item.id}`;
-                    div.className = `flex justify-between items-center p-4 rounded-[20px] shadow-sm border border-[#FDE68A]/50 bg-gradient-to-r from-[#FFFDF0] to-white transition-colors duration-300 shrink-0`;
+                    var isJudged = item.status !== null;
+                    var rowClasses = `pass-word-row flex justify-between items-center p-4 rounded-[20px] shadow-sm border transition-all duration-300 shrink-0 ${isJudged ? (item.status === 'unknown' ? 'bg-[#FEF2F2] border-[#FECACA]' : 'bg-[#F0FDF4] border-[#BBF7D0]') : 'border-[#FDE68A]/50 bg-gradient-to-r from-[#FFFDF0] to-white'}`;
                     
+                    div.className = rowClasses;
+                    
+                    // Button UI
+                    var btnXClass = `judge-btn w-[56px] h-[44px] rounded-[14px] flex items-center justify-center text-[22px] active:scale-90 transition-all ${isJudged && item.status==='unknown' ? 'bg-[#EF4444] text-white shadow-sm' : 'bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500'}`;
+                    var btnCClass = `judge-btn w-[56px] h-[44px] rounded-[14px] flex items-center justify-center text-[22px] active:scale-90 transition-all ${isJudged && item.status==='known' ? 'bg-[#10B981] text-white shadow-sm' : 'bg-gray-50 text-gray-400 hover:bg-green-50 hover:text-green-500'}`;
+
                     div.innerHTML = `
-                        <div class="flex items-baseline gap-2 flex-1 overflow-hidden pr-2">
-                            <span class="font-mono text-[16px] text-gray-400 font-bold shrink-0 w-7">${index + 1}.</span>
-                            <div class="shrink-0 flex items-baseline gap-2 flex-wrap xl:flex-nowrap">
-                                <span id="word-text-${item.id}" class="font-extrabold text-[18px] font-mono tracking-tight text-gray-800">${item.word}</span>
-                                <span id="word-phonetic-${item.id}" class="font-extrabold text-[18px] font-mono tracking-tight text-gray-800">
+                        <div class="flex items-center gap-3 flex-1 overflow-hidden pr-2 min-w-0">
+                            <span class="font-mono text-[16px] text-gray-400 font-bold shrink-0 w-7 text-left">${index + 1}.</span>
+                            <div id="word-content-${item.id}" class="pass-content-strip ${isJudged ? 'revealed' : ''}">
+                                <span id="word-text-${item.id}" class="font-extrabold text-[18px] font-mono tracking-tight shrink-0 transition-colors duration-300 ${isJudged ? 'text-gray-400' : 'text-gray-800'}">${item.word}</span>
+                                <span id="word-phonetic-${item.id}" class="font-extrabold text-[18px] font-mono tracking-tight shrink-0 transition-colors duration-300 ${isJudged ? 'text-gray-400' : 'text-gray-800'}">
                                     ${item.phonetic}
                                 </span>
+                                <div class="pass-meaning-container shrink-0">
+                                    <div>
+                                        <span id="word-desc-${item.id}" class="pass-meaning text-[14px] ${isJudged ? 'text-gray-500 opacity-80' : 'text-gray-500'}">
+                                            ${item.meaning}
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
-                            <span id="word-desc-${item.id}" class="text-[14px] text-gray-500 truncate flex-1 min-w-0 ml-2">
-                                ${item.meaning}
-                            </span>
                         </div>
-                        <div class="flex gap-2 shrink-0 ml-2">
-                            <button id="btn-x-${item.id}" onclick="window.judgeWord(${item.id}, 'unknown')" class="judge-btn w-[56px] h-[44px] rounded-[14px] bg-gray-50 text-gray-400 flex items-center justify-center text-[22px] hover:bg-red-50 hover:text-red-500 active:scale-90 transition-all"><i class="ph-bold ph-x"></i></button>
-                            <button id="btn-c-${item.id}" onclick="window.judgeWord(${item.id}, 'known')" class="judge-btn w-[56px] h-[44px] rounded-[14px] bg-gray-50 text-gray-400 flex items-center justify-center text-[22px] hover:bg-green-50 hover:text-green-500 active:scale-90 transition-all"><i class="ph-bold ph-check"></i></button>
+                        <div class="pass-actions flex gap-2 shrink-0 ml-2 transition-transform duration-300">
+                            <button id="btn-x-${item.id}" onclick="window.judgeWord(${item.id}, 'unknown')" class="${btnXClass}"><i class="ph-bold ph-x"></i></button>
+                            <button id="btn-c-${item.id}" onclick="window.judgeWord(${item.id}, 'known')" class="${btnCClass}"><i class="ph-bold ph-check"></i></button>
                         </div>`;
                     container.appendChild(div);
                 });
@@ -1144,9 +1249,10 @@
                 var wordSpan = document.getElementById(`word-text-${id}`);
                 var wordPhonetic = document.getElementById(`word-phonetic-${id}`);
                 var wordDesc = document.getElementById(`word-desc-${id}`);
+                var wordContent = document.getElementById(`word-content-${id}`);
 
                 if (row && btnX && btnC) {
-                    row.className = `flex justify-between items-center p-4 rounded-[20px] shadow-sm border transition-colors duration-300 shrink-0`;
+                    row.className = `pass-word-row flex justify-between items-center p-4 rounded-[20px] shadow-sm border transition-all duration-300 shrink-0`;
                     btnX.className = `judge-btn w-[56px] h-[44px] rounded-[14px] flex items-center justify-center text-[22px] hover:bg-red-50 hover:text-red-500 active:scale-90 transition-all`;
                     btnC.className = `judge-btn w-[56px] h-[44px] rounded-[14px] flex items-center justify-center text-[22px] hover:bg-green-50 hover:text-green-500 active:scale-90 transition-all`;
                     wordSpan.classList.remove('text-gray-400', 'text-gray-500', 'text-gray-800');
@@ -1166,6 +1272,10 @@
                     wordSpan.classList.add('text-gray-400');
                     wordPhonetic.classList.add('text-gray-400');
                     wordDesc.classList.add('opacity-80');
+                    
+                    if (wordContent) {
+                        wordContent.classList.add('revealed');
+                    }
                 }
 
                 updatePassingStats();
@@ -1197,6 +1307,7 @@
 
             window.submitPassResults = function() {
                 if (state.passingStats.remaining > 0) return;
+                stopPassingTimer();
                 
                 dataStore.stats.todayLearned += TOTAL_WORDS;
                 dataStore.stats.totalLearned += TOTAL_WORDS;
@@ -1638,57 +1749,6 @@
             }
 
             // ============== 设置页自定义交互逻辑 ==============
-            
-            // 标记卡片为已更改
-            window.markCardChanged = function(el) {
-                var card = el.closest('.settings-card') || el.closest('.playback-card');
-                if (card) {
-                    var btn = card.querySelector('.save-btn');
-                    if (btn && btn.disabled) {
-                        btn.disabled = false;
-                        btn.classList.remove('bg-gray-100', 'text-gray-400', 'cursor-not-allowed');
-                        btn.classList.add('active'); // 使用 CSS 定义的高亮效果
-                    }
-                }
-            };
-
-            // 保存卡片操作
-            window.saveCard = function(btn) {
-                if (btn.disabled) return;
-                
-                btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-[16px]"></i> <span>保存中...</span>';
-                
-                setTimeout(() => {
-                    btn.innerHTML = '<i class="ph-bold ph-check text-[16px]"></i> <span>已保存</span>';
-                    btn.classList.add('bg-green-500', 'text-white', 'shadow-sm');
-                    btn.classList.remove('active');
-                    
-                    setTimeout(() => {
-                        var isConfigCard = btn.closest('.playback-card') !== null;
-                        btn.innerHTML = isConfigCard ? '<i class="ph-bold ph-floppy-disk text-[16px]"></i> <span>保存配置</span>' : '<i class="ph-bold ph-floppy-disk text-[16px]"></i> <span>保存修改</span>';
-                        btn.disabled = true;
-                        btn.classList.add('bg-gray-100', 'text-gray-400', 'cursor-not-allowed');
-                        btn.classList.remove('bg-green-500', 'text-white', 'shadow-sm');
-                    }, 1500);
-                }, 600);
-            };
-
-            // 全局监听设置页的输入变化
-            var settingsView = document.getElementById('view-settings');
-            if (settingsView) {
-                settingsView.addEventListener('input', function(e) {
-                    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') {
-                        window.markCardChanged(e.target);
-                    }
-                });
-                settingsView.addEventListener('change', function(e) {
-                    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') {
-                        window.markCardChanged(e.target);
-                    }
-                });
-            }
-
-
             window.initCustomSpeedDropdown = function() {
                 var trigger = document.getElementById('speed-trigger');
                 var menu = document.getElementById('speed-menu');
@@ -1766,7 +1826,6 @@
                 dropdown.classList.add('hidden');
                 dropdown.classList.remove('flex');
                 card.style.zIndex = '1';
-                window.markCardChanged(wrapper);
             };
 
             window.updateCardType = function(selectEl) {
@@ -1826,7 +1885,6 @@
                 if (item) {
                     item.remove();
                     window.checkSequenceEmpty(containerId);
-                    window.markCardChanged(document.getElementById(containerId));
                 }
             };
 
@@ -1861,9 +1919,9 @@
                         <div class="flex items-center gap-1 hidden sm:flex shrink-0">
                             <span class="text-[12px] text-gray-500 font-medium">音频间隔</span>
                             <div class="flex items-center bg-gray-50 border border-gray-200 rounded-[6px] px-1 shadow-sm">
-                                <span class="text-gray-400 cursor-pointer px-1.5 py-0.5 text-[14px] font-bold hover:text-gray-600" onclick="var inp=this.nextElementSibling; if(inp.value>0) { inp.value=(parseFloat(inp.value)-0.5).toFixed(1); window.markCardChanged(inp); } event.stopPropagation();">-</span>
+                                <span class="text-gray-400 cursor-pointer px-1.5 py-0.5 text-[14px] font-bold hover:text-gray-600" onclick="var inp=this.nextElementSibling; if(inp.value>0) inp.value=(parseFloat(inp.value)-0.5).toFixed(1); event.stopPropagation();">-</span>
                                 <input type="number" value="1.0" min="0" step="0.5" class="w-8 text-center text-[12px] font-bold outline-none bg-transparent text-gray-700 pointer-events-auto" onclick="event.stopPropagation();">
-                                <span class="text-gray-400 cursor-pointer px-1.5 py-0.5 text-[14px] font-bold hover:text-gray-600" onclick="var inp=this.previousElementSibling; inp.value=(parseFloat(inp.value)+0.5).toFixed(1); window.markCardChanged(inp); event.stopPropagation();">+</span>
+                                <span class="text-gray-400 cursor-pointer px-1.5 py-0.5 text-[14px] font-bold hover:text-gray-600" onclick="var inp=this.previousElementSibling; inp.value=(parseFloat(inp.value)+0.5).toFixed(1); event.stopPropagation();">+</span>
                             </div>
                         </div>
                         <div class="flex items-center gap-1 relative shrink-0">
@@ -1890,7 +1948,6 @@
                 el.innerHTML = html;
                 container.appendChild(el);
                 window.checkSequenceEmpty(containerId);
-                window.markCardChanged(container);
             };
 
             window.toggleCustomSelect = function(wrapper, e) {
@@ -1936,8 +1993,6 @@
                 dropdown.classList.add('hidden');
                 dropdown.classList.remove('flex');
                 wrapper.closest('.playback-card').style.zIndex = '1';
-                
-                window.markCardChanged(wrapper);
             };
 
             document.addEventListener('click', function() {
@@ -1977,7 +2032,6 @@
                 document.addEventListener('dragend', function(e) {
                     if (dragEl) {
                         dragEl.classList.remove('dragging');
-                        window.markCardChanged(dragEl);
                         dragEl = null;
                     }
                 });
@@ -2041,9 +2095,9 @@
                                     <div class="flex items-center gap-1.5">
                                         <span class="text-[12px] text-gray-500 font-medium">后续间隔</span>
                                         <div class="flex items-center bg-white border border-gray-200 rounded-[8px] px-1 shadow-sm">
-                                            <span class="text-gray-400 cursor-pointer px-2 py-1 text-[16px] font-bold hover:text-gray-600" onclick="var inp=this.nextElementSibling; if(inp.value>0) { inp.value=(parseFloat(inp.value)-0.5).toFixed(1); window.markCardChanged(inp); }">-</span>
+                                            <span class="text-gray-400 cursor-pointer px-2 py-1 text-[16px] font-bold hover:text-gray-600" onclick="var inp=this.nextElementSibling; if(inp.value>0) inp.value=(parseFloat(inp.value)-0.5).toFixed(1)">-</span>
                                             <input type="number" value="1.0" min="0" step="0.5" class="w-9 text-center bg-transparent text-[13px] font-bold outline-none text-gray-700">
-                                            <span class="text-gray-400 cursor-pointer px-2 py-1 text-[16px] font-bold hover:text-gray-600" onclick="var inp=this.previousElementSibling; inp.value=(parseFloat(inp.value)+0.5).toFixed(1); window.markCardChanged(inp);">+</span>
+                                            <span class="text-gray-400 cursor-pointer px-2 py-1 text-[16px] font-bold hover:text-gray-600" onclick="var inp=this.previousElementSibling; inp.value=(parseFloat(inp.value)+0.5).toFixed(1)">+</span>
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-1.5 relative z-50">
@@ -2094,9 +2148,6 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="mt-auto pt-4 border-t border-gray-100/50 flex justify-end w-full">
-                                <button class="save-btn px-5 py-2 rounded-[12px] font-bold text-[13px] transition-all bg-gray-100 text-gray-400 cursor-not-allowed flex items-center justify-center gap-1.5 w-max ml-auto" disabled onclick="window.saveCard(this)"><i class="ph-bold ph-floppy-disk text-[16px]"></i> <span>保存配置</span></button>
                             </div>
                         </div>
                     </div>
