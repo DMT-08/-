@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI 记词 - 极致原生体验</title>
+    <title>AI学习 - 极致原生体验</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.0.3"></script>
@@ -44,45 +44,10 @@
         
         .judge-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
         .pass-word-row { will-change: transform; }
-        
-        /* 动态顶位新布局样式 */
-        .pass-content-strip { 
-            margin-left: auto; 
-            width: fit-content; 
-            max-width: 100%; 
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 0.75rem;
-            transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); 
-        }
-        .pass-meaning-container {
-            display: grid;
-            grid-template-columns: 0fr;
-            opacity: 0;
-            transform: translateX(-15px) scale(0.98);
-            transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .pass-meaning-container > div {
-            overflow: hidden;
-            min-width: 0;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-        }
-        .pass-meaning { 
-            width: max-content; 
-            max-width: min(35vw, 360px); 
-            white-space: nowrap; 
-            overflow: hidden;
-            /* 彻底移除 text-overflow: ellipsis; 解决动画过程中出现 "..." 的顿挫感 */
-            text-align: right; 
-        }
-        .pass-content-strip.revealed .pass-meaning-container {
-            grid-template-columns: 1fr;
-            opacity: 1;
-            transform: translateX(0) scale(1);
-        }
+        .pass-content-strip { margin-left: auto; width: fit-content; max-width: 100%; flex: 0 1 auto; transition: opacity 0.25s ease; }
+        .pass-meaning { width: max-content; max-width: 0; margin-left: 0; opacity: 0; overflow: hidden; white-space: nowrap; text-align: right; transition: max-width 0.42s cubic-bezier(0.2, 0.9, 0.2, 1), margin-left 0.42s cubic-bezier(0.2, 0.9, 0.2, 1), opacity 0.22s ease; }
+        .pass-meaning.is-revealed { max-width: min(42vw, 520px); margin-left: 0.75rem; opacity: 1; white-space: normal; overflow-wrap: anywhere; }
+        .pass-content-strip.selected-left { transform: none; }
 
         @keyframes pulse-red-light {
             0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.15); }
@@ -140,7 +105,7 @@
                 <button class="w-10 h-10 bg-white rounded-[14px] flex items-center justify-center shadow-premium active:scale-90 transition-transform text-slate-700 cursor-pointer" onclick="window.showModal('返回提示', '<div class=\'mt-1 font-medium\'>学习可随时退出，<br>此处将返回上一级页面。</div>')">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mr-0.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
                 </button>
-                <h1 class="text-[32px] font-extrabold text-gray-900 tracking-tight leading-none">AI 记词</h1>
+                <h1 class="text-[32px] font-extrabold text-gray-900 tracking-tight leading-none">AI学习</h1>
             </div>
             <div class="flex items-center gap-3">
                 <button onclick="window.switchView('view-settings')" class="bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 px-3.5 py-2 rounded-[10px] font-bold text-[13px] shadow-sm active:scale-95 transition-transform flex items-center gap-1.5">
@@ -203,9 +168,9 @@
                     <div class="bg-orange-50/80 border border-orange-200 rounded-[16px] px-3 lg:px-4 py-3.5 flex items-center justify-between relative overflow-hidden group transition-all hover:shadow-md h-full w-full">
                         <div class="flex items-center gap-1.5 lg:gap-2 text-orange-700 z-10 shrink-0 min-w-0">
                             <div class="w-[28px] h-[28px] rounded-[8px] bg-white flex items-center justify-center shadow-sm shrink-0 border border-orange-100">
-                                <i class="ph-bold ph-clock text-[16px] text-orange-500"></i>
+                                <i class="ph-bold ph-calendar-check text-[16px] text-orange-500"></i>
                             </div>
-                            <span class="text-[12px] lg:text-[13px] font-bold whitespace-nowrap">待过单词</span>
+                            <span class="text-[12px] lg:text-[13px] font-bold whitespace-nowrap">今日已学</span>
                         </div>
                         <div class="flex items-baseline gap-1 z-10 whitespace-nowrap ml-1 shrink-0">
                             <span class="text-[20px] lg:text-[24px] font-extrabold text-orange-700 leading-none tracking-tight font-mono" id="statPendingPass">0</span><span class="text-[11px] font-bold text-orange-600/70">词</span>
@@ -264,25 +229,25 @@
 
             <div class="bg-white rounded-[24px] shadow-premium p-4 md:p-5 flex flex-col justify-between gap-4 h-full min-h-0 relative">
                 
-                <div class="grid grid-cols-2 gap-4 h-[90px] shrink-0">
+                <div class="grid grid-cols-2 gap-3 h-[76px] shrink-0">
                     <button id="btnNew" onclick="window.startPassing('new', '过新词')" class="w-full h-full"></button>
                     <button id="btnOld" onclick="window.startPassing('old', '过旧词')" class="w-full h-full"></button>
                 </div>
 
-                <div class="bg-gray-50/60 rounded-[16px] border border-gray-100 p-3 shrink-0 relative overflow-hidden min-h-[80px] flex flex-col justify-center transition-all">
+                <div class="shrink-0 relative overflow-hidden min-h-[76px] h-[76px] flex flex-col justify-center transition-all">
                     
-                    <div id="hubIdleState" class="flex flex-row items-center justify-center gap-2 transition-opacity h-full">
-                        <button id="hubLearnNewBtn" onclick="window.generateManualByType('new')" class="flex-1 flex items-center justify-center gap-2 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 py-3 rounded-[12px] transition-all active:scale-95 font-bold text-[14px] shadow-sm border border-blue-100/70">
+                    <div id="hubIdleState" class="grid grid-cols-2 gap-3 transition-opacity h-full w-full">
+                        <button id="hubLearnNewBtn" onclick="window.generateManualByType('new')" class="w-full h-full flex items-center justify-center gap-2 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-[16px] transition-all active:scale-95 font-bold text-[14px] shadow-sm border border-blue-100/70">
                             <i class="ph-bold ph-rocket text-[18px]"></i><span>学新词</span><span class="font-mono text-[13px] bg-white/80 px-2 py-0.5 rounded-[6px]">0 词</span>
                         </button>
-                        <button id="hubLearnOldBtn" onclick="window.generateManualByType('old')" class="flex-1 flex items-center justify-center gap-2 text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 py-3 rounded-[12px] transition-all active:scale-95 font-bold text-[14px] shadow-sm border border-emerald-100/70">
+                        <button id="hubLearnOldBtn" onclick="window.generateManualByType('old')" class="w-full h-full flex items-center justify-center gap-2 text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-[16px] transition-all active:scale-95 font-bold text-[14px] shadow-sm border border-emerald-100/70">
                             <i class="ph-bold ph-arrows-clockwise text-[18px]"></i><span>学旧词</span><span class="font-mono text-[13px] bg-white/80 px-2 py-0.5 rounded-[6px]">0 词</span>
                         </button>
                     </div>
 
-                    <div id="hubActiveState" class="hidden bg-[#FFF5F5] border-[2px] border-[#FECACA] flex-row items-center justify-between p-2.5 lg:p-3 z-20 pulse-alert-light rounded-[16px] gap-2 lg:gap-3 w-full">
+                    <div id="hubActiveState" class="hidden bg-[#FFF5F5] border-[2px] border-[#FECACA] flex-row items-center justify-between p-2.5 lg:p-3 z-20 pulse-alert-light rounded-[16px] gap-2 lg:gap-3 w-full h-full">
                         <div class="flex flex-col shrink-0 text-left pl-1">
-                            <h3 class="font-extrabold text-[14px] lg:text-[15px] text-red-600 flex items-center gap-1"><i class="ph-fill ph-warning-circle"></i> 专属强化关卡</h3>
+                            <h3 class="font-extrabold text-[14px] lg:text-[15px] text-red-600 flex items-center gap-1">专属关卡</h3>
                             <span class="text-[11px] font-bold text-red-500 mt-0.5">待强化 <span id="hubLevelCount" class="text-[13px] font-mono">0</span> 词</span>
                         </div>
                         <div class="flex-1 flex flex-row items-center justify-center gap-1 overflow-x-auto hide-scrollbar px-1" id="hubStepsContainer"></div>
@@ -330,6 +295,7 @@
                     <button onclick="window.setVocabFilterFull('all')" id="full-filter-all"></button>
                     <button onclick="window.setVocabFilterFull('new')" id="full-filter-new"></button>
                     <button onclick="window.setVocabFilterFull('old')" id="full-filter-old"></button>
+                    <button onclick="window.setVocabFilterFull('learned')" id="full-filter-learned"></button>
                 </div>
                 <div class="text-[13px] text-gray-500 font-medium">共 <span id="fullVocabCount">0</span> 词</div>
             </div>
@@ -962,7 +928,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 setVal('statMemoTotal', dataStore.stats.memo);
                 setVal('statDictTotal', dataStore.stats.dict);
                 
-                setVal('statPendingPass', Math.max(0, total - learnedSum));
+                setVal('statPendingPass', dataStore.stats.todayLearned);
                 var unlearnedGrid = document.getElementById('statUnlearnedGrid');
                 if (unlearnedGrid) unlearnedGrid.innerText = unlearned;
             }
@@ -975,6 +941,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 var newCount = validVocab.filter(w => w.type === 'new').length;
                 var oldCount = validVocab.filter(w => w.type === 'old').length;
                 var allCount = validVocab.length;
+                var learnedCount = validVocab.filter(w => w.learned !== false).length;
                 
                 var themes = {
                     all: { 
@@ -999,6 +966,14 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                         inactiveBadge: 'bg-emerald-100/80 text-emerald-600',
                         activeWrapper: 'bg-[#10B981] border-transparent shadow-md scale-[1.02] text-white',
                         activeIconClass: 'ph-fill ph-arrows-clockwise text-[#10B981]',
+                        activeBadge: 'bg-white/20 text-white'
+                    },
+                    learned: {
+                        inactiveWrapper: 'bg-[#FFF7ED] hover:bg-orange-100 border-[#FED7AA] text-orange-600',
+                        inactiveIconClass: 'ph-bold ph-check-circle text-orange-500',
+                        inactiveBadge: 'bg-orange-100/80 text-orange-600',
+                        activeWrapper: 'bg-[#F97316] border-transparent shadow-md scale-[1.02] text-white',
+                        activeIconClass: 'ph-fill ph-check-circle text-[#F97316]',
                         activeBadge: 'bg-white/20 text-white'
                     }
                 };
@@ -1025,8 +1000,9 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 updateTab('full-filter-all', '全部', allCount, 'all');
                 updateTab('full-filter-new', '新词', newCount, 'new');
                 updateTab('full-filter-old', '旧词', oldCount, 'old');
+                updateTab('full-filter-learned', '已学', learnedCount, 'learned');
                 
-                var filteredList = validVocab.filter(item => state.vocabFilter === 'all' || item.type === state.vocabFilter);
+                var filteredList = validVocab.filter(item => state.vocabFilter === 'all' || (state.vocabFilter === 'learned' ? item.learned !== false : item.type === state.vocabFilter));
                 var countEl = document.getElementById('fullVocabCount');
                 if (countEl) countEl.innerText = filteredList.length;
                 if (filteredList.length === 0) {
@@ -1034,7 +1010,8 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 } else {
                     [...filteredList].reverse().forEach((item, index) => {
                         var typeTag = item.type === 'assigned' ? `<span class="text-[11px] bg-purple-50 border border-purple-100 text-purple-600 px-2.5 py-0.5 rounded-[6px] font-bold shadow-sm">指定</span>` : (item.type === 'new' ? `<span class="text-[11px] bg-blue-50 border border-blue-100 text-blue-600 px-2.5 py-0.5 rounded-[6px] font-bold shadow-sm">新词</span>` : `<span class="text-[11px] bg-emerald-50 border border-emerald-100 text-emerald-600 px-2.5 py-0.5 rounded-[6px] font-bold shadow-sm">旧词</span>`);
-                        container.innerHTML += `<div class="flex items-center w-full p-4 rounded-[20px] shadow-sm border border-[#FDE68A]/50 bg-gradient-to-r from-[#FFFDF0] to-white hover:border-[#FDE68A] transition-colors duration-300 z-10 shrink-0"><div class="flex items-baseline gap-3 flex-1 overflow-hidden pr-2"><span class="font-mono text-[15px] text-gray-400 font-bold shrink-0 w-6">${index + 1}.</span><span class="font-extrabold text-[18px] font-mono tracking-tight text-gray-800 shrink-0">${item.word}</span><span class="font-extrabold text-[18px] font-mono tracking-tight text-gray-800 shrink-0">${item.phonetic}</span><span class="text-[14px] text-gray-500 truncate flex-1 min-w-0 ml-2">${item.meaning}</span></div><div class="shrink-0 flex items-center justify-end ml-2">${typeTag}</div></div>`;
+                        var learnedTag = item.learned === false ? '' : `<span class="text-[11px] bg-orange-50 border border-orange-100 text-orange-600 px-2.5 py-0.5 rounded-[6px] font-bold shadow-sm">已学</span>`;
+                        container.innerHTML += `<div class="flex items-center w-full p-4 rounded-[20px] shadow-sm border border-[#FDE68A]/50 bg-gradient-to-r from-[#FFFDF0] to-white hover:border-[#FDE68A] transition-colors duration-300 z-10 shrink-0"><div class="flex items-baseline gap-3 flex-1 overflow-hidden pr-2"><span class="font-mono text-[15px] text-gray-400 font-bold shrink-0 w-6">${index + 1}.</span><span class="font-extrabold text-[18px] font-mono tracking-tight text-gray-800 shrink-0">${item.word}</span><span class="font-extrabold text-[18px] font-mono tracking-tight text-gray-800 shrink-0">${item.phonetic}</span><span class="text-[14px] text-gray-500 truncate flex-1 min-w-0 ml-2">${item.meaning}</span></div><div class="shrink-0 flex items-center justify-end ml-2 gap-1.5">${typeTag}${learnedTag}</div></div>`;
                     });
                 }
             }
@@ -1082,10 +1059,11 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                                 <i class="ph-fill ph-lock-key text-[10px] mr-1"></i>
                                 <span class="text-[10px] font-bold tracking-wide">请先完成专属关卡</span>
                             </div>
+                            <div class="absolute top-2.5 right-2.5 bg-white/20 backdrop-blur-md text-white text-[11px] font-bold px-2 py-0.5 rounded-[6px] border border-white/20 transition-opacity z-20">旧词 <span id="badgeUnlearnedOld">${dataStore.stats.unlearnedOld}</span></div>
                             <i class="ph-bold ph-arrows-clockwise text-white/90 text-[28px] mb-1 relative z-0"></i>
                             <h3 class="font-bold text-[15px] text-white/90 relative z-0 tracking-wide mt-0.5">过旧词</h3>`; 
                     }
-                    document.getElementById('hubIdleState').classList.add('hidden'); document.getElementById('hubIdleState').classList.remove('flex'); document.getElementById('hubActiveState').classList.remove('hidden'); document.getElementById('hubActiveState').classList.add('flex');
+                    document.getElementById('hubIdleState').classList.add('hidden'); document.getElementById('hubIdleState').classList.remove('grid'); document.getElementById('hubActiveState').classList.remove('hidden'); document.getElementById('hubActiveState').classList.add('flex');
                     document.getElementById('hubLevelCount').innerText = state.activeLevel.wordCount;
                     
                     var stepsHtml = '';
@@ -1116,18 +1094,20 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                     });
                     document.getElementById('hubStepsContainer').innerHTML = stepsHtml;
                 } else {
-                    if(btnNew) { btnNew.className = "bg-gradient-to-r from-[#508BFF] to-[#3B66FF] rounded-[16px] shadow-sm flex flex-col items-center justify-center text-center active:scale-95 transition-all relative group overflow-hidden h-full w-full cursor-pointer"; btnNew.innerHTML = `<div class="absolute top-2.5 right-2.5 bg-white/20 backdrop-blur-md text-white text-[11px] font-bold px-2 py-0.5 rounded-[6px] border border-white/20 transition-opacity">新词 <span id="badgeUnlearnedNew">${dataStore.stats.unlearnedNew}</span></div><i class="ph-bold ph-rocket text-white text-[28px] mb-1 group-hover:-translate-y-1 transition-transform duration-300 relative z-0"></i><h3 class="font-bold text-[15px] text-white relative z-0 tracking-wide mt-0.5">过新词</h3>`; }
-                    if(btnOld) { btnOld.className = "bg-gradient-to-r from-[#44D99B] to-[#12A772] rounded-[16px] shadow-sm flex flex-col items-center justify-center text-center active:scale-95 transition-all relative group overflow-hidden h-full w-full cursor-pointer"; btnOld.innerHTML = `<i class="ph-bold ph-arrows-clockwise text-white text-[28px] mb-1 group-hover:-rotate-90 transition-transform duration-300 relative z-0"></i><h3 class="font-bold text-[15px] text-white relative z-0 tracking-wide mt-0.5">过旧词</h3>`; }
+                    if(btnNew) { btnNew.className = "bg-gradient-to-r from-[#508BFF] to-[#3B66FF] rounded-[16px] shadow-sm flex flex-col items-center justify-center text-center active:scale-95 transition-all relative group overflow-hidden h-full w-full cursor-pointer"; btnNew.innerHTML = `<div class="absolute top-2.5 right-2.5 bg-white/20 backdrop-blur-md text-white text-[11px] font-bold px-2 py-0.5 rounded-[6px] border border-white/20 transition-opacity">新词 <span id="badgeUnlearnedNew">${dataStore.stats.unlearnedNew}</span></div><i class="ph-bold ph-rocket text-white text-[24px] mb-1 group-hover:-translate-y-1 transition-transform duration-300 relative z-0"></i><h3 class="font-bold text-[14px] text-white relative z-0 tracking-wide mt-0.5">过新词</h3>`; }
+                    if(btnOld) { btnOld.className = "bg-gradient-to-r from-[#44D99B] to-[#12A772] rounded-[16px] shadow-sm flex flex-col items-center justify-center text-center active:scale-95 transition-all relative group overflow-hidden h-full w-full cursor-pointer"; btnOld.innerHTML = `<div class="absolute top-2.5 right-2.5 bg-white/20 backdrop-blur-md text-white text-[11px] font-bold px-2 py-0.5 rounded-[6px] border border-white/20 transition-opacity">旧词 <span id="badgeUnlearnedOld">${dataStore.stats.unlearnedOld}</span></div><i class="ph-bold ph-arrows-clockwise text-white text-[24px] mb-1 group-hover:-rotate-90 transition-transform duration-300 relative z-0"></i><h3 class="font-bold text-[14px] text-white relative z-0 tracking-wide mt-0.5">过旧词</h3>`; }
                     if (hubIdle) {
                         hubIdle.innerHTML = `
-                            <button onclick="window.generateManualByType('new')" class="flex-1 flex items-center justify-center gap-2 py-3 rounded-[12px] transition-all font-bold text-[14px] shadow-sm border border-blue-100/70 ${hubNewCount === 0 ? 'bg-gray-50 text-gray-400 cursor-not-allowed opacity-70' : 'text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 active:scale-95'}">
-                                <i class="ph-bold ph-rocket text-[18px]"></i><span>学新词</span><span class="font-mono text-[13px] bg-white/80 px-2 py-0.5 rounded-[6px]">${hubNewCount} 词</span>
+                            <button onclick="window.generateManualByType('new')" class="w-full h-full flex flex-col items-center justify-center text-center rounded-[16px] transition-all font-bold text-[14px] shadow-sm border relative overflow-hidden ${hubNewCount === 0 ? 'bg-gray-50 text-gray-400 cursor-not-allowed opacity-70 border-gray-100' : 'bg-gradient-to-r from-blue-50 to-white text-blue-600 hover:bg-blue-100 active:scale-95 border-blue-100'}">
+                                <span class="absolute top-2.5 right-2.5 bg-white/80 text-blue-600 text-[11px] font-bold px-2 py-0.5 rounded-[6px] border border-blue-100"><span class="font-mono">${hubNewCount}</span> 词</span>
+                                <i class="ph-bold ph-rocket text-[24px] mb-1"></i><span>学新词</span>
                             </button>
-                            <button onclick="window.generateManualByType('old')" class="flex-1 flex items-center justify-center gap-2 py-3 rounded-[12px] transition-all font-bold text-[14px] shadow-sm border border-emerald-100/70 ${hubOldCount === 0 ? 'bg-gray-50 text-gray-400 cursor-not-allowed opacity-70' : 'text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 active:scale-95'}">
-                                <i class="ph-bold ph-arrows-clockwise text-[18px]"></i><span>学旧词</span><span class="font-mono text-[13px] bg-white/80 px-2 py-0.5 rounded-[6px]">${hubOldCount} 词</span>
+                            <button onclick="window.generateManualByType('old')" class="w-full h-full flex flex-col items-center justify-center text-center rounded-[16px] transition-all font-bold text-[14px] shadow-sm border relative overflow-hidden ${hubOldCount === 0 ? 'bg-gray-50 text-gray-400 cursor-not-allowed opacity-70 border-gray-100' : 'bg-gradient-to-r from-emerald-50 to-white text-emerald-600 hover:bg-emerald-100 active:scale-95 border-emerald-100'}">
+                                <span class="absolute top-2.5 right-2.5 bg-white/80 text-emerald-600 text-[11px] font-bold px-2 py-0.5 rounded-[6px] border border-emerald-100"><span class="font-mono">${hubOldCount}</span> 词</span>
+                                <i class="ph-bold ph-arrows-clockwise text-[24px] mb-1"></i><span>学旧词</span>
                             </button>`;
                     }
-                    document.getElementById('hubIdleState').classList.remove('hidden'); document.getElementById('hubIdleState').classList.add('flex'); document.getElementById('hubActiveState').classList.add('hidden'); document.getElementById('hubActiveState').classList.remove('flex');
+                    document.getElementById('hubIdleState').classList.remove('hidden'); document.getElementById('hubIdleState').classList.add('grid'); document.getElementById('hubActiveState').classList.add('hidden'); document.getElementById('hubActiveState').classList.remove('flex');
                 }
             }
 
@@ -1161,35 +1141,24 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 testWords.forEach((item, index) => {
                     var div = document.createElement('div');
                     div.id = `word-row-${item.id}`;
-                    var isJudged = item.status !== null;
-                    var rowClasses = `pass-word-row flex justify-between items-center p-4 rounded-[20px] shadow-sm border transition-all duration-300 shrink-0 ${isJudged ? (item.status === 'unknown' ? 'bg-[#FEF2F2] border-[#FECACA]' : 'bg-[#F0FDF4] border-[#BBF7D0]') : 'border-[#FDE68A]/50 bg-gradient-to-r from-[#FFFDF0] to-white'}`;
+                    div.className = `pass-word-row flex justify-between items-center p-4 rounded-[20px] shadow-sm border border-[#FDE68A]/50 bg-gradient-to-r from-[#FFFDF0] to-white transition-all duration-300 shrink-0`;
                     
-                    div.className = rowClasses;
-                    
-                    // Button UI
-                    var btnXClass = `judge-btn w-[56px] h-[44px] rounded-[14px] flex items-center justify-center text-[22px] active:scale-90 transition-all ${isJudged && item.status==='unknown' ? 'bg-[#EF4444] text-white shadow-sm' : 'bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500'}`;
-                    var btnCClass = `judge-btn w-[56px] h-[44px] rounded-[14px] flex items-center justify-center text-[22px] active:scale-90 transition-all ${isJudged && item.status==='known' ? 'bg-[#10B981] text-white shadow-sm' : 'bg-gray-50 text-gray-400 hover:bg-green-50 hover:text-green-500'}`;
-
                     div.innerHTML = `
                         <div class="flex items-center gap-3 flex-1 overflow-hidden pr-2 min-w-0">
                             <span class="font-mono text-[16px] text-gray-400 font-bold shrink-0 w-7 text-left">${index + 1}.</span>
-                            <div id="word-content-${item.id}" class="pass-content-strip ${isJudged ? 'revealed' : ''}">
-                                <span id="word-text-${item.id}" class="font-extrabold text-[18px] font-mono tracking-tight shrink-0 transition-colors duration-300 ${isJudged ? 'text-gray-400' : 'text-gray-800'}">${item.word}</span>
-                                <span id="word-phonetic-${item.id}" class="font-extrabold text-[18px] font-mono tracking-tight shrink-0 transition-colors duration-300 ${isJudged ? 'text-gray-400' : 'text-gray-800'}">
+                            <div id="word-content-${item.id}" class="pass-content-strip min-w-0 inline-flex items-baseline justify-end gap-0 text-right overflow-visible whitespace-nowrap">
+                                <span id="word-text-${item.id}" class="font-extrabold text-[18px] font-mono tracking-tight text-gray-800 shrink-0 mr-3">${item.word}</span>
+                                <span id="word-phonetic-${item.id}" class="font-extrabold text-[18px] font-mono tracking-tight text-gray-800 shrink-0">
                                     ${item.phonetic}
                                 </span>
-                                <div class="pass-meaning-container shrink-0">
-                                    <div>
-                                        <span id="word-desc-${item.id}" class="pass-meaning text-[14px] ${isJudged ? 'text-gray-500 opacity-80' : 'text-gray-500'}">
-                                            ${item.meaning}
-                                        </span>
-                                    </div>
-                                </div>
+                                <span id="word-desc-${item.id}" class="pass-meaning text-[14px] text-gray-500 leading-snug break-words text-right shrink-0">
+                                    ${item.meaning}
+                                </span>
                             </div>
                         </div>
                         <div class="pass-actions flex gap-2 shrink-0 ml-2 transition-transform duration-300">
-                            <button id="btn-x-${item.id}" onclick="window.judgeWord(${item.id}, 'unknown')" class="${btnXClass}"><i class="ph-bold ph-x"></i></button>
-                            <button id="btn-c-${item.id}" onclick="window.judgeWord(${item.id}, 'known')" class="${btnCClass}"><i class="ph-bold ph-check"></i></button>
+                            <button id="btn-x-${item.id}" onclick="window.judgeWord(${item.id}, 'unknown')" class="judge-btn w-[56px] h-[44px] rounded-[14px] bg-gray-50 text-gray-400 flex items-center justify-center text-[22px] hover:bg-red-50 hover:text-red-500 active:scale-90 transition-all"><i class="ph-bold ph-x"></i></button>
+                            <button id="btn-c-${item.id}" onclick="window.judgeWord(${item.id}, 'known')" class="judge-btn w-[56px] h-[44px] rounded-[14px] bg-gray-50 text-gray-400 flex items-center justify-center text-[22px] hover:bg-green-50 hover:text-green-500 active:scale-90 transition-all"><i class="ph-bold ph-check"></i></button>
                         </div>`;
                     container.appendChild(div);
                 });
@@ -1258,6 +1227,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                     wordSpan.classList.remove('text-gray-400', 'text-gray-500', 'text-gray-800');
                     wordPhonetic.classList.remove('text-gray-400', 'text-gray-500', 'text-gray-800');
                     wordDesc.classList.remove('opacity-60', 'opacity-80');
+                    wordDesc.classList.add('is-revealed');
 
                     if (result === 'unknown') {
                         row.classList.add('bg-[#FEF2F2]', 'border-[#FECACA]');
@@ -1269,12 +1239,12 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                         btnX.classList.add('bg-gray-50', 'text-gray-400'); 
                     }
 
-                    wordSpan.classList.add('text-gray-400');
-                    wordPhonetic.classList.add('text-gray-400');
-                    wordDesc.classList.add('opacity-80');
-                    
+                    wordSpan.classList.add('text-gray-800');
+                    wordPhonetic.classList.add('text-gray-800');
                     if (wordContent) {
-                        wordContent.classList.add('revealed');
+                        wordContent.classList.remove('selected-left');
+                        void wordContent.offsetWidth;
+                        wordContent.classList.add('selected-left');
                     }
                 }
 
