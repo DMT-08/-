@@ -1,0 +1,1735 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>校园综合管理系统 - 独立版</title>
+    <style>
+        :root {
+            --primary-color: #1F5FFF;
+            --primary-light: rgba(31, 95, 255, 0.12);
+            --bg-start: #EFF6FF;
+            --bg-end: #DFE7FF;
+            --surface-white: rgba(255, 255, 255, 0.92);
+            --surface-strong: rgba(255, 255, 255, 0.94);
+
+            --text-title: #14213D;
+            --text-main: #334155;
+            --text-secondary: #64748B;
+
+            --danger-color: #EF4444;
+            --danger-light: rgba(239, 68, 68, 0.14);
+            --success-color: #10B981;
+            --success-light: rgba(16, 185, 129, 0.14);
+            --warning-color: #F59E0B;
+            --warning-light: rgba(245, 158, 11, 0.16);
+
+            --border-line: rgba(31, 95, 255, 0.08);
+
+            --icon-bg-blue: rgba(96, 165, 250, 0.18); --icon-color-blue: #3B82F6;
+            --icon-bg-purple: rgba(167, 139, 250, 0.18); --icon-color-purple: #8B5CF6;
+            --icon-bg-pink: rgba(244, 114, 182, 0.18); --icon-color-pink: #EC4899;
+            --icon-bg-orange: rgba(251, 146, 60, 0.18); --icon-color-orange: #F97316;
+            --icon-bg-teal: rgba(45, 212, 191, 0.18); --icon-color-teal: #0D9488;
+            --icon-bg-emerald: rgba(16, 185, 129, 0.18); --icon-color-emerald: #059669;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif; background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%); display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
+
+        .device-simulator { width: 375px; height: 812px; background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%); position: relative; overflow: hidden; overflow-x: hidden; border-radius: 42px; box-shadow: 0 26px 60px rgba(31, 95, 255, 0.18); display: flex; flex-direction: column; }
+        .device-simulator::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 42px; box-shadow: inset 0 0 0 8px rgba(255,255,255,0.92); pointer-events: none; z-index: 1000; }
+
+        .wrapper-main { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; }
+        .tab-view { position: absolute; top: 0; left: 0; right: 0; bottom: 80px; display: none; flex-direction: column; }
+        .tab-view.active { display: flex; pointer-events: auto; }
+
+        .page-view { position: absolute; inset: 0; width: 100%; height: 100%; max-width: 100%; overflow-x: hidden; display: flex; flex-direction: column; z-index: 200; transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1); background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%); }
+        .page-view.hidden-left { transform: translateX(-100%); pointer-events: none; }
+        .page-view.hidden-right { transform: translateX(100%); pointer-events: none; }
+        .page-view.active { transform: translateX(0); pointer-events: auto; }
+
+        .nav-bar { padding: 48px 20px 12px; display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 10; flex-shrink: 0; }
+        .nav-bar.main-nav { justify-content: center; }
+        .nav-title-group { display: flex; flex-direction: column; align-items: center; }
+        .nav-title { font-size: 18px; font-weight: 800; color: var(--text-title); letter-spacing: 0.5px;}
+        .icon-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-title); transition: 0.2s;}
+        .icon-btn:active { opacity: 0.6; }
+
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 0 20px 20px 20px; scrollbar-width: none; padding-bottom: 30px; -webkit-overflow-scrolling: touch;}
+        .main-content::-webkit-scrollbar { display: none; }
+
+        .tab-bar, .sub-tab-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 84px; background: rgba(255, 255, 255, 0.82); backdrop-filter: blur(24px); border-top: 1px solid rgba(255, 255, 255, 0.88); display: flex; justify-content: space-around; align-items: flex-start; padding-top: 10px; z-index: 100; padding-bottom: 20px; box-shadow: 0 -10px 30px rgba(31, 95, 255, 0.08); }
+        .sub-tab-bar { justify-content: space-around; gap: 4px; padding-left: 8px; padding-right: 8px; scrollbar-width: none; }
+        .sub-tab-bar::-webkit-scrollbar { display: none; }
+        .tab-item, .sub-tab-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94A3B8; cursor: pointer; width: 60px; transition: all 0.3s; }
+        .sub-tab-item { flex: 0 0 62px; }
+        .tab-item.active, .sub-tab-item.active { color: var(--primary-color); }
+        .tab-icon { position: relative; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; }
+        .tab-icon svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+        .tab-label { font-size: 11px; font-weight: 700; letter-spacing: 0.2px;}
+
+        .sub-view { position: absolute; top: 0; left: 0; right: 0; bottom: 0; max-width: 100%; padding: 0 20px 100px; display: none; flex-direction: column; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .sub-view::-webkit-scrollbar { display: none; }
+        .sub-view.active { display: flex; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .glass-card { background: var(--surface-white); backdrop-filter: blur(22px); border: 1px solid rgba(255, 255, 255, 0.92); border-radius: 26px; box-shadow: 0 14px 34px rgba(31, 95, 255, 0.08), inset 0 1px 0 rgba(255,255,255,0.7); }
+        .global-semester-bar { display:flex; justify-content: space-between; align-items:center; background: rgba(255,255,255,0.82); backdrop-filter: blur(14px); padding: 11px 16px; border-radius: 18px; margin-bottom: 18px; border: 1px solid rgba(255,255,255,0.94); box-shadow: 0 8px 20px rgba(31, 95, 255, 0.06); flex-shrink:0; position: relative; z-index: 50;}
+        .semester-select { border:none; background:transparent; font-size:14px; font-weight:800; color:var(--primary-color); outline:none; appearance:none; padding-right:20px; cursor: pointer; width: 100%;}
+
+        .grid-menu { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 8px; padding: 16px 12px; }
+        .grid-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: transform 0.2s; position: relative; }
+        .grid-icon-wrap { width: 52px; height: 52px; border-radius: 18px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.92); box-shadow: 0 10px 20px rgba(148, 169, 214, 0.08), inset 0 1px 0 rgba(255,255,255,0.72); }
+        .grid-icon-wrap svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.85; stroke-linecap: round; stroke-linejoin: round; }
+        .grid-label { font-size: 12px; font-weight: 700; color: var(--text-main); text-align: center; line-height: 1.35; }
+        .grid-item.manage-mode .grid-icon-wrap { border-style: dashed; }
+        .grid-item.manage-mode::after { content: attr(data-manage-label); position: absolute; top: -6px; right: 6px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 999px; background: var(--danger-color); color: white; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+
+        .dir-tabs { display: flex; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid rgba(0,0,0,0.03); padding: 4px 12px 0; -webkit-overflow-scrolling: touch;}
+        .dir-tabs::-webkit-scrollbar { display: none; }
+        .dir-tab { flex-shrink: 0; padding: 14px 14px; font-size: 14px; font-weight: 600; color: var(--text-secondary); cursor: pointer; white-space: nowrap; position: relative; transition: 0.2s; }
+        .dir-tab.active { color: var(--primary-color); font-weight: 800; }
+        .dir-tab.active::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 24px; height: 3px; background: var(--primary-color); border-radius: 2px 2px 0 0; }
+        .manage-btn { font-size: 13px; font-weight: 700; color: var(--primary-color); cursor: pointer; }
+
+        .pill-scroll { display: flex; gap: 10px; overflow-x: auto; overflow-y: hidden; max-width: 100%; padding-bottom: 8px; scrollbar-width: none; margin-bottom: 12px; flex-shrink: 0; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
+        .pill-scroll::-webkit-scrollbar { display: none; }
+        .pill { flex-shrink: 0; padding: 9px 16px; border-radius: 999px; font-size: 13px; font-weight: 700; white-space: nowrap; cursor: pointer; background: rgba(255,255,255,0.84); color: var(--text-secondary); border: 1px solid rgba(255,255,255,0.9); transition: 0.2s; display: flex; align-items: center; gap:4px; box-shadow: 0 6px 18px rgba(31, 95, 255, 0.06);}
+        .pill:hover { background: rgba(255,255,255,0.9); }
+        .pill.active { background: linear-gradient(135deg, #3f7aff 0%, var(--primary-color) 100%); color: white; border-color: transparent; box-shadow: 0 10px 22px rgba(31, 95, 255, 0.24); transform: scale(1.02);}
+
+        .list-card { padding: 18px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; cursor: pointer; transition: all 0.3s; position: relative; background: rgba(255, 255, 255, 0.86);}
+        .list-card:active { transform: scale(0.985); background: rgba(255, 255, 255, 0.98); }
+        .list-card.invalid { opacity: 0.72; filter: saturate(0.7); cursor: default; }
+        .card-row-between { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+        .card-title { font-size: 15px; font-weight: 800; color: var(--text-title); line-height: 1.4; display:flex; align-items:center; gap:6px;}
+        .card-desc { font-size: 12px; color: var(--text-secondary); display: flex; gap: 8px; align-items: center; font-weight: 500; flex-wrap: wrap;}
+
+        .checkbox-wrap { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border: 2px solid #CBD5E1; border-radius: 6px; cursor: pointer; transition: 0.2s; background: white;}
+        .checkbox-wrap.checked { background: var(--primary-color); border-color: var(--primary-color); }
+        .checkbox-wrap svg { width: 14px; height: 14px; stroke: white; opacity: 0; transition: 0.2s;}
+        .checkbox-wrap.checked svg { opacity: 1; }
+
+        .badge-tag { padding: 4px 9px; border-radius: 999px; font-size: 10px; font-weight: 800; white-space: nowrap; border: 1px solid transparent; }
+        .tag-primary { background: var(--primary-light); color: var(--primary-color); }
+        .tag-warning { background: var(--warning-light); color: var(--warning-color); border-color: var(--warning-color); }
+        .tag-success { background: var(--success-color); color: white; }
+        .tag-danger { background: var(--danger-light); color: var(--danger-color); }
+        .badge-outline { border: 1px solid var(--primary-color); color: var(--primary-color); padding: 2px 6px; border-radius: 6px; font-size: 10px; font-weight: 700; white-space: nowrap;}
+        .badge-outline.warning { border-color: var(--warning-color); color: var(--warning-color); }
+        .badge-outline.danger { border-color: var(--danger-color); color: var(--danger-color); }
+
+        .step-container { display: flex; align-items: center; justify-content: space-between; margin: 12px 0 16px; position: relative; width: 100%;}
+        .step-container::before { content:''; position:absolute; top: 10px; left: 5%; right: 5%; height: 2px; background: rgba(0,0,0,0.08); z-index: 0;}
+        .step-item { display: flex; flex-direction: column; align-items: center; gap: 6px; z-index: 1; position:relative; padding: 0 2px; border-radius: 12px; flex: 1;}
+        .step-circle { width: 20px; height: 20px; border-radius: 50%; background: #E2E8F0; color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; border: 2px solid white; box-shadow:0 2px 4px rgba(0,0,0,0.05); transition: 0.3s;}
+        .step-item.active .step-circle { background: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-light), 0 2px 4px rgba(0,0,0,0.05); border-color: transparent; animation: nodePulse 0.46s ease both;}
+        .step-item.done .step-circle { background: var(--success-color); border-color: transparent;}
+        .step-label { font-size: 9px; font-weight: 800; color: #94A3B8; text-align: center; white-space: nowrap;}
+        .step-item.active .step-label { color: var(--primary-color); }
+        .step-item.done .step-label { color: var(--success-color); }
+
+        .card-actions { display: flex; gap: 8px; margin-top: 6px; padding-top: 12px; border-top: 1px dashed rgba(126, 147, 190, 0.18); align-items:center; flex-wrap: wrap;}
+        .btn-xs { background: rgba(31,95,255,0.1); color: var(--primary-color); border:none; padding: 7px 13px; border-radius: 999px; font-size: 12px; font-weight: 800; cursor:pointer; transition:0.2s;}
+        .btn-xs:active, .btn-xs:hover { transform: scale(0.95); opacity: 0.9; }
+        .btn-xs.outline { background: transparent; border: 1px solid var(--primary-color); }
+        .btn-xs.danger { background: var(--danger-light); color: var(--danger-color); }
+        .btn-xs.disabled { opacity: 0.5; pointer-events: none; }
+
+        .search-input-pill { width: 100%; padding: 14px 14px 14px 44px; border-radius: 999px; background: rgba(255,255,255,0.92); border: 1px solid rgba(255,255,255,0.88); font-size: 14px; font-weight: 600; color: var(--text-title); outline: none; box-shadow: 0 10px 24px rgba(31, 95, 255, 0.06); transition: all 0.2s; }
+        .search-icon-pill { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: #9CA3AF; z-index: 10; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; padding: 0 6px 12px; margin-top: 16px;}
+        .section-title { font-size: 18px; font-weight: 800; color: var(--text-title); letter-spacing: 0.5px;}
+
+        .toast { position: absolute; top: 20%; left: 50%; transform: translate(-50%, -50%); background: rgba(50, 63, 98, 0.82); color: white; padding: 14px 24px; border-radius: 16px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 2000; backdrop-filter: blur(12px); font-weight: 600; text-align: center; box-shadow: 0 14px 30px rgba(94, 111, 158, 0.22); display: flex; align-items: center; gap: 8px; justify-content: center;}
+        .toast.show { opacity: 1; top: 25%; }
+        .toast-undo-btn { margin-left: 12px; padding: 4px 10px; background: rgba(255,255,255,0.2); border-radius: 6px; cursor: pointer; font-size: 12px; }
+
+        .primary-action-btn { background: linear-gradient(135deg, #4b82ff 0%, var(--primary-color) 100%); color: white; padding: 12px 16px; min-height: 76px; border-radius: 26px; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 16px 28px rgba(31, 95, 255, 0.24); cursor: pointer; transition: 0.2s; margin-bottom: 14px; flex-shrink: 0;}
+        .primary-action-btn svg { width: 34px; height: 34px; flex-shrink: 0; stroke-width: 1.9; }
+        .primary-action-btn span { font-size: 18px; font-weight: 800; letter-spacing: 0.2px; }
+        .primary-action-btn:active { transform: scale(0.98); opacity: 0.9;}
+
+        .modal-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; backdrop-filter: blur(2px);}
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+        .bottom-sheet { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.96); border-radius: 30px 30px 0 0; padding: 24px 20px 34px; z-index: 1001; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 0 -16px 40px rgba(31, 95, 255, 0.1); display: flex; flex-direction: column; max-height: 85%; backdrop-filter: blur(24px);}
+        .bottom-sheet.active { transform: translateY(0); }
+        .sheet-indicator { width: 40px; height: 4px; background: #E2E8F0; border-radius: 2px; margin: 0 auto 20px; flex-shrink: 0;}
+        .sheet-title { font-size: 18px; font-weight: 800; color: var(--text-title); text-align: center; margin-bottom: 24px; flex-shrink: 0;}
+
+        .dialog-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); background: rgba(255,255,255,0.95); border-radius: 28px; width: 80%; padding: 24px 20px; z-index: 1001; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 20px 50px rgba(31, 95, 255, 0.1); backdrop-filter: blur(22px);}
+        .dialog-box.active { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
+        .dialog-title { font-size: 18px; font-weight: 800; color: var(--text-title); margin-bottom: 12px; margin-top: 12px;}
+        .dialog-desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5; padding: 0 10px;}
+        .dialog-actions { display: flex; gap: 12px; width: 100%;}
+        .dialog-btn { flex: 1; padding: 14px; font-size: 15px; font-weight: 800; border-radius: 14px; cursor: pointer; text-align: center; transition: 0.2s;}
+        .dialog-btn.cancel { background: #F1F5F9; color: var(--text-secondary);}
+        .dialog-btn.confirm { background: var(--primary-color); color: white;}
+
+        .form-group { margin-bottom: 16px; text-align: left; width: 100%;}
+        .form-label { font-size: 13px; font-weight: 800; color: var(--text-title); margin-bottom: 8px; display: block; }
+        .form-label.required::after { content: '*'; color: var(--danger-color); margin-left: 4px; }
+        .form-control { width: 100%; padding: 14px 16px; border-radius: 18px; border: 1px solid rgba(155,169,206,0.14); background: rgba(245,248,255,0.9); font-size: 14px; color: var(--text-title); outline: none; transition: 0.2s; font-family: inherit;}
+        .form-control:focus { border-color: var(--primary-color); background: #fff; box-shadow: 0 0 0 3px var(--primary-light); }
+        .form-control:invalid:focus { border-color: var(--danger-color); box-shadow: 0 0 0 3px var(--danger-light); }
+        textarea.form-control { resize: none; height: 100px; }
+        .form-section { padding: 14px; margin-bottom: 14px; border-radius: 20px; background: rgba(245,248,255,0.72); border: 1px solid rgba(255,255,255,0.9); }
+        .form-section-title { font-size: 14px; font-weight: 900; color: var(--primary-color); margin-bottom: 12px; }
+        .form-two-col { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+        .switch-field { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 16px; background: rgba(255,255,255,0.78); margin-bottom: 12px; }
+        .switch-options { display: flex; gap: 6px; flex-shrink: 0; }
+        .switch-options label { font-size: 12px; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 4px; }
+        .advanced-section { margin-bottom: 14px; border-radius: 20px; background: rgba(245,248,255,0.72); border: 1px solid rgba(255,255,255,0.9); overflow: hidden; }
+        .advanced-section summary { padding: 14px; color: var(--primary-color); font-size: 14px; font-weight: 900; cursor: pointer; list-style: none; }
+        .advanced-section summary::-webkit-details-marker { display: none; }
+        .advanced-section .form-section { margin: 0; border: none; background: transparent; }
+
+        .submit-btn { width: 100%; padding: 16px; border-radius: 20px; background: linear-gradient(135deg, #4b82ff 0%, var(--primary-color) 100%); color: white; font-size: 16px; font-weight: 800; text-align: center; cursor: pointer; transition: 0.2s; margin-top: 8px; border: none; box-shadow: 0 12px 24px rgba(31, 95, 255, 0.2);}
+        .submit-btn:disabled { opacity: 0.6; pointer-events: none; }
+
+        .sheet-scroll-area { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; width: 100%; max-height: 50vh; padding: 0 4px;}
+        .sheet-scroll-area::-webkit-scrollbar { display: none; }
+
+        .log-timeline { margin-top: 8px; padding-left: 12px; border-left: 2px solid var(--primary-light); }
+        .log-item { position: relative; padding-bottom: 24px; padding-left: 16px; animation: fadeInUp 0.32s ease both; }
+        .log-item::before { content: ''; position: absolute; left: -21px; top: 2px; width: 10px; height: 10px; border-radius: 50%; background: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-light); }
+        .log-time { font-size: 11px; color: var(--text-secondary); margin-bottom: 4px; font-weight: 600;}
+        .log-content { font-size: 14px; color: var(--text-title); font-weight: 700; margin-bottom: 4px;}
+        .log-detail { font-size: 12px; color: var(--text-main); line-height: 1.4; background: #F8FAFC; padding: 8px 12px; border-radius: 8px; margin-top: 6px;}
+
+        .sheet-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 10px; margin-bottom: 10px;}
+        .task-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+        .task-card { padding: 14px; border-radius: 20px; background: rgba(255,255,255,0.92); border: 1px solid rgba(255,255,255,0.9); box-shadow: 0 10px 24px rgba(31,95,255,0.06); cursor: pointer; transition: 0.2s; }
+        .task-card:active { transform: scale(0.98); }
+        .task-card.danger { border-color: rgba(239,68,68,0.22); background: rgba(255,255,255,0.96); }
+        .task-card.warning { border-color: rgba(245,158,11,0.24); background: rgba(255,255,255,0.96); }
+        .task-label { font-size: 12px; color: var(--text-secondary); font-weight: 800; margin-bottom: 8px; }
+        .task-value { font-size: 24px; color: var(--primary-color); font-weight: 900; line-height: 1; animation: numberPop 0.36s ease; }
+        .task-card.danger .task-value { color: var(--danger-color); }
+        .task-card.warning .task-value { color: var(--warning-color); }
+        .urgent-task-list { display: grid; gap: 10px; margin-bottom: 14px; }
+        .urgent-task-card { padding: 14px; border-radius: 22px; background: rgba(255,255,255,0.92); border: 1px solid rgba(255,255,255,0.9); box-shadow: 0 12px 26px rgba(31,95,255,0.08); animation: fadeInUp 0.32s ease both; }
+        .urgent-task-title { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 14px; font-weight: 900; color: var(--text-title); margin-bottom: 6px; }
+        .urgent-task-desc { font-size: 12px; font-weight: 700; line-height: 1.45; color: var(--text-secondary); margin-bottom: 12px; }
+        .urgent-task-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .compact-action { padding: 8px 12px; border-radius: 999px; border: 1px solid rgba(31,95,255,0.18); background: rgba(31,95,255,0.08); color: var(--primary-color); font-size: 12px; font-weight: 900; cursor: pointer; font-family: inherit; }
+        .global-add-btn { width: 34px; height: 34px; border-radius: 14px; border: none; background: var(--primary-color); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 22px rgba(31,95,255,0.24); cursor: pointer; }
+        .global-add-btn svg { width: 20px; height: 20px; stroke: currentColor; }
+        .quick-menu-wrap { position: relative; }
+        .quick-dropdown { position: absolute; top: 42px; right: 0; width: 168px; padding: 8px; border-radius: 20px; background: rgba(255,255,255,0.94); border: 1px solid rgba(255,255,255,0.92); box-shadow: 0 18px 38px rgba(31,95,255,0.18); backdrop-filter: blur(18px); z-index: 300; opacity: 0; transform: translateY(-8px) scale(0.96); pointer-events: none; transition: 0.18s ease; }
+        .quick-dropdown.active { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+        .quick-menu-item { width: 100%; border: none; background: transparent; border-radius: 14px; padding: 10px; display: flex; align-items: center; gap: 10px; color: var(--text-title); font-size: 13px; font-weight: 900; font-family: inherit; cursor: pointer; }
+        .quick-menu-item:active { background: var(--primary-light); }
+        .quick-menu-icon { width: 28px; height: 28px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: var(--primary-light); color: var(--primary-color); flex-shrink: 0; }
+        .quick-menu-icon svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+        .appointment-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+        .appointment-card { padding: 16px; min-height: 104px; border-radius: 24px; background: linear-gradient(145deg, rgba(255,255,255,0.96), rgba(236,244,255,0.86)); border: 1px solid rgba(255,255,255,0.9); box-shadow: 0 14px 28px rgba(31,95,255,0.08); display: flex; flex-direction: column; justify-content: space-between; }
+        .appointment-label { font-size: 13px; color: var(--text-secondary); font-weight: 900; }
+        .appointment-value { font-size: 34px; color: var(--primary-color); font-weight: 950; line-height: 1; }
+        .appointment-desc { font-size: 11px; color: var(--text-secondary); font-weight: 700; }
+        .data-board { padding: 12px; margin-bottom: 14px; }
+        .compact-metric-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+        .compact-metric { min-height: 64px; padding: 10px; border-radius: 18px; background: rgba(255,255,255,0.76); border: 1px solid rgba(255,255,255,0.84); display: flex; flex-direction: column; justify-content: space-between; }
+        .compact-metric span { font-size: 11px; color: var(--text-secondary); font-weight: 900; white-space: nowrap; }
+        .compact-metric strong { font-size: 22px; line-height: 1; color: var(--primary-color); font-weight: 950; }
+        .compact-metric.danger strong { color: var(--danger-color); }
+        .compact-student-card { padding: 14px 16px; border-radius: 22px; background: rgba(255,255,255,0.9); border: 1px solid rgba(255,255,255,0.9); box-shadow: 0 10px 24px rgba(31,95,255,0.06); margin-bottom: 10px; cursor: pointer; animation: fadeInUp 0.32s ease both; }
+        .compact-student-main { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .compact-student-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+        .student-index { width: 24px; height: 24px; border-radius: 10px; background: var(--primary-light); color: var(--primary-color); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 950; flex-shrink: 0; }
+        .compact-student-name { font-size: 15px; font-weight: 950; color: var(--text-title); }
+        .compact-progress { flex-shrink: 0; padding: 6px 10px; border-radius: 999px; background: var(--primary-light); color: var(--primary-color); font-size: 12px; font-weight: 900; }
+        .filter-panel { position: sticky; top: 0; z-index: 60; padding: 0 0 10px; background: linear-gradient(135deg, rgba(239,246,255,0.96) 0%, rgba(223,231,255,0.96) 100%); backdrop-filter: blur(12px); }
+        .filter-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+        .mini-search { flex: 1; min-width: 0; height: 38px; border: 1px solid rgba(255,255,255,0.88); border-radius: 999px; padding: 0 14px; background: rgba(255,255,255,0.9); outline: none; color: var(--text-title); font-weight: 700; }
+        .filter-btn { height: 38px; padding: 0 14px; border: 1px solid rgba(31,95,255,0.16); border-radius: 999px; background: rgba(255,255,255,0.86); color: var(--primary-color); font-size: 12px; font-weight: 900; cursor: pointer; }
+        .meta-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 4px; }
+        .meta-item { padding: 8px 10px; border-radius: 12px; background: rgba(31,95,255,0.06); color: var(--text-main); font-size: 11px; font-weight: 700; line-height: 1.35; }
+        .next-action { padding: 10px 12px; border-radius: 14px; background: var(--primary-light); color: var(--primary-color); font-size: 12px; font-weight: 900; }
+        .lead-main { cursor: pointer; display: flex; flex-direction: column; gap: 8px; min-width: 0; flex: 1; }
+        .lead-status { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+        .focus-note { font-size: 11px; color: var(--text-secondary); font-weight: 800; line-height: 1.35; }
+        .detail-summary-grid { display: grid; gap: 10px; margin-bottom: 14px; }
+        .detail-summary { padding: 14px; border-radius: 18px; background: rgba(255,255,255,0.9); border: 1px solid rgba(255,255,255,0.88); }
+        .detail-summary-title { font-size: 12px; color: var(--text-secondary); font-weight: 900; margin-bottom: 8px; }
+        .detail-summary-body { font-size: 13px; color: var(--text-main); font-weight: 700; line-height: 1.5; }
+        .funnel-subtitle { margin: -6px 6px 12px; color: var(--text-secondary); font-size: 12px; font-weight: 800; }
+        .funnel-metric { padding: 14px 16px; border-radius: 20px; background: rgba(255,255,255,0.92); border: 1px solid rgba(255,255,255,0.9); box-shadow: 0 10px 24px rgba(31,95,255,0.08), inset 0 1px 0 rgba(255,255,255,0.5); animation: fadeInUp 0.32s ease both; }
+        .funnel-topline { display:flex; justify-content:space-between; gap:12px; font-size:12px; font-weight:800; color:var(--text-main); margin-bottom:8px; }
+        .funnel-track { width:100%; height:10px; border-radius:999px; background: rgba(31,95,255,0.14); overflow:hidden; }
+        .funnel-bar { height:100%; border-radius:999px; transform-origin: left center; animation: fillLine 0.45s ease both; }
+        .funnel-grid { display:grid; gap:10px; }
+        .funnel-note { margin-top: 12px; padding: 10px 12px; border-radius: 16px; background: rgba(31,95,255,0.06); color: var(--text-secondary); font-size: 11px; font-weight: 700; line-height: 1.55; }
+        .sheet-list-item { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: rgba(245,248,255,0.9); border-radius: 20px; cursor: pointer; transition: 0.2s; border: 1px solid rgba(255,255,255,0.7); margin-bottom: 12px;}
+        .sheet-list-item:active { transform: scale(0.98); }
+        .sheet-list-title { font-size: 14px; font-weight: 900; color: var(--text-title); margin-bottom: 4px; }
+        .sheet-list-desc { font-size: 12px; font-weight: 700; color: var(--text-secondary); line-height: 1.45; }
+        .more-group-title { padding: 4px 6px 8px; font-size: 13px; color: var(--text-title); font-weight: 900; }
+        .summary-card { padding: 16px; border-radius: 22px; background: rgba(255,255,255,0.86); border: 1px solid rgba(255,255,255,0.9); box-shadow: 0 12px 26px rgba(31,95,255,0.06); margin-bottom: 12px; }
+        .summary-row { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px dashed rgba(31,95,255,0.1); font-size: 13px; font-weight: 800; color: var(--text-main); }
+        .summary-row:last-child { border-bottom: none; }
+        .summary-value { color: var(--primary-color); text-align: right; }
+        .detail-action-panel { margin-bottom: 14px; padding: 14px; border-radius: 22px; background: rgba(31,95,255,0.08); border: 1px solid rgba(31,95,255,0.14); }
+        .detail-primary-btn { width: 100%; padding: 13px 16px; border: none; border-radius: 18px; background: var(--primary-color); color: #fff; font-size: 14px; font-weight: 900; font-family: inherit; cursor: pointer; box-shadow: 0 10px 22px rgba(31,95,255,0.24); }
+        .module-hint { margin: -4px 6px 12px; color: var(--text-secondary); font-size: 12px; font-weight: 700; line-height: 1.5; }
+        .module-chip-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding: 0 2px 12px; }
+        .module-chip { min-height: 70px; padding: 8px 4px; border-radius: 20px; background: rgba(255,255,255,0.86); color: var(--primary-color); font-size: 11px; font-weight: 900; border: 1px solid rgba(255,255,255,0.88); cursor: pointer; font-family: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 10px 22px rgba(31,95,255,0.06); }
+        .module-chip svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+        .module-chip.disabled { color: var(--text-secondary); background: rgba(148,163,184,0.12); }
+
+        .skeleton { background: #E2E8F0; border-radius: 8px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+        @keyframes fillLine { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+        @keyframes numberPop { 0% { transform: scale(0.92); opacity: 0.7; } 65% { transform: scale(1.08); } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes nodePulse { 0% { transform: scale(0.86); } 60% { transform: scale(1.12); } 100% { transform: scale(1); } }
+
+        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; text-align: center;}
+        .empty-state svg { width: 64px; height: 64px; stroke: #CBD5E1; margin-bottom: 16px;}
+        .empty-state p { font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5;}
+
+        #page-lead-detail { z-index: 300; background: #F8FAFC; transform: translate3d(100%,0,0); visibility: hidden; left: 0 !important; right: auto !important; top: 0 !important; bottom: auto !important; width: 100% !important; height: 100% !important; min-width: 100% !important; max-width: 100% !important; }
+        #page-lead-detail.active { transform: translateX(0); visibility: visible; }
+        .detail-header { background: rgba(255,255,255,0.92); padding: 24px 20px; border-bottom: 1px solid var(--border-line); backdrop-filter: blur(18px); }
+        .detail-tabs { display: flex; border-bottom: 1px solid var(--border-line); background: rgba(255,255,255,0.9); padding: 0 20px; backdrop-filter: blur(18px);}
+        .detail-tab { padding: 16px 0; margin-right: 24px; font-size: 14px; font-weight: 600; color: var(--text-secondary); cursor: pointer; position: relative;}
+        .detail-tab.active { color: var(--primary-color); font-weight: 800; }
+        .detail-tab.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--primary-color); border-radius: 2px 2px 0 0; }
+
+        .batch-action-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 80px; background: rgba(255,255,255,0.94); box-shadow: 0 -8px 24px rgba(31, 95, 255, 0.08); z-index: 150; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; transform: translateY(100%); transition: 0.3s; backdrop-filter: blur(18px);}
+        .batch-action-bar.active { transform: translateY(0); }
+    </style>
+</head>
+<body>
+
+<div class="device-simulator">
+    <div class="wrapper-main">
+        <div id="tab-school" class="tab-view active">
+            <div class="nav-bar main-nav" style="padding-bottom:16px;">
+                <div class="nav-title" style="font-size: 20px;">学校管理</div>
+            </div>
+            <div class="main-content">
+                <div style="position: relative; margin-bottom: 8px;">
+                    <svg class="search-icon-pill" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" class="search-input-pill" placeholder="全局搜索功能/拼音首字母">
+                </div>
+
+                <div class="section-header">
+                    <div class="section-title">高频功能</div>
+                    <div class="manage-btn" onclick="toggleManage()" id="manage-btn-text">管理</div>
+                </div>
+                <div class="glass-card" style="margin-bottom: 12px; padding-bottom: 8px;">
+                    <div class="grid-menu" style="padding-top:16px;" id="high-freq-grid"></div>
+                </div>
+
+                <div class="section-header">
+                    <div class="section-title">功能目录</div>
+                </div>
+                <div class="glass-card" style="margin-bottom: 16px;">
+                    <div class="dir-tabs" id="dir-tabs"></div>
+                    <div class="grid-menu" style="padding-top:16px; padding-bottom:16px;" id="dir-grid"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-teacher" class="tab-view">
+            <div class="nav-bar main-nav"><div class="nav-title">教师</div></div>
+            <div class="main-content" style="display:flex; justify-content:center; align-items:center; color: var(--text-secondary); font-weight:bold;">模块开发中...</div>
+        </div>
+
+        <div class="tab-bar">
+            <div class="tab-item" onclick="showToast('该模块暂不跳转')"><div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></div><div class="tab-label">通告</div></div>
+            <div class="tab-item" onclick="showToast('该模块暂不跳转')"><div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></div><div class="tab-label">课件</div></div>
+            <div class="tab-item" onclick="switchTab('tab-teacher', this)"><div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg></div><div class="tab-label">教师</div></div>
+            <div class="tab-item active" onclick="switchTab('tab-school', this)"><div class="tab-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div><div class="tab-label">学校</div></div>
+            <div class="tab-item" onclick="showToast('该模块暂不跳转')"><div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div><div class="tab-label">我的</div></div>
+        </div>
+    </div>
+
+    <div id="workspace-enrollment" class="page-view hidden-right" style="background: linear-gradient(135deg, #EFF6FF 0%, #DFE7FF 100%);">
+        <div class="nav-bar">
+            <div class="icon-btn" style="margin-left: -8px;" onclick="closeEnrollmentWorkspace()">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </div>
+            <div class="nav-title-group"><div class="nav-title">招生工作台</div></div>
+            <div class="quick-menu-wrap">
+                <button class="global-add-btn" onclick="toggleQuickMenu(event)" aria-label="快捷操作">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </button>
+                <div class="quick-dropdown" id="quick-dropdown">
+                    <button class="quick-menu-item" onclick="quickAction('lead')"><span class="quick-menu-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-8 0v2"></path><circle cx="12" cy="7" r="4"></circle><path d="M19 8v6M22 11h-6"></path></svg></span>录入线索</button>
+                    <button class="quick-menu-item" onclick="quickAction('scan')"><span class="quick-menu-icon"><svg viewBox="0 0 24 24"><path d="M4 7V4h3"></path><path d="M17 4h3v3"></path><path d="M20 17v3h-3"></path><path d="M7 20H4v-3"></path><path d="M7 12h10"></path></svg></span>扫码</button>
+                    <button class="quick-menu-item" onclick="quickAction('qr')"><span class="quick-menu-icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6"></rect><rect x="14" y="4" width="6" height="6"></rect><rect x="4" y="14" width="6" height="6"></rect><path d="M14 14h2v2h-2zM18 14h2v6h-6v-2"></path></svg></span>我的二维码</button>
+                    <button class="quick-menu-item" onclick="quickAction('visit')"><span class="quick-menu-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 12-9 12S3 17 3 10a9 9 0 1 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></span>到访签到</button>
+                </div>
+            </div>
+        </div>
+
+        <div style="flex:1; position:relative; overflow: hidden;">
+            <div id="sub-view-dashboard" class="sub-view active">
+                <div class="section-header" style="margin-top: 4px;"><div class="section-title">数据看板</div></div>
+                <div class="glass-card data-board">
+                    <div class="compact-metric-grid">
+                        <div class="compact-metric"><span>跟进总数</span><strong id="active-follow-count">0</strong></div>
+                        <div class="compact-metric"><span>今日跟进</span><strong id="today-follow-count">0</strong></div>
+                        <div class="compact-metric danger"><span>异常记录</span><strong id="exception-count">0</strong></div>
+                    </div>
+                </div>
+
+                <div class="section-header"><div class="section-title">招生进度概览</div></div>
+                <div class="funnel-subtitle">查看本学期线索、跟进、到访、预定、录取与交接进展。</div>
+                <div class="glass-card" style="padding: 16px; margin-bottom: 12px;" id="funnel-container"></div>
+            </div>
+
+            <div id="sub-view-leads" class="sub-view">
+                <div class="filter-panel">
+                    <div class="filter-row">
+                        <input class="mini-search" id="leads-search" placeholder="搜索姓名/手机号/来源/负责人" oninput="rerenderActiveList('leads')">
+                        <button class="filter-btn" onclick="showToast('可按来源、专业、负责人、创建时间继续筛选')">筛选</button>
+                        <button class="filter-btn" onclick="showModal('sheet-add-lead')">录入</button>
+                    </div>
+                    <div class="pill-scroll" id="pills-leads">
+                        <div class="pill active" onclick="switchFilter(this, 'leads', '公海线索')">公海线索</div>
+                        <div class="pill" onclick="switchFilter(this, 'leads', '全部个人(组长)')">全部个人(组长)</div>
+                        <div class="pill" onclick="switchFilter(this, 'leads', '我的线索')">我的线索</div>
+                        <div class="pill" onclick="switchFilter(this, 'leads', '超时待办')">超时待办</div>
+                    </div>
+                </div>
+                <div id="leads-list-container"></div>
+            </div>
+
+            <div id="sub-view-follow" class="sub-view">
+                <div class="module-chip-row">
+                    <button class="module-chip" onclick="startQuickFollowUp()"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path><path d="M8 9h8M8 13h5"></path></svg><span>写跟进</span></button>
+                    <button class="module-chip" onclick="openDynamicForm('visitAppointment')"><svg viewBox="0 0 24 24"><path d="M8 2v4M16 2v4"></path><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M3 10h18"></path><path d="M9 16l2 2 4-5"></path></svg><span>约到访</span></button>
+                    <button class="module-chip" onclick="openDynamicForm('reservationRecord')"><svg viewBox="0 0 24 24"><path d="M12 1v22"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg><span>交定位</span></button>
+                    <button class="module-chip" onclick="startQuickEnroll()"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><path d="M22 4 12 14.01l-3-3"></path></svg><span>标记已报名</span></button>
+                </div>
+                <div class="pill-scroll" id="pills-follow">
+                    <div class="pill active" onclick="switchFilter(this, 'follow', '跟进列表')">跟进列表</div>
+                    <div class="pill" onclick="switchFilter(this, 'follow', '待跟进')">待跟进</div>
+                    <div class="pill" onclick="switchFilter(this, 'follow', '跟进记录')">跟进记录</div>
+                    <div class="pill" onclick="switchFilter(this, 'follow', '待到访')">待到访</div>
+                    <div class="pill" onclick="switchFilter(this, 'follow', '已定位/已报名')">已定位/已报名</div>
+                </div>
+                <div id="follow-list-container"></div>
+            </div>
+
+            <div id="sub-view-reservation" class="sub-view">
+                <div class="section-header" style="margin-top: 0;"><div class="section-title">预定与录取</div></div>
+                <div class="module-hint">已到访学生可办理预定，已预定学生可转正式录取。</div>
+                <div class="module-chip-row">
+                    <button class="module-chip" onclick="openDynamicForm('reservationRecord')">办理预定</button>
+                    <button class="module-chip" onclick="startQuickEnroll()">转正式录取</button>
+                </div>
+                <div class="pill-scroll" id="pills-reservation">
+                    <div class="pill active" onclick="switchFilter(this, 'reservation', '待预定')">待预定</div>
+                    <div class="pill" onclick="switchFilter(this, 'reservation', '预定记录')">预定记录</div>
+                    <div class="pill" onclick="switchFilter(this, 'reservation', '待录取')">待录取</div>
+                    <div class="pill" onclick="switchFilter(this, 'reservation', '录取记录')">录取记录</div>
+                </div>
+                <div id="reservation-list-container"></div>
+            </div>
+
+            <div id="sub-view-handover" class="sub-view">
+                <div class="section-header" style="margin-top: 0;"><div class="section-title">报到与入学交接</div></div>
+                <div class="module-hint">优先查看报到交接异常，必要时可重新提交交接任务。</div>
+                <div class="pill-scroll" id="pills-handover">
+                    <div class="pill active" onclick="switchFilter(this, 'handover', '报到记录')">报到记录</div>
+                    <div class="pill" onclick="switchFilter(this, 'handover', '预分班')">预分班</div>
+                    <div class="pill" onclick="switchFilter(this, 'handover', '转正式班')">转正式班</div>
+                    <div class="pill" onclick="switchFilter(this, 'handover', '入学交接任务')">入学交接任务</div>
+                </div>
+                <div id="handover-list-container"></div>
+            </div>
+
+            <div id="sub-view-schools" class="sub-view">
+                <div class="section-header" style="margin-top: 0;"><div class="section-title">生源学校</div></div>
+                <div class="module-hint">查看重点生源学校与责任归属，维护请前往后台管理端。</div>
+                <div class="glass-card" style="padding: 12px;">
+                    <div class="sheet-list-item" onclick="showToast('已打开学校档案摘要')"><div><div class="sheet-list-title">学校档案</div><div class="sheet-list-desc">120 所学校，A 级重点资源 18 所。</div></div><span class="badge-tag tag-primary">查看</span></div>
+                    <div class="sheet-list-item" onclick="showToast('候选学校归集以查看为主')"><div><div class="sheet-list-title">候选学校归集</div><div class="sheet-list-desc">待匹配 6 所，已匹配 114 所。</div></div><span class="badge-tag tag-primary">查看</span></div>
+                    <div class="sheet-list-item" onclick="showToast('责任资源配置请前往后台管理端维护')"><div><div class="sheet-list-title">责任资源配置</div><div class="sheet-list-desc">当前已按招生分组完成责任绑定。</div></div><span class="badge-tag tag-success">已配置</span></div>
+                </div>
+            </div>
+
+            <div id="sub-view-config" class="sub-view">
+                <div class="section-header" style="margin-top: 0;"><div class="section-title">招生配置</div></div>
+                <div class="module-hint">查看当前招生基础配置，维护请前往后台管理端。</div>
+                <div class="summary-card">
+                    <div class="summary-row"><span>当前学期</span><span class="summary-value">2026 秋季学期</span></div>
+                    <div class="summary-row"><span>招生专业</span><span class="summary-value">8 个</span></div>
+                    <div class="summary-row"><span>招生人员</span><span class="summary-value">32 人</span></div>
+                    <div class="summary-row"><span>招生分组</span><span class="summary-value">5 个</span></div>
+                    <div class="summary-row"><span>专业计划</span><span class="summary-value">已配置</span></div>
+                    <div class="summary-row"><span>组内分配</span><span class="summary-value">已配置</span></div>
+                </div>
+                <div class="module-hint">配置维护请前往后台管理端。</div>
+            </div>
+
+            <div id="sub-view-logs" class="sub-view">
+                <div class="section-header" style="margin-top: 0;"><div class="section-title">日志中心</div></div>
+                <div class="module-hint">查看关键流转记录，可按日志类型切换。</div>
+                <div class="pill-scroll" id="pills-logs">
+                    <div class="pill active" onclick="switchLogFilter(this, '入池日志')">入池日志</div>
+                    <div class="pill" onclick="switchLogFilter(this, '分配日志')">分配日志</div>
+                    <div class="pill" onclick="switchLogFilter(this, '线索阶段日志')">线索阶段日志</div>
+                    <div class="pill" onclick="switchLogFilter(this, '阶段变更日志')">阶段变更日志</div>
+                </div>
+                <div class="glass-card" style="padding: 16px; margin-bottom: 12px;">
+                    <div class="log-timeline" id="logs-list-container"></div>
+                </div>
+            </div>
+
+            <div id="sub-view-more" class="sub-view">
+                <div class="more-group-title">线索分配与资源管理</div>
+                <div class="glass-card" style="padding: 12px; margin-bottom: 12px;">
+                    <div class="sheet-list-item" onclick="openManagerPublicPool()"><div class="sheet-list-title">公海线索池</div></div>
+                    <div class="sheet-list-item" onclick="switchEnrollmentTab('sub-view-schools', document.getElementById('tab-btn-more'))"><div class="sheet-list-title">生源学校配置</div></div>
+                    <div class="sheet-list-item" onclick="switchEnrollmentTab('sub-view-schools', document.getElementById('tab-btn-more'))"><div class="sheet-list-title">责任资源配置</div></div>
+                </div>
+            </div>
+
+            <div class="batch-action-bar" id="batch-bar">
+                <div style="font-size:14px; font-weight:700;"><span id="batch-summary">已选 0 项</span></div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-xs" onclick="showModal('sheet-assign')">批量分配</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="sub-tab-bar">
+            <div class="sub-tab-item active" id="tab-btn-dash" onclick="switchEnrollmentTab('sub-view-dashboard', this)">
+                <div class="tab-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
+                <div class="tab-label">数据</div>
+            </div>
+            <div class="sub-tab-item" id="tab-btn-follow" onclick="switchEnrollmentTab('sub-view-follow', this)">
+                <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>
+                <div class="tab-label">跟进</div>
+            </div>
+            <div class="sub-tab-item" id="tab-btn-more" onclick="switchEnrollmentTab('sub-view-more', this)">
+                <div class="tab-icon"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg></div>
+                <div class="tab-label">管理</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-lead-detail" class="page-view" style="z-index: 300; background: #F8FAFC;">
+        <div class="nav-bar" style="background:white;">
+            <div class="icon-btn" style="margin-left: -8px;" onclick="closeLeadDetail()">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </div>
+            <div class="nav-title-group"><div class="nav-title">学生线索详情</div></div>
+            <div class="icon-btn"></div>
+        </div>
+        <div class="detail-header" id="detail-header-info"></div>
+        <div class="detail-tabs">
+            <div class="detail-tab active">时间线与跟进</div>
+            <div class="detail-tab" onclick="showToast('暂无详尽资料')">基础资料</div>
+            <div class="detail-tab" onclick="showToast('暂无更多操作日志')">操作日志</div>
+        </div>
+        <div class="main-content" style="padding-top: 20px;">
+            <div class="glass-card" style="padding: 16px;">
+                <div class="log-timeline" id="detail-timeline"></div>
+            </div>
+        </div>
+        <div style="position:absolute; bottom:0; left:0; right:0; padding:16px 20px; background:white; box-shadow:0 -4px 20px rgba(0,0,0,0.05); display:flex; gap:12px; z-index:310;">
+            <button class="btn-xs outline" style="flex:1; padding:14px; font-size:15px;" onclick="showModal('sheet-follow-up')">写跟进</button>
+            <button class="btn-xs outline" style="flex:1; padding:14px; font-size:15px;" onclick="openDynamicForm('visitAppointment')">发起邀约</button>
+            <button class="btn-xs" style="flex:1; padding:14px; font-size:15px;" onclick="showModal('dialog-confirm-enroll')">转录取</button>
+        </div>
+    </div>
+
+    <div id="modal-overlay" class="modal-overlay" onclick="closeAllModals()"></div>
+
+    <div id="sheet-new-business" class="bottom-sheet">
+        <div class="sheet-indicator"></div>
+        <div class="sheet-title">快速操作</div>
+        <div class="sheet-grid">
+            <div class="grid-item" onclick="showModal('sheet-add-lead')">
+                <div class="grid-icon-wrap" style="background:var(--icon-bg-blue); color:var(--icon-color-blue);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg></div>
+                <div class="grid-label">录入线索</div>
+            </div>
+            <div class="grid-item" onclick="startVisitCheckin()">
+                <div class="grid-icon-wrap" style="background:var(--icon-bg-emerald); color:var(--icon-color-emerald);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div>
+                <div class="grid-label">到访签到</div>
+            </div>
+            <div class="grid-item" onclick="startQuickFollowUp()">
+                <div class="grid-icon-wrap" style="background:var(--icon-bg-pink); color:var(--icon-color-pink);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>
+                <div class="grid-label">写跟进</div>
+            </div>
+            <div class="grid-item" onclick="startQuickEnroll()">
+                <div class="grid-icon-wrap" style="background:var(--icon-bg-purple); color:var(--icon-color-purple);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
+                <div class="grid-label">转预定/录取</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="sheet-add-lead" class="bottom-sheet">
+        <div class="sheet-indicator"></div>
+        <div class="sheet-title">录入新线索</div>
+        <div class="sheet-scroll-area">
+            <form onsubmit="event.preventDefault(); submitFormAction(this, 'addLead');">
+                <div class="form-section">
+                    <div class="form-section-title">基础信息</div>
+                    <div class="form-group"><label class="form-label required">线索姓名</label><input type="text" class="form-control" name="name" placeholder="请输入线索姓名" required></div>
+                    <div class="form-group"><label class="form-label required">联系电话</label><input type="tel" class="form-control" name="phone" placeholder="11位手机号" pattern="^1[3-9]\d{9}$" required title="请输入正确的手机号码"></div>
+                    <div class="form-two-col">
+                        <div class="form-group"><label class="form-label">性别</label><select class="form-control" name="gender"><option>未知</option><option>男</option><option>女</option></select></div>
+                        <div class="form-group"><label class="form-label">来源类型</label><select class="form-control" name="sourceType"><option>线下 OFFLINE</option><option>巨量 OCEAN</option><option>百度 BAIDU</option></select></div>
+                    </div>
+                    <div class="form-two-col">
+                        <div class="form-group"><label class="form-label">意向等级</label><select class="form-control" name="intentLevel"><option>高意向</option><option>中意向</option><option>低意向</option></select></div>
+                        <div class="form-group"><label class="form-label">线索状态</label><select class="form-control" name="leadStatus"><option>已分配</option><option>已联系</option><option>有意向</option><option>已邀约</option><option>已到访</option><option>已预定</option><option>已报名</option><option>无效</option></select></div>
+                    </div>
+                </div>
+                <div class="form-section">
+                    <details class="advanced-section"><summary>更多信息</summary><div class="form-section"><div class="form-section-title">扩展信息</div>
+                    <div class="form-group"><label class="form-label">关键词</label><input type="text" class="form-control" name="keyword" placeholder="如：护理、住宿、就业"></div>
+                    <div class="form-group"><label class="form-label">来源细节</label><input type="text" class="form-control" name="source" placeholder="如：线下 OFFLINE / 校区A登记"></div>
+                    <div class="form-two-col">
+                        <div class="form-group"><label class="form-label">生源学校</label><input type="text" class="form-control" name="school" placeholder="请输入学校"></div>
+                        <div class="form-group"><label class="form-label">生源年级</label><input type="text" class="form-control" name="grade" placeholder="如：初三"></div>
+                    </div>
+                    <div class="form-group"><label class="form-label">生源班级</label><input type="text" class="form-control" name="sourceClass" placeholder="如：3班"></div>
+                    <div class="form-group"><label class="form-label">生源学校快照</label><input type="text" class="form-control" name="schoolSnapshot" placeholder="系统快照可后续补录"></div>
+                    <div class="form-group"><label class="form-label">生源班级快照</label><input type="text" class="form-control" name="classSnapshot" placeholder="系统快照可后续补录"></div>
+                    <div class="form-group"><label class="form-label">备注</label><textarea class="form-control" name="remark" placeholder="补充说明"></textarea></div>
+                    </div></details>
+                </div>
+                <button type="submit" class="submit-btn">保存到我的线索</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="sheet-quick-enroll" class="bottom-sheet">
+        <div class="sheet-indicator"></div>
+        <div class="sheet-title">转正式录取</div>
+        <div class="sheet-scroll-area">
+            <form onsubmit="event.preventDefault(); submitFormAction(this, 'enroll');">
+                <div class="form-group">
+                    <label class="form-label required">选择待录取学生</label>
+                    <select class="form-control" name="enrollLeadId" id="enroll-lead-select" required></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label required">录取班级</label>
+                    <select class="form-control" required>
+                        <option>26级 计算机网络技术 1班 (剩余名额 8)</option>
+                        <option disabled>26级 新能源汽车工程 (满额，禁止分配)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">意向缴费状态</label>
+                    <input type="text" class="form-control" value="未对接在线支付，依赖财务专员人工核销" readonly style="color:var(--success-color); font-weight:bold; background:#fff;">
+                </div>
+                <button type="submit" class="submit-btn">确认转正式录取</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="sheet-follow-up" class="bottom-sheet">
+        <div class="sheet-indicator"></div>
+        <div class="sheet-title">新增跟进记录</div>
+        <div class="sheet-scroll-area">
+            <form onsubmit="event.preventDefault(); submitFormAction(this, 'followup');">
+                <div class="form-section">
+                    <div class="form-section-title">基础信息</div>
+                    <div class="form-group"><label class="form-label required">个人线索</label><input type="text" class="form-control" value="从线索卡片/详情页选择后自动绑定" readonly></div>
+                    <div class="form-two-col">
+                        <div class="form-group"><label class="form-label required">跟进方式</label><select class="form-control" required><option>电话拨打</option><option>微信联络</option><option>面谈</option><option>短信</option></select></div>
+                        <div class="form-group"><label class="form-label required">跟进时间</label><input type="datetime-local" class="form-control" required></div>
+                    </div>
+                </div>
+                <div class="form-section">
+                    <div class="form-section-title">跟进内容</div>
+                    <div class="form-group"><label class="form-label required">接触结果</label><select class="form-control" name="followResult" required><option value="note">仅记录沟通</option><option value="contacted">已有效触达</option><option value="invited">已约到访</option><option value="visited">已确认到访</option><option value="reserved">转入预定意向</option><option value="low">暂缓跟进</option><option value="invalid">标记无效</option></select></div>
+                    <div class="form-group"><label class="form-label required">跟进内容</label><textarea class="form-control" required placeholder="请记录本次沟通内容、学生关注点和风险"></textarea></div>
+                </div>
+                <div class="form-section">
+                    <div class="form-section-title">后续安排</div>
+                    <div class="form-two-col">
+                        <div class="form-group"><label class="form-label">意向等级</label><select class="form-control" name="intentLevel"><option>高意向</option><option>中意向</option><option>低意向</option></select></div>
+                        <div class="form-group"><label class="form-label">下次跟进时间</label><input type="datetime-local" class="form-control" name="nextFollowTime"></div>
+                    </div>
+                    <div class="form-group"><label class="form-label">下次动作</label><select class="form-control" name="nextAction"><option>继续电话跟进</option><option>邀约到访</option><option>准备预定</option><option>暂缓跟进</option></select></div>
+                </div>
+                <details class="advanced-section"><summary>更多信息</summary><div class="form-section">
+                    <div class="form-group"><label class="form-label">跟进人</label><input type="text" class="form-control" value="当前顾问" readonly></div>
+                    <div class="form-group"><label class="form-label">跟进类型</label><select class="form-control"><option>首次跟进</option><option>二次跟进</option><option>邀约确认</option><option>预定沟通</option></select></div>
+                    <div class="form-group"><label class="form-label">到访记录</label><input type="text" class="form-control" placeholder="可关联已有到访记录"></div>
+                </div></details>
+                <button type="submit" class="submit-btn">保存跟进记录</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="sheet-history-data" class="bottom-sheet">
+        <div class="sheet-indicator"></div>
+        <div class="sheet-title">往期学期结转汇总</div>
+        <div class="sheet-scroll-area">
+            <div class="sheet-list-item">
+                <div>
+                    <div style="font-size: 15px; font-weight: 800; color: var(--text-title); margin-bottom:4px;">2025年秋季学期 (已封存)</div>
+                    <div style="font-size: 12px; color: var(--text-secondary);">入池线索 3,420 | 最终录取交接 840 人</div>
+                </div>
+                <button class="btn-xs outline" onclick="showToast('正在生成历史PDF简报')">导出报告</button>
+            </div>
+            <div class="sheet-list-item">
+                <div>
+                    <div style="font-size: 15px; font-weight: 800; color: var(--text-title); margin-bottom:4px;">2025年春季学期 (已封存)</div>
+                    <div style="font-size: 12px; color: var(--text-secondary);">入池线索 1,100 | 最终录取交接 320 人</div>
+                </div>
+                <button class="btn-xs outline" onclick="showToast('正在生成历史PDF简报')">导出报告</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="sheet-log-details" class="bottom-sheet">
+        <div class="sheet-indicator"></div>
+        <div class="sheet-title">日志详情</div>
+        <div class="sheet-scroll-area">
+            <div class="log-timeline">
+                <div class="log-item">
+                    <div class="log-time">10:30:14 | 触发器: 系统流转引擎</div>
+                    <div class="log-content">自动阶段变更为 [已邀约]</div>
+                    <div class="log-detail">规则命中：业务员创建了未来 7 天内的有效到访预约单，系统自动将线索 #1420 状态翻转。</div>
+                </div>
+                <div class="log-item">
+                    <div class="log-time">09:15:22 | 触发器: Admin (管理员)</div>
+                    <div class="log-content">强制分配归属人</div>
+                    <div class="log-detail">管理员利用批量分配功能，将线索从 [公海池] 强指派给顾问 [尹娣]，开启 24 小时响应考核倒计时。</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="sheet-assign" class="bottom-sheet">
+        <div class="sheet-indicator"></div>
+        <div class="sheet-title">转移至指定顾问池</div>
+        <div class="sheet-scroll-area">
+            <div class="form-section">
+                <div class="form-section-title">分配字段</div>
+                <div class="form-group"><label class="form-label required">招生学期</label><select class="form-control"><option>2026年秋季学期</option><option>2026年春季学期</option></select></div>
+                <div class="form-group"><label class="form-label required">招生分组</label><select class="form-control"><option>城南招生组</option><option>城北招生组</option></select></div>
+                <div class="form-group"><label class="form-label required">分配方式</label><select class="form-control"><option>系统自动分配</option><option>手动分配</option><option>创建为自己的</option></select></div>
+                <div class="form-group"><label class="form-label">状态</label><select class="form-control"><option>已分配</option><option>已联系</option><option>有意向</option><option>已邀约</option><option>已到访</option><option>已预定</option><option>已报名</option><option>无效</option></select></div>
+                <div class="form-group"><label class="form-label">备注</label><textarea class="form-control" placeholder="分配说明或特殊备注"></textarea></div>
+            </div>
+            <div class="sheet-list-item" onclick="executeAssign('尹娣')">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="width:40px; height:40px; border-radius:50%; background:var(--primary-light); color:var(--primary-color); display:flex; align-items:center; justify-content:center; font-weight:800;">尹</div>
+                    <div style="display:flex; flex-direction:column; gap:2px;">
+                        <span style="font-size:15px; font-weight:800; color:var(--text-title);">尹娣 (大区组长)</span>
+                        <span style="font-size:12px; color:var(--text-secondary);">负载状态: 12 条线索待推进</span>
+                    </div>
+                </div>
+            </div>
+            <div class="sheet-list-item" onclick="executeAssign('张伟')">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="width:40px; height:40px; border-radius:50%; background:var(--icon-bg-emerald); color:var(--icon-color-emerald); display:flex; align-items:center; justify-content:center; font-weight:800;">张</div>
+                    <div style="display:flex; flex-direction:column; gap:2px;">
+                        <span style="font-size:15px; font-weight:800; color:var(--text-title);">张伟 (招生专员)</span>
+                        <span style="font-size:12px; color:var(--text-secondary);">负载状态: 5 条线索待推进</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="sheet-dynamic-form" class="bottom-sheet">
+        <div class="sheet-indicator"></div>
+        <div class="sheet-title" id="dynamic-form-title">新增记录</div>
+        <div class="sheet-scroll-area">
+            <form onsubmit="event.preventDefault(); submitDynamicForm(this);">
+                <div id="dynamic-form-body"></div>
+                <button type="submit" class="submit-btn" id="dynamic-form-submit">保存</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="dialog-confirm-enroll" class="dialog-box">
+        <div class="dialog-icon-wrap" style="background:var(--success-light); color:var(--success-color);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        </div>
+        <div class="dialog-title">转为正式录取？</div>
+        <div class="dialog-desc">确认后将生成录取记录，线索阶段更新为已录取，后续等待登记报到和入学交接。</div>
+        <div class="dialog-actions">
+            <div class="dialog-btn cancel" onclick="closeAllModals()">再核对下</div>
+            <div class="dialog-btn confirm" onclick="executeAdmit(this)" style="background:var(--success-color); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);">确认录取</div>
+        </div>
+    </div>
+
+    <div id="dialog-handover" class="dialog-box">
+        <div class="dialog-icon-wrap" style="background:var(--icon-bg-orange); color:var(--icon-color-orange);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        </div>
+        <div class="dialog-title">发起入学交接？</div>
+        <div class="dialog-desc">系统将生成入学交接任务，并同步学生档案、班级归属和报到信息。失败后可重新提交。</div>
+        <div class="dialog-actions">
+            <div class="dialog-btn cancel" onclick="closeAllModals()">取消</div>
+            <div class="dialog-btn confirm" onclick="simulateAction(this, '正在生成入学交接任务...', '已生成入学交接任务', true)">确认发起</div>
+        </div>
+    </div>
+
+    <div class="toast" id="sys-toast">
+        <svg id="toast-icon-success" style="display:none; flex-shrink:0;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--success-color)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        <span id="sys-toast-msg"></span>
+        <div id="toast-undo" class="toast-undo-btn" style="display:none;" onclick="handleUndo()">撤回操作</div>
+    </div>
+</div>
+
+<script>
+    const origHighFreq = ['招生工作台', '线索管理'];
+    const dirData = {
+        招生管理: ['招生工作台', '线索池', '跟进与到访', '预定与录取', '报到与入学交接', '生源学校', '招生配置', '日志中心'],
+        教学管理: ['课表编排', '课堂巡检', '成绩归档', '教师排班'],
+        校园服务: ['宿舍管理', '请假审批', '安全巡检', '家校通知']
+    };
+    const featureMeta = {
+        '招生工作台': { bg: 'var(--icon-bg-blue)', color: 'var(--icon-color-blue)', icon: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>' },
+        '线索池': { bg: 'var(--icon-bg-pink)', color: 'var(--icon-color-pink)', icon: '<svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><path d="M20 8v6"></path><path d="M23 11h-6"></path></svg>' },
+        '跟进与到访': { bg: 'var(--icon-bg-emerald)', color: 'var(--icon-color-emerald)', icon: '<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>' },
+        '预定与录取': { bg: 'var(--icon-bg-purple)', color: 'var(--icon-color-purple)', icon: '<svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>' },
+        '报到与入学交接': { bg: 'var(--icon-bg-orange)', color: 'var(--icon-color-orange)', icon: '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>' },
+        '日志中心': { bg: 'var(--icon-bg-teal)', color: 'var(--icon-color-teal)', icon: '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6M8 13h8M8 17h6"></path></svg>' },
+        '教务排课': { bg: 'var(--icon-bg-purple)', color: 'var(--icon-color-purple)', icon: '<svg viewBox="0 0 24 24"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M3 10h18"></path></svg>' },
+        '学生档案': { bg: 'var(--icon-bg-emerald)', color: 'var(--icon-color-emerald)', icon: '<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
+        '缴费中心': { bg: 'var(--icon-bg-orange)', color: 'var(--icon-color-orange)', icon: '<svg viewBox="0 0 24 24"><path d="M12 1v22"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>' },
+        '线索管理': { bg: 'var(--icon-bg-pink)', color: 'var(--icon-color-pink)', icon: '<svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><path d="M20 8v6"></path><path d="M23 11h-6"></path></svg>' },
+        '跟进到访': { bg: 'var(--icon-bg-emerald)', color: 'var(--icon-color-emerald)', icon: '<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>' },
+        '报名录取': { bg: 'var(--icon-bg-purple)', color: 'var(--icon-color-purple)', icon: '<svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>' },
+        '招生配置': { bg: 'var(--icon-bg-orange)', color: 'var(--icon-color-orange)', icon: '<svg viewBox="0 0 24 24"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h16"></path><circle cx="8" cy="6" r="2"></circle><circle cx="16" cy="12" r="2"></circle><circle cx="10" cy="18" r="2"></circle></svg>' },
+        '生源学校': { bg: 'var(--icon-bg-blue)', color: 'var(--icon-color-blue)', icon: '<svg viewBox="0 0 24 24"><path d="M3 21h18"></path><path d="M5 21V7l8-4 6 4v14"></path><path d="M9 21v-8h6v8"></path></svg>' },
+        '入学交接': { bg: 'var(--icon-bg-orange)', color: 'var(--icon-color-orange)', icon: '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>' }
+    };
+
+    let currentDirTab = Object.keys(dirData)[0];
+    let manageMode = false;
+
+    const state = {
+        currentUser: '当前顾问',
+        currentActionLeadId: null,
+        selectedIds: new Set(),
+        leads: [
+            { id: 101, name: '李明', phone: '138****0001', source: '抖音信息流广告', school: '城南中学', major: '计算机网络技术', semester: '2026年秋季', focus: '就业方向 / 住宿', lastFollow: '暂无', stage: -1, owner: null, isInvalid: false, isOverdue: false },
+            { id: 102, name: '王雨萌', phone: '139****0002', source: '线下校区A登记', school: '实验中学', major: '护理', semester: '2026年秋季', focus: '学费 / 护理实训', lastFollow: '暂无', stage: -1, owner: null, isInvalid: false, isOverdue: false },
+            { id: 103, name: '张峰', phone: '133****1111', source: '渠道(ID:201)转介', school: '东湖中学', major: '新能源汽车', semester: '2026年秋季', focus: '就业方向 / 住宿', lastFollow: '昨天 15:30', stage: 0, owner: '当前顾问', isInvalid: false, isOverdue: true },
+            { id: 104, name: '刘小宇', phone: '135****4444', source: '生源中学A直推', school: '生源中学A', major: '计算机网络技术', semester: '2026年秋季', focus: '升学路径 / 班级安排', lastFollow: '今天 09:20', stage: 1, owner: '张伟', isInvalid: false, isOverdue: false },
+            { id: 105, name: '无效线索_空号', phone: '100****0000', source: '未知网页抓取', school: '未知学校', major: '未确认', semester: '2026年秋季', focus: '电话无法接通', lastFollow: '暂无', stage: -1, owner: null, isInvalid: true, isOverdue: false }
+        ],
+        conversions: [
+            { id: 201, name: '刘子涵', phone: '137****0003', source: '营销渠道', school: '城北中学', major: '幼儿保育', semester: '2026年秋季', focus: '住宿 / 报到时间', lastFollow: '今天 11:10', stage: 3, owner: '当前顾问', visitPlan: 'today', isInvalid: false, handoverStatus: null },
+            { id: 202, name: '赵佳佳', phone: '136****5555', source: '线下校区B', school: '实验中学', major: '计算机网络技术', semester: '2026年秋季', focus: '录取材料 / 学费', lastFollow: '今天 10:05', stage: 4, owner: '当前顾问', visitPlan: 'tomorrow', isInvalid: false, handoverStatus: null },
+            { id: 203, name: '张晓明', phone: '136****0004', source: '机构引流', school: '西城中学', major: '新能源汽车', semester: '2026年秋季', focus: '报到材料缺失', lastFollow: '昨天 18:20', stage: 5, owner: '张伟', isInvalid: false, handoverStatus: 'failed' }
+        ]
+    };
+
+    function getFunnelCounts() {
+        let leadPool = 1250;
+        let followed = 850 + state.leads.filter(l => l.owner && !l.isInvalid).length + state.conversions.length;
+        let visited = 510 + state.conversions.filter(l => l.stage >= 3 && !l.isInvalid).length;
+        let admitted = 382 + state.conversions.filter(l => l.stage >= 4 && !l.isInvalid).length;
+        let handedOver = 126 + state.conversions.filter(l => (l.stage >= 5 || l.handoverStatus) && !l.isInvalid).length;
+        return [leadPool, followed, visited, admitted, handedOver];
+    }
+
+    let toastTimeout;
+    function showToast(msg, isSuccess = false, duration = 1800, showUndo = false) {
+        let toast = document.getElementById('sys-toast');
+        document.getElementById('sys-toast-msg').innerText = msg;
+        document.getElementById('toast-icon-success').style.display = isSuccess ? 'block' : 'none';
+        document.getElementById('toast-undo').style.display = showUndo ? 'block' : 'none';
+
+        toast.classList.add('show');
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => toast.classList.remove('show'), duration);
+    }
+
+    function showModal(modalId) {
+        document.getElementById('modal-overlay').classList.add('active');
+        closeQuickMenu();
+        const modal = document.getElementById(modalId);
+        if (modal) modal.classList.add('active');
+    }
+
+    function closeAllModals() {
+        document.getElementById('modal-overlay').classList.remove('active');
+        closeQuickMenu();
+        document.querySelectorAll('.bottom-sheet, .dialog-box').forEach(el => el.classList.remove('active'));
+    }
+
+    function toggleQuickMenu(evt) {
+        if (evt) evt.stopPropagation();
+        const menu = document.getElementById('quick-dropdown');
+        if (menu) menu.classList.toggle('active');
+    }
+
+    function closeQuickMenu() {
+        const menu = document.getElementById('quick-dropdown');
+        if (menu) menu.classList.remove('active');
+    }
+
+    function quickAction(type) {
+        closeQuickMenu();
+        if (type === 'lead') showModal('sheet-add-lead');
+        else if (type === 'visit') startVisitCheckin();
+        else if (type === 'scan') showToast('扫码功能已打开，请对准学生到访码', true);
+        else if (type === 'qr') showToast('已显示我的招生二维码，可用于学生扫码登记', true);
+    }
+
+    function simulateAction(el, loadingMsg, successMsg, isSuccess = true, callback = null) {
+        let isBtn = el && el.tagName === 'BUTTON';
+        let isSubmit = el && el.type === 'submit';
+
+        if (isBtn) {
+            if (el.classList.contains('disabled')) return;
+            el.classList.add('disabled');
+            el.dataset.oldText = el.innerText;
+            el.innerText = '处理中...';
+        } else if (el) {
+            el.style.pointerEvents = 'none';
+            el.style.opacity = '0.7';
+        }
+
+        closeAllModals();
+        showToast(loadingMsg, false, 800);
+
+        setTimeout(() => {
+            if (isBtn) {
+                el.classList.remove('disabled');
+                el.innerText = el.dataset.oldText;
+            } else if (el) {
+                el.style.pointerEvents = 'auto';
+                el.style.opacity = '1';
+            }
+            showToast(successMsg, isSuccess, 2000);
+            if (callback) callback();
+        }, 800);
+    }
+
+    function getStepsHtml(currentStage, mode = 'list') {
+        const labels = mode === 'detail' ? ['入池', '分配', '跟进', '到访', '预定', '录取', '报到', '交接'] : ['线索', '跟进', '到访', '录取', '交接'];
+        const activeIndex = mode === 'detail' ? mapDetailStage(currentStage) : mapListStage(currentStage);
+        let html = '<div class="step-container">';
+        labels.forEach((label, idx) => {
+            let sClass = '';
+            let content = idx + 1;
+            if (activeIndex > idx) {
+                sClass = 'done';
+                content = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+            } else if (activeIndex === idx) {
+                sClass = 'active';
+            }
+            html += '<div class="step-item ' + sClass + '"><div class="step-circle">' + content + '</div><div class="step-label">' + label + '</div></div>';
+        });
+        html += '</div>';
+        return html;
+    }
+
+    function mapListStage(stage) {
+        if (stage < 0) return 0;
+        if (stage <= 2) return 1;
+        if (stage === 3) return 2;
+        if (stage <= 5) return 3;
+        return 4;
+    }
+
+    function mapDetailStage(stage) {
+        if (stage < 0) return 0;
+        if (stage === 0) return 1;
+        if (stage <= 2) return 2;
+        if (stage === 3) return 3;
+        if (stage === 4) return 4;
+        if (stage === 5) return 5;
+        return 7;
+    }
+
+    function getNextAction(lead) {
+        if (lead.isInvalid) return '可在异常无效中恢复';
+        if (lead.handoverStatus === 'failed') return '查看失败原因并重新提交交接';
+        if (!lead.owner) return '分配顾问';
+        if (lead.isOverdue) return '立即写跟进';
+        if (lead.nextAction) return lead.nextAction;
+        if (lead.stage <= 0) return '首次联系并记录跟进';
+        if (lead.stage === 1) return '发起到访邀约';
+        if (lead.stage === 2) return '确认到访结果';
+        if (lead.stage === 3) return '评估意向并转预定';
+        if (lead.stage === 4) return '转正式录取';
+        if (lead.stage === 5) return '登记报到或发起入学交接';
+        return '继续推进';
+    }
+
+    function getStageText(stage) {
+        if (stage < 0) return '待分配';
+        return ['已分配', '已联系', '已邀约', '已到访', '已预定', '已录取'][stage] || '待分配';
+    }
+
+    function getSearchValue(type) {
+        const cfg = moduleListConfig[type];
+        const input = cfg && cfg.search ? document.getElementById(cfg.search) : null;
+        return input ? input.value.trim().toLowerCase() : '';
+    }
+
+    function renderList(containerId, list, listType) {
+        const container = document.getElementById(containerId);
+        if (list.length === 0) {
+            container.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="15"></line><line x1="15" y1="9" x2="9" y2="15"></line></svg><p>' + getEmptyMessage(containerId) + '</p></div>';
+            updateBatchBar();
+            return;
+        }
+
+        let html = '';
+        list.forEach((lead, index) => {
+            if (listType === 'follow') {
+                html += '<div class="compact-student-card" onclick="openLeadDetail(' + lead.id + ')"><div class="compact-student-main"><div class="compact-student-left"><div class="student-index">' + (index + 1) + '</div><div class="compact-student-name">' + lead.name + '</div></div><div class="compact-progress">' + getStageText(lead.stage) + '</div></div></div>';
+                return;
+            }
+            let invalidCls = lead.isInvalid ? 'invalid' : '';
+            let badge = '';
+            if (lead.isInvalid) badge = '<div class="badge-tag tag-danger">无效线索</div>';
+            else if (lead.owner) badge = '<div class="badge-tag tag-success">负责人: ' + lead.owner + '</div>';
+            else badge = '<div class="badge-tag tag-primary">待分配</div>';
+
+            let checkbox = listType === 'leads' && !lead.isInvalid ? '<div class="checkbox-wrap ' + (state.selectedIds.has(lead.id) ? 'checked' : '') + '" onclick="toggleSelect(' + lead.id + ', event)"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>' : '';
+            let overdueDesc = lead.isOverdue ? '<span style="color:var(--warning-color); font-weight:800;">超时未跟进</span>' : '';
+            let handoverDesc = lead.handoverStatus === 'failed' ? '<span style="color:var(--danger-color); font-weight:800;">入学交接失败：基础信息缺失</span>' : (lead.handoverStatus === 'retrying' ? '<span style="color:var(--primary-color); font-weight:800;">入学交接已重新提交</span>' : '');
+            let nextAction = getNextAction(lead);
+            let meta = '<div class="meta-grid"><div class="meta-item">联系电话：' + (lead.phone || '待补充') + '</div><div class="meta-item">来源类型：' + (lead.sourceType || lead.source || '待确认') + '</div><div class="meta-item">意向等级：' + (lead.intentLevel || '中意向') + '</div><div class="meta-item">线索状态：' + (lead.leadStatus || getStageText(lead.stage)) + '</div><div class="meta-item">最近跟进：' + (lead.lastFollow || '暂无') + '</div><div class="meta-item">入池时间：' + (lead.createdAt || '刚刚') + '</div></div>';
+
+            let actions = '';
+            if (lead.isInvalid) {
+                actions = '<button class="btn-xs outline" onclick="event.stopPropagation(); simulateAction(this,\'校验中...\',\'已恢复入池\',true,()=>updateData(' + lead.id + ',\'isInvalid\',false))">撤销作废</button>';
+            } else if (listType === 'leads') {
+                if (lead.owner) {
+                    if (lead.isOverdue) {
+                        actions = '<button class="btn-xs" onclick="openContextModal(\'sheet-follow-up\', ' + lead.id + ', event)">立即写跟进</button>';
+                    } else {
+                        actions = '<button class="btn-xs" onclick="openContextModal(\'sheet-follow-up\', ' + lead.id + ', event)">写跟进</button><button class="btn-xs outline" onclick="openDynamicForm(\'visitAppointment\')">约到访</button>';
+                    }
+                } else {
+                    actions = '<button class="btn-xs" onclick="openContextModal(\'sheet-assign\', ' + lead.id + ', event)">分配顾问</button>';
+                }
+            } else if (listType !== 'leads') {
+                if (lead.handoverStatus === 'failed') {
+                    actions = '<button class="btn-xs danger" onclick="event.stopPropagation(); simulateAction(this,\'正在重新提交交接...\',\'任务已重新提交\',true,()=>updateData(' + lead.id + ',\'handoverStatus\',\'retrying\'))">重新提交交接</button>';
+                } else if (lead.stage === 4) {
+                    actions = '<button class="btn-xs" onclick="openContextModal(\'dialog-confirm-enroll\', ' + lead.id + ', event)">转正式录取</button><button class="btn-xs outline" onclick="openContextModal(\'sheet-follow-up\', ' + lead.id + ', event)">写跟进</button>';
+                } else if (lead.stage === 5) {
+                    actions = '<button class="btn-xs" onclick="openContextModal(\'dialog-handover\', ' + lead.id + ', event)">发起入学交接</button>';
+                } else if (lead.stage === 2) {
+                    actions = '<button class="btn-xs" onclick="event.stopPropagation(); confirmVisit(' + lead.id + ')">确认到访</button><button class="btn-xs outline" onclick="openContextModal(\'sheet-follow-up\', ' + lead.id + ', event)">写跟进</button>';
+                } else if (lead.stage === 3) {
+                    actions = '<button class="btn-xs" onclick="openDynamicForm(\'reservationRecord\')">办理预定</button><button class="btn-xs outline" onclick="openContextModal(\'sheet-follow-up\', ' + lead.id + ', event)">写跟进</button>';
+                } else {
+                    actions = '<button class="btn-xs" onclick="openContextModal(\'sheet-follow-up\', ' + lead.id + ', event)">写跟进</button>';
+                }
+            }
+
+            html += '<div class="list-card glass-card ' + invalidCls + '"><div class="card-row-between"><div class="lead-main" onclick="openLeadDetail(' + lead.id + ')"><div class="card-title">' + checkbox + ' ' + lead.name + '</div><div class="card-desc"><span>来源: ' + lead.source + '</span> ' + overdueDesc + ' ' + handoverDesc + '</div></div><div class="lead-status" onclick="event.stopPropagation()">' + badge + '<div class="focus-note">' + (lead.owner || '待分配') + '</div></div></div><div class="lead-main" onclick="openLeadDetail(' + lead.id + ')">' + getStepsHtml(lead.stage) + '<div class="next-action">' + nextAction + '</div>' + meta + '</div><div class="card-actions" onclick="event.stopPropagation()">' + actions + '</div></div>';
+        });
+        container.innerHTML = html;
+        updateBatchBar();
+    }
+
+    function getEmptyMessage(containerId) {
+        if (containerId === 'leads-list-container') {
+            const active = getModuleFilter('leads', '公海线索');
+            if (active === '我的线索') return '暂无我的线索<br/>可等待主管分配，或通过右上角加号录入';
+            if (active === '超时待办') return '暂无超时待办<br/>当前跟进节奏良好';
+            if (active === '公海线索') return '暂无公海线索<br/>可通过快速操作录入线索';
+        }
+        if (containerId === 'follow-list-container' && getModuleFilter('follow', '') === '跟进列表') return '暂无正在跟进的学生<br/>可通过右上角加号录入我的线索';
+        if (containerId === 'follow-list-container' && getModuleFilter('follow', '') === '待跟进') return '暂无待跟进学生<br/>当前跟进节奏良好';
+        if (containerId === 'follow-list-container' && getModuleFilter('follow', '') === '到访记录') return '暂无到访记录<br/>可从待到访确认后生成';
+        if (containerId === 'reservation-list-container') return '暂无预定/录取记录<br/>可从已到访学生办理预定';
+        if (containerId === 'handover-list-container') return '暂无报到交接数据<br/>交接异常会在这里优先展示';
+        return '该筛选维度下暂无数据<br/>请切换筛选或返回今日查看待办';
+    }
+
+    function renderFunnelStep(label, value, ratio, color) {
+        return '<div class="funnel-metric"><div class="funnel-topline"><span>' + label + '</span><span>' + value + '</span></div><div class="funnel-track"><div class="funnel-bar" style="width:' + ratio + '%; background:' + color + ';"></div></div></div>';
+    }
+
+    function renderDashboard() {
+        const counts = getFunnelCounts();
+        const pct = (value, base) => base ? Math.round(value / base * 100) : 0;
+        let ratios = [100, pct(counts[1], counts[0]), pct(counts[2], counts[1]), pct(counts[3], counts[2]), pct(counts[4], counts[3])];
+        const funnelHtml = '<div class="funnel-grid">' +
+            renderFunnelStep('1. 线索入池', counts[0], ratios[0], 'linear-gradient(90deg, #1F5FFF 0%, #5B83FF 100%)') +
+            renderFunnelStep('2. 跟进 (有效跟进率' + ratios[1] + '%)', counts[1], ratios[1], 'linear-gradient(90deg, #8B5CF6 0%, #A78BFA 100%)') +
+            renderFunnelStep('3. 到访转化 (到访率' + ratios[2] + '%)', counts[2], ratios[2], 'linear-gradient(90deg, #F59E0B 0%, #FBBF24 100%)') +
+            renderFunnelStep('4. 预定录取 (录取率' + ratios[3] + '%)', counts[3], ratios[3], 'linear-gradient(90deg, #10B981 0%, #34D399 100%)') +
+            renderFunnelStep('5. 报到交接 (交接率' + ratios[4] + '%)', counts[4], ratios[4], 'linear-gradient(90deg, #0D9488 0%, #2DD4BF 100%)') +
+            '</div><div class="funnel-note">统计口径：线索=成功入池；跟进=已分配并有效跟进；到访=已邀约或登记到访；预定/录取=已预定或已录取；交接=已报到并生成入学交接任务。</div>';
+        document.getElementById('funnel-container').innerHTML = funnelHtml;
+        const all = state.leads.concat(state.conversions);
+        const mine = all.filter(l => l.owner === state.currentUser && !l.isInvalid);
+        const activeFollow = mine.length;
+        const todayFollow = mine.filter(l => (l.lastFollow || '').includes('今天')).length || 1;
+        const exceptionCount = state.leads.filter(l => l.isOverdue && !l.isInvalid).length + state.conversions.filter(l => l.handoverStatus === 'failed').length + state.leads.filter(l => l.isInvalid).length;
+        document.getElementById('active-follow-count').innerText = activeFollow;
+        document.getElementById('today-follow-count').innerText = todayFollow;
+        document.getElementById('exception-count').innerText = exceptionCount;
+    }
+
+    function openContextModal(modalId, leadId, evt) {
+        if (evt) evt.stopPropagation();
+        state.currentActionLeadId = leadId;
+        showModal(modalId);
+    }
+
+    function findLead(id) {
+        return state.leads.find(l => l.id === id) || state.conversions.find(l => l.id === id);
+    }
+
+    function startQuickFollowUp() {
+        closeAllModals();
+        state.currentActionLeadId = null;
+        switchEnrollmentTab('sub-view-follow', document.getElementById('tab-btn-follow'));
+        activatePill('pills-follow', '跟进列表');
+        execFilterRender('follow-list-container', state.leads.concat(state.conversions), 'follow', '跟进列表');
+        showToast('请先选择一名学生，再写跟进');
+    }
+
+    function startVisitCheckin() {
+        closeAllModals();
+        switchEnrollmentTab('sub-view-follow', document.getElementById('tab-btn-follow'));
+        const pill = activatePill('pills-follow', '待到访');
+        execFilterRender('follow-list-container', state.leads.concat(state.conversions), 'follow', pill ? pill.innerText : '待到访');
+        showToast('请选择待到访学生，确认后会生成到访记录');
+    }
+
+    function showConfigReadonly() {
+        showToast('配置类信息请前往后台管理端维护，这里仅提供查看');
+    }
+
+    function getEnrollCandidates() {
+        return state.conversions.filter(l => !l.isInvalid && l.stage >= 4);
+    }
+
+    function populateEnrollSelect() {
+        const select = document.getElementById('enroll-lead-select');
+        if (!select) return;
+        const candidates = getEnrollCandidates();
+        select.innerHTML = candidates.map(l => '<option value="' + l.id + '">' + l.name + ' · ' + getStageText(l.stage) + ' · ' + (l.major || '未确认专业') + '</option>').join('');
+    }
+
+    function startQuickEnroll() {
+        state.currentActionLeadId = null;
+        if (getEnrollCandidates().length === 0) {
+            showToast('暂无已预定/可录取学生，不能从任意线索直接录取');
+            return;
+        }
+        populateEnrollSelect();
+        openDynamicForm('admissionRecord');
+    }
+
+    function openManagerPublicPool() {
+        switchEnrollmentTab('sub-view-leads', document.getElementById('tab-btn-more'));
+        const pill = activatePill('pills-leads', '公海线索');
+        execFilterRender('leads-list-container', state.leads, 'leads', pill ? pill.innerText : '公海线索');
+        showToast('已进入公海线索池，可进行分配');
+    }
+
+    function openManagerAdmissionView() {
+        switchEnrollmentTab('sub-view-reservation', document.getElementById('tab-btn-more'));
+        const pill = activatePill('pills-reservation', '录取记录');
+        execFilterRender('reservation-list-container', state.conversions, 'reservation', pill ? pill.innerText : '录取记录');
+        showToast('已进入报名查看');
+    }
+
+    function updateData(id, prop, value) {
+        let isConv = false;
+        let lead = state.leads.find(l => l.id === id);
+        if (!lead) {
+            lead = state.conversions.find(l => l.id === id);
+            isConv = true;
+        }
+        if (lead) {
+            lead[prop] = value;
+            if (prop === 'owner' && value !== null) {
+                lead.stage = Math.max(lead.stage, 0);
+                lead.isOverdue = false;
+            }
+            if (prop === 'stage' && value >= 3 && !isConv) {
+                state.conversions.unshift(lead);
+                state.leads = state.leads.filter(l => l.id !== id);
+            }
+        }
+
+        refreshAllModuleLists();
+    }
+
+    function submitFormAction(form, type) {
+        if (!form.checkValidity()) {
+            showToast('无法入库：拦截到空缺或错误格式字段');
+            return;
+        }
+        let btn = form.querySelector('button[type="submit"]');
+        if (type === 'followup' && form.followResult && form.followResult.value === 'invalid') {
+            if (!window.confirm('确认将该线索标记为无效？标记后不会进入分配和跟进流程，但可在异常无效中恢复。')) return;
+        }
+        if (type === 'enroll') {
+            if (!window.confirm('确认转为正式录取？确认后将生成录取记录，后续等待报到和入学交接。')) return;
+        }
+
+        simulateAction(btn, '正在校验表单...', type === 'addLead' ? '已保存到我的线索' : (type === 'followup' ? '跟进记录已保存，最近跟进时间已更新' : '已生成录取记录，等待报到'), true, () => {
+            if (type === 'addLead') {
+                let newLead = { id: Date.now(), name: form.name.value, phone: form.phone.value, source: form.source.value || form.sourceType.value, sourceType: form.sourceType.value, intentLevel: form.intentLevel.value, leadStatus: form.leadStatus.value, school: form.school.value || '待确认学校', grade: form.grade.value, sourceClass: form.sourceClass.value, major: '待确认专业', semester: '2026年秋季', focus: form.keyword.value || '待补充', lastFollow: '暂无', stage: 0, owner: state.currentUser, isInvalid: form.leadStatus.value === '无效', isOverdue: false };
+                state.leads.unshift(newLead);
+                switchEnrollmentTab('sub-view-follow', document.getElementById('tab-btn-follow'));
+                const pill = activatePill('pills-follow', '跟进列表');
+                execFilterRender('follow-list-container', state.leads.concat(state.conversions), 'follow', pill ? pill.innerText : '跟进列表');
+            } else if (type === 'enroll') {
+                const selectedId = Number(form.enrollLeadId ? form.enrollLeadId.value : state.currentActionLeadId);
+                const selected = findLead(selectedId);
+                if (!selected || selected.stage < 4) {
+                    showToast('当前线索尚未形成预定/可录取记录，暂不可录取');
+                    return;
+                }
+                state.currentActionLeadId = selectedId;
+                updateData(selectedId, 'stage', 5);
+                updateData(selectedId, 'lastFollow', '刚刚');
+                switchEnrollmentTab('sub-view-follow', document.getElementById('tab-btn-follow'));
+            } else if (type === 'followup') {
+                if (!state.currentActionLeadId) {
+                    showToast('请先选择一条线索');
+                    return;
+                }
+                const wasConversion = state.conversions.some(l => l.id === state.currentActionLeadId);
+                applyFollowupResult(state.currentActionLeadId, form.followResult.value, form);
+                const nowConversion = wasConversion || state.conversions.some(l => l.id === state.currentActionLeadId);
+                switchEnrollmentTab('sub-view-follow', document.getElementById('tab-btn-follow'));
+            }
+            form.reset();
+        });
+    }
+
+    function applyFollowupResult(id, result, form = null) {
+        const lead = findLead(id);
+        if (!lead) return;
+        lead.lastFollow = '刚刚';
+        lead.isOverdue = false;
+        if (form && form.intentLevel) lead.intentLevel = form.intentLevel.value;
+        if (form && form.nextFollowTime) lead.nextFollowTime = form.nextFollowTime.value;
+        if (form && form.nextAction) lead.nextAction = form.nextAction.value;
+        if (result === 'contacted') lead.stage = Math.max(lead.stage, 1);
+        else if (result === 'invited') lead.stage = Math.max(lead.stage, 2);
+        else if (result === 'visited') lead.stage = Math.max(lead.stage, 3);
+        else if (result === 'reserved') lead.stage = Math.max(lead.stage, 4);
+        else if (result === 'low') lead.focus = '暂无意向，建议一周后再联系';
+        else if (result === 'invalid') lead.isInvalid = true;
+        if (form && form.nextAction && form.nextAction.value === '邀约到访') lead.stage = Math.max(lead.stage, 2);
+        if (form && form.nextAction && form.nextAction.value === '准备预定') lead.stage = Math.max(lead.stage, 4);
+        if (lead.stage >= 3 && state.leads.some(l => l.id === id)) {
+            state.conversions.unshift(lead);
+            state.leads = state.leads.filter(l => l.id !== id);
+        }
+        refreshAllModuleLists();
+    }
+
+    function executeAssign(name) {
+        let btn = event.currentTarget;
+        simulateAction(btn, '正在分配顾问...', '已分配给顾问: ' + name, true, () => {
+            if (state.selectedIds.size > 0) {
+                state.selectedIds.forEach(id => updateData(id, 'owner', name));
+                state.selectedIds.clear();
+            } else if (state.currentActionLeadId) {
+                updateData(state.currentActionLeadId, 'owner', name);
+            }
+            showToast('已分配给 ' + name + '，开始计算响应时效', true, 3000, true);
+        });
+    }
+
+    function executeAdmit(btn) {
+        const selected = state.currentActionLeadId ? findLead(state.currentActionLeadId) : null;
+        if (selected && selected.stage < 4) {
+            showToast('当前线索尚未形成预定/可录取记录，暂不可录取');
+            closeAllModals();
+            return;
+        }
+        simulateAction(btn, '正在生成录取记录...', '已生成录取记录，等待报到', true, () => {
+            if (state.currentActionLeadId) updateData(state.currentActionLeadId, 'stage', 5);
+        });
+    }
+
+    function handleUndo() {
+        showToast('系统已拦截上一次流转，数据回溯成功', true);
+        if (state.currentActionLeadId) updateData(state.currentActionLeadId, 'owner', null);
+    }
+
+    function activatePill(containerId, filterName) {
+        const container = document.getElementById(containerId);
+        const pills = Array.from(container.querySelectorAll('.pill'));
+        const target = pills.find(p => p.innerText.trim() === filterName);
+        if (target) {
+            pills.forEach(p => p.classList.remove('active'));
+            target.classList.add('active');
+        }
+        return target;
+    }
+
+    const moduleListConfig = {
+        leads: { pills: 'pills-leads', list: 'leads-list-container', view: 'sub-view-leads', tab: 'tab-btn-more', data: () => state.leads, search: 'leads-search' },
+        follow: { pills: 'pills-follow', list: 'follow-list-container', view: 'sub-view-follow', tab: 'tab-btn-follow', data: () => state.leads.concat(state.conversions), search: null },
+        reservation: { pills: 'pills-reservation', list: 'reservation-list-container', view: 'sub-view-reservation', tab: 'tab-btn-more', data: () => state.conversions, search: null },
+        handover: { pills: 'pills-handover', list: 'handover-list-container', view: 'sub-view-handover', tab: 'tab-btn-more', data: () => state.conversions, search: null }
+    };
+
+    const optionSets = {
+        personalLeads: ['刘子涵 · 已到访', '赵佳佳 · 已预定', '张晓明 · 已录取'],
+        advisors: ['当前顾问', '尹娣', '张伟'],
+        semester: ['2026年秋季学期', '2026年春季学期'],
+        majors: ['计算机网络技术', '护理', '新能源汽车'],
+        groups: ['城南招生组', '城北招生组'],
+        staff: ['尹娣', '张伟', '李老师'],
+        classes: ['汽修 6 班', '护车 4 班', '汽修 3 班', '杨程个性化班 2', '杨程个性化班 1', '李肖东专用班级', '个性化任务班级', '汽修 2 班']
+    };
+
+    function field(label, type = 'text', options = [], required = false, value = '') {
+        return { label, type, options, required, value };
+    }
+
+    const dynamicFormConfigs = {
+        visitAppointment: { title: '新增到访预约', success: '到访预约已保存', groups: [
+            { title: '预约信息', fields: [field('个人线索', 'select', optionSets.personalLeads, true), field('预约到访日期', 'date', [], true), field('预约到访时间', 'time', [], true), field('预约状态', 'select', ['待确认', '已确认', '已取消', '已到访'], true)] },
+            { title: '更多信息', fields: [field('备注', 'textarea'), field('取消原因')] },
+            { title: '系统信息', fields: [field('二维码 Token', 'readonly', [], false, '系统提交后自动生成'), field('二维码有效期', 'datetime-local')] }
+        ] },
+        reservationRecord: { title: '办理预定', success: '预定记录已保存', groups: [
+            { title: '预定信息', fields: [field('个人线索', 'select', optionSets.personalLeads, true), field('招生顾问', 'select', optionSets.advisors, true), field('预定专业', 'select', optionSets.majors, true), field('预定金额', 'number', [], true), field('预定时间', 'datetime-local', [], true), field('预定状态', 'select', ['待确认', '已确认', '已失效', '已退费'], true), field('招生学期', 'select', optionSets.semester)] },
+            { title: '财务信息', fields: [field('预定支付方式', 'select', ['现金', '微信', '支付宝', '银行转账']), field('收款来源', 'select', ['线下收款', '财务登记', '转账凭证']), field('票据图片引用'), field('收款人员', 'select', optionSets.staff), field('财务确认', 'switch'), field('财务确认人员', 'select', optionSets.staff), field('财务确认时间', 'datetime-local')] },
+            { title: '异常信息', fields: [field('失效时间', 'datetime-local'), field('退费金额', 'number'), field('退费时间', 'datetime-local'), field('备注', 'textarea')] }
+        ] },
+        admissionRecord: { title: '转正式录取', success: '录取记录已保存', groups: [
+            { title: '录取信息', fields: [field('个人线索', 'select', optionSets.personalLeads, true), field('预定记录', 'select', ['赵佳佳 · 预定记录 #202', '刘子涵 · 可录取记录 #201'], true), field('录取专业', 'select', optionSets.majors, true), field('招生学期', 'select', optionSets.semester, true), field('预分班', 'select', ['26秋计算机预分班', '26秋护理预分班']), field('录取时间', 'datetime-local', [], true)] },
+            { title: '业务信息', fields: [field('资料齐全', 'switch')] },
+            { title: '更多信息', fields: [field('班主任', 'select', optionSets.staff), field('需交资料', 'switch'), field('备注', 'textarea')] }
+        ] },
+        checkinRecord: { title: '新增报到记录', success: '报到记录已保存', groups: [
+            { title: '报到信息', fields: [field('个人线索', 'select', optionSets.personalLeads, true), field('录取记录', 'select', ['张晓明 · 录取记录 #203'], true), field('报到时间', 'datetime-local', [], true), field('报到经办人', 'select', optionSets.staff), field('正式班级', 'select', optionSets.classes), field('宿舍'), field('招生学期', 'select', optionSets.semester)] },
+            { title: '资料状态', fields: [field('资料补齐', 'switch'), field('照片提交', 'switch'), field('备注', 'textarea')] }
+        ] },
+        preClass: { title: '新增预分班', success: '预分班已保存', groups: [
+            { title: '预分班信息', fields: [field('招生学期', 'select', optionSets.semester, true), field('预分班名称', 'text', [], true), field('招生专业', 'select', optionSets.majors, true), field('计划人数', 'number', [], true), field('班主任', 'select', optionSets.staff), field('备注', 'textarea')] }
+        ] },
+        classTransfer: { title: '预分班转正式班', success: '正式班分配已保存', groups: [
+            { title: '转班信息', fields: [field('预分班', 'select', ['26秋计算机预分班', '26秋护理预分班'], true), field('正式班级', 'select', optionSets.classes, true), field('流向类型', 'select', ['整体转入', '部分转入', '人工调整']), field('计划分配人数', 'number'), field('实际分配人数', 'number'), field('映射时间', 'datetime-local'), field('操作人', 'select', optionSets.staff), field('状态', 'select', ['待执行', '已生效', '已取消']), field('备注', 'textarea')] }
+        ] },
+        handoverTask: { title: '新增入学交接任务', success: '入学交接任务已保存', groups: [
+            { title: '交接信息', fields: [field('报到记录', 'select', ['张晓明 · 报到记录 #203'], true), field('任务状态', 'select', ['待提交', '处理中', '成功', '失败可重试', '最终失败', '已取消', '已被新版本取代'], true), field('重试次数', 'number'), field('最近错误信息'), field('下次重试时间', 'datetime-local'), field('取消原因')] },
+            { title: '系统信息', fields: [field('交接请求号', 'readonly', [], false, '系统自动生成'), field('版本号', 'readonly', [], false, 'v1'), field('交接载荷', 'readonly', [], false, '提交后生成 JSON'), field('载荷摘要', 'readonly', [], false, '系统自动计算'), field('最近错误码', 'readonly'), field('响应快照', 'readonly'), field('基础学生', 'readonly'), field('取代任务', 'readonly'), field('提交时间', 'datetime-local'), field('成功时间', 'datetime-local'), field('失败时间', 'datetime-local')] }
+        ] },
+        schoolArchive: { title: '新增学校档案', success: '学校档案已保存', groups: [
+            { title: '学校信息', fields: [field('学校名称', 'text', [], true), field('省市区县', 'text', [], true), field('详细地址'), field('资源等级', 'select', ['A', 'B', 'C']), field('学校性质', 'select', ['公办', '民办', '其他']), field('学校规模'), field('毕业生人数', 'number'), field('预计职校人数', 'number'), field('升高中比例'), field('学校描述', 'textarea')] }
+        ] },
+        candidateSchool: { title: '新增候选学校归集', success: '候选学校已归集', groups: [
+            { title: '归集信息', fields: [field('标准化学校名', 'text', [], true), field('展示学校名', 'text', [], true), field('状态', 'select', ['待匹配', '已匹配', '已驳回']), field('匹配正式学校'), field('合并候选 ID'), field('匹配方式', 'select', ['自动匹配', '人工匹配']), field('匹配置信度'), field('匹配时间', 'datetime-local'), field('匹配规则'), field('驳回原因', 'textarea')] }
+        ] },
+        schoolResource: { title: '新增责任资源配置', success: '责任资源配置已保存', groups: [
+            { title: '配置字段', fields: [field('生源学校', 'select', ['城南中学', '实验中学', '东湖中学'], true), field('招生学期', 'select', optionSets.semester, true), field('招生分组', 'select', optionSets.groups, true), field('分配时间', 'datetime-local'), field('分配原因', 'textarea'), field('备注', 'textarea')] }
+        ] },
+        major: { title: '新增专业', success: '专业已保存', groups: [{ title: '专业字段', fields: [field('专业名称', 'text', [], true), field('专业代码', 'text', [], true), field('当前学期招生', 'switch'), field('计划招生人数', 'number')] }] },
+        group: { title: '新增分组', success: '分组已保存', groups: [{ title: '分组字段', fields: [field('分组名称', 'text', [], true), field('激活状态', 'select', ['已激活', '未激活']), field('当前学期', 'select', ['加入', '不加入'])] }] },
+        staff: { title: '新增招生人员库', success: '招生人员已保存', groups: [{ title: '人员字段', fields: [field('系统用户'), field('招生人员姓名', 'text', [], true), field('联系电话'), field('人员类型', 'select', ['招生顾问', '组长', '管理员']), field('人员状态', 'select', ['在岗', '离职', '休假'])] }] },
+        semester: { title: '新增招生学期', success: '招生学期已保存', groups: [{ title: '学期字段', fields: [field('招生学期名称', 'text', [], true), field('开始日期', 'date', [], true), field('结束日期', 'date', [], true), field('当前招生学期', 'select', ['否', '是'])] }] },
+        majorPlan: { title: '新增专业计划', success: '专业计划已保存', groups: [{ title: '计划字段', fields: [field('招生学期', 'select', optionSets.semester, true), field('招生专业', 'select', optionSets.majors, true), field('计划招生人数', 'number', [], true)] }] },
+        enrollGroup: { title: '新增招生组', success: '招生组已保存', groups: [{ title: '招生组字段', fields: [field('招生学期', 'select', optionSets.semester, true), field('招生分组', 'select', optionSets.groups, true), field('组长', 'select', optionSets.staff), field('备注', 'textarea')] }] },
+        termStaff: { title: '新增学期招生人员', success: '学期招生人员已保存', groups: [{ title: '人员字段', fields: [field('招生学期', 'select', optionSets.semester, true), field('招生人员', 'select', optionSets.staff, true)] }] },
+        intraGroup: { title: '新增组内分配', success: '组内分配已保存', groups: [{ title: '分配字段', fields: [field('招生学期', 'select', optionSets.semester, true), field('招生分组', 'select', optionSets.groups, true), field('招生人员', 'multi', optionSets.staff, true), field('组长', 'select', optionSets.staff), field('备注', 'textarea')] }] }
+    };
+
+    let currentDynamicFormType = null;
+
+    function renderDynamicField(item, idx) {
+        const required = item.required ? ' required' : '';
+        const requiredClass = item.required ? ' required' : '';
+        const name = 'dynamic_' + idx + '_' + item.label.replace(/\s+/g, '');
+        if (item.type === 'textarea') {
+            return '<div class="form-group"><label class="form-label' + requiredClass + '">' + item.label + '</label><textarea class="form-control" name="' + name + '"' + required + ' placeholder="请输入' + item.label + '"></textarea></div>';
+        }
+        if (item.type === 'select' || item.type === 'multi') {
+            const multi = item.type === 'multi' ? ' multiple' : '';
+            const options = item.options.map(opt => '<option>' + opt + '</option>').join('');
+            return '<div class="form-group"><label class="form-label' + requiredClass + '">' + item.label + '</label><select class="form-control" name="' + name + '"' + required + multi + '>' + options + '</select></div>';
+        }
+        if (item.type === 'switch') {
+            return '<div class="switch-field"><span class="form-label">' + item.label + '</span><div class="switch-options"><label><input type="radio" name="' + name + '" value="是"> 是</label><label><input type="radio" name="' + name + '" value="否" checked> 否</label></div></div>';
+        }
+        if (item.type === 'readonly') {
+            return '<div class="form-group"><label class="form-label">' + item.label + '</label><input type="text" class="form-control" value="' + (item.value || '系统生成/只读') + '" readonly></div>';
+        }
+        const inputType = ['date', 'time', 'datetime-local', 'number'].includes(item.type) ? item.type : 'text';
+        return '<div class="form-group"><label class="form-label' + requiredClass + '">' + item.label + '</label><input type="' + inputType + '" class="form-control" name="' + name + '" value="' + (item.value || '') + '" placeholder="请输入' + item.label + '"' + required + '></div>';
+    }
+
+    function openDynamicForm(type) {
+        const config = dynamicFormConfigs[type];
+        if (!config) {
+            showToast('该表单暂未配置');
+            return;
+        }
+        currentDynamicFormType = type;
+        document.getElementById('dynamic-form-title').innerText = config.title;
+        document.getElementById('dynamic-form-submit').innerText = '保存' + config.title.replace('新增', '').replace('转', '');
+        let fieldIndex = 0;
+        document.getElementById('dynamic-form-body').innerHTML = config.groups.map(group => {
+            const fields = group.fields.map(item => renderDynamicField(item, fieldIndex++)).join('');
+            if (group.title.includes('系统信息') || group.title.includes('高级信息') || group.title.includes('财务信息') || group.title.includes('异常信息') || group.title.includes('更多信息')) {
+                return '<details class="advanced-section"><summary>' + group.title + '</summary><div class="form-section">' + fields + '</div></details>';
+            }
+            return '<div class="form-section"><div class="form-section-title">' + group.title + '</div>' + fields + '</div>';
+        }).join('');
+        showModal('sheet-dynamic-form');
+    }
+
+    function submitDynamicForm(form) {
+        const config = dynamicFormConfigs[currentDynamicFormType];
+        if (!config || !form.checkValidity()) {
+            showToast('请先补齐必填字段');
+            return;
+        }
+        const btn = form.querySelector('button[type="submit"]');
+        simulateAction(btn, '正在校验表单信息...', config.success || '记录已保存', true, () => {
+            form.reset();
+            refreshAllModuleLists();
+        });
+    }
+
+    function renderLogs(filterName = '入池日志') {
+        const logs = {
+            入池日志: ['原始线索 ID #RAW-1024 已生成公海线索 ID #101', '动作类型：入池；操作人：系统；动作时间：刚刚；创建时间：刚刚'],
+            分配日志: ['公海线索 #103 已分配给招生人员尹娣', '动作类型：手动分配；操作人：Admin；动作时间：09:15；备注：按生源学校属地分配'],
+            线索阶段日志: ['个人线索 #201 阶段更新为已到访', '动作类型：阶段记录；操作人：张伟；动作时间：10:30；备注：到访预约核销'],
+            阶段变更日志: ['线索阶段从已邀约变更为已到访', '动作类型：阶段变更；操作人：系统流转引擎；动作时间：10:31；备注：命中到访登记规则']
+        };
+        const rows = logs[filterName] || logs.入池日志;
+        const container = document.getElementById('logs-list-container');
+        if (!container) return;
+        container.innerHTML = '<div class="log-item"><div class="log-time">' + filterName + '</div><div class="log-content">' + rows[0] + '</div><div class="log-detail">' + rows[1] + '</div></div>';
+    }
+
+    function switchLogFilter(el, filterName) {
+        document.querySelectorAll('#pills-logs .pill').forEach(pill => pill.classList.remove('active'));
+        el.classList.add('active');
+        renderLogs(filterName);
+    }
+
+    function getModuleFilter(type, fallback) {
+        const cfg = moduleListConfig[type];
+        if (!cfg) return fallback;
+        const pill = document.querySelector('#' + cfg.pills + ' .pill.active');
+        return pill ? pill.innerText.trim() : fallback;
+    }
+
+    function refreshModuleList(type) {
+        const cfg = moduleListConfig[type];
+        if (!cfg) return;
+        execFilterRender(cfg.list, cfg.data(), type, getModuleFilter(type, '全部'));
+    }
+
+    function refreshAllModuleLists() {
+        Object.keys(moduleListConfig).forEach(refreshModuleList);
+        renderDashboard();
+    }
+
+    function handleDashboardJump(type) {
+        clearSelection();
+        if (type === 'syncFailed') {
+            switchEnrollmentTab('sub-view-handover', document.getElementById('tab-btn-more'));
+            const pill = activatePill('pills-handover', '入学交接任务');
+            execFilterRender('handover-list-container', state.conversions, 'handover', pill ? pill.innerText : '入学交接任务');
+            showToast('已筛选入学交接异常');
+            return;
+        }
+        if (type === 'visit') {
+            switchEnrollmentTab('sub-view-follow', document.getElementById('tab-btn-follow'));
+            const pill = activatePill('pills-follow', '待到访');
+            execFilterRender('follow-list-container', state.leads.concat(state.conversions), 'follow', pill ? pill.innerText : '待到访');
+            showToast('已进入跟进与到访，展示待确认到访学生');
+            return;
+        }
+        if (type === 'admit') {
+            switchEnrollmentTab('sub-view-reservation', document.getElementById('tab-btn-more'));
+            const pill = activatePill('pills-reservation', '待录取');
+            execFilterRender('reservation-list-container', state.conversions, 'reservation', pill ? pill.innerText : '待录取');
+            showToast('已进入录取，展示待转正式录取学生');
+            return;
+        }
+        if (type === 'located' || type === 'registered') {
+            switchEnrollmentTab('sub-view-reservation', document.getElementById('tab-btn-more'));
+            const filterName = type === 'located' ? '预定记录' : '录取记录';
+            const pill = activatePill('pills-reservation', filterName);
+            execFilterRender('reservation-list-container', state.conversions, 'reservation', pill ? pill.innerText : filterName);
+            showToast(type === 'located' ? '已展示已定位学生' : '已展示已报名学生');
+            return;
+        }
+        switchEnrollmentTab('sub-view-leads', document.getElementById('tab-btn-more'));
+        const filterMap = { overdue: '超时待办', unassigned: '公海线索' };
+        const filterName = filterMap[type] || '公海线索';
+        const pill = activatePill('pills-leads', filterName);
+        execFilterRender('leads-list-container', state.leads, 'leads', pill ? pill.innerText : filterName);
+        const jumpMsg = type === 'unassigned' ? '已进入公海线索，展示待分配资源' : ('已同步筛选：' + filterName);
+        showToast(jumpMsg);
+    }
+
+    function toggleSelect(id, e) {
+        e.stopPropagation();
+        let box = e.currentTarget;
+        if (state.selectedIds.has(id)) {
+            state.selectedIds.delete(id);
+            box.classList.remove('checked');
+        } else {
+            state.selectedIds.add(id);
+            box.classList.add('checked');
+        }
+        updateBatchBar();
+    }
+
+    function clearSelection() {
+        state.selectedIds.clear();
+        document.querySelectorAll('.checkbox-wrap.checked').forEach(box => box.classList.remove('checked'));
+        updateBatchBar();
+    }
+
+    function updateBatchBar() {
+        const bar = document.getElementById('batch-bar');
+        const names = Array.from(state.selectedIds).map(id => {
+            const lead = state.leads.find(l => l.id === id);
+            return lead ? lead.name : '';
+        }).filter(Boolean);
+        document.getElementById('batch-summary').innerText = state.selectedIds.size > 0 ? '已选 ' + state.selectedIds.size + ' 项：' + names.slice(0, 3).join('、') : '已选 0 项';
+        if (state.selectedIds.size > 0) bar.classList.add('active');
+        else bar.classList.remove('active');
+    }
+
+    function executeBatch(action) {
+        if (action === 'invalid') {
+            const names = Array.from(state.selectedIds).map(id => {
+                const lead = state.leads.find(l => l.id === id);
+                return lead ? lead.name : '';
+            }).filter(Boolean);
+            if (!window.confirm('将作废 ' + state.selectedIds.size + ' 条线索。作废后不会进入分配和跟进流程，但可在异常无效中恢复。')) return;
+            state.selectedIds.forEach(id => updateData(id, 'isInvalid', true));
+            state.selectedIds.clear();
+            showToast('已标记无效：' + names.join('、'));
+            updateBatchBar();
+        }
+    }
+
+    function switchFilter(el, type, filterName) {
+        clearSelection();
+        const cfg = moduleListConfig[type];
+        if (!cfg) return;
+        const container = document.getElementById(cfg.pills);
+        container.querySelectorAll('.pill').forEach(pill => pill.classList.remove('active'));
+        el.classList.add('active');
+        keepPillInOwnScroll(el, container);
+
+        const listContainer = document.getElementById(cfg.list);
+        listContainer.innerHTML = '<div class="list-card glass-card" style="border:none; box-shadow:none;"><div class="card-row-between"><div class="skeleton" style="width: 150px; height: 18px;"></div><div class="skeleton" style="width: 60px; height: 18px; border-radius: 6px;"></div></div><div class="skeleton" style="width: 200px; height: 14px; margin-top: 8px;"></div><div class="step-container" style="margin: 20px 0;"><div class="skeleton" style="width: 100%; height: 20px;"></div></div></div>';
+
+        setTimeout(() => {
+            execFilterRender(cfg.list, cfg.data(), type, filterName);
+        }, 300);
+    }
+
+    function keepPillInOwnScroll(el, container) {
+        if (!el || !container) return;
+        const targetLeft = el.offsetLeft - (container.clientWidth - el.offsetWidth) / 2;
+        container.scrollTo({ left: Math.max(0, targetLeft), behavior: 'smooth' });
+    }
+
+    function rerenderActiveList(type) {
+        refreshModuleList(type);
+    }
+
+    function execFilterRender(listContainerId, data, type, filterName) {
+        let filtered = [...data];
+        if (filterName === '公海线索') filtered = data.filter(d => !d.owner && !d.isInvalid);
+        else if (filterName === '全部个人线索' || filterName === '全部个人(组长)') filtered = data.filter(d => d.owner && !d.isInvalid);
+        else if (filterName === '我的线索' || filterName === '我的') filtered = data.filter(d => d.owner === state.currentUser && !d.isInvalid);
+        else if (filterName === '待分配') filtered = data.filter(d => !d.owner && !d.isInvalid);
+        else if (filterName === '超时待办') filtered = data.filter(d => d.owner && d.isOverdue && !d.isInvalid);
+        else if (filterName === '异常无效') filtered = data.filter(d => d.isInvalid);
+        else if (filterName === '营销线索') filtered = data.filter(d => d.source.includes('营销') || d.source.includes('抖音'));
+        else if (filterName === '全部线索' || filterName === '全部') filtered = data.filter(d => !d.isInvalid);
+        else if (filterName === '跟进列表') filtered = data.filter(d => d.owner === state.currentUser && !d.isInvalid && d.stage >= 0 && d.stage < 5);
+        else if (filterName === '待跟进') filtered = data.filter(d => d.owner === state.currentUser && !d.isInvalid && d.stage <= 1);
+        else if (filterName === '跟进记录') filtered = data.filter(d => d.owner && !d.isInvalid && d.stage <= 2);
+        else if (filterName === '待到访' || filterName === '到访预约') filtered = data.filter(d => !d.isInvalid && d.stage === 2);
+        else if (filterName === '已定位/已报名') filtered = data.filter(d => d.owner === state.currentUser && !d.isInvalid && d.stage >= 4);
+        else if (filterName === '到访记录' || filterName === '到访确认' || filterName === '到访') filtered = data.filter(d => !d.isInvalid && d.stage === 3);
+        else if (filterName === '待预定') filtered = data.filter(d => !d.isInvalid && d.stage === 3);
+        else if (filterName === '预定记录' || filterName === '待录取' || filterName === '意向预定' || filterName === '预定') filtered = data.filter(d => !d.isInvalid && d.stage === 4);
+        else if (filterName === '录取记录' || filterName === '报名录取' || filterName === '录取') filtered = data.filter(d => !d.isInvalid && d.stage === 5);
+        else if (filterName === '报到记录') filtered = data.filter(d => !d.isInvalid && d.stage === 5);
+        else if (filterName === '预分班') filtered = data.filter(d => !d.isInvalid && d.stage === 5);
+        else if (filterName === '转正式班') filtered = data.filter(d => !d.isInvalid && d.stage === 5 && d.handoverStatus !== 'failed');
+        else if (filterName === '入学交接任务' || filterName === '入学交接' || filterName === '交接') filtered = data.filter(d => d.handoverStatus !== undefined || d.stage === 5);
+        else if (filterName === '推进中') filtered = data;
+
+        const query = getSearchValue(type);
+        if (query) {
+            filtered = filtered.filter(d => [d.name, d.phone, d.source, d.owner, d.school, d.major].some(v => String(v || '').toLowerCase().includes(query)));
+        }
+
+        renderList(listContainerId, filtered, type);
+    }
+
+    function getDetailActionHtml(lead) {
+        if (!lead.owner) return '<button class="detail-primary-btn" onclick="openContextModal(\'sheet-assign\', ' + lead.id + ', event)">分配顾问</button>';
+        if (lead.stage <= 1) return '<button class="detail-primary-btn" onclick="openContextModal(\'sheet-follow-up\', ' + lead.id + ', event)">写跟进记录</button>';
+        if (lead.stage === 2) return '<button class="detail-primary-btn" onclick="confirmVisit(' + lead.id + ')">确认到访</button>';
+        if (lead.stage === 3) return '<button class="detail-primary-btn" onclick="openDynamicForm(\'reservationRecord\')">办理预定</button>';
+        if (lead.stage === 4) return '<button class="detail-primary-btn" onclick="openContextModal(\'dialog-confirm-enroll\', ' + lead.id + ', event)">转正式录取</button>';
+        if (lead.handoverStatus === 'failed') return '<button class="detail-primary-btn" onclick="handleDashboardJump(\'syncFailed\')">查看交接异常</button>';
+        return '<button class="detail-primary-btn" onclick="openDynamicForm(\'handoverTask\')">发起入学交接</button>';
+    }
+
+    function confirmVisit(id) {
+        updateData(id, 'stage', 3);
+        showToast('已确认到访，学生进入预定办理阶段', true);
+        openLeadDetail(id);
+    }
+
+    function getDetailTimelineHtml(lead) {
+        const labels = ['线索入池', '分配', '跟进', '邀约', '到访', '预定', '录取', '报到', '交接'];
+        const doneMap = {
+            '线索入池': true,
+            '分配': !!lead.owner,
+            '跟进': lead.stage >= 1,
+            '邀约': lead.stage >= 2,
+            '到访': lead.stage >= 3,
+            '预定': lead.stage >= 4,
+            '录取': lead.stage >= 5,
+            '报到': lead.stage >= 5,
+            '交接': lead.handoverStatus !== undefined
+        };
+        return labels.map(label => {
+            const active = doneMap[label];
+            return '<div class="log-item"><div class="log-time">' + (active ? '已完成' : '待推进') + '</div><div class="log-content">' + label + '</div><div class="log-detail">' + (active ? '该节点已有业务记录。' : '下一步可根据学生状态继续推进。') + '</div></div>';
+        }).join('');
+    }
+
+    function openLeadDetail(id) {
+        let lead = state.leads.find(l => l.id === id) || state.conversions.find(l => l.id === id);
+        if (!lead) return;
+        if (lead.isInvalid) {
+            showToast('无效线索仅支持恢复，不进入详情页');
+            return;
+        }
+
+        state.currentActionLeadId = id;
+        let badge = lead.owner ? '<span class="badge-tag tag-success">负责人: ' + lead.owner + '</span>' : '<span class="badge-tag tag-primary">待分配</span>';
+        let riskBadge = lead.isOverdue ? '<span class="badge-tag tag-warning">SLA 超时</span>' : '<span class="badge-tag tag-primary">SLA 正常</span>';
+        let headerHtml = '<div style="font-size:20px; font-weight:800; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between; gap:8px;">' + lead.name + ' <span style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;">' + badge + riskBadge + '</span></div><div style="font-size:13px; color:var(--text-secondary); margin-bottom:16px;">手机号: ' + lead.phone + ' | 来源: ' + lead.source + '</div>' + getStepsHtml(lead.stage, 'detail');
+        document.getElementById('detail-header-info').innerHTML = headerHtml;
+
+        let summaryHtml = '<div class="detail-summary-grid"><div class="detail-summary"><div class="detail-summary-title">基础信息</div><div class="detail-summary-body">意向专业：' + (lead.major || '计算机网络技术') + '；生源学校：' + (lead.school || '待确认学校') + '；来源：' + lead.source + '。</div></div><div class="detail-summary"><div class="detail-summary-title">当前阶段</div><div class="detail-summary-body">阶段：' + getStageText(lead.stage) + '；负责人：' + (lead.owner || '待分配') + '。</div></div><div class="detail-summary"><div class="detail-summary-title">下一步动作</div><div class="detail-summary-body">' + getNextAction(lead) + '</div></div><div class="detail-summary"><div class="detail-summary-title">风险提醒</div><div class="detail-summary-body">' + (lead.isOverdue ? '已超时，请优先处理并补充跟进记录。' : '当前无超时风险，按计划推进即可。') + '</div></div></div>';
+        let timelineHtml = summaryHtml + '<div class="section-header" style="padding-left:0; margin-top: 4px;"><div class="section-title" style="font-size:16px;">流程时间线</div></div>' + getDetailTimelineHtml(lead);
+        document.getElementById('detail-timeline').innerHTML = timelineHtml;
+        const detailPage = document.getElementById('page-lead-detail');
+        detailPage.classList.remove('hidden-left', 'hidden-right');
+        detailPage.style.cssText = 'z-index:300;background:#F8FAFC;position:absolute;left:0;top:0;right:auto;bottom:auto;width:100%;height:100%;min-width:100%;max-width:100%;';
+        detailPage.classList.add('active');
+    }
+
+    function closeLeadDetail() {
+        const detailPage = document.getElementById('page-lead-detail');
+        detailPage.classList.remove('active');
+    }
+
+    function handleGridAction(label) {
+        if (manageMode) {
+            showToast('当前为管理模式，可继续调整高频功能');
+            return;
+        }
+        if (['招生工作台', '线索管理', '线索池', '跟进到访', '跟进与到访', '报名录取', '预定与录取', '入学交接', '报到与入学交接', '招生配置', '生源学校', '日志中心'].includes(label)) {
+            openEnrollmentWorkspace();
+            const routeMap = {
+                '招生工作台': ['sub-view-dashboard', 'tab-btn-dash'],
+                '线索管理': ['sub-view-leads', 'tab-btn-more'],
+                '线索池': ['sub-view-leads', 'tab-btn-more'],
+                '跟进到访': ['sub-view-follow', 'tab-btn-follow'],
+                '跟进与到访': ['sub-view-follow', 'tab-btn-follow'],
+                '报名录取': ['sub-view-reservation', 'tab-btn-more'],
+                '预定与录取': ['sub-view-reservation', 'tab-btn-more'],
+                '入学交接': ['sub-view-handover', 'tab-btn-more'],
+                '报到与入学交接': ['sub-view-handover', 'tab-btn-more'],
+                '生源学校': ['sub-view-schools', 'tab-btn-more'],
+                '招生配置': ['sub-view-config', 'tab-btn-more'],
+                '日志中心': ['sub-view-logs', 'tab-btn-more']
+            };
+            if (routeMap[label]) switchEnrollmentTab(routeMap[label][0], document.getElementById(routeMap[label][1]));
+            return;
+        }
+        showToast(label + ' 模块开发中');
+    }
+
+    function generateGridItem(label, isHighFreq) {
+        const meta = featureMeta[label] || { bg: 'var(--primary-light)', color: 'var(--primary-color)', icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"></circle></svg>' };
+        const manageClass = isHighFreq && manageMode ? 'manage-mode' : '';
+        const manageLabel = isHighFreq && manageMode ? '移除' : '';
+        return '<div class="grid-item ' + manageClass + '" data-manage-label="' + manageLabel + '" onclick="handleGridAction(\'' + label + '\')"><div class="grid-icon-wrap" style="background:' + meta.bg + '; color:' + meta.color + ';">' + meta.icon + '</div><div class="grid-label">' + label + '</div></div>';
+    }
+
+    function toggleManage() {
+        manageMode = !manageMode;
+        document.getElementById('manage-btn-text').innerText = manageMode ? '完成' : '管理';
+        renderHighFreq();
+    }
+
+    function renderHighFreq() {
+        document.getElementById('high-freq-grid').innerHTML = origHighFreq.map(label => generateGridItem(label, true)).join('') + '<div class="grid-item" onclick="toggleManage()"><div style="position:relative;"><div class="grid-icon-wrap" style="background: rgba(255,255,255,0.58); color: var(--primary-color); border: 2px dashed rgba(110, 142, 253, 0.35);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></div></div><div class="grid-label" style="color: var(--primary-color);">配置</div></div>';
+    }
+
+    function renderDirTabs() {
+        document.getElementById('dir-tabs').innerHTML = Object.keys(dirData).map(key => '<div class="dir-tab ' + (key === currentDirTab ? 'active' : '') + '" onclick="switchDirTab(\'' + key + '\')">' + key + '</div>').join('');
+    }
+
+    function switchDirTab(key) {
+        currentDirTab = key;
+        renderDirTabs();
+        renderDirContent();
+    }
+
+    function renderDirContent() {
+        document.getElementById('dir-grid').innerHTML = dirData[currentDirTab].map(label => generateGridItem(label, false)).join('');
+    }
+
+    window.onload = function() {
+        renderHighFreq();
+        renderDirTabs();
+        renderDirContent();
+        renderDashboard();
+        refreshAllModuleLists();
+        renderLogs();
+    };
+
+    function switchTab(tabId, el) {
+        document.querySelectorAll('.tab-bar .tab-item').forEach(item => item.classList.remove('active'));
+        el.classList.add('active');
+        document.querySelectorAll('.wrapper-main > .tab-view').forEach(view => view.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+    }
+
+    function openEnrollmentWorkspace() {
+        document.getElementById('workspace-enrollment').classList.replace('hidden-right', 'active');
+    }
+
+    function closeEnrollmentWorkspace() {
+        document.getElementById('workspace-enrollment').classList.replace('active', 'hidden-right');
+    }
+
+    function switchEnrollmentTab(viewId, el) {
+        document.querySelectorAll('.sub-tab-item').forEach(item => item.classList.remove('active'));
+        el.classList.add('active');
+        document.querySelectorAll('.sub-view').forEach(view => view.classList.remove('active'));
+        document.getElementById(viewId).classList.add('active');
+    }
+</script>
+</body>
+</html>
