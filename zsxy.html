@@ -76,7 +76,6 @@
         .nav-title { font-size: 17px; font-weight: 800; color: var(--text-title); letter-spacing: 0.5px;}
         .icon-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-title); }
 
-        /* 顶部导航栏药丸按钮样式 (恢复到顶部栏右侧使用) */
         .header-pill-btn {
             display: inline-flex; align-items: center; justify-content: center; gap: 3px;
             height: 26px; padding: 0 8px; border-radius: 8px; border: 1px solid transparent;
@@ -103,8 +102,9 @@
             box-shadow: 0 8px 24px rgba(31, 95, 255, 0.04);
         }
 
+        /* 修复：增加 flex-shrink: 0，防止列表在 Flex 容器内被过度压缩导致无法滚动 */
         .version-list-container, .field-list-container, .task-list-container { 
-            display: flex; flex-direction: column; gap: 14px; padding-bottom: 40px; 
+            display: flex; flex-direction: column; gap: 14px; padding-bottom: 40px; flex-shrink: 0;
         }
         
         .list-card {
@@ -177,11 +177,11 @@
             height: 38px; background: rgba(255, 255, 255, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.9); border-radius: 12px;
             display: flex; align-items: center; justify-content: space-between;
-            padding: 0 12px; font-size: 13px; font-weight: 700; color: var(--primary-color);
+            padding: 0 12px; font-size: 13px; font-weight: 700; color: var(--text-title);
             cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.02); transition: all 0.2s;
         }
         .custom-filter-trigger:active { background: rgba(255, 255, 255, 0.95); }
-        .custom-filter-trigger svg { width: 14px; height: 14px; transition: transform 0.3s; color: var(--primary-color);}
+        .custom-filter-trigger svg { width: 14px; height: 14px; transition: transform 0.3s; color: currentColor;}
         .custom-filter-trigger.open svg { transform: rotate(180deg); }
         
         .custom-filter-dropdown {
@@ -198,7 +198,20 @@
         }
         .filter-option:last-child { border-bottom: none; }
         .filter-option:active { background: rgba(31, 95, 255, 0.1); }
-        .filter-option.selected { color: var(--primary-color); background: rgba(31, 95, 255, 0.05); }
+        
+        /* 状态颜色类 */
+        .color-primary { color: var(--primary-color) !important; }
+        .color-warning { color: var(--warning-color) !important; }
+        .color-pending { color: var(--pending-color) !important; }
+        .color-success { color: var(--success-color) !important; }
+        .color-danger { color: var(--danger-color) !important; }
+
+        /* 下拉项选中态底色 */
+        .filter-option[data-val="全部"].selected { color: var(--primary-color); background: var(--primary-light); }
+        .filter-option[data-val="未录音"].selected { color: var(--warning-color); background: var(--warning-light); }
+        .filter-option[data-val="待审核"].selected { color: var(--pending-color); background: var(--pending-light); }
+        .filter-option[data-val="已通过"].selected { color: var(--success-color); background: var(--success-light); }
+        .filter-option[data-val="需重录"].selected { color: var(--danger-color); background: var(--danger-light); }
 
         .search-container { position: relative; flex: 1; }
         .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #9CA3AF; }
@@ -210,22 +223,16 @@
         .search-input:focus { background: rgba(255, 255, 255, 0.9); border-color: rgba(31, 95, 255, 0.3); box-shadow: 0 0 0 2px var(--primary-light); }
         .search-input::placeholder { color: #9CA3AF; }
 
-        /* 修复：移除 space-between，让右侧通过 margin-left: auto 自动对齐贴边，释放中间空间 */
         .toolbar-row-2 { display: flex; align-items: center; gap: 6px; }
         
-        /* 优化：允许向右侧延展占领部分空隙，并使其两端自然排版 */
         .batch-pill {
             display: flex; align-items: center; background: rgba(255,255,255,0.7);
             border: 1px solid rgba(255,255,255,0.9); border-radius: 12px; padding: 4px 4px 4px 10px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.03); 
-            flex: 1; /* 允许向右侧延展占领部分空隙 */
-            max-width: 115px; /* 精确设定的舒适最大宽度 */
-            height: 34px;
-            justify-content: space-between; /* 数量和刷新按钮分布两端，视觉比例更匀称 */
+            flex: 1; max-width: 115px; height: 34px; justify-content: space-between; 
         }
         .batch-pill-text { font-size: 13px; color: var(--text-secondary); font-weight: 600; white-space: nowrap;}
         
-        /* 修复：隐藏 number 原生的上下箭头，微调宽度防止挤压 */
         .batch-pill-input { width: 36px; text-align: center; border: none; background: transparent; font-size: 15px; font-weight: 800; color: var(--text-title); outline: none; padding: 0; -moz-appearance: textfield; }
         .batch-pill-input::-webkit-outer-spin-button,
         .batch-pill-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
@@ -236,19 +243,15 @@
             cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-left: 6px;
         }
 
-        /* 新增：次要操作按钮样式，用于试听开关 */
         .btn-action-secondary {
             display: inline-flex; align-items: center; justify-content: center; gap: 4px;
             background: rgba(31, 95, 255, 0.1); color: var(--primary-color);
             border: 1px solid rgba(31, 95, 255, 0.2); border-radius: 12px;
-            height: 34px; padding: 0 10px;
-            font-size: 13px; font-weight: 700; cursor: pointer;
+            height: 34px; padding: 0 10px; font-size: 13px; font-weight: 700; cursor: pointer;
             transition: all 0.2s; white-space: nowrap; flex-shrink: 0;
         }
         .btn-action-secondary:active { transform: scale(0.95); background: rgba(31, 95, 255, 0.15); }
-        .btn-action-secondary.off {
-            background: rgba(0,0,0,0.05); color: var(--text-secondary); border-color: rgba(0,0,0,0.08);
-        }
+        .btn-action-secondary.off { background: rgba(0,0,0,0.05); color: var(--text-secondary); border-color: rgba(0,0,0,0.08); }
 
         .btn-action-primary {
             display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: var(--primary-color); color: #fff;
@@ -258,32 +261,30 @@
         .btn-action-primary:active { transform: scale(0.95); }
         .btn-action-primary svg, .btn-action-secondary svg { width: 14px; height: 14px; }
 
+        /* 修复：增加 flex-shrink: 0，释放表格容器高度，恢复正常的垂直滚动体验 */
         .table-container {
             background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.9); border-radius: 16px; box-shadow: 0 8px 24px rgba(31, 95, 255, 0.04);
-            margin-bottom: 80px; display: flex; flex-direction: column; height: auto; 
+            margin-bottom: 80px; display: flex; flex-direction: column; height: auto; overflow: hidden; flex-shrink: 0;
         }
+        
         .table-row {
-            display: flex; align-items: stretch; border-bottom: 1px solid var(--border-line); transition: background 0.2s;
-            scroll-margin-top: 140px; flex-shrink: 0; 
+            display: flex; align-items: stretch; border-bottom: 1px solid var(--border-line); 
+            transition: background 0.2s; scroll-margin-top: 140px; 
         }
         .table-row:last-child { border-bottom: none; }
         .table-row.focused { background: rgba(31, 95, 255, 0.08); }
 
-        .row-index-col {
-            width: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border-right: 1px solid var(--border-line); flex-shrink: 0; padding: 12px 4px; gap: 6px;
+        /* 左侧序号与操作组合列 */
+        .row-left-col {
+            width: 48px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border-right: 1px solid var(--border-line); gap: 8px; padding: 12px 2px;
         }
-        .row-index { font-size: 15px; font-weight: 800; color: var(--text-secondary); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
         
-        .badge { display: inline-flex; padding: 2px 6px; border-radius: 6px; font-size: 10px; font-weight: 700; white-space: nowrap; text-align: center; }
-        .badge-warning { background: var(--warning-light); color: var(--warning-color); }
-        .badge-pending { background: var(--pending-light); color: var(--pending-color); }
-        .badge-success { background: var(--success-light); color: var(--success-color); }
-        .badge-rejected { background: var(--danger-light); color: var(--danger-color); }
-
-        .row-content-col { flex: 1; display: flex; align-items: center; justify-content: space-between; padding: 16px 14px 16px 12px; min-width: 0; gap: 12px; }
-        .row-left-content { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px;}
+        .row-index { font-size: 16px; font-weight: 900; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; transition: color 0.3s; }
+        
+        .row-main-content { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; padding: 12px 10px; justify-content: center;}
+        .row-right-col { flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 12px 10px 12px 0; }
         
         .en-display { display: flex; flex-direction: column; gap: 3px; }
         .en-word-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap;}
@@ -300,8 +301,6 @@
         .inline-speaker svg { width: 13px; height: 13px; fill: currentColor; }
         .inline-speaker:disabled { background: transparent; color: #CBD5E1; cursor: not-allowed; }
         .inline-speaker.playing-ai { background: var(--primary-color); color: white; animation: pulse-blue 1.5s infinite; }
-
-        .row-right-action { flex-shrink: 0; display: flex; align-items: center; gap: 8px;}
         
         .review-actions { display: flex; gap: 10px; align-items: center; }
         .btn-review { width: 34px; height: 34px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s, background 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
@@ -430,7 +429,7 @@
             </div>
             <div class="header-pill-btn hp-success" id="roleTrigger" onclick="toggleRole()" style="margin-right: -8px;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
-                <span>录音视图</span>
+                <span>录音</span>
             </div>
         </div>
 
@@ -443,16 +442,16 @@
             <div class="sticky-toolbar">
                 <div class="toolbar-row-1">
                     <div class="custom-filter-container" id="filterContainer">
-                        <div class="custom-filter-trigger" id="filterTrigger" onclick="toggleCustomFilter(event)">
+                        <div class="custom-filter-trigger color-warning" id="filterTrigger" onclick="toggleCustomFilter(event)">
                             <span id="filterLabel">未录音</span>
                             <svg class="filter-icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </div>
                         <div class="custom-filter-dropdown" id="filterDropdown">
-                            <div class="filter-option" onclick="selectFilter('全部', event)">全部</div>
-                            <div class="filter-option" id="opt-unrecorded" onclick="selectFilter('未录音', event)">未录音</div>
-                            <div class="filter-option" onclick="selectFilter('待审核', event)">待审核</div>
-                            <div class="filter-option" onclick="selectFilter('已通过', event)">已通过</div>
-                            <div class="filter-option" onclick="selectFilter('需重录', event)">需重录</div>
+                            <div class="filter-option" data-val="全部" onclick="selectFilter('全部', event)">全部</div>
+                            <div class="filter-option selected" data-val="未录音" id="opt-unrecorded" onclick="selectFilter('未录音', event)">未录音</div>
+                            <div class="filter-option" data-val="待审核" onclick="selectFilter('待审核', event)">待审核</div>
+                            <div class="filter-option" data-val="已通过" onclick="selectFilter('已通过', event)">已通过</div>
+                            <div class="filter-option" data-val="需重录" onclick="selectFilter('需重录', event)">需重录</div>
                         </div>
                     </div>
                     
@@ -473,11 +472,10 @@
                         </button>
                     </div>
                     
-                    <!-- 修复：通过 margin-left: auto 将控制区稳稳推至最右侧 -->
                     <div style="display: flex; gap: 6px; flex-shrink: 0; margin-left: auto;">
                         <button class="btn-action-secondary" id="autoListenToggle" onclick="toggleAutoListen()">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
-                            自动播
+                            自动听
                         </button>
                         <button class="btn-action-primary" onclick="startAutoPlay()">
                             <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
@@ -510,7 +508,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
             </button>
             <button class="fp-btn fp-btn-close" onclick="closeAutoPlay()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
     </div>
@@ -807,11 +805,11 @@
         
         if(isAutoListenEnabled) {
             trigger.className = 'btn-action-secondary';
-            trigger.innerHTML = `${iconSoundOn} 自动播`;
+            trigger.innerHTML = `${iconSoundOn} 自动听`;
             showToast('已开启录音后自动试听');
         } else {
             trigger.className = 'btn-action-secondary off';
-            trigger.innerHTML = `${iconSoundOff} 手动播`;
+            trigger.innerHTML = `${iconSoundOff} 手动听`;
             showToast('已关闭自动试听');
         }
     }
@@ -822,12 +820,12 @@
         
         if(currentUserRole === 'reviewer') {
             trigger.className = 'header-pill-btn hp-warning';
-            trigger.innerHTML = `${iconShield} <span>审核视图</span>`;
+            trigger.innerHTML = `${iconShield} <span>审核</span>`;
             showToast('已切换至审核视图');
             selectFilter('待审核', null);
         } else {
             trigger.className = 'header-pill-btn hp-success';
-            trigger.innerHTML = `${iconMicSm} <span>录音视图</span>`;
+            trigger.innerHTML = `${iconMicSm} <span>录音</span>`;
             showToast('已切换至录音视图');
             selectFilter('未录音', null);
         }
@@ -926,6 +924,14 @@
         activeFilterValue = value;
         document.getElementById('filterLabel').innerText = value;
         
+        const trigger = document.getElementById('filterTrigger');
+        trigger.className = 'custom-filter-trigger'; 
+        if(value === '未录音') trigger.classList.add('color-warning');
+        else if(value === '待审核') trigger.classList.add('color-pending');
+        else if(value === '已通过') trigger.classList.add('color-success');
+        else if(value === '需重录') trigger.classList.add('color-danger');
+        else trigger.classList.add('color-primary');
+        
         const options = document.querySelectorAll('.filter-option');
         options.forEach(opt => {
             if(opt.innerText === value) opt.classList.add('selected');
@@ -1000,18 +1006,17 @@
 
         renderedItems.forEach((item, index) => {
             let displayIndex = index + 1; 
-            let badgeHTML = '';
-            let speakerDisabled = '';
+            let speakerDisabled = item.status === 'unrecorded' ? 'disabled' : '';
             
+            let indexColor = 'var(--text-secondary)';
             if (item.status === 'unrecorded') {
-                badgeHTML = `<span class="badge badge-warning">未录音</span>`;
-                speakerDisabled = 'disabled';
+                indexColor = 'var(--warning-color)';
             } else if (item.status === 'pending') {
-                badgeHTML = `<span class="badge badge-pending">待审核</span>`;
+                indexColor = 'var(--pending-color)';
             } else if (item.status === 'approved') {
-                badgeHTML = `<span class="badge badge-success">已通过</span>`;
+                indexColor = 'var(--success-color)';
             } else if (item.status === 'rejected') {
-                badgeHTML = `<span class="badge badge-rejected">需重录</span>`;
+                indexColor = 'var(--danger-color)';
             }
 
             let contentHTML = '';
@@ -1042,13 +1047,25 @@
                 `;
             }
 
-            let actionHTML = '';
+            let itemInner = '';
             
             if (currentUserRole === 'reviewer') {
-                actionHTML = `
+                let actionHTML = `
                     <div class="review-actions">
-                        <button class="btn-review btn-approve" onclick="handleReview('${item.id}', 'approved')" title="通过审核">${iconCheck}</button>
                         <button class="btn-review btn-reject" onclick="handleReview('${item.id}', 'rejected')" title="需重录">${iconCross}</button>
+                        <button class="btn-review btn-approve" onclick="handleReview('${item.id}', 'approved')" title="通过审核">${iconCheck}</button>
+                    </div>
+                `;
+                
+                itemInner = `
+                    <div class="row-left-col" style="width: 36px;">
+                        <span class="row-index" id="index-${item.id}" style="color: ${indexColor};">${displayIndex}</span>
+                    </div>
+                    <div class="row-main-content">
+                        ${contentHTML}
+                    </div>
+                    <div class="row-right-col">
+                        ${actionHTML}
                     </div>
                 `;
             } else {
@@ -1060,29 +1077,23 @@
                     ontouchend="handlePressEnd(this, '${item.id}', true, event)"
                     ontouchcancel="handlePressEnd(this, '${item.id}', false, event)"
                 `;
-                actionHTML = `<button class="btn-record" ${pressEvents}>${iconMic}</button>`;
+                let actionHTML = `<button class="btn-record" ${pressEvents}>${iconMic}</button>`;
+                
+                itemInner = `
+                    <div class="row-left-col">
+                        <span class="row-index" id="index-${item.id}" style="color: ${indexColor};">${displayIndex}</span>
+                        ${actionHTML}
+                    </div>
+                    <div class="row-main-content">
+                        ${contentHTML}
+                    </div>
+                `;
             }
 
             const itemDiv = document.createElement('div');
             itemDiv.className = 'table-row';
             itemDiv.id = `item-el-${item.id}`;
-            
-            itemDiv.innerHTML = `
-                <div class="row-index-col">
-                    <span class="row-index">${displayIndex}</span>
-                    <div class="word-meta" id="meta-${item.id}">
-                        ${badgeHTML}
-                    </div>
-                </div>
-                <div class="row-content-col">
-                    <div class="row-left-content">
-                        ${contentHTML}
-                    </div>
-                    <div class="row-right-action">
-                        ${actionHTML}
-                    </div>
-                </div>
-            `;
+            itemDiv.innerHTML = itemInner;
             container.appendChild(itemDiv);
         });
     }
@@ -1121,8 +1132,10 @@
                 if(item) {
                     item.status = 'pending';
                     updateStatsBoard();
-                    let metaDiv = itemEl.querySelector(`#meta-${item.id}`);
-                    metaDiv.innerHTML = `<span class="badge badge-pending">待审核</span>`;
+                    
+                    let indexSpan = itemEl.querySelector(`#index-${item.id}`);
+                    if(indexSpan) indexSpan.style.color = 'var(--pending-color)';
+                    
                     let speakerBtn = document.getElementById(`play-${item.id}`);
                     if (speakerBtn) {
                         speakerBtn.disabled = false;
@@ -1149,12 +1162,12 @@
             
             const itemEl = document.getElementById(`item-el-${itemId}`);
             if(itemEl) {
-                let metaDiv = itemEl.querySelector(`#meta-${item.id}`);
+                let indexSpan = itemEl.querySelector(`#index-${item.id}`);
                 if (newStatus === 'approved') {
-                    metaDiv.innerHTML = `<span class="badge badge-success">已通过</span>`;
+                    if(indexSpan) indexSpan.style.color = 'var(--success-color)';
                     showToast('审核：已通过', 1000);
                 } else {
-                    metaDiv.innerHTML = `<span class="badge badge-rejected">需重录</span>`;
+                    if(indexSpan) indexSpan.style.color = 'var(--danger-color)';
                     showToast('审核：需重录', 1000);
                 }
             }
