@@ -9,11 +9,12 @@
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
     
     body {
-      font-family: 'Noto Sans SC', sans-serif;
+      font-family: Inter, system-ui, -apple-system, 'Noto Sans SC', sans-serif;
       margin: 0;
       height: 100vh;
       width: 100vw;
       overflow: hidden;
+      /* 背景色用于在网页预览时衬托 1300x813 的画幅 */
       background-color: #F1F5F9; 
       display: flex;
       align-items: center;
@@ -26,14 +27,13 @@
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
     .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #94A3B8; }
 
-    /* ================= 极致精准的表格 CSS ================= */
+    /* ================= 极致精准的通栏表格 CSS ================= */
     table {
       border-collapse: separate;
       border-spacing: 0;
       width: 100%;
       table-layout: fixed; /* 强制均分宽度 */
-      /* 启用等宽数字，确保所有4位数字严格对齐 */
-      font-variant-numeric: tabular-nums; 
+      font-variant-numeric: tabular-nums; /* 等宽数字 */
     }
     
     th, td {
@@ -43,7 +43,7 @@
       box-sizing: border-box;
       overflow: hidden;
       text-overflow: ellipsis;
-      min-width: 70px; /* 保证至少容纳4位数和边距 */
+      min-width: 70px;
     }
 
     /* 修复表头缝隙：1px重叠覆盖法 */
@@ -56,7 +56,7 @@
     thead tr:nth-child(2) th.fixed-col { z-index: 30; }
 
     /* 修正列宽 */
-    .fixed-col-1 { left: 0; width: 60px; min-width: 60px; max-width: 60px; }
+    .fixed-col-1 { left: 0; width: 60px; min-width: 60px; max-width: 60px; border-left: none; }
     .fixed-col-2 { left: 60px; width: 100px; min-width: 100px; max-width: 100px; }
     .fixed-col-3 { left: 160px; width: 80px; min-width: 80px; max-width: 80px; }
 
@@ -65,15 +65,15 @@
       content: ''; 
       position: absolute; 
       top: 0; 
-      right: -2px; /* 往右稍微偏移盖住原本的边框 */
+      right: -2px; 
       bottom: 0; 
       width: 2px;
-      background-color: #CBD5E1; /* 颜色加深 */
-      box-shadow: 3px 0 8px rgba(0,0,0,0.12); /* 阴影放大加粗 */
+      background-color: #CBD5E1; 
+      box-shadow: 3px 0 8px rgba(0,0,0,0.12); 
       z-index: 5;
     }
 
-    /* 去除表尾和表右边界的多余边框 */
+    /* 去除表尾和表右边界的多余边框，适配通栏 */
     tbody tr:last-child td { border-bottom: none; }
     th:last-child, td:last-child { border-right: none; }
 
@@ -91,7 +91,7 @@
     .modal-enter { opacity: 0; transform: scale(0.95); }
     .modal-enter-active { opacity: 1; transform: scale(1); transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
     .modal-leave { opacity: 1; transform: scale(1); }
-    .modal-leave-active { opacity: 0; transform: scale(0.95); transition: all 0.2s ease-in; pointer-events: none; }
+    .modal-leave-active { opacity: 0; transform: scale(0.95); transition: all 0.15s ease-in; pointer-events: none; }
   </style>
   <script>
     tailwind.config = {
@@ -107,33 +107,33 @@
 <body>
 
   <!-- 全局 Toast 提示 -->
-  <div id="toast" class="fixed top-[45%] left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-800/90 text-white px-8 py-3 rounded-xl shadow-2xl opacity-0 transition-opacity duration-300 z-[200] pointer-events-none flex items-center justify-center">
-    <span class="font-bold tracking-wide">分配成功</span>
+  <div id="toast" class="fixed top-[45%] left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-800/90 text-white px-8 py-3 rounded-[14px] shadow-2xl opacity-0 transition-opacity duration-300 z-[200] pointer-events-none flex items-center justify-center">
+    <span class="font-bold tracking-wide text-[15px]">分配成功</span>
   </div>
 
-  <!-- 主应用容器 -->
+  <!-- 主应用容器：严格锁定 1300x813 平板尺寸 -->
   <div class="w-[1300px] h-[813px] bg-white flex flex-col overflow-hidden relative shadow-app border border-gray-200/50">
 
     <!-- 顶部导航区 -->
-    <header class="h-[72px] flex items-center justify-between px-8 bg-white border-b border-gray-100 flex-shrink-0 relative z-40">
+    <header class="h-[76px] flex items-center justify-between px-8 bg-white border-b border-gray-100 flex-shrink-0 relative z-40">
       <div class="flex items-center space-x-4">
-        <!-- 带阴影的独立返回按钮 -->
-        <button class="w-9 h-9 flex items-center justify-center rounded-[12px] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)] transition-shadow text-gray-700 cursor-pointer shrink-0">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        <!-- 独立返回按钮：圆形设计，Pad 端按压反馈 -->
+        <button class="w-[44px] h-[44px] flex items-center justify-center rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.06)] active:scale-[0.90] transition-all text-gray-700 shrink-0">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
-        <h1 class="text-2xl font-black text-gray-900 tracking-tight ml-2">班级数据</h1>
+        <h1 class="text-[30px] font-extrabold text-gray-900 tracking-tight ml-2 leading-none">班级数据</h1>
         
-        <div class="ml-4 flex items-center">
+        <div class="ml-6 flex items-center">
           <div class="relative" id="class-dropdown-container">
-            <div onclick="toggleDropdown()" class="flex items-center space-x-1.5 px-4 py-2 bg-primary-light rounded-full text-primary font-bold cursor-pointer active:bg-blue-100 transition-colors">
-              <span class="text-sm">24级软件3班</span>
+            <div onclick="toggleDropdown()" class="flex items-center space-x-1.5 px-4 h-[40px] bg-primary-light rounded-[12px] text-primary font-bold cursor-pointer active:scale-95 transition-all select-none">
+              <span class="text-[15px]">24级软件3班</span>
               <svg id="class-dropdown-icon" class="w-4 h-4 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
             </div>
-            <div id="class-dropdown-menu" class="absolute top-full left-0 mt-2 w-44 bg-white border border-gray-100 rounded-xl shadow-lg opacity-0 invisible transition-all duration-200 origin-top-left z-50">
-              <ul class="py-2 text-center text-sm font-medium">
-                <li class="px-4 py-2.5 text-primary bg-primary-light/50 cursor-pointer">24级软件3班</li>
-                <li class="px-4 py-2.5 text-gray-600 active:bg-gray-50 cursor-pointer">英语实验1班</li>
-                <li class="px-4 py-2.5 text-gray-600 active:bg-gray-50 cursor-pointer">2404班</li>
+            <div id="class-dropdown-menu" class="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-100 rounded-[16px] shadow-lg opacity-0 invisible transition-all duration-200 origin-top-left z-50">
+              <ul class="py-2 text-center text-[15px] font-medium">
+                <li class="px-4 py-3 text-primary bg-primary-light/50 cursor-pointer">24级软件3班</li>
+                <li class="px-4 py-3 text-gray-600 active:bg-gray-50 cursor-pointer">英语实验1班</li>
+                <li class="px-4 py-3 text-gray-600 active:bg-gray-50 cursor-pointer">2404班</li>
               </ul>
             </div>
           </div>
@@ -141,25 +141,25 @@
       </div>
 
       <div class="flex items-center space-x-6">
-        <div class="flex bg-[#F1F5F9] p-1 rounded-xl text-sm font-bold shadow-inner">
-          <button id="btn-today" class="transition-all bg-primary text-white shadow-md px-6 py-2 rounded-lg" onclick="toggleData('today')">今日数据</button>
-          <button id="btn-summary" class="transition-all text-gray-500 hover:text-gray-800 px-6 py-2 rounded-lg bg-transparent" onclick="toggleData('summary')">汇总数据</button>
+        <div class="flex bg-[#F1F5F9] p-1 rounded-[14px] text-[15px] font-bold shadow-inner">
+          <button id="btn-today" class="transition-all bg-primary text-white shadow-md px-6 h-[40px] rounded-[10px] active:scale-95" onclick="toggleData('today')">今日数据</button>
+          <button id="btn-summary" class="transition-all text-gray-500 active:bg-gray-200/50 px-6 h-[40px] rounded-[10px] bg-transparent active:scale-95" onclick="toggleData('summary')">汇总数据</button>
         </div>
         
-        <div class="flex items-center space-x-3 border-l border-gray-200 pl-4">
-          <span class="text-xs font-medium text-gray-400" id="refresh-time">上次更新: --</span>
-          <button onclick="triggerRefresh()" class="w-9 h-9 flex items-center justify-center rounded-full bg-white border border-gray-200 shadow-sm hover:shadow hover:border-gray-300 active:bg-gray-50 transition-all text-gray-500">
-            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        <div class="flex items-center space-x-4 border-l border-gray-200 pl-6">
+          <span class="text-[13px] font-medium text-gray-400" id="refresh-time">上次更新: --</span>
+          <button onclick="triggerRefresh()" class="w-[44px] h-[44px] flex items-center justify-center rounded-full bg-white border border-gray-200 shadow-sm active:scale-[0.90] transition-all text-gray-500">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
           </button>
         </div>
       </div>
     </header>
 
-    <!-- 表格区域 -->
+    <!-- 表格区域：完全 0 padding 的通栏设计，直接铺满 -->
     <main class="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar p-0 bg-white relative">
       <div id="loading-overlay" class="absolute inset-0 z-50 hidden"></div>
       
-      <table class="text-center text-sm w-full bg-white">
+      <table class="text-center text-[14px] w-full bg-white">
         <thead>
           <tr>
             <th rowspan="2" class="p-3 fixed-col fixed-col-1 bg-[#F8FAFC] text-gray-500 border-l-0">序号</th>
@@ -172,7 +172,7 @@
             <th colspan="3" class="p-3 bg-[#FFFBEB] text-amber-600 font-bold tracking-wide">练习</th>
             <th colspan="3" class="p-3 bg-[#FFF1F2] text-rose-600 font-bold tracking-wide border-r-0">游戏</th>
           </tr>
-          <tr id="header-row-2" class="text-xs font-bold">
+          <tr id="header-row-2" class="text-[13px] font-bold">
             <!-- 由 JS 渲染二级表头 -->
           </tr>
         </thead>
@@ -184,44 +184,44 @@
     
     <!-- ================= 任务分配弹窗 ================= -->
     <div id="assign-modal-wrapper" class="absolute inset-0 z-[100] flex items-center justify-center bg-gray-900/40 backdrop-blur-sm hidden modal-leave">
-      <div class="bg-white w-[880px] h-[600px] rounded-2xl shadow-2xl flex flex-col overflow-hidden relative">
-        <div class="h-16 px-6 border-b border-gray-100 flex items-center justify-between bg-white flex-shrink-0">
-          <div class="flex items-center space-x-2">
-            <div class="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center text-primary">
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1Z"/><path d="M9 14h6"/><path d="M12 11v6"/></svg>
+      <div class="bg-white w-[960px] h-[680px] rounded-[24px] shadow-2xl flex flex-col overflow-hidden relative">
+        <div class="h-[72px] px-8 border-b border-gray-100 flex items-center justify-between bg-white flex-shrink-0">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-[14px] bg-primary-light flex items-center justify-center text-primary">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1Z"/><path d="M9 14h6"/><path d="M12 11v6"/></svg>
             </div>
-            <h2 class="text-lg font-bold text-gray-800">分配任务 <span class="text-gray-300 mx-2">|</span> <span id="assign-target-name" class="text-primary">张三</span></h2>
+            <h2 class="text-[20px] font-bold text-gray-800">分配任务 <span class="text-gray-300 mx-2">|</span> <span id="assign-target-name" class="text-primary">张三</span></h2>
           </div>
-          <button onclick="closeAssignModal()" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
-            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <button onclick="closeAssignModal()" class="w-10 h-10 flex items-center justify-center text-gray-400 active:bg-gray-100 rounded-full transition-colors active:scale-95">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
 
         <div class="flex-1 flex overflow-hidden bg-gray-50/50">
           <!-- 左栏：已分配 -->
           <div class="w-1/2 border-r border-gray-200 flex flex-col bg-[#F8FAFC]">
-            <div class="px-5 py-3 border-b border-gray-200 bg-white shadow-sm z-10">
-              <h3 class="font-bold text-gray-700 flex justify-between items-center">
+            <div class="px-6 py-4 border-b border-gray-200 bg-white shadow-sm z-10">
+              <h3 class="font-bold text-[16px] text-gray-700 flex justify-between items-center">
                 <span>已分配任务</span>
-                <span id="assigned-count" class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">0</span>
+                <span id="assigned-count" class="bg-blue-100 text-blue-700 px-2.5 py-0.5 rounded-[8px] text-[13px]">0</span>
               </h3>
             </div>
-            <div class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar" id="assigned-tasks-list"></div>
+            <div class="flex-1 overflow-y-auto p-5 space-y-4 custom-scrollbar" id="assigned-tasks-list"></div>
           </div>
 
           <!-- 右栏：可分配（任务库） -->
           <div class="w-1/2 flex flex-col bg-white">
-            <div class="px-5 py-3 border-b border-gray-100 shadow-sm z-10 flex flex-col space-y-3">
-               <h3 class="font-bold text-gray-700 flex justify-between items-center">
+            <div class="px-6 py-4 border-b border-gray-100 shadow-sm z-10 flex flex-col space-y-4">
+               <h3 class="font-bold text-[16px] text-gray-700 flex justify-between items-center">
                 <span>可分配任务库</span>
-                <span id="available-count" class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">0</span>
+                <span id="available-count" class="bg-gray-100 text-gray-600 px-2.5 py-0.5 rounded-[8px] text-[13px]">0</span>
               </h3>
               <div class="relative">
-                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input type="text" id="task-search" placeholder="搜索任务名称..." oninput="renderAssignUI()" class="w-full bg-gray-50 border border-gray-200 rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
+                <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="task-search" placeholder="搜索任务名称..." oninput="renderAssignUI()" class="w-full bg-gray-50 border border-gray-200 rounded-[12px] pl-10 pr-4 h-[44px] text-[14px] focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
               </div>
             </div>
-            <div class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar" id="available-tasks-list"></div>
+            <div class="flex-1 overflow-y-auto p-5 space-y-4 custom-scrollbar" id="available-tasks-list"></div>
           </div>
         </div>
       </div>
@@ -340,28 +340,28 @@
             </div>`;
 
         let colsHTML = `
-          <td class="p-2 fixed-col fixed-col-1 ${rowBg} ${hoverBg} text-gray-400 text-xs transition-colors h-[46px] border-l-0">${student.id}</td>
-          <td class="p-2 fixed-col fixed-col-2 ${rowBg} ${hoverBg} transition-colors h-[46px]">${nameCellHtml}</td>
-          <td class="p-2 fixed-col fixed-col-3 ${rowBg} ${hoverBg} font-extrabold text-gray-800 transition-colors h-[46px]">${student.totalVocab}</td>
+          <td class="p-2 fixed-col fixed-col-1 ${rowBg} ${hoverBg} text-gray-400 text-xs transition-colors h-[48px] border-l-0">${student.id}</td>
+          <td class="p-2 fixed-col fixed-col-2 ${rowBg} ${hoverBg} transition-colors h-[48px]">${nameCellHtml}</td>
+          <td class="p-2 fixed-col fixed-col-3 ${rowBg} ${hoverBg} font-extrabold text-gray-800 transition-colors h-[48px]">${student.totalVocab}</td>
         `;
 
         if (currentView === 'today') {
           const td = student.today;
           colsHTML += `
-            <td class="p-2 h-[46px]">${formatNum(td.zxTotal)}</td><td class="p-2 h-[46px]">${formatNum(td.zxTodayAdd, 'add')}</td><td class="p-2 h-[46px]">${formatNum(td.zxYestAdd, 'add')}</td>
-            <td class="p-2 h-[46px]">${formatNum(td.txTotal)}</td><td class="p-2 h-[46px]">${formatNum(td.txTodayAdd, 'add')}</td><td class="p-2 h-[46px]">${formatNum(td.txYestAdd, 'add')}</td>
-            <td class="p-2 h-[46px]">${formatNum(td.ztTotal)}</td><td class="p-2 h-[46px]">${formatNum(td.ztTodayAdd, 'add')}</td><td class="p-2 h-[46px]">${formatNum(td.ztYestAdd, 'add')}</td>
-            <td class="p-2 h-[46px]">${formatNum(td.lxTotal)}</td><td class="p-2 h-[46px]">${formatNum(td.lxTodayAdd, 'add')}</td><td class="p-2 h-[46px]">${formatNum(td.lxYestAdd, 'add')}</td>
-            <td class="p-2 h-[46px]">${formatNum(td.yxTotal)}</td><td class="p-2 h-[46px]">${formatNum(td.yxTodayAdd, 'add')}</td><td class="p-2 h-[46px] border-r-0">${formatNum(td.yxYestAdd, 'add')}</td>
+            <td class="p-2 h-[48px]">${formatNum(td.zxTotal)}</td><td class="p-2 h-[48px]">${formatNum(td.zxTodayAdd, 'add')}</td><td class="p-2 h-[48px]">${formatNum(td.zxYestAdd, 'add')}</td>
+            <td class="p-2 h-[48px]">${formatNum(td.txTotal)}</td><td class="p-2 h-[48px]">${formatNum(td.txTodayAdd, 'add')}</td><td class="p-2 h-[48px]">${formatNum(td.txYestAdd, 'add')}</td>
+            <td class="p-2 h-[48px]">${formatNum(td.ztTotal)}</td><td class="p-2 h-[48px]">${formatNum(td.ztTodayAdd, 'add')}</td><td class="p-2 h-[48px]">${formatNum(td.ztYestAdd, 'add')}</td>
+            <td class="p-2 h-[48px]">${formatNum(td.lxTotal)}</td><td class="p-2 h-[48px]">${formatNum(td.lxTodayAdd, 'add')}</td><td class="p-2 h-[48px]">${formatNum(td.lxYestAdd, 'add')}</td>
+            <td class="p-2 h-[48px]">${formatNum(td.yxTotal)}</td><td class="p-2 h-[48px]">${formatNum(td.yxTodayAdd, 'add')}</td><td class="p-2 h-[48px] border-r-0">${formatNum(td.yxYestAdd, 'add')}</td>
           `;
         } else {
            const sd = student.summary;
            colsHTML += `
-            <td class="p-2 h-[46px]">${formatNum(sd.zxPass)}</td><td class="p-2 h-[46px]">${formatNum(sd.zxFail, 'fail')}</td><td class="p-2 h-[46px] text-gray-400">${formatNum(sd.zxUnknown)}</td>
-            <td class="p-2 h-[46px]">${formatNum(sd.txPass)}</td><td class="p-2 h-[46px]">${formatNum(sd.txFail, 'fail')}</td><td class="p-2 h-[46px] text-gray-400">${formatNum(sd.txUnknown)}</td>
-            <td class="p-2 h-[46px]">${formatNum(sd.ztPass)}</td><td class="p-2 h-[46px]">${formatNum(sd.ztFail, 'fail')}</td><td class="p-2 h-[46px] text-gray-400">${formatNum(sd.ztUnknown)}</td>
-            <td class="p-2 h-[46px]">${formatNum(sd.lxPass)}</td><td class="p-2 h-[46px]">${formatNum(sd.lxFail, 'fail')}</td><td class="p-2 h-[46px] text-gray-400">${formatNum(sd.lxUnknown)}</td>
-            <td class="p-2 h-[46px]">${formatNum(sd.yxPass)}</td><td class="p-2 h-[46px]">${formatNum(sd.yxFail, 'fail')}</td><td class="p-2 h-[46px] text-gray-400 border-r-0">${formatNum(sd.yxUnknown)}</td>
+            <td class="p-2 h-[48px]">${formatNum(sd.zxPass)}</td><td class="p-2 h-[48px]">${formatNum(sd.zxFail, 'fail')}</td><td class="p-2 h-[48px] text-gray-400">${formatNum(sd.zxUnknown)}</td>
+            <td class="p-2 h-[48px]">${formatNum(sd.txPass)}</td><td class="p-2 h-[48px]">${formatNum(sd.txFail, 'fail')}</td><td class="p-2 h-[48px] text-gray-400">${formatNum(sd.txUnknown)}</td>
+            <td class="p-2 h-[48px]">${formatNum(sd.ztPass)}</td><td class="p-2 h-[48px]">${formatNum(sd.ztFail, 'fail')}</td><td class="p-2 h-[48px] text-gray-400">${formatNum(sd.ztUnknown)}</td>
+            <td class="p-2 h-[48px]">${formatNum(sd.lxPass)}</td><td class="p-2 h-[48px]">${formatNum(sd.lxFail, 'fail')}</td><td class="p-2 h-[48px] text-gray-400">${formatNum(sd.lxUnknown)}</td>
+            <td class="p-2 h-[48px]">${formatNum(sd.yxPass)}</td><td class="p-2 h-[48px]">${formatNum(sd.yxFail, 'fail')}</td><td class="p-2 h-[48px] text-gray-400 border-r-0">${formatNum(sd.yxUnknown)}</td>
           `;
         }
         
@@ -379,13 +379,13 @@
         const tr = document.createElement('tr');
         tr.className = `${rowBg}`;
         let colsHTML = `
-          <td class="p-2 fixed-col fixed-col-1 h-[46px] ${rowBg} border-l-0"><div class="skeleton-box h-4 w-6 mx-auto"></div></td>
-          <td class="p-2 fixed-col fixed-col-2 h-[46px] ${rowBg}"><div class="skeleton-box h-4 w-14 mx-auto"></div></td>
-          <td class="p-2 fixed-col fixed-col-3 h-[46px] ${rowBg}"><div class="skeleton-box h-4 w-12 mx-auto"></div></td>
+          <td class="p-2 fixed-col fixed-col-1 h-[48px] ${rowBg} border-l-0"><div class="skeleton-box h-4 w-6 mx-auto"></div></td>
+          <td class="p-2 fixed-col fixed-col-2 h-[48px] ${rowBg}"><div class="skeleton-box h-4 w-14 mx-auto"></div></td>
+          <td class="p-2 fixed-col fixed-col-3 h-[48px] ${rowBg}"><div class="skeleton-box h-4 w-12 mx-auto"></div></td>
         `;
         for (let j = 0; j < 15; j++) { 
           const borderClass = j === 14 ? 'border-r-0' : '';
-          colsHTML += `<td class="p-2 h-[46px] ${borderClass}"><div class="skeleton-box h-4 w-8 mx-auto"></div></td>`; 
+          colsHTML += `<td class="p-2 h-[48px] ${borderClass}"><div class="skeleton-box h-4 w-8 mx-auto"></div></td>`; 
         }
         tr.innerHTML = colsHTML;
         tbody.appendChild(tr);
@@ -400,11 +400,11 @@
       const btnSummary = document.getElementById('btn-summary');
 
       if (viewType === 'today') {
-        btnToday.className = "transition-all bg-primary text-white shadow-md px-6 py-2 rounded-lg";
-        btnSummary.className = "transition-all text-gray-500 hover:text-gray-800 px-6 py-2 rounded-lg bg-transparent shadow-none";
+        btnToday.className = "transition-all bg-primary text-white shadow-md px-6 h-[40px] rounded-[10px] active:scale-95";
+        btnSummary.className = "transition-all text-gray-500 active:bg-gray-200/50 px-6 h-[40px] rounded-[10px] bg-transparent active:scale-95";
       } else {
-        btnSummary.className = "transition-all bg-primary text-white shadow-md px-6 py-2 rounded-lg";
-        btnToday.className = "transition-all text-gray-500 hover:text-gray-800 px-6 py-2 rounded-lg bg-transparent shadow-none";
+        btnSummary.className = "transition-all bg-primary text-white shadow-md px-6 h-[40px] rounded-[10px] active:scale-95";
+        btnToday.className = "transition-all text-gray-500 active:bg-gray-200/50 px-6 h-[40px] rounded-[10px] bg-transparent active:scale-95";
       }
 
       renderHeaders();
@@ -482,40 +482,40 @@
 
       const assignedList = document.getElementById('assigned-tasks-list');
       if (assignedTasks.length === 0) {
-        assignedList.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-gray-400 text-sm"><svg class="w-12 h-12 mb-2 text-gray-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>暂无分配任务</div>`;
+        assignedList.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-gray-400 text-[14px]"><svg class="w-12 h-12 mb-3 text-gray-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>暂无分配任务</div>`;
       } else {
         assignedList.innerHTML = assignedTasks.map((t, index) => {
           const num = index + 1;
           return `
-          <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between transition-colors">
+          <div class="bg-white p-4 rounded-[20px] border border-gray-100 shadow-sm flex items-center justify-between transition-colors">
             <div class="flex items-center space-x-3">
-              <span class="text-sm font-bold text-gray-400 font-mono w-5 text-center">${num}</span>
+              <span class="text-[14px] font-bold text-gray-400 font-mono w-5 text-center">${num}</span>
               <div class="flex flex-col items-start space-y-1">
-                <span class="text-sm font-bold text-gray-800">${t.name}</span>
-                <span class="inline-block bg-gray-50 border border-gray-200 text-gray-600 px-2 py-0.5 rounded-sm text-xs font-medium">${t.words} 词</span>
+                <span class="text-[15px] font-bold text-gray-800">${t.name}</span>
+                <span class="inline-block bg-gray-50 border border-gray-200 text-gray-500 px-2 py-[2px] rounded-[6px] text-[11px] font-bold">${t.words} 词</span>
               </div>
             </div>
-            <button onclick="moveTask(${t.id}, 'remove')" class="px-4 py-1.5 rounded-lg text-sm font-medium text-red-500 bg-red-50 active:bg-red-500 active:text-white transition-colors">取消</button>
+            <button onclick="moveTask(${t.id}, 'remove')" class="px-5 h-[44px] rounded-[14px] text-[14px] font-bold text-red-500 bg-red-50 active:bg-red-500 active:text-white transition-all active:scale-95">取消</button>
           </div>
         `}).join('');
       }
 
       const availableList = document.getElementById('available-tasks-list');
       if (availableTasks.length === 0) {
-        availableList.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-gray-400 text-sm"><svg class="w-10 h-10 mb-2 text-gray-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>未搜索到相关任务</div>`;
+        availableList.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-gray-400 text-[14px]"><svg class="w-10 h-10 mb-3 text-gray-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>未搜索到相关任务</div>`;
       } else {
         availableList.innerHTML = availableTasks.map((t, index) => {
           const num = index + 1;
           return `
-          <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between transition-colors">
+          <div class="bg-white p-4 rounded-[20px] border border-gray-100 shadow-sm flex items-center justify-between transition-colors">
             <div class="flex items-center space-x-3">
-              <span class="text-sm font-bold text-gray-400 font-mono w-5 text-center">${num}</span>
+              <span class="text-[14px] font-bold text-gray-400 font-mono w-5 text-center">${num}</span>
               <div class="flex flex-col items-start space-y-1">
-                <span class="text-sm font-bold text-gray-800">${t.name}</span>
-                <span class="inline-block bg-gray-50 border border-gray-200 text-gray-600 px-2 py-0.5 rounded-sm text-xs font-medium">${t.words} 词</span>
+                <span class="text-[15px] font-bold text-gray-800">${t.name}</span>
+                <span class="inline-block bg-gray-50 border border-gray-200 text-gray-500 px-2 py-[2px] rounded-[6px] text-[11px] font-bold">${t.words} 词</span>
               </div>
             </div>
-            <button onclick="moveTask(${t.id}, 'add')" class="px-5 py-1.5 rounded-lg text-sm font-medium text-white bg-primary active:bg-blue-700 shadow-sm transition-colors flex items-center justify-center min-w-[72px]">
+            <button onclick="moveTask(${t.id}, 'add')" class="px-6 h-[44px] rounded-[14px] text-[14px] font-bold text-white bg-primary active:bg-blue-700 shadow-sm transition-all flex items-center justify-center min-w-[80px] active:scale-95">
               加入
             </button>
           </div>
