@@ -8,42 +8,32 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
     
-    :root {
-      --brand: #1F5FFF;
-      --brand-hover: #004CE6;
-      --surface: #FFFFFF;
-      --surface-soft: #F8FAFC;
-    }
-
     body {
       font-family: Inter, system-ui, -apple-system, 'Noto Sans SC', sans-serif;
       margin: 0;
       height: 100vh;
       width: 100vw;
       overflow: hidden;
-      /* 规范：全局背景使用浅蓝紫渐变 */
-      background: linear-gradient(135deg, #EFF6FF 0%, #DFE7FF 100%);
+      /* 背景色用于在网页预览时衬托 1300x813 的画幅 */
+      background-color: #F1F5F9; 
       display: flex;
       align-items: center;
       justify-content: center;
-      /* 规范：页面级 padding 20px */
-      padding: 20px;
-      box-sizing: border-box;
     }
 
     /* 自定义滚动条 */
     .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #94A3B8; }
 
-    /* ================= 极致精准的表格 CSS ================= */
+    /* ================= 极致精准的通栏表格 CSS ================= */
     table {
       border-collapse: separate;
       border-spacing: 0;
       width: 100%;
-      table-layout: fixed;
-      font-variant-numeric: tabular-nums; 
+      table-layout: fixed; /* 强制均分宽度 */
+      font-variant-numeric: tabular-nums; /* 等宽数字 */
     }
     
     th, td {
@@ -53,29 +43,37 @@
       box-sizing: border-box;
       overflow: hidden;
       text-overflow: ellipsis;
-      min-width: 70px; 
+      min-width: 70px;
     }
 
     /* 修复表头缝隙：1px重叠覆盖法 */
     thead tr:nth-child(1) th { position: sticky; top: 0; z-index: 20; height: 48px; background-clip: padding-box; border-top: none; }
     thead tr:nth-child(2) th { position: sticky; top: 47px; z-index: 20; height: 48px; background-clip: padding-box; }
     
+    /* 左侧列粘性定位 */
     .fixed-col { position: sticky; z-index: 10; background-clip: padding-box; }
     thead tr:nth-child(1) th.fixed-col,
     thead tr:nth-child(2) th.fixed-col { z-index: 30; }
 
     /* 修正列宽 */
-    .fixed-col-1 { left: 0; width: 60px; min-width: 60px; max-width: 60px; }
+    .fixed-col-1 { left: 0; width: 60px; min-width: 60px; max-width: 60px; border-left: none; }
     .fixed-col-2 { left: 60px; width: 100px; min-width: 100px; max-width: 100px; }
     .fixed-col-3 { left: 160px; width: 80px; min-width: 80px; max-width: 80px; }
 
-    /* 加粗右侧阴影分割线 */
+    /* 加粗右侧阴影分割线，凸显层级 */
     .fixed-col-3::after {
-      content: ''; position: absolute; top: 0; right: -2px; bottom: 0; width: 2px;
-      background-color: #CBD5E1; box-shadow: 3px 0 8px rgba(0,0,0,0.08); z-index: 5;
+      content: ''; 
+      position: absolute; 
+      top: 0; 
+      right: -2px; 
+      bottom: 0; 
+      width: 2px;
+      background-color: #CBD5E1; 
+      box-shadow: 3px 0 8px rgba(0,0,0,0.12); 
+      z-index: 5;
     }
 
-    /* 去除表尾和表右边界的多余边框 */
+    /* 去除表尾和表右边界的多余边框，适配通栏 */
     tbody tr:last-child td { border-bottom: none; }
     th:last-child, td:last-child { border-right: none; }
 
@@ -86,24 +84,21 @@
     }
     .skeleton-box {
       background: linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%);
-      background-size: 400% 100%; animation: shimmer 1.5s infinite linear; border-radius: 6px;
+      background-size: 400% 100%; animation: shimmer 1.5s infinite linear; border-radius: 4px;
     }
 
     /* 弹窗过渡动画 */
     .modal-enter { opacity: 0; transform: scale(0.95); }
     .modal-enter-active { opacity: 1; transform: scale(1); transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
     .modal-leave { opacity: 1; transform: scale(1); }
-    .modal-leave-active { opacity: 0; transform: scale(0.95); transition: all 0.2s ease-in; pointer-events: none; }
+    .modal-leave-active { opacity: 0; transform: scale(0.95); transition: all 0.15s ease-in; pointer-events: none; }
   </style>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: { primary: '#1F5FFF', 'primary-light': '#E6F0FF' },
-          boxShadow: { 
-            /* 规范：主卡片默认阴影 */
-            'pad-card': '0 4px 20px -4px rgba(0, 0, 0, 0.03), 0 2px 8px -2px rgba(0, 0, 0, 0.02)' 
-          }
+          boxShadow: { 'app': '0 0 40px rgba(0,0,0,0.05), 0 0 10px rgba(0,0,0,0.02)' }
         }
       }
     }
@@ -112,26 +107,24 @@
 <body>
 
   <!-- 全局 Toast 提示 -->
-  <div id="toast" class="fixed top-[45%] left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-800/90 text-white px-8 py-3 rounded-[16px] shadow-2xl opacity-0 transition-opacity duration-300 z-[200] pointer-events-none flex items-center justify-center">
+  <div id="toast" class="fixed top-[45%] left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-800/90 text-white px-8 py-3 rounded-[14px] shadow-2xl opacity-0 transition-opacity duration-300 z-[200] pointer-events-none flex items-center justify-center">
     <span class="font-bold tracking-wide text-[15px]">分配成功</span>
   </div>
 
-  <!-- 规范：主容器最大宽度 1300px，高度满屏(减去padding)，圆角 24px，轻阴影，半透明浅白边框 -->
-  <div class="w-full max-w-[1300px] h-full bg-white rounded-[24px] flex flex-col overflow-hidden relative shadow-pad-card border border-white/90">
+  <!-- 主应用容器：严格锁定 1300x813 平板尺寸 -->
+  <div class="w-[1300px] h-[813px] bg-white flex flex-col overflow-hidden relative shadow-app border border-gray-200/50">
 
     <!-- 顶部导航区 -->
-    <header class="h-[88px] flex items-center justify-between px-6 bg-white border-b border-gray-100 flex-shrink-0 relative z-40">
+    <header class="h-[76px] flex items-center justify-between px-8 bg-white border-b border-gray-100 flex-shrink-0 relative z-40">
       <div class="flex items-center space-x-4">
-        <!-- 规范：返回按钮尺寸 40-44px。这里取 44px -->
+        <!-- 独立返回按钮：圆形设计，Pad 端按压反馈 -->
         <button class="w-[44px] h-[44px] flex items-center justify-center rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.06)] active:scale-[0.90] transition-all text-gray-700 shrink-0">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
-        <!-- 规范：标题 32px 特粗 -->
-        <h1 class="text-[32px] font-extrabold text-gray-900 tracking-tight ml-2 leading-none">班级数据</h1>
+        <h1 class="text-[30px] font-extrabold text-gray-900 tracking-tight ml-2 leading-none">班级数据</h1>
         
         <div class="ml-6 flex items-center">
           <div class="relative" id="class-dropdown-container">
-            <!-- 规范：分段/小控件圆角 10-12px，点击 active:scale-95 -->
             <div onclick="toggleDropdown()" class="flex items-center space-x-1.5 px-4 h-[40px] bg-primary-light rounded-[12px] text-primary font-bold cursor-pointer active:scale-95 transition-all select-none">
               <span class="text-[15px]">24级软件3班</span>
               <svg id="class-dropdown-icon" class="w-4 h-4 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
@@ -148,7 +141,6 @@
       </div>
 
       <div class="flex items-center space-x-6">
-        <!-- 规范：分段控件 -->
         <div class="flex bg-[#F1F5F9] p-1 rounded-[14px] text-[15px] font-bold shadow-inner">
           <button id="btn-today" class="transition-all bg-primary text-white shadow-md px-6 h-[40px] rounded-[10px] active:scale-95" onclick="toggleData('today')">今日数据</button>
           <button id="btn-summary" class="transition-all text-gray-500 active:bg-gray-200/50 px-6 h-[40px] rounded-[10px] bg-transparent active:scale-95" onclick="toggleData('summary')">汇总数据</button>
@@ -163,13 +155,13 @@
       </div>
     </header>
 
-    <!-- 表格区域：内部滚动 -->
+    <!-- 表格区域：完全 0 padding 的通栏设计，直接铺满 -->
     <main class="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar p-0 bg-white relative">
       <div id="loading-overlay" class="absolute inset-0 z-50 hidden"></div>
       
-      <table class="text-center text-[14px] w-full relative">
+      <table class="text-center text-[14px] w-full bg-white">
         <thead>
-          <tr class="h-[48px]">
+          <tr>
             <th rowspan="2" class="p-3 fixed-col fixed-col-1 bg-[#F8FAFC] text-gray-500 border-l-0">序号</th>
             <th rowspan="2" class="p-3 fixed-col fixed-col-2 bg-[#F8FAFC] text-gray-900 font-bold">学生姓名</th>
             <th rowspan="2" class="p-3 fixed-col fixed-col-3 bg-[#F8FAFC] text-gray-900 font-bold">总词汇</th>
@@ -180,8 +172,8 @@
             <th colspan="3" class="p-3 bg-[#FFFBEB] text-amber-600 font-bold tracking-wide">练习</th>
             <th colspan="3" class="p-3 bg-[#FFF1F2] text-rose-600 font-bold tracking-wide border-r-0">游戏</th>
           </tr>
-          <tr id="header-row-2" class="text-[13px] font-bold h-[48px]">
-            <!-- 由 JS 渲染 -->
+          <tr id="header-row-2" class="text-[13px] font-bold">
+            <!-- 由 JS 渲染二级表头 -->
           </tr>
         </thead>
         <tbody class="text-gray-700 font-medium" id="table-body">
@@ -191,9 +183,7 @@
     </main>
     
     <!-- ================= 任务分配弹窗 ================= -->
-    <!-- 规范：弹窗进入 opacity + scale 0.3s -->
     <div id="assign-modal-wrapper" class="absolute inset-0 z-[100] flex items-center justify-center bg-gray-900/40 backdrop-blur-sm hidden modal-leave">
-      <!-- 规范：弹窗圆角 24px -->
       <div class="bg-white w-[960px] h-[680px] rounded-[24px] shadow-2xl flex flex-col overflow-hidden relative">
         <div class="h-[72px] px-8 border-b border-gray-100 flex items-center justify-between bg-white flex-shrink-0">
           <div class="flex items-center space-x-3">
@@ -216,7 +206,6 @@
                 <span id="assigned-count" class="bg-blue-100 text-blue-700 px-2.5 py-0.5 rounded-[8px] text-[13px]">0</span>
               </h3>
             </div>
-            <!-- 规范：区块间距 16-24px -->
             <div class="flex-1 overflow-y-auto p-5 space-y-4 custom-scrollbar" id="assigned-tasks-list"></div>
           </div>
 
@@ -229,7 +218,6 @@
               </h3>
               <div class="relative">
                 <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <!-- 规范：搜索框高度，适合触控 -->
                 <input type="text" id="task-search" placeholder="搜索任务名称..." oninput="renderAssignUI()" class="w-full bg-gray-50 border border-gray-200 rounded-[12px] pl-10 pr-4 h-[44px] text-[14px] focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
               </div>
             </div>
@@ -470,7 +458,7 @@
       setTimeout(() => {
         wrapper.classList.add('hidden');
         wrapper.classList.remove('modal-leave-active');
-      }, 300);
+      }, 200);
     };
 
     window.moveTask = (taskId, action) => {
@@ -496,7 +484,6 @@
       if (assignedTasks.length === 0) {
         assignedList.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-gray-400 text-[14px]"><svg class="w-12 h-12 mb-3 text-gray-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>暂无分配任务</div>`;
       } else {
-        // 规范：列表项 padding: 16px, border-radius: 20px
         assignedList.innerHTML = assignedTasks.map((t, index) => {
           const num = index + 1;
           return `
@@ -505,11 +492,9 @@
               <span class="text-[14px] font-bold text-gray-400 font-mono w-5 text-center">${num}</span>
               <div class="flex flex-col items-start space-y-1">
                 <span class="text-[15px] font-bold text-gray-800">${t.name}</span>
-                <!-- 规范：标签 font-size: 11px; padding: 2px 8px; border-radius: 6px; -->
                 <span class="inline-block bg-gray-50 border border-gray-200 text-gray-500 px-2 py-[2px] rounded-[6px] text-[11px] font-bold">${t.words} 词</span>
               </div>
             </div>
-            <!-- 规范：按钮圆角 14px，高度 >= 44px -->
             <button onclick="moveTask(${t.id}, 'remove')" class="px-5 h-[44px] rounded-[14px] text-[14px] font-bold text-red-500 bg-red-50 active:bg-red-500 active:text-white transition-all active:scale-95">取消</button>
           </div>
         `}).join('');
