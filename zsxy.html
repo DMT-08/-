@@ -102,7 +102,6 @@
             box-shadow: 0 8px 24px rgba(31, 95, 255, 0.04);
         }
 
-        /* 修复：增加 flex-shrink: 0，防止列表在 Flex 容器内被过度压缩导致无法滚动 */
         .version-list-container, .field-list-container, .task-list-container { 
             display: flex; flex-direction: column; gap: 14px; padding-bottom: 40px; flex-shrink: 0;
         }
@@ -199,14 +198,12 @@
         .filter-option:last-child { border-bottom: none; }
         .filter-option:active { background: rgba(31, 95, 255, 0.1); }
         
-        /* 状态颜色类 */
         .color-primary { color: var(--primary-color) !important; }
         .color-warning { color: var(--warning-color) !important; }
         .color-pending { color: var(--pending-color) !important; }
         .color-success { color: var(--success-color) !important; }
         .color-danger { color: var(--danger-color) !important; }
 
-        /* 下拉项选中态底色 */
         .filter-option[data-val="全部"].selected { color: var(--primary-color); background: var(--primary-light); }
         .filter-option[data-val="未录音"].selected { color: var(--warning-color); background: var(--warning-light); }
         .filter-option[data-val="待审核"].selected { color: var(--pending-color); background: var(--pending-light); }
@@ -261,11 +258,16 @@
         .btn-action-primary:active { transform: scale(0.95); }
         .btn-action-primary svg, .btn-action-secondary svg { width: 14px; height: 14px; }
 
-        /* 修复：增加 flex-shrink: 0，释放表格容器高度，恢复正常的垂直滚动体验 */
+        /* ======== 表格满屏优化 ======== */
         .table-container {
             background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.9); border-radius: 16px; box-shadow: 0 8px 24px rgba(31, 95, 255, 0.04);
-            margin-bottom: 80px; display: flex; flex-direction: column; height: auto; overflow: hidden; flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.9); 
+            border-radius: 16px 0 0 16px; /* 右侧直角贴边 */
+            border-right: none;           /* 去除右侧边框 */
+            box-shadow: 0 8px 24px rgba(31, 95, 255, 0.04);
+            margin-bottom: 80px; 
+            margin-right: -20px;          /* 利用负边距向右侧延伸满屏 */
+            display: flex; flex-direction: column; height: auto; overflow: hidden; flex-shrink: 0;
         }
         
         .table-row {
@@ -275,23 +277,36 @@
         .table-row:last-child { border-bottom: none; }
         .table-row.focused { background: rgba(31, 95, 255, 0.08); }
 
-        /* 左侧序号与操作组合列 */
+        /* 优化：进一步极限压缩左侧列的间距 gap 降至 3px，padding-right 0 */
         .row-left-col {
-            width: 48px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border-right: 1px solid var(--border-line); gap: 8px; padding: 12px 2px;
+            flex-shrink: 0; display: flex; align-items: center; justify-content: flex-start;
+            border-right: 1px solid var(--border-line); gap: 3px; padding: 12px 4px 12px 0;
         }
         
         .row-index { font-size: 16px; font-weight: 900; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; transition: color 0.3s; }
         
+        .badge { display: inline-flex; padding: 2px 4px; border-radius: 4px; font-size: 10px; font-weight: 700; white-space: nowrap; text-align: center; line-height: 1.1; }
+        .badge-warning { background: var(--warning-light); color: var(--warning-color); }
+        .badge-pending { background: var(--pending-light); color: var(--pending-color); }
+        .badge-success { background: var(--success-light); color: var(--success-color); }
+        .badge-rejected { background: var(--danger-light); color: var(--danger-color); }
+        
         .row-main-content { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; padding: 12px 10px; justify-content: center;}
-        .row-right-col { flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 12px 10px 12px 0; }
+        .row-main-content:last-child { padding-right: 20px; }
+        
+        .row-right-col { flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 12px 20px 12px 0; }
         
         .en-display { display: flex; flex-direction: column; gap: 3px; }
-        .en-word-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap;}
-        .en-text { font-size: 16px; font-weight: 700; color: var(--text-title); word-break: break-word; }
+        
+        /* 优化：将文字和喇叭分为左右两端，且留有少量安全间隙 gap: 4px */
+        .en-word-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 4px; }
+        
+        /* 优化：文字自适应换行 */
+        .en-text { font-size: 16px; font-weight: 700; color: var(--text-title); word-break: break-word; flex: 1; min-width: 0; }
         .en-phonetic { font-size: 13px; color: var(--text-secondary); font-family: ui-monospace, sans-serif; }
         .en-trans { font-size: 14px; color: var(--text-main); font-weight: 500; }
-        .row-text { font-size: 15px; font-weight: 500; color: var(--text-main); word-break: break-word; }
+        
+        .row-text { font-size: 15px; font-weight: 500; color: var(--text-main); word-break: break-word; flex: 1; min-width: 0; }
         
         .inline-speaker {
             display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; border: none; outline: none;
@@ -310,13 +325,15 @@
         .btn-reject { background: var(--danger-light); color: var(--danger-color); border: 1px solid rgba(239, 68, 68, 0.2); }
         .btn-reject:active { background: var(--danger-color); color: white; }
 
+        /* 优化：录音按钮尺寸从 32px 调整至 30px，进一步为右侧腾出空间 */
         .btn-record {
-            width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
             border: none; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             background: linear-gradient(135deg, #FF4B4B 0%, #E11D48 100%); color: white; box-shadow: 0 4px 10px rgba(225, 29, 72, 0.25);
             user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+            flex-shrink: 0;
         }
-        .btn-record svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .btn-record svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         .btn-record.recording { background: #E11D48; transform: scale(1.15); box-shadow: 0 0 0 6px rgba(225, 29, 72, 0.15); }
         
         .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; text-align: center; color: var(--text-secondary); }
@@ -485,6 +502,7 @@
                 </div>
             </div>
 
+            <!-- 这里是您想要满屏展示的表格容器 -->
             <div class="table-container" id="wordListContainer">
                 <!-- 列表由 JS 渲染 -->
             </div>
@@ -539,7 +557,8 @@
         'chinese': [
             { id: 'zh_word', name: '词语' },
             { id: 'zh_pinyin', name: '拼音' },
-            { id: 'zh_meaning', name: '意思' }
+            { id: 'zh_meaning', name: '意思' },
+            { id: 'zh_sentence', name: '句子' }
         ],
         'math': [
             { id: 'math_name', name: '名称' },
@@ -591,7 +610,12 @@
         'chinese': {
             'zh_word': [{ text: "落霞" }, { text: "踌躇满志" }, { text: "魑魅魍魉" }],
             'zh_pinyin': [{ text: "luò xiá" }, { text: "chóu chú mǎn zhì" }],
-            'zh_meaning': [{ text: "落日的彩霞。" }, { text: "形容对自己的现状非常得意。" }]
+            'zh_meaning': [{ text: "落日的彩霞。" }, { text: "形容对自己的现状非常得意。" }],
+            'zh_sentence': [
+                { text: "落霞与孤鹜齐飞，秋水共长天一色。" },
+                { text: "这是一句非常长的测试文本，专门用来观察在移动端极端情况下的排版表现，看看文字折行后右侧的小喇叭会不会被挤压变形，间距到底合不合适。" },
+                { text: "短句测试。" }
+            ]
         },
         'math': {
             'math_name': [{ text: "勾股定理" }, { text: "泰勒展开式" }],
@@ -1006,18 +1030,27 @@
 
         renderedItems.forEach((item, index) => {
             let displayIndex = index + 1; 
-            let speakerDisabled = item.status === 'unrecorded' ? 'disabled' : '';
             
             let indexColor = 'var(--text-secondary)';
+            let badgeHTML = '';
+
             if (item.status === 'unrecorded') {
                 indexColor = 'var(--warning-color)';
+                badgeHTML = `<span class="badge badge-warning">未录</span>`;
             } else if (item.status === 'pending') {
                 indexColor = 'var(--pending-color)';
+                badgeHTML = `<span class="badge badge-pending">待审</span>`;
             } else if (item.status === 'approved') {
                 indexColor = 'var(--success-color)';
+                badgeHTML = `<span class="badge badge-success">通过</span>`;
             } else if (item.status === 'rejected') {
                 indexColor = 'var(--danger-color)';
+                badgeHTML = `<span class="badge badge-rejected">重录</span>`;
             }
+
+            // 智能隐藏小喇叭：未录音时不渲染
+            let speakerStyle = item.status === 'unrecorded' ? 'display: none;' : '';
+            let speakerHTML = `<button class="inline-speaker" id="play-${item.id}" onclick="handleInlinePlay(this, '${item.id}')" style="${speakerStyle}">${iconInlineSpeaker}</button>`;
 
             let contentHTML = '';
             if (activeFieldId === 'en_word') {
@@ -1025,7 +1058,7 @@
                     <div class="en-display">
                         <div class="en-word-row">
                             <span class="en-text">${item.en}</span>
-                            <button class="inline-speaker" id="play-${item.id}" onclick="handleInlinePlay(this, '${item.id}')" ${speakerDisabled}>${iconInlineSpeaker}</button>
+                            ${speakerHTML}
                         </div>
                         <div class="en-phonetic">${item.ph}</div>
                         <div class="en-trans">${item.zh}</div>
@@ -1042,7 +1075,7 @@
                 contentHTML = `
                     <div class="en-word-row">
                         <span class="row-text">${displayStr}</span>
-                        <button class="inline-speaker" id="play-${item.id}" onclick="handleInlinePlay(this, '${item.id}')" ${speakerDisabled}>${iconInlineSpeaker}</button>
+                        ${speakerHTML}
                     </div>
                 `;
             }
@@ -1058,8 +1091,9 @@
                 `;
                 
                 itemInner = `
-                    <div class="row-left-col" style="width: 36px;">
+                    <div class="row-left-col" style="padding-left: 6px;">
                         <span class="row-index" id="index-${item.id}" style="color: ${indexColor};">${displayIndex}</span>
+                        <div class="word-meta" id="meta-${item.id}">${badgeHTML}</div>
                     </div>
                     <div class="row-main-content">
                         ${contentHTML}
@@ -1080,9 +1114,10 @@
                 let actionHTML = `<button class="btn-record" ${pressEvents}>${iconMic}</button>`;
                 
                 itemInner = `
-                    <div class="row-left-col">
-                        <span class="row-index" id="index-${item.id}" style="color: ${indexColor};">${displayIndex}</span>
+                    <div class="row-left-col" style="padding-left: 4px;">
                         ${actionHTML}
+                        <span class="row-index" id="index-${item.id}" style="color: ${indexColor};">${displayIndex}</span>
+                        <div class="word-meta" id="meta-${item.id}">${badgeHTML}</div>
                     </div>
                     <div class="row-main-content">
                         ${contentHTML}
@@ -1136,8 +1171,13 @@
                     let indexSpan = itemEl.querySelector(`#index-${item.id}`);
                     if(indexSpan) indexSpan.style.color = 'var(--pending-color)';
                     
+                    let metaDiv = itemEl.querySelector(`#meta-${item.id}`);
+                    if(metaDiv) metaDiv.innerHTML = `<span class="badge badge-pending">待审</span>`;
+                    
+                    // 录音完成后智能显示小喇叭，并触发试听
                     let speakerBtn = document.getElementById(`play-${item.id}`);
                     if (speakerBtn) {
+                        speakerBtn.style.display = 'inline-flex';
                         speakerBtn.disabled = false;
                         if (isAutoListenEnabled) {
                             handleInlinePlay(speakerBtn, item.id);
@@ -1163,11 +1203,15 @@
             const itemEl = document.getElementById(`item-el-${itemId}`);
             if(itemEl) {
                 let indexSpan = itemEl.querySelector(`#index-${item.id}`);
+                let metaDiv = itemEl.querySelector(`#meta-${item.id}`);
+                
                 if (newStatus === 'approved') {
                     if(indexSpan) indexSpan.style.color = 'var(--success-color)';
+                    if(metaDiv) metaDiv.innerHTML = `<span class="badge badge-success">通过</span>`;
                     showToast('审核：已通过', 1000);
                 } else {
                     if(indexSpan) indexSpan.style.color = 'var(--danger-color)';
+                    if(metaDiv) metaDiv.innerHTML = `<span class="badge badge-rejected">重录</span>`;
                     showToast('审核：需重录', 1000);
                 }
             }
