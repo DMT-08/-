@@ -307,19 +307,19 @@
             <div class="bg-white rounded-[24px] shadow-premium p-4 md:p-5 flex flex-col justify-between gap-4 h-full min-h-0 relative">
                 
                 <div class="grid grid-cols-2 gap-3 h-[76px] shrink-0">
-                    <a id="btnNew" href="./2-0.1aixuexi.html?action=pass&type=new" data-action="start-pass" data-pass-type="new" role="button" class="w-full h-full"></a>
-                    <a id="btnOld" href="./2-0.1aixuexi.html?action=pass&type=old" data-action="start-pass" data-pass-type="old" role="button" class="w-full h-full"></a>
+                    <button id="btnNew" onclick="window.startPassing('new', '过新词')" class="w-full h-full"></button>
+                    <button id="btnOld" onclick="window.startPassing('old', '过旧词')" class="w-full h-full"></button>
                 </div>
 
                 <div class="shrink-0 relative overflow-hidden min-h-[76px] h-[76px] flex flex-col justify-center transition-all">
                     
                     <div id="hubIdleState" class="grid grid-cols-2 gap-3 transition-opacity h-full w-full">
-                        <a id="hubLearnNewBtn" href="./2-0.1aixuexi.html?action=learn&type=new" data-action="learn-type" data-learn-type="new" role="button" class="w-full h-full flex items-center justify-center gap-2 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-[16px] transition-all active:scale-95 font-bold text-[14px] shadow-sm border border-blue-100/70">
+                        <button id="hubLearnNewBtn" onclick="window.generateManualByType('new')" class="w-full h-full flex items-center justify-center gap-2 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-[16px] transition-all active:scale-95 font-bold text-[14px] shadow-sm border border-blue-100/70">
                             <i class="ph-bold ph-rocket text-[18px]"></i><span>学新词</span><span class="font-mono text-[13px] bg-white/80 px-2 py-0.5 rounded-[6px]">0 词</span>
-                        </a>
-                        <a id="hubLearnOldBtn" href="./2-0.1aixuexi.html?action=learn&type=old" data-action="learn-type" data-learn-type="old" role="button" class="w-full h-full flex items-center justify-center gap-2 text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-[16px] transition-all active:scale-95 font-bold text-[14px] shadow-sm border border-emerald-100/70">
+                        </button>
+                        <button id="hubLearnOldBtn" onclick="window.generateManualByType('old')" class="w-full h-full flex items-center justify-center gap-2 text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-[16px] transition-all active:scale-95 font-bold text-[14px] shadow-sm border border-emerald-100/70">
                             <i class="ph-bold ph-arrows-clockwise text-[18px]"></i><span>学旧词</span><span class="font-mono text-[13px] bg-white/80 px-2 py-0.5 rounded-[6px]">0 词</span>
-                        </a>
+                        </button>
                     </div>
 
                     <div id="hubActiveState" class="hidden bg-[#FFF5F5] border-[2px] border-[#FECACA] flex-row items-center justify-between p-2.5 lg:p-3 z-20 pulse-alert-light rounded-[16px] gap-2 lg:gap-3 w-full h-full">
@@ -1960,14 +1960,14 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                     if(btnOld) { btnOld.className = "bg-gradient-to-r from-[#44D99B] to-[#12A772] rounded-[16px] shadow-sm flex flex-col items-center justify-center text-center active:scale-95 transition-all relative group overflow-hidden h-full w-full cursor-pointer"; btnOld.innerHTML = `<div class="absolute top-2.5 right-2.5 bg-white/20 backdrop-blur-md text-white text-[11px] font-bold px-2 py-0.5 rounded-[6px] border border-white/20 transition-opacity">旧词 <span id="badgeUnlearnedOld">${dataStore.stats.unlearnedOld}</span></div><i class="ph-bold ph-arrows-clockwise text-white text-[24px] mb-1 group-hover:-rotate-90 transition-transform duration-300 relative z-0"></i><h3 class="font-bold text-[14px] text-white relative z-0 tracking-wide mt-0.5">过旧词</h3>`; }
                     if (hubIdle) {
                         hubIdle.innerHTML = `
-                            <a href="./2-0.1aixuexi.html?action=learn&type=new" data-action="learn-type" data-learn-type="new" role="button" class="w-full h-full flex flex-col items-center justify-center text-center rounded-[16px] transition-all font-bold text-[14px] shadow-sm border relative overflow-hidden ${hubNewCount === 0 ? 'bg-gray-50 text-gray-400 cursor-not-allowed opacity-70 border-gray-100' : 'bg-gradient-to-r from-blue-50 to-white text-blue-600 hover:bg-blue-100 active:scale-95 border-blue-100'}">
+                            <button onclick="window.generateManualByType('new')" class="w-full h-full flex flex-col items-center justify-center text-center rounded-[16px] transition-all font-bold text-[14px] shadow-sm border relative overflow-hidden ${hubNewCount === 0 ? 'bg-gray-50 text-gray-400 cursor-not-allowed opacity-70 border-gray-100' : 'bg-gradient-to-r from-blue-50 to-white text-blue-600 hover:bg-blue-100 active:scale-95 border-blue-100'}">
                                 <span class="absolute top-2.5 right-2.5 bg-white/80 text-blue-600 text-[11px] font-bold px-2 py-0.5 rounded-[6px] border border-blue-100"><span class="font-mono">${hubNewCount}</span> 词</span>
                                 <i class="ph-bold ph-rocket text-[24px] mb-1"></i><span>学新词</span>
-                            </a>
-                            <a href="./2-0.1aixuexi.html?action=learn&type=old" data-action="learn-type" data-learn-type="old" role="button" class="w-full h-full flex flex-col items-center justify-center text-center rounded-[16px] transition-all font-bold text-[14px] shadow-sm border relative overflow-hidden ${hubOldCount === 0 ? 'bg-gray-50 text-gray-400 cursor-not-allowed opacity-70 border-gray-100' : 'bg-gradient-to-r from-emerald-50 to-white text-emerald-600 hover:bg-emerald-100 active:scale-95 border-emerald-100'}">
+                            </button>
+                            <button onclick="window.generateManualByType('old')" class="w-full h-full flex flex-col items-center justify-center text-center rounded-[16px] transition-all font-bold text-[14px] shadow-sm border relative overflow-hidden ${hubOldCount === 0 ? 'bg-gray-50 text-gray-400 cursor-not-allowed opacity-70 border-gray-100' : 'bg-gradient-to-r from-emerald-50 to-white text-emerald-600 hover:bg-emerald-100 active:scale-95 border-emerald-100'}">
                                 <span class="absolute top-2.5 right-2.5 bg-white/80 text-emerald-600 text-[11px] font-bold px-2 py-0.5 rounded-[6px] border border-emerald-100"><span class="font-mono">${hubOldCount}</span> 词</span>
                                 <i class="ph-bold ph-arrows-clockwise text-[24px] mb-1"></i><span>学旧词</span>
-                            </a>`;
+                            </button>`;
                     }
                     document.getElementById('hubIdleState').classList.remove('hidden'); document.getElementById('hubIdleState').classList.add('grid'); document.getElementById('hubActiveState').classList.add('hidden'); document.getElementById('hubActiveState').classList.remove('flex');
                 }
@@ -3038,27 +3038,13 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 return false;
             };
 
-            var lastDashboardTouchTime = 0;
-
             function handleDashboardTap(event) {
                 var target = getActionTarget(event.target);
                 if (!target) return;
-                if (event.type === 'touchend' || event.type === 'pointerup') {
-                    lastDashboardTouchTime = Date.now();
-                    window.handleDashboardAction(target, event);
-                    return;
-                }
-                if (event.type === 'click' && Date.now() - lastDashboardTouchTime < 700) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    return;
-                }
                 window.handleDashboardAction(target, event);
             }
 
             document.addEventListener('click', handleDashboardTap);
-            document.addEventListener('touchend', handleDashboardTap, { passive: false });
-            document.addEventListener('pointerup', handleDashboardTap);
 
             function getRouteParams() {
                 var query = window.location.search ? window.location.search.substring(1) : '';
