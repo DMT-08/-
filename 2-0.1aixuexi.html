@@ -7,6 +7,48 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.0.3"></script>
+    <script>
+        (function() {
+            if (window.NodeList && !NodeList.prototype.forEach) {
+                NodeList.prototype.forEach = Array.prototype.forEach;
+            }
+            if (window.HTMLCollection && !HTMLCollection.prototype.forEach) {
+                HTMLCollection.prototype.forEach = Array.prototype.forEach;
+            }
+            if (window.DOMTokenList && !DOMTokenList.prototype.replace) {
+                DOMTokenList.prototype.replace = function(oldToken, newToken) {
+                    if (this.contains(oldToken)) {
+                        this.remove(oldToken);
+                        this.add(newToken);
+                        return true;
+                    }
+                    return false;
+                };
+            }
+            function showRuntimeError(message, source, lineno, colno) {
+                function render() {
+                    var bar = document.getElementById('runtime-error-bar');
+                    if (!bar) {
+                        bar = document.createElement('div');
+                        bar.id = 'runtime-error-bar';
+                        bar.style.cssText = 'position:fixed;left:12px;right:12px;top:12px;z-index:999999;background:#FEF2F2;color:#991B1B;border:1px solid #FECACA;border-radius:14px;padding:10px 12px;font:12px/1.4 system-ui,-apple-system,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.12);white-space:pre-wrap;';
+                        document.body.appendChild(bar);
+                    }
+                    bar.textContent = '页面脚本报错：' + message + '\n位置：' + (source || 'inline') + ':' + (lineno || 0) + ':' + (colno || 0);
+                }
+                if (document.body) render();
+                else setTimeout(render, 0);
+            }
+            window.onerror = function(message, source, lineno, colno) {
+                showRuntimeError(message, source, lineno, colno);
+                return false;
+            };
+            window.addEventListener && window.addEventListener('unhandledrejection', function(event) {
+                var reason = event && event.reason;
+                showRuntimeError(reason && reason.message ? reason.message : String(reason || 'Promise rejection'), 'promise', 0, 0);
+            });
+        })();
+    </script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
