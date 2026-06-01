@@ -279,24 +279,33 @@
         .table-row:last-child { border-bottom: none; }
         .table-row.focused { background: rgba(31, 95, 255, 0.08); }
 
-        /* 优化：进一步极限压缩左侧列的间距 gap 降至 3px，padding-right 0 */
+        /* 新增：专门放置录音按钮的列 */
+        .row-record-btn-col {
+            flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+            padding-left: 8px; width: 46px;
+        }
+
+        /* 优化：左侧列改为纵向（column）排列，专门放序号和标签 */
         .row-left-col {
-            flex-shrink: 0; display: flex; align-items: center; justify-content: flex-start;
-            border-right: 1px solid var(--border-line); gap: 3px; padding: 12px 4px 12px 0;
+            flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border-right: 1px solid var(--border-line); gap: 4px; padding: 12px 4px;
+            width: 40px;
         }
         
         /* 优化：恢复序号的常规字号和字重，避免喧宾夺主 */
         .row-index { font-size: 14px; font-weight: 600; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; transition: color 0.3s; }
         
-        .badge { display: inline-flex; padding: 2px 4px; border-radius: 4px; font-size: 10px; font-weight: 700; white-space: nowrap; text-align: center; line-height: 1.1; }
+        .badge { display: inline-flex; padding: 2px 4px; border-radius: 4px; font-size: 10px; font-weight: 700; white-space: nowrap; text-align: center; line-height: 1; }
         .badge-warning { background: var(--warning-light); color: var(--warning-color); }
         .badge-pending { background: var(--pending-light); color: var(--pending-color); }
         .badge-success { background: var(--success-light); color: var(--success-color); }
         .badge-rejected { background: var(--danger-light); color: var(--danger-color); }
         
         .row-main-content { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; padding: 12px 10px; justify-content: center;}
+        /* 录音视角时，右侧没有操作列，手动为文字增加足够的右安全距离 */
         .row-main-content:last-child { padding-right: 20px; }
         
+        /* 审核视角下，右侧操作列的安全边距 */
         .row-right-col { flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 12px 20px 12px 0; }
         
         .en-display { display: flex; flex-direction: column; gap: 3px; }
@@ -1118,8 +1127,10 @@
                 let actionHTML = `<button class="btn-record" ${pressEvents}>${iconMic}</button>`;
                 
                 itemInner = `
-                    <div class="row-left-col" style="padding-left: 4px;">
+                    <div class="row-record-btn-col">
                         ${actionHTML}
+                    </div>
+                    <div class="row-left-col">
                         <span class="row-index" id="index-${item.id}" style="color: ${indexColor};">${displayIndex}</span>
                         <div class="word-meta" id="meta-${item.id}">${badgeHTML}</div>
                     </div>
