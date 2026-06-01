@@ -21,7 +21,7 @@
       height: 100vh;
       width: 100vw;
       overflow: hidden;
-      background-color: #ffffff; /* 回归纯白全屏背景 */
+      background-color: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -151,31 +151,44 @@
       </div>
     </header>
 
-    <!-- 表格区域：完全 0 padding 的通栏设计 -->
-    <main class="flex-1 overflow-auto custom-scrollbar p-0 bg-white relative">
-      <div id="loading-overlay" class="absolute inset-0 z-50 hidden"></div>
+    <!-- 主体区域包裹器 -->
+    <main class="flex-1 flex flex-col overflow-hidden bg-white relative">
       
-      <table class="text-center text-[14px] w-full bg-white">
-        <thead>
-          <tr class="h-[48px]">
-            <th rowspan="2" class="p-3 fixed-col fixed-col-1 bg-[#F8FAFC] text-gray-500 border-l-0">序号</th>
-            <th rowspan="2" class="p-3 fixed-col fixed-col-2 bg-[#F8FAFC] text-gray-900 font-bold">学生姓名</th>
-            <th rowspan="2" class="p-3 fixed-col fixed-col-3 bg-[#F8FAFC] text-gray-900 font-bold">总词汇</th>
-            
-            <th colspan="3" class="p-3 bg-[#EFF6FF] text-blue-600 font-bold tracking-wide">正向过词</th>
-            <th colspan="3" class="p-3 bg-[#FAF5FF] text-purple-600 font-bold tracking-wide">听写</th>
-            <th colspan="3" class="p-3 bg-[#F0FDF4] text-emerald-600 font-bold tracking-wide">正向测试</th>
-            <th colspan="3" class="p-3 bg-[#FFFBEB] text-amber-600 font-bold tracking-wide">练习</th>
-            <th colspan="3" class="p-3 bg-[#FFF1F2] text-rose-600 font-bold tracking-wide border-r-0">游戏</th>
-          </tr>
-          <tr id="header-row-2" class="text-[13px] font-bold h-[48px]">
-            <!-- 由 JS 渲染 -->
-          </tr>
-        </thead>
-        <tbody class="text-gray-700 font-medium" id="table-body">
-          <!-- 数据或骨架屏由 JS 渲染 -->
-        </tbody>
-      </table>
+      <!-- 排序微提示 (Micro-hint) -->
+      <div class="h-[36px] px-6 bg-[#F8FAFC] border-b border-gray-100 flex items-center justify-between flex-shrink-0 z-10">
+        <div class="flex items-center space-x-2 text-[13px]">
+          <svg class="w-4 h-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+          <span class="text-gray-500 font-medium">班级排位基准：</span>
+          <span class="font-bold text-primary bg-primary-light/60 px-2 py-0.5 rounded-[6px]">正向过词 · 通过数</span>
+        </div>
+      </div>
+
+      <!-- 表格滚动区域：完全 0 padding 的通栏设计 -->
+      <div class="flex-1 overflow-auto custom-scrollbar relative">
+        <div id="loading-overlay" class="absolute inset-0 z-50 hidden"></div>
+        
+        <table class="text-center text-[14px] w-full bg-white relative">
+          <thead>
+            <tr class="h-[48px]">
+              <th rowspan="2" class="p-3 fixed-col fixed-col-1 bg-[#F8FAFC] text-gray-500 border-l-0">排名</th>
+              <th rowspan="2" class="p-3 fixed-col fixed-col-2 bg-[#F8FAFC] text-gray-900 font-bold">学生姓名</th>
+              <th rowspan="2" class="p-3 fixed-col fixed-col-3 bg-[#F8FAFC] text-gray-900 font-bold">总词汇</th>
+              
+              <th colspan="3" class="p-3 bg-[#EFF6FF] text-blue-600 font-bold tracking-wide">正向过词</th>
+              <th colspan="3" class="p-3 bg-[#FAF5FF] text-purple-600 font-bold tracking-wide">听写</th>
+              <th colspan="3" class="p-3 bg-[#F0FDF4] text-emerald-600 font-bold tracking-wide">正向测试</th>
+              <th colspan="3" class="p-3 bg-[#FFFBEB] text-amber-600 font-bold tracking-wide">练习</th>
+              <th colspan="3" class="p-3 bg-[#FFF1F2] text-rose-600 font-bold tracking-wide border-r-0">游戏</th>
+            </tr>
+            <tr id="header-row-2" class="text-[13px] font-bold h-[48px]">
+              <!-- 由 JS 渲染 -->
+            </tr>
+          </thead>
+          <tbody class="text-gray-700 font-medium" id="table-body">
+            <!-- 数据或骨架屏由 JS 渲染 -->
+          </tbody>
+        </table>
+      </div>
     </main>
     
     <!-- ================= 分配任务：纯净二级全屏页面 ================= -->
@@ -263,22 +276,26 @@
     ];
 
     const generateStudentData = () => {
-      const data = [];
+      let data = [];
       for (let i = 0; i < 32; i++) {
         const totalVocab = [2893, 2910, 3103, 3109, 2996, 3194][Math.floor(Math.random() * 6)];
+        const zxPassSummary = Math.floor(Math.random() * 1400) + 100; // 核心排序依据
+
         data.push({
-          id: i + 1,
           name: names[i] || `学生${i+1}`,
           totalVocab: totalVocab,
           today: {
-            zxTotal: Math.floor(Math.random() * 1400) + 100, zxTodayAdd: Math.random() > 0.5 ? Math.floor(Math.random() * 50) : 0, zxYestAdd: Math.random() > 0.3 ? Math.floor(Math.random() * 40) : 0,
+            zxTotal: zxPassSummary, // 让今日数据和汇总数据的逻辑自洽一点
+            zxTodayAdd: Math.random() > 0.5 ? Math.floor(Math.random() * 50) : 0, 
+            zxYestAdd: Math.random() > 0.3 ? Math.floor(Math.random() * 40) : 0,
             txTotal: Math.floor(Math.random() * 2800) + 50,  txTodayAdd: Math.random() > 0.7 ? Math.floor(Math.random() * 20) : 0, txYestAdd: Math.random() > 0.5 ? Math.floor(Math.random() * 15) : 0,
             ztTotal: Math.random() > 0.6 ? Math.floor(Math.random() * 300) : 0, ztTodayAdd: 0, ztYestAdd: 0,
             lxTotal: Math.floor(Math.random() * 1000), lxTodayAdd: Math.random() > 0.8 ? Math.floor(Math.random() * 10) : 0, lxYestAdd: 0,
             yxTotal: Math.floor(Math.random() * 1000), yxTodayAdd: Math.random() > 0.5 ? Math.floor(Math.random() * 100) : 0, yxYestAdd: Math.random() > 0.5 ? Math.floor(Math.random() * 80) : 0
           },
           summary: {
-            zxPass: Math.floor(Math.random() * 1400) + 100, zxFail: Math.floor(Math.random() * 50), zxUnknown: Math.floor(Math.random() * 1000),
+            zxPass: zxPassSummary, 
+            zxFail: Math.floor(Math.random() * 50), zxUnknown: Math.floor(Math.random() * 1000),
             txPass: Math.floor(Math.random() * 2000) + 500, txFail: Math.floor(Math.random() * 10), txUnknown: Math.floor(Math.random() * 500),
             ztPass: Math.random() > 0.6 ? Math.floor(Math.random() * 100) : 0, ztFail: 0, ztUnknown: Math.floor(Math.random() * 2800),
             lxPass: Math.floor(Math.random() * 800), lxFail: Math.floor(Math.random() * 20), lxUnknown: Math.floor(Math.random() * 2000),
@@ -286,6 +303,15 @@
           }
         });
       }
+
+      // 规范落实：名字排序按照「正向过词的通过数」降序排列
+      data.sort((a, b) => b.summary.zxPass - a.summary.zxPass);
+
+      // 排序完成后，统一分配排名(id)
+      data.forEach((student, index) => {
+        student.id = index + 1;
+      });
+
       return data;
     };
 
@@ -344,7 +370,7 @@
         if (currentView === 'today') {
           const td = student.today;
           colsHTML += `
-            <td class="p-2 h-[48px]">${formatNum(td.zxTotal)}</td><td class="p-2 h-[48px]">${formatNum(td.zxTodayAdd, 'add')}</td><td class="p-2 h-[48px]">${formatNum(td.zxYestAdd, 'add')}</td>
+            <td class="p-2 h-[48px] font-bold text-gray-900">${formatNum(td.zxTotal)}</td><td class="p-2 h-[48px]">${formatNum(td.zxTodayAdd, 'add')}</td><td class="p-2 h-[48px]">${formatNum(td.zxYestAdd, 'add')}</td>
             <td class="p-2 h-[48px]">${formatNum(td.txTotal)}</td><td class="p-2 h-[48px]">${formatNum(td.txTodayAdd, 'add')}</td><td class="p-2 h-[48px]">${formatNum(td.txYestAdd, 'add')}</td>
             <td class="p-2 h-[48px]">${formatNum(td.ztTotal)}</td><td class="p-2 h-[48px]">${formatNum(td.ztTodayAdd, 'add')}</td><td class="p-2 h-[48px]">${formatNum(td.ztYestAdd, 'add')}</td>
             <td class="p-2 h-[48px]">${formatNum(td.lxTotal)}</td><td class="p-2 h-[48px]">${formatNum(td.lxTodayAdd, 'add')}</td><td class="p-2 h-[48px]">${formatNum(td.lxYestAdd, 'add')}</td>
@@ -353,7 +379,7 @@
         } else {
            const sd = student.summary;
            colsHTML += `
-            <td class="p-2 h-[48px]">${formatNum(sd.zxPass)}</td><td class="p-2 h-[48px]">${formatNum(sd.zxFail, 'fail')}</td><td class="p-2 h-[48px] text-gray-400">${formatNum(sd.zxUnknown)}</td>
+            <td class="p-2 h-[48px] font-bold text-gray-900">${formatNum(sd.zxPass)}</td><td class="p-2 h-[48px]">${formatNum(sd.zxFail, 'fail')}</td><td class="p-2 h-[48px] text-gray-400">${formatNum(sd.zxUnknown)}</td>
             <td class="p-2 h-[48px]">${formatNum(sd.txPass)}</td><td class="p-2 h-[48px]">${formatNum(sd.txFail, 'fail')}</td><td class="p-2 h-[48px] text-gray-400">${formatNum(sd.txUnknown)}</td>
             <td class="p-2 h-[48px]">${formatNum(sd.ztPass)}</td><td class="p-2 h-[48px]">${formatNum(sd.ztFail, 'fail')}</td><td class="p-2 h-[48px] text-gray-400">${formatNum(sd.ztUnknown)}</td>
             <td class="p-2 h-[48px]">${formatNum(sd.lxPass)}</td><td class="p-2 h-[48px]">${formatNum(sd.lxFail, 'fail')}</td><td class="p-2 h-[48px] text-gray-400">${formatNum(sd.lxUnknown)}</td>
@@ -396,11 +422,11 @@
       const btnSummary = document.getElementById('btn-summary');
 
       if (viewType === 'today') {
-        btnToday.className = "transition-all bg-primary text-white shadow-md px-6 h-[40px] rounded-[10px] active:scale-95";
-        btnSummary.className = "transition-all text-gray-500 active:bg-gray-200/50 px-6 h-[40px] rounded-[10px] bg-transparent active:scale-95";
+        btnToday.className = "transition-all bg-primary text-white shadow-md px-6 h-[40px] rounded-[10px] active:scale-95 whitespace-nowrap";
+        btnSummary.className = "transition-all text-gray-500 active:bg-gray-200/50 px-6 h-[40px] rounded-[10px] bg-transparent active:scale-95 whitespace-nowrap";
       } else {
-        btnSummary.className = "transition-all bg-primary text-white shadow-md px-6 h-[40px] rounded-[10px] active:scale-95";
-        btnToday.className = "transition-all text-gray-500 active:bg-gray-200/50 px-6 h-[40px] rounded-[10px] bg-transparent active:scale-95";
+        btnSummary.className = "transition-all bg-primary text-white shadow-md px-6 h-[40px] rounded-[10px] active:scale-95 whitespace-nowrap";
+        btnToday.className = "transition-all text-gray-500 active:bg-gray-200/50 px-6 h-[40px] rounded-[10px] bg-transparent active:scale-95 whitespace-nowrap";
       }
 
       renderHeaders();
