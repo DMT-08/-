@@ -379,7 +379,7 @@
             <section class="h-full min-h-0 flex flex-col">
                 <div class="h-[40px] mb-4 shrink-0 flex items-center px-1">
                     <div class="min-w-0">
-                        <button id="taskGroupEyebrow" onclick="window.openTaskPicker()" class="bg-white/70 hover:bg-white border border-blue-100 text-blue-600 shadow-sm h-9 px-3 rounded-[13px] text-[13px] font-extrabold truncate flex items-center gap-1.5 active:scale-95 transition-all">
+                        <button id="taskGroupEyebrow" onclick="window.openTaskPickerFromEvent(event)" ontouchend="window.openTaskPickerFromEvent(event)" onpointerup="window.openTaskPickerFromEvent(event)" class="bg-white/70 hover:bg-white border border-blue-100 text-blue-600 shadow-sm h-9 px-3 rounded-[13px] text-[13px] font-extrabold truncate flex items-center gap-1.5 active:scale-95 transition-all touch-manipulation">
                             第 1 关 · 第 1 组 <i class="ph-bold ph-caret-down text-[13px]"></i>
                         </button>
                     </div>
@@ -1401,6 +1401,60 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 renderTaskLevelPage();
             };
 
+            function getTaskPickerActionTarget(startEl) {
+                var el = startEl;
+                while (el && el !== document) {
+                    if (el.getAttribute && (el.getAttribute('data-task-picker-group') || el.getAttribute('data-task-picker-level'))) return el;
+                    el = el.parentNode;
+                }
+                return null;
+            }
+
+            var taskPickerActionTouchTime = 0;
+
+            function handleTaskPickerActionTouch(e) {
+                var target = getTaskPickerActionTarget(e.target);
+                if (!target) return;
+                e.preventDefault();
+                e.stopPropagation();
+                var now = Date.now();
+                if (now - taskPickerActionTouchTime < 350) return;
+                taskPickerActionTouchTime = now;
+
+                var levelId = parseInt(target.getAttribute('data-level-id'), 10);
+                if (target.getAttribute('data-task-picker-group')) {
+                    var groupId = parseInt(target.getAttribute('data-group-id'), 10);
+                    if (!isNaN(levelId) && !isNaN(groupId)) window.selectTaskGroup(levelId, groupId, e);
+                    return;
+                }
+                if (!isNaN(levelId)) window.selectTaskLevel(levelId);
+            }
+
+            function initTaskPickerTouchEvents() {
+                var modal = document.getElementById('taskPickerModal');
+                if (!modal || modal.getAttribute('data-touch-bound') === '1') return;
+                modal.setAttribute('data-touch-bound', '1');
+                modal.addEventListener('touchend', handleTaskPickerActionTouch, { passive: false });
+                modal.addEventListener('pointerup', handleTaskPickerActionTouch);
+            }
+
+            var taskPickerLastTouchTime = 0;
+
+            window.openTaskPickerFromEvent = function(e) {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var now = Date.now();
+                    if (e.type === 'touchend' || e.type === 'pointerup') {
+                        if (now - taskPickerLastTouchTime < 350) return;
+                        taskPickerLastTouchTime = now;
+                    } else if (e.type === 'click' && now - taskPickerLastTouchTime < 700) {
+                        return;
+                    }
+                }
+                window.openTaskPicker();
+            };
+
             window.openTaskPicker = function() {
                 var modal = document.getElementById('taskPickerModal');
                 if (modal) {
@@ -1749,7 +1803,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                                 var isSelected = selectedGroup && selectedGroup.key === group.key;
                                 var groupClass = isSelected ? 'bg-[#1F5FFF] text-white border-[#1F5FFF] shadow-[0_4px_10px_rgba(31,95,255,0.22)]' : 'bg-white text-slate-600 border-gray-100 hover:border-blue-200';
                                 return `
-                                    <button onclick="window.selectTaskGroup(${level.id}, ${group.id}, event)" class="h-[48px] rounded-[12px] border ${groupClass} active:scale-95 transition-all flex flex-col items-start justify-center px-2.5 text-left">
+                                    <button onclick="window.selectTaskGroup(${level.id}, ${group.id}, event)" data-task-picker-group="1" data-level-id="${level.id}" data-group-id="${group.id}" class="h-[48px] rounded-[12px] border ${groupClass} active:scale-95 transition-all flex flex-col items-start justify-center px-2.5 text-left touch-manipulation">
                                         <span class="text-[12px] font-extrabold leading-none">${group.name}</span>
                                         <span class="text-[10px] font-bold opacity-75 mt-1.5 font-mono">${group.counts.read}/${group.counts.memo}/${group.counts.dict}</span>
                                     </button>
@@ -1760,7 +1814,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
 
                     return `
                         <div class="rounded-[16px] border ${levelClass} transition-all p-2.5">
-                            <button onclick="window.selectTaskLevel(${level.id})" class="w-full flex items-center gap-3 text-left active:scale-[0.99] transition-transform">
+                            <button onclick="window.selectTaskLevel(${level.id})" data-task-picker-level="1" data-level-id="${level.id}" class="w-full flex items-center gap-3 text-left active:scale-[0.99] transition-transform touch-manipulation">
                                 <div class="min-w-0 flex-1">
                                     <div class="flex items-center gap-2 min-w-0">
                                         <h4 class="text-[13px] font-extrabold text-gray-900 truncate">${level.title}</h4>
@@ -3081,6 +3135,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
             initDragAndDrop();
             initDefaultProfiles();
             initTaskMicEvents();
+            initTaskPickerTouchEvents();
             renderDashboardUI();
             runStartupRoute();
         })();
