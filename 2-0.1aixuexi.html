@@ -25,6 +25,25 @@
                     return false;
                 };
             }
+            window.showToast = window.showToast || function(message) {
+                function render() {
+                    var toast = document.getElementById('fallback-toast');
+                    if (!toast) {
+                        toast = document.createElement('div');
+                        toast.id = 'fallback-toast';
+                        toast.style.cssText = 'position:fixed;left:50%;bottom:22px;z-index:999998;transform:translateX(-50%);background:#1E293B;color:#fff;border-radius:14px;padding:10px 14px;font:13px/1.4 system-ui,-apple-system,sans-serif;box-shadow:0 8px 24px rgba(15,23,42,.18);max-width:80vw;text-align:center;';
+                        document.body.appendChild(toast);
+                    }
+                    toast.textContent = message || '';
+                    toast.style.opacity = '1';
+                    clearTimeout(window.__fallbackToastTimer);
+                    window.__fallbackToastTimer = setTimeout(function() {
+                        toast.style.opacity = '0';
+                    }, 1800);
+                }
+                if (document.body) render();
+                else setTimeout(render, 0);
+            };
             function showRuntimeError(message, source, lineno, colno) {
                 function render() {
                     var bar = document.getElementById('runtime-error-bar');
@@ -288,19 +307,19 @@
             <div class="bg-white rounded-[24px] shadow-premium p-4 md:p-5 flex flex-col justify-between gap-4 h-full min-h-0 relative">
                 
                 <div class="grid grid-cols-2 gap-3 h-[76px] shrink-0">
-                    <button id="btnNew" onclick="window.startPassing('new', '过新词')" class="w-full h-full"></button>
-                    <button id="btnOld" onclick="window.startPassing('old', '过旧词')" class="w-full h-full"></button>
+                    <a id="btnNew" href="./2-0.1aixuexi.html?action=pass&type=new" data-action="start-pass" data-pass-type="new" role="button" class="w-full h-full"></a>
+                    <a id="btnOld" href="./2-0.1aixuexi.html?action=pass&type=old" data-action="start-pass" data-pass-type="old" role="button" class="w-full h-full"></a>
                 </div>
 
                 <div class="shrink-0 relative overflow-hidden min-h-[76px] h-[76px] flex flex-col justify-center transition-all">
                     
                     <div id="hubIdleState" class="grid grid-cols-2 gap-3 transition-opacity h-full w-full">
-                        <button id="hubLearnNewBtn" onclick="window.generateManualByType('new')" class="w-full h-full flex items-center justify-center gap-2 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-[16px] transition-all active:scale-95 font-bold text-[14px] shadow-sm border border-blue-100/70">
+                        <a id="hubLearnNewBtn" href="./2-0.1aixuexi.html?action=learn&type=new" data-action="learn-type" data-learn-type="new" role="button" class="w-full h-full flex items-center justify-center gap-2 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-[16px] transition-all active:scale-95 font-bold text-[14px] shadow-sm border border-blue-100/70">
                             <i class="ph-bold ph-rocket text-[18px]"></i><span>学新词</span><span class="font-mono text-[13px] bg-white/80 px-2 py-0.5 rounded-[6px]">0 词</span>
-                        </button>
-                        <button id="hubLearnOldBtn" onclick="window.generateManualByType('old')" class="w-full h-full flex items-center justify-center gap-2 text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-[16px] transition-all active:scale-95 font-bold text-[14px] shadow-sm border border-emerald-100/70">
+                        </a>
+                        <a id="hubLearnOldBtn" href="./2-0.1aixuexi.html?action=learn&type=old" data-action="learn-type" data-learn-type="old" role="button" class="w-full h-full flex items-center justify-center gap-2 text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-[16px] transition-all active:scale-95 font-bold text-[14px] shadow-sm border border-emerald-100/70">
                             <i class="ph-bold ph-arrows-clockwise text-[18px]"></i><span>学旧词</span><span class="font-mono text-[13px] bg-white/80 px-2 py-0.5 rounded-[6px]">0 词</span>
-                        </button>
+                        </a>
                     </div>
 
                     <div id="hubActiveState" class="hidden bg-[#FFF5F5] border-[2px] border-[#FECACA] flex-row items-center justify-between p-2.5 lg:p-3 z-20 pulse-alert-light rounded-[16px] gap-2 lg:gap-3 w-full h-full">
@@ -1852,7 +1871,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                             var progressColor = isDoneToday ? 'text-emerald-500' : 'text-gray-800';
                             var btnHtml = isDoneToday
                                 ? `<button class="w-8 h-8 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center cursor-not-allowed shadow-inner transition-all mx-auto" title="已完成"><i class="ph-bold ph-check text-[15px]"></i></button>`
-                                : `<button class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 group-hover:bg-blue-500 group-hover:text-white flex items-center justify-center transition-all shadow-sm mx-auto active:scale-95" onclick="window.openTaskLevelPage(${task.id})" title="进入任务"><i class="ph-bold ph-arrow-right text-[15px]"></i></button>`;
+                                : `<a href="./2-0.1aixuexi.html?task=${task.id}" data-action="open-task" data-task-id="${task.id}" class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 group-hover:bg-blue-500 group-hover:text-white flex items-center justify-center transition-all shadow-sm mx-auto active:scale-95" title="进入任务"><i class="ph-bold ph-arrow-right text-[15px]"></i></a>`;
 
                             unfinishedHtml += `
                                 <tr class="${trClass}">
@@ -1941,14 +1960,14 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                     if(btnOld) { btnOld.className = "bg-gradient-to-r from-[#44D99B] to-[#12A772] rounded-[16px] shadow-sm flex flex-col items-center justify-center text-center active:scale-95 transition-all relative group overflow-hidden h-full w-full cursor-pointer"; btnOld.innerHTML = `<div class="absolute top-2.5 right-2.5 bg-white/20 backdrop-blur-md text-white text-[11px] font-bold px-2 py-0.5 rounded-[6px] border border-white/20 transition-opacity">旧词 <span id="badgeUnlearnedOld">${dataStore.stats.unlearnedOld}</span></div><i class="ph-bold ph-arrows-clockwise text-white text-[24px] mb-1 group-hover:-rotate-90 transition-transform duration-300 relative z-0"></i><h3 class="font-bold text-[14px] text-white relative z-0 tracking-wide mt-0.5">过旧词</h3>`; }
                     if (hubIdle) {
                         hubIdle.innerHTML = `
-                            <button onclick="window.generateManualByType('new')" class="w-full h-full flex flex-col items-center justify-center text-center rounded-[16px] transition-all font-bold text-[14px] shadow-sm border relative overflow-hidden ${hubNewCount === 0 ? 'bg-gray-50 text-gray-400 cursor-not-allowed opacity-70 border-gray-100' : 'bg-gradient-to-r from-blue-50 to-white text-blue-600 hover:bg-blue-100 active:scale-95 border-blue-100'}">
+                            <a href="./2-0.1aixuexi.html?action=learn&type=new" data-action="learn-type" data-learn-type="new" role="button" class="w-full h-full flex flex-col items-center justify-center text-center rounded-[16px] transition-all font-bold text-[14px] shadow-sm border relative overflow-hidden ${hubNewCount === 0 ? 'bg-gray-50 text-gray-400 cursor-not-allowed opacity-70 border-gray-100' : 'bg-gradient-to-r from-blue-50 to-white text-blue-600 hover:bg-blue-100 active:scale-95 border-blue-100'}">
                                 <span class="absolute top-2.5 right-2.5 bg-white/80 text-blue-600 text-[11px] font-bold px-2 py-0.5 rounded-[6px] border border-blue-100"><span class="font-mono">${hubNewCount}</span> 词</span>
                                 <i class="ph-bold ph-rocket text-[24px] mb-1"></i><span>学新词</span>
-                            </button>
-                            <button onclick="window.generateManualByType('old')" class="w-full h-full flex flex-col items-center justify-center text-center rounded-[16px] transition-all font-bold text-[14px] shadow-sm border relative overflow-hidden ${hubOldCount === 0 ? 'bg-gray-50 text-gray-400 cursor-not-allowed opacity-70 border-gray-100' : 'bg-gradient-to-r from-emerald-50 to-white text-emerald-600 hover:bg-emerald-100 active:scale-95 border-emerald-100'}">
+                            </a>
+                            <a href="./2-0.1aixuexi.html?action=learn&type=old" data-action="learn-type" data-learn-type="old" role="button" class="w-full h-full flex flex-col items-center justify-center text-center rounded-[16px] transition-all font-bold text-[14px] shadow-sm border relative overflow-hidden ${hubOldCount === 0 ? 'bg-gray-50 text-gray-400 cursor-not-allowed opacity-70 border-gray-100' : 'bg-gradient-to-r from-emerald-50 to-white text-emerald-600 hover:bg-emerald-100 active:scale-95 border-emerald-100'}">
                                 <span class="absolute top-2.5 right-2.5 bg-white/80 text-emerald-600 text-[11px] font-bold px-2 py-0.5 rounded-[6px] border border-emerald-100"><span class="font-mono">${hubOldCount}</span> 词</span>
                                 <i class="ph-bold ph-arrows-clockwise text-[24px] mb-1"></i><span>学旧词</span>
-                            </button>`;
+                            </a>`;
                     }
                     document.getElementById('hubIdleState').classList.remove('hidden'); document.getElementById('hubIdleState').classList.add('grid'); document.getElementById('hubActiveState').classList.add('hidden'); document.getElementById('hubActiveState').classList.remove('flex');
                 }
@@ -2980,11 +2999,87 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 window.addPlaybackProfile('dict', '584');
             }
 
+            function getActionTarget(startEl) {
+                var el = startEl;
+                while (el && el !== document) {
+                    if (el.getAttribute && el.getAttribute('data-action')) return el;
+                    el = el.parentNode;
+                }
+                return null;
+            }
+
+            window.handleDashboardAction = function(target, event) {
+                if (!target) return false;
+                var action = target.getAttribute('data-action');
+                if (!action) return false;
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+
+                if (action === 'start-pass') {
+                    var passType = target.getAttribute('data-pass-type') || 'new';
+                    window.startPassing(passType, passType === 'old' ? '过旧词' : '过新词');
+                    return true;
+                }
+
+                if (action === 'learn-type') {
+                    var learnType = target.getAttribute('data-learn-type') || 'new';
+                    window.generateManualByType(learnType);
+                    return true;
+                }
+
+                if (action === 'open-task') {
+                    var taskId = parseInt(target.getAttribute('data-task-id'), 10);
+                    if (!isNaN(taskId)) window.openTaskLevelPage(taskId);
+                    return true;
+                }
+
+                return false;
+            };
+
+            document.addEventListener('click', function(event) {
+                var target = getActionTarget(event.target);
+                if (target) window.handleDashboardAction(target, event);
+            });
+
+            function getRouteParams() {
+                var query = window.location.search ? window.location.search.substring(1) : '';
+                var params = {};
+                if (!query) return params;
+                query.split('&').forEach(function(pair) {
+                    if (!pair) return;
+                    var parts = pair.split('=');
+                    var key = decodeURIComponent(parts[0] || '');
+                    var value = decodeURIComponent((parts[1] || '').replace(/\+/g, ' '));
+                    if (key) params[key] = value;
+                });
+                return params;
+            }
+
+            function runStartupRoute() {
+                var params = getRouteParams();
+                if (params.task) {
+                    var taskId = parseInt(params.task, 10);
+                    if (!isNaN(taskId)) window.openTaskLevelPage(taskId);
+                    return;
+                }
+                if (params.action === 'pass') {
+                    var passType = params.type === 'old' ? 'old' : 'new';
+                    window.startPassing(passType, passType === 'old' ? '过旧词' : '过新词');
+                    return;
+                }
+                if (params.action === 'learn') {
+                    window.generateManualByType(params.type === 'old' ? 'old' : 'new');
+                }
+            }
+
             window.initCustomSpeedDropdown();
             initDragAndDrop();
             initDefaultProfiles();
             initTaskMicEvents();
             renderDashboardUI();
+            runStartupRoute();
         })();
     </script>
 </body>
