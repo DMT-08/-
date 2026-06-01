@@ -25,6 +25,25 @@
                     return false;
                 };
             }
+            window.showToast = window.showToast || function(message) {
+                function render() {
+                    var toast = document.getElementById('fallback-toast');
+                    if (!toast) {
+                        toast = document.createElement('div');
+                        toast.id = 'fallback-toast';
+                        toast.style.cssText = 'position:fixed;left:50%;bottom:22px;z-index:999998;transform:translateX(-50%);background:#1E293B;color:#fff;border-radius:14px;padding:10px 14px;font:13px/1.4 system-ui,-apple-system,sans-serif;box-shadow:0 8px 24px rgba(15,23,42,.18);max-width:80vw;text-align:center;';
+                        document.body.appendChild(toast);
+                    }
+                    toast.textContent = message || '';
+                    toast.style.opacity = '1';
+                    clearTimeout(window.__fallbackToastTimer);
+                    window.__fallbackToastTimer = setTimeout(function() {
+                        toast.style.opacity = '0';
+                    }, 1800);
+                }
+                if (document.body) render();
+                else setTimeout(render, 0);
+            };
             function showRuntimeError(message, source, lineno, colno) {
                 function render() {
                     var bar = document.getElementById('runtime-error-bar');
@@ -707,9 +726,9 @@
                                 ? `<button class="w-8 h-8 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center cursor-not-allowed shadow-inner transition-all mx-auto" title="已完成">
                                        <i class="ph-bold ph-check text-[15px]"></i>
                                    </button>` 
-                                : `<button class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 group-hover:bg-blue-500 group-hover:text-white flex items-center justify-center transition-all shadow-sm mx-auto active:scale-95" onclick="window.showToast('进入任务: ${task.title}')" title="进入任务">
+                                : `<a href="./2-0.1aixuexi.html?task=${task.id}" class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 group-hover:bg-blue-500 group-hover:text-white flex items-center justify-center transition-all shadow-sm mx-auto active:scale-95" title="进入任务">
                                        <i class="ph-bold ph-arrow-right text-[15px]"></i>
-                                   </button>`;
+                                   </a>`;
 
                             html += `
                                 <tr class="${trClass}">
