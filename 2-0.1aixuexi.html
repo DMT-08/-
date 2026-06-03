@@ -360,36 +360,34 @@
                     <i class="ph-bold ph-caret-left text-[20px] -ml-0.5"></i>
                 </button>
                 <div id="taskProgress" class="bg-[#1F5FFF]/10 text-[#1F5FFF] font-bold px-4 py-2 rounded-full text-[14px] shrink-0">1/4</div>
-                <div class="flex items-center bg-white rounded-full px-3 py-2 shadow-sm border border-gray-100 gap-1.5 shrink-0">
-                    <i class="ph-bold ph-clock text-[15px] text-gray-400"></i>
-                    <span id="task-timer" class="font-mono font-bold text-[13px] text-gray-600 tracking-wide">00:00</span>
-                </div>
             </div>
 
-            <div class="absolute left-1/2 top-0 -translate-x-1/2 flex items-center space-x-1 pointer-events-auto" id="taskTopStepper"></div>
-
-            <div class="flex items-center gap-4">
-                <button id="taskAutoplayBtn" onclick="window.toggleTaskAutoPlay()" class="h-10 flex items-center px-4 rounded-full border-[1.5px] font-bold text-[13px] transition-all bg-[#eff6ff] border-[#bfdbfe] text-[#3B82F6] hover:bg-[#dbeafe] shadow-sm shrink-0 whitespace-nowrap">
-                    <i class="ph-bold ph-arrows-clockwise text-[16px] mr-1.5"></i><span id="taskAutoplayText">自动下一个</span>
+            <div class="absolute left-1/2 top-0 -translate-x-1/2 flex items-center space-x-4 pointer-events-auto">
+                <div id="taskTopStepper" class="flex items-center space-x-1"></div>
+                <div class="h-4 w-px bg-gray-300"></div>
+                <button id="taskGroupEyebrow" onclick="window.openTaskPickerFromEvent(event)" ontouchend="window.openTaskPickerFromEvent(event)" onpointerup="window.openTaskPickerFromEvent(event)" class="bg-white/80 hover:bg-white border border-blue-100 text-blue-600 shadow-sm h-9 px-3.5 rounded-full text-[13px] font-extrabold truncate flex items-center gap-1.5 active:scale-95 transition-all touch-manipulation">
+                    第 1 关 · 第 1 组 <i class="ph-bold ph-caret-down text-[12px]"></i>
                 </button>
+            </div>
+
+            <div class="flex items-center bg-white rounded-full px-3 py-2 shadow-sm border border-gray-100 gap-1.5 shrink-0">
+                <i class="ph-bold ph-clock text-[15px] text-gray-400"></i>
+                <span id="task-timer" class="font-mono font-bold text-[13px] text-gray-600 tracking-wide">00:00</span>
             </div>
         </div>
 
         <div class="flex-1 min-h-0 grid grid-cols-[minmax(0,1fr)_1px_minmax(0,1fr)] gap-6 pointer-events-auto">
             <section class="h-full min-h-0 flex flex-col">
-                <div class="h-[40px] mb-4 shrink-0 flex items-center px-1">
-                    <div class="min-w-0">
-                        <button id="taskGroupEyebrow" onclick="window.openTaskPickerFromEvent(event)" ontouchend="window.openTaskPickerFromEvent(event)" onpointerup="window.openTaskPickerFromEvent(event)" class="bg-white/70 hover:bg-white border border-blue-100 text-blue-600 shadow-sm h-9 px-3 rounded-[13px] text-[13px] font-extrabold truncate flex items-center gap-1.5 active:scale-95 transition-all touch-manipulation">
-                            第 1 关 · 第 1 组 <i class="ph-bold ph-caret-down text-[13px]"></i>
-                        </button>
-                    </div>
-                </div>
+                <div class="h-[20px] mb-2 shrink-0 flex items-center px-1"></div>
                 <ul id="taskQueueList" class="flex-1 overflow-y-auto px-1 -mx-1 space-y-[6px] scroll-smooth hide-scrollbar relative"></ul>
                 <div class="mt-4 pt-4 border-t border-gray-300/30 flex items-center justify-between px-2 shrink-0 h-[72px]">
-                    <div class="flex items-center gap-1.5 text-[#4F65FF] text-[15px] font-medium cursor-pointer active:opacity-70 transition-all">
-                        <i class="ph-fill ph-warning-circle text-[22px]"></i>
-                        <span>剩余待完成：<span id="taskRemaining" class="text-[22px] font-extrabold px-1 leading-none">4</span> 题</span>
-                        <i class="ph-bold ph-caret-right text-[16px] ml-0.5"></i>
+                    <div class="flex items-center gap-3 min-w-0">
+                        <span class="text-[13px] text-gray-500 font-medium bg-white/70 border border-white/80 px-3 py-2 rounded-[12px] whitespace-nowrap">共 <span id="taskTotalCount" class="font-mono font-extrabold text-gray-800">4</span> 题</span>
+                        <div class="flex items-center gap-1.5 text-blue-600 text-[15px] font-bold cursor-pointer active:opacity-70 transition-all whitespace-nowrap">
+                            <i class="ph-fill ph-warning-circle text-[22px]"></i>
+                            <span>待完成：<span id="taskRemaining" class="text-[22px] font-black px-1 leading-none">4</span></span>
+                            <i class="ph-bold ph-caret-right text-[16px] ml-0.5"></i>
+                        </div>
                     </div>
                     <button id="taskSubmitBtn" onclick="window.submitTaskRound()" class="bg-[#F1F5F9] text-[#94A3B8] font-bold py-3 px-6 text-[14px] rounded-[14px] transition-all cursor-not-allowed whitespace-nowrap shrink-0">提交本轮</button>
                 </div>
@@ -398,11 +396,7 @@
             <div class="w-px bg-gray-200/80 mt-10 mb-10 shrink-0 rounded-full shadow-sm"></div>
 
             <section class="h-full min-h-0 flex flex-col relative">
-                <div class="h-[40px] mb-4 shrink-0 flex items-center justify-center relative">
-                    <div id="taskStatusPill" class="flex items-center bg-blue-50/90 backdrop-blur-md px-4 py-1.5 rounded-full border border-blue-200 text-[13px] transition-colors shadow-sm whitespace-nowrap">
-                        <i class="ph-bold ph-microphone text-[16px] mr-1.5 text-blue-500"></i><span class="text-blue-600 font-bold">请按住录音</span>
-                    </div>
-                </div>
+                <div class="h-[20px] mb-2 shrink-0"></div>
                 <div class="flex-1 flex flex-col items-center justify-center text-center px-4 min-w-0 w-full space-y-12">
                     <div id="taskWordEn" class="text-gray-800 tracking-wide font-bold leading-tight drop-shadow-md max-w-full break-words break-all w-full text-[40px] transition-all duration-300">dilemma</div>
                     <div id="taskWordPhon" class="text-gray-800 font-bold font-serif tracking-widest drop-shadow-sm transition-all duration-300 break-words break-all max-w-full w-full text-[40px] leading-tight">/dɪ'lemə/</div>
@@ -454,16 +448,24 @@
                             </button>
                         </div>
                     </div>
-                    <div class="h-[90px] flex items-center justify-end w-full pr-2">
-                        <button id="taskMicBtn" class="w-[84px] h-[84px] bg-[#3B82F6] text-white rounded-full flex items-center justify-center shadow-[0_8px_24px_rgba(59,130,246,0.4)] hover:bg-[#2563EB] transition-all active:scale-95">
-                            <i class="ph-fill ph-microphone text-[38px]"></i>
-                        </button>
+                    <div class="h-[84px] flex items-center justify-between w-full px-4 shrink-0">
+                        <div id="taskStatusPill" class="flex items-center bg-blue-50/90 backdrop-blur-md px-4 py-1.5 rounded-full border border-blue-200 text-[13px] transition-colors shadow-sm whitespace-nowrap">
+                            <i class="ph-bold ph-microphone text-[16px] mr-1.5 text-blue-500"></i><span class="text-blue-600 font-bold">请按住录音</span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <button id="taskAutoplayBtn" onclick="window.toggleTaskAutoPlay()" class="h-9 flex items-center px-4 rounded-full border-[1.5px] font-bold text-[13px] transition-all bg-[#eff6ff] border-[#bfdbfe] text-[#3B82F6] hover:bg-[#dbeafe] shadow-sm shrink-0 whitespace-nowrap">
+                                <i class="ph-bold ph-arrows-clockwise text-[16px] mr-1.5"></i><span id="taskAutoplayText">自动下一个</span>
+                            </button>
+                            <button id="taskMicBtn" class="w-[72px] h-[72px] bg-[#3B82F6] text-white rounded-full flex items-center justify-center shadow-[0_8px_24px_rgba(59,130,246,0.4)] hover:bg-[#2563EB] transition-all active:scale-95">
+                                <i class="ph-fill ph-microphone text-[32px]"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>
         </div>
 
-        <div id="taskPickerModal" class="hidden absolute left-8 top-[74px] z-[120]">
+        <div id="taskPickerModal" class="hidden absolute z-[120]" style="left: max(16px, calc(25% - 215px)); top: 118px;">
             <div class="bg-white rounded-[24px] shadow-2xl border border-white/90 w-[430px] max-h-[650px] overflow-hidden flex flex-col modal-enter">
                 <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between shrink-0">
                     <div class="flex items-center gap-3">
@@ -593,6 +595,10 @@
     <div id="view-scoring" class="view-section flex-col w-full h-full absolute inset-0 z-[60] bg-gradient-to-br from-[#EFF6FF] to-[#DFE7FF] text-gray-700 select-none overflow-hidden">
         
         <div class="absolute left-1/2 top-8 transform -translate-x-1/2 flex items-center space-x-1 z-[70] pointer-events-auto" id="nav-stepper-container"></div>
+        <div class="absolute right-8 top-8 z-[70] flex items-center bg-white rounded-full px-3 py-1.5 shadow-sm border border-gray-100 gap-1.5 pointer-events-auto">
+            <i class="ph-bold ph-clock text-[15px] text-gray-400"></i>
+            <span id="scoring-timer" class="font-mono font-bold text-[13px] text-gray-600 tracking-wide">00:00</span>
+        </div>
 
         <div class="absolute inset-0 pt-[32px] p-8 flex pointer-events-none">
             <div class="flex-1 h-full flex flex-col pointer-events-auto pr-6 pb-0 shrink-0 min-w-0">
@@ -602,10 +608,6 @@
                             <i class="ph-bold ph-caret-left text-[20px] -ml-0.5"></i>
                         </div>
                         <div id="score-progress" class="bg-[#1F5FFF]/10 text-[#1F5FFF] font-bold px-4 py-1.5 rounded-full text-[14px] shrink-0 pointer-events-auto">1/11</div>
-                        <div class="flex items-center bg-white rounded-full px-3 py-1.5 shadow-sm border border-gray-100 gap-1.5 pointer-events-auto ml-1">
-                            <i class="ph-bold ph-clock text-[15px] text-gray-400"></i>
-                            <span id="scoring-timer" class="font-mono font-bold text-[13px] text-gray-600 tracking-wide">00:00</span>
-                        </div>
                     </div>
                 </div>
 
@@ -616,17 +618,6 @@
             <div class="w-px bg-gray-200/80 mt-16 mb-8 mx-2 shrink-0 rounded-full shadow-sm pointer-events-auto"></div>
 
             <div class="flex-1 h-full flex flex-col relative pointer-events-auto pl-6 min-w-0 shrink-0">
-                
-                <div class="w-full flex items-center justify-between h-[40px] relative z-20 mb-4 shrink-0 pointer-events-auto">
-                    <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
-                        <div id="scoring-status-pill" class="flex items-center space-x-1.5 bg-white/80 backdrop-blur-md px-6 py-2.5 rounded-full border border-white text-[14px] font-medium text-gray-500 transition-colors shadow-sm pointer-events-auto whitespace-nowrap">等待开始...</div>
-                    </div>
-                    <div></div>
-                    <button id="autoplay-toggle-btn" onclick="window.toggleAutoPlay()" class="h-9 flex items-center px-4 rounded-full border-[1.5px] font-bold text-[13px] transition-all bg-[#eff6ff] border-[#bfdbfe] text-[#3B82F6] hover:bg-[#dbeafe] shadow-sm shrink-0 whitespace-nowrap relative z-10">
-                        <i class="ph-bold ph-arrows-clockwise text-[16px] mr-1.5"></i><span id="autoplay-toggle-text">自动下一个</span>
-                    </button>
-                </div>
-
                 <div class="flex-1 flex flex-col items-center justify-center text-center px-4 pointer-events-none min-w-0 w-full space-y-12">
                     <div id="score-word-en" class="text-gray-800 tracking-wide font-bold leading-tight drop-shadow-md max-w-full break-words break-all pointer-events-auto w-full text-[40px] transition-all duration-300">afternoon</div>
                     <div id="score-word-phon" class="text-gray-800 font-bold font-serif tracking-widest drop-shadow-sm pointer-events-auto transition-all duration-300 break-words break-all max-w-full w-full text-[40px] leading-tight">/ˌa:ftə'nu:n/</div>
@@ -634,6 +625,12 @@
                 </div>
 
                 <div class="w-full flex flex-col items-center shrink-0 mt-auto relative z-50 pointer-events-auto">
+                    <div class="w-full flex items-center justify-between px-2 mb-3">
+                        <div id="scoring-status-pill" class="flex items-center space-x-1.5 bg-white/80 backdrop-blur-md px-5 py-1.5 rounded-full border border-gray-200 text-[14px] font-medium text-gray-500 transition-colors shadow-sm pointer-events-auto whitespace-nowrap">等待开始...</div>
+                        <button id="autoplay-toggle-btn" onclick="window.toggleAutoPlay()" class="h-9 flex items-center px-4 rounded-full border-[1.5px] font-bold text-[13px] transition-all bg-[#eff6ff] border-[#bfdbfe] text-[#3B82F6] hover:bg-[#dbeafe] shadow-sm shrink-0 whitespace-nowrap relative z-10">
+                            <i class="ph-bold ph-arrows-clockwise text-[16px] mr-1.5"></i><span id="autoplay-toggle-text">自动下一个</span>
+                        </button>
+                    </div>
                     <div id="control-capsule" class="w-full flex items-center justify-between bg-white/90 backdrop-blur-2xl px-5 h-[72px] rounded-[36px] shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-white/60 pointer-events-auto">
                         
                         <div class="flex items-center space-x-6 pl-6 pr-8 border-r border-gray-200/80 shrink-0">
@@ -1565,6 +1562,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 taskCurrentIdx = Math.max(0, Math.min(taskCurrentIdx, taskVisibleWords.length - 1));
                 var currWord = taskVisibleWords[taskCurrentIdx];
                 var progressEl = document.getElementById('taskProgress');
+                var totalEl = document.getElementById('taskTotalCount');
                 var remainingEl = document.getElementById('taskRemaining');
                 var submitBtn = document.getElementById('taskSubmitBtn');
                 var wordEnEl = document.getElementById('taskWordEn');
@@ -1572,6 +1570,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 var wordCnEl = document.getElementById('taskWordCn');
                 var remainingCount = taskVisibleWords.filter((_, index) => taskScores[index] == null).length;
                 if (progressEl) progressEl.innerText = `${taskCurrentIdx + 1}/${taskVisibleWords.length}`;
+                if (totalEl) totalEl.innerText = taskVisibleWords.length;
                 if (remainingEl) remainingEl.innerText = remainingCount;
                 if (submitBtn) {
                     if (remainingCount === 0) {
@@ -2592,13 +2591,14 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 var activeBg = currentMode === 'yinji' 
                     ? 'bg-[#f97316] hover:bg-[#ea580c] shadow-[0_4px_12px_rgba(249,115,22,0.3)] hover:shadow-[0_6px_16px_rgba(249,115,22,0.4)] animate-pulse' 
                     : 'bg-[#1F5FFF] hover:bg-[#004ce6] shadow-[0_4px_12px_rgba(31,95,255,0.3)] hover:shadow-[0_6px_16px_rgba(31,95,255,0.4)]';
+                var totalBadge = `<span class="text-[13px] text-gray-500 font-medium bg-white/70 border border-white/80 px-3 py-2 rounded-[12px] whitespace-nowrap">共 <span class="font-mono font-extrabold text-gray-800">${scoringData.length}</span> 题</span>`;
 
                 if (modeRound[currentMode] >= sysConfig[currentMode].target) {
-                    bar.innerHTML = `<div class="flex items-center shrink-0"><div class="w-7 h-7 rounded-full bg-[#dcfce7] flex items-center justify-center text-[#10b981] mr-2 shadow-sm shrink-0"><i class="ph-bold ph-check-circle text-[18px]"></i></div><span class="text-[#10b981] font-bold text-[16px] whitespace-nowrap">所有题目都已完成</span></div><div class="flex items-center space-x-5 shrink-0"><button class="bg-[#e2e8f0] text-[#94a3b8] font-bold py-2.5 px-6 rounded-xl text-[15px] cursor-not-allowed whitespace-nowrap flex items-center shrink-0">${btnIcon} ${btnText} (已完成)</button></div>`;
+                    bar.innerHTML = `<div class="flex items-center gap-3 shrink-0">${totalBadge}<div class="flex items-center shrink-0"><div class="w-7 h-7 rounded-full bg-[#dcfce7] flex items-center justify-center text-[#10b981] mr-2 shadow-sm shrink-0"><i class="ph-bold ph-check-circle text-[18px]"></i></div><span class="text-[#10b981] font-bold text-[16px] whitespace-nowrap">所有题目都已完成</span></div></div><div class="flex items-center space-x-5 shrink-0"><button class="bg-[#e2e8f0] text-[#94a3b8] font-bold py-2.5 px-6 rounded-xl text-[15px] cursor-not-allowed whitespace-nowrap flex items-center shrink-0">${btnIcon} ${btnText} (已完成)</button></div>`;
                 } else if (unfinished > 0) {
-                    bar.innerHTML = `<div class="flex items-center cursor-pointer group shrink-0" onclick="window.scrollToFirstUnfinished()"><div class="w-6 h-6 rounded-full bg-[#eef2ff] border border-[#c7d2fe] flex items-center justify-center text-[#6366f1] mr-2 shrink-0"><span class="font-bold text-[16px] -mt-px">!</span></div><span class="text-[#6366f1] font-medium text-[15px] flex items-center whitespace-nowrap">剩余待完成: <span class="font-bold text-[22px] mx-1.5 leading-none">${unfinished}</span> 题 <i class="ph-bold ph-caret-right text-[16px] ml-0.5 opacity-70"></i></span></div><div class="flex items-center space-x-5 shrink-0"><button class="bg-[#e2e8f0] text-[#94a3b8] font-bold py-2.5 px-6 rounded-xl text-[15px] cursor-not-allowed whitespace-nowrap flex items-center shrink-0">${btnIcon} ${btnText}</button></div>`;
+                    bar.innerHTML = `<div class="flex items-center gap-3 shrink-0">${totalBadge}<div class="flex items-center cursor-pointer group shrink-0" onclick="window.scrollToFirstUnfinished()"><div class="w-6 h-6 rounded-full bg-[#eef2ff] border border-[#c7d2fe] flex items-center justify-center text-[#6366f1] mr-2 shrink-0"><span class="font-bold text-[16px] -mt-px">!</span></div><span class="text-[#6366f1] font-medium text-[15px] flex items-center whitespace-nowrap">剩余待完成: <span class="font-bold text-[22px] mx-1.5 leading-none">${unfinished}</span> 题 <i class="ph-bold ph-caret-right text-[16px] ml-0.5 opacity-70"></i></span></div></div><div class="flex items-center space-x-5 shrink-0"><button class="bg-[#e2e8f0] text-[#94a3b8] font-bold py-2.5 px-6 rounded-xl text-[15px] cursor-not-allowed whitespace-nowrap flex items-center shrink-0">${btnIcon} ${btnText}</button></div>`;
                 } else {
-                    bar.innerHTML = `<div class="flex items-center shrink-0"><div class="w-7 h-7 rounded-full bg-[#dcfce7] flex items-center justify-center text-[#10b981] mr-2 shadow-sm shrink-0"><i class="ph-bold ph-check text-[18px]"></i></div><span class="text-[#10b981] font-bold text-[16px] whitespace-nowrap">本轮已结束，请提交</span></div><div class="flex items-center space-x-5 shrink-0"><button onclick="window.submitRound()" class="flex items-center text-white font-bold py-2.5 px-6 rounded-xl text-[15px] transition-all active:scale-95 whitespace-nowrap shrink-0 ${activeBg} shadow-sm">${btnIcon} ${btnText}</button></div>`;
+                    bar.innerHTML = `<div class="flex items-center gap-3 shrink-0">${totalBadge}<div class="flex items-center shrink-0"><div class="w-7 h-7 rounded-full bg-[#dcfce7] flex items-center justify-center text-[#10b981] mr-2 shadow-sm shrink-0"><i class="ph-bold ph-check text-[18px]"></i></div><span class="text-[#10b981] font-bold text-[16px] whitespace-nowrap">本轮已结束，请提交</span></div></div><div class="flex items-center space-x-5 shrink-0"><button onclick="window.submitRound()" class="flex items-center text-white font-bold py-2.5 px-6 rounded-xl text-[15px] transition-all active:scale-95 whitespace-nowrap shrink-0 ${activeBg} shadow-sm">${btnIcon} ${btnText}</button></div>`;
                 }
             }
 
