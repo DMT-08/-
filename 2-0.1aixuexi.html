@@ -362,14 +362,6 @@
                 <div id="taskProgress" class="bg-[#1F5FFF]/10 text-[#1F5FFF] font-bold px-4 py-2 rounded-full text-[14px] shrink-0">1/4</div>
             </div>
 
-            <div class="absolute left-1/2 top-0 -translate-x-1/2 flex items-center space-x-4 pointer-events-auto">
-                <div id="taskTopStepper" class="flex items-center space-x-1"></div>
-                <div class="h-4 w-px bg-gray-300"></div>
-                <button id="taskGroupEyebrow" onclick="window.openTaskPickerFromEvent(event)" ontouchend="window.openTaskPickerFromEvent(event)" onpointerup="window.openTaskPickerFromEvent(event)" class="bg-white/80 hover:bg-white border border-blue-100 text-blue-600 shadow-sm h-9 px-3.5 rounded-full text-[13px] font-extrabold truncate flex items-center gap-1.5 active:scale-95 transition-all touch-manipulation">
-                    第 1 关 · 第 1 组 <i class="ph-bold ph-caret-down text-[12px]"></i>
-                </button>
-            </div>
-
             <div class="flex items-center bg-white rounded-full px-3 py-2 shadow-sm border border-gray-100 gap-1.5 shrink-0">
                 <i class="ph-bold ph-clock text-[15px] text-gray-400"></i>
                 <span id="task-timer" class="font-mono font-bold text-[13px] text-gray-600 tracking-wide">00:00</span>
@@ -378,25 +370,38 @@
 
         <div class="flex-1 min-h-0 grid grid-cols-[minmax(0,1fr)_1px_minmax(0,1fr)] gap-6 pointer-events-auto">
             <section class="h-full min-h-0 flex flex-col">
-                <div class="h-[20px] mb-2 shrink-0 flex items-center px-1"></div>
+                <div class="h-[40px] mb-4 shrink-0 flex items-center justify-center px-1">
+                    <button id="taskGroupEyebrow" onclick="window.openTaskPickerFromEvent(event)" ontouchend="window.openTaskPickerFromEvent(event)" onpointerup="window.openTaskPickerFromEvent(event)" class="bg-white/80 hover:bg-white border border-blue-100 text-blue-600 shadow-sm h-9 px-4 rounded-full text-[13px] font-extrabold truncate flex items-center gap-1.5 active:scale-95 transition-all touch-manipulation">
+                        第 1 关 · 第 1 组 <i class="ph-bold ph-caret-down text-[12px]"></i>
+                    </button>
+                </div>
                 <ul id="taskQueueList" class="flex-1 overflow-y-auto px-1 -mx-1 space-y-[6px] scroll-smooth hide-scrollbar relative"></ul>
                 <div class="mt-4 pt-4 border-t border-gray-300/30 flex items-center justify-between px-2 shrink-0 h-[72px]">
                     <div class="flex items-center gap-3 min-w-0">
-                        <span class="text-[13px] text-gray-500 font-medium bg-white/70 border border-white/80 px-3 py-2 rounded-[12px] whitespace-nowrap">共 <span id="taskTotalCount" class="font-mono font-extrabold text-gray-800">4</span> 题</span>
-                        <div class="flex items-center gap-1.5 text-blue-600 text-[15px] font-bold cursor-pointer active:opacity-70 transition-all whitespace-nowrap">
-                            <i class="ph-fill ph-warning-circle text-[22px]"></i>
-                            <span>待完成：<span id="taskRemaining" class="text-[22px] font-black px-1 leading-none">4</span></span>
-                            <i class="ph-bold ph-caret-right text-[16px] ml-0.5"></i>
+                        <div class="flex items-baseline bg-white/70 border border-white/80 px-3 py-1.5 rounded-[12px] whitespace-nowrap shadow-sm">
+                            <span class="text-[12px] text-gray-500 font-medium">共</span>
+                            <span id="taskTotalCount" class="font-mono font-bold text-[14px] text-gray-800 mx-1">4</span>
+                            <span class="text-[12px] text-gray-500 font-medium">题</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 text-blue-600 cursor-pointer active:opacity-70 transition-all whitespace-nowrap">
+                            <i class="ph-fill ph-warning-circle text-[18px]"></i>
+                            <div class="flex items-baseline gap-1">
+                                <span class="text-[13px] font-bold">待完成：</span>
+                                <span id="taskRemaining" class="text-[20px] font-black leading-none">4</span>
+                            </div>
+                            <i class="ph-bold ph-caret-right text-[14px] ml-0.5"></i>
                         </div>
                     </div>
-                    <button id="taskSubmitBtn" onclick="window.submitTaskRound()" class="bg-[#F1F5F9] text-[#94A3B8] font-bold py-3 px-6 text-[14px] rounded-[14px] transition-all cursor-not-allowed whitespace-nowrap shrink-0">提交本轮</button>
+                    <button id="taskSubmitBtn" onclick="window.submitTaskRound()" class="bg-[#F1F5F9] text-[#94A3B8] font-bold py-2.5 px-5 text-[13px] rounded-[12px] transition-all cursor-not-allowed whitespace-nowrap shrink-0 ml-4">提交本轮</button>
                 </div>
             </section>
 
             <div class="w-px bg-gray-200/80 mt-10 mb-10 shrink-0 rounded-full shadow-sm"></div>
 
             <section class="h-full min-h-0 flex flex-col relative">
-                <div class="h-[20px] mb-2 shrink-0"></div>
+                <div class="h-[40px] mb-4 shrink-0 flex items-center justify-center">
+                    <div id="taskTopStepper" class="flex items-center space-x-1"></div>
+                </div>
                 <div class="flex-1 flex flex-col items-center justify-center text-center px-4 min-w-0 w-full space-y-12">
                     <div id="taskWordEn" class="text-gray-800 tracking-wide font-bold leading-tight drop-shadow-md max-w-full break-words break-all w-full text-[40px] transition-all duration-300">dilemma</div>
                     <div id="taskWordPhon" class="text-gray-800 font-bold font-serif tracking-widest drop-shadow-sm transition-all duration-300 break-words break-all max-w-full w-full text-[40px] leading-tight">/dɪ'lemə/</div>
@@ -449,13 +454,15 @@
                         </div>
                     </div>
                     <div class="h-[84px] flex items-center justify-between w-full px-4 shrink-0">
-                        <div id="taskStatusPill" class="flex items-center bg-blue-50/90 backdrop-blur-md px-4 py-1.5 rounded-full border border-blue-200 text-[13px] transition-colors shadow-sm whitespace-nowrap">
-                            <i class="ph-bold ph-microphone text-[16px] mr-1.5 text-blue-500"></i><span class="text-blue-600 font-bold">请按住录音</span>
-                        </div>
                         <div class="flex items-center gap-4">
                             <button id="taskAutoplayBtn" onclick="window.toggleTaskAutoPlay()" class="h-9 flex items-center px-4 rounded-full border-[1.5px] font-bold text-[13px] transition-all bg-[#eff6ff] border-[#bfdbfe] text-[#3B82F6] hover:bg-[#dbeafe] shadow-sm shrink-0 whitespace-nowrap">
                                 <i class="ph-bold ph-arrows-clockwise text-[16px] mr-1.5"></i><span id="taskAutoplayText">自动下一个</span>
                             </button>
+                        </div>
+                        <div class="flex items-center gap-4 ml-auto">
+                            <div id="taskStatusPill" class="flex items-center bg-blue-50/90 backdrop-blur-md px-4 py-1.5 rounded-full border border-blue-200 text-[13px] transition-colors shadow-sm whitespace-nowrap h-9">
+                                <i class="ph-bold ph-microphone text-[16px] mr-1.5 text-blue-500"></i><span class="text-blue-600 font-bold">请按住录音</span>
+                            </div>
                             <button id="taskMicBtn" class="w-[72px] h-[72px] bg-[#3B82F6] text-white rounded-full flex items-center justify-center shadow-[0_8px_24px_rgba(59,130,246,0.4)] hover:bg-[#2563EB] transition-all active:scale-95">
                                 <i class="ph-fill ph-microphone text-[32px]"></i>
                             </button>
@@ -1682,7 +1689,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 var btn = document.getElementById('taskMicBtn');
                 if (!btn) return;
                 var startRecord = function(e) {
-                    if (e.type === 'touchstart') e.preventDefault();
+                    if (e.type === 'touchstart' && e.cancelable) e.preventDefault();
                     if (taskRecording) return;
                     taskRecording = true;
                     btn.classList.add('scale-95', 'bg-red-500');
@@ -1690,8 +1697,8 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                     renderTaskQueue();
                 };
                 var stopRecord = function(e) {
-                    if (e && e.type === 'touchend') e.preventDefault();
                     if (!taskRecording) return;
+                    if (e && (e.type === 'touchend' || e.type === 'touchcancel') && e.cancelable) e.preventDefault();
                     taskRecording = false;
                     btn.classList.remove('scale-95', 'bg-red-500');
                     taskScores[taskCurrentIdx] = 72 + ((taskCurrentIdx * 7 + taskSeconds) % 27);
