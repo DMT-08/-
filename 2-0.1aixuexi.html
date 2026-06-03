@@ -420,7 +420,7 @@
                                 </div>
                             </div>
                             
-                            <div class="flex flex-col items-center justify-center space-y-0.5 relative" id="speed-dropdown-container">
+                            <div class="flex flex-col items-center justify-center space-y-0.5 relative z-[120]" id="speed-dropdown-container">
                                 <span class="text-[11px] text-[#94a3b8] font-bold tracking-wide">倍速</span>
                                 <div id="speed-trigger" class="bg-[#f1f5f9] text-[#475569] px-2 py-0.5 rounded text-[12px] font-mono font-bold leading-tight min-w-[36px] text-center cursor-pointer hover:bg-[#e2e8f0] transition-colors relative select-none">
                                     <span id="speed-display">1x</span>
@@ -544,9 +544,20 @@
                                     <span class="text-[10px] opacity-70 font-bold ml-px mr-1">秒</span>
                                 </div>
                             </div>
-                            <div class="flex flex-col items-center justify-center space-y-0.5">
+                            <div class="flex flex-col items-center justify-center space-y-0.5 relative z-[120]" id="unfinished-speed-dropdown-container">
                                 <span class="text-[11px] text-[#94a3b8] font-bold tracking-wide">倍速</span>
-                                <div class="bg-[#f1f5f9] text-[#475569] px-2 py-0.5 rounded text-[12px] font-mono font-bold leading-tight min-w-[36px] text-center">1x</div>
+                                <div id="unfinished-speed-trigger" class="bg-[#f1f5f9] text-[#475569] px-2 py-0.5 rounded text-[12px] font-mono font-bold leading-tight min-w-[36px] text-center cursor-pointer hover:bg-[#e2e8f0] transition-colors relative select-none">
+                                    <span id="unfinished-speed-display">1x</span>
+                                </div>
+                                <div id="unfinished-speed-menu" class="hidden absolute bottom-[calc(100%+8px)] left-1/2 transform -translate-x-1/2 bg-white/95 backdrop-blur-xl rounded-[14px] shadow-[0_4px_24px_rgba(0,0,0,0.12)] border border-white/80 py-1.5 w-[68px] z-[120] origin-bottom transition-all duration-200 opacity-0 scale-95 flex flex-col gap-0.5">
+                                    <div class="unfinished-speed-option px-0 py-1.5 text-[12px] font-mono font-bold text-center cursor-pointer text-gray-500 hover:bg-gray-100/80 transition-colors rounded-[8px] mx-1.5" data-value="0.75">0.75x</div>
+                                    <div class="unfinished-speed-option px-0 py-1.5 text-[12px] font-mono font-bold text-center cursor-pointer bg-blue-50 text-[#3B82F6] transition-colors rounded-[8px] mx-1.5" data-value="1">1x</div>
+                                    <div class="unfinished-speed-option px-0 py-1.5 text-[12px] font-mono font-bold text-center cursor-pointer text-gray-500 hover:bg-gray-100/80 transition-colors rounded-[8px] mx-1.5" data-value="1.25">1.25x</div>
+                                    <div class="unfinished-speed-option px-0 py-1.5 text-[12px] font-mono font-bold text-center cursor-pointer text-gray-500 hover:bg-gray-100/80 transition-colors rounded-[8px] mx-1.5" data-value="1.5">1.5x</div>
+                                    <div class="unfinished-speed-option px-0 py-1.5 text-[12px] font-mono font-bold text-center cursor-pointer text-gray-500 hover:bg-gray-100/80 transition-colors rounded-[8px] mx-1.5" data-value="1.75">1.75x</div>
+                                    <div class="unfinished-speed-option px-0 py-1.5 text-[12px] font-mono font-bold text-center cursor-pointer text-gray-500 hover:bg-gray-100/80 transition-colors rounded-[8px] mx-1.5" data-value="10">2x</div>
+                                </div>
+                                <input type="hidden" id="unfinished-playback-speed" value="1">
                             </div>
                         </div>
 
@@ -1546,6 +1557,9 @@ if(viewId === 'view-dashboard') renderDashboardUI();
             var unfinishedRecording = false;
             var unfinishedPlayTimer = null;
             var unfinishedAutoTimer = null;
+            var unfinishedMode = 'gendu';
+            var unfinishedModeTargets = { gendu: 2, yinji: 2, tingxie: 1 };
+            var unfinishedModeRound = { gendu: 0, yinji: 0, tingxie: 0 };
             var unfinishedLevelGroups = [];
             var unfinishedSelectedLevel = 1;
             var unfinishedSelectedGroup = 1;
@@ -1629,13 +1643,106 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 if (caret) caret.classList.toggle('rotate-180', open);
             }
 
+            function updateUnfinishedTopNav() {
+                var container = document.getElementById('unfinished-nav-stepper-container');
+                if (!container) return;
+                var modes = ['gendu', 'yinji', 'tingxie'];
+                var names = { gendu: '跟读', yinji: '音记', tingxie: '听写' };
+                var icons = { gendu: 'ph-hourglass-high', yinji: 'ph-headphones', tingxie: 'ph-lock-key' };
+                container.innerHTML = modes.map((mode, index) => {
+                    var isDone = unfinishedModeRound[mode] >= unfinishedModeTargets[mode];
+                    var isCurrent = unfinishedMode === mode;
+                    var isLocked = (mode === 'yinji' && unfinishedModeRound.gendu < unfinishedModeTargets.gendu) || (mode === 'tingxie' && unfinishedModeRound.yinji < unfinishedModeTargets.yinji);
+                    var boxClass = isDone
+                        ? 'bg-[#ecfdf5] border-[#bbf7d0]'
+                        : (isCurrent ? 'bg-[#f0f4ff] border-[#bfdbfe]' : 'bg-white border-transparent opacity-80');
+                    var iconClass = isDone ? 'ph-check text-green-500' : (isCurrent ? icons[mode] + ' animate-pulse text-[#3B82F6]' : (isLocked ? 'ph-lock-key text-gray-400' : icons[mode] + ' text-gray-500'));
+                    var textClass = isDone ? 'text-green-600' : (isCurrent ? 'text-blue-600' : 'text-gray-500');
+                    var countClass = isDone ? 'text-green-400 line-through' : (isCurrent ? 'text-blue-400' : 'text-gray-400');
+                    var html = `
+                        <div class="flex items-center ${boxClass} border-[1.5px] rounded-[14px] px-2.5 py-1.5 min-w-[76px] shadow-sm">
+                            <div class="bg-white rounded-[6px] p-1 mr-1.5 shadow-sm shrink-0 flex items-center justify-center border ${isDone ? 'border-green-200' : 'border-blue-100'}"><i class="ph-bold ${iconClass} text-[14px]"></i></div>
+                            <div class="flex flex-col text-left justify-center"><span class="text-[12px] font-bold leading-none mb-[2px] ${textClass}">${names[mode]}</span><span class="text-[10px] font-bold font-mono leading-none ${countClass}">${unfinishedModeRound[mode]}/${unfinishedModeTargets[mode]}</span></div>
+                        </div>
+                    `;
+                    if (index < modes.length - 1) html += '<i class="ph-bold ph-caret-right text-gray-300 text-[14px] shrink-0 mx-0.5"></i>';
+                    return html;
+                }).join('');
+            }
+
             function resetUnfinishedGroupProgress() {
                 unfinishedScoringData = buildUnfinishedScoringWords(unfinishedActiveTask);
                 unfinishedScores = unfinishedScoringData.map(() => null);
                 unfinishedCurrentIdx = 0;
                 unfinishedRecording = false;
+                unfinishedMode = 'gendu';
+                unfinishedModeRound = { gendu: 0, yinji: 0, tingxie: 0 };
                 clearTimeout(unfinishedPlayTimer);
                 clearTimeout(unfinishedAutoTimer);
+            }
+
+            function resetUnfinishedRoundProgress() {
+                unfinishedScores = unfinishedScoringData.map(() => null);
+                unfinishedCurrentIdx = 0;
+                unfinishedRecording = false;
+                clearTimeout(unfinishedPlayTimer);
+                clearTimeout(unfinishedAutoTimer);
+            }
+
+            function moveUnfinishedToNextGroup() {
+                var nextLevel = unfinishedSelectedLevel;
+                var nextGroup = unfinishedSelectedGroup + 1;
+                if (nextGroup > 4) {
+                    nextLevel += 1;
+                    nextGroup = 1;
+                }
+                if (nextLevel > unfinishedLevelGroups.length) {
+                    updateUnfinishedLevelTrigger();
+                    renderUnfinishedLevelPicker();
+                    renderUnfinishedScoringPage();
+                    return;
+                }
+                unfinishedSelectedLevel = nextLevel;
+                unfinishedSelectedGroup = nextGroup;
+                unfinishedExpandedLevel = nextLevel;
+                resetUnfinishedGroupProgress();
+                setUnfinishedLevelPickerOpen(false);
+                renderUnfinishedLevelPicker();
+                renderUnfinishedScoringPage();
+            }
+
+            function advanceUnfinishedWorkflowAfterSubmit() {
+                unfinishedModeRound[unfinishedMode]++;
+                if (unfinishedMode === 'gendu' && unfinishedModeRound.gendu < unfinishedModeTargets.gendu) {
+                    resetUnfinishedRoundProgress();
+                    renderUnfinishedScoringPage();
+                    return;
+                }
+                if (unfinishedMode === 'gendu') {
+                    unfinishedMode = 'yinji';
+                    resetUnfinishedRoundProgress();
+                    renderUnfinishedScoringPage();
+                    return;
+                }
+                if (unfinishedMode === 'yinji' && unfinishedModeRound.yinji < unfinishedModeTargets.yinji) {
+                    resetUnfinishedRoundProgress();
+                    renderUnfinishedScoringPage();
+                    return;
+                }
+                if (unfinishedMode === 'yinji') {
+                    unfinishedMode = 'tingxie';
+                    resetUnfinishedRoundProgress();
+                    renderUnfinishedScoringPage();
+                    return;
+                }
+                if (unfinishedMode === 'tingxie' && unfinishedModeRound.tingxie < unfinishedModeTargets.tingxie) {
+                    resetUnfinishedRoundProgress();
+                    renderUnfinishedScoringPage();
+                    return;
+                }
+                var group = getUnfinishedGroup(unfinishedSelectedLevel, unfinishedSelectedGroup);
+                if (group) group.completed = true;
+                moveUnfinishedToNextGroup();
             }
 
             function buildUnfinishedScoringWords(task) {
@@ -1659,6 +1766,11 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                     pill.innerHTML = `<div class="w-2.5 h-2.5 rounded-full bg-red-500 mr-2 animate-pulse"></div><span class="font-bold">录音中</span>`;
                     pill.className = "flex items-center bg-red-50/90 backdrop-blur-md text-red-600 px-5 py-1.5 rounded-full border border-red-200 text-[14px] transition-colors shadow-sm whitespace-nowrap pointer-events-auto";
                 } else if (type === 'scored') {
+                    if (unfinishedMode !== 'gendu') {
+                        pill.innerHTML = `<i class="ph-bold ph-check-circle text-[16px] mr-1.5 text-green-500"></i><span class="font-bold text-green-600">已完成</span>`;
+                        pill.className = "flex items-center bg-green-50/90 backdrop-blur-md px-5 py-1.5 rounded-full border border-green-200 text-[14px] transition-colors shadow-sm whitespace-nowrap pointer-events-auto";
+                        return;
+                    }
                     var score = unfinishedScores[unfinishedCurrentIdx] || 0;
                     var scoreClass = score < 60 ? 'bg-red-50 text-red-600 border-red-200' : (score <= 70 ? 'bg-orange-50 text-orange-600 border-orange-200' : 'bg-green-50 text-green-600 border-green-200');
                     pill.innerHTML = `<i class="ph-bold ph-seal-check text-[16px] mr-1.5"></i><span class="font-bold">${score}分</span>`;
@@ -1678,9 +1790,10 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 var enEl = document.getElementById('unfinished-score-word-en');
                 var phonEl = document.getElementById('unfinished-score-word-phon');
                 var cnEl = document.getElementById('unfinished-score-word-cn');
-                if (enEl) enEl.innerText = curr.en;
-                if (phonEl) phonEl.innerText = curr.phon;
-                if (cnEl) cnEl.innerText = curr.cn;
+                var shouldMask = unfinishedMode !== 'gendu';
+                if (enEl) enEl.innerText = shouldMask ? '***' : curr.en;
+                if (phonEl) phonEl.innerText = shouldMask ? '***' : curr.phon;
+                if (cnEl) cnEl.innerText = shouldMask ? '***' : curr.cn;
 
                 var prevBtn = document.getElementById('unfinished-prev-btn');
                 var nextBtn = document.getElementById('unfinished-next-btn');
@@ -1699,6 +1812,8 @@ if(viewId === 'view-dashboard') renderDashboardUI();
 
                 renderUnfinishedQueue();
                 renderUnfinishedSubmitBar();
+                updateUnfinishedTopNav();
+                updateUnfinishedMicState();
                 if (unfinishedScores[unfinishedCurrentIdx] != null) setUnfinishedStatus('scored');
                 else if (!unfinishedRecording) setUnfinishedStatus('idle');
             }
@@ -1712,16 +1827,20 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                     var score = unfinishedScores[index];
                     var statusHtml = '';
                     if (unfinishedRecording && isCurrent) statusHtml = `<div class="text-[13px] text-red-600 bg-red-100/90 px-3 py-1.5 rounded-xl font-bold flex items-center border border-red-200 backdrop-blur-md transition-colors"><span class="relative flex h-2.5 w-2.5 mr-1.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span></span>录音中</div>`;
-                    else if (score != null) { var colorClass = score < 60 ? 'text-red-600 bg-red-100/80 border-red-200' : (score <= 70 ? 'text-orange-600 bg-orange-100/80 border-orange-200' : 'text-green-600 bg-green-100/80 border-green-200'); statusHtml = `<div class="text-[13px] ${colorClass} px-3 py-1.5 rounded-xl font-bold border backdrop-blur-md">${score}分</div>`; }
+                    else if (score != null && unfinishedMode === 'gendu') { var colorClass = score < 60 ? 'text-red-600 bg-red-100/80 border-red-200' : (score <= 70 ? 'text-orange-600 bg-orange-100/80 border-orange-200' : 'text-green-600 bg-green-100/80 border-green-200'); statusHtml = `<div class="text-[13px] ${colorClass} px-3 py-1.5 rounded-xl font-bold border backdrop-blur-md">${score}分</div>`; }
+                    else if (score != null) statusHtml = `<div class="text-[13px] text-green-600 bg-green-50/80 px-4 py-1.5 rounded-xl font-bold border border-green-200/50 backdrop-blur-md flex items-center">已播</div>`;
                     else if (isCurrent) statusHtml = `<div class="text-[13px] text-[#1F5FFF] bg-[#1F5FFF]/15 px-4 py-1.5 rounded-xl font-bold flex items-center border border-[#1F5FFF]/20 backdrop-blur-md transition-colors">当前</div>`;
                     else statusHtml = `<div class="text-[13px] ${index < unfinishedCurrentIdx ? 'text-gray-400' : 'text-gray-500 bg-gray-200/50 rounded-xl'} px-4 py-1.5 backdrop-blur-md">${index < unfinishedCurrentIdx ? '已跳过' : '即将'}</div>`;
+                    var displayEn = unfinishedMode !== 'gendu' ? '***' : item.en;
+                    var displayPhon = unfinishedMode !== 'gendu' ? '***' : item.phon;
+                    var displayCn = unfinishedMode !== 'gendu' ? '***' : item.cn;
                     return `
                         <li id="unfinished-queue-item-${index}" onclick="window.selectUnfinishedScoreWord(${index})" class="${isCurrent ? 'bg-white/95 backdrop-blur-xl opacity-100 scale-100 z-10 relative shadow-[0_8px_24px_rgba(0,0,0,0.08)] border-white' : 'bg-white/50 backdrop-blur-md opacity-70 scale-[0.98] border-white/40'} pl-4 pr-4 py-3.5 rounded-[16px] border flex justify-between items-center transition-all duration-300 min-h-[68px] cursor-pointer">
                             <div class="flex-1 flex items-baseline space-x-3 overflow-hidden pr-2 min-w-0">
                                 <span class="text-[15px] font-mono text-gray-400 font-bold shrink-0">${index + 1}.</span>
-                                <span class="font-extrabold text-[17px] ${isCurrent ? 'text-[#2563EB]' : 'text-[#334155]'} transition-colors truncate shrink min-w-0 max-w-[40%]">${item.en}</span>
-                                <span class="text-[17px] text-gray-400 font-serif shrink-0">${item.phon}</span>
-                                <span class="text-[17px] ${isCurrent ? 'text-[#475569]' : 'text-gray-500'} truncate font-medium shrink min-w-0 flex-1">${item.cn}</span>
+                                <span class="font-extrabold text-[17px] ${isCurrent ? 'text-[#2563EB]' : 'text-[#334155]'} transition-colors truncate shrink min-w-0 max-w-[40%]">${displayEn}</span>
+                                <span class="text-[17px] text-gray-400 font-serif shrink-0">${displayPhon}</span>
+                                <span class="text-[17px] ${isCurrent ? 'text-[#475569]' : 'text-gray-500'} truncate font-medium shrink min-w-0 flex-1">${displayCn}</span>
                             </div>
                             <div class="flex-shrink-0">${statusHtml}</div>
                         </li>
@@ -1748,6 +1867,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 btn.setAttribute('data-bound', '1');
                 var start = function(e) {
                     if (e.type === 'touchstart') e.preventDefault();
+                    if (unfinishedMode !== 'gendu') return;
                     if (unfinishedRecording) return;
                     clearTimeout(unfinishedPlayTimer);
                     unfinishedRecording = true;
@@ -1775,6 +1895,20 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 window.addEventListener('touchcancel', end, { passive: false });
             }
 
+            function updateUnfinishedMicState() {
+                var btn = document.getElementById('unfinished-score-action-btn');
+                if (!btn) return;
+                if (unfinishedMode === 'gendu') {
+                    btn.disabled = false;
+                    btn.className = "w-[84px] h-[84px] bg-[#3B82F6] text-white rounded-full flex items-center justify-center shadow-[0_8px_24px_rgba(59,130,246,0.4)] hover:bg-[#2563EB] transition-all focus:outline-none select-none group relative z-[100] overflow-hidden transform cursor-pointer pointer-events-auto";
+                    btn.innerHTML = `<i class="ph-bold ph-microphone text-[32px] pointer-events-none transition-transform group-active:scale-90 shrink-0"></i>`;
+                } else {
+                    btn.disabled = true;
+                    btn.className = "w-[84px] h-[84px] bg-[#cbd5e1] text-white/80 rounded-full flex items-center justify-center shadow-[0_8px_20px_rgba(148,163,184,0.25)] transition-all focus:outline-none select-none group relative z-[100] overflow-hidden transform cursor-not-allowed pointer-events-none opacity-70";
+                    btn.innerHTML = `<i class="ph-bold ph-microphone text-[32px] pointer-events-none shrink-0"></i>`;
+                }
+            }
+
             window.enterUnfinishedScoringView = function(taskId) {
                 var task = (state.unfinishedTasks || []).find(item => item.id === taskId) || (state.unfinishedTasks || [])[0];
                 unfinishedActiveTask = task;
@@ -1789,6 +1923,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 setUnfinishedLevelPickerOpen(false);
                 setTimeout(() => {
                     bindUnfinishedMicEvents();
+                    window.initCustomSpeedDropdown();
                     renderUnfinishedLevelPicker();
                     renderUnfinishedScoringPage();
                 }, 50);
@@ -1842,9 +1977,27 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 if (unfinishedRecording) return;
                 clearTimeout(unfinishedPlayTimer);
                 setUnfinishedStatus('playing');
+                var speedInput = document.getElementById('unfinished-playback-speed');
+                var speedMultiplier = speedInput ? parseFloat(speedInput.value) || 1 : 1;
+                var playIndex = unfinishedCurrentIdx;
                 unfinishedPlayTimer = setTimeout(() => {
-                    if (!unfinishedRecording) setUnfinishedStatus(unfinishedScores[unfinishedCurrentIdx] != null ? 'scored' : 'idle');
-                }, 650);
+                    if (unfinishedRecording) return;
+                    if (unfinishedMode !== 'gendu') {
+                        unfinishedScores[playIndex] = 100;
+                        renderUnfinishedScoringPage();
+                        var nextIdx = unfinishedScores.findIndex((score, idx) => idx > playIndex && score == null);
+                        if (unfinishedAutoPlay && nextIdx !== -1) {
+                            clearTimeout(unfinishedAutoTimer);
+                            unfinishedAutoTimer = setTimeout(() => {
+                                unfinishedCurrentIdx = nextIdx;
+                                renderUnfinishedScoringPage();
+                                window.playUnfinishedSystemAudio();
+                            }, 320 / speedMultiplier);
+                        }
+                    } else {
+                        setUnfinishedStatus(unfinishedScores[unfinishedCurrentIdx] != null ? 'scored' : 'idle');
+                    }
+                }, 650 / speedMultiplier);
             };
 
             window.toggleUnfinishedAutoPlay = function() {
@@ -1860,11 +2013,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
 
             window.submitUnfinishedRound = function() {
                 if (unfinishedScores.some(score => score == null)) return;
-                var group = getUnfinishedGroup(unfinishedSelectedLevel, unfinishedSelectedGroup);
-                if (group) group.completed = true;
-                updateUnfinishedLevelTrigger();
-                renderUnfinishedLevelPicker();
-                window.showModal('提交成功', '<div class="mt-1 font-medium text-gray-600">本轮任务已提交。</div>', () => window.switchView('view-dashboard'));
+                advanceUnfinishedWorkflowAfterSubmit();
             };
 
             // ====== 沉浸式评分视图与核心逻辑 ======
@@ -1879,6 +2028,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 if(!btn) return;
                 var startRecord = (e) => {
                     if (e.type === 'touchstart') e.preventDefault(); 
+                    if (currentMode !== 'gendu') return;
                     if (isRecording) return;
                     if (isPlayingSystem) { isPlayingSystem = false; clearTimeout(systemAudioTimeout); }
                     isRecording = true;
@@ -1925,6 +2075,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 
                 setTimeout(() => {
                     if (!window.__pressEventsBound) { initPressEvents(); window.__pressEventsBound = true; }
+                    window.initCustomSpeedDropdown();
                     updateScoringUI();
                 }, 50);
             };
@@ -2158,11 +2309,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 nextBtn.disabled = currentScoreIdx === scoringData.length - 1; nextBtn.className = currentScoreIdx === scoringData.length - 1 ? "flex items-center text-gray-300 font-medium text-[14px] py-1.5 px-3 rounded-full cursor-not-allowed opacity-50 whitespace-nowrap shrink-0" : "flex items-center text-[#3B82F6] hover:text-[#2563EB] transition-colors font-medium text-[14px] py-1.5 px-3 rounded-full cursor-pointer hover:bg-blue-50 whitespace-nowrap shrink-0";
                 
                 var micContainer = document.getElementById('mic-container');
-                if (currentMode === 'gendu') {
-                    micContainer.style.display = 'flex';
-                } else {
-                    micContainer.style.display = 'none';
-                }
+                if (micContainer) micContainer.style.display = 'flex';
 
                 updateTopNav(); updateQueueList(); resetScoringState();
                 var targetProgress = modeRound[currentMode] + 1; var unfinishedCount = scoringData.filter(item => item[currentMode + 'Progress'] < targetProgress).length;
@@ -2271,21 +2418,26 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 if (btnEl && currentMode === 'gendu') {
                     btnEl.className = "w-[84px] h-[84px] bg-[#3B82F6] text-white rounded-full flex items-center justify-center shadow-[0_8px_24px_rgba(59,130,246,0.4)] hover:bg-[#2563EB] transition-all duration-500 ease-in-out focus:outline-none select-none group relative z-[100] overflow-hidden transform scale-100 cursor-pointer pointer-events-auto";
                     btnEl.innerHTML = `<i class="ph-bold ph-microphone text-[32px] pointer-events-none transition-transform group-active:scale-90 shrink-0"></i>`;
+                    btnEl.disabled = false;
+                } else if (btnEl) {
+                    btnEl.className = "w-[84px] h-[84px] bg-[#cbd5e1] text-white/80 rounded-full flex items-center justify-center shadow-[0_8px_20px_rgba(148,163,184,0.25)] transition-all duration-500 ease-in-out focus:outline-none select-none group relative z-[100] overflow-hidden transform scale-100 cursor-not-allowed pointer-events-none opacity-70";
+                    btnEl.innerHTML = `<i class="ph-bold ph-microphone text-[32px] pointer-events-none shrink-0"></i>`;
+                    btnEl.disabled = true;
                 }
                 updateTopNav();
             }
 
             // ============== 设置页自定义交互逻辑 ==============
             window.initCustomSpeedDropdown = function() {
-                var trigger = document.getElementById('speed-trigger');
-                var menu = document.getElementById('speed-menu');
-                var display = document.getElementById('speed-display');
-                var hiddenInput = document.getElementById('playback-speed');
-                var options = document.querySelectorAll('.speed-option');
-
-                if (!trigger || !menu) return;
-
-                var closeMenu = () => {
+                var bindSpeedDropdown = function(config) {
+                    var trigger = document.getElementById(config.triggerId);
+                    var menu = document.getElementById(config.menuId);
+                    var display = document.getElementById(config.displayId);
+                    var hiddenInput = document.getElementById(config.inputId);
+                    if (!trigger || !menu || trigger.getAttribute('data-bound') === '1') return;
+                    var options = menu.querySelectorAll(config.optionSelector);
+                    trigger.setAttribute('data-bound', '1');
+                    var closeMenu = () => {
                     if (!menu.classList.contains('hidden')) {
                         menu.classList.remove('opacity-100', 'scale-100');
                         menu.classList.add('opacity-0', 'scale-95');
@@ -2293,38 +2445,38 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                             menu.classList.add('hidden');
                         }, 200);
                     }
-                };
-
-                trigger.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (menu.classList.contains('hidden')) {
-                        menu.classList.remove('hidden');
-                        void menu.offsetWidth; 
-                        menu.classList.remove('opacity-0', 'scale-95');
-                        menu.classList.add('opacity-100', 'scale-100');
-                    } else {
-                        closeMenu();
-                    }
-                });
-
-                options.forEach(opt => {
-                    opt.addEventListener('click', (e) => {
+                    };
+                    trigger.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        var val = opt.getAttribute('data-value');
-                        var text = opt.innerText;
-                        display.innerText = text;
-                        if (hiddenInput) hiddenInput.value = val;
-                        options.forEach(o => {
-                            o.classList.remove('bg-blue-50', 'text-[#3B82F6]');
-                            o.classList.add('text-gray-500', 'hover:bg-gray-100/80');
-                        });
-                        opt.classList.remove('text-gray-500', 'hover:bg-gray-100/80');
-                        opt.classList.add('bg-blue-50', 'text-[#3B82F6]');
-                        closeMenu();
+                        if (menu.classList.contains('hidden')) {
+                            menu.classList.remove('hidden');
+                            void menu.offsetWidth;
+                            menu.classList.remove('opacity-0', 'scale-95');
+                            menu.classList.add('opacity-100', 'scale-100');
+                        } else {
+                            closeMenu();
+                        }
                     });
-                });
-
-                document.addEventListener('click', closeMenu);
+                    options.forEach(opt => {
+                        opt.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            var val = opt.getAttribute('data-value');
+                            var text = opt.innerText;
+                            if (display) display.innerText = text;
+                            if (hiddenInput) hiddenInput.value = val;
+                            options.forEach(o => {
+                                o.classList.remove('bg-blue-50', 'text-[#3B82F6]');
+                                o.classList.add('text-gray-500', 'hover:bg-gray-100/80');
+                            });
+                            opt.classList.remove('text-gray-500', 'hover:bg-gray-100/80');
+                            opt.classList.add('bg-blue-50', 'text-[#3B82F6]');
+                            closeMenu();
+                        });
+                    });
+                    document.addEventListener('click', closeMenu);
+                };
+                bindSpeedDropdown({ triggerId: 'speed-trigger', menuId: 'speed-menu', displayId: 'speed-display', inputId: 'playback-speed', optionSelector: '.speed-option' });
+                bindSpeedDropdown({ triggerId: 'unfinished-speed-trigger', menuId: 'unfinished-speed-menu', displayId: 'unfinished-speed-display', inputId: 'unfinished-playback-speed', optionSelector: '.unfinished-speed-option' });
             };
 
             window.selectCardType = function(optionEl, val, label, iconClass, colorClass, e) {
