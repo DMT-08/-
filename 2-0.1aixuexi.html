@@ -82,6 +82,17 @@
             background-size: 12px;
             padding-right: 24px !important;
         }
+
+        #speed-trigger, #unfinished-speed-trigger, #unfinished-level-group-trigger {
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        #speed-menu, #unfinished-speed-menu, #unfinished-level-group-panel {
+            z-index: 9999;
+            pointer-events: auto;
+        }
+        #scoring-status-pill, #unfinished-scoring-status-pill { order: 2; }
+        #autoplay-toggle-btn, #unfinished-autoplay-toggle-btn { order: 1; }
     </style>
 </head>
 <body class="flex flex-col h-screen">
@@ -470,7 +481,7 @@
 
     <div id="view-unfinished-scoring" class="view-section flex-col w-full h-full absolute inset-0 z-[60] bg-gradient-to-br from-[#EFF6FF] to-[#DFE7FF] text-gray-700 select-none overflow-hidden">
         <div class="absolute left-[258px] top-8 z-[80] pointer-events-auto">
-            <button id="unfinished-level-group-trigger" onclick="window.toggleUnfinishedLevelPicker(event)" class="h-9 px-4 bg-white/95 border border-blue-100 rounded-full shadow-sm text-[#1F5FFF] text-[14px] font-extrabold flex items-center justify-center gap-1.5 hover:bg-white hover:shadow-md active:scale-95 transition-all whitespace-nowrap">
+            <button id="unfinished-level-group-trigger" onclick="window.toggleUnfinishedLevelPicker(event)" ontouchstart="window.touchUnfinishedLevelPicker(event)" class="h-9 px-4 bg-white/95 border border-blue-100 rounded-full shadow-sm text-[#1F5FFF] text-[14px] font-extrabold flex items-center justify-center gap-1.5 hover:bg-white hover:shadow-md active:scale-95 transition-all whitespace-nowrap">
                 <span id="unfinished-level-group-label">第1关 · 第1组</span>
                 <i id="unfinished-level-group-caret" class="ph-bold ph-caret-down text-[13px] transition-transform"></i>
             </button>
@@ -1560,6 +1571,8 @@ if(viewId === 'view-dashboard') renderDashboardUI();
             var unfinishedMode = 'gendu';
             var unfinishedModeTargets = { gendu: 2, yinji: 2, tingxie: 1 };
             var unfinishedModeRound = { gendu: 0, yinji: 0, tingxie: 0 };
+            var unfinishedLevelPickerTouchAt = 0;
+            var unfinishedLevelActionTouchAt = 0;
             var unfinishedLevelGroups = [];
             var unfinishedSelectedLevel = 1;
             var unfinishedSelectedGroup = 1;
@@ -1612,7 +1625,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                                     ? 'bg-green-50 border-green-200 text-green-700'
                                     : (isSelected ? 'bg-[#1F5FFF] border-[#1F5FFF] text-white shadow-sm' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-blue-50 hover:border-blue-200 hover:text-[#1F5FFF]');
                                 return `
-                                    <button onclick="window.selectUnfinishedLevelGroup(${level.id}, ${group.id}, event)" class="min-h-[44px] rounded-[14px] border ${groupClass} px-3 py-2 flex items-center justify-center gap-1.5 text-[13px] font-extrabold active:scale-95 transition-all">
+                                    <button onclick="window.selectUnfinishedLevelGroup(${level.id}, ${group.id}, event)" ontouchstart="window.touchUnfinishedLevelGroup(${level.id}, ${group.id}, event)" class="min-h-[44px] rounded-[14px] border ${groupClass} px-3 py-2 flex items-center justify-center gap-1.5 text-[13px] font-extrabold active:scale-95 transition-all">
                                         <span>第${group.id}组</span>
                                         ${group.completed ? '<span class="text-[11px] font-bold opacity-90">已完成</span>' : ''}
                                     </button>
@@ -1622,7 +1635,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                     ` : '';
                     return `
                         <div class="rounded-[18px] border ${isExpanded ? 'border-blue-100 bg-blue-50/40' : 'border-slate-100 bg-white'} overflow-hidden transition-all">
-                            <button onclick="window.toggleUnfinishedLevelRow(${level.id}, event)" class="w-full min-h-[46px] px-3 flex items-center justify-between text-left active:scale-[0.98] transition-all">
+                            <button onclick="window.toggleUnfinishedLevelRow(${level.id}, event)" ontouchstart="window.touchUnfinishedLevelRow(${level.id}, event)" class="w-full min-h-[46px] px-3 flex items-center justify-between text-left active:scale-[0.98] transition-all">
                                 <span class="${selectedInLevel ? 'text-[#1F5FFF]' : 'text-slate-700'} text-[14px] font-extrabold">第${level.id}关</span>
                                 <span class="flex items-center gap-2">
                                     ${completeCount ? `<span class="text-[11px] font-bold text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full">${completeCount}/4已完成</span>` : ''}
@@ -1781,6 +1794,55 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 }
             }
 
+            function setUnfinishedStatus(type) {
+                var pill = document.getElementById('unfinished-scoring-status-pill');
+                if (!pill) return;
+                if (type === 'playing') {
+                    pill.innerHTML = `<span class="relative flex h-3 w-3 mr-2.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span></span><span class="font-bold text-[#1F5FFF]">系统发音中</span>`;
+                    pill.className = "flex items-center bg-[#1F5FFF]/10 backdrop-blur-md px-6 py-2.5 rounded-full border border-[#1F5FFF]/20 text-[14px] transition-colors shadow-sm whitespace-nowrap pointer-events-auto";
+                    return;
+                }
+                if (type === 'recording') {
+                    pill.innerHTML = `<div class="w-2.5 h-2.5 rounded-full bg-red-500 mr-2 animate-pulse"></div><span class="font-bold">录音中</span>`;
+                    pill.className = "flex items-center bg-red-50/90 backdrop-blur-md text-red-600 px-5 py-1.5 rounded-full border border-red-200 text-[14px] transition-colors shadow-sm whitespace-nowrap pointer-events-auto";
+                    return;
+                }
+                var allDone = unfinishedScores.length && unfinishedScores.every(score => score != null);
+                if (type === 'done' || allDone) {
+                    pill.innerHTML = `<i class="ph-bold ph-check-circle text-[16px] mr-1.5 text-green-500"></i><span class="text-green-600 font-bold">本轮已结束，请提交</span>`;
+                    pill.className = "flex items-center bg-green-50/90 backdrop-blur-md px-5 py-1.5 rounded-full border border-green-200 text-[14px] transition-colors shadow-sm whitespace-nowrap pointer-events-auto";
+                    return;
+                }
+                if (type === 'scored' && unfinishedMode !== 'gendu') type = 'ready';
+                if (type === 'ready') {
+                    if (unfinishedMode === 'yinji') {
+                        pill.innerHTML = `<i class="ph-bold ph-pencil-simple text-[16px] mr-1.5 text-orange-500"></i><span class="text-orange-600 font-bold">请记下当前单词</span>`;
+                        pill.className = "flex items-center bg-orange-50/90 backdrop-blur-md px-4 py-1.5 rounded-full border border-orange-200 text-[13px] transition-colors shadow-sm whitespace-nowrap pointer-events-auto";
+                    } else if (unfinishedMode === 'tingxie') {
+                        pill.innerHTML = `<i class="ph-bold ph-brain text-[16px] mr-1.5 text-orange-500"></i><span class="text-orange-600 font-bold">请默写当前单词</span>`;
+                        pill.className = "flex items-center bg-orange-50/90 backdrop-blur-md px-4 py-1.5 rounded-full border border-orange-200 text-[13px] transition-colors shadow-sm whitespace-nowrap pointer-events-auto";
+                    } else {
+                        pill.innerHTML = `<i class="ph-bold ph-microphone text-[16px] mr-1.5 text-blue-500"></i><span class="text-blue-600 font-bold">请按住录音</span>`;
+                        pill.className = "flex items-center bg-blue-50/90 backdrop-blur-md px-4 py-1.5 rounded-full border border-blue-200 text-[13px] transition-colors shadow-sm whitespace-nowrap pointer-events-auto";
+                    }
+                    return;
+                }
+                if (type === 'scored' && unfinishedMode === 'gendu') {
+                    var score = unfinishedScores[unfinishedCurrentIdx] || 0;
+                    var icons = {
+                        red: `<svg class="w-[16px] h-[16px] mr-1.5 text-red-500" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.3 12.89l-1.41 1.41L12 13.41l-2.89 2.89-1.41-1.41L10.59 12 7.7 9.11l1.41-1.41L12 10.59l2.89-2.89 1.41 1.41L13.41 12l2.89 2.89z"/></svg>`,
+                        orange: `<svg class="w-[16px] h-[16px] mr-1.5 text-orange-500" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 13a3 3 0 110-6 3 3 0 010 6z"/></svg>`,
+                        green: `<svg class="w-[16px] h-[16px] mr-1.5 text-green-500" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`
+                    };
+                    var feedback = score < 60 ? { c: "bg-red-50 text-red-600 border-red-200", i: icons.red, f: "需努力" } : (score <= 70 ? { c: "bg-orange-50 text-orange-600 border-orange-200", i: icons.orange, f: "还不错" } : { c: "bg-green-50 text-green-600 border-green-200", i: icons.green, f: "非常好" });
+                    pill.innerHTML = `${feedback.i} <span class="font-bold">${feedback.f} &nbsp;${score}分</span>`;
+                    pill.className = `flex items-center px-4 py-1.5 rounded-full border text-[14px] transition-colors backdrop-blur-md shadow-sm whitespace-nowrap pointer-events-auto ${feedback.c}`;
+                    return;
+                }
+                pill.innerHTML = `<span class="text-gray-500 font-medium">等待开始...</span>`;
+                pill.className = "flex items-center bg-white/80 backdrop-blur-md px-5 py-1.5 rounded-full border border-gray-200 text-[14px] transition-colors shadow-sm whitespace-nowrap pointer-events-auto";
+            }
+
             function renderUnfinishedScoringPage() {
                 if (!unfinishedScoringData.length) return;
                 unfinishedCurrentIdx = Math.max(0, Math.min(unfinishedCurrentIdx, unfinishedScoringData.length - 1));
@@ -1931,20 +1993,41 @@ if(viewId === 'view-dashboard') renderDashboardUI();
 
             window.toggleUnfinishedLevelPicker = function(event) {
                 if (event) event.stopPropagation();
+                if (event && event.type === 'click' && Date.now() - unfinishedLevelPickerTouchAt < 450) return;
                 initUnfinishedLevelGroups();
                 renderUnfinishedLevelPicker();
                 var panel = document.getElementById('unfinished-level-group-panel');
                 setUnfinishedLevelPickerOpen(panel ? panel.classList.contains('hidden') : true);
             };
 
+            window.touchUnfinishedLevelPicker = function(event) {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                unfinishedLevelPickerTouchAt = Date.now();
+                window.toggleUnfinishedLevelPicker(event);
+            };
+
             window.toggleUnfinishedLevelRow = function(levelId, event) {
                 if (event) event.stopPropagation();
+                if (event && event.type === 'click' && Date.now() - unfinishedLevelActionTouchAt < 450) return;
                 unfinishedExpandedLevel = levelId;
                 renderUnfinishedLevelPicker();
             };
 
+            window.touchUnfinishedLevelRow = function(levelId, event) {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                unfinishedLevelActionTouchAt = Date.now();
+                window.toggleUnfinishedLevelRow(levelId, event);
+            };
+
             window.selectUnfinishedLevelGroup = function(levelId, groupId, event) {
                 if (event) event.stopPropagation();
+                if (event && event.type === 'click' && Date.now() - unfinishedLevelActionTouchAt < 450) return;
                 if (unfinishedRecording) return;
                 unfinishedSelectedLevel = levelId;
                 unfinishedSelectedGroup = groupId;
@@ -1953,6 +2036,15 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 renderUnfinishedLevelPicker();
                 setUnfinishedLevelPickerOpen(false);
                 renderUnfinishedScoringPage();
+            };
+
+            window.touchUnfinishedLevelGroup = function(levelId, groupId, event) {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                unfinishedLevelActionTouchAt = Date.now();
+                window.selectUnfinishedLevelGroup(levelId, groupId, event);
             };
 
             window.selectUnfinishedScoreWord = function(index) {
@@ -1995,7 +2087,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                             }, 320 / speedMultiplier);
                         }
                     } else {
-                        setUnfinishedStatus(unfinishedScores[unfinishedCurrentIdx] != null ? 'scored' : 'idle');
+                        setUnfinishedStatus(unfinishedScores[unfinishedCurrentIdx] != null ? 'scored' : 'ready');
                     }
                 }, 650 / speedMultiplier);
             };
@@ -2446,7 +2538,8 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                         }, 200);
                     }
                     };
-                    trigger.addEventListener('click', (e) => {
+                    var lastTouchAt = 0;
+                    var toggleMenu = (e) => {
                         e.stopPropagation();
                         if (menu.classList.contains('hidden')) {
                             menu.classList.remove('hidden');
@@ -2456,9 +2549,22 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                         } else {
                             closeMenu();
                         }
+                    };
+                    trigger.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        lastTouchAt = Date.now();
+                        toggleMenu(e);
+                    }, { passive: false });
+                    trigger.addEventListener('click', (e) => {
+                        if (Date.now() - lastTouchAt < 450) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            return;
+                        }
+                        toggleMenu(e);
                     });
                     options.forEach(opt => {
-                        opt.addEventListener('click', (e) => {
+                        var selectSpeed = (e) => {
                             e.stopPropagation();
                             var val = opt.getAttribute('data-value');
                             var text = opt.innerText;
@@ -2471,6 +2577,19 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                             opt.classList.remove('text-gray-500', 'hover:bg-gray-100/80');
                             opt.classList.add('bg-blue-50', 'text-[#3B82F6]');
                             closeMenu();
+                        };
+                        opt.addEventListener('touchstart', (e) => {
+                            e.preventDefault();
+                            lastTouchAt = Date.now();
+                            selectSpeed(e);
+                        }, { passive: false });
+                        opt.addEventListener('click', (e) => {
+                            if (Date.now() - lastTouchAt < 450) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                return;
+                            }
+                            selectSpeed(e);
                         });
                     });
                     document.addEventListener('click', closeMenu);
