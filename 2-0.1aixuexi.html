@@ -7,67 +7,6 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.0.3"></script>
-    <script>
-        (function() {
-            if (window.NodeList && !NodeList.prototype.forEach) {
-                NodeList.prototype.forEach = Array.prototype.forEach;
-            }
-            if (window.HTMLCollection && !HTMLCollection.prototype.forEach) {
-                HTMLCollection.prototype.forEach = Array.prototype.forEach;
-            }
-            if (window.DOMTokenList && !DOMTokenList.prototype.replace) {
-                DOMTokenList.prototype.replace = function(oldToken, newToken) {
-                    if (this.contains(oldToken)) {
-                        this.remove(oldToken);
-                        this.add(newToken);
-                        return true;
-                    }
-                    return false;
-                };
-            }
-            window.showToast = window.showToast || function(message) {
-                function render() {
-                    var toast = document.getElementById('fallback-toast');
-                    if (!toast) {
-                        toast = document.createElement('div');
-                        toast.id = 'fallback-toast';
-                        toast.style.cssText = 'position:fixed;left:50%;bottom:22px;z-index:999998;transform:translateX(-50%);background:#1E293B;color:#fff;border-radius:14px;padding:10px 14px;font:13px/1.4 system-ui,-apple-system,sans-serif;box-shadow:0 8px 24px rgba(15,23,42,.18);max-width:80vw;text-align:center;';
-                        document.body.appendChild(toast);
-                    }
-                    toast.textContent = message || '';
-                    toast.style.opacity = '1';
-                    clearTimeout(window.__fallbackToastTimer);
-                    window.__fallbackToastTimer = setTimeout(function() {
-                        toast.style.opacity = '0';
-                    }, 1800);
-                }
-                if (document.body) render();
-                else setTimeout(render, 0);
-            };
-            function showRuntimeError(message, source, lineno, colno) {
-                function render() {
-                    var bar = document.getElementById('runtime-error-bar');
-                    if (!bar) {
-                        bar = document.createElement('div');
-                        bar.id = 'runtime-error-bar';
-                        bar.style.cssText = 'position:fixed;left:12px;right:12px;top:12px;z-index:999999;background:#FEF2F2;color:#991B1B;border:1px solid #FECACA;border-radius:14px;padding:10px 12px;font:12px/1.4 system-ui,-apple-system,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.12);white-space:pre-wrap;';
-                        document.body.appendChild(bar);
-                    }
-                    bar.textContent = '页面脚本报错：' + message + '\n位置：' + (source || 'inline') + ':' + (lineno || 0) + ':' + (colno || 0);
-                }
-                if (document.body) render();
-                else setTimeout(render, 0);
-            }
-            window.onerror = function(message, source, lineno, colno) {
-                showRuntimeError(message, source, lineno, colno);
-                return false;
-            };
-            window.addEventListener && window.addEventListener('unhandledrejection', function(event) {
-                var reason = event && event.reason;
-                showRuntimeError(reason && reason.message ? reason.message : String(reason || 'Promise rejection'), 'promise', 0, 0);
-            });
-        })();
-    </script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -163,7 +102,7 @@
         
         <header class="flex justify-between items-center shrink-0">
             <div class="flex items-center gap-4">
-                <button class="w-10 h-10 bg-white rounded-[14px] flex items-center justify-center shadow-premium active:scale-90 transition-transform text-slate-700 cursor-pointer" onclick="window.location.href='./1-0.1aijici.html'">
+                <button class="w-10 h-10 bg-white rounded-[14px] flex items-center justify-center shadow-premium active:scale-90 transition-transform text-slate-700 cursor-pointer" onclick="window.showModal('返回提示', '<div class=\'mt-1 font-medium\'>学习可随时退出，<br>此处将返回上一级页面。</div>')">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mr-0.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
                 </button>
                 <h1 class="text-[32px] font-extrabold text-gray-900 tracking-tight leading-none">AI学习</h1>
@@ -273,32 +212,34 @@
             </div>
         </div>
 
-        <div class="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[0.95fr_1.55fr] gap-5 md:gap-6 mt-1">
-            <div class="flex flex-col gap-4 h-full min-h-0">
-                <div class="bg-[#FFFDF8] rounded-[24px] shadow-premium px-5 py-4 flex items-center min-h-[132px] border border-[#FDE68A] relative overflow-hidden group cursor-pointer hover:border-orange-300 transition-all shrink-0" onclick="window.switchView('view-vocab')">
-                    <div class="absolute -right-4 -top-4 w-20 h-20 bg-orange-100/50 rounded-full blur-xl group-hover:bg-orange-200/50 transition-colors pointer-events-none"></div>
-                    <div class="w-14 h-14 bg-gradient-to-br from-orange-100 to-orange-50 rounded-[18px] flex items-center justify-center text-orange-500 mr-4 group-hover:-translate-y-0.5 group-hover:shadow-md transition-all relative z-10 border border-orange-200 shrink-0">
+        <div class="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[470px_minmax(0,1fr)] gap-5 md:gap-6 mt-1">
+            <div class="flex flex-col gap-5 min-h-0 h-full">
+                <div class="bg-[#FFFDF8] rounded-[24px] shadow-premium px-5 py-5 flex items-center min-h-[132px] h-[132px] border border-[#FDE68A] relative overflow-hidden group cursor-pointer hover:border-orange-300 transition-all" onclick="window.switchView('view-vocab')">
+                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-orange-100/50 rounded-full blur-xl group-hover:bg-orange-200/50 transition-colors pointer-events-none"></div>
+                    <div class="absolute -left-4 -bottom-4 w-20 h-20 bg-yellow-100/50 rounded-full blur-lg group-hover:bg-yellow-200/50 transition-colors pointer-events-none"></div>
+
+                    <div class="w-[58px] h-[58px] bg-gradient-to-br from-orange-100 to-orange-50 rounded-[18px] flex items-center justify-center text-orange-500 group-hover:shadow-md transition-all relative z-10 border border-orange-200 shrink-0">
                         <i class="ph-fill ph-books text-[28px]"></i>
                     </div>
-                    <div class="relative z-10 min-w-0 flex-1 text-left">
-                        <h2 class="text-[18px] font-extrabold text-gray-800 mb-1">我的生词本</h2>
-                        <p class="text-[13px] text-gray-500">已累计生词: <span id="dashVocabCount" class="font-extrabold text-orange-500 text-[15px]">0</span> 词</p>
+                    <div class="relative z-10 min-w-0 flex-1 ml-5 text-left">
+                        <h2 class="text-[20px] font-extrabold text-gray-800 mb-1.5 leading-tight">我的生词本</h2>
+                        <p class="text-[13px] text-gray-500 leading-tight">已累计生词: <span id="dashVocabCount" class="font-extrabold text-orange-500 text-[15px]">0</span> 词</p>
                     </div>
-                    <button class="w-11 h-11 bg-white text-orange-500 border border-orange-200 rounded-[14px] font-bold group-hover:bg-orange-500 group-hover:text-white transition-colors shadow-sm relative z-10 flex items-center justify-center shrink-0" onclick="event.stopPropagation(); window.switchView('view-vocab')" title="进入详情">
-                        <i class="ph-bold ph-arrow-right text-[18px]"></i>
+                    <button class="w-11 h-11 bg-white text-orange-500 border border-orange-200 rounded-[14px] font-bold text-[18px] group-hover:bg-orange-500 group-hover:text-white transition-colors shadow-sm relative z-10 flex items-center justify-center shrink-0" onclick="event.stopPropagation(); window.switchView('view-vocab')" aria-label="进入生词本详情">
+                        <i class="ph-bold ph-arrow-right"></i>
                     </button>
                 </div>
 
-                <div class="bg-white rounded-[24px] shadow-premium p-4 flex flex-col relative overflow-hidden flex-1 min-h-[0] border border-gray-100">
+                <div class="bg-white/80 rounded-[24px] shadow-premium p-4 flex flex-col flex-1 min-h-[300px] border border-white/80 relative overflow-hidden">
                     <div class="flex items-center gap-2 mb-3 px-1 shrink-0 text-slate-700">
                         <div class="w-8 h-8 rounded-[10px] bg-indigo-50 text-indigo-500 flex items-center justify-center border border-indigo-100">
-                            <i class="ph-fill ph-chalkboard-teacher text-[17px]"></i>
+                            <i class="ph-fill ph-chalkboard-teacher text-[16px]"></i>
                         </div>
                         <span class="text-[15px] font-extrabold">老师指定任务</span>
                     </div>
                     <div id="assignedTaskContainer" class="w-full overflow-y-auto hide-scrollbar flex flex-col gap-2 pb-1 relative z-10"></div>
-                    <div id="noAssignedTaskBox" class="absolute inset-0 flex flex-col items-center justify-center text-center opacity-50 pointer-events-none z-0 mt-12">
-                        <i class="ph-fill ph-coffee text-[32px] text-gray-400 mb-1"></i>
+                    <div id="noAssignedTaskBox" class="absolute inset-0 flex flex-col items-center justify-center text-center opacity-50 pointer-events-none z-0 mt-10">
+                        <i class="ph-fill ph-coffee text-[30px] text-gray-400 mb-1"></i>
                         <p class="text-[12px] font-bold text-gray-500 mt-1">暂未发布指定任务</p>
                     </div>
                 </div>
@@ -334,10 +275,12 @@
                     </div>
                 </div>
 
-                <div class="bg-white/80 rounded-[16px] border border-gray-100 shrink-0 flex flex-col relative overflow-hidden flex-1 min-h-[150px]">
+                <div class="bg-white rounded-[16px] border border-gray-100 shrink-0 flex flex-col relative overflow-hidden flex-1 min-h-[210px]">
                     <div class="px-4 py-3 border-b border-gray-100 bg-white flex justify-between items-center shrink-0 z-20 relative">
-                        <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-[10px] bg-red-50 text-red-500 flex items-center justify-center border border-red-100/50"><i class="ph-fill ph-push-pin text-[17px]"></i></div>
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-[10px] bg-red-50 text-red-500 flex items-center justify-center border border-red-100/50">
+                                <i class="ph-fill ph-push-pin text-[17px]"></i>
+                            </div>
                             <h3 class="font-extrabold text-[15px] text-gray-900 leading-tight">未完成任务 (<span id="unfinishedTaskCount" class="font-mono">0</span>)</h3>
                         </div>
                         <a href="#" class="text-[12px] font-bold text-blue-600 hover:text-blue-700 flex items-center transition-colors">全部任务 <i class="ph-bold ph-caret-right ml-0.5 text-[12px]"></i></a>
@@ -348,182 +291,6 @@
                         <p class="text-[12px] font-bold text-gray-500 mt-1">暂未发布指定任务</p>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-
-    <div id="view-task-levels" class="view-section flex-col w-full h-full max-w-[1300px] mx-auto p-4 md:p-5 overflow-hidden bg-gradient-to-br from-[#EFF6FF] to-[#DFE7FF] text-gray-700 select-none relative">
-        <div class="h-[54px] shrink-0 flex items-start justify-between relative z-20 pointer-events-auto">
-            <div class="flex items-center gap-3">
-                <button onclick="window.switchView('view-dashboard')" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-gray-600 shrink-0 cursor-pointer hover:shadow-md transition-all active:scale-95">
-                    <i class="ph-bold ph-caret-left text-[20px] -ml-0.5"></i>
-                </button>
-                <div id="taskProgress" class="bg-[#1F5FFF]/10 text-[#1F5FFF] font-bold px-4 py-2 rounded-full text-[14px] shrink-0">1/4</div>
-            </div>
-
-            <div class="flex items-center bg-white rounded-full px-3 py-2 shadow-sm border border-gray-100 gap-1.5 shrink-0">
-                <i class="ph-bold ph-clock text-[15px] text-gray-400"></i>
-                <span id="task-timer" class="font-mono font-bold text-[13px] text-gray-600 tracking-wide">00:00</span>
-            </div>
-        </div>
-
-        <div class="flex-1 min-h-0 grid grid-cols-[minmax(0,1fr)_1px_minmax(0,1fr)] gap-6 pointer-events-auto">
-            <section class="h-full min-h-0 flex flex-col">
-                <div class="h-[40px] mb-4 shrink-0 flex items-center justify-center px-1">
-                    <button id="taskGroupEyebrow" onclick="window.openTaskPickerFromEvent(event)" ontouchend="window.openTaskPickerFromEvent(event)" onpointerup="window.openTaskPickerFromEvent(event)" class="bg-white/80 hover:bg-white border border-blue-100 text-blue-600 shadow-sm h-9 px-4 rounded-full text-[13px] font-extrabold truncate flex items-center gap-1.5 active:scale-95 transition-all touch-manipulation">
-                        第 1 关 · 第 1 组 <i class="ph-bold ph-caret-down text-[12px]"></i>
-                    </button>
-                </div>
-                <ul id="taskQueueList" class="flex-1 overflow-y-auto px-1 -mx-1 space-y-[6px] scroll-smooth hide-scrollbar relative"></ul>
-                <div class="mt-4 pt-4 border-t border-gray-300/30 flex items-center justify-between px-2 shrink-0 h-[72px]">
-                    <div class="flex items-center gap-3 min-w-0">
-                        <div class="flex items-baseline bg-white/70 border border-white/80 px-3 py-1.5 rounded-[12px] whitespace-nowrap shadow-sm">
-                            <span class="text-[12px] text-gray-500 font-medium">共</span>
-                            <span id="taskTotalCount" class="font-mono font-bold text-[14px] text-gray-800 mx-1">4</span>
-                            <span class="text-[12px] text-gray-500 font-medium">题</span>
-                        </div>
-                        <div class="flex items-center gap-1.5 text-blue-600 cursor-pointer active:opacity-70 transition-all whitespace-nowrap">
-                            <i class="ph-fill ph-warning-circle text-[18px]"></i>
-                            <div class="flex items-baseline gap-1">
-                                <span class="text-[13px] font-bold">待完成：</span>
-                                <span id="taskRemaining" class="text-[20px] font-black leading-none">4</span>
-                            </div>
-                            <i class="ph-bold ph-caret-right text-[14px] ml-0.5"></i>
-                        </div>
-                    </div>
-                    <button id="taskSubmitBtn" onclick="window.submitTaskRound()" class="bg-[#F1F5F9] text-[#94A3B8] font-bold py-2.5 px-5 text-[13px] rounded-[12px] transition-all cursor-not-allowed whitespace-nowrap shrink-0 ml-4">提交本轮</button>
-                </div>
-            </section>
-
-            <div class="w-px bg-gray-200/80 mt-10 mb-10 shrink-0 rounded-full shadow-sm"></div>
-
-            <section class="h-full min-h-0 flex flex-col relative">
-                <div class="h-[40px] mb-4 shrink-0 flex items-center justify-center">
-                    <div id="taskTopStepper" class="flex items-center space-x-1"></div>
-                </div>
-                <div class="flex-1 flex flex-col items-center justify-center text-center px-4 min-w-0 w-full space-y-12">
-                    <div id="taskWordEn" class="text-gray-800 tracking-wide font-bold leading-tight drop-shadow-md max-w-full break-words break-all w-full text-[40px] transition-all duration-300">dilemma</div>
-                    <div id="taskWordPhon" class="text-gray-800 font-bold font-serif tracking-widest drop-shadow-sm transition-all duration-300 break-words break-all max-w-full w-full text-[40px] leading-tight">/dɪ'lemə/</div>
-                    <div id="taskWordCn" class="text-gray-800 font-bold tracking-widest leading-tight transition-all duration-300 max-w-full break-words w-full text-[40px]">进退两难的困境</div>
-                </div>
-                <div class="w-full flex flex-col items-center shrink-0 mt-auto relative z-30">
-                    <div class="w-full flex items-center justify-between bg-white/90 backdrop-blur-2xl px-5 h-[72px] rounded-[36px] shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-white/60">
-                        <div class="flex items-center space-x-6 pl-6 pr-8 border-r border-gray-200/80 shrink-0">
-                            <div class="flex flex-col items-center justify-center space-y-0.5">
-                                <span class="text-[11px] text-[#94a3b8] font-bold tracking-wide">音频间隔</span>
-                                <div class="bg-[#f1f5f9] text-[#475569] pl-2 pr-1 py-0.5 rounded flex items-center focus-within:ring-1 focus-within:ring-blue-300 transition-shadow">
-                                    <input id="task-audio-gap" type="number" step="0.1" value="1.0" class="bg-transparent text-[12px] font-mono font-bold leading-tight w-6 text-center outline-none">
-                                    <span class="text-[10px] opacity-70 font-bold ml-px mr-1">秒</span>
-                                </div>
-                            </div>
-                            <div class="flex flex-col items-center justify-center space-y-0.5">
-                                <span class="text-[11px] text-[#94a3b8] font-bold tracking-wide">单词间隔</span>
-                                <div class="bg-[#f1f5f9] text-[#475569] pl-2 pr-1 py-0.5 rounded flex items-center focus-within:ring-1 focus-within:ring-blue-300 transition-shadow">
-                                    <input id="task-word-gap" type="number" step="0.1" value="1.0" class="bg-transparent text-[12px] font-mono font-bold leading-tight w-6 text-center outline-none">
-                                    <span class="text-[10px] opacity-70 font-bold ml-px mr-1">秒</span>
-                                </div>
-                            </div>
-                            <div class="flex flex-col items-center justify-center space-y-0.5">
-                                <span class="text-[11px] text-[#94a3b8] font-bold tracking-wide">倍速</span>
-                                <div class="relative" id="task-speed-dropdown-container">
-                                    <button onclick="window.toggleTaskSpeedMenu(event)" class="bg-[#f1f5f9] text-[#475569] px-2 py-0.5 rounded text-[12px] font-mono font-bold leading-tight min-w-[36px] text-center hover:bg-[#e2e8f0] transition-colors">
-                                        <span id="taskSpeedDisplay">1x</span>
-                                    </button>
-                                    <div id="taskSpeedMenu" class="hidden absolute bottom-[calc(100%+8px)] left-1/2 transform -translate-x-1/2 bg-white/95 backdrop-blur-xl rounded-[14px] shadow-[0_4px_24px_rgba(0,0,0,0.12)] border border-white/80 py-1.5 w-[68px] z-[100] origin-bottom transition-all duration-200 opacity-0 scale-95 flex-col gap-0.5">
-                                        <button onclick="window.setTaskSpeed(0.75, '0.75x', event)" class="w-full px-0 py-1.5 text-[12px] font-mono font-bold text-center cursor-pointer text-gray-500 hover:bg-gray-100/80 transition-colors rounded-[8px]">0.75x</button>
-                                        <button onclick="window.setTaskSpeed(1, '1x', event)" class="w-full px-0 py-1.5 text-[12px] font-mono font-bold text-center cursor-pointer bg-blue-50 text-[#3B82F6] transition-colors rounded-[8px]">1x</button>
-                                        <button onclick="window.setTaskSpeed(1.25, '1.25x', event)" class="w-full px-0 py-1.5 text-[12px] font-mono font-bold text-center cursor-pointer text-gray-500 hover:bg-gray-100/80 transition-colors rounded-[8px]">1.25x</button>
-                                        <button onclick="window.setTaskSpeed(1.5, '1.5x', event)" class="w-full px-0 py-1.5 text-[12px] font-mono font-bold text-center cursor-pointer text-gray-500 hover:bg-gray-100/80 transition-colors rounded-[8px]">1.5x</button>
-                                        <button onclick="window.setTaskSpeed(1.75, '1.75x', event)" class="w-full px-0 py-1.5 text-[12px] font-mono font-bold text-center cursor-pointer text-gray-500 hover:bg-gray-100/80 transition-colors rounded-[8px]">1.75x</button>
-                                        <button onclick="window.setTaskSpeed(10, '2x', event)" class="w-full px-0 py-1.5 text-[12px] font-mono font-bold text-center cursor-pointer text-gray-500 hover:bg-gray-100/80 transition-colors rounded-[8px]">2x</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex-1 flex justify-between items-center pl-4 pr-0 relative w-full min-w-[260px]">
-                            <button id="taskPrevBtn" onclick="window.prevTaskWord()" class="flex items-center justify-center text-[#3B82F6]/20 transition-colors font-medium text-[15px] py-2 px-2 rounded-full cursor-not-allowed whitespace-nowrap shrink-0">
-                                <i class="ph-bold ph-caret-left text-[16px] mr-1"></i>上一题
-                            </button>
-                            <button id="taskPlayBtn" onclick="window.playTaskAudio()" class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[46px] h-[46px] shrink-0 bg-transparent text-[#3B82F6] border-[1.5px] border-[#3B82F6]/40 rounded-full flex items-center justify-center shadow-sm hover:bg-blue-50 transition-all active:scale-95">
-                                <i class="ph-fill ph-play text-[20px] ml-1"></i>
-                            </button>
-                            <button id="taskNextBtn" onclick="window.nextTaskWord()" class="flex items-center justify-center text-[#3B82F6] hover:text-[#2563EB] transition-colors font-medium text-[15px] py-2 px-2 rounded-full cursor-pointer hover:bg-blue-50 whitespace-nowrap shrink-0 ml-auto">下一题
-                                <i class="ph-bold ph-caret-right text-[16px] ml-1"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="h-[84px] flex items-center justify-between w-full px-4 shrink-0">
-                        <div class="flex items-center gap-4">
-                            <button id="taskAutoplayBtn" onclick="window.toggleTaskAutoPlay()" class="h-9 flex items-center px-4 rounded-full border-[1.5px] font-bold text-[13px] transition-all bg-[#eff6ff] border-[#bfdbfe] text-[#3B82F6] hover:bg-[#dbeafe] shadow-sm shrink-0 whitespace-nowrap">
-                                <i class="ph-bold ph-arrows-clockwise text-[16px] mr-1.5"></i><span id="taskAutoplayText">自动下一个</span>
-                            </button>
-                        </div>
-                        <div class="flex items-center gap-4 ml-auto">
-                            <div id="taskStatusPill" class="flex items-center bg-blue-50/90 backdrop-blur-md px-4 py-1.5 rounded-full border border-blue-200 text-[13px] transition-colors shadow-sm whitespace-nowrap h-9">
-                                <i class="ph-bold ph-microphone text-[16px] mr-1.5 text-blue-500"></i><span class="text-blue-600 font-bold">请按住录音</span>
-                            </div>
-                            <button id="taskMicBtn" class="w-[72px] h-[72px] bg-[#3B82F6] text-white rounded-full flex items-center justify-center shadow-[0_8px_24px_rgba(59,130,246,0.4)] hover:bg-[#2563EB] transition-all active:scale-95">
-                                <i class="ph-fill ph-microphone text-[32px]"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
-
-        <div id="taskPickerModal" class="hidden absolute z-[120]" style="left: max(16px, calc(25% - 215px)); top: 118px;">
-            <div class="bg-white rounded-[24px] shadow-2xl border border-white/90 w-[430px] max-h-[650px] overflow-hidden flex flex-col modal-enter">
-                <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between shrink-0">
-                    <div class="flex items-center gap-3">
-                        <div>
-                            <div class="text-[17px] font-extrabold text-gray-900 leading-tight">选择关卡与分组</div>
-                        </div>
-                    </div>
-                    <button onclick="window.closeTaskPicker()" class="w-9 h-9 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors active:scale-95">
-                        <i class="ph-bold ph-x text-[18px]"></i>
-                    </button>
-                </div>
-                <div id="taskLevelList" class="flex-1 min-h-0 overflow-y-auto hide-scrollbar p-3 bg-gray-50/50 flex flex-col gap-2"></div>
-            </div>
-        </div>
-    </div>
-
-
-    <div id="view-task-grading" class="view-section flex-col w-full h-full max-w-[1300px] mx-auto p-4 md:p-5 overflow-hidden gap-4 bg-[#F8FAFC]">
-        <div class="flex items-center justify-between shrink-0 mb-2 px-2 gap-4">
-            <div class="flex items-center gap-4 min-w-0">
-                <button onclick="window.switchView('view-task-levels')" class="w-11 h-11 bg-white hover:bg-gray-50 rounded-[14px] shadow-sm flex items-center justify-center transition-colors text-slate-600 active:scale-95 border border-gray-100">
-                    <i class="ph-bold ph-caret-left text-[22px] -ml-0.5"></i>
-                </button>
-                <h2 class="font-extrabold text-[32px] text-gray-900 tracking-tight leading-none truncate">本轮结果</h2>
-            </div>
-            <div class="flex items-baseline bg-white rounded-[16px] px-4 py-2 shadow-sm border border-gray-100 shrink-0">
-                <span id="taskFinalScore" class="text-[#3B82F6] font-black text-[22px] font-mono leading-none">0</span>
-                <span class="text-gray-400 font-bold text-[14px] ml-1">/ <span id="taskFinalTotal">0</span></span>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-[24px] shadow-premium flex flex-col flex-1 min-h-0 border border-gray-100 relative overflow-hidden">
-            <div class="px-5 py-4 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-[10px] bg-orange-50 text-orange-500 flex items-center justify-center border border-orange-100"><i class="ph-fill ph-warning-circle text-[18px]"></i></div>
-                    <h3 class="font-extrabold text-[17px] text-gray-900">标记不熟</h3>
-                </div>
-                <span class="text-[12px] font-bold text-gray-400">点击单词卡片可切换状态</span>
-            </div>
-            <div id="taskGradingList" class="flex-1 min-h-0 overflow-y-auto hide-scrollbar p-4 bg-gray-50/30 grid grid-cols-2 gap-4 content-start"></div>
-            <div class="shrink-0 border-t border-gray-100 bg-white px-5 py-4 flex items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <button id="taskTakePhotoBtn" onclick="window.simulateTaskTakePhoto()" class="flex items-center justify-center bg-orange-50 hover:bg-orange-100 text-orange-500 border border-orange-200 transition-all font-bold text-[14px] px-5 py-2.5 rounded-[12px] shadow-sm active:scale-95 gap-2">
-                        <i class="ph-fill ph-camera text-[18px]"></i> 拍照留档
-                    </button>
-                    <div id="taskPhotoThumb" class="hidden items-center gap-3">
-                        <div class="w-12 h-12 rounded-[12px] bg-gradient-to-br from-blue-100 to-indigo-100 border border-blue-200 flex items-center justify-center text-blue-500 shadow-sm"><i class="ph-fill ph-image text-[22px]"></i></div>
-                        <div class="text-[13px] font-bold text-gray-500">照片已上传</div>
-                    </div>
-                </div>
-                <button onclick="window.finishTaskGrading()" class="bg-[#1F5FFF] hover:bg-[#004CE6] text-white font-bold py-3 px-10 text-[16px] rounded-[14px] active:scale-95 transition-all shadow-[0_4px_12px_rgba(31,95,255,0.3)]">完成关卡</button>
             </div>
         </div>
     </div>
@@ -580,10 +347,9 @@
             <div id="wordListContainer" class="flex-1 min-h-0 overflow-y-auto px-5 py-4 flex flex-col gap-4 pb-24 hide-scrollbar bg-gray-50/30 content-start"></div>
             <div class="absolute bottom-0 left-0 w-full bg-white border-t border-gray-100 px-6 py-4 flex justify-between items-center z-10 shadow-[0_-4px_20px_rgba(0,0,0,0.03)] shrink-0 gap-4 flex-wrap">
                 <div class="flex items-center gap-4 min-w-0 flex-wrap">
-                    <span class="text-[13px] text-gray-500 font-medium bg-gray-50 border border-gray-100 px-3 py-2 rounded-[12px] whitespace-nowrap">共 <span id="totalPassCount" class="font-mono font-extrabold text-gray-800">10</span> 词</span>
                     <div class="flex items-center gap-1.5 text-[#F97316] text-[15px] font-medium cursor-pointer active:opacity-70 transition-all whitespace-nowrap" onclick="window.scrollToFirstUnanswered()">
                         <i class="ph-fill ph-warning-circle text-[22px]"></i>
-                        <span>剩余待完成：<span id="statRemaining" class="text-[22px] font-extrabold px-1 leading-none">10</span> 题</span>
+                        <span>共 <span id="totalPassCount" class="text-[22px] font-extrabold px-1 leading-none">10</span> 题，剩余 <span id="statRemaining" class="text-[22px] font-extrabold px-1 leading-none">10</span> 题</span>
                         <i class="ph-bold ph-caret-right text-[16px] ml-0.5"></i>
                     </div>
                 </div>
@@ -601,10 +367,12 @@
 
     <div id="view-scoring" class="view-section flex-col w-full h-full absolute inset-0 z-[60] bg-gradient-to-br from-[#EFF6FF] to-[#DFE7FF] text-gray-700 select-none overflow-hidden">
         
-        <div class="absolute left-1/2 top-8 transform -translate-x-1/2 flex items-center space-x-1 z-[70] pointer-events-auto" id="nav-stepper-container"></div>
-        <div class="absolute right-8 top-8 z-[70] flex items-center bg-white rounded-full px-3 py-1.5 shadow-sm border border-gray-100 gap-1.5 pointer-events-auto">
-            <i class="ph-bold ph-clock text-[15px] text-gray-400"></i>
-            <span id="scoring-timer" class="font-mono font-bold text-[13px] text-gray-600 tracking-wide">00:00</span>
+        <div class="absolute left-[73%] top-8 transform -translate-x-1/2 flex items-center space-x-1 z-[70] pointer-events-auto" id="nav-stepper-container"></div>
+        <div class="absolute right-8 top-8 z-[70] pointer-events-auto">
+            <div class="flex items-center bg-white rounded-full px-3 py-1.5 shadow-sm border border-gray-100 gap-1.5 pointer-events-auto">
+                <i class="ph-bold ph-clock text-[15px] text-gray-400"></i>
+                <span id="scoring-timer" class="font-mono font-bold text-[13px] text-gray-600 tracking-wide">00:00</span>
+            </div>
         </div>
 
         <div class="absolute inset-0 pt-[32px] p-8 flex pointer-events-none">
@@ -625,6 +393,8 @@
             <div class="w-px bg-gray-200/80 mt-16 mb-8 mx-2 shrink-0 rounded-full shadow-sm pointer-events-auto"></div>
 
             <div class="flex-1 h-full flex flex-col relative pointer-events-auto pl-6 min-w-0 shrink-0">
+                <div class="h-[40px] mb-4 shrink-0 pointer-events-none"></div>
+
                 <div class="flex-1 flex flex-col items-center justify-center text-center px-4 pointer-events-none min-w-0 w-full space-y-12">
                     <div id="score-word-en" class="text-gray-800 tracking-wide font-bold leading-tight drop-shadow-md max-w-full break-words break-all pointer-events-auto w-full text-[40px] transition-all duration-300">afternoon</div>
                     <div id="score-word-phon" class="text-gray-800 font-bold font-serif tracking-widest drop-shadow-sm pointer-events-auto transition-all duration-300 break-words break-all max-w-full w-full text-[40px] leading-tight">/ˌa:ftə'nu:n/</div>
@@ -632,12 +402,6 @@
                 </div>
 
                 <div class="w-full flex flex-col items-center shrink-0 mt-auto relative z-50 pointer-events-auto">
-                    <div class="w-full flex items-center justify-between px-2 mb-3">
-                        <div id="scoring-status-pill" class="flex items-center space-x-1.5 bg-white/80 backdrop-blur-md px-5 py-1.5 rounded-full border border-gray-200 text-[14px] font-medium text-gray-500 transition-colors shadow-sm pointer-events-auto whitespace-nowrap">等待开始...</div>
-                        <button id="autoplay-toggle-btn" onclick="window.toggleAutoPlay()" class="h-9 flex items-center px-4 rounded-full border-[1.5px] font-bold text-[13px] transition-all bg-[#eff6ff] border-[#bfdbfe] text-[#3B82F6] hover:bg-[#dbeafe] shadow-sm shrink-0 whitespace-nowrap relative z-10">
-                            <i class="ph-bold ph-arrows-clockwise text-[16px] mr-1.5"></i><span id="autoplay-toggle-text">自动下一个</span>
-                        </button>
-                    </div>
                     <div id="control-capsule" class="w-full flex items-center justify-between bg-white/90 backdrop-blur-2xl px-5 h-[72px] rounded-[36px] shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-white/60 pointer-events-auto">
                         
                         <div class="flex items-center space-x-6 pl-6 pr-8 border-r border-gray-200/80 shrink-0">
@@ -688,8 +452,124 @@
                         </div>
 
                     </div>
-                    <div id="mic-container" class="mt-5 h-[84px] flex items-center justify-end w-full transition-opacity duration-300 pr-2 pointer-events-auto">
+                    <div id="mic-container" class="mt-5 h-[84px] flex items-center justify-end w-full transition-opacity duration-300 pr-2 pointer-events-auto relative">
+                        <div class="absolute left-0 top-1/2 -translate-y-1/2 flex items-center gap-8">
+                            <div id="scoring-status-pill" class="flex items-center space-x-1.5 bg-white/80 backdrop-blur-md px-6 py-2.5 rounded-full border border-white text-[14px] font-medium text-gray-500 transition-colors shadow-sm pointer-events-auto whitespace-nowrap">等待开始...</div>
+                            <button id="autoplay-toggle-btn" onclick="window.toggleAutoPlay()" class="h-9 flex items-center px-4 rounded-full border-[1.5px] font-bold text-[13px] transition-all bg-[#eff6ff] border-[#bfdbfe] text-[#3B82F6] hover:bg-[#dbeafe] shadow-sm shrink-0 whitespace-nowrap">
+                                <i class="ph-bold ph-arrows-clockwise text-[16px] mr-1.5"></i><span id="autoplay-toggle-text">自动下一个</span>
+                            </button>
+                        </div>
                         <button id="score-action-btn" class="w-[84px] h-[84px] bg-[#3B82F6] text-white rounded-full flex items-center justify-center shadow-[0_8px_24px_rgba(59,130,246,0.4)] hover:bg-[#2563EB] transition-all focus:outline-none select-none group relative z-[100] overflow-hidden transform cursor-pointer">
+                            <i class="ph-bold ph-microphone text-[32px] pointer-events-none transition-transform group-active:scale-90 shrink-0"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-unfinished-scoring" class="view-section flex-col w-full h-full absolute inset-0 z-[60] bg-gradient-to-br from-[#EFF6FF] to-[#DFE7FF] text-gray-700 select-none overflow-hidden">
+        <div class="absolute left-[258px] top-8 z-[80] pointer-events-auto">
+            <button id="unfinished-level-group-trigger" onclick="window.toggleUnfinishedLevelPicker(event)" class="h-9 px-4 bg-white/95 border border-blue-100 rounded-full shadow-sm text-[#1F5FFF] text-[14px] font-extrabold flex items-center justify-center gap-1.5 hover:bg-white hover:shadow-md active:scale-95 transition-all whitespace-nowrap">
+                <span id="unfinished-level-group-label">第1关 · 第1组</span>
+                <i id="unfinished-level-group-caret" class="ph-bold ph-caret-down text-[13px] transition-transform"></i>
+            </button>
+            <div id="unfinished-level-group-panel" class="hidden absolute left-0 top-[46px] w-[288px] max-h-[430px] overflow-y-auto no-scrollbar rounded-[22px] border border-white/90 bg-white/95 backdrop-blur-xl p-3 shadow-[0_16px_40px_rgba(30,64,175,0.14)]">
+                <div id="unfinished-level-group-list" class="space-y-2"></div>
+            </div>
+        </div>
+        <div class="absolute left-[73%] top-8 transform -translate-x-1/2 flex items-center space-x-1 z-[70] pointer-events-auto" id="unfinished-nav-stepper-container">
+            <div class="flex items-center bg-[#f0f4ff] border-[1.5px] border-[#bfdbfe] rounded-[14px] px-2.5 py-1.5 min-w-[76px] shadow-sm">
+                <div class="bg-white rounded-[6px] p-1 mr-1.5 shadow-sm shrink-0 flex items-center justify-center border border-blue-100"><i class="ph-bold ph-hourglass-high animate-pulse text-[14px] text-[#3B82F6]"></i></div>
+                <div class="flex flex-col text-left justify-center"><span class="text-[12px] font-bold leading-none mb-[2px] text-blue-600">跟读</span><span class="text-[10px] font-bold font-mono leading-none text-blue-400">0/2</span></div>
+            </div>
+            <i class="ph-bold ph-caret-right text-gray-300 text-[14px] shrink-0 mx-0.5"></i>
+            <div class="flex items-center bg-white border-[1.5px] border-transparent rounded-[14px] px-2.5 py-1.5 min-w-[76px] shadow-sm opacity-80">
+                <div class="bg-gray-100 rounded-[6px] p-1 mr-1.5 shrink-0 flex items-center justify-center"><i class="ph-fill ph-lock-key text-[14px] text-gray-400"></i></div>
+                <div class="flex flex-col text-left justify-center"><span class="text-[12px] font-bold leading-none mb-[2px] text-gray-500">音记</span><span class="text-[10px] font-bold font-mono leading-none text-gray-400">0/2</span></div>
+            </div>
+            <i class="ph-bold ph-caret-right text-gray-300 text-[14px] shrink-0 mx-0.5"></i>
+            <div class="flex items-center bg-white border-[1.5px] border-transparent rounded-[14px] px-2.5 py-1.5 min-w-[76px] shadow-sm opacity-80">
+                <div class="bg-gray-100 rounded-[6px] p-1 mr-1.5 shrink-0 flex items-center justify-center"><i class="ph-fill ph-lock-key text-[14px] text-gray-400"></i></div>
+                <div class="flex flex-col text-left justify-center"><span class="text-[12px] font-bold leading-none mb-[2px] text-gray-500">听写</span><span class="text-[10px] font-bold font-mono leading-none text-gray-400">0/1</span></div>
+            </div>
+        </div>
+        <div class="absolute right-8 top-8 z-[70] pointer-events-auto">
+            <div class="flex items-center bg-white rounded-full px-3 py-1.5 shadow-sm border border-gray-100 gap-1.5 pointer-events-auto">
+                <i class="ph-bold ph-clock text-[15px] text-gray-400"></i>
+                <span id="unfinished-scoring-timer" class="font-mono font-bold text-[13px] text-gray-600 tracking-wide">00:00</span>
+            </div>
+        </div>
+
+        <div class="absolute inset-0 pt-[32px] p-8 flex pointer-events-none">
+            <div class="flex-1 h-full flex flex-col pointer-events-auto pr-6 pb-0 shrink-0 min-w-0">
+                <div class="flex items-center h-[40px] mb-4 shrink-0 w-full justify-between">
+                    <div class="flex items-center gap-3">
+                        <button onclick="window.switchView('view-dashboard')" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-gray-600 shrink-0 cursor-pointer hover:shadow-md transition-all pointer-events-auto active:scale-95">
+                            <i class="ph-bold ph-caret-left text-[20px] -ml-0.5"></i>
+                        </button>
+                        <div id="unfinished-score-progress" class="bg-[#1F5FFF]/10 text-[#1F5FFF] font-bold px-4 py-1.5 rounded-full text-[14px] shrink-0 pointer-events-auto">1/4</div>
+                    </div>
+                </div>
+
+                <ul id="unfinished-queue-words-list" class="flex-1 overflow-y-auto px-1 -mx-1 space-y-[6px] scroll-smooth no-scrollbar relative"></ul>
+                <div id="unfinished-queue-submit-bar" class="mt-4 pt-4 border-t border-gray-300/30 flex items-center justify-between px-2 shrink-0 h-[72px]"></div>
+            </div>
+
+            <div class="w-px bg-gray-200/80 mt-16 mb-8 mx-2 shrink-0 rounded-full shadow-sm pointer-events-auto"></div>
+
+            <div class="flex-1 h-full flex flex-col relative pointer-events-auto pl-6 min-w-0 shrink-0">
+                <div class="h-[40px] mb-4 shrink-0 pointer-events-none"></div>
+
+                <div class="flex-1 flex flex-col items-center justify-center text-center px-4 pointer-events-none min-w-0 w-full space-y-12">
+                    <div id="unfinished-score-word-en" class="text-gray-800 tracking-wide font-bold leading-tight drop-shadow-md max-w-full break-words break-all pointer-events-auto w-full text-[40px] transition-all duration-300">phenomenon</div>
+                    <div id="unfinished-score-word-phon" class="text-gray-800 font-bold font-serif tracking-widest drop-shadow-sm pointer-events-auto transition-all duration-300 break-words break-all max-w-full w-full text-[40px] leading-tight">/fəˈnɑːmɪnən/</div>
+                    <div id="unfinished-score-word-cn" class="text-gray-800 font-bold tracking-widest pointer-events-auto leading-tight transition-all duration-300 max-w-full break-words w-full text-[40px]">现象，杰出的人</div>
+                </div>
+
+                <div class="w-full flex flex-col items-center shrink-0 mt-auto relative z-50 pointer-events-auto">
+                    <div class="w-full flex items-center justify-between bg-white/90 backdrop-blur-2xl px-5 h-[72px] rounded-[36px] shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-white/60 pointer-events-auto">
+                        <div class="flex items-center space-x-6 pl-6 pr-8 border-r border-gray-200/80 shrink-0">
+                            <div class="flex flex-col items-center justify-center space-y-0.5">
+                                <span class="text-[11px] text-[#94a3b8] font-bold tracking-wide">音频间隔</span>
+                                <div class="bg-[#f1f5f9] text-[#475569] pl-2 pr-1 py-0.5 rounded flex items-center">
+                                    <input id="unfinished-audio-gap" type="number" step="0.1" value="1.0" class="bg-transparent text-[12px] font-mono font-bold leading-tight w-6 text-center outline-none">
+                                    <span class="text-[10px] opacity-70 font-bold ml-px mr-1">秒</span>
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-center justify-center space-y-0.5">
+                                <span class="text-[11px] text-[#94a3b8] font-bold tracking-wide">单词间隔</span>
+                                <div class="bg-[#f1f5f9] text-[#475569] pl-2 pr-1 py-0.5 rounded flex items-center">
+                                    <input id="unfinished-word-gap" type="number" step="0.1" value="1.0" class="bg-transparent text-[12px] font-mono font-bold leading-tight w-6 text-center outline-none">
+                                    <span class="text-[10px] opacity-70 font-bold ml-px mr-1">秒</span>
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-center justify-center space-y-0.5">
+                                <span class="text-[11px] text-[#94a3b8] font-bold tracking-wide">倍速</span>
+                                <div class="bg-[#f1f5f9] text-[#475569] px-2 py-0.5 rounded text-[12px] font-mono font-bold leading-tight min-w-[36px] text-center">1x</div>
+                            </div>
+                        </div>
+
+                        <div class="flex-1 flex justify-between items-center pl-4 pr-0 relative w-full">
+                            <button id="unfinished-prev-btn" class="flex items-center justify-center text-[#3B82F6]/20 transition-colors font-medium text-[14px] sm:text-[15px] py-2 px-2 rounded-full cursor-not-allowed whitespace-nowrap shrink-0" onclick="window.prevUnfinishedScoreWord()">
+                                <i class="ph-bold ph-caret-left text-[16px] mr-1"></i>上一题
+                            </button>
+                            <button onclick="window.playUnfinishedSystemAudio()" class="absolute left-1/2 transform -translate-x-1/2 w-[46px] h-[46px] shrink-0 bg-transparent text-[#3B82F6] border-[1.5px] border-[#3B82F6]/40 rounded-full flex items-center justify-center shadow-sm hover:bg-blue-50 transition-all active:scale-95 focus:outline-none">
+                                <i class="ph-fill ph-play text-[20px] ml-1"></i>
+                            </button>
+                            <button id="unfinished-next-btn" class="flex items-center justify-center text-[#3B82F6] hover:text-[#2563EB] transition-colors font-medium text-[14px] sm:text-[15px] py-2 px-2 rounded-full cursor-pointer hover:bg-blue-50 whitespace-nowrap shrink-0 ml-auto" onclick="window.nextUnfinishedScoreWord()">下一题
+                                <i class="ph-bold ph-caret-right text-[16px] ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-5 h-[84px] flex items-center justify-end w-full transition-opacity duration-300 pr-2 pointer-events-auto relative">
+                        <div class="absolute left-0 top-1/2 -translate-y-1/2 flex items-center gap-8">
+                            <div id="unfinished-scoring-status-pill" class="flex items-center space-x-1.5 bg-white/80 backdrop-blur-md px-6 py-2.5 rounded-full border border-white text-[14px] font-medium text-gray-500 transition-colors shadow-sm pointer-events-auto whitespace-nowrap">等待开始...</div>
+                            <button id="unfinished-autoplay-toggle-btn" onclick="window.toggleUnfinishedAutoPlay()" class="h-9 flex items-center px-4 rounded-full border-[1.5px] font-bold text-[13px] transition-all bg-[#eff6ff] border-[#bfdbfe] text-[#3B82F6] hover:bg-[#dbeafe] shadow-sm shrink-0 whitespace-nowrap">
+                                <i class="ph-bold ph-arrows-clockwise text-[16px] mr-1.5"></i><span id="unfinished-autoplay-toggle-text">自动下一个</span>
+                            </button>
+                        </div>
+                        <button id="unfinished-score-action-btn" class="w-[84px] h-[84px] bg-[#3B82F6] text-white rounded-full flex items-center justify-center shadow-[0_8px_24px_rgba(59,130,246,0.4)] hover:bg-[#2563EB] transition-all focus:outline-none select-none group relative z-[100] overflow-hidden transform cursor-pointer">
                             <i class="ph-bold ph-microphone text-[32px] pointer-events-none transition-transform group-active:scale-90 shrink-0"></i>
                         </button>
                     </div>
@@ -858,17 +738,8 @@
             var selectedGenType = 'new';
             var learningTimerInterval = null;
             var learningSeconds = 0;
-            var taskTimerInterval = null;
-            var taskSeconds = 0;
-            var taskVisibleWords = [];
-            var taskCurrentIdx = 0;
-            var taskRecording = false;
-            var taskScores = [];
-            var taskAutoPlay = true;
-            var taskPlaybackSpeed = 1;
-            var taskAutoTimer = null;
-            var taskPlayTimer = null;
-            var taskMarkedUnfamiliar = new Set();
+            var unfinishedTimerInterval = null;
+            var unfinishedSeconds = 0;
             
                         var passingTimerInterval = null;
             var passingSeconds = 0;
@@ -894,6 +765,21 @@
                 clearInterval(learningTimerInterval);
             }
 
+            function startUnfinishedTimer() {
+                clearInterval(unfinishedTimerInterval);
+                unfinishedSeconds = 0;
+                var timerEl = document.getElementById('unfinished-scoring-timer');
+                if (timerEl) timerEl.innerText = '00:00';
+                unfinishedTimerInterval = setInterval(function() {
+                    unfinishedSeconds++;
+                    if (timerEl) timerEl.innerText = formatTime(unfinishedSeconds);
+                }, 1000);
+            }
+
+            function stopUnfinishedTimer() {
+                clearInterval(unfinishedTimerInterval);
+            }
+
             function startPassingTimer() {
                 clearInterval(passingTimerInterval);
                 passingSeconds = 0;
@@ -907,23 +793,6 @@
 
             function stopPassingTimer() {
                 clearInterval(passingTimerInterval);
-            }
-
-            function startTaskTimer() {
-                clearInterval(taskTimerInterval);
-                taskSeconds = 0;
-                var timerEl = document.getElementById('task-timer');
-                if (timerEl) timerEl.innerText = '00:00';
-                taskTimerInterval = setInterval(function() {
-                    taskSeconds++;
-                    if (timerEl) timerEl.innerText = formatTime(taskSeconds);
-                }, 1000);
-            }
-
-            function stopTaskTimer() {
-                clearInterval(taskTimerInterval);
-                clearTimeout(taskAutoTimer);
-                clearTimeout(taskPlayTimer);
             }
 
             // ====== 全局挂载基础函数 ======
@@ -980,12 +849,10 @@
                 var targetView = document.getElementById(viewId);
                 if (targetView) targetView.classList.add('active');
                 
-                if (viewId !== 'view-passing') stopPassingTimer();
-                if (viewId !== 'view-task-levels') stopTaskTimer();
+                                if (viewId !== 'view-passing') stopPassingTimer();
+                if (viewId !== 'view-unfinished-scoring') stopUnfinishedTimer();
 if(viewId === 'view-dashboard') renderDashboardUI();
                 if(viewId === 'view-vocab') renderVocabBookFull();
-                if(viewId === 'view-task-levels') { renderTaskLevelPage(); startTaskTimer(); }
-                if(viewId === 'view-task-grading') renderTaskGradingPage();
             };
 
             // ====== 核心数据与状态 ======
@@ -1035,19 +902,15 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 currentTaskId: null,
                 assignedTasks: [],
                 unfinishedTasks: [
-                    { id: 101, title: "必修一 Unit 1 核心词汇", count: 45, current: 45, lastDone: new Date().toDateString() },
-                    { id: 102, title: "单元音单音节（新）", count: 30, current: 15, lastDone: null },
-                    { id: 103, title: "必修一 Unit 2 重点词组", count: 25, current: 0, lastDone: null },
-                    { id: 104, title: "模块三 综合复习卷一", count: 60, current: 12, lastDone: null },
-                    { id: 105, title: "高考高频词 冲刺一", count: 50, current: 5, lastDone: null },
-                    { id: 106, title: "双元音发音特训", count: 40, current: 0, lastDone: null },
-                    { id: 107, title: "必修一 Unit 3 拓展词汇", count: 35, current: 0, lastDone: null },
-                    { id: 108, title: "不规则动词变化表上", count: 55, current: 0, lastDone: null }
+                    { id: 101, title: "必修一 Unit 1 核心词汇", count: 45, target: 1, current: 45, lastDone: getTodayDateString() },
+                    { id: 102, title: "单元音单音节（新）", count: 30, target: 1, current: 15, lastDone: null },
+                    { id: 103, title: "必修一 Unit 2 重点词组", count: 25, target: 1, current: 0, lastDone: null },
+                    { id: 104, title: "模块三 综合复习卷一", count: 60, target: 1, current: 12, lastDone: null },
+                    { id: 105, title: "高考高频词 冲刺一", count: 50, target: 1, current: 5, lastDone: null },
+                    { id: 106, title: "双元音发音特训", count: 40, target: 1, current: 0, lastDone: null },
+                    { id: 107, title: "必修一 Unit 3 拓展词汇", count: 35, target: 1, current: 0, lastDone: null },
+                    { id: 108, title: "不规则动词变化表一", count: 55, target: 1, current: 0, lastDone: null }
                 ],
-                taskLevels: [],
-                expandedLevelId: null,
-                selectedGroupKey: null,
-                activeTaskMode: 'read',
                 _tempUnknowns: [],
                 wordOffset: 0 
             };
@@ -1321,567 +1184,6 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 }
             }
 
-            function buildTaskLevels(task) {
-                var seed = task ? task.id : 100;
-                return Array.from({ length: 20 }, (_, levelIndex) => {
-                    var levelNo = levelIndex + 1;
-                    var groups = Array.from({ length: 4 }, (_, groupIndex) => {
-                        var groupNo = groupIndex + 1;
-                        var base = 5 + ((seed + levelNo + groupNo) % 4);
-                        var counts = {
-                            read: base,
-                            memo: base + ((levelNo + groupNo) % 2),
-                            dict: base + 1 + ((levelNo + groupNo) % 2)
-                        };
-                        var words = Array.from({ length: 6 }, (_, wordIndex) => {
-                            var raw = rawWordsData[(seed + levelNo * 3 + groupNo * 5 + wordIndex) % rawWordsData.length];
-                            return {
-                                word: raw.word,
-                                phonetic: raw.phonetic,
-                                meaning: raw.meaning,
-                                tag: ['跟读', '音记', '听写'][(wordIndex + groupNo + levelNo) % 3]
-                            };
-                        });
-                        return {
-                            id: groupNo,
-                            key: `${levelNo}-${groupNo}`,
-                            name: `第 ${groupNo} 组`,
-                            counts: counts,
-                            total: counts.read + counts.memo + counts.dict,
-                            words: words,
-                            status: (levelNo + groupNo) % 5 === 0 ? '学习中' : ((levelNo + groupNo) % 4 === 0 ? '待强化' : '待学习')
-                        };
-                    });
-                    return {
-                        id: levelNo,
-                        title: `第 ${levelNo} 关`,
-                        groups: groups,
-                        total: groups.reduce((sum, group) => sum + group.total, 0)
-                    };
-                });
-            }
-
-            window.openTaskLevelPage = function(taskId) {
-                var task = state.unfinishedTasks.find(item => item.id === taskId) || state.unfinishedTasks[0];
-                state.taskLevels = buildTaskLevels(task);
-                state.expandedLevelId = null;
-                state.selectedGroupKey = null;
-                state.activeTaskMode = 'read';
-                taskCurrentIdx = 0;
-                taskRecording = false;
-                taskScores = [];
-                taskMarkedUnfamiliar.clear();
-                setTaskStatus('idle');
-                clearTimeout(taskAutoTimer);
-                clearTimeout(taskPlayTimer);
-                window.switchView('view-task-levels');
-            };
-
-            window.selectTaskLevel = function(levelId) {
-                var level = state.taskLevels.find(item => item.id === levelId);
-                if (!level) return;
-                state.expandedLevelId = levelId;
-                state.selectedGroupKey = level.groups[0].key;
-                state.activeTaskMode = 'read';
-                taskCurrentIdx = 0;
-                taskScores = [];
-                taskMarkedUnfamiliar.clear();
-                renderTaskLevelPage();
-            };
-
-            window.selectTaskGroup = function(levelId, groupId, e) {
-                if (e) e.stopPropagation();
-                var level = state.taskLevels.find(item => item.id === levelId);
-                if (!level) return;
-                var group = level.groups.find(item => item.id === groupId);
-                if (!group) return;
-                state.expandedLevelId = levelId;
-                state.selectedGroupKey = group.key;
-                state.activeTaskMode = 'read';
-                taskCurrentIdx = 0;
-                taskScores = [];
-                taskMarkedUnfamiliar.clear();
-                window.closeTaskPicker();
-                renderTaskLevelPage();
-            };
-
-            function getTaskPickerActionTarget(startEl) {
-                var el = startEl;
-                while (el && el !== document) {
-                    if (el.getAttribute && (el.getAttribute('data-task-picker-group') || el.getAttribute('data-task-picker-level'))) return el;
-                    el = el.parentNode;
-                }
-                return null;
-            }
-
-            var taskPickerActionTouchTime = 0;
-
-            function handleTaskPickerActionTouch(e) {
-                var target = getTaskPickerActionTarget(e.target);
-                if (!target) return;
-                e.preventDefault();
-                e.stopPropagation();
-                var now = Date.now();
-                if (now - taskPickerActionTouchTime < 350) return;
-                taskPickerActionTouchTime = now;
-
-                var levelId = parseInt(target.getAttribute('data-level-id'), 10);
-                if (target.getAttribute('data-task-picker-group')) {
-                    var groupId = parseInt(target.getAttribute('data-group-id'), 10);
-                    if (!isNaN(levelId) && !isNaN(groupId)) window.selectTaskGroup(levelId, groupId, e);
-                    return;
-                }
-                if (!isNaN(levelId)) window.selectTaskLevel(levelId);
-            }
-
-            function initTaskPickerTouchEvents() {
-                var modal = document.getElementById('taskPickerModal');
-                if (!modal || modal.getAttribute('data-touch-bound') === '1') return;
-                modal.setAttribute('data-touch-bound', '1');
-                modal.addEventListener('touchend', handleTaskPickerActionTouch, { passive: false });
-                modal.addEventListener('pointerup', handleTaskPickerActionTouch);
-            }
-
-            var taskPickerLastTouchTime = 0;
-
-            window.openTaskPickerFromEvent = function(e) {
-                if (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    var now = Date.now();
-                    if (e.type === 'touchend' || e.type === 'pointerup') {
-                        if (now - taskPickerLastTouchTime < 350) return;
-                        taskPickerLastTouchTime = now;
-                    } else if (e.type === 'click' && now - taskPickerLastTouchTime < 700) {
-                        return;
-                    }
-                }
-                window.openTaskPicker();
-            };
-
-            window.openTaskPicker = function() {
-                var modal = document.getElementById('taskPickerModal');
-                if (modal) {
-                    if (!modal.classList.contains('hidden')) {
-                        window.closeTaskPicker();
-                        return;
-                    }
-                    modal.classList.remove('hidden');
-                    modal.classList.add('block');
-                }
-                renderTaskLevelPage();
-            };
-
-            window.closeTaskPicker = function() {
-                var modal = document.getElementById('taskPickerModal');
-                if (modal) {
-                    modal.classList.add('hidden');
-                    modal.classList.remove('block');
-                }
-            };
-
-            window.setTaskGroupMode = function(mode) {
-                state.activeTaskMode = mode;
-                taskCurrentIdx = 0;
-                taskScores = [];
-                taskMarkedUnfamiliar.clear();
-                renderTaskLevelPage();
-            };
-
-            function taskSpeedDelay(ms) {
-                return Math.max(120, Math.round(ms / taskPlaybackSpeed));
-            }
-
-            function getTaskAudioGapMs() {
-                var input = document.getElementById('task-audio-gap');
-                var value = input ? parseFloat(input.value) : 1;
-                return Math.max(100, (isNaN(value) ? 1 : value) * 1000);
-            }
-
-            function getTaskWordGapMs() {
-                var input = document.getElementById('task-word-gap');
-                var value = input ? parseFloat(input.value) : 1;
-                return Math.max(100, (isNaN(value) ? 1 : value) * 1000);
-            }
-
-            function updateTaskAutoPlayButton() {
-                var btn = document.getElementById('taskAutoplayBtn');
-                var text = document.getElementById('taskAutoplayText');
-                if (!btn || !text) return;
-                text.innerText = taskAutoPlay ? '自动下一个' : '手动下一个';
-                btn.className = taskAutoPlay
-                    ? "h-10 flex items-center px-4 rounded-full border-[1.5px] font-bold text-[13px] transition-all bg-[#eff6ff] border-[#bfdbfe] text-[#3B82F6] hover:bg-[#dbeafe] shadow-sm shrink-0 whitespace-nowrap"
-                    : "h-10 flex items-center px-4 rounded-full border-[1.5px] font-bold text-[13px] transition-all bg-white border-gray-200 text-gray-500 hover:bg-gray-50 shadow-sm shrink-0 whitespace-nowrap";
-            }
-
-            window.toggleTaskAutoPlay = function() {
-                taskAutoPlay = !taskAutoPlay;
-                updateTaskAutoPlayButton();
-            };
-
-            window.toggleTaskSpeedMenu = function(e) {
-                if (e) e.stopPropagation();
-                var menu = document.getElementById('taskSpeedMenu');
-                if (!menu) return;
-                var isHidden = menu.classList.contains('hidden');
-                menu.classList.toggle('hidden', !isHidden);
-                menu.classList.toggle('flex', isHidden);
-                setTimeout(() => {
-                    menu.classList.toggle('opacity-0', !isHidden);
-                    menu.classList.toggle('scale-95', !isHidden);
-                }, 10);
-            };
-
-            window.setTaskSpeed = function(value, label, e) {
-                if (e) e.stopPropagation();
-                taskPlaybackSpeed = value;
-                var display = document.getElementById('taskSpeedDisplay');
-                var menu = document.getElementById('taskSpeedMenu');
-                if (display) display.innerText = label;
-                if (menu) {
-                    menu.classList.add('hidden', 'opacity-0', 'scale-95');
-                    menu.classList.remove('flex');
-                }
-            };
-
-            function setTaskStatus(type) {
-                var pill = document.getElementById('taskStatusPill');
-                if (!pill) return;
-                if (type === 'recording') {
-                    pill.innerHTML = `<div class="w-2.5 h-2.5 rounded-full bg-red-500 mr-2 animate-pulse"></div><span class="font-bold">录音中</span>`;
-                    pill.className = "flex items-center bg-red-50/90 backdrop-blur-md text-red-600 px-5 py-1.5 rounded-full border border-red-200 text-[14px] transition-colors shadow-sm whitespace-nowrap";
-                } else if (type === 'playing') {
-                    pill.innerHTML = `<span class="relative flex h-3 w-3 mr-2.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span></span><span class="font-bold text-[#1F5FFF]">系统发音中</span>`;
-                    pill.className = "flex items-center bg-[#1F5FFF]/10 backdrop-blur-md px-6 py-2.5 rounded-full border border-[#1F5FFF]/20 text-[14px] transition-colors shadow-sm whitespace-nowrap";
-                } else if (type === 'scored') {
-                    var score = taskScores[taskCurrentIdx];
-                    var scoreClass = score < 60 ? 'text-red-600 bg-red-50 border-red-200' : (score <= 70 ? 'text-orange-600 bg-orange-50 border-orange-200' : 'text-green-600 bg-green-50 border-green-200');
-                    pill.innerHTML = `<i class="ph-bold ph-seal-check text-[16px] mr-1.5"></i><span class="font-bold">${score}分</span>`;
-                    pill.className = `flex items-center ${scoreClass} px-5 py-1.5 rounded-full border text-[14px] transition-colors shadow-sm whitespace-nowrap`;
-                } else {
-                    pill.innerHTML = `<i class="ph-bold ph-microphone text-[16px] mr-1.5 text-blue-500"></i><span class="text-blue-600 font-bold">请按住录音</span>`;
-                    pill.className = "flex items-center bg-blue-50/90 backdrop-blur-md px-4 py-1.5 rounded-full border border-blue-200 text-[13px] transition-colors shadow-sm whitespace-nowrap";
-                }
-            }
-
-            function updateTaskWordView() {
-                if (!taskVisibleWords.length) return;
-                taskCurrentIdx = Math.max(0, Math.min(taskCurrentIdx, taskVisibleWords.length - 1));
-                var currWord = taskVisibleWords[taskCurrentIdx];
-                var progressEl = document.getElementById('taskProgress');
-                var totalEl = document.getElementById('taskTotalCount');
-                var remainingEl = document.getElementById('taskRemaining');
-                var submitBtn = document.getElementById('taskSubmitBtn');
-                var wordEnEl = document.getElementById('taskWordEn');
-                var wordPhonEl = document.getElementById('taskWordPhon');
-                var wordCnEl = document.getElementById('taskWordCn');
-                var remainingCount = taskVisibleWords.filter((_, index) => taskScores[index] == null).length;
-                if (progressEl) progressEl.innerText = `${taskCurrentIdx + 1}/${taskVisibleWords.length}`;
-                if (totalEl) totalEl.innerText = taskVisibleWords.length;
-                if (remainingEl) remainingEl.innerText = remainingCount;
-                if (submitBtn) {
-                    if (remainingCount === 0) {
-                        submitBtn.className = 'bg-[#1F5FFF] hover:bg-[#004CE6] text-white font-bold py-3 px-6 text-[14px] rounded-[14px] transition-all active:scale-95 shadow-[0_4px_12px_rgba(31,95,255,0.22)] whitespace-nowrap shrink-0';
-                        submitBtn.disabled = false;
-                    } else {
-                        submitBtn.className = 'bg-[#F1F5F9] text-[#94A3B8] font-bold py-3 px-6 text-[14px] rounded-[14px] transition-all cursor-not-allowed whitespace-nowrap shrink-0';
-                        submitBtn.disabled = true;
-                    }
-                }
-                if (wordEnEl) wordEnEl.innerText = currWord.word;
-                if (wordPhonEl) wordPhonEl.innerText = currWord.phonetic;
-                if (wordCnEl) wordCnEl.innerText = currWord.meaning;
-                if (taskScores[taskCurrentIdx] != null) setTaskStatus('scored');
-                else if (!taskRecording) setTaskStatus('idle');
-
-                var prevBtn = document.getElementById('taskPrevBtn');
-                var nextBtn = document.getElementById('taskNextBtn');
-                if (prevBtn) {
-                    prevBtn.disabled = taskCurrentIdx === 0;
-                    prevBtn.className = taskCurrentIdx === 0
-                        ? "flex items-center justify-center text-[#3B82F6]/20 transition-colors font-medium text-[15px] py-2 px-2 rounded-full cursor-not-allowed whitespace-nowrap shrink-0"
-                        : "flex items-center justify-center text-[#3B82F6] hover:text-[#2563EB] transition-colors font-medium text-[15px] py-2 px-2 rounded-full cursor-pointer hover:bg-blue-50 whitespace-nowrap shrink-0";
-                }
-                if (nextBtn) {
-                    nextBtn.disabled = taskCurrentIdx === taskVisibleWords.length - 1;
-                    nextBtn.className = taskCurrentIdx === taskVisibleWords.length - 1
-                        ? "flex items-center justify-center text-[#3B82F6]/20 transition-colors font-medium text-[15px] py-2 px-2 rounded-full cursor-not-allowed whitespace-nowrap shrink-0 ml-auto"
-                        : "flex items-center justify-center text-[#3B82F6] hover:text-[#2563EB] transition-colors font-medium text-[15px] py-2 px-2 rounded-full cursor-pointer hover:bg-blue-50 whitespace-nowrap shrink-0 ml-auto";
-                }
-
-                renderTaskQueue();
-            }
-
-            function renderTaskQueue() {
-                var queueEl = document.getElementById('taskQueueList');
-                if (!queueEl) return;
-                queueEl.style.paddingTop = queueEl.style.paddingBottom = 'calc(50% - 34px)';
-                queueEl.innerHTML = taskVisibleWords.map((item, index) => {
-                    var isCurrent = index === taskCurrentIdx;
-                    var statusHtml = '';
-                    var score = taskScores[index];
-                    if (taskRecording && isCurrent) statusHtml = `<div class="text-[13px] text-red-600 bg-red-100/90 px-3 py-1.5 rounded-xl font-bold flex items-center border border-red-200 backdrop-blur-md transition-colors"><span class="relative flex h-2.5 w-2.5 mr-1.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span></span>录音中</div>`;
-                    else if (score != null) { var colorClass = score < 60 ? 'text-red-600 bg-red-100/80 border-red-200' : (score <= 70 ? 'text-orange-600 bg-orange-100/80 border-orange-200' : 'text-green-600 bg-green-100/80 border-green-200'); statusHtml = `<div class="text-[13px] ${colorClass} px-3 py-1.5 rounded-xl font-bold border backdrop-blur-md">${score}分</div>`; }
-                    else if (isCurrent) statusHtml = `<div class="text-[13px] text-[#1F5FFF] bg-[#1F5FFF]/15 px-4 py-1.5 rounded-xl font-bold flex items-center border border-[#1F5FFF]/20 backdrop-blur-md transition-colors">当前</div>`;
-                    else statusHtml = `<div class="text-[13px] ${index < taskCurrentIdx ? 'text-gray-400' : 'text-gray-500 bg-gray-200/50 rounded-xl'} px-4 py-1.5 backdrop-blur-md">${index < taskCurrentIdx ? '已跳过' : '即将'}</div>`;
-
-                    return `
-                        <li id="task-queue-item-${index}" onclick="window.selectTaskWord(${index})" class="${isCurrent ? 'bg-white/95 backdrop-blur-xl opacity-100 scale-100 z-10 relative shadow-[0_8px_24px_rgba(0,0,0,0.08)] border-white' : 'bg-white/50 backdrop-blur-md opacity-70 scale-[0.98] border-white/40'} pl-4 pr-4 py-3.5 rounded-[16px] border flex justify-between items-center transition-all duration-300 min-h-[68px] cursor-pointer">
-                            <div class="flex-1 flex items-baseline space-x-3 overflow-hidden pr-2 min-w-0">
-                                <span class="text-[15px] font-mono text-gray-400 font-bold shrink-0">${index + 1}.</span>
-                                <span class="font-extrabold text-[17px] ${isCurrent ? 'text-[#2563EB]' : 'text-[#334155]'} transition-colors truncate shrink min-w-0 max-w-[40%]">${item.word}</span>
-                                <span class="text-[17px] text-gray-400 font-serif shrink-0">${item.phonetic}</span>
-                                <span class="text-[17px] ${isCurrent ? 'text-[#475569]' : 'text-gray-500'} truncate font-medium shrink min-w-0 flex-1">${item.meaning}</span>
-                            </div>
-                            <div class="flex-shrink-0">${statusHtml}</div>
-                        </li>
-                    `;
-                }).join('');
-                setTimeout(() => {
-                    var curr = document.getElementById(`task-queue-item-${taskCurrentIdx}`);
-                    if (curr) queueEl.scrollTo({ top: curr.offsetTop + (curr.clientHeight / 2) - queueEl.clientHeight / 2, behavior: 'smooth' });
-                }, 50);
-            }
-
-            window.selectTaskWord = function(index) {
-                if (taskRecording) return;
-                clearTimeout(taskAutoTimer);
-                clearTimeout(taskPlayTimer);
-                taskCurrentIdx = index;
-                updateTaskWordView();
-            };
-
-            window.prevTaskWord = function() {
-                if (!taskRecording && taskCurrentIdx > 0) {
-                    clearTimeout(taskAutoTimer);
-                    clearTimeout(taskPlayTimer);
-                    taskCurrentIdx--;
-                    updateTaskWordView();
-                }
-            };
-
-            window.nextTaskWord = function() {
-                if (!taskRecording && taskCurrentIdx < taskVisibleWords.length - 1) {
-                    clearTimeout(taskAutoTimer);
-                    clearTimeout(taskPlayTimer);
-                    taskCurrentIdx++;
-                    updateTaskWordView();
-                }
-            };
-
-            function scheduleTaskAutoNext() {
-                clearTimeout(taskAutoTimer);
-                if (!taskAutoPlay || taskCurrentIdx >= taskVisibleWords.length - 1) return;
-                taskAutoTimer = setTimeout(() => {
-                    window.nextTaskWord();
-                    if (taskAutoPlay) window.playTaskAudio();
-                }, taskSpeedDelay(getTaskWordGapMs()));
-            }
-
-            window.playTaskAudio = function() {
-                if (taskRecording) return;
-                clearTimeout(taskPlayTimer);
-                setTaskStatus('playing');
-                taskPlayTimer = setTimeout(() => { if (!taskRecording) setTaskStatus(taskScores[taskCurrentIdx] != null ? 'scored' : 'idle'); }, taskSpeedDelay(getTaskAudioGapMs()));
-            };
-
-            function initTaskMicEvents() {
-                var btn = document.getElementById('taskMicBtn');
-                if (!btn) return;
-                var startRecord = function(e) {
-                    if (e.type === 'touchstart' && e.cancelable) e.preventDefault();
-                    if (taskRecording) return;
-                    taskRecording = true;
-                    btn.classList.add('scale-95', 'bg-red-500');
-                    setTaskStatus('recording');
-                    renderTaskQueue();
-                };
-                var stopRecord = function(e) {
-                    if (!taskRecording) return;
-                    if (e && (e.type === 'touchend' || e.type === 'touchcancel') && e.cancelable) e.preventDefault();
-                    taskRecording = false;
-                    btn.classList.remove('scale-95', 'bg-red-500');
-                    taskScores[taskCurrentIdx] = 72 + ((taskCurrentIdx * 7 + taskSeconds) % 27);
-                    setTaskStatus('scored');
-                    renderTaskQueue();
-                    scheduleTaskAutoNext();
-                };
-                btn.addEventListener('mousedown', startRecord);
-                btn.addEventListener('touchstart', startRecord, { passive: false });
-                window.addEventListener('mouseup', stopRecord);
-                window.addEventListener('touchend', stopRecord, { passive: false });
-                window.addEventListener('touchcancel', stopRecord, { passive: false });
-            }
-
-            window.submitTaskRound = function() {
-                var remainingCount = taskVisibleWords.filter((_, index) => taskScores[index] == null).length;
-                if (remainingCount > 0) return;
-                taskMarkedUnfamiliar.clear();
-                window.switchView('view-task-grading');
-            };
-
-            function renderTaskGradingPage() {
-                var list = document.getElementById('taskGradingList');
-                var finalScoreEl = document.getElementById('taskFinalScore');
-                var finalTotalEl = document.getElementById('taskFinalTotal');
-                if (!list) return;
-                var total = taskVisibleWords.length;
-                var baseScore = taskScores.reduce((sum, score) => sum + (score || 0), 0);
-                var finalScore = Math.max(0, Math.round(baseScore / Math.max(1, total)) - taskMarkedUnfamiliar.size * 3);
-                if (finalScoreEl) finalScoreEl.innerText = finalScore;
-                if (finalTotalEl) finalTotalEl.innerText = total;
-                list.innerHTML = taskVisibleWords.map((item, index) => {
-                    var marked = taskMarkedUnfamiliar.has(index);
-                    var score = taskScores[index] || 0;
-                    return `
-                        <button onclick="window.toggleTaskUnfamiliar(${index})" class="text-left rounded-[20px] border ${marked ? 'border-red-200 bg-red-50/80' : 'border-gray-100 bg-white'} shadow-sm p-4 transition-all active:scale-[0.98] flex items-center gap-3 min-h-[88px]">
-                            <div class="w-10 h-10 rounded-[12px] ${marked ? 'bg-red-100 text-red-500 border-red-200' : 'bg-blue-50 text-blue-500 border-blue-100'} border flex items-center justify-center shrink-0">
-                                <i class="ph-fill ${marked ? 'ph-warning-circle' : 'ph-check-circle'} text-[21px]"></i>
-                            </div>
-                            <div class="min-w-0 flex-1">
-                                <div class="flex items-baseline gap-2 min-w-0">
-                                    <span class="font-mono font-extrabold text-[17px] ${marked ? 'text-red-700' : 'text-gray-900'} truncate">${item.word}</span>
-                                    <span class="font-mono text-[13px] text-gray-400 shrink-0">${item.phonetic}</span>
-                                </div>
-                                <div class="text-[13px] text-gray-500 truncate mt-1">${item.meaning}</div>
-                            </div>
-                            <div class="shrink-0 flex flex-col items-end gap-1">
-                                <span class="font-mono font-black text-[18px] ${marked ? 'text-red-600' : 'text-blue-600'}">${score}</span>
-                                <span class="text-[11px] font-bold ${marked ? 'text-red-600 bg-red-100 border-red-200' : 'text-gray-400 bg-gray-50 border-gray-100'} border px-2 py-0.5 rounded-[6px]">${marked ? '不熟' : '标记不熟'}</span>
-                            </div>
-                        </button>
-                    `;
-                }).join('');
-            }
-
-            window.toggleTaskUnfamiliar = function(index) {
-                if (taskMarkedUnfamiliar.has(index)) taskMarkedUnfamiliar.delete(index);
-                else taskMarkedUnfamiliar.add(index);
-                renderTaskGradingPage();
-            };
-
-            window.simulateTaskTakePhoto = function() {
-                var btn = document.getElementById('taskTakePhotoBtn');
-                var thumb = document.getElementById('taskPhotoThumb');
-                if (btn) btn.classList.add('hidden');
-                if (thumb) {
-                    thumb.classList.remove('hidden');
-                    thumb.classList.add('flex');
-                }
-            };
-
-            window.finishTaskGrading = function() {
-                var btn = document.getElementById('taskTakePhotoBtn');
-                var thumb = document.getElementById('taskPhotoThumb');
-                if (btn) btn.classList.remove('hidden');
-                if (thumb) {
-                    thumb.classList.add('hidden');
-                    thumb.classList.remove('flex');
-                }
-                window.switchView('view-task-levels');
-            };
-
-            function getSelectedTaskLevelAndGroup() {
-                for (var level of state.taskLevels) {
-                    var group = level.groups.find(item => item.key === state.selectedGroupKey);
-                    if (group) return { level: level, group: group };
-                }
-                return { level: null, group: null };
-            }
-
-            function renderTaskLevelPage() {
-                var listEl = document.getElementById('taskLevelList');
-                var eyebrowEl = document.getElementById('taskGroupEyebrow');
-                var queueEl = document.getElementById('taskQueueList');
-                var stepperEl = document.getElementById('taskTopStepper');
-                if (!listEl || !queueEl) return;
-
-                if (!state.taskLevels.length) state.taskLevels = buildTaskLevels(state.unfinishedTasks[0]);
-                if (!state.selectedGroupKey && state.taskLevels[0]) state.selectedGroupKey = state.taskLevels[0].groups[0].key;
-
-                listEl.innerHTML = state.taskLevels.map(level => {
-                    var isExpanded = state.expandedLevelId === level.id;
-                    var selectedGroup = level.groups.find(group => group.key === state.selectedGroupKey);
-                    var levelClass = isExpanded ? 'bg-blue-50 border-blue-200 shadow-sm' : (selectedGroup ? 'bg-white border-blue-100 shadow-sm' : 'bg-white border-gray-100 hover:border-blue-100 hover:bg-blue-50/30');
-                    var groupHtml = isExpanded ? `
-                        <div class="grid grid-cols-2 gap-1.5 mt-2">
-                            ${level.groups.map(group => {
-                                var isSelected = selectedGroup && selectedGroup.key === group.key;
-                                var groupClass = isSelected ? 'bg-[#1F5FFF] text-white border-[#1F5FFF] shadow-[0_4px_10px_rgba(31,95,255,0.22)]' : 'bg-white text-slate-600 border-gray-100 hover:border-blue-200';
-                                return `
-                                    <button onclick="window.selectTaskGroup(${level.id}, ${group.id}, event)" data-task-picker-group="1" data-level-id="${level.id}" data-group-id="${group.id}" class="h-[48px] rounded-[12px] border ${groupClass} active:scale-95 transition-all flex flex-col items-start justify-center px-2.5 text-left touch-manipulation">
-                                        <span class="text-[12px] font-extrabold leading-none">${group.name}</span>
-                                        <span class="text-[10px] font-bold opacity-75 mt-1.5 font-mono">${group.counts.read}/${group.counts.memo}/${group.counts.dict}</span>
-                                    </button>
-                                `;
-                            }).join('')}
-                        </div>
-                    ` : '';
-
-                    return `
-                        <div class="rounded-[16px] border ${levelClass} transition-all p-2.5">
-                            <button onclick="window.selectTaskLevel(${level.id})" data-task-picker-level="1" data-level-id="${level.id}" class="w-full flex items-center gap-3 text-left active:scale-[0.99] transition-transform touch-manipulation">
-                                <div class="min-w-0 flex-1">
-                                    <div class="flex items-center gap-2 min-w-0">
-                                        <h4 class="text-[13px] font-extrabold text-gray-900 truncate">${level.title}</h4>
-                                        ${selectedGroup ? '<span class="text-[9px] font-bold bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-[6px] shrink-0">当前</span>' : ''}
-                                    </div>
-                                </div>
-                                <i class="ph-bold ${isExpanded ? 'ph-caret-up text-blue-500' : 'ph-caret-down text-gray-400'} text-[16px] shrink-0"></i>
-                            </button>
-                            ${groupHtml}
-                        </div>
-                    `;
-                }).join('');
-
-                var selected = getSelectedTaskLevelAndGroup();
-                if (!selected.level || !selected.group) {
-                    if (eyebrowEl) eyebrowEl.innerHTML = '选择关卡 <i class="ph-bold ph-caret-down text-[13px]"></i>';
-                    return;
-                }
-
-                var level = selected.level;
-                var group = selected.group;
-                var modeMeta = {
-                    read: { label: '跟读', icon: 'ph-microphone-stage', colorClass: 'bg-blue-50 text-blue-500 border-blue-100', count: group.counts.read },
-                    memo: { label: '音记', icon: 'ph-headphones', colorClass: 'bg-cyan-50 text-cyan-500 border-cyan-100', count: group.counts.memo },
-                    dict: { label: '听写', icon: 'ph-pencil-simple', colorClass: 'bg-rose-50 text-rose-500 border-rose-100', count: group.counts.dict }
-                };
-                var activeMeta = modeMeta[state.activeTaskMode] || modeMeta.read;
-                var activeCount = activeMeta.count;
-                var visibleWords = group.words.slice(0, Math.min(group.words.length, Math.max(4, activeCount)));
-                taskVisibleWords = visibleWords;
-                if (taskCurrentIdx >= taskVisibleWords.length) taskCurrentIdx = 0;
-                while (taskScores.length < taskVisibleWords.length) taskScores.push(null);
-                if (taskScores.length > taskVisibleWords.length) taskScores = taskScores.slice(0, taskVisibleWords.length);
-                updateTaskAutoPlayButton();
-
-                if (eyebrowEl) eyebrowEl.innerHTML = `${level.title} · ${group.name} <i class="ph-bold ph-caret-down text-[13px]"></i>`;
-                if (stepperEl) {
-                    stepperEl.innerHTML = Object.entries(modeMeta).map(([key, meta], idx) => {
-                        var isActive = key === 'read';
-                        var isLocked = key !== 'read';
-                        var target = key === 'dict' ? 1 : 2;
-                        return `
-                        <div class="flex items-center">
-                            <button class="${isActive ? 'bg-[#f0f4ff] border-[#bfdbfe] shadow-sm' : 'bg-white border-transparent shadow-sm opacity-80'} border-[1.5px] h-[38px] px-2.5 rounded-[14px] flex items-center gap-1.5 transition-all min-w-[76px]">
-                                <div class="${isActive ? 'bg-white border border-blue-100 shadow-sm' : 'bg-gray-100'} rounded-[6px] p-1 shrink-0 flex items-center justify-center">
-                                        <i class="${isLocked ? 'ph-fill ph-lock-key text-gray-400' : 'ph-bold ph-hourglass-high animate-pulse text-[#3B82F6]'} text-[14px]"></i>
-                                    </div>
-                                    <div class="flex flex-col items-start leading-none">
-                                        <span class="text-[12px] font-bold leading-none mb-[2px] ${isActive ? 'text-blue-600' : 'text-gray-500'}">${meta.label}</span>
-                                        <span class="text-[10px] font-bold font-mono leading-none ${isActive ? 'text-blue-400' : 'text-gray-400'}">0/${target}</span>
-                                    </div>
-                                </button>
-                                ${idx < 2 ? '<i class="ph-bold ph-caret-right text-gray-300 text-[14px] mx-2"></i>' : ''}
-                            </div>
-                        `;
-                    }).join('');
-                }
-                setTaskStatus('idle');
-                updateTaskWordView();
-            }
-
             function renderDashboardUI() {
                 renderDataDashboard();
                 var dashVocabCount = document.getElementById('dashVocabCount');
@@ -1895,63 +1197,63 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                         taskContainer.classList.remove('hidden'); noTaskBox.classList.add('hidden'); taskContainer.innerHTML = '';
                         state.assignedTasks.forEach(task => {
                             var isDoneToday = task.lastDone === today;
-                            taskContainer.innerHTML += `<button onclick="${isDoneToday ? '' : `window.startPassing('assigned', '老师指定任务', ${task.id}, ${task.count})`}" class="w-full p-3.5 rounded-[14px] transition-colors flex justify-between items-center text-left relative overflow-hidden ${isDoneToday ? 'opacity-70 cursor-not-allowed bg-gradient-to-r from-gray-50 to-white border border-gray-100' : 'bg-gradient-to-r from-[#F0F5FF] to-white active:scale-95 border border-blue-100 hover:border-blue-300 cursor-pointer shadow-sm'}"><div class="flex flex-col gap-1 w-full pr-4"><h3 class="font-bold text-[14px] ${isDoneToday ? 'text-gray-500' : 'text-gray-900'} truncate w-full">${task.title}</h3><div class="text-[11px] font-bold ${isDoneToday ? 'text-gray-500' : 'text-blue-600'} font-mono mt-0.5">进度 ${task.current}/${task.target}</div></div><div class="shrink-0 text-[12px] font-bold">${isDoneToday ? `<span class="text-green-600 bg-green-50 border border-green-200 px-2.5 py-1 rounded-[6px] flex items-center gap-1"><i class="ph-fill ph-check-circle"></i> 今日已完成</span>` : `<span class="text-orange-500 bg-orange-50 border border-orange-200 px-2.5 py-1 rounded-[6px] flex items-center gap-1"><i class="ph-fill ph-sparkle"></i> 今日待打卡</span>`}</div></button>`;
+                            taskContainer.innerHTML += `<button onclick="${isDoneToday ? '' : `window.startPassing('assigned', '老师指定任务', ${task.id}, ${task.count})`}" class="w-full p-3 rounded-[14px] transition-colors flex justify-between items-center text-left relative overflow-hidden ${isDoneToday ? 'opacity-70 cursor-not-allowed bg-gradient-to-r from-gray-50 to-white border border-gray-100' : 'bg-gradient-to-r from-[#F0F5FF] to-white active:scale-95 border border-blue-100 hover:border-blue-300 cursor-pointer shadow-sm'}"><div class="flex flex-col gap-1 w-full pr-3 min-w-0"><h3 class="font-bold text-[13px] ${isDoneToday ? 'text-gray-500' : 'text-gray-900'} truncate w-full">${task.title}</h3><div class="text-[11px] font-bold ${isDoneToday ? 'text-gray-500' : 'text-blue-600'} font-mono mt-0.5">进度 ${task.current}/${task.count}</div></div><div class="shrink-0 text-[11px] font-bold">${isDoneToday ? `<span class="text-green-600 bg-green-50 border border-green-200 px-2 py-1 rounded-[6px] flex items-center gap-1"><i class="ph-fill ph-check-circle"></i> 已完成</span>` : `<span class="text-orange-500 bg-orange-50 border border-orange-200 px-2 py-1 rounded-[6px] flex items-center gap-1"><i class="ph-fill ph-sparkle"></i> 待打卡</span>`}</div></button>`;
                         });
                     } else { taskContainer.classList.add('hidden'); noTaskBox.classList.remove('hidden'); }
                 }
                 var unfinishedContainer = document.getElementById('unfinishedTaskContainer');
-                var noUnfinishedBox = document.getElementById('noUnfinishedTaskBox');
                 var unfinishedCount = document.getElementById('unfinishedTaskCount');
-                if (unfinishedContainer && noUnfinishedBox) {
-                    if (state.unfinishedTasks.length > 0) {
+                var noUnfinishedTaskBox = document.getElementById('noUnfinishedTaskBox');
+                if (unfinishedContainer && noUnfinishedTaskBox) {
+                    var unfinishedTasks = state.unfinishedTasks || [];
+                    if (unfinishedTasks.length > 0) {
                         unfinishedContainer.classList.remove('hidden');
-                        noUnfinishedBox.classList.add('hidden');
-                        if (unfinishedCount) unfinishedCount.innerText = state.unfinishedTasks.length;
-
-                        var unfinishedHtml = `
+                        noUnfinishedTaskBox.classList.add('hidden');
+                        if (unfinishedCount) unfinishedCount.innerText = unfinishedTasks.length;
+                        var tableHtml = `
                             <div class="w-full border-t border-gray-200 overflow-hidden bg-white">
                                 <table class="w-full text-left border-collapse" style="table-layout: fixed;">
-                                    <thead class="bg-gray-50/80 text-[11px] font-extrabold text-gray-500 tracking-wider sticky top-0 z-10">
+                                    <thead class="bg-gray-50/80 text-[12px] font-extrabold text-gray-500 tracking-wider">
                                         <tr>
-                                            <th class="w-[48px] py-2.5 text-center border-b border-r border-gray-200">序号</th>
-                                            <th class="py-2.5 pl-3 border-b border-r border-gray-200 truncate">任务名称</th>
-                                            <th class="w-[58px] py-2.5 text-center border-b border-r border-gray-200">词数</th>
-                                            <th class="w-[76px] py-2.5 text-center border-b border-r border-gray-200">进度</th>
-                                            <th class="w-[58px] py-2.5 text-center border-b border-gray-200">操作</th>
+                                            <th class="w-[50px] py-3 text-center border-b border-r border-gray-200">序号</th>
+                                            <th class="py-3 pl-4 border-b border-r border-gray-200 truncate">任务名称</th>
+                                            <th class="w-[60px] py-3 text-center border-b border-r border-gray-200">词数</th>
+                                            <th class="w-[80px] py-3 text-center border-b border-r border-gray-200">进度</th>
+                                            <th class="w-[60px] py-3 text-center border-b border-gray-200">操作</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                         `;
-
-                        state.unfinishedTasks.forEach((task, index) => {
+                        unfinishedTasks.forEach((task, index) => {
                             var isDoneToday = task.lastDone === today;
                             var numStr = (index + 1).toString().padStart(2, '0');
+                            var rowClick = isDoneToday ? '' : `onclick="window.enterUnfinishedScoringView(${task.id})"`;
                             var trClass = isDoneToday ? 'bg-gray-50/40' : 'hover:bg-blue-50/30 transition-colors cursor-pointer group';
                             var titleColor = isDoneToday ? 'text-gray-400' : 'text-gray-700 group-hover:text-blue-700';
                             var progressColor = isDoneToday ? 'text-emerald-500' : 'text-gray-800';
                             var btnHtml = isDoneToday
                                 ? `<button class="w-8 h-8 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center cursor-not-allowed shadow-inner transition-all mx-auto" title="已完成"><i class="ph-bold ph-check text-[15px]"></i></button>`
-                                : `<a href="./2-0.1aixuexi.html?task=${task.id}" data-action="open-task" data-task-id="${task.id}" class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 group-hover:bg-blue-500 group-hover:text-white flex items-center justify-center transition-all shadow-sm mx-auto active:scale-95" title="进入任务"><i class="ph-bold ph-arrow-right text-[15px]"></i></a>`;
+                                : `<button class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 group-hover:bg-blue-500 group-hover:text-white flex items-center justify-center transition-all shadow-sm mx-auto active:scale-95" onclick="event.stopPropagation(); window.enterUnfinishedScoringView(${task.id})" title="进入任务"><i class="ph-bold ph-arrow-right text-[15px]"></i></button>`;
 
-                            unfinishedHtml += `
-                                <tr class="${trClass}">
+                            tableHtml += `
+                                <tr class="${trClass}" ${rowClick}>
                                     <td class="py-3 text-center border-b border-r border-gray-200 text-[13px] font-mono font-bold text-gray-400">${numStr}</td>
-                                    <td class="py-3 pl-3 border-b border-r border-gray-200 text-[13px] font-bold ${titleColor} truncate transition-colors" title="${task.title}">${task.title}</td>
+                                    <td class="py-3 pl-4 border-b border-r border-gray-200 text-[14px] font-bold ${titleColor} truncate transition-colors" title="${task.title}">${task.title}</td>
                                     <td class="py-3 text-center border-b border-r border-gray-200 text-[13px] font-mono font-medium text-gray-500">${task.count}</td>
-                                    <td class="py-3 text-center border-b border-r border-gray-200 text-[13px] font-mono font-black ${progressColor}">${task.current}/${task.count}</td>
+                                    <td class="py-3 text-center border-b border-r border-gray-200 text-[14px] font-mono font-black ${progressColor}">${task.current}/${task.count}</td>
                                     <td class="py-3 text-center border-b border-gray-200">${btnHtml}</td>
                                 </tr>
                             `;
                         });
-                        unfinishedHtml += `
+                        tableHtml += `
                                     </tbody>
                                 </table>
                             </div>
                         `;
-                        unfinishedContainer.innerHTML = unfinishedHtml;
+                        unfinishedContainer.innerHTML = tableHtml;
                     } else {
                         unfinishedContainer.classList.add('hidden');
-                        noUnfinishedBox.classList.remove('hidden');
+                        noUnfinishedTaskBox.classList.remove('hidden');
                         if (unfinishedCount) unfinishedCount.innerText = '0';
                     }
                 }
@@ -2234,6 +1536,335 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 } else {
                     window.showModal('完美掌握', `<div class="mt-1 font-medium text-gray-600">太棒了！<br>本次打卡全对，没有产生任何盲点！</div>`, () => window.switchView('view-dashboard'));
                 }
+            };
+
+            // ====== 未完成任务专用沉浸页：复制专属关卡页面但独立运行 ======
+            var unfinishedScoringData = [];
+            var unfinishedScores = [];
+            var unfinishedCurrentIdx = 0;
+            var unfinishedAutoPlay = true;
+            var unfinishedRecording = false;
+            var unfinishedPlayTimer = null;
+            var unfinishedAutoTimer = null;
+            var unfinishedLevelGroups = [];
+            var unfinishedSelectedLevel = 1;
+            var unfinishedSelectedGroup = 1;
+            var unfinishedExpandedLevel = 1;
+            var unfinishedActiveTask = null;
+
+            function initUnfinishedLevelGroups() {
+                if (unfinishedLevelGroups.length) return;
+                for (var level = 1; level <= 10; level++) {
+                    var groups = [];
+                    for (var group = 1; group <= 4; group++) {
+                        groups.push({ id: group, completed: false });
+                    }
+                    unfinishedLevelGroups.push({ id: level, groups: groups });
+                }
+            }
+
+            function getUnfinishedGroup(levelId, groupId) {
+                initUnfinishedLevelGroups();
+                var level = unfinishedLevelGroups.find(item => item.id === levelId);
+                return level ? level.groups.find(item => item.id === groupId) : null;
+            }
+
+            function updateUnfinishedLevelTrigger() {
+                var label = document.getElementById('unfinished-level-group-label');
+                var trigger = document.getElementById('unfinished-level-group-trigger');
+                var currentGroup = getUnfinishedGroup(unfinishedSelectedLevel, unfinishedSelectedGroup);
+                if (label) label.innerText = `第${unfinishedSelectedLevel}关 · 第${unfinishedSelectedGroup}组`;
+                if (trigger) {
+                    trigger.className = currentGroup && currentGroup.completed
+                        ? "h-9 px-4 bg-green-50/95 border border-green-200 rounded-full shadow-sm text-green-700 text-[14px] font-extrabold flex items-center justify-center gap-1.5 hover:bg-green-50 hover:shadow-md active:scale-95 transition-all whitespace-nowrap"
+                        : "h-9 px-4 bg-white/95 border border-blue-100 rounded-full shadow-sm text-[#1F5FFF] text-[14px] font-extrabold flex items-center justify-center gap-1.5 hover:bg-white hover:shadow-md active:scale-95 transition-all whitespace-nowrap";
+                }
+            }
+
+            function renderUnfinishedLevelPicker() {
+                initUnfinishedLevelGroups();
+                updateUnfinishedLevelTrigger();
+                var list = document.getElementById('unfinished-level-group-list');
+                if (!list) return;
+                list.innerHTML = unfinishedLevelGroups.map(level => {
+                    var isExpanded = unfinishedExpandedLevel === level.id;
+                    var selectedInLevel = unfinishedSelectedLevel === level.id;
+                    var completeCount = level.groups.filter(group => group.completed).length;
+                    var groupsHtml = isExpanded ? `
+                        <div class="grid grid-cols-2 gap-2 px-1 pb-1">
+                            ${level.groups.map(group => {
+                                var isSelected = selectedInLevel && unfinishedSelectedGroup === group.id;
+                                var groupClass = group.completed
+                                    ? 'bg-green-50 border-green-200 text-green-700'
+                                    : (isSelected ? 'bg-[#1F5FFF] border-[#1F5FFF] text-white shadow-sm' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-blue-50 hover:border-blue-200 hover:text-[#1F5FFF]');
+                                return `
+                                    <button onclick="window.selectUnfinishedLevelGroup(${level.id}, ${group.id}, event)" class="min-h-[44px] rounded-[14px] border ${groupClass} px-3 py-2 flex items-center justify-center gap-1.5 text-[13px] font-extrabold active:scale-95 transition-all">
+                                        <span>第${group.id}组</span>
+                                        ${group.completed ? '<span class="text-[11px] font-bold opacity-90">已完成</span>' : ''}
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
+                    ` : '';
+                    return `
+                        <div class="rounded-[18px] border ${isExpanded ? 'border-blue-100 bg-blue-50/40' : 'border-slate-100 bg-white'} overflow-hidden transition-all">
+                            <button onclick="window.toggleUnfinishedLevelRow(${level.id}, event)" class="w-full min-h-[46px] px-3 flex items-center justify-between text-left active:scale-[0.98] transition-all">
+                                <span class="${selectedInLevel ? 'text-[#1F5FFF]' : 'text-slate-700'} text-[14px] font-extrabold">第${level.id}关</span>
+                                <span class="flex items-center gap-2">
+                                    ${completeCount ? `<span class="text-[11px] font-bold text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full">${completeCount}/4已完成</span>` : ''}
+                                    <i class="ph-bold ph-caret-down text-[13px] ${isExpanded ? 'rotate-180 text-[#1F5FFF]' : 'text-slate-400'} transition-transform"></i>
+                                </span>
+                            </button>
+                            ${groupsHtml}
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            function setUnfinishedLevelPickerOpen(open) {
+                var panel = document.getElementById('unfinished-level-group-panel');
+                var caret = document.getElementById('unfinished-level-group-caret');
+                if (!panel) return;
+                panel.classList.toggle('hidden', !open);
+                if (caret) caret.classList.toggle('rotate-180', open);
+            }
+
+            function resetUnfinishedGroupProgress() {
+                unfinishedScoringData = buildUnfinishedScoringWords(unfinishedActiveTask);
+                unfinishedScores = unfinishedScoringData.map(() => null);
+                unfinishedCurrentIdx = 0;
+                unfinishedRecording = false;
+                clearTimeout(unfinishedPlayTimer);
+                clearTimeout(unfinishedAutoTimer);
+            }
+
+            function buildUnfinishedScoringWords(task) {
+                var seed = ((task && task.id ? task.id : 101) - 101) + ((unfinishedSelectedLevel - 1) * 4) + (unfinishedSelectedGroup - 1);
+                var start = Math.max(0, seed % rawWordsData.length);
+                var words = [];
+                for (var i = 0; i < 4; i++) {
+                    var base = rawWordsData[(start + i) % rawWordsData.length];
+                    words.push({ en: base.word, phon: base.phonetic, cn: base.meaning });
+                }
+                return words;
+            }
+
+            function setUnfinishedStatus(type) {
+                var pill = document.getElementById('unfinished-scoring-status-pill');
+                if (!pill) return;
+                if (type === 'playing') {
+                    pill.innerHTML = `<span class="relative flex h-3 w-3 mr-2.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span></span><span class="font-bold text-[#1F5FFF]">系统发音中</span>`;
+                    pill.className = "flex items-center bg-[#1F5FFF]/10 backdrop-blur-md px-6 py-2.5 rounded-full border border-[#1F5FFF]/20 text-[14px] transition-colors shadow-sm whitespace-nowrap pointer-events-auto";
+                } else if (type === 'recording') {
+                    pill.innerHTML = `<div class="w-2.5 h-2.5 rounded-full bg-red-500 mr-2 animate-pulse"></div><span class="font-bold">录音中</span>`;
+                    pill.className = "flex items-center bg-red-50/90 backdrop-blur-md text-red-600 px-5 py-1.5 rounded-full border border-red-200 text-[14px] transition-colors shadow-sm whitespace-nowrap pointer-events-auto";
+                } else if (type === 'scored') {
+                    var score = unfinishedScores[unfinishedCurrentIdx] || 0;
+                    var scoreClass = score < 60 ? 'bg-red-50 text-red-600 border-red-200' : (score <= 70 ? 'bg-orange-50 text-orange-600 border-orange-200' : 'bg-green-50 text-green-600 border-green-200');
+                    pill.innerHTML = `<i class="ph-bold ph-seal-check text-[16px] mr-1.5"></i><span class="font-bold">${score}分</span>`;
+                    pill.className = `flex items-center px-4 py-1.5 rounded-full border text-[14px] transition-colors backdrop-blur-md shadow-sm whitespace-nowrap pointer-events-auto ${scoreClass}`;
+                } else {
+                    pill.innerHTML = `<i class="ph-bold ph-microphone text-[16px] mr-1.5 text-blue-500"></i><span class="text-blue-600 font-bold">请按住录音</span>`;
+                    pill.className = "flex items-center bg-white/80 backdrop-blur-md px-6 py-2.5 rounded-full border border-white text-[14px] font-medium text-gray-500 transition-colors shadow-sm pointer-events-auto whitespace-nowrap";
+                }
+            }
+
+            function renderUnfinishedScoringPage() {
+                if (!unfinishedScoringData.length) return;
+                unfinishedCurrentIdx = Math.max(0, Math.min(unfinishedCurrentIdx, unfinishedScoringData.length - 1));
+                var curr = unfinishedScoringData[unfinishedCurrentIdx];
+                var progressEl = document.getElementById('unfinished-score-progress');
+                if (progressEl) progressEl.innerText = `${unfinishedCurrentIdx + 1}/${unfinishedScoringData.length}`;
+                var enEl = document.getElementById('unfinished-score-word-en');
+                var phonEl = document.getElementById('unfinished-score-word-phon');
+                var cnEl = document.getElementById('unfinished-score-word-cn');
+                if (enEl) enEl.innerText = curr.en;
+                if (phonEl) phonEl.innerText = curr.phon;
+                if (cnEl) cnEl.innerText = curr.cn;
+
+                var prevBtn = document.getElementById('unfinished-prev-btn');
+                var nextBtn = document.getElementById('unfinished-next-btn');
+                if (prevBtn) {
+                    prevBtn.disabled = unfinishedCurrentIdx === 0;
+                    prevBtn.className = unfinishedCurrentIdx === 0
+                        ? "flex items-center justify-center text-[#3B82F6]/20 transition-colors font-medium text-[14px] sm:text-[15px] py-2 px-2 rounded-full cursor-not-allowed whitespace-nowrap shrink-0"
+                        : "flex items-center justify-center text-[#3B82F6] hover:text-[#2563EB] transition-colors font-medium text-[14px] sm:text-[15px] py-2 px-2 rounded-full cursor-pointer hover:bg-blue-50 whitespace-nowrap shrink-0";
+                }
+                if (nextBtn) {
+                    nextBtn.disabled = unfinishedCurrentIdx === unfinishedScoringData.length - 1;
+                    nextBtn.className = unfinishedCurrentIdx === unfinishedScoringData.length - 1
+                        ? "flex items-center justify-center text-[#3B82F6]/20 transition-colors font-medium text-[14px] sm:text-[15px] py-2 px-2 rounded-full cursor-not-allowed whitespace-nowrap shrink-0 ml-auto"
+                        : "flex items-center justify-center text-[#3B82F6] hover:text-[#2563EB] transition-colors font-medium text-[14px] sm:text-[15px] py-2 px-2 rounded-full cursor-pointer hover:bg-blue-50 whitespace-nowrap shrink-0 ml-auto";
+                }
+
+                renderUnfinishedQueue();
+                renderUnfinishedSubmitBar();
+                if (unfinishedScores[unfinishedCurrentIdx] != null) setUnfinishedStatus('scored');
+                else if (!unfinishedRecording) setUnfinishedStatus('idle');
+            }
+
+            function renderUnfinishedQueue() {
+                var list = document.getElementById('unfinished-queue-words-list');
+                if (!list) return;
+                list.style.paddingTop = list.style.paddingBottom = 'calc(50% - 34px)';
+                list.innerHTML = unfinishedScoringData.map((item, index) => {
+                    var isCurrent = index === unfinishedCurrentIdx;
+                    var score = unfinishedScores[index];
+                    var statusHtml = '';
+                    if (unfinishedRecording && isCurrent) statusHtml = `<div class="text-[13px] text-red-600 bg-red-100/90 px-3 py-1.5 rounded-xl font-bold flex items-center border border-red-200 backdrop-blur-md transition-colors"><span class="relative flex h-2.5 w-2.5 mr-1.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span></span>录音中</div>`;
+                    else if (score != null) { var colorClass = score < 60 ? 'text-red-600 bg-red-100/80 border-red-200' : (score <= 70 ? 'text-orange-600 bg-orange-100/80 border-orange-200' : 'text-green-600 bg-green-100/80 border-green-200'); statusHtml = `<div class="text-[13px] ${colorClass} px-3 py-1.5 rounded-xl font-bold border backdrop-blur-md">${score}分</div>`; }
+                    else if (isCurrent) statusHtml = `<div class="text-[13px] text-[#1F5FFF] bg-[#1F5FFF]/15 px-4 py-1.5 rounded-xl font-bold flex items-center border border-[#1F5FFF]/20 backdrop-blur-md transition-colors">当前</div>`;
+                    else statusHtml = `<div class="text-[13px] ${index < unfinishedCurrentIdx ? 'text-gray-400' : 'text-gray-500 bg-gray-200/50 rounded-xl'} px-4 py-1.5 backdrop-blur-md">${index < unfinishedCurrentIdx ? '已跳过' : '即将'}</div>`;
+                    return `
+                        <li id="unfinished-queue-item-${index}" onclick="window.selectUnfinishedScoreWord(${index})" class="${isCurrent ? 'bg-white/95 backdrop-blur-xl opacity-100 scale-100 z-10 relative shadow-[0_8px_24px_rgba(0,0,0,0.08)] border-white' : 'bg-white/50 backdrop-blur-md opacity-70 scale-[0.98] border-white/40'} pl-4 pr-4 py-3.5 rounded-[16px] border flex justify-between items-center transition-all duration-300 min-h-[68px] cursor-pointer">
+                            <div class="flex-1 flex items-baseline space-x-3 overflow-hidden pr-2 min-w-0">
+                                <span class="text-[15px] font-mono text-gray-400 font-bold shrink-0">${index + 1}.</span>
+                                <span class="font-extrabold text-[17px] ${isCurrent ? 'text-[#2563EB]' : 'text-[#334155]'} transition-colors truncate shrink min-w-0 max-w-[40%]">${item.en}</span>
+                                <span class="text-[17px] text-gray-400 font-serif shrink-0">${item.phon}</span>
+                                <span class="text-[17px] ${isCurrent ? 'text-[#475569]' : 'text-gray-500'} truncate font-medium shrink min-w-0 flex-1">${item.cn}</span>
+                            </div>
+                            <div class="flex-shrink-0">${statusHtml}</div>
+                        </li>
+                    `;
+                }).join('');
+                setTimeout(() => {
+                    var currEl = document.getElementById(`unfinished-queue-item-${unfinishedCurrentIdx}`);
+                    if (currEl) list.scrollTo({ top: currEl.offsetTop + (currEl.clientHeight / 2) - list.clientHeight / 2, behavior: 'smooth' });
+                }, 80);
+            }
+
+            function renderUnfinishedSubmitBar() {
+                var bar = document.getElementById('unfinished-queue-submit-bar');
+                if (!bar) return;
+                var total = unfinishedScoringData.length;
+                var remaining = unfinishedScores.filter(score => score == null).length;
+                var canSubmit = remaining === 0;
+                bar.innerHTML = `<div class="flex items-center cursor-pointer group shrink-0"><div class="w-6 h-6 rounded-full bg-[#eef2ff] border border-[#c7d2fe] flex items-center justify-center text-[#6366f1] mr-2 shrink-0"><span class="font-bold text-[16px] -mt-px">!</span></div><span class="text-[#6366f1] font-medium text-[15px] flex items-center whitespace-nowrap">共 <span class="font-bold text-[22px] mx-1.5 leading-none">${total}</span> 题，剩余 <span class="font-bold text-[22px] mx-1.5 leading-none">${remaining}</span> 题 <i class="ph-bold ph-caret-right text-[16px] ml-0.5 opacity-70"></i></span></div><div class="flex items-center space-x-5 shrink-0"><button onclick="window.submitUnfinishedRound()" class="${canSubmit ? 'bg-[#1F5FFF] hover:bg-[#004ce6] text-white active:scale-95 shadow-sm' : 'bg-[#e2e8f0] text-[#94a3b8] cursor-not-allowed'} font-bold py-2.5 px-6 rounded-xl text-[15px] transition-all whitespace-nowrap flex items-center shrink-0">提交本轮</button></div>`;
+            }
+
+            function bindUnfinishedMicEvents() {
+                var btn = document.getElementById('unfinished-score-action-btn');
+                if (!btn || btn.getAttribute('data-bound') === '1') return;
+                btn.setAttribute('data-bound', '1');
+                var start = function(e) {
+                    if (e.type === 'touchstart') e.preventDefault();
+                    if (unfinishedRecording) return;
+                    clearTimeout(unfinishedPlayTimer);
+                    unfinishedRecording = true;
+                    btn.classList.add('scale-95', 'bg-red-500');
+                    setUnfinishedStatus('recording');
+                    renderUnfinishedQueue();
+                };
+                var end = function(e) {
+                    if (e && e.type === 'touchend') e.preventDefault();
+                    if (!unfinishedRecording) return;
+                    unfinishedRecording = false;
+                    btn.classList.remove('scale-95', 'bg-red-500');
+                    unfinishedScores[unfinishedCurrentIdx] = 72 + ((unfinishedCurrentIdx * 9 + unfinishedSeconds) % 25);
+                    setUnfinishedStatus('scored');
+                    renderUnfinishedScoringPage();
+                    if (unfinishedAutoPlay && unfinishedCurrentIdx < unfinishedScoringData.length - 1) {
+                        clearTimeout(unfinishedAutoTimer);
+                        unfinishedAutoTimer = setTimeout(() => window.nextUnfinishedScoreWord(), 650);
+                    }
+                };
+                btn.addEventListener('mousedown', start);
+                btn.addEventListener('touchstart', start, { passive: false });
+                window.addEventListener('mouseup', end);
+                window.addEventListener('touchend', end, { passive: false });
+                window.addEventListener('touchcancel', end, { passive: false });
+            }
+
+            window.enterUnfinishedScoringView = function(taskId) {
+                var task = (state.unfinishedTasks || []).find(item => item.id === taskId) || (state.unfinishedTasks || [])[0];
+                unfinishedActiveTask = task;
+                initUnfinishedLevelGroups();
+                unfinishedSelectedLevel = 1;
+                unfinishedSelectedGroup = 1;
+                unfinishedExpandedLevel = 1;
+                resetUnfinishedGroupProgress();
+                unfinishedAutoPlay = true;
+                window.switchView('view-unfinished-scoring');
+                startUnfinishedTimer();
+                setUnfinishedLevelPickerOpen(false);
+                setTimeout(() => {
+                    bindUnfinishedMicEvents();
+                    renderUnfinishedLevelPicker();
+                    renderUnfinishedScoringPage();
+                }, 50);
+            };
+
+            window.toggleUnfinishedLevelPicker = function(event) {
+                if (event) event.stopPropagation();
+                initUnfinishedLevelGroups();
+                renderUnfinishedLevelPicker();
+                var panel = document.getElementById('unfinished-level-group-panel');
+                setUnfinishedLevelPickerOpen(panel ? panel.classList.contains('hidden') : true);
+            };
+
+            window.toggleUnfinishedLevelRow = function(levelId, event) {
+                if (event) event.stopPropagation();
+                unfinishedExpandedLevel = levelId;
+                renderUnfinishedLevelPicker();
+            };
+
+            window.selectUnfinishedLevelGroup = function(levelId, groupId, event) {
+                if (event) event.stopPropagation();
+                if (unfinishedRecording) return;
+                unfinishedSelectedLevel = levelId;
+                unfinishedSelectedGroup = groupId;
+                unfinishedExpandedLevel = levelId;
+                resetUnfinishedGroupProgress();
+                renderUnfinishedLevelPicker();
+                setUnfinishedLevelPickerOpen(false);
+                renderUnfinishedScoringPage();
+            };
+
+            window.selectUnfinishedScoreWord = function(index) {
+                if (unfinishedRecording) return;
+                unfinishedCurrentIdx = index;
+                renderUnfinishedScoringPage();
+            };
+
+            window.prevUnfinishedScoreWord = function() {
+                if (unfinishedRecording || unfinishedCurrentIdx <= 0) return;
+                unfinishedCurrentIdx--;
+                renderUnfinishedScoringPage();
+            };
+
+            window.nextUnfinishedScoreWord = function() {
+                if (unfinishedRecording || unfinishedCurrentIdx >= unfinishedScoringData.length - 1) return;
+                unfinishedCurrentIdx++;
+                renderUnfinishedScoringPage();
+            };
+
+            window.playUnfinishedSystemAudio = function() {
+                if (unfinishedRecording) return;
+                clearTimeout(unfinishedPlayTimer);
+                setUnfinishedStatus('playing');
+                unfinishedPlayTimer = setTimeout(() => {
+                    if (!unfinishedRecording) setUnfinishedStatus(unfinishedScores[unfinishedCurrentIdx] != null ? 'scored' : 'idle');
+                }, 650);
+            };
+
+            window.toggleUnfinishedAutoPlay = function() {
+                unfinishedAutoPlay = !unfinishedAutoPlay;
+                var btn = document.getElementById('unfinished-autoplay-toggle-btn');
+                var text = document.getElementById('unfinished-autoplay-toggle-text');
+                if (!btn || !text) return;
+                text.innerText = unfinishedAutoPlay ? '自动下一个' : '手动下一个';
+                btn.className = unfinishedAutoPlay
+                    ? "h-9 flex items-center px-4 rounded-full border-[1.5px] font-bold text-[13px] transition-all bg-[#eff6ff] border-[#bfdbfe] text-[#3B82F6] hover:bg-[#dbeafe] shadow-sm shrink-0 whitespace-nowrap"
+                    : "h-9 flex items-center px-4 rounded-full border-[1.5px] font-bold text-[13px] transition-all bg-white border-gray-300 text-gray-500 hover:bg-gray-50 shadow-sm shrink-0 whitespace-nowrap";
+            };
+
+            window.submitUnfinishedRound = function() {
+                if (unfinishedScores.some(score => score == null)) return;
+                var group = getUnfinishedGroup(unfinishedSelectedLevel, unfinishedSelectedGroup);
+                if (group) group.completed = true;
+                updateUnfinishedLevelTrigger();
+                renderUnfinishedLevelPicker();
+                window.showModal('提交成功', '<div class="mt-1 font-medium text-gray-600">本轮任务已提交。</div>', () => window.switchView('view-dashboard'));
             };
 
             // ====== 沉浸式评分视图与核心逻辑 ======
@@ -2592,20 +2223,22 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 var targetProgress = modeRound[currentMode] + 1; 
                 var unfinished = scoringData.filter(item => item[currentMode + 'Progress'] < targetProgress).length;
                 var bar = document.getElementById('queue-submit-bar'); 
+                var total = scoringData.length;
                 
-                var btnText = currentMode === 'yinji' ? '拍照凭证' : '提交本轮'; 
-                var btnIcon = currentMode === 'yinji' ? '<i class="ph-bold ph-camera text-[16px] mr-1.5"></i>' : '';
-                var activeBg = currentMode === 'yinji' 
+                var isYinjiFinalRound = currentMode === 'yinji' && targetProgress >= sysConfig.yinji.target;
+                var isYinjiPhotoReady = isYinjiFinalRound && unfinished === 0;
+                var btnText = isYinjiPhotoReady ? '拍照凭证' : '提交本轮'; 
+                var btnIcon = isYinjiPhotoReady ? '<i class="ph-bold ph-camera text-[16px] mr-1.5"></i>' : '';
+                var activeBg = isYinjiPhotoReady
                     ? 'bg-[#f97316] hover:bg-[#ea580c] shadow-[0_4px_12px_rgba(249,115,22,0.3)] hover:shadow-[0_6px_16px_rgba(249,115,22,0.4)] animate-pulse' 
                     : 'bg-[#1F5FFF] hover:bg-[#004ce6] shadow-[0_4px_12px_rgba(31,95,255,0.3)] hover:shadow-[0_6px_16px_rgba(31,95,255,0.4)]';
-                var totalBadge = `<span class="text-[13px] text-gray-500 font-medium bg-white/70 border border-white/80 px-3 py-2 rounded-[12px] whitespace-nowrap">共 <span class="font-mono font-extrabold text-gray-800">${scoringData.length}</span> 题</span>`;
 
                 if (modeRound[currentMode] >= sysConfig[currentMode].target) {
-                    bar.innerHTML = `<div class="flex items-center gap-3 shrink-0">${totalBadge}<div class="flex items-center shrink-0"><div class="w-7 h-7 rounded-full bg-[#dcfce7] flex items-center justify-center text-[#10b981] mr-2 shadow-sm shrink-0"><i class="ph-bold ph-check-circle text-[18px]"></i></div><span class="text-[#10b981] font-bold text-[16px] whitespace-nowrap">所有题目都已完成</span></div></div><div class="flex items-center space-x-5 shrink-0"><button class="bg-[#e2e8f0] text-[#94a3b8] font-bold py-2.5 px-6 rounded-xl text-[15px] cursor-not-allowed whitespace-nowrap flex items-center shrink-0">${btnIcon} ${btnText} (已完成)</button></div>`;
+                    bar.innerHTML = `<div class="flex items-center shrink-0"><div class="w-7 h-7 rounded-full bg-[#dcfce7] flex items-center justify-center text-[#10b981] mr-2 shadow-sm shrink-0"><i class="ph-bold ph-check-circle text-[18px]"></i></div><span class="text-[#10b981] font-bold text-[16px] whitespace-nowrap">所有题目都已完成</span></div><div class="flex items-center space-x-5 shrink-0"><button class="bg-[#e2e8f0] text-[#94a3b8] font-bold py-2.5 px-6 rounded-xl text-[15px] cursor-not-allowed whitespace-nowrap flex items-center shrink-0">${btnIcon} ${btnText} (已完成)</button></div>`;
                 } else if (unfinished > 0) {
-                    bar.innerHTML = `<div class="flex items-center gap-3 shrink-0">${totalBadge}<div class="flex items-center cursor-pointer group shrink-0" onclick="window.scrollToFirstUnfinished()"><div class="w-6 h-6 rounded-full bg-[#eef2ff] border border-[#c7d2fe] flex items-center justify-center text-[#6366f1] mr-2 shrink-0"><span class="font-bold text-[16px] -mt-px">!</span></div><span class="text-[#6366f1] font-medium text-[15px] flex items-center whitespace-nowrap">剩余待完成: <span class="font-bold text-[22px] mx-1.5 leading-none">${unfinished}</span> 题 <i class="ph-bold ph-caret-right text-[16px] ml-0.5 opacity-70"></i></span></div></div><div class="flex items-center space-x-5 shrink-0"><button class="bg-[#e2e8f0] text-[#94a3b8] font-bold py-2.5 px-6 rounded-xl text-[15px] cursor-not-allowed whitespace-nowrap flex items-center shrink-0">${btnIcon} ${btnText}</button></div>`;
+                    bar.innerHTML = `<div class="flex items-center cursor-pointer group shrink-0" onclick="window.scrollToFirstUnfinished()"><div class="w-6 h-6 rounded-full bg-[#eef2ff] border border-[#c7d2fe] flex items-center justify-center text-[#6366f1] mr-2 shrink-0"><span class="font-bold text-[16px] -mt-px">!</span></div><span class="text-[#6366f1] font-medium text-[15px] flex items-center whitespace-nowrap">共 <span class="font-bold text-[22px] mx-1.5 leading-none">${total}</span> 题，剩余 <span class="font-bold text-[22px] mx-1.5 leading-none">${unfinished}</span> 题 <i class="ph-bold ph-caret-right text-[16px] ml-0.5 opacity-70"></i></span></div><div class="flex items-center space-x-5 shrink-0"><button class="bg-[#e2e8f0] text-[#94a3b8] font-bold py-2.5 px-6 rounded-xl text-[15px] cursor-not-allowed whitespace-nowrap flex items-center shrink-0">${btnIcon} ${btnText}</button></div>`;
                 } else {
-                    bar.innerHTML = `<div class="flex items-center gap-3 shrink-0">${totalBadge}<div class="flex items-center shrink-0"><div class="w-7 h-7 rounded-full bg-[#dcfce7] flex items-center justify-center text-[#10b981] mr-2 shadow-sm shrink-0"><i class="ph-bold ph-check text-[18px]"></i></div><span class="text-[#10b981] font-bold text-[16px] whitespace-nowrap">本轮已结束，请提交</span></div></div><div class="flex items-center space-x-5 shrink-0"><button onclick="window.submitRound()" class="flex items-center text-white font-bold py-2.5 px-6 rounded-xl text-[15px] transition-all active:scale-95 whitespace-nowrap shrink-0 ${activeBg} shadow-sm">${btnIcon} ${btnText}</button></div>`;
+                    bar.innerHTML = `<div class="flex items-center shrink-0"><div class="w-7 h-7 rounded-full bg-[#dcfce7] flex items-center justify-center text-[#10b981] mr-2 shadow-sm shrink-0"><i class="ph-bold ph-check text-[18px]"></i></div><span class="text-[#10b981] font-bold text-[16px] whitespace-nowrap">本轮已结束，请提交</span></div><div class="flex items-center space-x-5 shrink-0"><button onclick="window.submitRound()" class="flex items-center text-white font-bold py-2.5 px-6 rounded-xl text-[15px] transition-all active:scale-95 whitespace-nowrap shrink-0 ${activeBg} shadow-sm">${btnIcon} ${btnText}</button></div>`;
                 }
             }
 
@@ -3060,91 +2693,10 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 window.addPlaybackProfile('dict', '584');
             }
 
-            function getActionTarget(startEl) {
-                var el = startEl;
-                while (el && el !== document) {
-                    if (el.getAttribute && el.getAttribute('data-action')) return el;
-                    el = el.parentNode;
-                }
-                return null;
-            }
-
-            window.handleDashboardAction = function(target, event) {
-                if (!target) return false;
-                var action = target.getAttribute('data-action');
-                if (!action) return false;
-                if (event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-
-                if (action === 'start-pass') {
-                    var passType = target.getAttribute('data-pass-type') || 'new';
-                    window.startPassing(passType, passType === 'old' ? '过旧词' : '过新词');
-                    return true;
-                }
-
-                if (action === 'learn-type') {
-                    var learnType = target.getAttribute('data-learn-type') || 'new';
-                    window.generateManualByType(learnType);
-                    return true;
-                }
-
-                if (action === 'open-task') {
-                    var taskId = parseInt(target.getAttribute('data-task-id'), 10);
-                    if (!isNaN(taskId)) window.openTaskLevelPage(taskId);
-                    return true;
-                }
-
-                return false;
-            };
-
-            function handleDashboardTap(event) {
-                var target = getActionTarget(event.target);
-                if (!target) return;
-                window.handleDashboardAction(target, event);
-            }
-
-            document.addEventListener('click', handleDashboardTap);
-
-            function getRouteParams() {
-                var query = window.location.search ? window.location.search.substring(1) : '';
-                var params = {};
-                if (!query) return params;
-                query.split('&').forEach(function(pair) {
-                    if (!pair) return;
-                    var parts = pair.split('=');
-                    var key = decodeURIComponent(parts[0] || '');
-                    var value = decodeURIComponent((parts[1] || '').replace(/\+/g, ' '));
-                    if (key) params[key] = value;
-                });
-                return params;
-            }
-
-            function runStartupRoute() {
-                var params = getRouteParams();
-                if (params.task) {
-                    var taskId = parseInt(params.task, 10);
-                    if (!isNaN(taskId)) window.openTaskLevelPage(taskId);
-                    return;
-                }
-                if (params.action === 'pass') {
-                    var passType = params.type === 'old' ? 'old' : 'new';
-                    window.startPassing(passType, passType === 'old' ? '过旧词' : '过新词');
-                    return;
-                }
-                if (params.action === 'learn') {
-                    window.generateManualByType(params.type === 'old' ? 'old' : 'new');
-                }
-            }
-
             window.initCustomSpeedDropdown();
             initDragAndDrop();
             initDefaultProfiles();
-            initTaskMicEvents();
-            initTaskPickerTouchEvents();
             renderDashboardUI();
-            runStartupRoute();
         })();
     </script>
 </body>
