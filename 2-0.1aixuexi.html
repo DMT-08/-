@@ -83,7 +83,7 @@
             padding-right: 24px !important;
         }
 
-        #speed-trigger, #unfinished-speed-trigger, #unfinished-level-group-trigger {
+        button, [onclick], .custom-select-wrapper, .select-item, #speed-trigger, #unfinished-speed-trigger, #unfinished-level-group-trigger {
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
         }
@@ -2148,6 +2148,8 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                     var statusPill = document.getElementById('scoring-status-pill');
                     statusPill.innerHTML = `${feedback.i} <span class="font-bold">${feedback.f} &nbsp;${randomScore}分</span>`;
                     statusPill.className = `flex items-center px-4 py-1.5 rounded-full border text-[14px] transition-colors backdrop-blur-md shadow-sm whitespace-nowrap pointer-events-auto ${feedback.c}`;
+                    btn.className = "w-[84px] h-[84px] bg-[#3B82F6] text-white rounded-full flex items-center justify-center shadow-[0_8px_24px_rgba(59,130,246,0.4)] hover:bg-[#2563EB] transition-all duration-300 ease-in-out focus:outline-none select-none group relative z-[100] overflow-hidden transform scale-100 cursor-pointer pointer-events-auto";
+                    btn.innerHTML = `<i class="ph-bold ph-microphone text-[32px] pointer-events-none transition-transform group-active:scale-90 shrink-0"></i>`;
                     triggerActionComplete();
                 };
                 btn.addEventListener('mousedown', startRecord); btn.addEventListener('touchstart', startRecord, { passive: false });
@@ -2964,6 +2966,69 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 window.addPlaybackProfile('dict', '584');
             }
 
+            function initIPadInteractionFixes() {
+                if (window.__ipadInteractionFixesBound) return;
+                window.__ipadInteractionFixesBound = true;
+
+                var startTarget = null;
+                var startX = 0;
+                var startY = 0;
+                var lastBridgeClickAt = 0;
+
+                var isEditable = function(el) {
+                    return !!(el && el.closest && el.closest('input, textarea, select, [contenteditable="true"]'));
+                };
+                var isNativeHandled = function(el) {
+                    return !!(el && el.closest && el.closest('[data-no-touch-bridge], #score-action-btn, #unfinished-score-action-btn, .drag-handle, [draggable="true"]'));
+                };
+                var findActionTarget = function(el) {
+                    if (!el || !el.closest) return null;
+                    return el.closest('button, [role="button"], [onclick], .custom-select-wrapper, .select-item');
+                };
+                var canBridge = function(target) {
+                    if (!target || isEditable(target) || isNativeHandled(target)) return false;
+                    if (target.disabled || target.getAttribute('aria-disabled') === 'true') return false;
+                    if (target.hasAttribute('ontouchstart') && !target.classList.contains('custom-select-wrapper')) return false;
+                    return true;
+                };
+
+                document.addEventListener('touchstart', function(e) {
+                    var target = findActionTarget(e.target);
+                    if (!canBridge(target)) {
+                        startTarget = null;
+                        return;
+                    }
+                    var touch = e.changedTouches && e.changedTouches[0];
+                    startTarget = target;
+                    startX = touch ? touch.clientX : 0;
+                    startY = touch ? touch.clientY : 0;
+                }, { capture: true, passive: true });
+
+                document.addEventListener('touchend', function(e) {
+                    if (!startTarget || !document.documentElement.contains(startTarget)) return;
+                    var target = findActionTarget(e.target);
+                    if (target !== startTarget || !canBridge(target)) {
+                        startTarget = null;
+                        return;
+                    }
+                    var touch = e.changedTouches && e.changedTouches[0];
+                    var dx = touch ? Math.abs(touch.clientX - startX) : 0;
+                    var dy = touch ? Math.abs(touch.clientY - startY) : 0;
+                    startTarget = null;
+                    if (dx > 12 || dy > 12) return;
+                    if (Date.now() - lastBridgeClickAt < 120) return;
+                    lastBridgeClickAt = Date.now();
+                    e.preventDefault();
+                    e.stopPropagation();
+                    target.click();
+                }, { capture: true, passive: false });
+
+                document.addEventListener('touchcancel', function() {
+                    startTarget = null;
+                }, { capture: true, passive: true });
+            }
+
+            initIPadInteractionFixes();
             window.initCustomSpeedDropdown();
             initDragAndDrop();
             initDefaultProfiles();
