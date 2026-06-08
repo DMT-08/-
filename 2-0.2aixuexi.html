@@ -695,7 +695,7 @@
                     </div>
                 </div>
                 <button id="finishLevelBtn" onclick="window.finishScoringLevel()" class="bg-[#1F5FFF] hover:bg-[#004ce6] shadow-[0_4px_12px_rgba(31,95,255,0.3)] hover:shadow-[0_6px_16px_rgba(31,95,255,0.4)] text-white font-bold py-3 px-10 text-[16px] rounded-[14px] active:scale-95 transition-all">
-                    完成关卡
+                    完成打分，进入过词
                 </button>
             </div>
         </div>
@@ -1157,7 +1157,12 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                     title: '专属强化关卡', 
                     wordCount: filteredWords.length, 
                     words: [...filteredWords], 
-                    steps: [{ id: 'read', name: '跟读', target: 2, current: 0 }, { id: 'memo', name: '音记', target: 2, current: 0 }, { id: 'dict', name: '听写', target: 1, current: 0 }] 
+                    steps: [
+                        { id: 'read', name: '跟读', target: 2, current: 0 }, 
+                        { id: 'memo', name: '音记', target: 2, current: 0 }, 
+                        { id: 'dict', name: '听写', target: 1, current: 0 },
+                        { id: 'pass', name: '过词', target: 1, current: 0 }
+                    ] 
                 };
                 window.switchView('view-dashboard');
             };
@@ -1610,6 +1615,28 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 startPassingTimer();
             };
 
+            window.startLevelPassing = function() {
+                testWords = state.activeLevel.words.map((w, idx) => ({ id: idx + 1, word: w.word, phonetic: w.phonetic, meaning: w.meaning, status: null }));
+                TOTAL_WORDS = testWords.length;
+                state.currentActionType = 'levelPass';
+                state.currentTaskId = null;
+                state.passingStats = { known: 0, unknown: 0, remaining: TOTAL_WORDS, answered: 0 };
+                state._tempUnknowns = [];
+                state.passFilter = 'all';
+                
+                var titleEl = document.getElementById('passingTitle');
+                if (titleEl) titleEl.innerText = '专属关卡: 过词';
+                
+                var totalEl = document.getElementById('totalPassCount');
+                if (totalEl) totalEl.innerText = TOTAL_WORDS;
+                
+                renderWordList();
+                updatePassingStats();
+                window.setPassFilter('all');
+                window.switchView('view-passing');
+                startPassingTimer();
+            };
+
             window.startPassing = function(typeKey, typeName, taskId = null, wordCount = 10) {
                 if(state.activeLevel !== null && typeKey !== 'assigned') return; 
                 initData(wordCount);
@@ -1807,6 +1834,17 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                     }
                 }
 
+                if (state.currentActionType === 'levelPass') {
+                    state.activeLevel.steps[3].current = 1;
+                    window.showModal('关卡完美攻克', '<div class="mt-1 font-medium text-gray-600">恭喜！您已成功完成全部学习任务。<br>生词本已清空，可继续探索。</div>', () => {
+                        state.activeLevel = null;
+                        state.vocabBook = [];
+                        window.switchView('view-dashboard');
+                        stopLearningTimer();
+                    });
+                    return;
+                }
+
                 if (state.currentActionType === 'unfinishedPass') {
                     var unfinishedTask = (state.unfinishedTasks || []).find(t => t.id === state.currentTaskId);
                     if (unfinishedTask) {
@@ -1837,8 +1875,8 @@ if(viewId === 'view-dashboard') renderDashboardUI();
             var unfinishedPlayTimer = null;
             var unfinishedAutoTimer = null;
             var unfinishedMode = 'gendu';
-            var unfinishedModeTargets = { gendu: 2, yinji: 2, tingxie: 1 };
-            var unfinishedModeRound = { gendu: 0, yinji: 0, tingxie: 0 };
+            var unfinishedModeTargets = { gendu: 2, yinji: 2, tingxie: 1, guoci: 1 };
+            var unfinishedModeRound = { gendu: 0, yinji: 0, tingxie: 0, guoci: 0 };
             var unfinishedLevelPickerTouchAt = 0;
             var unfinishedLevelActionTouchAt = 0;
             var unfinishedLevelGroups = [];
@@ -1854,7 +1892,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                     photoUploaded: false,
                     mode: 'gendu',
                     currentIdx: 0,
-                    modeRound: { gendu: 0, yinji: 0, tingxie: 0 },
+                    modeRound: { gendu: 0, yinji: 0, tingxie: 0, guoci: 0 },
                     scores: null
                 };
             }
@@ -2023,13 +2061,13 @@ if(viewId === 'view-dashboard') renderDashboardUI();
             function updateUnfinishedTopNav() {
                 var container = document.getElementById('unfinished-nav-stepper-container');
                 if (!container) return;
-                var modes = ['gendu', 'yinji', 'tingxie'];
-                var names = { gendu: '跟读', yinji: '音记', tingxie: '听写' };
-                var icons = { gendu: 'ph-hourglass-high', yinji: 'ph-headphones', tingxie: 'ph-lock-key' };
+                var modes = ['gendu', 'yinji', 'tingxie', 'guoci'];
+                var names = { gendu: '跟读', yinji: '音记', tingxie: '听写', guoci: '过词' };
+                var icons = { gendu: 'ph-hourglass-high', yinji: 'ph-headphones', tingxie: 'ph-lock-key', guoci: 'ph-arrows-clockwise' };
                 container.innerHTML = modes.map((mode, index) => {
                     var isDone = unfinishedModeRound[mode] >= unfinishedModeTargets[mode];
                     var isCurrent = unfinishedMode === mode;
-                    var isLocked = (mode === 'yinji' && unfinishedModeRound.gendu < unfinishedModeTargets.gendu) || (mode === 'tingxie' && unfinishedModeRound.yinji < unfinishedModeTargets.yinji);
+                    var isLocked = (mode === 'yinji' && unfinishedModeRound.gendu < unfinishedModeTargets.gendu) || (mode === 'tingxie' && unfinishedModeRound.yinji < unfinishedModeTargets.yinji) || (mode === 'guoci' && unfinishedModeRound.tingxie < unfinishedModeTargets.tingxie);
                     var boxClass = isDone
                         ? 'bg-[#ecfdf5] border-[#bbf7d0]'
                         : (isCurrent ? 'bg-[#f0f4ff] border-[#bfdbfe]' : 'bg-white border-transparent opacity-80');
@@ -2516,8 +2554,10 @@ if(viewId === 'view-dashboard') renderDashboardUI();
 
             // ====== 沉浸式评分视图与核心逻辑 ======
             var scoringData = [];
-            var sysConfig = { gendu: { target: 2 }, yinji: { target: 2 }, tingxie: { target: 1 } };
-            var currentMode = 'gendu'; var currentScoreIdx = 0; var modeRound = { gendu: 0, yinji: 0, tingxie: 0 };
+            var sysConfig = { gendu: { target: 2 }, yinji: { target: 2 }, tingxie: { target: 1 }, guoci: { target: 1 } };
+            var currentMode = 'gendu'; 
+            var currentScoreIdx = 0; 
+            var modeRound = { gendu: 0, yinji: 0, tingxie: 0, guoci: 0 };
             var isRecording = false; var isPlayingSystem = false; var systemAudioTimeout = null; var isAutoPlay = true; 
             var autoAdvanceTimeout = null;
 
@@ -2565,8 +2605,8 @@ if(viewId === 'view-dashboard') renderDashboardUI();
             window.enterScoringView = function() {
                 if (!state.activeLevel) return;
                 scoringData = state.activeLevel.words.map(w => ({ en: w.word, phon: w.phonetic, cn: w.meaning, score: null, genduProgress: 0, yinjiProgress: 0, tingxieProgress: 0 }));
-                sysConfig.gendu.target = state.activeLevel.steps[0].target; sysConfig.yinji.target = state.activeLevel.steps[1].target; sysConfig.tingxie.target = state.activeLevel.steps[2].target;
-                currentMode = 'gendu'; currentScoreIdx = 0; modeRound = { gendu: state.activeLevel.steps[0].current || 0, yinji: state.activeLevel.steps[1].current || 0, tingxie: state.activeLevel.steps[2].current || 0 };
+                sysConfig.gendu.target = state.activeLevel.steps[0].target; sysConfig.yinji.target = state.activeLevel.steps[1].target; sysConfig.tingxie.target = state.activeLevel.steps[2].target; sysConfig.guoci.target = state.activeLevel.steps[3].target;
+                currentMode = 'gendu'; currentScoreIdx = 0; modeRound = { gendu: state.activeLevel.steps[0].current || 0, yinji: state.activeLevel.steps[1].current || 0, tingxie: state.activeLevel.steps[2].current || 0, guoci: state.activeLevel.steps[3].current || 0 };
                 isRecording = false; isPlayingSystem = false; isAutoPlay = true; 
                 clearTimeout(systemAudioTimeout); clearTimeout(window.autoPlayTimer); clearTimeout(autoAdvanceTimeout);
                 window.switchView('view-scoring');
@@ -2713,13 +2753,14 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                         gradingSource = 'scoring';
                         window.switchView('view-unfinished-scoring');
                         startUnfinishedTimer();
+                        // Update unfinished tasks for 'guoci' mode here if needed, but for now we follow the same path
                         moveUnfinishedToNextGroup();
                         return;
                     }
-                    state.activeLevel = null;
-                    state.vocabBook = [];
-                    window.switchView('view-dashboard');
-                    stopLearningTimer();
+                    
+                    // Transition to 'guoci' step
+                    currentMode = 'guoci';
+                    window.startLevelPassing();
                 });
             };
 
@@ -2777,10 +2818,10 @@ if(viewId === 'view-dashboard') renderDashboardUI();
             }
 
             function updateTopNav() {
-                var locked = { gendu: false, yinji: modeRound.gendu < sysConfig.gendu.target, tingxie: modeRound.yinji < sysConfig.yinji.target };
+                var locked = { gendu: false, yinji: modeRound.gendu < sysConfig.gendu.target, tingxie: modeRound.yinji < sysConfig.yinji.target, guoci: modeRound.tingxie < sysConfig.tingxie.target };
                 var container = document.getElementById('nav-stepper-container'); container.innerHTML = '';
-                ['gendu', 'yinji', 'tingxie'].forEach((mode, index) => {
-                    var names = { gendu: '跟读', yinji: '音记', tingxie: '听写' };
+                ['gendu', 'yinji', 'tingxie', 'guoci'].forEach((mode, index) => {
+                    var names = { gendu: '跟读', yinji: '音记', tingxie: '听写', guoci: '过词' };
                     var btn = document.createElement('div');
                     if (modeRound[mode] >= sysConfig[mode].target) {
                         btn.className = "flex items-center bg-[#ecfdf5] border-[1.5px] border-[#bbf7d0] rounded-[14px] px-2.5 py-1.5 min-w-[76px] shadow-sm";
@@ -2794,7 +2835,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                         if (!locked[mode]) btn.onclick = () => switchMode(mode);
                     }
                     container.appendChild(btn);
-                    if (index < 2) { var sep = document.createElement('i'); sep.className = "ph-bold ph-caret-right text-gray-300 text-[14px] shrink-0 mx-0.5"; container.appendChild(sep); }
+                    if (index < 3) { var sep = document.createElement('i'); sep.className = "ph-bold ph-caret-right text-gray-300 text-[14px] shrink-0 mx-0.5"; container.appendChild(sep); }
                 });
             }
 
