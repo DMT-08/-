@@ -1481,6 +1481,20 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 return Math.max(4, Math.min(10, task && task.count ? task.count : 10));
             }
 
+            function getUnfinishedPassCompletedLevels(task) {
+                if (!task) return [];
+                if (!Array.isArray(task.passCompletedLevels)) task.passCompletedLevels = [];
+                return task.passCompletedLevels;
+            }
+
+            function markUnfinishedPassLevelCompleted(task, levelId) {
+                var completedLevels = getUnfinishedPassCompletedLevels(task);
+                if (completedLevels.includes(levelId)) return false;
+                completedLevels.push(levelId);
+                completedLevels.sort((a, b) => a - b);
+                return true;
+            }
+
             function initUnfinishedPassData(task, level) {
                 var selectedTask = task || getActiveUnfinishedPassTask();
                 var levelId = Math.max(1, Math.min(10, level || state.currentPassingLevel || 1));
@@ -1530,13 +1544,23 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 }
                 if (label) label.innerText = `第${state.currentPassingLevel || 1}关`;
                 if (!list) return;
+                var activeTask = getActiveUnfinishedPassTask();
+                var completedLevels = getUnfinishedPassCompletedLevels(activeTask);
                 list.innerHTML = Array.from({ length: 10 }, (_, index) => {
                     var levelId = index + 1;
                     var isSelected = levelId === state.currentPassingLevel;
-                    var cls = isSelected
-                        ? 'bg-[#1F5FFF] border-[#1F5FFF] text-white shadow-sm'
-                        : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-blue-50 hover:border-blue-200 hover:text-[#1F5FFF]';
-                    return `<button data-passing-level="${levelId}" onclick="window.selectPassingLevel(${levelId}, event)" ontouchstart="window.touchPassingLevel(${levelId}, event)" class="w-full min-h-[42px] rounded-[14px] border ${cls} px-3 py-2 flex items-center justify-center text-[13px] font-extrabold active:scale-[0.98] transition-all">第${levelId}关</button>`;
+                    var isCompleted = completedLevels.includes(levelId);
+                    var cls = isSelected && isCompleted
+                        ? 'bg-[#10B981] border-[#10B981] text-white shadow-sm'
+                        : (isSelected
+                            ? 'bg-[#1F5FFF] border-[#1F5FFF] text-white shadow-sm'
+                            : (isCompleted
+                                ? 'bg-green-50 border-green-200 text-green-700 hover:bg-green-100 hover:border-green-300'
+                                : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-blue-50 hover:border-blue-200 hover:text-[#1F5FFF]'));
+                    var checkHtml = isCompleted
+                        ? `<span class="w-5 h-5 rounded-full ${isSelected ? 'bg-white/20 text-white' : 'bg-green-100 text-green-600'} flex items-center justify-center shrink-0"><i class="ph-bold ph-check text-[12px]"></i></span>`
+                        : '';
+                    return `<button data-passing-level="${levelId}" aria-label="第${levelId}关${isCompleted ? '，已完成' : ''}" onclick="window.selectPassingLevel(${levelId}, event)" ontouchstart="window.touchPassingLevel(${levelId}, event)" class="w-full min-h-[44px] rounded-[14px] border ${cls} px-3 py-2 flex items-center justify-between gap-2 text-[13px] font-extrabold active:scale-[0.98] transition-all"><span>第${levelId}关</span>${checkHtml}</button>`;
                 }).join('');
             }
 
@@ -1847,7 +1871,9 @@ if(viewId === 'view-dashboard') renderDashboardUI();
 
                 if (state.currentActionType === 'unfinishedPass') {
                     var unfinishedTask = (state.unfinishedTasks || []).find(t => t.id === state.currentTaskId);
-                    if (unfinishedTask) {
+                    var submittedLevel = state.currentPassingLevel || 1;
+                    var isFirstCompletion = markUnfinishedPassLevelCompleted(unfinishedTask, submittedLevel);
+                    if (unfinishedTask && isFirstCompletion) {
                         unfinishedTask.current = Math.min(unfinishedTask.count, (unfinishedTask.current || 0) + TOTAL_WORDS);
                         if (unfinishedTask.current >= unfinishedTask.count) unfinishedTask.lastDone = getTodayDateString();
                     }
@@ -1858,6 +1884,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                     if (resetUnfinishedPassLevel(unfinishedTask || getActiveUnfinishedPassTask(), nextLevel)) {
                         window.switchView('view-passing');
                         startPassingTimer();
+                        setPassingLevelPickerOpen(true);
                     }
                 } else if (state._tempUnknowns.length > 0) {
                     window.showModal('提交成功', `<div class="mt-1 text-[15px] font-medium text-gray-600">已将发现的 <b class="text-[20px] text-orange-500 font-mono px-0.5">${state._tempUnknowns.length}</b> 个生词加入生词本！</div>`, () => window.switchView('view-dashboard'));
