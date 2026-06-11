@@ -738,7 +738,7 @@
                     <div id="unfinished-score-word-cn" class="text-gray-800 font-bold tracking-widest pointer-events-auto leading-tight transition-all duration-300 max-w-full break-words w-full text-[40px]">现象，杰出的人</div>
                 </div>
 
-                <div class="w-full flex flex-col items-center shrink-0 mt-auto relative z-50 pointer-events-auto">
+                <div id="unfinished-bottom-controls" class="w-full flex flex-col items-center shrink-0 mt-auto relative z-50 pointer-events-auto">
                     <div class="w-full flex items-center justify-between bg-white/90 backdrop-blur-2xl px-5 h-[72px] rounded-[36px] shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-white/60 pointer-events-auto">
                         <div class="flex items-center space-x-6 pl-6 pr-8 border-r border-gray-200/80 shrink-0">
                             <div class="flex flex-col items-center justify-center space-y-0.5 relative z-[120]" id="unfinished-audio-gap-dropdown-container">
@@ -804,7 +804,7 @@
                             </button>
                         </div>
                     </div>
-                    <div class="mt-5 h-[84px] flex items-center justify-end w-full transition-opacity duration-300 pr-2 pointer-events-auto relative">
+                    <div id="unfinished-mic-area" class="mt-5 h-[84px] flex items-center justify-end w-full transition-opacity duration-300 pr-2 pointer-events-auto relative">
                         <div class="absolute left-0 top-1/2 -translate-y-1/2 flex items-center gap-8">
                             <div id="unfinished-scoring-status-pill" class="flex items-center space-x-1.5 bg-white/80 backdrop-blur-md px-6 py-2.5 rounded-full border border-white text-[14px] font-medium text-gray-500 transition-colors shadow-sm pointer-events-auto whitespace-nowrap">等待开始...</div>
                             <button id="unfinished-autoplay-toggle-btn" onclick="window.toggleUnfinishedAutoPlay()" class="h-9 flex items-center px-4 rounded-full border-[1.5px] font-bold text-[13px] transition-all bg-[#eff6ff] border-[#bfdbfe] text-[#3B82F6] hover:bg-[#dbeafe] shadow-sm shrink-0 whitespace-nowrap">
@@ -1122,6 +1122,13 @@
                 if (viewId !== 'view-unfinished-scoring') stopUnfinishedTimer();
 if(viewId === 'view-dashboard') renderDashboardUI();
                 if(viewId === 'view-vocab') renderVocabBookFull();
+
+                // 学习/考试页面隐藏悬浮翻译按钮
+                var fabHideViews = ['view-scoring', 'view-unfinished-scoring', 'view-passing', 'view-grading'];
+                var fabEl = document.getElementById('fab-translate');
+                var panelEl = document.getElementById('translate-panel');
+                if (fabEl) fabEl.style.display = fabHideViews.includes(viewId) ? 'none' : '';
+                if (panelEl && fabHideViews.includes(viewId)) { panelEl.classList.remove('panel-open'); panelEl.style.display = 'none'; }
             };
 
             // ====== 核心数据与状态 ======
@@ -2468,11 +2475,21 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                     renderUnfinishedScoringPage();
                     return;
                 }
+                if (unfinishedMode === 'tingxie') {
+                    enterUnfinishedGradingView();
+                    return;
+                }
+                if (unfinishedMode === 'guoci' && unfinishedModeRound.guoci < unfinishedModeTargets.guoci) {
+                    resetUnfinishedRoundProgress();
+                    renderUnfinishedLevelPicker();
+                    renderUnfinishedScoringPage();
+                    return;
+                }
                 var group = getUnfinishedGroup(unfinishedSelectedLevel, unfinishedSelectedGroup);
                 if (group) group.completed = true;
                 saveUnfinishedGroupProgress();
                 renderUnfinishedLevelPicker();
-                enterUnfinishedGradingView();
+                renderUnfinishedScoringPage();
             }
 
             function buildUnfinishedScoringWords(task) {
@@ -2582,12 +2599,16 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                     var prevBtn = document.getElementById('unfinished-prev-btn');
                     var nextBtn = document.getElementById('unfinished-next-btn');
                     var micArea = document.getElementById('unfinished-mic-btn');
+                    var bottomControls = document.getElementById('unfinished-bottom-controls');
+                    var micAreaWrap = document.getElementById('unfinished-mic-area');
                     if (enEl) enEl.style.display = 'none';
                     if (phonEl) phonEl.style.display = 'none';
                     if (cnEl) cnEl.style.display = 'none';
                     if (prevBtn) prevBtn.style.visibility = 'hidden';
                     if (nextBtn) nextBtn.style.visibility = 'hidden';
                     if (micArea) micArea.style.display = 'none';
+                    if (bottomControls) bottomControls.style.display = 'none';
+                    if (micAreaWrap) micAreaWrap.style.display = 'none';
                     // 注入或更新完成提示
                     var doneNotice = document.getElementById('unfinished-group-done-notice');
                     if (!doneNotice) {
@@ -2598,11 +2619,18 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                     }
                     if (doneNotice) {
                         doneNotice.className = 'flex flex-col items-center justify-center gap-4 py-8 px-6 text-center pointer-events-auto';
-                        doneNotice.innerHTML = `<div class="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center mb-2"><i class="ph-bold ph-check text-[28px] text-green-500"></i></div><p class="text-[18px] font-extrabold text-gray-700">第${unfinishedSelectedLevel}关第${unfinishedSelectedGroup}组的学习任务已经完成</p><div class="flex gap-3 mt-2"><button onclick="window.toggleUnfinishedLevelPicker(event)" class="px-5 py-2.5 bg-[#1F5FFF] text-white text-[14px] font-bold rounded-[14px] active:scale-95 transition-all">切换关卡</button><button onclick="window.confirmExitUnfinishedScoringView()" class="px-5 py-2.5 bg-gray-100 text-gray-600 text-[14px] font-bold rounded-[14px] active:scale-95 transition-all">返回退出</button></div>`;
+                        doneNotice.innerHTML = `
+                            <div class="flex flex-col items-center justify-center text-center mt-4">
+                                <div class="w-14 h-14 rounded-full bg-emerald-50 flex items-center justify-center mb-4">
+                                    <i class="ph-bold ph-check text-[28px] text-emerald-400"></i>
+                                </div>
+                                <h3 class="text-[18px] font-extrabold text-gray-800 mb-2">任务已完成</h3>
+                                <p class="text-[13px] text-gray-500 font-medium tracking-wide">第 <span class="font-bold text-[#1F5FFF] mx-0.5">${unfinishedSelectedLevel}</span> 关 · 第 <span class="font-bold text-[#1F5FFF] mx-0.5">${unfinishedSelectedGroup}</span> 组</p>
+                            </div>
+                        `;
                         doneNotice.style.display = 'flex';
                     }
                     var submitBar = document.getElementById('unfinished-queue-submit-bar');
-                    if (submitBar) submitBar.innerHTML = '';
                     updateUnfinishedTopNav();
                     renderUnfinishedLevelPicker();
                     return;
@@ -2613,17 +2641,19 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 var phonEl2 = document.getElementById('unfinished-score-word-phon');
                 var cnEl2 = document.getElementById('unfinished-score-word-cn');
                 var micArea2 = document.getElementById('unfinished-mic-btn');
+                var bottomControls2 = document.getElementById('unfinished-bottom-controls');
+                var micAreaWrap2 = document.getElementById('unfinished-mic-area');
                 if (enEl2) enEl2.style.display = '';
                 if (phonEl2) phonEl2.style.display = '';
                 if (cnEl2) cnEl2.style.display = '';
                 if (micArea2) micArea2.style.display = '';
+                if (bottomControls2) bottomControls2.style.display = '';
+                if (micAreaWrap2) micAreaWrap2.style.display = '';
                 var doneNoticeEl = document.getElementById('unfinished-group-done-notice');
                 if (doneNoticeEl) doneNoticeEl.style.display = 'none';
 
                 unfinishedCurrentIdx = Math.max(0, Math.min(unfinishedCurrentIdx, unfinishedScoringData.length - 1));
                 var curr = unfinishedScoringData[unfinishedCurrentIdx];
-                var progressEl = document.getElementById('unfinished-score-progress');
-                if (progressEl) progressEl.innerText = `${unfinishedCurrentIdx + 1}/${unfinishedScoringData.length}`;
                 var shouldMask = unfinishedMode === 'tingxie';
                 if (enEl2) enEl2.innerText = shouldMask ? '***' : curr.en;
                 if (phonEl2) phonEl2.innerText = shouldMask ? '***' : curr.phon;
@@ -3101,8 +3131,11 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                         gradingSource = 'scoring';
                         window.switchView('view-unfinished-scoring');
                         startUnfinishedTimer();
-                        // Update unfinished tasks for 'guoci' mode here if needed, but for now we follow the same path
-                        moveUnfinishedToNextGroup();
+                        
+                        unfinishedMode = 'guoci';
+                        resetUnfinishedRoundProgress();
+                        renderUnfinishedLevelPicker();
+                        renderUnfinishedScoringPage();
                         return;
                     }
                     
