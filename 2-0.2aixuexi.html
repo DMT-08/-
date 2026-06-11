@@ -93,6 +93,161 @@
         }
         #scoring-status-pill, #unfinished-scoring-status-pill { order: 2; }
         #autoplay-toggle-btn, #unfinished-autoplay-toggle-btn { order: 1; }
+        /* ===== 悬浮翻译按钮 ===== */
+        #fab-translate {
+            position: fixed;
+            z-index: 99999;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1F5FFF 0%, #6366F1 100%);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 24px rgba(31,95,255,0.35), 0 2px 8px rgba(0,0,0,0.1);
+            cursor: grab;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: box-shadow 0.2s, transform 0.15s;
+        }
+        #fab-translate:active { cursor: grabbing; transform: scale(1.08); box-shadow: 0 8px 32px rgba(31,95,255,0.45), 0 2px 12px rgba(0,0,0,0.15); }
+        #fab-translate .fab-icon { font-size: 24px; pointer-events: none; }
+
+        #translate-panel {
+            position: fixed;
+            z-index: 99998;
+            width: 340px;
+            max-width: calc(100vw - 32px);
+            background: rgba(255,255,255,0.97);
+            backdrop-filter: blur(20px) saturate(1.4);
+            -webkit-backdrop-filter: blur(20px) saturate(1.4);
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.9);
+            box-shadow: 0 16px 48px rgba(30,64,175,0.14), 0 4px 16px rgba(0,0,0,0.06);
+            padding: 20px;
+            display: none;
+            flex-direction: column;
+            gap: 14px;
+            opacity: 0;
+            transform: scale(0.92) translateY(8px);
+            transition: opacity 0.25s cubic-bezier(0.16,1,0.3,1), transform 0.25s cubic-bezier(0.16,1,0.3,1);
+        }
+        #translate-panel.panel-open {
+            display: flex;
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+        #translate-panel .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        #translate-panel .panel-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        #translate-panel .panel-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            cursor: pointer;
+            transition: background 0.15s;
+            border: none;
+            font-size: 16px;
+        }
+        #translate-panel .panel-close:hover { background: #e2e8f0; }
+        #translate-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        #translate-input {
+            flex: 1;
+            height: 44px;
+            border-radius: 14px;
+            border: 1.5px solid #e2e8f0;
+            padding: 0 14px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #1e293b;
+            background: #f8fafc;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            font-family: Inter, system-ui, sans-serif;
+        }
+        #translate-input:focus {
+            border-color: #93c5fd;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+            background: #fff;
+        }
+        #translate-input::placeholder { color: #94a3b8; font-weight: 500; }
+        #translate-submit-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: #1F5FFF;
+            color: #fff;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            flex-shrink: 0;
+            transition: background 0.15s, transform 0.1s;
+        }
+        #translate-submit-btn:hover { background: #1a4fdd; }
+        #translate-submit-btn:active { transform: scale(0.93); }
+        #translate-result {
+            min-height: 52px;
+            border-radius: 16px;
+            background: #f0f4ff;
+            border: 1px solid #dbeafe;
+            padding: 14px 16px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e40af;
+            line-height: 1.5;
+            word-break: break-word;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        #translate-result.result-empty {
+            color: #94a3b8;
+            font-weight: 500;
+            font-size: 14px;
+            background: #f8fafc;
+            border-color: #e2e8f0;
+        }
+        #translate-result .result-loading {
+            display: inline-flex;
+            gap: 4px;
+            align-items: center;
+        }
+        #translate-result .result-loading span {
+            width: 6px; height: 6px; border-radius: 50%; background: #93c5fd;
+            animation: dotPulse 1.2s ease-in-out infinite;
+        }
+        #translate-result .result-loading span:nth-child(2) { animation-delay: 0.15s; }
+        #translate-result .result-loading span:nth-child(3) { animation-delay: 0.3s; }
+        @keyframes dotPulse {
+            0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+            40% { opacity: 1; transform: scale(1.2); }
+        }
     </style>
 </head>
 <body class="flex flex-col h-screen">
@@ -105,6 +260,12 @@
                 <button id="modal-cancel-btn" class="hidden flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold text-[15px] py-3.5 rounded-[16px] transition-all active:scale-95">取消</button>
                 <button id="modal-btn" class="flex-1 bg-brand hover-bg-brand text-white font-bold text-[15px] py-3.5 rounded-[16px] shadow-sm active:scale-95 transition-all">我知道了</button>
             </div>
+        </div>
+    </div>
+
+    <div id="passing-toast" role="status" aria-live="polite" class="fixed left-1/2 top-[86px] z-[140] -translate-x-1/2 -translate-y-2 opacity-0 pointer-events-none transition-all duration-200">
+        <div class="flex min-h-[36px] items-center rounded-[10px] bg-gray-900/80 px-3.5 py-2 text-[12px] font-bold text-white shadow-[0_8px_22px_rgba(15,23,42,0.18)] backdrop-blur-sm whitespace-nowrap">
+            <span id="passing-toast-text">已切换关卡</span>
         </div>
     </div>
 
@@ -1466,6 +1627,8 @@ if(viewId === 'view-dashboard') renderDashboardUI();
 
             var passingLevelPickerTouchAt = 0;
             var passingLevelActionTouchAt = 0;
+            var unfinishedPassSessionLockedLevels = new Set();
+            var passingToastTimer = null;
 
             function getActiveUnfinishedPassTask(taskId) {
                 var tasks = state.unfinishedTasks || [];
@@ -1485,6 +1648,69 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 if (!task) return [];
                 if (!Array.isArray(task.passCompletedLevels)) task.passCompletedLevels = [];
                 return task.passCompletedLevels;
+            }
+
+            function getUnfinishedPassLevelRecords(task) {
+                if (!task) return {};
+                if (!task.passLevelRecords || typeof task.passLevelRecords !== 'object') task.passLevelRecords = {};
+                return task.passLevelRecords;
+            }
+
+            function getUnfinishedPassLevelRecord(task, levelId) {
+                return getUnfinishedPassLevelRecords(task)[levelId] || null;
+            }
+
+            function saveUnfinishedPassLevelRecord(task, levelId) {
+                if (!task) return;
+                getUnfinishedPassLevelRecords(task)[levelId] = {
+                    submittedAt: Date.now(),
+                    words: testWords.map(item => ({
+                        word: item.word,
+                        status: item.status
+                    }))
+                };
+            }
+
+            function restoreUnfinishedPassLevelRecord(task, levelId) {
+                var record = getUnfinishedPassLevelRecord(task, levelId);
+                if (!record || !Array.isArray(record.words)) return false;
+                testWords.forEach((item, index) => {
+                    var savedWord = record.words[index];
+                    if (savedWord && savedWord.word === item.word) item.status = savedWord.status || null;
+                });
+                return true;
+            }
+
+            function syncPassingStatsFromWords() {
+                var known = testWords.filter(item => item.status === 'known').length;
+                var unknownWords = testWords.filter(item => item.status === 'unknown');
+                var answered = known + unknownWords.length;
+                state.passingStats = {
+                    known: known,
+                    unknown: unknownWords.length,
+                    remaining: Math.max(0, TOTAL_WORDS - answered),
+                    answered: answered
+                };
+                state._tempUnknowns = unknownWords.slice();
+            }
+
+            function isCurrentUnfinishedPassLevelLocked() {
+                return state.currentActionType === 'unfinishedPass'
+                    && unfinishedPassSessionLockedLevels.has(state.currentPassingLevel || 1);
+            }
+
+            function showPassingToast(message) {
+                var toast = document.getElementById('passing-toast');
+                var text = document.getElementById('passing-toast-text');
+                if (!toast || !text) return;
+                clearTimeout(passingToastTimer);
+                text.innerText = message;
+                toast.classList.remove('opacity-0', '-translate-y-2');
+                toast.classList.add('opacity-100', 'translate-y-0');
+                passingToastTimer = setTimeout(() => {
+                    toast.classList.remove('opacity-100', 'translate-y-0');
+                    toast.classList.add('opacity-0', '-translate-y-2');
+                }, 1800);
             }
 
             function markUnfinishedPassLevelCompleted(task, levelId) {
@@ -1508,10 +1734,15 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 if (!selectedTask) return false;
                 state.currentPassingLevel = Math.max(1, Math.min(10, levelId || 1));
                 initUnfinishedPassData(selectedTask, state.currentPassingLevel);
+                var hasSavedRecord = restoreUnfinishedPassLevelRecord(selectedTask, state.currentPassingLevel);
                 state.currentActionType = 'unfinishedPass';
                 state.currentTaskId = selectedTask.id;
-                state.passingStats = { known: 0, unknown: 0, remaining: TOTAL_WORDS, answered: 0 };
-                state._tempUnknowns = [];
+                if (hasSavedRecord) {
+                    syncPassingStatsFromWords();
+                } else {
+                    state.passingStats = { known: 0, unknown: 0, remaining: TOTAL_WORDS, answered: 0 };
+                    state._tempUnknowns = [];
+                }
                 state.passFilter = 'all';
                 var titleEl = document.getElementById('passingTitle');
                 if (titleEl) titleEl.innerText = selectedTask.title || '未完成任务';
@@ -1599,18 +1830,10 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 if (event) event.stopPropagation();
                 if (event && event.type === 'click' && Date.now() - passingLevelActionTouchAt < 450) return;
                 if (state.currentActionType !== 'unfinishedPass') return;
-                state.currentPassingLevel = levelId;
-                initUnfinishedPassData(getActiveUnfinishedPassTask(), levelId);
-                state.passingStats = { known: 0, unknown: 0, remaining: TOTAL_WORDS, answered: 0 };
-                state._tempUnknowns = [];
-                state.passFilter = 'all';
-                var totalEl = document.getElementById('totalPassCount');
-                if (totalEl) totalEl.innerText = TOTAL_WORDS;
-                renderPassingLevelPicker();
-                setPassingLevelPickerOpen(false);
-                renderWordList();
-                updatePassingStats();
-                window.setPassFilter('all');
+                if (resetUnfinishedPassLevel(getActiveUnfinishedPassTask(), levelId)) {
+                    setPassingLevelPickerOpen(false);
+                    showPassingToast(`已切换至第${levelId}关`);
+                }
             };
 
             window.touchPassingLevel = function(levelId, event) {
@@ -1633,6 +1856,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                     window.showModal('暂无任务', '<div class="mt-1 font-medium">当前没有可过词的未完成任务。</div>');
                     return;
                 }
+                unfinishedPassSessionLockedLevels = new Set();
                 state.currentPassingLevel = state.currentPassingLevel || 1;
                 resetUnfinishedPassLevel(task, state.currentPassingLevel);
                 window.switchView('view-passing');
@@ -1684,6 +1908,50 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 startPassingTimer();
             };
 
+            function applyPassingWordVisualState(id, result) {
+                var row = document.getElementById(`word-row-${id}`);
+                var btnX = document.getElementById(`btn-x-${id}`);
+                var btnC = document.getElementById(`btn-c-${id}`);
+                var wordSpan = document.getElementById(`word-text-${id}`);
+                var wordPhonetic = document.getElementById(`word-phonetic-${id}`);
+                var wordDesc = document.getElementById(`word-desc-${id}`);
+                var isLocked = isCurrentUnfinishedPassLevelLocked();
+                if (!row || !btnX || !btnC || !wordSpan || !wordPhonetic || !wordDesc) return;
+
+                row.className = 'pass-word-row flex justify-between items-center p-4 rounded-[20px] shadow-sm border transition-all duration-300 shrink-0';
+                btnX.className = `judge-btn w-[56px] h-[44px] rounded-[14px] flex items-center justify-center text-[22px] hover:bg-red-50 hover:text-red-500 ${isLocked ? 'cursor-pointer' : 'active:scale-90'} transition-all`;
+                btnC.className = `judge-btn w-[56px] h-[44px] rounded-[14px] flex items-center justify-center text-[22px] hover:bg-green-50 hover:text-green-500 ${isLocked ? 'cursor-pointer' : 'active:scale-90'} transition-all`;
+                btnX.disabled = false;
+                btnC.disabled = false;
+                btnX.setAttribute('aria-disabled', isLocked ? 'true' : 'false');
+                btnC.setAttribute('aria-disabled', isLocked ? 'true' : 'false');
+                btnX.title = isLocked ? '本关已提交，下次进入可修改' : '';
+                btnC.title = isLocked ? '本关已提交，下次进入可修改' : '';
+                wordSpan.classList.remove('text-gray-400', 'text-gray-500', 'text-gray-800');
+                wordPhonetic.classList.remove('text-gray-400', 'text-gray-500', 'text-gray-800');
+                wordDesc.classList.remove('opacity-60', 'opacity-80');
+
+                if (result === 'unknown') {
+                    row.classList.add('bg-[#FEF2F2]', 'border-[#FECACA]');
+                    btnX.classList.add('bg-[#EF4444]', 'text-white', 'shadow-sm');
+                    btnC.classList.add('bg-gray-50', 'text-gray-400');
+                    wordDesc.classList.add('is-revealed');
+                } else if (result === 'known') {
+                    row.classList.add('bg-[#F0FDF4]', 'border-[#BBF7D0]');
+                    btnC.classList.add('bg-[#10B981]', 'text-white', 'shadow-sm');
+                    btnX.classList.add('bg-gray-50', 'text-gray-400');
+                    wordDesc.classList.add('is-revealed');
+                } else {
+                    row.classList.add('border-[#FDE68A]/50', 'bg-gradient-to-r', 'from-[#FFFDF0]', 'to-white');
+                    btnX.classList.add('bg-gray-50', 'text-gray-400');
+                    btnC.classList.add('bg-gray-50', 'text-gray-400');
+                    wordDesc.classList.remove('is-revealed');
+                }
+
+                wordSpan.classList.add('text-gray-800');
+                wordPhonetic.classList.add('text-gray-800');
+            }
+
             function renderWordList() {
                 var container = document.getElementById('wordListContainer');
                 if(!container) return;
@@ -1712,6 +1980,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                             <button id="btn-c-${item.id}" onclick="window.judgeWord(${item.id}, 'known')" class="judge-btn w-[56px] h-[44px] rounded-[14px] bg-gray-50 text-gray-400 flex items-center justify-center text-[22px] hover:bg-green-50 hover:text-green-500 active:scale-90 transition-all"><i class="ph-bold ph-check"></i></button>
                         </div>`;
                     container.appendChild(div);
+                    if (item.status) applyPassingWordVisualState(item.id, item.status);
                 });
             }
 
@@ -1736,6 +2005,10 @@ if(viewId === 'view-dashboard') renderDashboardUI();
             };
 
             window.judgeWord = function(id, result) {
+                if (isCurrentUnfinishedPassLevelLocked()) {
+                    showPassingToast('下次进入，才可重新过当前关');
+                    return;
+                }
                 var wordObj = testWords.find(w => w.id === id);
                 if (!wordObj) return;
 
@@ -1763,41 +2036,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 state.passingStats.remaining = TOTAL_WORDS - state.passingStats.answered;
                 wordObj.status = result;
 
-                var row = document.getElementById(`word-row-${id}`);
-                var btnX = document.getElementById(`btn-x-${id}`);
-                var btnC = document.getElementById(`btn-c-${id}`);
-                var wordSpan = document.getElementById(`word-text-${id}`);
-                var wordPhonetic = document.getElementById(`word-phonetic-${id}`);
-                var wordDesc = document.getElementById(`word-desc-${id}`);
-                var wordContent = document.getElementById(`word-content-${id}`);
-
-                if (row && btnX && btnC) {
-                    row.className = `pass-word-row flex justify-between items-center p-4 rounded-[20px] shadow-sm border transition-all duration-300 shrink-0`;
-                    btnX.className = `judge-btn w-[56px] h-[44px] rounded-[14px] flex items-center justify-center text-[22px] hover:bg-red-50 hover:text-red-500 active:scale-90 transition-all`;
-                    btnC.className = `judge-btn w-[56px] h-[44px] rounded-[14px] flex items-center justify-center text-[22px] hover:bg-green-50 hover:text-green-500 active:scale-90 transition-all`;
-                    wordSpan.classList.remove('text-gray-400', 'text-gray-500', 'text-gray-800');
-                    wordPhonetic.classList.remove('text-gray-400', 'text-gray-500', 'text-gray-800');
-                    wordDesc.classList.remove('opacity-60', 'opacity-80');
-                    wordDesc.classList.add('is-revealed');
-
-                    if (result === 'unknown') {
-                        row.classList.add('bg-[#FEF2F2]', 'border-[#FECACA]');
-                        btnX.classList.add('bg-[#EF4444]', 'text-white', 'shadow-sm'); 
-                        btnC.classList.add('bg-gray-50', 'text-gray-400'); 
-                    } else {
-                        row.classList.add('bg-[#F0FDF4]', 'border-[#BBF7D0]');
-                        btnC.classList.add('bg-[#10B981]', 'text-white', 'shadow-sm'); 
-                        btnX.classList.add('bg-gray-50', 'text-gray-400'); 
-                    }
-
-                    wordSpan.classList.add('text-gray-800');
-                    wordPhonetic.classList.add('text-gray-800');
-                    if (wordContent) {
-                        wordContent.classList.remove('selected-left');
-                        void wordContent.offsetWidth;
-                        wordContent.classList.add('selected-left');
-                    }
-                }
+                applyPassingWordVisualState(id, result);
 
                 updatePassingStats();
                 window.setPassFilter(state.passFilter);
@@ -1816,10 +2055,25 @@ if(viewId === 'view-dashboard') renderDashboardUI();
 
                 var submitBtn = document.getElementById('submitLevelBtn');
                 if (submitBtn) {
+                    var activeUnfinishedTask = state.currentActionType === 'unfinishedPass' ? getActiveUnfinishedPassTask() : null;
+                    var hasSavedRecord = !!getUnfinishedPassLevelRecord(activeUnfinishedTask, state.currentPassingLevel || 1);
+                    var isLocked = isCurrentUnfinishedPassLevelLocked();
+                    var allLevelsCompleted = activeUnfinishedTask
+                        && getUnfinishedPassCompletedLevels(activeUnfinishedTask).length >= 10;
+                    if (isLocked) {
+                        submitBtn.innerText = allLevelsCompleted && state.currentPassingLevel === 10
+                            ? '全部关卡都已提交'
+                            : '已提交';
+                        submitBtn.className = `${allLevelsCompleted && state.currentPassingLevel === 10 ? 'min-w-[240px] px-6' : 'px-10'} bg-green-50 text-green-600 border border-green-200 font-bold py-3 text-[15px] rounded-[14px] transition-all cursor-pointer active:scale-95 whitespace-nowrap shrink-0`;
+                        submitBtn.disabled = false;
+                        return;
+                    }
                     if (state.passingStats.remaining === 0) {
+                        submitBtn.innerText = hasSavedRecord ? '重新提交' : '提 交';
                         submitBtn.className = 'bg-brand hover-bg-brand text-white font-bold py-3 px-10 text-[16px] rounded-[14px] shadow-sm active:scale-95 transition-all whitespace-nowrap shrink-0';
                         submitBtn.disabled = false;
                     } else {
+                        submitBtn.innerText = hasSavedRecord ? '重新提交' : '提 交';
                         submitBtn.className = 'bg-[#F1F5F9] text-[#94A3B8] font-bold py-3 px-10 text-[16px] rounded-[14px] transition-all cursor-not-allowed whitespace-nowrap shrink-0';
                         submitBtn.disabled = true;
                     }
@@ -1827,6 +2081,10 @@ if(viewId === 'view-dashboard') renderDashboardUI();
             }
 
             window.submitPassResults = function() {
+                if (isCurrentUnfinishedPassLevelLocked()) {
+                    showPassingToast('下次进入，才可重新过当前关');
+                    return;
+                }
                 if (state.passingStats.remaining > 0) return;
                 stopPassingTimer();
                 
@@ -1872,6 +2130,8 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 if (state.currentActionType === 'unfinishedPass') {
                     var unfinishedTask = (state.unfinishedTasks || []).find(t => t.id === state.currentTaskId);
                     var submittedLevel = state.currentPassingLevel || 1;
+                    saveUnfinishedPassLevelRecord(unfinishedTask, submittedLevel);
+                    unfinishedPassSessionLockedLevels.add(submittedLevel);
                     var isFirstCompletion = markUnfinishedPassLevelCompleted(unfinishedTask, submittedLevel);
                     if (unfinishedTask && isFirstCompletion) {
                         unfinishedTask.current = Math.min(unfinishedTask.count, (unfinishedTask.current || 0) + TOTAL_WORDS);
@@ -1880,11 +2140,21 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 }
                 
                 if (state.currentActionType === 'unfinishedPass') {
-                    var nextLevel = ((state.currentPassingLevel || 1) % 10) + 1;
-                    if (resetUnfinishedPassLevel(unfinishedTask || getActiveUnfinishedPassTask(), nextLevel)) {
-                        window.switchView('view-passing');
-                        startPassingTimer();
-                        setPassingLevelPickerOpen(true);
+                    if (submittedLevel >= 10) {
+                        if (resetUnfinishedPassLevel(unfinishedTask || getActiveUnfinishedPassTask(), 10)) {
+                            window.switchView('view-passing');
+                            stopPassingTimer();
+                            setPassingLevelPickerOpen(false);
+                            showPassingToast('全部关卡都已提交');
+                        }
+                    } else {
+                        var nextLevel = submittedLevel + 1;
+                        if (resetUnfinishedPassLevel(unfinishedTask || getActiveUnfinishedPassTask(), nextLevel)) {
+                            window.switchView('view-passing');
+                            startPassingTimer();
+                            setPassingLevelPickerOpen(false);
+                            showPassingToast(`第${submittedLevel}关已提交，已进入第${nextLevel}关`);
+                        }
                     }
                 } else if (state._tempUnknowns.length > 0) {
                     window.showModal('提交成功', `<div class="mt-1 text-[15px] font-medium text-gray-600">已将发现的 <b class="text-[20px] text-orange-500 font-mono px-0.5">${state._tempUnknowns.length}</b> 个生词加入生词本！</div>`, () => window.switchView('view-dashboard'));
@@ -1930,7 +2200,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 group.photoUploaded = !!group.photoUploaded;
                 group.mode = group.mode || 'gendu';
                 group.currentIdx = group.currentIdx || 0;
-                group.modeRound = Object.assign({ gendu: 0, yinji: 0, tingxie: 0 }, group.modeRound || {});
+                group.modeRound = Object.assign({ gendu: 0, yinji: 0, tingxie: 0, guoci: 0 }, group.modeRound || {});
                 if (!Array.isArray(group.scores)) group.scores = null;
                 return group;
             }
@@ -2298,27 +2568,78 @@ if(viewId === 'view-dashboard') renderDashboardUI();
 
             function renderUnfinishedScoringPage() {
                 if (!unfinishedScoringData.length) return;
+
+                // 当前组已全部完成时，显示简洁完成提示
+                var currentGroup = getUnfinishedGroup(unfinishedSelectedLevel, unfinishedSelectedGroup);
+                var focusArea = document.getElementById('unfinished-score-word-en') && document.getElementById('unfinished-score-word-en').closest('.flex-1.flex.flex-col.items-center');
+                var completionNotice = document.getElementById('unfinished-group-done-notice');
+
+                if (currentGroup && currentGroup.completed) {
+                    // 隐藏正常内容，显示完成提示
+                    var enEl = document.getElementById('unfinished-score-word-en');
+                    var phonEl = document.getElementById('unfinished-score-word-phon');
+                    var cnEl = document.getElementById('unfinished-score-word-cn');
+                    var prevBtn = document.getElementById('unfinished-prev-btn');
+                    var nextBtn = document.getElementById('unfinished-next-btn');
+                    var micArea = document.getElementById('unfinished-mic-btn');
+                    if (enEl) enEl.style.display = 'none';
+                    if (phonEl) phonEl.style.display = 'none';
+                    if (cnEl) cnEl.style.display = 'none';
+                    if (prevBtn) prevBtn.style.visibility = 'hidden';
+                    if (nextBtn) nextBtn.style.visibility = 'hidden';
+                    if (micArea) micArea.style.display = 'none';
+                    // 注入或更新完成提示
+                    var doneNotice = document.getElementById('unfinished-group-done-notice');
+                    if (!doneNotice) {
+                        doneNotice = document.createElement('div');
+                        doneNotice.id = 'unfinished-group-done-notice';
+                        var parentNode = enEl ? enEl.parentNode : null;
+                        if (parentNode) parentNode.appendChild(doneNotice);
+                    }
+                    if (doneNotice) {
+                        doneNotice.className = 'flex flex-col items-center justify-center gap-4 py-8 px-6 text-center pointer-events-auto';
+                        doneNotice.innerHTML = `<div class="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center mb-2"><i class="ph-bold ph-check text-[28px] text-green-500"></i></div><p class="text-[18px] font-extrabold text-gray-700">第${unfinishedSelectedLevel}关第${unfinishedSelectedGroup}组的学习任务已经完成</p><div class="flex gap-3 mt-2"><button onclick="window.toggleUnfinishedLevelPicker(event)" class="px-5 py-2.5 bg-[#1F5FFF] text-white text-[14px] font-bold rounded-[14px] active:scale-95 transition-all">切换关卡</button><button onclick="window.confirmExitUnfinishedScoringView()" class="px-5 py-2.5 bg-gray-100 text-gray-600 text-[14px] font-bold rounded-[14px] active:scale-95 transition-all">返回退出</button></div>`;
+                        doneNotice.style.display = 'flex';
+                    }
+                    var submitBar = document.getElementById('unfinished-queue-submit-bar');
+                    if (submitBar) submitBar.innerHTML = '';
+                    updateUnfinishedTopNav();
+                    renderUnfinishedLevelPicker();
+                    return;
+                }
+
+                // 非完成态：恢复正常显示
+                var enEl2 = document.getElementById('unfinished-score-word-en');
+                var phonEl2 = document.getElementById('unfinished-score-word-phon');
+                var cnEl2 = document.getElementById('unfinished-score-word-cn');
+                var micArea2 = document.getElementById('unfinished-mic-btn');
+                if (enEl2) enEl2.style.display = '';
+                if (phonEl2) phonEl2.style.display = '';
+                if (cnEl2) cnEl2.style.display = '';
+                if (micArea2) micArea2.style.display = '';
+                var doneNoticeEl = document.getElementById('unfinished-group-done-notice');
+                if (doneNoticeEl) doneNoticeEl.style.display = 'none';
+
                 unfinishedCurrentIdx = Math.max(0, Math.min(unfinishedCurrentIdx, unfinishedScoringData.length - 1));
                 var curr = unfinishedScoringData[unfinishedCurrentIdx];
                 var progressEl = document.getElementById('unfinished-score-progress');
                 if (progressEl) progressEl.innerText = `${unfinishedCurrentIdx + 1}/${unfinishedScoringData.length}`;
-                var enEl = document.getElementById('unfinished-score-word-en');
-                var phonEl = document.getElementById('unfinished-score-word-phon');
-                var cnEl = document.getElementById('unfinished-score-word-cn');
                 var shouldMask = unfinishedMode === 'tingxie';
-                if (enEl) enEl.innerText = shouldMask ? '***' : curr.en;
-                if (phonEl) phonEl.innerText = shouldMask ? '***' : curr.phon;
-                if (cnEl) cnEl.innerText = shouldMask ? '***' : curr.cn;
+                if (enEl2) enEl2.innerText = shouldMask ? '***' : curr.en;
+                if (phonEl2) phonEl2.innerText = shouldMask ? '***' : curr.phon;
+                if (cnEl2) cnEl2.innerText = shouldMask ? '***' : curr.cn;
 
                 var prevBtn = document.getElementById('unfinished-prev-btn');
                 var nextBtn = document.getElementById('unfinished-next-btn');
                 if (prevBtn) {
+                    prevBtn.style.visibility = '';
                     prevBtn.disabled = unfinishedCurrentIdx === 0;
                     prevBtn.className = unfinishedCurrentIdx === 0
                         ? "flex items-center justify-center text-[#3B82F6]/20 transition-colors font-medium text-[14px] sm:text-[15px] py-2 px-2 rounded-full cursor-not-allowed whitespace-nowrap shrink-0"
                         : "flex items-center justify-center text-[#3B82F6] hover:text-[#2563EB] transition-colors font-medium text-[14px] sm:text-[15px] py-2 px-2 rounded-full cursor-pointer hover:bg-blue-50 whitespace-nowrap shrink-0";
                 }
                 if (nextBtn) {
+                    nextBtn.style.visibility = '';
                     nextBtn.disabled = unfinishedCurrentIdx === unfinishedScoringData.length - 1;
                     nextBtn.className = unfinishedCurrentIdx === unfinishedScoringData.length - 1
                         ? "flex items-center justify-center text-[#3B82F6]/20 transition-colors font-medium text-[14px] sm:text-[15px] py-2 px-2 rounded-full cursor-not-allowed whitespace-nowrap shrink-0 ml-auto"
@@ -3528,6 +3849,255 @@ if(viewId === 'view-dashboard') renderDashboardUI();
             initDefaultProfiles();
             renderDashboardUI();
         })();
+    </script>
+
+    <!-- ===== 全局悬浮翻译按钮 ===== -->
+    <div id="fab-translate" style="bottom: 100px; right: 24px;" aria-label="翻译">
+        <i class="ph-bold ph-translate fab-icon"></i>
+    </div>
+    <div id="translate-panel">
+        <div class="panel-header">
+            <span class="panel-title"><i class="ph-bold ph-translate text-[18px] text-[#1F5FFF]"></i>快捷翻译</span>
+            <button class="panel-close" id="translate-panel-close" aria-label="关闭"><i class="ph-bold ph-x"></i></button>
+        </div>
+        <div id="translate-input-row">
+            <input id="translate-input" type="text" placeholder="输入英文或中文..." autocomplete="off" autocorrect="off" spellcheck="false" />
+            <button id="translate-submit-btn" aria-label="翻译"><i class="ph-bold ph-arrow-right"></i></button>
+        </div>
+        <div id="translate-result" class="result-empty">输入单词后点击翻译</div>
+    </div>
+
+    <script>
+    (function() {
+        /* ---------- FAB 拖拽 ---------- */
+        var fab = document.getElementById('fab-translate');
+        var panel = document.getElementById('translate-panel');
+        var input = document.getElementById('translate-input');
+        var submitBtn = document.getElementById('translate-submit-btn');
+        var resultEl = document.getElementById('translate-result');
+        var closeBtn = document.getElementById('translate-panel-close');
+
+        var isDragging = false;
+        var wasDragged = false;
+        var startTouchX = 0, startTouchY = 0;
+        var fabStartX = 0, fabStartY = 0;
+        var panelOpen = false;
+
+        function getFabRect() { return fab.getBoundingClientRect(); }
+
+        function clampPosition(x, y) {
+            var w = fab.offsetWidth, h = fab.offsetHeight;
+            var vw = window.innerWidth, vh = window.innerHeight;
+            x = Math.max(0, Math.min(x, vw - w));
+            y = Math.max(0, Math.min(y, vh - h));
+            return { x: x, y: y };
+        }
+
+        function setFabPosition(x, y) {
+            var clamped = clampPosition(x, y);
+            fab.style.left = clamped.x + 'px';
+            fab.style.top = clamped.y + 'px';
+            fab.style.right = 'auto';
+            fab.style.bottom = 'auto';
+        }
+
+        // 初始化：把 right/bottom 转换为 left/top
+        function initFabPos() {
+            var rect = getFabRect();
+            setFabPosition(rect.left, rect.top);
+        }
+        setTimeout(initFabPos, 0);
+
+        // --- pointer events for drag (touch + mouse) ---
+        fab.addEventListener('pointerdown', function(e) {
+            isDragging = true;
+            wasDragged = false;
+            startTouchX = e.clientX;
+            startTouchY = e.clientY;
+            var rect = getFabRect();
+            fabStartX = rect.left;
+            fabStartY = rect.top;
+            fab.setPointerCapture(e.pointerId);
+            e.preventDefault();
+        });
+
+        fab.addEventListener('pointermove', function(e) {
+            if (!isDragging) return;
+            var dx = e.clientX - startTouchX;
+            var dy = e.clientY - startTouchY;
+            if (Math.abs(dx) > 4 || Math.abs(dy) > 4) wasDragged = true;
+            setFabPosition(fabStartX + dx, fabStartY + dy);
+            if (panelOpen) positionPanel();
+        });
+
+        fab.addEventListener('pointerup', function(e) {
+            isDragging = false;
+            fab.releasePointerCapture(e.pointerId);
+            // 吸边
+            snapToEdge();
+            if (!wasDragged) {
+                togglePanel();
+            }
+        });
+
+        fab.addEventListener('pointercancel', function(e) {
+            isDragging = false;
+            fab.releasePointerCapture(e.pointerId);
+            snapToEdge();
+        });
+
+        function snapToEdge() {
+            var rect = getFabRect();
+            var vw = window.innerWidth;
+            var centerX = rect.left + rect.width / 2;
+            var targetX = centerX < vw / 2 ? 8 : vw - rect.width - 8;
+            fab.style.transition = 'left 0.25s cubic-bezier(0.16,1,0.3,1)';
+            fab.style.left = targetX + 'px';
+            setTimeout(function() { fab.style.transition = ''; }, 260);
+            if (panelOpen) setTimeout(positionPanel, 20);
+        }
+
+        /* ---------- 面板定位 ---------- */
+        function positionPanel() {
+            var fabRect = getFabRect();
+            var pw = 340;
+            var ph = panel.offsetHeight || 240;
+            var vw = window.innerWidth;
+            var vh = window.innerHeight;
+            var left, top;
+
+            // 水平：尽量在 fab 同侧展开
+            if (fabRect.left + fabRect.width / 2 > vw / 2) {
+                left = fabRect.right - pw;
+            } else {
+                left = fabRect.left;
+            }
+            left = Math.max(16, Math.min(left, vw - pw - 16));
+
+            // 垂直：优先向上
+            top = fabRect.top - ph - 12;
+            if (top < 16) top = fabRect.bottom + 12;
+            top = Math.max(16, Math.min(top, vh - ph - 16));
+
+            panel.style.left = left + 'px';
+            panel.style.top = top + 'px';
+        }
+
+        /* ---------- 面板开关 ---------- */
+        function togglePanel() {
+            panelOpen = !panelOpen;
+            if (panelOpen) {
+                positionPanel();
+                panel.style.display = 'flex';
+                requestAnimationFrame(function() {
+                    panel.classList.add('panel-open');
+                });
+                setTimeout(function() { input.focus(); }, 100);
+            } else {
+                closePanel();
+            }
+        }
+
+        function closePanel() {
+            panelOpen = false;
+            panel.classList.remove('panel-open');
+            setTimeout(function() {
+                if (!panelOpen) panel.style.display = 'none';
+            }, 260);
+        }
+
+        closeBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closePanel();
+        });
+
+        // 点击面板外关闭
+        document.addEventListener('click', function(e) {
+            if (!panelOpen) return;
+            if (panel.contains(e.target) || fab.contains(e.target)) return;
+            closePanel();
+        }, true);
+
+        /* ---------- 翻译逻辑 ---------- */
+        function isChinese(text) {
+            return /[\u4e00-\u9fff\u3400-\u4dbf]/.test(text);
+        }
+
+        function showLoading() {
+            resultEl.className = 'result-empty';
+            resultEl.id = 'translate-result';
+            resultEl.innerHTML = '<div class="result-loading"><span></span><span></span><span></span></div>';
+            resultEl.classList.remove('result-empty');
+        }
+
+        function showResult(text) {
+            resultEl.classList.remove('result-empty');
+            resultEl.textContent = text;
+        }
+
+        function showError(msg) {
+            resultEl.className = '';
+            resultEl.id = 'translate-result';
+            resultEl.classList.add('result-empty');
+            resultEl.textContent = msg || '翻译失败，请重试';
+        }
+
+        function showPlaceholder() {
+            resultEl.classList.add('result-empty');
+            resultEl.textContent = '输入单词后点击翻译';
+        }
+
+        async function doTranslate() {
+            var text = (input.value || '').trim();
+            if (!text) { showPlaceholder(); return; }
+
+            var isZh = isChinese(text);
+            var langpair = isZh ? 'zh-CN|en' : 'en|zh-CN';
+
+            showLoading();
+
+            try {
+                var url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text) + '&langpair=' + langpair;
+                var resp = await fetch(url);
+                var data = await resp.json();
+                if (data && data.responseData && data.responseData.translatedText) {
+                    var result = data.responseData.translatedText;
+                    // MyMemory 有时返回全大写，做一下处理
+                    if (!isZh && result === result.toUpperCase() && result.length > 1) {
+                        result = result.charAt(0).toUpperCase() + result.slice(1).toLowerCase();
+                    }
+                    showResult(result);
+                } else {
+                    showError('未找到翻译结果');
+                }
+            } catch (err) {
+                showError('网络错误，请检查连接');
+            }
+        }
+
+        submitBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            doTranslate();
+        });
+
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                doTranslate();
+            }
+        });
+
+        // 输入清空时恢复占位文字
+        input.addEventListener('input', function() {
+            if (!input.value.trim()) showPlaceholder();
+        });
+
+        // 窗口大小变化时重新吸边 + 修正面板位置
+        window.addEventListener('resize', function() {
+            snapToEdge();
+            if (panelOpen) positionPanel();
+        });
+    })();
     </script>
 </body>
 </html>
