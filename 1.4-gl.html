@@ -174,8 +174,9 @@
         .record-actions { display: flex; gap: 8px; flex-wrap: wrap; padding-top: 12px; margin-top: 12px; border-top: 1px dashed rgba(100,116,139,0.16); }
         .badge-tag.tag-muted { background: rgba(100,116,139,0.12); color: var(--text-secondary); }
 
-        .record-form-page { z-index: 1400 !important; background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%); }
-        .record-form-body { flex: 1; min-height: 0; overflow-y: auto; padding: 4px 20px 112px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+        .record-form-page { z-index: 1400 !important; background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%); overflow: hidden; }
+        #record-main-form { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+        .record-form-body { flex: 1; min-height: 0; height: 0; overflow-y: auto; overflow-x: hidden; padding: 4px 20px 112px; scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; touch-action: pan-y; }
         .record-form-body::-webkit-scrollbar { display: none; }
         .form-footer-fixed { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 20px 24px; background: rgba(255,255,255,0.86); border-top: 1px solid rgba(255,255,255,0.9); backdrop-filter: blur(18px); box-shadow: 0 -10px 24px rgba(31,95,255,0.08); }
         .form-note { font-size: 12px; font-weight: 700; color: var(--text-secondary); line-height: 1.45; margin: -2px 4px 12px; }
@@ -252,6 +253,30 @@
         .form-control { width: 100%; padding: 14px 16px; border-radius: 18px; border: 1px solid rgba(155,169,206,0.14); background: rgba(245,248,255,0.9); font-size: 14px; color: var(--text-title); outline: none; transition: 0.2s; font-family: inherit;}
         .form-control:focus { border-color: var(--primary-color); background: #fff; box-shadow: 0 0 0 3px var(--primary-light); }
         .form-control:invalid:focus { border-color: var(--danger-color); box-shadow: 0 0 0 3px var(--danger-light); }
+        select.form-control, select.entry-inline-input, select.semester-select, select.my-lead-filter-btn {
+            appearance: none;
+            -webkit-appearance: none;
+            padding-right: 44px;
+            cursor: pointer;
+            background-image:
+                linear-gradient(45deg, transparent 50%, #7182A3 50%),
+                linear-gradient(135deg, #7182A3 50%, transparent 50%),
+                linear-gradient(135deg, rgba(255,255,255,0.98), rgba(244,248,255,0.96));
+            background-position:
+                calc(100% - 20px) calc(50% - 2px),
+                calc(100% - 15px) calc(50% - 2px),
+                0 0;
+            background-size: 6px 6px, 6px 6px, 100% 100%;
+            background-repeat: no-repeat;
+            box-shadow: 0 7px 18px rgba(31,95,255,0.055), inset 0 1px 0 rgba(255,255,255,0.86);
+        }
+        select.form-control:focus, select.entry-inline-input:focus, select.semester-select:focus, select.my-lead-filter-btn:focus {
+            background-image:
+                linear-gradient(45deg, transparent 50%, var(--primary-color) 50%),
+                linear-gradient(135deg, var(--primary-color) 50%, transparent 50%),
+                linear-gradient(135deg, #fff, #F7FAFF);
+        }
+        select.form-control option, select.entry-inline-input option, select.semester-select option, select.my-lead-filter-btn option { background: #fff; color: var(--text-title); font-weight: 700; }
         textarea.form-control { resize: none; height: 100px; }
         .form-section { padding: 14px; margin-bottom: 14px; border-radius: 20px; background: rgba(245,248,255,0.72); border: 1px solid rgba(255,255,255,0.9); }
         .form-section-title { font-size: 14px; font-weight: 900; color: var(--primary-color); margin-bottom: 12px; }
@@ -295,8 +320,8 @@
         .compact-action { padding: 8px 12px; border-radius: 999px; border: 1px solid rgba(31,95,255,0.18); background: rgba(31,95,255,0.08); color: var(--primary-color); font-size: 12px; font-weight: 900; cursor: pointer; font-family: inherit; }
         .global-add-btn { width: 34px; height: 34px; border-radius: 14px; border: none; background: var(--primary-color); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 22px rgba(31,95,255,0.24); cursor: pointer; }
         .global-add-btn svg { width: 20px; height: 20px; stroke: currentColor; }
-        .quick-menu-wrap { position: relative; }
-        .quick-dropdown { position: absolute; top: 42px; right: 0; width: 168px; padding: 8px; border-radius: 20px; background: rgba(255,255,255,0.94); border: 1px solid rgba(255,255,255,0.92); box-shadow: 0 18px 38px rgba(31,95,255,0.18); backdrop-filter: blur(18px); z-index: 300; opacity: 0; transform: translateY(-8px) scale(0.96); pointer-events: none; transition: 0.18s ease; }
+        .quick-menu-wrap { position: relative; z-index: 1700; }
+        .quick-dropdown { position: absolute; top: 42px; right: 0; width: 168px; padding: 8px; border-radius: 20px; background: rgba(255,255,255,0.97); border: 1px solid rgba(255,255,255,0.96); box-shadow: 0 18px 38px rgba(31,95,255,0.18); backdrop-filter: blur(18px); z-index: 1800; opacity: 0; transform: translateY(-8px) scale(0.96); transform-origin: top right; pointer-events: none; transition: 0.18s ease; }
         .quick-dropdown.active { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
         .quick-menu-item { width: 100%; border: none; background: transparent; border-radius: 14px; padding: 10px; display: flex; align-items: center; gap: 10px; color: var(--text-title); font-size: 13px; font-weight: 900; font-family: inherit; cursor: pointer; }
         .quick-menu-item:active { background: var(--primary-light); }
@@ -426,12 +451,41 @@
         .my-lead-source-scroll .pill { min-height: 40px; padding: 0 16px; touch-action: manipulation; }
         .my-lead-list { display: grid; gap: 10px; }
         .my-lead-row { min-height: 52px; display: grid; grid-template-columns: 40px minmax(0, 1fr) 82px; align-items: center; gap: 8px; padding: 12px; border-radius: 18px; background: rgba(255,255,255,0.78); border: 1px solid rgba(255,255,255,0.9); box-shadow: 0 8px 18px rgba(31,95,255,0.04); cursor: pointer; transition: 0.2s; }
+        .my-lead-row.public-row { grid-template-columns: 40px minmax(0, 1fr) 58px; }
         .my-lead-row:active { transform: scale(0.97); background: rgba(255,255,255,0.92); }
         .my-lead-index { width: 28px; height: 28px; border-radius: 10px; background: rgba(31,95,255,0.10); color: var(--primary-color); font-size: 12px; font-weight: 950; display: flex; align-items: center; justify-content: center; }
         .my-lead-name { min-width: 0; font-size: 15px; font-weight: 950; color: var(--text-title); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .my-lead-status { justify-self: end; max-width: 82px; padding: 5px 8px; border-radius: 10px; background: rgba(31,95,255,0.10); color: var(--primary-color); font-size: 11px; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .my-lead-fab { position: fixed; right: max(22px, calc((100vw - 375px) / 2 + 24px)); bottom: max(26px, calc((100vh - 812px) / 2 + 34px)); z-index: 1450; width: 58px; height: 58px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.78); background: linear-gradient(135deg, #4B82FF 0%, var(--primary-color) 100%); color: #fff; font-size: 32px; font-weight: 700; line-height: 1; display: flex; align-items: center; justify-content: center; box-shadow: 0 16px 30px rgba(31,95,255,0.30); font-family: inherit; cursor: pointer; }
-        .my-lead-fab:active { transform: scale(0.94); }
+        .public-lead-assign-btn { justify-self: end; width: 54px; height: 32px; border: 1px solid rgba(31,95,255,0.16); border-radius: 10px; background: rgba(31,95,255,0.10); color: var(--primary-color); font-size: 12px; font-weight: 900; font-family: inherit; }
+        .public-lead-assign-btn:active { transform: scale(0.95); background: rgba(31,95,255,0.16); }
+        .lead-scope-title-wrap { position: relative; }
+        .lead-scope-trigger { min-height: 32px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 0 5px; border: 0; background: transparent; color: var(--text-title); font: inherit; font-size: 18px; font-weight: 800; font-family: inherit; }
+        .lead-scope-trigger svg { display: none; width: 15px; height: 15px; color: var(--primary-color); transition: transform 0.22s ease; }
+        .lead-scope-trigger.switchable svg { display: block; }
+        .lead-scope-trigger.open svg { transform: rotate(180deg); }
+        .lead-scope-menu { top: 38px; left: 50%; right: auto; width: 148px; padding: 6px; transform: translate(-50%, -10px); }
+        .lead-scope-menu.active { transform: translate(-50%, 0); }
+        .lead-scope-option { width: 100%; min-height: 42px; justify-content: center; }
+        .lead-scope-option.active { color: var(--primary-color); background: rgba(31,95,255,0.09); }
+        .assign-self-section { flex: 0 0 auto; margin-bottom: 10px; }
+        .assign-search-wrap { position: relative; flex: 0 0 auto; margin-bottom: 10px; }
+        .assign-search-wrap svg { position: absolute; left: 13px; top: 50%; width: 17px; height: 17px; color: #94A3B8; transform: translateY(-50%); pointer-events: none; }
+        .assign-teacher-search { width: 100%; height: 42px; box-sizing: border-box; border: 1px solid rgba(31,95,255,0.12); border-radius: 13px; background: rgba(245,248,255,0.92); padding: 0 38px 0 40px; color: var(--text-title); font-size: 13px; font-weight: 800; font-family: inherit; outline: none; }
+        .assign-teacher-search:focus { border-color: rgba(31,95,255,0.34); box-shadow: 0 0 0 3px rgba(31,95,255,0.08); background: #fff; }
+        .assign-search-clear { position: absolute; right: 8px; top: 50%; width: 28px; height: 28px; display: none; align-items: center; justify-content: center; border: 0; border-radius: 9px; background: rgba(100,116,139,0.09); color: #64748B; font-size: 17px; font-family: inherit; transform: translateY(-50%); }
+        .assign-search-clear.visible { display: flex; }
+        .assign-teacher-list { flex: 1; min-height: 0; display: grid; align-content: start; gap: 9px; margin-bottom: 14px; overflow-y: auto; overscroll-behavior-y: contain; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+        .assign-teacher-list::-webkit-scrollbar { display: none; }
+        .assign-list-caption { flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; margin: 0 3px 8px; color: var(--text-secondary); font-size: 11px; font-weight: 800; }
+        .assign-teacher-empty { padding: 28px 12px; border-radius: 16px; background: rgba(245,248,255,0.68); color: var(--text-secondary); font-size: 13px; font-weight: 800; text-align: center; }
+        .assign-teacher-option { width: 100%; min-height: 56px; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid rgba(148,163,184,0.12); border-radius: 16px; background: rgba(245,248,255,0.78); color: var(--text-title); text-align: left; font-family: inherit; }
+        .assign-teacher-option.selected { border-color: rgba(31,95,255,0.32); background: rgba(31,95,255,0.09); box-shadow: inset 0 0 0 1px rgba(31,95,255,0.08); }
+        .assign-teacher-avatar { width: 36px; height: 36px; flex: 0 0 36px; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: rgba(31,95,255,0.12); color: var(--primary-color); font-size: 14px; font-weight: 950; }
+        .assign-teacher-copy { min-width: 0; flex: 1; }
+        .assign-teacher-name { font-size: 14px; font-weight: 900; }
+        .assign-teacher-role { margin-top: 3px; color: var(--text-secondary); font-size: 11px; font-weight: 750; }
+        .assign-teacher-check { width: 20px; height: 20px; flex: 0 0 20px; border: 2px solid #CBD5E1; border-radius: 50%; }
+        .assign-teacher-option.selected .assign-teacher-check { border: 6px solid var(--primary-color); background: #fff; }
         .entry-action-text.plus-action { min-width: 32px; height: 32px; border-radius: 12px; background: rgba(31,95,255,0.10); display: flex; align-items: center; justify-content: center; font-size: 22px; line-height: 1; }
         .my-lead-detail-hero { position: relative; overflow: hidden; padding: 18px; border-radius: 24px; background: linear-gradient(145deg, rgba(255,255,255,0.92), rgba(237,244,255,0.74)); border: 1px solid rgba(255,255,255,0.9); margin-bottom: 12px; box-shadow: 0 12px 26px rgba(31,95,255,0.07); }
         .my-lead-detail-hero::after { content: ''; position: absolute; right: -28px; top: -36px; width: 120px; height: 120px; border-radius: 40px; background: rgba(31,95,255,0.08); transform: rotate(24deg); }
@@ -452,13 +506,19 @@
         .lead-compact-info-item.wide .lead-compact-info-label { margin-bottom: 0; flex-shrink: 0; }
         .lead-compact-info-item.wide .lead-compact-info-value { text-align: right; }
         .lead-timeline { position: relative; margin: 6px 0 14px; padding-left: 20px; }
-        .lead-timeline::before { content: ''; position: absolute; left: 6px; top: 20px; bottom: 20px; width: 2px; border-radius: 999px; background: linear-gradient(180deg, rgba(31,95,255,0.34), rgba(31,95,255,0.06)); }
-        .lead-timeline-item { position: relative; padding: 0 0 12px 12px; }
+        .lead-timeline::before { content: ''; position: absolute; left: 6px; top: 18px; bottom: 18px; width: 2px; border-radius: 999px; background: #CBD5E1; }
+        .lead-timeline-item { position: relative; padding: 0 0 10px 12px; }
         .lead-timeline-item:last-child { padding-bottom: 0; }
-        .lead-timeline-dot { position: absolute; left: -19px; top: 50%; width: 12px; height: 12px; border-radius: 50%; background: #CBD5E1; border: 3px solid rgba(255,255,255,0.96); box-shadow: 0 0 0 3px rgba(148,163,184,0.12); transform: translateY(calc(-50% - 6px)); }
-        .lead-timeline-item.done .lead-timeline-dot { background: var(--primary-color); box-shadow: 0 0 0 4px rgba(31,95,255,0.12); }
-        .lead-timeline-item.current .lead-timeline-dot { background: var(--primary-color); box-shadow: 0 0 0 4px rgba(31,95,255,0.15); animation: lead-current-breathe 1.9s ease-in-out infinite; }
-        .lead-timeline-item.current .lead-timeline-card { border-color: rgba(31,95,255,0.18); background: rgba(255,255,255,0.90); }
+        .lead-timeline-dot { position: absolute; left: -19px; top: calc((100% - 10px) / 2); width: 12px; height: 12px; border-radius: 50%; background: #CBD5E1; border: 3px solid rgba(255,255,255,0.98); box-shadow: 0 0 0 2px rgba(148,163,184,0.12); transform: translateY(-50%); }
+        .lead-timeline-item.completed .lead-timeline-dot { background: #2453C4; box-shadow: 0 0 0 3px rgba(36,83,196,0.10); }
+        .lead-timeline-item.current .lead-timeline-dot { background: var(--primary-color); box-shadow: 0 0 0 5px rgba(31,95,255,0.16); animation: lead-current-breathe 1.9s ease-in-out infinite; }
+        .lead-timeline-item.current .lead-timeline-card { padding: 14px; border-color: rgba(31,95,255,0.24); background: rgba(255,255,255,0.98); box-shadow: 0 10px 24px rgba(31,95,255,0.12); }
+        .lead-timeline-item.pending { padding-bottom: 7px; }
+        .lead-timeline-item.pending .lead-timeline-dot { top: calc((100% - 7px) / 2); }
+        .lead-timeline-item:last-child .lead-timeline-dot { top: 50%; }
+        .lead-timeline-item.pending .lead-timeline-card { min-height: 42px; padding: 9px 12px; background: rgba(241,245,249,0.64); border-color: rgba(148,163,184,0.14); box-shadow: none; }
+        .lead-timeline-item.pending .lead-timeline-desc { display: none; }
+        .lead-timeline-item.pending .lead-timeline-title, .lead-timeline-item.pending .lead-timeline-time { color: #7C8AA3; }
         @keyframes lead-current-breathe {
             0%, 100% { box-shadow: 0 0 0 4px rgba(31,95,255,0.13), 0 0 0 7px rgba(31,95,255,0); }
             50% { box-shadow: 0 0 0 5px rgba(31,95,255,0.20), 0 0 0 11px rgba(31,95,255,0.08); }
@@ -466,11 +526,16 @@
         @media (prefers-reduced-motion: reduce) {
             .lead-timeline-item.current .lead-timeline-dot { animation: none; }
         }
-        .lead-timeline-card { padding: 12px 13px; border-radius: 16px; background: rgba(255,255,255,0.78); border: 1px solid rgba(255,255,255,0.88); box-shadow: 0 8px 18px rgba(31,95,255,0.04); }
+        .lead-timeline-card { padding: 11px 13px; border-radius: 14px; background: rgba(255,255,255,0.66); border: 1px solid rgba(255,255,255,0.82); box-shadow: 0 5px 14px rgba(31,95,255,0.025); }
         .lead-timeline-top { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; margin-bottom: 4px; }
-        .lead-timeline-title { font-size: 13px; font-weight: 950; color: var(--text-title); }
-        .lead-timeline-time { font-size: 11px; font-weight: 800; color: var(--text-secondary); white-space: nowrap; }
-        .lead-timeline-desc { font-size: 12px; color: var(--text-main); font-weight: 750; line-height: 1.45; }
+        .lead-timeline-title-wrap { min-width: 0; display: flex; align-items: center; gap: 7px; }
+        .lead-timeline-title { font-size: 13px; font-weight: 950; color: #172554; }
+        .lead-timeline-time { font-size: 10px; font-weight: 800; color: #64748B; white-space: nowrap; }
+        .lead-timeline-desc { font-size: 12px; color: #334155; font-weight: 750; line-height: 1.42; }
+        .lead-timeline-current-tag { padding: 3px 7px; border-radius: 7px; background: var(--primary-color); color: #fff; font-size: 9px; font-weight: 950; white-space: nowrap; }
+        .lead-timeline-item.completed .lead-timeline-card { opacity: 0.82; }
+        .lead-timeline-item.current .lead-timeline-title { color: var(--primary-color); font-size: 14px; }
+        .lead-timeline-item.current .lead-timeline-time { color: #365FAE; }
         .school-mode-toggle { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; padding: 5px; border-radius: 14px; background: rgba(31,95,255,0.08); margin-bottom: 10px; }
         .school-mode-btn { height: 34px; border: none; border-radius: 10px; background: transparent; color: var(--text-secondary); font-size: 12px; font-weight: 900; font-family: inherit; }
         .school-mode-btn.active { background: #fff; color: var(--primary-color); box-shadow: 0 6px 14px rgba(31,95,255,0.08); }
@@ -487,6 +552,19 @@
         .qr-result-card { padding: 16px; border-radius: 22px; background: rgba(255,255,255,0.86); border: 1px solid rgba(255,255,255,0.9); text-align: center; }
         .qr-result-card img { width: 148px; height: 148px; border-radius: 16px; background: #fff; padding: 8px; margin: 8px auto 12px; display: block; }
         .qr-fallback { width: 148px; height: 148px; border-radius: 16px; margin: 8px auto 12px; background: linear-gradient(90deg, #111827 10px, transparent 10px) 0 0/22px 22px, linear-gradient(#111827 10px, transparent 10px) 0 0/22px 22px, #fff; border: 8px solid #fff; box-shadow: inset 0 0 0 1px rgba(15,23,42,0.08); }
+        .lead-qr-preview { width: 100%; display: flex; align-items: center; gap: 13px; margin-bottom: 12px; padding: 11px 13px; border: 1px solid rgba(255,255,255,0.94); border-radius: 18px; background: rgba(255,255,255,0.84); box-shadow: 0 9px 22px rgba(31,95,255,0.07); font-family: inherit; text-align: left; cursor: pointer; }
+        .lead-qr-preview:active { transform: scale(0.98); }
+        .lead-qr-thumb { flex: 0 0 58px; width: 58px; height: 58px; padding: 4px; border-radius: 12px; background: #fff; object-fit: cover; box-shadow: inset 0 0 0 1px rgba(15,23,42,0.07); }
+        .lead-qr-preview-copy { min-width: 0; flex: 1; }
+        .lead-qr-preview-title { color: var(--text-title); font-size: 14px; font-weight: 950; }
+        .lead-qr-preview-time { margin-top: 5px; color: var(--text-secondary); font-size: 11px; font-weight: 800; line-height: 1.4; }
+        .lead-qr-preview-arrow { color: var(--primary-color); font-size: 12px; font-weight: 900; white-space: nowrap; }
+        .qr-preview-overlay { position: absolute; inset: 0; z-index: 2600; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(15,23,42,0.58); backdrop-filter: blur(14px); opacity: 0; visibility: hidden; pointer-events: none; transition: 0.22s ease; }
+        .qr-preview-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
+        .qr-preview-panel { width: 100%; padding: 18px; border-radius: 24px; background: rgba(255,255,255,0.97); border: 1px solid rgba(255,255,255,0.96); box-shadow: 0 24px 60px rgba(15,23,42,0.24); text-align: center; transform: scale(0.92); transition: 0.22s ease; }
+        .qr-preview-overlay.active .qr-preview-panel { transform: scale(1); }
+        .qr-preview-panel img { width: 232px; height: 232px; max-width: 100%; padding: 10px; border-radius: 20px; background: #fff; display: block; margin: 12px auto; }
+        .qr-preview-close { width: 100%; min-height: 44px; border: 0; border-radius: 13px; background: rgba(31,95,255,0.10); color: var(--primary-color); font-family: inherit; font-size: 14px; font-weight: 900; cursor: pointer; }
         .my-lead-detail-page { min-height: 100%; box-sizing: border-box; display: flex; flex-direction: column; padding: 8px 0 20px; }
         .my-lead-detail-main { flex: 0 0 auto; }
         .detail-bottom-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; position: sticky; bottom: 0; padding: 12px 0 4px; background: linear-gradient(180deg, rgba(239,246,255,0), rgba(239,246,255,0.96) 28%, rgba(223,231,255,0.96)); backdrop-filter: blur(10px); }
@@ -503,13 +581,31 @@
         .entry-inline-input { width: 100%; height: 38px; border: 1px solid rgba(31,95,255,0.12); border-radius: 13px; background: rgba(245,248,255,0.86); padding: 0 12px; color: var(--text-title); font-size: 13px; font-weight: 800; outline: none; font-family: inherit; }
         .entry-picker-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 15px; border-radius: 18px; background: rgba(255,255,255,0.82); border: 1px solid rgba(255,255,255,0.9); margin-bottom: 12px; color: var(--text-title); font-size: 13px; font-weight: 900; }
         .entry-picker-row span { color: var(--text-secondary); font-weight: 800; }
-        .entry-school-list { display: grid; gap: 9px; }
+        .entry-school-list { width: 100%; max-width: 100%; min-width: 0; display: grid; gap: 9px; overflow: hidden; }
         .entry-school-item { padding: 13px 14px; border-radius: 16px; background: rgba(255,255,255,0.82); border: 1px solid rgba(255,255,255,0.9); color: var(--text-main); font-size: 13px; font-weight: 850; line-height: 1.4; }
-        .coop-school-item { min-height: 66px; display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; touch-action: manipulation; }
+        .coop-school-item { width: 100%; max-width: 100%; min-width: 0; min-height: 60px; display: grid; grid-template-columns: 34px minmax(0, 1fr) 28px; align-items: center; gap: 10px; padding: 12px; cursor: pointer; touch-action: manipulation; overflow: hidden; }
         .coop-school-main { min-width: 0; }
         .coop-school-name { color: var(--text-title); font-size: 14px; font-weight: 900; line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .coop-school-contact { margin-top: 5px; color: var(--text-secondary); font-size: 11px; font-weight: 750; line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .coop-school-arrow { flex-shrink: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; color: #A7B3C7; }
+        .coop-school-index { flex: 0 0 34px; width: 34px; height: 34px; border-radius: 11px; display: flex; align-items: center; justify-content: center; background: rgba(31,95,255,0.10); color: var(--primary-color); font-size: 12px; font-weight: 950; }
+        .coop-school-main { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        .coop-school-term-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 4px 0 12px; padding: 13px 14px; border-radius: 16px; background: rgba(255,255,255,0.72); border: 1px solid rgba(255,255,255,0.9); }
+        .coop-school-term-summary strong { color: var(--text-title); font-size: 14px; font-weight: 900; }
+        .coop-school-term-summary span { color: var(--text-secondary); font-size: 12px; font-weight: 800; }
+        .coop-empty-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
+        .coop-empty-btn { min-height: 42px; border-radius: 12px; border: 1px solid rgba(31,95,255,0.14); background: rgba(31,95,255,0.09); color: var(--primary-color); font-family: inherit; font-size: 13px; font-weight: 900; }
+        .coop-empty-btn.primary { border-color: var(--primary-color); background: var(--primary-color); color: #fff; box-shadow: 0 8px 18px rgba(31,95,255,0.20); }
+        .coop-link-list { display: grid; gap: 10px; padding-top: 10px; }
+        .coop-link-option { width: 100%; min-height: 54px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1px solid rgba(255,255,255,0.9); border-radius: 16px; background: rgba(255,255,255,0.78); color: var(--text-title); font-family: inherit; font-size: 13px; font-weight: 850; text-align: left; }
+        #sub-view-follow { padding-right: 0; }
+        #my-leads-workspace { padding-right: 20px; }
+        #workspace-enrollment > .nav-bar { z-index: 1600; overflow: visible; }
+        .school-detail-page { min-height: 100%; display: flex; flex-direction: column; padding: 16px 0 20px; }
+        .school-detail-main { flex: 0 0 auto; }
+        .school-detail-actions { position: sticky; bottom: 20px; z-index: 50; display: grid; grid-template-columns: 1fr 2fr; gap: 10px; margin-top: auto; padding: 12px; border-radius: 18px; background: rgba(255,255,255,0.92); border: 1px solid rgba(255,255,255,0.96); box-shadow: 0 10px 28px rgba(31,95,255,0.13), inset 0 1px 0 rgba(255,255,255,1); backdrop-filter: blur(18px); }
+        .school-detail-delete { border: 1px solid rgba(239,68,68,0.18); background: rgba(239,68,68,0.08); color: var(--danger-color); }
+        .school-value-missing { color: var(--danger-color) !important; font-weight: 900 !important; }
         .entry-empty { padding: 42px 18px; text-align: center; color: var(--text-secondary); font-size: 14px; font-weight: 800; }
 
         .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; text-align: center;}
@@ -586,16 +682,23 @@
             <div class="icon-btn" style="margin-left: -8px;" onclick="closeEnrollmentWorkspace()">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
             </div>
-            <div class="nav-title-group"><div class="nav-title">招生工作台</div></div>
+            <div class="nav-title-group lead-scope-title-wrap">
+                <button class="lead-scope-trigger" id="workspace-title" type="button" onclick="toggleLeadScopeMenu(event)">
+                    <span id="workspace-title-text">招生工作台</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div class="quick-dropdown lead-scope-menu" id="lead-scope-menu">
+                    <button class="quick-menu-item lead-scope-option active" data-scope="mine" onclick="switchLeadScope('mine', event)">我的线索</button>
+                    <button class="quick-menu-item lead-scope-option" data-scope="public" onclick="switchLeadScope('public', event)">公海线索</button>
+                </div>
+            </div>
             <div class="quick-menu-wrap">
                 <button class="global-add-btn" onclick="toggleQuickMenu(event)" aria-label="快捷操作">
                     <svg viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 </button>
                 <div class="quick-dropdown" id="quick-dropdown">
-                    <button class="quick-menu-item" onclick="quickAction('lead')"><span class="quick-menu-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-8 0v2"></path><circle cx="12" cy="7" r="4"></circle><path d="M19 8v6M22 11h-6"></path></svg></span>录入线索</button>
+                    <button class="quick-menu-item" onclick="quickAction('lead')"><span class="quick-menu-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-8 0v2"></path><circle cx="12" cy="7" r="4"></circle><path d="M19 8v6M22 11h-6"></path></svg></span>线下登记线索</button>
                     <button class="quick-menu-item" onclick="quickAction('scan')"><span class="quick-menu-icon"><svg viewBox="0 0 24 24"><path d="M4 7V4h3"></path><path d="M17 4h3v3"></path><path d="M20 17v3h-3"></path><path d="M7 20H4v-3"></path><path d="M7 12h10"></path></svg></span>扫码</button>
-                    <button class="quick-menu-item" onclick="quickAction('qr')"><span class="quick-menu-icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6"></rect><rect x="14" y="4" width="6" height="6"></rect><rect x="4" y="14" width="6" height="6"></rect><path d="M14 14h2v2h-2zM18 14h2v6h-6v-2"></path></svg></span>我的二维码</button>
-                    <button class="quick-menu-item" onclick="quickAction('visit')"><span class="quick-menu-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 12-9 12S3 17 3 10a9 9 0 1 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></span>到访签到</button>
                 </div>
             </div>
         </div>
@@ -634,20 +737,7 @@
             </div>
 
             <div id="sub-view-follow" class="sub-view">
-                <div class="module-chip-row">
-                    <button class="module-chip" onclick="startQuickFollowUp()"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path><path d="M8 9h8M8 13h5"></path></svg><span>写跟进</span></button>
-                    <button class="module-chip" onclick="openDynamicForm('visitAppointment')"><svg viewBox="0 0 24 24"><path d="M8 2v4M16 2v4"></path><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M3 10h18"></path><path d="M9 16l2 2 4-5"></path></svg><span>约到访</span></button>
-                    <button class="module-chip" onclick="openDynamicForm('reservationRecord')"><svg viewBox="0 0 24 24"><path d="M12 1v22"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg><span>办理预定</span></button>
-                    <button class="module-chip" onclick="startQuickEnroll()"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><path d="M22 4 12 14.01l-3-3"></path></svg><span>标记已报名</span></button>
-                </div>
-                <div class="pill-scroll" id="pills-follow">
-                    <div class="pill active" onclick="switchFilter(this, 'follow', '跟进列表')">跟进列表</div>
-                    <div class="pill" onclick="switchFilter(this, 'follow', '待跟进')">待跟进</div>
-                    <div class="pill" onclick="switchFilter(this, 'follow', '跟进记录')">跟进记录</div>
-                    <div class="pill" onclick="switchFilter(this, 'follow', '待到访')">待到访</div>
-                    <div class="pill" onclick="switchFilter(this, 'follow', '已定位/已报名')">已定位/已报名</div>
-                </div>
-                <div id="follow-list-container"></div>
+                <div id="my-leads-workspace"></div>
             </div>
 
             <div id="sub-view-reservation" class="sub-view">
@@ -734,7 +824,6 @@
                         <div class="admission-entry-group-title">招生数据</div>
                         <button class="admission-entry-btn" onclick="handleGridAction('工作统计')">工作统计</button>
                         <button class="admission-entry-btn" onclick="handleGridAction('报名学生查看')">报名学生查看</button>
-                        <button class="admission-entry-btn" onclick="handleGridAction('我的线索')">我的线索</button>
                         <button class="admission-entry-btn" onclick="handleGridAction('招生人员')">招生人员</button>
                         <button class="admission-entry-btn" onclick="handleGridAction('新生统计')">新生统计</button>
                         <button class="admission-entry-btn" onclick="handleGridAction('意向学生汇总')">意向学生汇总</button>
@@ -839,6 +928,21 @@
     </div>
 
     <div id="modal-overlay" class="modal-overlay" onclick="closeAllModals()"></div>
+
+    <div id="sheet-public-assign" class="bottom-sheet">
+        <div class="sheet-indicator"></div>
+        <div class="sheet-title">分配线索</div>
+        <div class="form-note" id="public-assign-summary">请选择接收老师</div>
+        <div class="assign-self-section" id="public-assign-self"></div>
+        <div class="assign-search-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+            <input id="public-assign-search" class="assign-teacher-search" type="search" inputmode="search" autocomplete="off" placeholder="搜索姓名、手机号或招生组" oninput="updatePublicAssignSearch(this.value)">
+            <button id="public-assign-search-clear" class="assign-search-clear" type="button" aria-label="清空搜索" onclick="clearPublicAssignSearch()">×</button>
+        </div>
+        <div class="assign-list-caption"><span>其他老师</span><span id="public-assign-result-count"></span></div>
+        <div class="assign-teacher-list" id="public-assign-teacher-list"></div>
+        <button type="button" class="submit-btn" onclick="confirmPublicLeadAssignment()">确定分配</button>
+    </div>
 
     <div id="sheet-entry-form" class="bottom-sheet">
         <div class="sheet-indicator"></div>
@@ -1112,9 +1216,17 @@
     </div>
 
     <div class="toast" id="sys-toast">
-        <svg id="toast-icon-success" style="display:none; flex-shrink:0;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--success-color)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
         <span id="sys-toast-msg"></span>
         <div id="toast-undo" class="toast-undo-btn" style="display:none;" onclick="handleUndo()">撤回操作</div>
+    </div>
+
+    <div class="qr-preview-overlay" id="qr-preview-overlay" onclick="closeLeadQrPreview(event)">
+        <div class="qr-preview-panel" onclick="event.stopPropagation()">
+            <div class="entry-card-title" id="qr-preview-name">到访预约二维码</div>
+            <div class="entry-card-sub" id="qr-preview-meta" style="margin-top:6px;"></div>
+            <img id="qr-preview-image" alt="到访预约二维码">
+            <button class="qr-preview-close" onclick="closeLeadQrPreview()">关闭</button>
+        </div>
     </div>
 </div>
 
@@ -1172,7 +1284,7 @@
         ]
     };
 
-    const admissionEntryNames = ['联系人管理', '学校汇总', '我的联系人', '工作统计', '报名学生查看', '网上报名', '我的日志', '日志管理', '新生报名', '班级报到', '新生搜索', '新生统计', '合作学校', '常见问题', '我的意向学生', '意向学生汇总', '招生汇总', '积分规则设置', '我的线索', '招生人员', '报到记录', '预定记录', '录取记录', '跟进记录', '到访预约', '到访记录'];
+    const admissionEntryNames = ['联系人管理', '学校汇总', '我的联系人', '工作统计', '报名学生查看', '网上报名', '我的日志', '日志管理', '新生报名', '班级报到', '新生搜索', '新生统计', '合作学校', '常见问题', '我的意向学生', '意向学生汇总', '招生汇总', '积分规则设置', '招生人员', '报到记录', '预定记录', '录取记录', '跟进记录', '到访预约', '到访记录'];
     let currentEntryLabel = '';
     let currentOnlineTab = 'students';
     let currentMyLeadId = null;
@@ -1182,6 +1294,11 @@
     let myLeadSearchQuery = '';
     let myLeadStatusFilter = '全部状态';
     let myLeadSourceFilter = '全部来源';
+    let currentLeadScope = 'mine';
+    let pendingPublicLeadId = null;
+    let selectedAssignTeacher = '';
+    let publicAssignSearchQuery = '';
+    let myLeadPageState = 'list';
     const myLeadStatusOptions = ['全部状态', '已分配', '已联系', '有意向', '已邀约', '已到访', '已预定', '已报名', '无效'];
     const myLeadSourceOptions = ['全部来源', '巨量OCEAN', '百度BAIDU', '线下OFFLINE'];
 
@@ -1258,8 +1375,12 @@
     }
 
     function closeAdmissionEntryPage() {
-        if (currentEntryLabel === '我的线索' && document.getElementById('entry-page-title').innerText !== '我的线索') {
-            restoreMyLeadsEntryPage();
+        if (currentEntryLabel === '我的线索') {
+            if (myLeadPageState === 'form' && currentMyLeadId) {
+                openMyLeadDetail(currentMyLeadId);
+                return;
+            }
+            returnToMyLeadsWorkspace();
             return;
         }
         if (currentEntryLabel === '学校详情') {
@@ -1281,11 +1402,34 @@
     }
 
     function restoreMyLeadsEntryPage() {
+        returnToMyLeadsWorkspace();
+    }
+
+    function renderMyLeadsWorkspace() {
+        const container = document.getElementById('my-leads-workspace');
+        if (!container) return;
+        container.innerHTML = renderMyLeadsEntry();
+    }
+
+    function returnToMyLeadsWorkspace() {
+        const page = document.getElementById('page-admission-entry');
+        page.classList.remove('active');
+        page.classList.add('hidden-right');
+        currentEntryLabel = '';
+        currentMyLeadId = null;
+        myLeadPageState = 'list';
+        renderMyLeadsWorkspace();
+        switchEnrollmentTab('sub-view-follow', document.getElementById('tab-btn-follow'));
+    }
+
+    function openOfflineLeadFormFromWorkspace() {
         currentEntryLabel = '我的线索';
-        document.getElementById('entry-page-title').innerText = '我的线索';
-        document.getElementById('entry-page-action').innerText = getEntryActionText('我的线索');
-        document.getElementById('entry-page-action').classList.remove('plus-action');
-        renderAdmissionEntryPage('我的线索');
+        currentMyLeadId = null;
+        myLeadPageState = 'add';
+        const page = document.getElementById('page-admission-entry');
+        page.classList.remove('hidden-right');
+        page.classList.add('active');
+        openOfflineLeadForm();
     }
 
     function getEntryActionText(label) {
@@ -1311,7 +1455,7 @@
             return;
         }
         if (currentEntryLabel === '合作学校') {
-            openEntryForm('school');
+            openSchoolEditor();
             return;
         }
         if (currentEntryLabel === '我的日志') {
@@ -1368,6 +1512,10 @@
         return state.leads.concat(state.conversions).filter(lead => lead.owner === state.currentUser);
     }
 
+    function getPublicLeads() {
+        return state.leads.concat(state.conversions).filter(lead => !lead.owner && !lead.isInvalid);
+    }
+
     function getLeadBusinessStatus(lead) {
         if (lead.isInvalid) return '无效';
         if (lead.stage >= 5) return '已报名';
@@ -1389,17 +1537,52 @@
 
     function getFilteredMyLeads() {
         const query = myLeadSearchQuery.trim().toLowerCase();
-        return getMyLeads().filter(lead => {
+        const scopeLeads = currentLeadScope === 'public' ? getPublicLeads() : getMyLeads();
+        return scopeLeads.filter(lead => {
             const matchQuery = !query || [lead.name, lead.phone].some(v => String(v || '').toLowerCase().includes(query));
-            const matchStatus = myLeadStatusFilter === '全部状态' || getLeadBusinessStatus(lead) === myLeadStatusFilter;
+            const matchStatus = currentLeadScope === 'public' || myLeadStatusFilter === '全部状态' || getLeadBusinessStatus(lead) === myLeadStatusFilter;
             const matchSource = myLeadSourceFilter === '全部来源' || getLeadSourceFilterLabel(lead) === myLeadSourceFilter;
             return matchQuery && matchStatus && matchSource;
         });
     }
 
+    function setWorkspaceTitle(text, switchable = false) {
+        const title = document.getElementById('workspace-title');
+        const titleText = document.getElementById('workspace-title-text');
+        if (titleText) titleText.innerText = text;
+        if (title) title.classList.toggle('switchable', switchable);
+        if (!switchable) closeQuickMenu();
+    }
+
+    function toggleLeadScopeMenu(evt) {
+        if (evt) evt.stopPropagation();
+        const trigger = document.getElementById('workspace-title');
+        if (!trigger || !trigger.classList.contains('switchable')) return;
+        const menu = document.getElementById('lead-scope-menu');
+        if (!menu) return;
+        document.querySelectorAll('.quick-dropdown').forEach(el => {
+            if (el !== menu) el.classList.remove('active');
+        });
+        menu.classList.toggle('active');
+        trigger.classList.toggle('open', menu.classList.contains('active'));
+    }
+
+    function switchLeadScope(scope, evt) {
+        if (evt) evt.stopPropagation();
+        currentLeadScope = scope === 'public' ? 'public' : 'mine';
+        myLeadStatusFilter = '全部状态';
+        myLeadSearchQuery = '';
+        document.querySelectorAll('#lead-scope-menu .lead-scope-option').forEach(option => {
+            option.classList.toggle('active', option.dataset.scope === currentLeadScope);
+        });
+        setWorkspaceTitle(currentLeadScope === 'public' ? '公海线索' : '我的线索', true);
+        closeQuickMenu();
+        renderMyLeadsWorkspace();
+    }
+
     function updateMyLeadSearch(value) {
         myLeadSearchQuery = value || '';
-        renderAdmissionEntryPage('我的线索');
+        renderMyLeadsWorkspace();
     }
 
     function openMyLeadFilterPicker(kind) {
@@ -1414,7 +1597,7 @@
 
     function updateMyLeadStatus(value) {
         myLeadStatusFilter = value;
-        renderAdmissionEntryPage('我的线索');
+        renderMyLeadsWorkspace();
     }
 
     function toggleMyLeadStatusDropdown(evt) {
@@ -1430,7 +1613,7 @@
 
     function updateMyLeadSource(value) {
         myLeadSourceFilter = value;
-        renderAdmissionEntryPage('我的线索');
+        renderMyLeadsWorkspace();
     }
 
     function renderMyLeadsEntry() {
@@ -1441,25 +1624,123 @@
             myLeadStatusOptions.map(opt => '<button class="quick-menu-item" style="padding: 10px; justify-content: center; font-size: 14px; text-align: center; width: 100%;" onclick="updateMyLeadStatus(\'' + opt + '\')">' + opt + '</button>').join('') +
             '</div>';
 
+        const statusControl = currentLeadScope === 'public'
+            ? '<button class="my-lead-filter-btn my-lead-status-trigger" type="button" disabled><span>待分配</span></button>'
+            : '<div style="position:relative; flex-shrink:0;">' +
+                '<button class="my-lead-filter-btn my-lead-status-trigger" onclick="toggleMyLeadStatusDropdown(event)">' +
+                '<span>' + escapeHtml(myLeadStatusFilter) + '</span>' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="6 9 12 15 18 9"></polyline></svg>' +
+                '</button>' +
+                statusDropdownHtml +
+                '</div>';
+
         const toolbar = '<div class="my-lead-filter-bar"><div class="my-lead-filter-row">' +
-            '<div style="position:relative; flex-shrink:0;">' +
-            '<button class="my-lead-filter-btn my-lead-status-trigger" onclick="toggleMyLeadStatusDropdown(event)">' +
-            '<span>' + escapeHtml(myLeadStatusFilter) + '</span>' +
-            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="6 9 12 15 18 9"></polyline></svg>' +
-            '</button>' +
-            statusDropdownHtml +
-            '</div>' +
+            statusControl +
             '<div class="my-lead-search-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg><input class="my-lead-search" value="' + escapeHtml(myLeadSearchQuery) + '" placeholder="搜索姓名 / 电话" oninput="updateMyLeadSearch(this.value)"></div>' +
             '</div>' + pills + '</div>';
 
-        const list = !leads.length ? '<div class="entry-empty">暂无匹配线索</div>' : '<div class="my-lead-list">' + leads.map((lead, index) =>
-            '<div class="my-lead-row" onclick="openMyLeadDetail(' + lead.id + ')">' +
-            '<div class="my-lead-index">' + (index + 1) + '</div>' +
-            '<div class="my-lead-name">' + escapeHtml(lead.name) + '</div>' +
-            '<div class="my-lead-status">' + getLeadBusinessStatus(lead) + '</div>' +
-            '</div>'
-        ).join('') + '</div>';
+        const emptyText = currentLeadScope === 'public' ? '暂无待分配的公海线索' : '暂无匹配线索';
+        const list = !leads.length ? '<div class="entry-empty">' + emptyText + '</div>' : '<div class="my-lead-list">' + leads.map((lead, index) => {
+            const trailing = currentLeadScope === 'public'
+                ? '<button type="button" class="public-lead-assign-btn" onclick="openPublicLeadAssignment(' + lead.id + ', event)">分配</button>'
+                : '<div class="my-lead-status">' + getLeadBusinessStatus(lead) + '</div>';
+            return '<div class="my-lead-row' + (currentLeadScope === 'public' ? ' public-row' : '') + '" onclick="openMyLeadDetail(' + lead.id + ')">' +
+                '<div class="my-lead-index">' + (index + 1) + '</div>' +
+                '<div class="my-lead-name">' + escapeHtml(lead.name) + '</div>' +
+                trailing +
+                '</div>';
+        }).join('') + '</div>';
         return toolbar + list;
+    }
+
+    function openPublicLeadAssignment(leadId, evt) {
+        if (evt) evt.stopPropagation();
+        const lead = findAnyLead(leadId);
+        if (!lead || lead.owner || lead.isInvalid) {
+            showToast('该线索已不在公海中');
+            renderMyLeadsWorkspace();
+            return;
+        }
+        pendingPublicLeadId = Number(leadId);
+        selectedAssignTeacher = state.currentUser;
+        publicAssignSearchQuery = '';
+        document.getElementById('public-assign-summary').innerText = '正在分配：' + lead.name + ' / ' + lead.phone;
+        document.getElementById('public-assign-search').value = '';
+        renderPublicAssignTeachers();
+        showModal('sheet-public-assign');
+    }
+
+    function getAssignTeacherProfile(name) {
+        return teacherDirectory[name] || { name, phone: '暂无联系方式', group: '未设置招生组', role: '招生老师' };
+    }
+
+    function renderAssignTeacherOption(profile, isSelf = false) {
+        const selected = selectedAssignTeacher === profile.name;
+        const meta = isSelf
+            ? '分配给自己 · ' + profile.group
+            : profile.phone + ' · ' + profile.group;
+        return '<button type="button" class="assign-teacher-option ' + (selected ? 'selected' : '') + '" data-teacher-name="' + escapeHtml(profile.name) + '" onclick="selectAssignTeacher(this.dataset.teacherName)">' +
+            '<span class="assign-teacher-avatar">' + escapeHtml(profile.name.slice(0, 1)) + '</span>' +
+            '<span class="assign-teacher-copy"><span class="assign-teacher-name">' + escapeHtml(profile.name) + (isSelf ? '（我）' : '') + '</span><span class="assign-teacher-role">' + escapeHtml(meta) + '</span></span>' +
+            '<span class="assign-teacher-check"></span></button>';
+    }
+
+    function renderPublicAssignTeachers() {
+        const query = publicAssignSearchQuery.trim().toLowerCase();
+        const compactQuery = query.replace(/[\s-]/g, '');
+        const selfProfile = getAssignTeacherProfile(state.currentUser);
+        const teachers = optionSets.staff
+            .filter((name, index, list) => name !== state.currentUser && list.indexOf(name) === index)
+            .map(getAssignTeacherProfile)
+            .filter(profile => {
+                if (!query) return true;
+                return [profile.name, profile.phone, profile.group].some(value => {
+                    const text = String(value || '').toLowerCase();
+                    return text.includes(query) || text.replace(/[\s-]/g, '').includes(compactQuery);
+                });
+            });
+        document.getElementById('public-assign-self').innerHTML = renderAssignTeacherOption(selfProfile, true);
+        document.getElementById('public-assign-result-count').innerText = query ? '找到 ' + teachers.length + ' 位' : '共 ' + teachers.length + ' 位';
+        document.getElementById('public-assign-search-clear').classList.toggle('visible', !!query);
+        document.getElementById('public-assign-teacher-list').innerHTML = teachers.length
+            ? teachers.map(profile => renderAssignTeacherOption(profile)).join('')
+            : '<div class="assign-teacher-empty">未找到匹配老师<br>可尝试姓名、手机号或招生组</div>';
+    }
+
+    function updatePublicAssignSearch(value) {
+        publicAssignSearchQuery = value || '';
+        renderPublicAssignTeachers();
+    }
+
+    function clearPublicAssignSearch() {
+        publicAssignSearchQuery = '';
+        const input = document.getElementById('public-assign-search');
+        input.value = '';
+        input.focus();
+        renderPublicAssignTeachers();
+    }
+
+    function selectAssignTeacher(name) {
+        selectedAssignTeacher = name;
+        renderPublicAssignTeachers();
+    }
+
+    function confirmPublicLeadAssignment() {
+        const lead = findAnyLead(pendingPublicLeadId);
+        if (!lead || lead.owner || !selectedAssignTeacher) {
+            showToast('请选择有效线索和接收老师');
+            return;
+        }
+        const assignedFromDetail = currentMyLeadId === lead.id && document.getElementById('page-admission-entry').classList.contains('active');
+        updateData(lead.id, 'owner', selectedAssignTeacher);
+        lead.leadStatus = '已分配';
+        closeAllModals();
+        if (assignedFromDetail) returnToMyLeadsWorkspace();
+        else renderMyLeadsWorkspace();
+        showToast('已将 ' + lead.name + ' 分配给 ' + selectedAssignTeacher, true);
+        pendingPublicLeadId = null;
+        selectedAssignTeacher = '';
+        publicAssignSearchQuery = '';
     }
 
     function openOfflineLeadForm() {
@@ -1470,6 +1751,7 @@
         document.getElementById('entry-page-action').innerText = '';
         document.getElementById('entry-page-action').classList.remove('plus-action');
         document.getElementById('entry-page-content').innerHTML = renderOfflineLeadForm();
+        myLeadPageState = 'add';
     }
 
     function renderOfflineLeadForm() {
@@ -1636,7 +1918,7 @@
             visitRecords: []
         };
         state.leads.unshift(newLead);
-        restoreMyLeadsEntryPage();
+        returnToMyLeadsWorkspace();
         refreshAllModuleLists();
         showToast('线索已登记并同步到我的线索', true);
     }
@@ -1645,7 +1927,12 @@
         currentMyLeadId = Number(id);
         const lead = findAnyLead(id);
         if (!lead) return;
-        document.getElementById('entry-page-title').innerText = '我的线索详情';
+        currentEntryLabel = '我的线索';
+        myLeadPageState = 'detail';
+        const page = document.getElementById('page-admission-entry');
+        page.classList.remove('hidden-right');
+        page.classList.add('active');
+        document.getElementById('entry-page-title').innerText = lead.owner ? '我的线索详情' : '公海线索详情';
         document.getElementById('entry-page-action').innerText = '';
         document.getElementById('entry-page-action').classList.remove('plus-action');
         document.getElementById('entry-page-content').innerHTML = renderMyLeadDetail(lead);
@@ -1664,6 +1951,8 @@
         ];
         
         let html = '<div class="my-lead-detail-page"><div class="my-lead-detail-main">';
+
+        html += renderLeadQrPreview(lead);
         
         html += '<div class="entry-card" style="margin-bottom: 16px; box-shadow: 0 4px 16px rgba(31,95,255,0.06); padding: 16px;">' +
             '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">' +
@@ -1687,15 +1976,52 @@
 
         html += '</div>';
 
-        html += '<div class="detail-bottom-actions">' +
-            '<button class="my-lead-action-btn my-lead-action-primary" onclick="openMyLeadFollowForm()">写跟进</button>' +
-            '<button class="my-lead-action-btn my-lead-action-secondary" onclick="openVisitInviteForm()">发起邀约</button>' +
-            '<button class="my-lead-action-btn my-lead-action-tertiary" onclick="startReservationFromMyLead()">转预定</button>' +
-            '</div>';
+        if (!lead.owner) {
+            html += '<div class="detail-bottom-actions" style="grid-template-columns:1fr;">' +
+                '<button class="my-lead-action-btn my-lead-action-primary" onclick="openPublicLeadAssignment(' + lead.id + ', event)">分配线索</button>' +
+                '</div>';
+        } else {
+            html += '<div class="detail-bottom-actions">' +
+                '<button class="my-lead-action-btn my-lead-action-primary" onclick="openMyLeadFollowForm()">写跟进</button>' +
+                '<button class="my-lead-action-btn my-lead-action-secondary" onclick="openVisitInviteForm()">发起邀约</button>' +
+                '<button class="my-lead-action-btn my-lead-action-tertiary" onclick="startReservationFromMyLead()">转预定</button>' +
+                '</div>';
+        }
 
         html += '</div>';
 
         return html;
+    }
+
+    function getVisitQrUrl(lead, appointment, size = 180) {
+        const payload = encodeURIComponent(appointment.code + '|' + lead.name + '|' + lead.phone + '|' + formatDateTime(appointment.visitAt));
+        return 'https://api.qrserver.com/v1/create-qr-code/?size=' + size + 'x' + size + '&data=' + payload;
+    }
+
+    function renderLeadQrPreview(lead) {
+        const appointment = (lead.visitAppointments || [])[0];
+        if (!appointment) return '';
+        const url = getVisitQrUrl(lead, appointment, 120);
+        return '<button class="lead-qr-preview" onclick="openLeadQrPreview(' + lead.id + ')">' +
+            '<img class="lead-qr-thumb" src="' + url + '" alt="到访预约二维码缩略图">' +
+            '<div class="lead-qr-preview-copy"><div class="lead-qr-preview-title">到访预约二维码</div><div class="lead-qr-preview-time">预约到访：' + escapeHtml(formatDateTime(appointment.visitAt)) + '</div></div>' +
+            '<span class="lead-qr-preview-arrow">点击放大</span></button>';
+    }
+
+    function openLeadQrPreview(leadId) {
+        const lead = findAnyLead(leadId);
+        const appointment = lead && (lead.visitAppointments || [])[0];
+        if (!lead || !appointment) return;
+        document.getElementById('qr-preview-name').innerText = lead.name + ' · 到访预约';
+        document.getElementById('qr-preview-meta').innerText = (lead.phone || '待补充') + ' · ' + formatDateTime(appointment.visitAt);
+        document.getElementById('qr-preview-image').src = getVisitQrUrl(lead, appointment, 360);
+        document.getElementById('qr-preview-overlay').classList.add('active');
+    }
+
+    function closeLeadQrPreview(event) {
+        if (event && event.target !== event.currentTarget) return;
+        document.getElementById('qr-preview-image').removeAttribute('src');
+        document.getElementById('qr-preview-overlay').classList.remove('active');
     }
 
     function renderLeadFlowEight(lead) {
@@ -1738,7 +2064,12 @@
         }
         let currentIndex = lead.owner ? items.findIndex((item, index) => index > 0 && !item.done) : 0;
         if (currentIndex < 0) currentIndex = items.length - 1;
-        return '<div class="lead-timeline">' + items.map((item, index) => '<div class="lead-timeline-item ' + (item.done ? 'done ' : '') + (index === currentIndex ? 'current' : '') + '"><div class="lead-timeline-dot"></div><div class="lead-timeline-card"><div class="lead-timeline-top"><div class="lead-timeline-title">' + escapeHtml(item.title) + '</div><div class="lead-timeline-time">' + escapeHtml(item.time) + '</div></div><div class="lead-timeline-desc">' + escapeHtml(item.desc) + '</div></div></div>').join('') + '</div>';
+        return '<div class="lead-timeline">' + items.map((item, index) => {
+            const stateClass = index === currentIndex ? 'current' : (item.done ? 'completed' : 'pending');
+            const timeText = item.done || index === currentIndex ? item.time : '待推进';
+            const currentTag = index === currentIndex ? '<span class="lead-timeline-current-tag">当前</span>' : '';
+            return '<div class="lead-timeline-item ' + stateClass + '"><div class="lead-timeline-dot"></div><div class="lead-timeline-card"><div class="lead-timeline-top"><div class="lead-timeline-title-wrap"><div class="lead-timeline-title">' + escapeHtml(item.title) + '</div>' + currentTag + '</div><div class="lead-timeline-time">' + escapeHtml(timeText) + '</div></div><div class="lead-timeline-desc">' + escapeHtml(item.desc) + '</div></div></div>';
+        }).join('') + '</div>';
     }
 
     function renderLeadRecords(records, emptyText) {
@@ -1752,6 +2083,7 @@
         const lead = findAnyLead(currentMyLeadId);
         if (!lead) return;
         document.getElementById('entry-page-title').innerText = '写跟进';
+        myLeadPageState = 'form';
         document.getElementById('entry-page-content').innerHTML = '<form onsubmit="event.preventDefault(); submitMyLeadFollow();"><div class="entry-form-card"><div class="form-group"><label class="form-label required">跟进内容</label><textarea id="my-follow-content" class="form-control" required placeholder="记录本次沟通重点"></textarea></div><div class="form-group"><label class="form-label">下次动作</label><input id="my-follow-next" class="form-control" placeholder="如：继续电话跟进 / 邀约到访"></div></div><button type="submit" class="submit-btn">确定</button></form>';
     }
 
@@ -1776,6 +2108,7 @@
         const lead = findAnyLead(currentMyLeadId);
         if (!lead) return;
         document.getElementById('entry-page-title').innerText = '发起邀约';
+        myLeadPageState = 'form';
         document.getElementById('entry-page-content').innerHTML = '<form onsubmit="event.preventDefault(); submitVisitInvite();"><div class="entry-form-card"><div class="form-group"><label class="form-label required">预约到访时间</label><input id="visit-invite-time" class="form-control" type="datetime-local" required value="' + nowDatetimeLocal() + '"></div></div><button type="submit" class="submit-btn">确定</button></form>';
     }
 
@@ -1805,8 +2138,7 @@
     }
 
     function renderVisitQrResult(lead, visitAt, code) {
-        const payload = encodeURIComponent(code + '|' + lead.name + '|' + lead.phone + '|' + formatDateTime(visitAt));
-        const url = 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' + payload;
+        const url = getVisitQrUrl(lead, { visitAt, code }, 180);
         document.getElementById('entry-page-title').innerText = '到访预约二维码';
         document.getElementById('entry-page-content').innerHTML = '<div class="qr-result-card"><div class="entry-card-title">' + escapeHtml(lead.name) + '</div><div class="entry-card-sub" style="margin-top:6px;">' + escapeHtml(lead.phone || '待补充') + '</div><img src="' + url + '" alt="预约二维码" onerror="this.style.display=\'none\'; document.getElementById(\'qr-fallback-' + code + '\').style.display=\'block\';"><div class="qr-fallback" id="qr-fallback-' + code + '" style="display:none;"></div><div class="entry-info-cell full" style="margin-top:10px;">预约到访时间：<strong>' + formatDateTime(visitAt) + '</strong></div><div class="entry-info-cell full" style="margin-top:8px;">预约码：<strong>' + code + '</strong></div><button class="submit-btn" onclick="openMyLeadDetail(' + lead.id + ')">返回详情</button></div>';
     }
@@ -1845,7 +2177,26 @@
         return renderToolbar('请输入学校名称关键词') + '<div class="entry-card-list">' + contacts.map(c => '<div class="entry-card"><div class="entry-card-top"><div><div class="entry-card-title">' + c[0] + '</div><div class="entry-card-sub">' + c[3] + '</div></div><button class="entry-soft-btn" onclick="showToast(\'已移除联系人\')">移除</button></div><div class="entry-card-grid"><div class="entry-info-cell">性别：<strong>' + c[1] + '</strong></div><div class="entry-info-cell">电话：<strong>' + c[2] + '</strong></div><div class="entry-info-cell">创建人：<strong>' + c[4] + '</strong></div><div class="entry-info-cell">日期：' + c[5] + '</div><div class="entry-info-cell full">' + c[6] + '</div></div></div>').join('') + '</div>' + schoolPanel;
     }
 
-    let currentCoopTerm = '全部学期';
+    const coopTerms = ['2026年秋季', '2026年春季', '2027年春季'];
+    const regionOptions = [
+        '广东省深圳市',
+        '广东省深圳市福田区',
+        '广东省深圳市罗湖区',
+        '广东省深圳市南山区',
+        '广东省深圳市宝安区',
+        '广东省深圳市龙岗区',
+        '广东省深圳市龙华区',
+        '广东省深圳市坪山区',
+        '广东省深圳市光明区',
+        '广东省广州市天河区',
+        '广东省东莞市'
+    ];
+    const coopTermRelations = {
+        '2026年秋季': Array.from({ length: entryData.schools.length }, (_, index) => index).filter(index => index % 2 === 0),
+        '2026年春季': Array.from({ length: entryData.schools.length }, (_, index) => index).filter(index => index % 2 === 1),
+        '2027年春季': []
+    };
+    let currentCoopTerm = '2026年秋季';
     let coopSearchQuery = '';
 
     function updateCoopTerm(value) {
@@ -1870,9 +2221,8 @@
     }
 
     function renderCoopSchools() {
-        const terms = ['2026年春季', '2026年秋季', '全部学期'];
         const statusDropdownHtml = '<div class="quick-dropdown" id="coop-term-dropdown" style="top: 48px; left: 0; right: auto; width: 110px; padding: 6px; z-index: 100;">' +
-            terms.map(opt => '<button class="quick-menu-item" style="padding: 10px; justify-content: center; font-size: 14px; text-align: center; width: 100%;" onclick="updateCoopTerm(\'' + opt + '\')">' + opt + '</button>').join('') +
+            coopTerms.map(opt => '<button class="quick-menu-item" style="padding: 10px; justify-content: center; font-size: 14px; text-align: center; width: 100%;" onclick="updateCoopTerm(\'' + opt + '\')">' + opt + '</button>').join('') +
             '</div>';
 
         const toolbar = '<div class="my-lead-filter-bar" style="padding-bottom: 0; margin-top: 12px;"><div class="my-lead-filter-row" style="margin-bottom: 12px; align-items: center;">' +
@@ -1886,14 +2236,38 @@
             '<div class="my-lead-search-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg><input class="my-lead-search" value="' + escapeHtml(coopSearchQuery) + '" placeholder="请输入学校名称关键词" oninput="updateCoopSearch(this.value)"></div>' +
             '</div></div>';
 
-        const list = '<div class="entry-school-list" style="margin-top: 12px;">' + entryData.schools
-            .filter(schoolName => schoolName.includes(coopSearchQuery))
-            .map((schoolName) => {
-               const originalIndex = entryData.schools.indexOf(schoolName);
-               return '<div class="entry-school-item coop-school-item" onclick="openSchoolDetail(' + originalIndex + ')"><div class="coop-school-main" style="align-items: center; min-height: 24px;"><div class="coop-school-name" style="font-weight: 800; color: var(--text-title); font-size: 15px;">' + escapeHtml(schoolName) + '</div></div><span class="coop-school-arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></span></div>';
-            }).join('') + '</div>';
+        const relatedIndexes = coopTermRelations[currentCoopTerm] || [];
+        const rows = relatedIndexes
+            .map(index => ({ index, name: entryData.schools[index] }))
+            .filter(item => item.name && item.name.includes(coopSearchQuery));
+        const list = rows.length
+            ? '<div class="entry-school-list">' + rows.map((item, visibleIndex) => {
+                return '<div class="entry-school-item coop-school-item" onclick="openSchoolDetail(' + item.index + ')">' +
+                    '<div class="coop-school-index">' + (visibleIndex + 1) + '</div>' +
+                    '<div class="coop-school-main"><div class="coop-school-name">' + escapeHtml(item.name) + '</div></div>' +
+                    '<span class="coop-school-arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></span></div>';
+            }).join('') + '</div>'
+            : '<div class="entry-card" style="padding:26px 18px; text-align:center;"><div style="font-size:15px; font-weight:900; color:var(--text-title);">本学期暂无合作学校</div><div style="margin-top:7px; color:var(--text-secondary); font-size:12px; font-weight:750; line-height:1.5;">学校主档仍会保留，可关联已有学校，也可新建并自动加入当前学期。</div><div class="coop-empty-actions"><button class="coop-empty-btn" onclick="openLinkExistingSchool()">关联已有学校</button><button class="coop-empty-btn primary" onclick="openSchoolEditor()">新增学校</button></div></div>';
 
         return toolbar + list;
+    }
+
+    function openLinkExistingSchool() {
+        const related = new Set(coopTermRelations[currentCoopTerm] || []);
+        const available = entryData.schools.map((name, index) => ({ name, index })).filter(item => !related.has(item.index));
+        document.getElementById('entry-form-title').innerText = '关联已有学校';
+        document.getElementById('entry-form-body').innerHTML = available.length
+            ? '<div class="coop-link-list">' + available.map(item => '<button class="coop-link-option" onclick="linkSchoolToCurrentTerm(' + item.index + ')"><span>' + escapeHtml(item.name) + '</span><span style="color:var(--primary-color);">关联</span></button>').join('') + '</div>'
+            : '<div class="entry-empty">暂无可关联的学校</div>';
+        showModal('sheet-entry-form');
+    }
+
+    function linkSchoolToCurrentTerm(index) {
+        const relations = coopTermRelations[currentCoopTerm] || (coopTermRelations[currentCoopTerm] = []);
+        if (!relations.includes(index)) relations.push(index);
+        closeAllModals();
+        renderAdmissionEntryPage('合作学校');
+        showToast('已关联至' + currentCoopTerm, true);
     }
 
     window.schoolDetailsMap = window.schoolDetailsMap || {};
@@ -1913,13 +2287,115 @@
                 highSchoolRatio: '60%',
                 vocationalStudents: '约150人',
                 description: schoolName + '是一所教学质量优良的知名学府，生源稳定。在区域内具有较高的知名度，历年为各类高一级学校输送大量优质生源。',
-                assignSemester: '2026年秋季',
                 assignGroup: '城南招生组',
                 assignTime: '2026-06-01 10:30',
                 assignReason: '生源优质，按区域划片就近分配给城南组进行重点突破。'
             };
         }
         return window.schoolDetailsMap[index];
+    }
+
+    function openSchoolEditor(index = null) {
+        const isNew = index === null || index === undefined;
+        const data = isNew ? {
+            province: '广东省深圳市',
+            address: '',
+            nature: '公办',
+            scale: '',
+            contactName: '',
+            contactPhone: '',
+            graduates: '',
+            highSchoolRatio: '',
+            vocationalStudents: '',
+            description: '',
+            assignGroup: '待分配',
+            assignReason: ''
+        } : getSchoolDetail(index);
+        const schoolName = isNew ? '' : entryData.schools[index];
+        currentEntryLabel = '学校编辑';
+        document.getElementById('entry-page-title').innerText = isNew ? '新增合作学校' : '编辑合作学校';
+        document.getElementById('entry-page-action').innerText = '';
+        document.getElementById('entry-page-content').innerHTML =
+            '<div style="padding:16px 0 20px;">' +
+            '<div class="section-header" style="margin-top:0; padding:0 4px 10px;"><div class="section-title" style="font-size:16px;">学校资料</div></div>' +
+            '<div class="entry-card" style="padding:14px; margin-bottom:16px;">' +
+            '<div class="form-group"><label class="form-label required">学校名称</label><input id="edit-school-name" class="form-control" value="' + escapeHtml(schoolName) + '" placeholder="请输入学校名称"></div>' +
+            '<div class="form-two-col"><div class="form-group"><label class="form-label">学校对接人</label><input id="edit-contact-name" class="form-control" value="' + escapeHtml(data.contactName || '') + '" placeholder="请输入对接人"></div><div class="form-group"><label class="form-label">联系方式</label><input id="edit-contact-phone" type="tel" inputmode="tel" class="form-control" value="' + escapeHtml(data.contactPhone || '') + '" placeholder="请输入联系电话"></div></div>' +
+            '<div class="form-group"><label class="form-label">省市区县</label><select id="edit-province" class="form-control">' + renderRegionOptions(data.province) + '</select></div>' +
+            '<div class="form-group"><label class="form-label">详细地址</label><input id="edit-address" class="form-control" value="' + escapeHtml(data.address || '') + '" placeholder="请输入详细地址"></div>' +
+            '<div class="form-two-col"><div class="form-group"><label class="form-label">学校性质</label><select id="edit-nature" class="form-control"><option' + (data.nature === '公办' ? ' selected' : '') + '>公办</option><option' + (data.nature === '民办' ? ' selected' : '') + '>民办</option><option' + (data.nature === '其他' ? ' selected' : '') + '>其他</option></select></div><div class="form-group"><label class="form-label">学校规模</label><input id="edit-scale" class="form-control" value="' + escapeHtml(data.scale || '') + '" placeholder="如：2000"></div></div>' +
+            '</div>' +
+            '<div class="section-header" style="padding:0 4px 10px;"><div class="section-title" style="font-size:16px;">生源数据评估</div></div>' +
+            '<div class="entry-card" style="padding:14px; margin-bottom:16px;"><div class="form-group"><label class="form-label">毕业生人数</label><input id="edit-graduates" class="form-control" value="' + escapeHtml(data.graduates || '') + '" placeholder="如：约800人"></div><div class="form-two-col"><div class="form-group"><label class="form-label">预计职校人数</label><input id="edit-vocational" class="form-control" value="' + escapeHtml(data.vocationalStudents || '') + '" placeholder="如：约150人"></div><div class="form-group"><label class="form-label">升高中比例</label><input id="edit-hs-ratio" class="form-control" value="' + escapeHtml(data.highSchoolRatio || '') + '" placeholder="如：60%"></div></div></div>' +
+            '<div class="section-header" style="padding:0 4px 10px;"><div class="section-title" style="font-size:16px;">责任分配</div></div>' +
+            '<div class="entry-card" style="padding:14px; margin-bottom:16px;"><div class="form-group"><label class="form-label required">责任分组</label><select id="assign-group" class="form-control"><option' + (data.assignGroup === '待分配' ? ' selected' : '') + '>待分配</option><option' + (data.assignGroup === '城南招生组' ? ' selected' : '') + '>城南招生组</option><option' + (data.assignGroup === '城北招生组' ? ' selected' : '') + '>城北招生组</option><option' + (data.assignGroup === '市区拓展组' ? ' selected' : '') + '>市区拓展组</option></select></div><div class="form-group"><label class="form-label">分配原因/备注</label><textarea id="assign-reason" class="form-control" style="min-height:70px;">' + escapeHtml(data.assignReason || '') + '</textarea></div></div>' +
+            '<div class="section-header" style="padding:0 4px 10px;"><div class="section-title" style="font-size:16px;">学校简介</div></div>' +
+            '<div class="entry-card" style="padding:14px; margin-bottom:16px;"><textarea id="edit-desc" class="form-control" style="min-height:90px;" placeholder="简要描述学校情况">' + escapeHtml(data.description || '') + '</textarea></div>' +
+            '<div style="display:grid; grid-template-columns:1fr 2fr; gap:10px;"><button class="my-lead-action-btn my-lead-action-tertiary" onclick="' + (isNew ? 'backToCoopSchoolList()' : 'openSchoolDetail(' + index + ')') + '">取消</button><button class="my-lead-action-btn my-lead-action-primary" onclick="saveSchoolEditor(' + (isNew ? 'null' : index) + ')">' + (isNew ? '新增并关联' : '保存资料') + '</button></div></div>';
+        document.getElementById('entry-page-content').scrollTop = 0;
+    }
+
+    function saveSchoolEditor(index) {
+        const name = document.getElementById('edit-school-name').value.trim();
+        if (!name) {
+            showToast('请填写学校名称');
+            return;
+        }
+        const duplicateIndex = entryData.schools.findIndex(item => item.toLowerCase() === name.toLowerCase());
+        if (duplicateIndex >= 0 && duplicateIndex !== index) {
+            showToast('该学校已存在，可选择关联已有学校');
+            return;
+        }
+        const isNew = index === null;
+        if (isNew) {
+            index = entryData.schools.length;
+            entryData.schools.push(name);
+        } else {
+            entryData.schools[index] = name;
+        }
+        window.schoolDetailsMap[index] = window.schoolDetailsMap[index] || {};
+        const data = window.schoolDetailsMap[index];
+        data.province = document.getElementById('edit-province').value.trim() || '待补充';
+        data.address = document.getElementById('edit-address').value.trim() || '待补充';
+        data.nature = document.getElementById('edit-nature').value;
+        data.scale = document.getElementById('edit-scale').value.trim() || '待补充';
+        data.contactName = document.getElementById('edit-contact-name').value.trim() || '待补充';
+        data.contactPhone = document.getElementById('edit-contact-phone').value.trim();
+        data.graduates = document.getElementById('edit-graduates').value.trim() || '待补充';
+        data.highSchoolRatio = document.getElementById('edit-hs-ratio').value.trim() || '待补充';
+        data.vocationalStudents = document.getElementById('edit-vocational').value.trim() || '待补充';
+        data.description = document.getElementById('edit-desc').value.trim() || '暂无学校简介。';
+        data.assignGroup = document.getElementById('assign-group').value;
+        data.assignReason = document.getElementById('assign-reason').value.trim();
+        data.assignTime = formatDateTime(nowDatetimeLocal());
+        if (isNew) {
+            const relations = coopTermRelations[currentCoopTerm] || (coopTermRelations[currentCoopTerm] = []);
+            if (!relations.includes(index)) relations.push(index);
+        }
+        showToast(isNew ? '学校已新增并关联当前学期' : '学校资料已保存', true);
+        openSchoolDetail(index);
+    }
+
+    function backToCoopSchoolList() {
+        currentEntryLabel = '合作学校';
+        document.getElementById('entry-page-title').innerText = '合作学校';
+        document.getElementById('entry-page-action').innerText = '添加';
+        renderAdmissionEntryPage('合作学校');
+    }
+
+    function renderRegionOptions(selectedValue) {
+        const selected = String(selectedValue || '');
+        const values = regionOptions.includes(selected) ? regionOptions : (selected && selected !== '待补充' ? [selected].concat(regionOptions) : regionOptions);
+        return '<option value="">请选择地区</option>' + values.map(region =>
+            '<option value="' + escapeHtml(region) + '"' + (region === selected ? ' selected' : '') + '>' + escapeHtml(region) + '</option>'
+        ).join('');
+    }
+
+    function renderSchoolDetailValue(value, accentColor) {
+        const text = String(value || '').trim();
+        const missing = !text || text === '待补充';
+        const style = missing ? ' class="school-value-missing"' : (accentColor ? ' style="color:' + accentColor + ';"' : '');
+        return '<strong' + style + '>' + escapeHtml(missing ? '待补充' : text) + '</strong>';
     }
 
     window.saveSchoolData = function(index) {
@@ -1935,7 +2411,6 @@
         data.vocationalStudents = document.getElementById('edit-vocational').value;
         data.description = document.getElementById('edit-desc').value;
 
-        data.assignSemester = document.getElementById('assign-semester').value;
         data.assignGroup = document.getElementById('assign-group').value;
         data.assignReason = document.getElementById('assign-reason').value;
 
@@ -1952,48 +2427,51 @@
     };
 
     function openSchoolDetail(index, isEditMode = false) {
+        if (isEditMode) {
+            openSchoolEditor(index);
+            return;
+        }
         const schoolName = entryData.schools[index];
         const data = getSchoolDetail(index);
 
-        let detailHtml = '<div style="padding-bottom: 20px; padding-top: 16px;">';
+        let detailHtml = '<div class="school-detail-page"><div class="school-detail-main">';
 
         if (!isEditMode) {
             // View Mode
             detailHtml += '<div class="section-header" style="margin-top: 0; padding: 0 4px 12px;"><div class="section-title" style="font-size:16px;">联系与地址</div></div>' +
             '<div class="entry-card" style="margin-bottom: 16px; box-shadow: 0 4px 16px rgba(31,95,255,0.06); padding: 14px;">' +
                 '<div class="entry-card-grid" style="grid-template-columns: 1fr; gap: 12px;">' +
-                    '<div class="entry-info-cell full" style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">学校对接人</span><strong style="color:var(--text-title);">' + escapeHtml(data.contactName || '待补充') + '</strong></div>' +
-                    '<div class="entry-info-cell full" style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">联系方式</span><strong style="color:var(--primary-color);">' + escapeHtml(data.contactPhone || '待补充') + '</strong></div>' +
-                    '<div class="entry-info-cell full" style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">省市区县</span><strong style="color:var(--text-title);">' + data.province + '</strong></div>' +
-                    '<div class="entry-info-cell full" style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">详细地址</span><strong style="color:var(--text-title);">' + data.address + '</strong></div>' +
-                    '<div class="entry-info-cell full" style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">学校性质</span><strong style="color:var(--text-title);">' + data.nature + '</strong></div>' +
-                    '<div class="entry-info-cell full" style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">学校规模人数</span><strong style="color:var(--text-title);">' + data.scale + '人</strong></div>' +
+                    '<div class="entry-info-cell full" style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">学校对接人</span>' + renderSchoolDetailValue(data.contactName) + '</div>' +
+                    '<div class="entry-info-cell full" style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">联系方式</span>' + renderSchoolDetailValue(data.contactPhone, 'var(--primary-color)') + '</div>' +
+                    '<div class="entry-info-cell full" style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">省市区县</span>' + renderSchoolDetailValue(data.province) + '</div>' +
+                    '<div class="entry-info-cell full" style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">详细地址</span>' + renderSchoolDetailValue(data.address) + '</div>' +
+                    '<div class="entry-info-cell full" style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">学校性质</span>' + renderSchoolDetailValue(data.nature) + '</div>' +
+                    '<div class="entry-info-cell full" style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">学校规模人数</span>' + renderSchoolDetailValue(data.scale && data.scale !== '待补充' ? data.scale + '人' : data.scale) + '</div>' +
                 '</div>' +
             '</div>' +
             '<div class="section-header" style="padding: 0 4px 12px;"><div class="section-title" style="font-size:16px;">生源数据评估</div></div>' +
             '<div class="entry-card" style="margin-bottom: 16px; box-shadow: 0 4px 16px rgba(31,95,255,0.06); padding: 14px;">' +
                 '<div class="entry-card-grid" style="grid-template-columns: 1fr; gap: 12px;">' +
-                    '<div class="entry-info-cell full" style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">毕业生人数</span><strong style="color:var(--primary-color); font-size:15px;">' + data.graduates + '</strong></div>' +
-                    '<div class="entry-info-cell full" style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">升高中比例</span><strong style="color:var(--primary-color); font-size:15px;">' + data.highSchoolRatio + '</strong></div>' +
-                    '<div class="entry-info-cell full" style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">预计职校生源</span><strong style="color:var(--warning-color); font-size:15px;">' + data.vocationalStudents + '</strong></div>' +
+                    '<div class="entry-info-cell full" style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">毕业生人数</span>' + renderSchoolDetailValue(data.graduates, 'var(--primary-color)') + '</div>' +
+                    '<div class="entry-info-cell full" style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">升高中比例</span>' + renderSchoolDetailValue(data.highSchoolRatio, 'var(--primary-color)') + '</div>' +
+                    '<div class="entry-info-cell full" style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">预计职校生源</span>' + renderSchoolDetailValue(data.vocationalStudents, 'var(--warning-color)') + '</div>' +
                 '</div>' +
             '</div>' +
             '<div class="section-header" style="padding: 0 4px 12px;"><div class="section-title" style="font-size:16px;">责任分配</div></div>' +
             '<div class="entry-card" style="margin-bottom: 16px; box-shadow: 0 4px 16px rgba(31,95,255,0.06); padding: 14px;">' +
-                '<div class="entry-picker-row" style="margin-bottom: 12px; padding: 10px 12px;"><strong>招生学期</strong><span>' + data.assignSemester + '</span></div>' +
                 '<div class="entry-card-grid" style="grid-template-columns: 1fr; gap: 12px;">' +
-                    '<div class="entry-info-cell full" style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">责任分组</span><strong style="color:var(--primary-color); font-size:14px;">' + data.assignGroup + '</strong></div>' +
-                    '<div class="entry-info-cell full" style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">分配时间</span><strong style="color:var(--text-main); font-weight:800;">' + data.assignTime + '</strong></div>' +
-                    '<div class="entry-info-cell full" style="display:flex; flex-direction:column; gap:4px;"><span style="color:var(--text-secondary);">分配原因/备注</span><div style="color:var(--text-main); font-weight:800; line-height:1.4;">' + (data.assignReason || '无') + '</div></div>' +
+                    '<div class="entry-info-cell full" style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">责任分组</span>' + renderSchoolDetailValue(data.assignGroup, 'var(--primary-color)') + '</div>' +
+                    '<div class="entry-info-cell full" style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">分配时间</span>' + renderSchoolDetailValue(data.assignTime) + '</div>' +
+                    '<div class="entry-info-cell full" style="display:flex; flex-direction:column; gap:4px;"><span style="color:var(--text-secondary);">分配原因/备注</span><div style="color:var(--text-main); font-weight:800; line-height:1.4;">' + escapeHtml(data.assignReason || '无') + '</div></div>' +
                 '</div>' +
             '</div>' +
             '<div class="section-header" style="padding: 0 4px 12px;"><div class="section-title" style="font-size:16px;">学校简介</div></div>' +
             '<div class="entry-card" style="padding: 16px; margin-bottom: 16px; box-shadow: 0 4px 16px rgba(31,95,255,0.06);">' +
                 '<div style="font-size: 13px; color: var(--text-main); line-height: 1.6; font-weight: 700;">' + data.description + '</div>' +
             '</div>' +
-            '<div class="detail-bottom-actions" style="grid-template-columns: 1fr 2fr; margin-top: 16px;">' +
-                '<button class="btn-xs danger outline" style="padding:14px 4px; font-size:14px; border:1px solid var(--danger-color); background: #fff;" onclick="showToast(\'删除成功\', true); closeAdmissionEntryPage();">删除</button>' +
-                '<button class="btn-xs" style="padding:14px 4px; font-size:14px; background: var(--primary-color); color: #fff; border:none; box-shadow:0 8px 16px rgba(31,95,255,0.2);" onclick="openSchoolDetail(' + index + ', true)">编辑</button>' +
+            '</div><div class="school-detail-actions">' +
+                '<button class="my-lead-action-btn school-detail-delete" onclick="showToast(\'删除成功\', true); closeAdmissionEntryPage();">删除</button>' +
+                '<button class="my-lead-action-btn my-lead-action-primary" onclick="openSchoolEditor(' + index + ')">编辑学校</button>' +
             '</div>';
         } else {
             // Edit Mode
@@ -2014,7 +2492,6 @@
             '</div>' +
             '<div class="section-header" style="padding: 0 4px 12px;"><div class="section-title" style="font-size:16px;">责任分配</div></div>' +
             '<div class="entry-card" style="margin-bottom: 16px; box-shadow: 0 4px 16px rgba(31,95,255,0.06); padding: 14px;">' +
-                '<div class="form-group"><label class="form-label required">招生学期</label><select id="assign-semester" class="form-control"><option' + (data.assignSemester==='2026年秋季'?' selected':'') + '>2026年秋季</option><option' + (data.assignSemester==='2026年春季'?' selected':'') + '>2026年春季</option></select></div>' +
                 '<div class="form-group"><label class="form-label required">责任分组</label><select id="assign-group" class="form-control"><option' + (data.assignGroup==='城南招生组'?' selected':'') + '>城南招生组</option><option' + (data.assignGroup==='城北招生组'?' selected':'') + '>城北招生组</option><option' + (data.assignGroup==='市区拓展组'?' selected':'') + '>市区拓展组</option></select></div>' +
                 '<div class="form-group"><label class="form-label">分配原因/备注</label><textarea id="assign-reason" class="form-control" style="min-height:60px;">' + data.assignReason + '</textarea></div>' +
             '</div>' +
@@ -2144,7 +2621,9 @@
         } else if (type === 'log') {
             body = '<div class="form-group"><label class="form-label required">工作类型</label><select class="form-control"><option>拜访学校</option><option>跟进学生</option><option>招生会议</option></select></div><div class="form-group"><label class="form-label required">日志内容</label><textarea class="form-control" placeholder="填写工作记录"></textarea></div><button class="submit-btn" onclick="closeAllModals(); showToast(\'日志已添加\', true)">提交</button>';
         } else if (type === 'school') {
-            body = '<form onsubmit="event.preventDefault(); submitNewCoopSchool();"><div class="form-group"><label class="form-label required">学校名称</label><input id="new-school-name" class="form-control" placeholder="请输入学校名称" required></div><div class="form-two-col"><div class="form-group"><label class="form-label">学校对接人</label><input id="new-school-contact-name" class="form-control" placeholder="请输入对接人"></div><div class="form-group"><label class="form-label">联系方式</label><input id="new-school-contact-phone" type="tel" inputmode="tel" class="form-control" placeholder="请输入联系电话"></div></div><div class="form-group"><label class="form-label">省市区县</label><input id="new-school-province" class="form-control" placeholder="如：广东省深圳市龙华区"></div><div class="form-group"><label class="form-label">详细地址</label><input id="new-school-address" class="form-control" placeholder="输入详细地址"></div><div class="form-group"><label class="form-label">学校性质</label><select id="new-school-nature" class="form-control"><option>公办</option><option>民办</option><option>其他</option></select></div><div class="form-group"><label class="form-label">学校规模</label><input id="new-school-scale" class="form-control" placeholder="如：2000"></div><div class="form-group"><label class="form-label">毕业生人数</label><input id="new-school-graduates" class="form-control" placeholder="如：约800人"></div><div class="form-group"><label class="form-label">预计职校人数</label><input id="new-school-vocational" class="form-control" placeholder="如：约150人"></div><div class="form-group"><label class="form-label">升高中比例</label><input id="new-school-ratio" class="form-control" placeholder="如：60%"></div><div class="form-group"><label class="form-label">学校描述</label><textarea id="new-school-description" class="form-control" placeholder="简要描述学校情况"></textarea></div><button type="submit" class="submit-btn">确认新增</button></form>';
+            closeAllModals();
+            openSchoolEditor();
+            return;
         } else {
             body = '<div class="entry-school-list"><div class="entry-school-item" onclick="closeAllModals(); showToast(\'已选择 2026年春季\', true)">2026年春季</div><div class="entry-school-item" onclick="closeAllModals(); showToast(\'已选择 2025年秋季\', true)">2025年秋季</div><div class="entry-school-item" onclick="closeAllModals(); showToast(\'已选择 2025年春季\', true)">2025年春季</div><div class="entry-school-item" onclick="closeAllModals(); showToast(\'已选择 2024年秋季\', true)">2024年秋季</div></div>';
         }
@@ -2153,39 +2632,8 @@
     }
 
     function submitNewCoopSchool() {
-        const name = document.getElementById('new-school-name').value.trim();
-        if (!name) {
-            showToast('请填写学校名称');
-            return;
-        }
-        if (entryData.schools.some(item => item.toLowerCase() === name.toLowerCase())) {
-            showToast('该学校已存在');
-            return;
-        }
-        const index = entryData.schools.length;
-        entryData.schools.push(name);
-        window.schoolDetailsMap[index] = {
-            province: document.getElementById('new-school-province').value.trim() || '待补充',
-            address: document.getElementById('new-school-address').value.trim() || '待补充',
-            nature: document.getElementById('new-school-nature').value,
-            scale: document.getElementById('new-school-scale').value.trim() || '待补充',
-            contactName: document.getElementById('new-school-contact-name').value.trim() || '待补充',
-            contactPhone: document.getElementById('new-school-contact-phone').value.trim(),
-            graduates: document.getElementById('new-school-graduates').value.trim() || '待补充',
-            highSchoolRatio: document.getElementById('new-school-ratio').value.trim() || '待补充',
-            vocationalStudents: document.getElementById('new-school-vocational').value.trim() || '待补充',
-            description: document.getElementById('new-school-description').value.trim() || '暂无学校简介。',
-            assignSemester: '2026年秋季',
-            assignGroup: '待分配',
-            assignTime: '暂未分配',
-            assignReason: '新建合作学校，等待责任分组。'
-        };
         closeAllModals();
-        currentEntryLabel = '合作学校';
-        document.getElementById('entry-page-title').innerText = '合作学校';
-        document.getElementById('entry-page-action').innerText = '添加';
-        renderAdmissionEntryPage('合作学校');
-        showToast('合作学校已新增', true);
+        openSchoolEditor();
     }
 
     function getFunnelCounts() {
@@ -2201,7 +2649,6 @@
     function showToast(msg, isSuccess = false, duration = 1800, showUndo = false) {
         let toast = document.getElementById('sys-toast');
         document.getElementById('sys-toast-msg').innerText = msg;
-        document.getElementById('toast-icon-success').style.display = isSuccess ? 'block' : 'none';
         document.getElementById('toast-undo').style.display = showUndo ? 'block' : 'none';
 
         toast.classList.add('show');
@@ -2235,6 +2682,8 @@
 
     function closeQuickMenu() {
         document.querySelectorAll('.quick-dropdown').forEach(el => el.classList.remove('active'));
+        const title = document.getElementById('workspace-title');
+        if (title) title.classList.remove('open');
     }
 
     document.addEventListener('click', (e) => {
@@ -2245,10 +2694,8 @@
 
     function quickAction(type) {
         closeQuickMenu();
-        if (type === 'lead') showModal('sheet-add-lead');
-        else if (type === 'visit') startVisitCheckin();
+        if (type === 'lead') openOfflineLeadFormFromWorkspace();
         else if (type === 'scan') showToast('扫码功能已打开，请对准学生到访码', true);
-        else if (type === 'qr') showToast('已显示我的招生二维码，可用于学生扫码登记', true);
     }
 
     function simulateAction(el, loadingMsg, successMsg, isSuccess = true, callback = null) {
@@ -2412,9 +2859,6 @@
             if (active === '超时待办') return '暂无超时待办<br/>当前跟进节奏良好';
             if (active === '公海线索') return '暂无公海线索<br/>可通过快速操作录入线索';
         }
-        if (containerId === 'follow-list-container' && getModuleFilter('follow', '') === '跟进列表') return '暂无正在跟进的学生<br/>可通过右上角加号录入我的线索';
-        if (containerId === 'follow-list-container' && getModuleFilter('follow', '') === '待跟进') return '暂无待跟进学生<br/>当前跟进节奏良好';
-        if (containerId === 'follow-list-container' && getModuleFilter('follow', '') === '到访记录') return '暂无到访记录<br/>可从待到访确认后生成';
         if (containerId === 'reservation-list-container') return '暂无预定/录取记录<br/>可从已到访学生办理预定';
         if (containerId === 'handover-list-container') return '暂无报到交接数据<br/>交接异常会在这里优先展示';
         return '该筛选维度下暂无数据<br/>请切换筛选或返回今日查看待办';
@@ -2460,17 +2904,15 @@
         closeAllModals();
         state.currentActionLeadId = null;
         switchEnrollmentTab('sub-view-follow', document.getElementById('tab-btn-follow'));
-        activatePill('pills-follow', '跟进列表');
-        execFilterRender('follow-list-container', state.leads.concat(state.conversions), 'follow', '跟进列表');
         showToast('请先选择一名学生，再写跟进');
     }
 
     function startVisitCheckin() {
         closeAllModals();
         switchEnrollmentTab('sub-view-follow', document.getElementById('tab-btn-follow'));
-        const pill = activatePill('pills-follow', '待到访');
-        execFilterRender('follow-list-container', state.leads.concat(state.conversions), 'follow', pill ? pill.innerText : '待到访');
-        showToast('请选择待到访学生，确认后会生成到访记录');
+        myLeadStatusFilter = '已邀约';
+        renderMyLeadsWorkspace();
+        showToast('已筛选待到访线索');
     }
 
     function showConfigReadonly() {
@@ -2557,8 +2999,7 @@
                 let newLead = { id: Date.now(), name: form.name.value, phone: form.phone.value, source: form.source.value || form.sourceType.value, sourceType: form.sourceType.value, intentLevel: form.intentLevel.value, leadStatus: form.leadStatus.value, school: form.school.value || '待确认学校', grade: form.grade.value, sourceClass: form.sourceClass.value, major: '待确认专业', semester: '2026年秋季', focus: form.keyword.value || '待补充', lastFollow: '暂无', stage: 0, owner: state.currentUser, isInvalid: form.leadStatus.value === '无效', isOverdue: false };
                 state.leads.unshift(newLead);
                 switchEnrollmentTab('sub-view-follow', document.getElementById('tab-btn-follow'));
-                const pill = activatePill('pills-follow', '跟进列表');
-                execFilterRender('follow-list-container', state.leads.concat(state.conversions), 'follow', pill ? pill.innerText : '跟进列表');
+                renderMyLeadsWorkspace();
             } else if (type === 'enroll') {
                 const selectedId = Number(form.enrollLeadId ? form.enrollLeadId.value : state.currentActionLeadId);
                 const selected = findLead(selectedId);
@@ -2639,6 +3080,7 @@
 
     function activatePill(containerId, filterName) {
         const container = document.getElementById(containerId);
+        if (!container) return null;
         const pills = Array.from(container.querySelectorAll('.pill, .reservation-tab'));
         const target = pills.find(p => p.innerText.trim() === filterName);
         if (target) {
@@ -2650,7 +3092,6 @@
 
     const moduleListConfig = {
         leads: { pills: 'pills-leads', list: 'leads-list-container', view: 'sub-view-leads', tab: 'tab-btn-more', data: () => state.leads, search: 'leads-search' },
-        follow: { pills: 'pills-follow', list: 'follow-list-container', view: 'sub-view-follow', tab: 'tab-btn-follow', data: () => state.leads.concat(state.conversions), search: null },
         reservation: { pills: 'pills-reservation', list: 'reservation-list-container', view: 'sub-view-reservation', tab: 'tab-btn-more', data: () => currentReservationTab === '录取记录' ? state.admissionRecords : state.reservationRecords, search: null },
         handover: { pills: 'pills-handover', list: 'handover-list-container', view: 'sub-view-handover', tab: 'tab-btn-more', data: () => state.conversions, search: null }
     };
@@ -2667,6 +3108,14 @@
         paymentMethods: ['现金', '微信', '支付宝', '银行卡', '转账', '其他'],
         receiptSources: ['顾问代收', '财务直收'],
         reservationStatuses: ['有效', '已报名', '已退费', '已失效']
+    };
+
+    const teacherDirectory = {
+        '当前顾问': { name: '当前顾问', phone: '138 0000 6698', group: '城南招生组', role: '招生顾问' },
+        '尹娣': { name: '尹娣', phone: '136 8821 1076', group: '城南招生组', role: '招生组长' },
+        '张伟': { name: '张伟', phone: '139 2156 8032', group: '城北招生组', role: '招生老师' },
+        '李老师': { name: '李老师', phone: '137 6048 2195', group: '城北招生组', role: '招生老师' },
+        '魏海霞': { name: '魏海霞', phone: '135 9072 4418', group: '市区拓展组', role: '招生老师' }
     };
 
     let currentReservationTab = '预定记录';
@@ -2977,7 +3426,12 @@
             showToast(field === 'leadId' ? '暂无已到访/待预定线索' : '暂无可选记录');
             return;
         }
-        currentPicker = { field, options, searchable: isLongPickerField(field) };
+        const inReservationForm = currentRecordForm.type === 'reservation';
+        currentPicker = {
+            field,
+            options,
+            searchable: !inReservationForm && isLongPickerField(field)
+        };
         const titleMap = { leadId: '选择个人线索', advisor: '选择招生顾问', major: '选择预定专业', semester: '选择招生学期', paymentMethod: '选择支付方式', receiptSource: '选择收款来源', collector: '选择收款人员', financeStaff: '选择财务确认人员', reservationId: '选择预定记录', admissionMajor: '选择录取专业', preClass: '选择预分班', headTeacher: '选择班主任' };
         document.getElementById('record-picker-title').innerText = titleMap[field] || '选择';
         document.getElementById('record-picker-input').value = '';
@@ -3298,7 +3752,7 @@
             { title: '系统信息', fields: [field('交接请求号', 'readonly', [], false, '系统自动生成'), field('版本号', 'readonly', [], false, 'v1'), field('交接载荷', 'readonly', [], false, '提交后生成 JSON'), field('载荷摘要', 'readonly', [], false, '系统自动计算'), field('最近错误码', 'readonly'), field('响应快照', 'readonly'), field('基础学生', 'readonly'), field('取代任务', 'readonly'), field('提交时间', 'datetime-local'), field('成功时间', 'datetime-local'), field('失败时间', 'datetime-local')] }
         ] },
         schoolArchive: { title: '新增学校档案', success: '学校档案已保存', groups: [
-            { title: '学校信息', fields: [field('学校名称', 'text', [], true), field('省市区县', 'text', [], true), field('详细地址'), field('资源等级', 'select', ['A', 'B', 'C']), field('学校性质', 'select', ['公办', '民办', '其他']), field('学校规模'), field('毕业生人数', 'number'), field('预计职校人数', 'number'), field('升高中比例'), field('学校描述', 'textarea')] }
+            { title: '学校信息', fields: [field('学校名称', 'text', [], true), field('省市区县', 'region', regionOptions, true), field('详细地址'), field('资源等级', 'select', ['A', 'B', 'C']), field('学校性质', 'select', ['公办', '民办', '其他']), field('学校规模'), field('毕业生人数', 'number'), field('预计职校人数', 'number'), field('升高中比例'), field('学校描述', 'textarea')] }
         ] },
         candidateSchool: { title: '新增候选学校归集', success: '候选学校已归集', groups: [
             { title: '归集信息', fields: [field('标准化学校名', 'text', [], true), field('展示学校名', 'text', [], true), field('状态', 'select', ['待匹配', '已匹配', '已驳回']), field('匹配正式学校'), field('合并候选 ID'), field('匹配方式', 'select', ['自动匹配', '人工匹配']), field('匹配置信度'), field('匹配时间', 'datetime-local'), field('匹配规则'), field('驳回原因', 'textarea')] }
@@ -3325,9 +3779,11 @@
         if (item.type === 'textarea') {
             return '<div class="form-group"><label class="form-label' + requiredClass + '">' + item.label + '</label><textarea class="form-control" name="' + name + '"' + required + ' placeholder="请输入' + item.label + '"></textarea></div>';
         }
-        if (item.type === 'select' || item.type === 'multi') {
+        if (item.type === 'select' || item.type === 'multi' || item.type === 'region') {
             const multi = item.type === 'multi' ? ' multiple' : '';
-            const options = item.options.map(opt => '<option>' + opt + '</option>').join('');
+            const options = item.type === 'region'
+                ? '<option value="">请选择地区</option>' + item.options.map(opt => '<option value="' + escapeHtml(opt) + '">' + escapeHtml(opt) + '</option>').join('')
+                : item.options.map(opt => '<option>' + opt + '</option>').join('');
             return '<div class="form-group"><label class="form-label' + requiredClass + '">' + item.label + '</label><select class="form-control" name="' + name + '"' + required + multi + '>' + options + '</select></div>';
         }
         if (item.type === 'switch') {
@@ -3416,6 +3872,7 @@
 
     function refreshAllModuleLists() {
         Object.keys(moduleListConfig).forEach(refreshModuleList);
+        renderMyLeadsWorkspace();
         renderDashboard();
     }
 
@@ -3430,9 +3887,9 @@
         }
         if (type === 'visit') {
             switchEnrollmentTab('sub-view-follow', document.getElementById('tab-btn-follow'));
-            const pill = activatePill('pills-follow', '待到访');
-            execFilterRender('follow-list-container', state.leads.concat(state.conversions), 'follow', pill ? pill.innerText : '待到访');
-            showToast('已进入跟进与到访，展示待确认到访学生');
+            myLeadStatusFilter = '已邀约';
+            renderMyLeadsWorkspace();
+            showToast('已进入跟进，展示已邀约线索');
             return;
         }
         if (type === 'admit') {
@@ -3699,6 +4156,7 @@
         renderDirTabs();
         renderDirContent();
         renderDashboard();
+        renderMyLeadsWorkspace();
         refreshAllModuleLists();
         renderLogs();
     };
@@ -3730,6 +4188,12 @@
         el.classList.add('active');
         document.querySelectorAll('.sub-view').forEach(view => view.classList.remove('active'));
         document.getElementById(viewId).classList.add('active');
+        if (viewId === 'sub-view-follow') {
+            setWorkspaceTitle(currentLeadScope === 'public' ? '公海线索' : '我的线索', true);
+            renderMyLeadsWorkspace();
+        } else {
+            setWorkspaceTitle(viewId === 'sub-view-more' ? '招生管理' : '招生工作台', false);
+        }
     }
 
     // Touch logic for bottom-sheets
@@ -3777,3 +4241,5 @@
 </script>
 </body>
 </html>
+
+
