@@ -58,33 +58,6 @@
         .fade-in { animation: fadeIn 0.3s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        @keyframes taskFocusFlash {
-            0%, 100% {
-                background-color: transparent;
-                box-shadow: inset 0 0 0 0 rgba(31, 95, 255, 0);
-            }
-            30% {
-                background-color: rgba(239, 246, 255, 0.96);
-                box-shadow: inset 0 0 0 2px rgba(31, 95, 255, 0.42);
-            }
-            62% {
-                background-color: rgba(255, 255, 255, 0.2);
-                box-shadow: inset 0 0 0 1px rgba(31, 95, 255, 0.08);
-            }
-            82% {
-                background-color: rgba(239, 246, 255, 0.8);
-                box-shadow: inset 0 0 0 2px rgba(31, 95, 255, 0.28);
-            }
-        }
-        .task-focus-flash {
-            animation: taskFocusFlash 1.1s ease-out both;
-        }
-        @media (prefers-reduced-motion: reduce) {
-            .task-focus-flash {
-                animation-duration: 0.35s;
-            }
-        }
-
         input[type="number"]::-webkit-inner-spin-button,
         input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type="number"] { -moz-appearance: textfield; }
@@ -759,14 +732,6 @@
             <div class="flex-1 h-full flex flex-col relative pointer-events-auto pl-6 min-w-0 shrink-0">
                 <div class="h-[40px] mb-4 shrink-0 pointer-events-none"></div>
 
-                <div id="unfinished-group-done-notice" class="hidden absolute inset-0 z-40 flex-col items-center justify-center text-center pointer-events-none">
-                    <div class="w-14 h-14 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center">
-                        <i class="ph-bold ph-check text-[28px]"></i>
-                    </div>
-                    <div class="mt-4 text-[20px] font-extrabold text-gray-900">任务已完成</div>
-                    <div id="unfinished-group-done-label" class="mt-2 text-[14px] font-medium text-slate-500">第 1 关 · 第 1 组</div>
-                </div>
-
                 <div class="flex-1 flex flex-col items-center justify-center text-center px-4 pointer-events-none min-w-0 w-full space-y-12">
                     <div id="unfinished-score-word-en" class="text-gray-800 tracking-wide font-bold leading-tight drop-shadow-md max-w-full break-words break-all pointer-events-auto w-full text-[40px] transition-all duration-300">phenomenon</div>
                     <div id="unfinished-score-word-phon" class="text-gray-800 font-bold font-serif tracking-widest drop-shadow-sm pointer-events-auto transition-all duration-300 break-words break-all max-w-full w-full text-[40px] leading-tight">/fəˈnɑːmɪnən/</div>
@@ -1029,118 +994,51 @@
             
             function startLearningTimer() {
                 clearInterval(learningTimerInterval);
-                learningTimerInterval = null;
                 learningSeconds = 0;
                 var timerEl = document.getElementById('scoring-timer');
                 if (timerEl) timerEl.innerText = '00:00';
-                resumeLearningTimer();
-            }
-
-            function resumeLearningTimer() {
-                if (learningTimerInterval) return;
                 learningTimerInterval = setInterval(function() {
                     learningSeconds++;
-                    var timerEl = document.getElementById('scoring-timer');
                     if (timerEl) timerEl.innerText = formatTime(learningSeconds);
                 }, 1000);
             }
             
             function stopLearningTimer() {
                 clearInterval(learningTimerInterval);
-                learningTimerInterval = null;
             }
 
             function startUnfinishedTimer() {
                 clearInterval(unfinishedTimerInterval);
-                unfinishedTimerInterval = null;
                 unfinishedSeconds = 0;
                 var timerEl = document.getElementById('unfinished-scoring-timer');
                 if (timerEl) timerEl.innerText = '00:00';
-                resumeUnfinishedTimer();
-            }
-
-            function resumeUnfinishedTimer() {
-                if (unfinishedTimerInterval) return;
                 unfinishedTimerInterval = setInterval(function() {
                     unfinishedSeconds++;
-                    var timerEl = document.getElementById('unfinished-scoring-timer');
                     if (timerEl) timerEl.innerText = formatTime(unfinishedSeconds);
                 }, 1000);
             }
 
             function stopUnfinishedTimer() {
                 clearInterval(unfinishedTimerInterval);
-                unfinishedTimerInterval = null;
             }
 
-            function startPassingTimer(initialSeconds = 0) {
+            function startPassingTimer() {
                 clearInterval(passingTimerInterval);
-                passingTimerInterval = null;
-                passingSeconds = Math.max(0, Number(initialSeconds) || 0);
+                passingSeconds = 0;
                 var timerEl = document.getElementById('passing-timer');
-                if (timerEl) timerEl.innerText = formatTime(passingSeconds);
-                resumePassingTimer();
-            }
-
-            function resumePassingTimer() {
-                if (passingTimerInterval) return;
+                if (timerEl) timerEl.innerText = '00:00';
                 passingTimerInterval = setInterval(function() {
                     passingSeconds++;
-                    var timerEl = document.getElementById('passing-timer');
                     if (timerEl) timerEl.innerText = formatTime(passingSeconds);
                 }, 1000);
             }
 
             function stopPassingTimer() {
                 clearInterval(passingTimerInterval);
-                passingTimerInterval = null;
-            }
-
-            function getActiveTimedView() {
-                var activeView = document.querySelector('.view-section.active');
-                if (!activeView) return null;
-                if (activeView.id === 'view-scoring') return { type: 'learning', seconds: learningSeconds };
-                if (activeView.id === 'view-unfinished-scoring') return { type: 'unfinished', seconds: unfinishedSeconds };
-                if (activeView.id === 'view-passing') return { type: 'passing', seconds: passingSeconds };
-                if (activeView.id === 'view-grading') {
-                    return gradingSource === 'unfinished'
-                        ? { type: 'unfinished', seconds: unfinishedSeconds }
-                        : { type: 'learning', seconds: learningSeconds };
-                }
-                return null;
-            }
-
-            function pauseActiveTimerForModal() {
-                var timerState = getActiveTimedView();
-                if (!timerState) return null;
-                if (timerState.type === 'learning') stopLearningTimer();
-                if (timerState.type === 'unfinished') stopUnfinishedTimer();
-                if (timerState.type === 'passing') stopPassingTimer();
-                return timerState;
-            }
-
-            function resumeTimerAfterModal(timerState) {
-                if (!timerState) return;
-                var currentState = getActiveTimedView();
-                if (!currentState || currentState.type !== timerState.type) return;
-                if (timerState.type === 'learning') resumeLearningTimer();
-                if (timerState.type === 'unfinished') resumeUnfinishedTimer();
-                if (timerState.type === 'passing') resumePassingTimer();
-            }
-
-            function appendModalElapsedTime(msg, timerState) {
-                if (!timerState) return msg;
-                return `${msg}
-                    <div class="mt-3 flex items-center justify-center text-[13px] font-medium text-slate-400">
-                        <span>本次用时</span>
-                        <span class="ml-1.5 font-mono font-extrabold text-slate-600">${formatTime(timerState.seconds)}</span>
-                    </div>
-                `;
             }
 
             // ====== 全局挂载基础函数 ======
-            window.showModal = function(title, msg, onConfirm = null, isConfirm = false, confirmText = '') {
-                var pausedTimerState = pauseActiveTimerForModal();
+            window.showModal = function(title, msg, onConfirm = null, isConfirm = false) {
                 var titleEl = document.getElementById('modal-title');
                 var msgEl = document.getElementById('modal-msg');
                 var modal = document.getElementById('native-modal');
@@ -1150,7 +1048,7 @@
                     titleEl.innerText = title;
                     titleEl.classList.toggle('hidden', !title);
                 }
-                if(msgEl) msgEl.innerHTML = appendModalElapsedTime(msg, pausedTimerState);
+                if(msgEl) msgEl.innerHTML = msg;
                 if (modal) {
                     modal.classList.remove('hidden');
                     modal.classList.add('flex');
@@ -1168,32 +1066,20 @@
                 if (isConfirm) {
                     cancelBtn.classList.remove('hidden');
                     cancelBtn.classList.add('block');
-                    btn.innerText = confirmText || '确认';
-                    cancelBtn.onclick = () => {
-                        hideModal();
-                        setTimeout(() => resumeTimerAfterModal(pausedTimerState), 300);
-                    };
+                    btn.innerText = '确认';
+                    cancelBtn.onclick = () => { hideModal(); if (title === '退出提示') stopLearningTimer(); };
                     btn.onclick = () => {
                         hideModal();
-                        if (onConfirm) {
-                            setTimeout(() => {
-                                onConfirm();
-                                if (title !== '退出提示') resumeTimerAfterModal(pausedTimerState);
-                            }, 300);
-                        } else if (title !== '退出提示') {
-                            setTimeout(() => resumeTimerAfterModal(pausedTimerState), 300);
-                        }
+                        if (title === '退出提示') stopLearningTimer();
+                        if (onConfirm) setTimeout(onConfirm, 300);
                     };
                 } else {
                     cancelBtn.classList.add('hidden');
                     cancelBtn.classList.remove('block');
-                    btn.innerText = confirmText || '我知道了';
+                    btn.innerText = '我知道了';
                     btn.onclick = () => {
                         hideModal();
-                        setTimeout(() => {
-                            if (onConfirm) onConfirm();
-                            resumeTimerAfterModal(pausedTimerState);
-                        }, 300);
+                        if (onConfirm) setTimeout(onConfirm, 300);
                     };
                 }
             };
@@ -1203,101 +1089,23 @@
                 window.showModal(title, `<div class="mt-2 text-gray-600 font-medium">${msg}</div>`);
             };
 
-            function getExitCurrentLevelPromptHtml(resultHtml = '') {
-                var resultBoxHtml = resultHtml
-                    ? `
-                        <div class="mt-3 w-full rounded-[14px] border border-slate-200 bg-slate-50 px-4 py-3">
-                            <div class="text-[14px] font-medium leading-6 text-gray-500">${resultHtml}</div>
-                        </div>
-                    `
-                    : '';
+            function getExitCurrentLevelPromptHtml() {
                 return `
-                    <div class="mt-1 flex w-full flex-col items-center justify-center text-center">
+                    <div class="mt-1 flex w-full flex-col items-center justify-center gap-2 text-center">
                         <div class="text-[16px] font-extrabold text-gray-900 whitespace-nowrap">确定要退出当前关吗？</div>
-                        <div class="mt-2 flex items-center justify-center text-[14px] font-bold leading-5 text-gray-500">
+                        <div class="flex items-center justify-center text-[14px] font-bold leading-none text-gray-500 whitespace-nowrap">
                             <span>未点击<span class="font-extrabold text-orange-600">「提交」</span>的进度将不会保留。</span>
                         </div>
-                        ${resultBoxHtml}
                     </div>
                 `;
             }
 
-            function getTaskSubmittedUnknownCount(task) {
-                if (!task || !task.passLevelRecords || typeof task.passLevelRecords !== 'object') return 0;
-                var unknownWords = new Set();
-                Object.keys(task.passLevelRecords).forEach(levelId => {
-                    var record = task.passLevelRecords[levelId];
-                    if (!record || !Array.isArray(record.words)) return;
-                    record.words.forEach((word, index) => {
-                        if (!word || word.status !== 'unknown') return;
-                        unknownWords.add(word.word || `${levelId}-${index}`);
-                    });
-                });
-                return unknownWords.size;
-            }
-
-            function getTaskExitProgressHtml(task) {
-                if (!task) return '';
-                var total = getUnfinishedPassTotalWordCount(task);
-                var current = Math.min(total, Math.max(0, Number(task.current) || 0));
-                var unknownCount = getTaskSubmittedUnknownCount(task);
-                return `不认识 <span class="font-extrabold text-orange-600">${unknownCount}</span> 个，任务进度 <span class="font-extrabold font-mono text-[#1F5FFF]">${current}/${total}</span>。`;
-            }
-
-            function getActiveLevelExitProgressHtml() {
-                if (!state.activeLevel || !Array.isArray(state.activeLevel.steps)) return '';
-                var readStep = state.activeLevel.steps[0] || { current: 0, target: 0 };
-                var memoStep = state.activeLevel.steps[1] || { current: 0, target: 0 };
-                var dictStep = state.activeLevel.steps[2] || { current: 0, target: 0 };
-                return `
-                    <div class="mb-2 text-[12px] font-extrabold tracking-wide text-slate-400">本关学习进度</div>
-                    <div class="grid grid-cols-3 gap-2">
-                        <div class="rounded-[10px] bg-white px-2 py-2"><div class="text-[12px] font-bold text-slate-500">跟读</div><div class="mt-0.5 font-mono font-extrabold text-[#1F5FFF]">${Number(readStep.current) || 0}/${Number(readStep.target) || 0}</div></div>
-                        <div class="rounded-[10px] bg-white px-2 py-2"><div class="text-[12px] font-bold text-slate-500">音记</div><div class="mt-0.5 font-mono font-extrabold text-[#1F5FFF]">${Number(memoStep.current) || 0}/${Number(memoStep.target) || 0}</div></div>
-                        <div class="rounded-[10px] bg-white px-2 py-2"><div class="text-[12px] font-bold text-slate-500">听写</div><div class="mt-0.5 font-mono font-extrabold text-[#1F5FFF]">${Number(dictStep.current) || 0}/${Number(dictStep.target) || 0}</div></div>
-                    </div>
-                `;
-            }
-
-            function getUnfinishedLearningExitProgressHtml() {
-                var level = unfinishedLevelGroups.find(item => item.id === unfinishedSelectedLevel);
-                var completedGroups = level && Array.isArray(level.groups)
-                    ? level.groups.filter(group => group.completed).length
-                    : 0;
-                return `
-                    <div class="mb-2 text-[12px] font-extrabold tracking-wide text-slate-400">本组学习进度</div>
-                    <div class="grid grid-cols-3 gap-2">
-                        <div class="rounded-[10px] bg-white px-2 py-2"><div class="text-[12px] font-bold text-slate-500">跟读</div><div class="mt-0.5 font-mono font-extrabold text-[#1F5FFF]">${Number(unfinishedModeRound.gendu) || 0}/${Number(unfinishedModeTargets.gendu) || 0}</div></div>
-                        <div class="rounded-[10px] bg-white px-2 py-2"><div class="text-[12px] font-bold text-slate-500">音记</div><div class="mt-0.5 font-mono font-extrabold text-[#1F5FFF]">${Number(unfinishedModeRound.yinji) || 0}/${Number(unfinishedModeTargets.yinji) || 0}</div></div>
-                        <div class="rounded-[10px] bg-white px-2 py-2"><div class="text-[12px] font-bold text-slate-500">听写</div><div class="mt-0.5 font-mono font-extrabold text-[#1F5FFF]">${Number(unfinishedModeRound.tingxie) || 0}/${Number(unfinishedModeTargets.tingxie) || 0}</div></div>
-                    </div>
-                    <div class="mt-2.5 flex items-center justify-between rounded-[10px] bg-blue-50 px-3 py-2 text-[13px] font-bold text-slate-500">
-                        <span>第 ${unfinishedSelectedLevel} 关</span>
-                        <span>组进度 <b class="font-mono text-[#1F5FFF]">${completedGroups}/4</b></span>
-                    </div>
-                `;
-            }
-
-            function getPassingExitProgressHtml() {
-                var passingTask = state.currentActionType === 'unfinishedPass'
-                    ? getActiveUnfinishedPassTask()
-                    : (state.currentActionType === 'unfinishedGroupGuoci' ? unfinishedActiveTask : null);
-                if (passingTask) return getTaskExitProgressHtml(passingTask);
-                var total = Math.max(0, Number(TOTAL_WORDS) || 0);
-                var answered = state.passingStats ? Math.max(0, Number(state.passingStats.answered) || 0) : 0;
-                var unknownCount = state.passingStats ? Math.max(0, Number(state.passingStats.unknown) || 0) : 0;
-                return `不认识 <span class="font-extrabold text-orange-600">${unknownCount}</span> 个，当前进度 <span class="font-extrabold font-mono text-[#1F5FFF]">${Math.min(total, answered)}/${total}</span>。`;
-            }
-
-            function showExitCurrentLevelConfirm(onConfirm, resultHtml = '') {
-                window.showModal('退出提示', getExitCurrentLevelPromptHtml(resultHtml), onConfirm, true, '确认退出');
+            function showExitCurrentLevelConfirm(onConfirm) {
+                window.showModal('退出提示', getExitCurrentLevelPromptHtml(), onConfirm, true);
             }
 
             window.confirmExitScoringView = function() {
-                showExitCurrentLevelConfirm(
-                    () => window.switchView('view-dashboard'),
-                    getActiveLevelExitProgressHtml()
-                );
+                showExitCurrentLevelConfirm(() => window.switchView('view-dashboard'));
             };
 
             window.confirmExitUnfinishedScoringView = function() {
@@ -1306,7 +1114,7 @@
                 showExitCurrentLevelConfirm(() => {
                     saveUnfinishedGroupProgress();
                     window.switchView('view-dashboard');
-                }, getUnfinishedLearningExitProgressHtml());
+                });
             };
 
             window.switchView = function(viewId) {
@@ -1387,6 +1195,67 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 _tempUnknowns: [],
                 wordOffset: 0 
             };
+
+            var UNFINISHED_TASK_RECORDS_KEY = 'douxue18UnfinishedTaskRecordsV1';
+
+            function ensureUnfinishedTaskStats(task) {
+                if (!task) return task;
+                var total = Math.max(0, Number(task.count) || 0);
+                var known = Number.isFinite(Number(task.knownCount))
+                    ? Number(task.knownCount)
+                    : Math.max(0, Number(task.current) || 0);
+                task.knownCount = Math.min(total, known);
+                task.unknownCount = Math.max(0, total - task.knownCount);
+                task.current = task.knownCount;
+                return task;
+            }
+
+            function readUnfinishedTaskRecords() {
+                try {
+                    var raw = localStorage.getItem(UNFINISHED_TASK_RECORDS_KEY);
+                    return raw ? JSON.parse(raw) : {};
+                } catch (error) {
+                    return {};
+                }
+            }
+
+            function persistUnfinishedTaskRecords() {
+                try {
+                    var records = {};
+                    (state.unfinishedTasks || []).forEach(task => {
+                        ensureUnfinishedTaskStats(task);
+                        records[task.id] = {
+                            current: task.current,
+                            knownCount: task.knownCount,
+                            unknownCount: task.unknownCount,
+                            lastDone: task.lastDone || null,
+                            passCompletedLevels: Array.isArray(task.passCompletedLevels) ? task.passCompletedLevels : [],
+                            passLevelRecords: task.passLevelRecords && typeof task.passLevelRecords === 'object' ? task.passLevelRecords : {}
+                        };
+                    });
+                    localStorage.setItem(UNFINISHED_TASK_RECORDS_KEY, JSON.stringify(records));
+                } catch (error) {
+                    // file:// 与受限 WebView 中不可用时保留当前会话数据。
+                }
+            }
+
+            function restoreUnfinishedTaskRecords() {
+                var records = readUnfinishedTaskRecords();
+                (state.unfinishedTasks || []).forEach(task => {
+                    var saved = records[task.id];
+                    if (saved) {
+                        task.current = Number(saved.current) || 0;
+                        task.knownCount = Number(saved.knownCount);
+                        task.unknownCount = Number(saved.unknownCount);
+                        task.lastDone = saved.lastDone || null;
+                        task.passCompletedLevels = Array.isArray(saved.passCompletedLevels) ? saved.passCompletedLevels : [];
+                        task.passLevelRecords = saved.passLevelRecords && typeof saved.passLevelRecords === 'object' ? saved.passLevelRecords : {};
+                    }
+                    ensureUnfinishedTaskStats(task);
+                });
+            }
+
+            restoreUnfinishedTaskRecords();
 
             function initData(count = 10) {
                 testWords = [];
@@ -1708,33 +1577,29 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                                             <th class="w-[50px] py-3 text-center border-b border-r border-gray-200">序号</th>
                                             <th class="py-3 pl-4 border-b border-r border-gray-200 truncate">任务名称</th>
                                             <th class="w-[60px] py-3 text-center border-b border-r border-gray-200">词数</th>
-                                            <th class="w-[80px] py-3 text-center border-b border-r border-gray-200">进度</th>
-                                            <th class="w-[142px] py-3 text-center border-b border-gray-200">操作</th>
+                                            <th class="w-[66px] py-3 text-center border-b border-r border-gray-200">认识</th>
+                                            <th class="w-[72px] py-3 text-center border-b border-r border-gray-200">不认识</th>
+                                            <th class="w-[112px] py-3 text-center border-b border-gray-200">操作</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                         `;
-                        var sortedUnfinishedTasks = getSortedUnfinishedTasks();
-                        sortedUnfinishedTasks.forEach((task, index) => {
-                            var isDoneToday = task.lastDone === today;
-                            var taskTotalCount = getUnfinishedPassTotalWordCount(task);
+                        unfinishedTasks.forEach((task, index) => {
+                            ensureUnfinishedTaskStats(task);
                             var numStr = (index + 1).toString().padStart(2, '0');
                             var rowClick = `onclick="window.enterUnfinishedScoringView(${task.id})"`;
-                            var trClass = 'hover:bg-blue-50/30 transition-colors cursor-pointer group';
-                            var titleColor = 'text-gray-700 group-hover:text-blue-700';
-                            var progressColor = isDoneToday ? 'text-emerald-500' : 'text-gray-800';
-                            var displayProgress = isDoneToday ? taskTotalCount : Math.min(task.current || 0, taskTotalCount);
+                            var trClass = 'hover:bg-blue-50/30 transition-colors cursor-pointer';
+                            var titleColor = 'text-gray-700';
                             var passBtnHtml = `<button class="w-10 h-10 rounded-full bg-orange-50 text-orange-600 border border-orange-200 hover:bg-orange-500 hover:text-white hover:border-orange-500 flex items-center justify-center font-extrabold text-[15px] transition-all shadow-sm active:scale-95" onclick="event.stopPropagation(); window.startUnfinishedPassing(${task.id})" title="${task.title} 过词" aria-label="${task.title} 过词">过</button>`;
-                            var btnHtml = isDoneToday
-                                ? `<button class="w-10 h-10 rounded-full bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 hover:border-green-300 flex items-center justify-center transition-all shadow-sm active:scale-95" onclick="event.stopPropagation(); window.enterUnfinishedScoringView(${task.id})" title="重新学习" aria-label="${task.title} 已完成，重新学习"><i class="ph-bold ph-check text-[15px] pointer-events-none"></i></button>`
-                                : `<button class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 group-hover:bg-blue-500 group-hover:text-white flex items-center justify-center font-extrabold text-[15px] transition-all shadow-sm active:scale-95" onclick="event.stopPropagation(); window.enterUnfinishedScoringView(${task.id})" title="进入任务" aria-label="${task.title} 学">学</button>`;
+                            var btnHtml = `<button class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-500 hover:text-white flex items-center justify-center font-extrabold text-[15px] transition-all shadow-sm active:scale-95" onclick="event.stopPropagation(); window.enterUnfinishedScoringView(${task.id})" title="进入任务" aria-label="${task.title} 学">学</button>`;
 
                             tableHtml += `
-                                <tr data-unfinished-task-id="${task.id}" class="${trClass}" ${rowClick}>
+                                <tr class="${trClass}" ${rowClick}>
                                     <td class="py-3 text-center border-b border-r border-gray-200 text-[13px] font-mono font-bold text-gray-400">${numStr}</td>
                                     <td class="py-3 pl-4 border-b border-r border-gray-200 text-[14px] font-bold ${titleColor} truncate transition-colors" title="${task.title}">${task.title}</td>
-                                    <td class="py-3 text-center border-b border-r border-gray-200 text-[13px] font-mono font-medium text-gray-500">${taskTotalCount}</td>
-                                    <td class="py-3 text-center border-b border-r border-gray-200 text-[14px] font-mono font-black ${progressColor}">${displayProgress}/${taskTotalCount}</td>
+                                    <td class="py-3 text-center border-b border-r border-gray-200 text-[13px] font-mono font-medium text-gray-500">${task.count}</td>
+                                    <td class="py-3 text-center border-b border-r border-gray-200 text-[14px] font-mono font-black text-emerald-600">${task.knownCount}</td>
+                                    <td class="py-3 text-center border-b border-r border-gray-200 text-[14px] font-mono font-black ${task.unknownCount > 0 ? 'text-red-500' : 'text-gray-300'}">${task.unknownCount}</td>
                                     <td class="py-2.5 text-center border-b border-gray-200">
                                         <div class="flex items-center justify-center gap-2">${passBtnHtml}${btnHtml}</div>
                                     </td>
@@ -1835,8 +1700,6 @@ if(viewId === 'view-dashboard') renderDashboardUI();
             var passingLevelActionTouchAt = 0;
             var unfinishedPassSessionLockedLevels = new Set();
             var passingToastTimer = null;
-            var unfinishedPassStartTaskId = null;
-            var unfinishedPassStartOrderIndex = -1;
 
             function getActiveUnfinishedPassTask(taskId) {
                 var tasks = state.unfinishedTasks || [];
@@ -1850,163 +1713,6 @@ if(viewId === 'view-dashboard') renderDashboardUI();
 
             function getUnfinishedPassWordCount(task) {
                 return Math.max(4, Math.min(10, task && task.count ? task.count : 10));
-            }
-
-            function getUnfinishedPassLevelCount() {
-                return 10;
-            }
-
-            function getUnfinishedPassTotalWordCount(task) {
-                return getUnfinishedPassLevelCount() * getUnfinishedPassWordCount(task);
-            }
-
-            function getUnfinishedTaskProgressRatio(task) {
-                var total = getUnfinishedPassTotalWordCount(task);
-                if (total <= 0) return 0;
-                if (task && (task.lastDone === getTodayDateString() || (task.current || 0) >= total)) return 1;
-                return Math.min(total, Math.max(0, task && task.current ? task.current : 0)) / total;
-            }
-
-            function getSortedUnfinishedTasks() {
-                return (state.unfinishedTasks || [])
-                    .map((task, originalIndex) => ({
-                        task: task,
-                        originalIndex: originalIndex,
-                        ratio: getUnfinishedTaskProgressRatio(task)
-                    }))
-                    .sort((a, b) => {
-                        var aCompleted = a.ratio >= 1 ? 1 : 0;
-                        var bCompleted = b.ratio >= 1 ? 1 : 0;
-                        return aCompleted - bCompleted
-                            || b.ratio - a.ratio
-                            || a.originalIndex - b.originalIndex;
-                    })
-                    .map(item => item.task);
-            }
-
-            function getUnfinishedTaskOrderIndex(taskId) {
-                return getSortedUnfinishedTasks().findIndex(task => task.id === taskId);
-            }
-
-            function isUnfinishedTaskCompleted(task) {
-                return !!task && (
-                    task.lastDone === getTodayDateString()
-                    || (task.current || 0) >= getUnfinishedPassTotalWordCount(task)
-                );
-            }
-
-            function getUnfinishedRelearnPromptHtml() {
-                return `
-                    <div class="mt-1 flex w-full flex-col items-center text-center">
-                        <div class="text-[16px] font-extrabold text-gray-900">重新学习前需先过词</div>
-                        <div class="mt-2 text-[14px] font-medium leading-6 text-gray-500">
-                            请在过词中至少选择一个<br>
-                            <span class="font-extrabold text-orange-600">「不认识」</span>的单词，才可再次进入学习。
-                        </div>
-                    </div>
-                `;
-            }
-
-            function getUnfinishedFirstPassPromptHtml() {
-                return `
-                    <div class="mt-1 flex w-full flex-col items-center text-center">
-                        <div class="text-[16px] font-extrabold text-gray-900">学习前需先过词</div>
-                        <div class="mt-2 text-[14px] font-medium leading-6 text-gray-500">
-                            请先完成本任务的过词，<br>
-                            再进入跟读、音记和听写学习。
-                        </div>
-                    </div>
-                `;
-            }
-
-            function addUnfinishedRelearnUnknownWords(task, words) {
-                if (!task) return;
-                if (!Array.isArray(task.relearnSessionUnknownWords)) task.relearnSessionUnknownWords = [];
-                (words || []).forEach(word => {
-                    if (!word || !word.word) return;
-                    if (task.relearnSessionUnknownWords.some(item => item.word === word.word)) return;
-                    task.relearnSessionUnknownWords.push({
-                        word: word.word,
-                        phonetic: word.phonetic,
-                        meaning: word.meaning,
-                        type: word.type || 'new'
-                    });
-                });
-            }
-
-            function getUnfinishedRelearnPassingResult(task) {
-                var unknownWords = task && Array.isArray(task.relearnSessionUnknownWords)
-                    ? task.relearnSessionUnknownWords.slice()
-                    : [];
-                var totalCount = getUnfinishedPassTotalWordCount(task);
-                return {
-                    unknownWords: unknownWords,
-                    unknownCount: unknownWords.length,
-                    totalCount: totalCount,
-                    nextProgress: Math.max(0, totalCount - unknownWords.length)
-                };
-            }
-
-            function getUnfinishedRelearnExitPromptHtml(task) {
-                var result = getUnfinishedRelearnPassingResult(task);
-                var resultHtml = result.unknownCount > 0
-                    ? `不认识 <span class="font-extrabold text-orange-600">${result.unknownCount}</span> 个，任务进度 <span class="font-extrabold font-mono text-[#1F5FFF]">${result.nextProgress}/${result.totalCount}</span>。`
-                    : `未选不认识，任务进度 <span class="font-extrabold font-mono text-emerald-600">${result.totalCount}/${result.totalCount}</span>。`;
-                return getExitCurrentLevelPromptHtml(resultHtml);
-            }
-
-            function focusUnfinishedTaskRow(taskId) {
-                var container = document.getElementById('unfinishedTaskContainer');
-                if (!container || taskId == null) return;
-                var row = container.querySelector(`[data-unfinished-task-id="${taskId}"]`);
-                if (!row) return;
-                var targetTop = Math.max(0, row.offsetTop - ((container.clientHeight - row.offsetHeight) / 2));
-                if (typeof container.scrollTo === 'function') {
-                    container.scrollTo({ top: targetTop, behavior: 'smooth' });
-                } else {
-                    container.scrollTop = targetTop;
-                }
-                window.setTimeout(() => {
-                    row.classList.remove('task-focus-flash');
-                    void row.offsetWidth;
-                    row.classList.add('task-focus-flash');
-                    window.setTimeout(() => row.classList.remove('task-focus-flash'), 1200);
-                }, 280);
-            }
-
-            function finishUnfinishedRelearnPassing(task) {
-                if (!task) {
-                    window.switchView('view-dashboard');
-                    return;
-                }
-                var result = getUnfinishedRelearnPassingResult(task);
-                var unknownWords = result.unknownWords;
-                var unknownCount = result.unknownCount;
-                var totalCount = result.totalCount;
-                task.awaitingRelearnPass = false;
-                delete task.relearnSessionUnknownWords;
-                delete task.relearnSessionSubmittedLevels;
-                delete task.passProgressBase;
-                delete task.passProgressKnownByLevel;
-                if (unknownCount > 0) {
-                    task.current = Math.max(0, totalCount - unknownCount);
-                    task.lastDone = null;
-                    task.relearnWords = unknownWords;
-                    clearUnfinishedTaskProgress(task);
-                    unfinishedLevelGroups = [];
-                } else {
-                    task.current = totalCount;
-                    task.lastDone = getTodayDateString();
-                }
-                renderDashboardUI();
-                var newOrderIndex = getUnfinishedTaskOrderIndex(task.id);
-                var orderChanged = unfinishedPassStartTaskId === task.id
-                    && unfinishedPassStartOrderIndex >= 0
-                    && newOrderIndex !== unfinishedPassStartOrderIndex;
-                window.switchView('view-dashboard');
-                if (orderChanged) {
-                    window.setTimeout(() => focusUnfinishedTaskRow(task.id), 60);
-                }
             }
 
             function getUnfinishedPassCompletedLevels(task) {
@@ -2086,27 +1792,9 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 return true;
             }
 
-            function updateUnfinishedTaskProgressFromPassing(task, levelId, knownCount) {
-                if (!task) return;
-                var total = getUnfinishedPassTotalWordCount(task);
-                if (!Number.isFinite(task.passProgressBase)) {
-                    task.passProgressBase = Math.min(total, Math.max(0, Number(task.current) || 0));
-                }
-                if (!task.passProgressKnownByLevel || typeof task.passProgressKnownByLevel !== 'object') {
-                    task.passProgressKnownByLevel = {};
-                }
-                task.passProgressKnownByLevel[levelId] = Math.max(0, Number(knownCount) || 0);
-                var submittedKnownCount = Object.keys(task.passProgressKnownByLevel).reduce((sum, key) => {
-                    return sum + Math.max(0, Number(task.passProgressKnownByLevel[key]) || 0);
-                }, 0);
-                task.current = Math.min(total, task.passProgressBase + submittedKnownCount);
-                task.lastDone = task.current >= total ? getTodayDateString() : null;
-                renderDashboardUI();
-            }
-
             function initUnfinishedPassData(task, level) {
                 var selectedTask = task || getActiveUnfinishedPassTask();
-                var levelId = Math.max(1, Math.min(getUnfinishedPassLevelCount(), level || state.currentPassingLevel || 1));
+                var levelId = Math.max(1, Math.min(10, level || state.currentPassingLevel || 1));
                 var taskSeed = selectedTask && selectedTask.id ? selectedTask.id : 100;
                 var seed = ((taskSeed - 100) * 13) + ((levelId - 1) * getUnfinishedPassWordCount(selectedTask));
                 buildPassingWordsFromSeed(seed, getUnfinishedPassWordCount(selectedTask));
@@ -2115,7 +1803,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
             function resetUnfinishedPassLevel(task, levelId) {
                 var selectedTask = task || getActiveUnfinishedPassTask();
                 if (!selectedTask) return false;
-                state.currentPassingLevel = Math.max(1, Math.min(getUnfinishedPassLevelCount(), levelId || 1));
+                state.currentPassingLevel = Math.max(1, Math.min(10, levelId || 1));
                 initUnfinishedPassData(selectedTask, state.currentPassingLevel);
                 var hasSavedRecord = restoreUnfinishedPassLevelRecord(selectedTask, state.currentPassingLevel);
                 state.currentActionType = 'unfinishedPass';
@@ -2160,7 +1848,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 if (!list) return;
                 var activeTask = getActiveUnfinishedPassTask();
                 var completedLevels = getUnfinishedPassCompletedLevels(activeTask);
-                list.innerHTML = Array.from({ length: getUnfinishedPassLevelCount() }, (_, index) => {
+                list.innerHTML = Array.from({ length: 10 }, (_, index) => {
                     var levelId = index + 1;
                     var isSelected = levelId === state.currentPassingLevel;
                     var isCompleted = completedLevels.includes(levelId);
@@ -2231,45 +1919,10 @@ if(viewId === 'view-dashboard') renderDashboardUI();
             window.exitPassingView = function() {
                 setPassingLevelPickerOpen(false);
                 if (state.currentActionType === 'unfinishedGroupGuoci') {
-                    showExitCurrentLevelConfirm(
-                        () => {
-                            unfinishedSeconds = passingSeconds;
-                            window.switchView('view-unfinished-scoring');
-                            var timerEl = document.getElementById('unfinished-scoring-timer');
-                            if (timerEl) timerEl.innerText = formatTime(unfinishedSeconds);
-                            resumeUnfinishedTimer();
-                        },
-                        getPassingExitProgressHtml()
-                    );
+                    showExitCurrentLevelConfirm(() => window.switchView('view-unfinished-scoring'));
                     return;
                 }
-                if (state.currentActionType === 'unfinishedPass') {
-                    var relearnTask = getActiveUnfinishedPassTask();
-                    if (relearnTask && relearnTask.awaitingRelearnPass) {
-                        window.showModal(
-                            '退出提示',
-                            getUnfinishedRelearnExitPromptHtml(relearnTask),
-                            () => {
-                                stopPassingTimer();
-                                finishUnfinishedRelearnPassing(relearnTask);
-                            },
-                            true,
-                            '确认退出'
-                        );
-                        return;
-                    }
-                }
-                var passingTask = state.currentActionType === 'unfinishedPass' ? getActiveUnfinishedPassTask() : null;
-                var shouldFocusAfterExit = passingTask
-                    && unfinishedPassStartTaskId === passingTask.id
-                    && unfinishedPassStartOrderIndex >= 0
-                    && getUnfinishedTaskOrderIndex(passingTask.id) !== unfinishedPassStartOrderIndex;
-                showExitCurrentLevelConfirm(() => {
-                    window.switchView('view-dashboard');
-                    if (shouldFocusAfterExit) {
-                        window.setTimeout(() => focusUnfinishedTaskRow(passingTask.id), 60);
-                    }
-                }, getPassingExitProgressHtml());
+                showExitCurrentLevelConfirm(() => window.switchView('view-dashboard'));
             };
 
             window.startUnfinishedPassing = function(taskId) {
@@ -2279,8 +1932,6 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                     return;
                 }
                 unfinishedPassSessionLockedLevels = new Set();
-                unfinishedPassStartTaskId = task.id;
-                unfinishedPassStartOrderIndex = getUnfinishedTaskOrderIndex(task.id);
                 state.currentPassingLevel = state.currentPassingLevel || 1;
                 resetUnfinishedPassLevel(task, state.currentPassingLevel);
                 window.switchView('view-passing');
@@ -2306,7 +1957,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 updatePassingStats();
                 window.setPassFilter('all');
                 window.switchView('view-passing');
-                startPassingTimer(learningSeconds);
+                startPassingTimer();
             };
 
             window.startPassing = function(typeKey, typeName, taskId = null, wordCount = 10) {
@@ -2483,12 +2134,12 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                     var hasSavedRecord = !!getUnfinishedPassLevelRecord(activeUnfinishedTask, state.currentPassingLevel || 1);
                     var isLocked = isCurrentUnfinishedPassLevelLocked();
                     var allLevelsCompleted = activeUnfinishedTask
-                        && getUnfinishedPassCompletedLevels(activeUnfinishedTask).length >= getUnfinishedPassLevelCount();
+                        && getUnfinishedPassCompletedLevels(activeUnfinishedTask).length >= 10;
                     if (isLocked) {
-                        submitBtn.innerText = allLevelsCompleted && state.currentPassingLevel === getUnfinishedPassLevelCount()
+                        submitBtn.innerText = allLevelsCompleted && state.currentPassingLevel === 10
                             ? '全部关卡都已提交'
                             : '已提交';
-                        submitBtn.className = `${allLevelsCompleted && state.currentPassingLevel === getUnfinishedPassLevelCount() ? 'min-w-[240px] px-6' : 'px-10'} bg-green-50 text-green-600 border border-green-200 font-bold py-3 text-[15px] rounded-[14px] transition-all cursor-pointer active:scale-95 whitespace-nowrap shrink-0`;
+                        submitBtn.className = `${allLevelsCompleted && state.currentPassingLevel === 10 ? 'min-w-[240px] px-6' : 'px-10'} bg-green-50 text-green-600 border border-green-200 font-bold py-3 text-[15px] rounded-[14px] transition-all cursor-pointer active:scale-95 whitespace-nowrap shrink-0`;
                         submitBtn.disabled = false;
                         return;
                     }
@@ -2551,33 +2202,29 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                     return;
                 }
 
+                if (state.currentActionType === 'unfinishedPass') {
+                    var unfinishedTask = (state.unfinishedTasks || []).find(t => t.id === state.currentTaskId);
+                    var submittedLevel = state.currentPassingLevel || 1;
+                    saveUnfinishedPassLevelRecord(unfinishedTask, submittedLevel);
+                    unfinishedPassSessionLockedLevels.add(submittedLevel);
+                    var isFirstCompletion = markUnfinishedPassLevelCompleted(unfinishedTask, submittedLevel);
+                    if (unfinishedTask && isFirstCompletion) {
+                        ensureUnfinishedTaskStats(unfinishedTask);
+                        var newlyKnown = state.passingStats ? Math.max(0, Number(state.passingStats.known) || 0) : 0;
+                        unfinishedTask.knownCount = Math.min(unfinishedTask.count, unfinishedTask.knownCount + newlyKnown);
+                        unfinishedTask.unknownCount = Math.max(0, unfinishedTask.count - unfinishedTask.knownCount);
+                        unfinishedTask.current = unfinishedTask.knownCount;
+                        if (unfinishedTask.knownCount >= unfinishedTask.count) unfinishedTask.lastDone = getTodayDateString();
+                    }
+                    persistUnfinishedTaskRecords();
+                }
+                
                 if (state.currentActionType === 'unfinishedGroupGuoci') {
                     var group = getUnfinishedGroup(unfinishedSelectedLevel, unfinishedSelectedGroup);
-                    if (group) {
-                        unfinishedMode = 'guoci';
-                        unfinishedModeRound.guoci = unfinishedModeTargets.guoci;
-                        group.mode = 'guoci';
-                        group.modeRound = Object.assign({ gendu: 0, yinji: 0, tingxie: 0, guoci: 0 }, unfinishedModeRound);
-                        group.completed = true;
-                    }
+                    if (group) group.completed = true;
                     saveUnfinishedGroupProgress();
-                    
-                    if (unfinishedActiveTask) {
-                        var newlyKnown = state.passingStats ? state.passingStats.known : 0;
-                        if (newlyKnown > 0) {
-                            var unfinishedTaskTotal = getUnfinishedPassTotalWordCount(unfinishedActiveTask);
-                            unfinishedActiveTask.current = Math.min(unfinishedTaskTotal, (unfinishedActiveTask.current || 0) + newlyKnown);
-                            if (unfinishedActiveTask.current >= unfinishedTaskTotal) unfinishedActiveTask.lastDone = getTodayDateString();
-                            renderDashboardUI();
-                        }
-                    }
-
                     window.showModal('过词完成', '<div class="mt-1 font-medium text-gray-600">本组所有学习任务已达标！</div>', () => {
-                        unfinishedSeconds = passingSeconds;
                         window.switchView('view-unfinished-scoring');
-                        var timerEl = document.getElementById('unfinished-scoring-timer');
-                        if (timerEl) timerEl.innerText = formatTime(unfinishedSeconds);
-                        resumeUnfinishedTimer();
                         renderUnfinishedLevelPicker();
                         renderUnfinishedScoringPage();
                     });
@@ -2585,27 +2232,8 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 }
 
                 if (state.currentActionType === 'unfinishedPass') {
-                    var unfinishedTask = (state.unfinishedTasks || []).find(t => t.id === state.currentTaskId);
-                    var submittedLevel = state.currentPassingLevel || 1;
-                    saveUnfinishedPassLevelRecord(unfinishedTask, submittedLevel);
-                    unfinishedPassSessionLockedLevels.add(submittedLevel);
-                    var isFirstCompletion = markUnfinishedPassLevelCompleted(unfinishedTask, submittedLevel);
-                    if (unfinishedTask && unfinishedTask.awaitingRelearnPass) {
-                        addUnfinishedRelearnUnknownWords(unfinishedTask, state._tempUnknowns);
-                        if (!Array.isArray(unfinishedTask.relearnSessionSubmittedLevels)) unfinishedTask.relearnSessionSubmittedLevels = [];
-                        if (!unfinishedTask.relearnSessionSubmittedLevels.includes(submittedLevel)) {
-                            unfinishedTask.relearnSessionSubmittedLevels.push(submittedLevel);
-                        }
-                    }
-                    if (unfinishedTask && !unfinishedTask.awaitingRelearnPass) {
-                        var newlyKnown = state.passingStats ? state.passingStats.known : 0;
-                        updateUnfinishedTaskProgressFromPassing(unfinishedTask, submittedLevel, newlyKnown);
-                    }
-                }
-
-                if (state.currentActionType === 'unfinishedPass') {
-                    if (submittedLevel >= getUnfinishedPassLevelCount()) {
-                        if (resetUnfinishedPassLevel(unfinishedTask || getActiveUnfinishedPassTask(), getUnfinishedPassLevelCount())) {
+                    if (submittedLevel >= 10) {
+                        if (resetUnfinishedPassLevel(unfinishedTask || getActiveUnfinishedPassTask(), 10)) {
                             window.switchView('view-passing');
                             stopPassingTimer();
                             setPassingLevelPickerOpen(false);
@@ -2645,29 +2273,59 @@ if(viewId === 'view-dashboard') renderDashboardUI();
             var unfinishedSelectedGroup = 1;
             var unfinishedExpandedLevel = 1;
             var unfinishedActiveTask = null;
-            var UNFINISHED_LEARNING_PROGRESS_KEY = 'douxueUnfinishedLearningProgressV2';
-            var unfinishedLearningProgressStore = readUnfinishedLearningProgressStore();
+            var UNFINISHED_LEARNING_RECORDS_KEY = 'douxue18UnfinishedLearningRecordsV1';
 
-            function readUnfinishedLearningProgressStore() {
+            function readUnfinishedLearningRecords() {
                 try {
-                    var saved = localStorage.getItem(UNFINISHED_LEARNING_PROGRESS_KEY);
-                    var parsed = saved ? JSON.parse(saved) : {};
-                    return parsed && typeof parsed === 'object' ? parsed : {};
+                    var raw = localStorage.getItem(UNFINISHED_LEARNING_RECORDS_KEY);
+                    return raw ? JSON.parse(raw) : {};
                 } catch (error) {
                     return {};
                 }
             }
 
-            function writeUnfinishedLearningProgressStore() {
+            function persistUnfinishedLearningProgress() {
+                if (!unfinishedActiveTask || !unfinishedLevelGroups.length) return;
                 try {
-                    localStorage.setItem(UNFINISHED_LEARNING_PROGRESS_KEY, JSON.stringify(unfinishedLearningProgressStore));
+                    var records = readUnfinishedLearningRecords();
+                    records[unfinishedActiveTask.id] = {
+                        selectedLevel: unfinishedSelectedLevel,
+                        selectedGroup: unfinishedSelectedGroup,
+                        expandedLevel: unfinishedExpandedLevel,
+                        levelGroups: unfinishedLevelGroups,
+                        updatedAt: Date.now()
+                    };
+                    localStorage.setItem(UNFINISHED_LEARNING_RECORDS_KEY, JSON.stringify(records));
                 } catch (error) {
-                    // Safari 隐私模式等场景下仍保留当前页面内的进度。
+                    // 无法使用持久化存储时仍保留当前页面会话。
                 }
             }
 
-            function getUnfinishedTaskProgressKey(task) {
-                return task && task.id != null ? String(task.id) : '';
+            function restoreUnfinishedLearningProgress(task) {
+                var records = readUnfinishedLearningRecords();
+                var saved = task ? records[task.id] : null;
+                unfinishedLevelGroups = saved && Array.isArray(saved.levelGroups) ? saved.levelGroups : [];
+                unfinishedSelectedLevel = Math.min(10, Math.max(1, Number(saved && saved.selectedLevel) || 1));
+                unfinishedSelectedGroup = Math.min(4, Math.max(1, Number(saved && saved.selectedGroup) || 1));
+                unfinishedExpandedLevel = Math.min(10, Math.max(1, Number(saved && saved.expandedLevel) || unfinishedSelectedLevel));
+                initUnfinishedLevelGroups();
+                for (var levelId = 1; levelId <= 10; levelId++) {
+                    if (!unfinishedLevelGroups.some(item => item.id === levelId)) {
+                        unfinishedLevelGroups.push({ id: levelId, groups: [] });
+                    }
+                }
+                unfinishedLevelGroups.sort((a, b) => a.id - b.id);
+                unfinishedLevelGroups.forEach(level => {
+                    if (!Array.isArray(level.groups)) level.groups = [];
+                    for (var groupId = 1; groupId <= 4; groupId++) {
+                        var group = level.groups.find(item => item.id === groupId);
+                        if (!group) {
+                            group = createUnfinishedGroupState(groupId);
+                            level.groups.push(group);
+                        }
+                        ensureUnfinishedGroupState(group);
+                    }
+                });
             }
 
             function createUnfinishedGroupState(groupId) {
@@ -2693,77 +2351,15 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 return group;
             }
 
-            function createUnfinishedLevelGroups() {
-                var levels = [];
+            function initUnfinishedLevelGroups() {
+                if (unfinishedLevelGroups.length) return;
                 for (var level = 1; level <= 10; level++) {
                     var groups = [];
                     for (var group = 1; group <= 4; group++) {
                         groups.push(createUnfinishedGroupState(group));
                     }
-                    levels.push({ id: level, groups: groups });
+                    unfinishedLevelGroups.push({ id: level, groups: groups });
                 }
-                return levels;
-            }
-
-            function normalizeUnfinishedLevelGroups(savedLevels) {
-                var levels = createUnfinishedLevelGroups();
-                if (!Array.isArray(savedLevels)) return levels;
-                levels.forEach(level => {
-                    var savedLevel = savedLevels.find(item => Number(item && item.id) === level.id);
-                    if (!savedLevel || !Array.isArray(savedLevel.groups)) return;
-                    level.groups.forEach(group => {
-                        var savedGroup = savedLevel.groups.find(item => Number(item && item.id) === group.id);
-                        if (!savedGroup) return;
-                        group.completed = !!savedGroup.completed;
-                        group.photoUploaded = !!savedGroup.photoUploaded;
-                        group.mode = ['gendu', 'yinji', 'tingxie', 'guoci'].includes(savedGroup.mode) ? savedGroup.mode : 'gendu';
-                        group.currentIdx = Number.isFinite(Number(savedGroup.currentIdx)) ? Math.max(0, Number(savedGroup.currentIdx)) : 0;
-                        group.modeRound = Object.assign({ gendu: 0, yinji: 0, tingxie: 0, guoci: 0 }, savedGroup.modeRound || {});
-                        group.scores = Array.isArray(savedGroup.scores) ? savedGroup.scores.slice() : null;
-                    });
-                });
-                return levels;
-            }
-
-            function initUnfinishedLevelGroups() {
-                if (unfinishedLevelGroups.length) return;
-                unfinishedLevelGroups = createUnfinishedLevelGroups();
-            }
-
-            function persistUnfinishedTaskProgress() {
-                var taskKey = getUnfinishedTaskProgressKey(unfinishedActiveTask);
-                if (!taskKey || !unfinishedLevelGroups.length) return;
-                unfinishedLearningProgressStore[taskKey] = {
-                    selectedLevel: unfinishedSelectedLevel,
-                    selectedGroup: unfinishedSelectedGroup,
-                    expandedLevel: unfinishedExpandedLevel,
-                    learningWords: Array.isArray(unfinishedActiveTask.relearnWords)
-                        ? unfinishedActiveTask.relearnWords
-                        : null,
-                    levelGroups: unfinishedLevelGroups,
-                    updatedAt: Date.now()
-                };
-                writeUnfinishedLearningProgressStore();
-            }
-
-            function restoreUnfinishedTaskProgress(task) {
-                unfinishedLearningProgressStore = readUnfinishedLearningProgressStore();
-                var taskKey = getUnfinishedTaskProgressKey(task);
-                var saved = taskKey ? unfinishedLearningProgressStore[taskKey] : null;
-                if (saved && Array.isArray(saved.learningWords) && saved.learningWords.length) {
-                    task.relearnWords = saved.learningWords.slice();
-                }
-                unfinishedLevelGroups = normalizeUnfinishedLevelGroups(saved && saved.levelGroups);
-                unfinishedSelectedLevel = Math.min(10, Math.max(1, Number(saved && saved.selectedLevel) || 1));
-                unfinishedSelectedGroup = Math.min(4, Math.max(1, Number(saved && saved.selectedGroup) || 1));
-                unfinishedExpandedLevel = Math.min(10, Math.max(1, Number(saved && saved.expandedLevel) || unfinishedSelectedLevel));
-            }
-
-            function clearUnfinishedTaskProgress(task) {
-                var taskKey = getUnfinishedTaskProgressKey(task);
-                if (!taskKey) return;
-                delete unfinishedLearningProgressStore[taskKey];
-                writeUnfinishedLearningProgressStore();
             }
 
             function getUnfinishedGroup(levelId, groupId) {
@@ -2777,9 +2373,9 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 if (!group || !unfinishedScoringData.length) return;
                 group.mode = unfinishedMode;
                 group.currentIdx = unfinishedCurrentIdx;
-                group.modeRound = Object.assign({ gendu: 0, yinji: 0, tingxie: 0, guoci: 0 }, unfinishedModeRound);
+                group.modeRound = Object.assign({ gendu: 0, yinji: 0, tingxie: 0 }, unfinishedModeRound);
                 group.scores = unfinishedScores.slice();
-                persistUnfinishedTaskProgress();
+                persistUnfinishedLearningProgress();
             }
 
             function loadUnfinishedGroupProgress() {
@@ -2790,7 +2386,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                     : unfinishedScoringData.map(() => null);
                 unfinishedCurrentIdx = group ? Math.max(0, Math.min(group.currentIdx || 0, unfinishedScoringData.length - 1)) : 0;
                 unfinishedMode = group ? (group.mode || 'gendu') : 'gendu';
-                unfinishedModeRound = group ? Object.assign({ gendu: 0, yinji: 0, tingxie: 0, guoci: 0 }, group.modeRound || {}) : { gendu: 0, yinji: 0, tingxie: 0, guoci: 0 };
+                unfinishedModeRound = group ? Object.assign({ gendu: 0, yinji: 0, tingxie: 0 }, group.modeRound || {}) : { gendu: 0, yinji: 0, tingxie: 0 };
                 unfinishedRecording = false;
                 clearTimeout(unfinishedPlayTimer);
                 clearTimeout(unfinishedAutoTimer);
@@ -2803,7 +2399,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                     group.photoUploaded = false;
                     group.mode = 'gendu';
                     group.currentIdx = 0;
-                    group.modeRound = { gendu: 0, yinji: 0, tingxie: 0, guoci: 0 };
+                    group.modeRound = { gendu: 0, yinji: 0, tingxie: 0 };
                     group.scores = null;
                 }
                 loadUnfinishedGroupProgress();
@@ -2963,7 +2559,6 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 unfinishedSelectedGroup = nextGroup;
                 unfinishedExpandedLevel = nextLevel;
                 loadUnfinishedGroupProgress();
-                persistUnfinishedTaskProgress();
                 setUnfinishedLevelPickerOpen(false);
                 renderUnfinishedLevelPicker();
                 renderUnfinishedScoringPage();
@@ -3038,21 +2633,6 @@ if(viewId === 'view-dashboard') renderDashboardUI();
             }
 
             function buildUnfinishedScoringWords(task) {
-                if (task && Array.isArray(task.relearnWords) && task.relearnWords.length) {
-                    var selectedWords = task.relearnWords;
-                    var groupOffset = (((unfinishedSelectedLevel - 1) * 4) + (unfinishedSelectedGroup - 1)) * 4;
-                    var selectedCount = Math.min(4, selectedWords.length);
-                    var relearnWords = [];
-                    for (var selectedIndex = 0; selectedIndex < selectedCount; selectedIndex++) {
-                        var selectedWord = selectedWords[(groupOffset + selectedIndex) % selectedWords.length];
-                        relearnWords.push({
-                            en: selectedWord.word,
-                            phon: selectedWord.phonetic,
-                            cn: selectedWord.meaning
-                        });
-                    }
-                    return relearnWords;
-                }
                 var seed = ((task && task.id ? task.id : 101) - 101) + ((unfinishedSelectedLevel - 1) * 4) + (unfinishedSelectedGroup - 1);
                 var start = Math.max(0, seed % rawWordsData.length);
                 var words = [];
@@ -3146,33 +2726,71 @@ if(viewId === 'view-dashboard') renderDashboardUI();
             function renderUnfinishedScoringPage() {
                 if (!unfinishedScoringData.length) return;
 
+                // 当前组已全部完成时，显示简洁完成提示
                 var currentGroup = getUnfinishedGroup(unfinishedSelectedLevel, unfinishedSelectedGroup);
                 var focusArea = document.getElementById('unfinished-score-word-en') && document.getElementById('unfinished-score-word-en').closest('.flex-1.flex.flex-col.items-center');
                 var completionNotice = document.getElementById('unfinished-group-done-notice');
 
+                if (currentGroup && currentGroup.completed) {
+                    // 隐藏正常内容，显示完成提示
+                    var enEl = document.getElementById('unfinished-score-word-en');
+                    var phonEl = document.getElementById('unfinished-score-word-phon');
+                    var cnEl = document.getElementById('unfinished-score-word-cn');
+                    var prevBtn = document.getElementById('unfinished-prev-btn');
+                    var nextBtn = document.getElementById('unfinished-next-btn');
+                    var micArea = document.getElementById('unfinished-mic-btn');
+                    var bottomControls = document.getElementById('unfinished-bottom-controls');
+                    var micAreaWrap = document.getElementById('unfinished-mic-area');
+                    if (enEl) enEl.style.display = 'none';
+                    if (phonEl) phonEl.style.display = 'none';
+                    if (cnEl) cnEl.style.display = 'none';
+                    if (prevBtn) prevBtn.style.visibility = 'hidden';
+                    if (nextBtn) nextBtn.style.visibility = 'hidden';
+                    if (micArea) micArea.style.display = 'none';
+                    if (bottomControls) bottomControls.style.display = 'none';
+                    if (micAreaWrap) micAreaWrap.style.display = 'none';
+                    // 注入或更新完成提示
+                    var doneNotice = document.getElementById('unfinished-group-done-notice');
+                    if (!doneNotice) {
+                        doneNotice = document.createElement('div');
+                        doneNotice.id = 'unfinished-group-done-notice';
+                        var parentNode = enEl ? enEl.parentNode : null;
+                        if (parentNode) parentNode.appendChild(doneNotice);
+                    }
+                    if (doneNotice) {
+                        doneNotice.className = 'flex flex-col items-center justify-center gap-4 py-8 px-6 text-center pointer-events-auto';
+                        doneNotice.innerHTML = `
+                            <div class="flex flex-col items-center justify-center text-center mt-4">
+                                <div class="w-14 h-14 rounded-full bg-emerald-50 flex items-center justify-center mb-4">
+                                    <i class="ph-bold ph-check text-[28px] text-emerald-400"></i>
+                                </div>
+                                <h3 class="text-[18px] font-extrabold text-gray-800 mb-2">任务已完成</h3>
+                                <p class="text-[13px] text-gray-500 font-medium tracking-wide">第 <span class="font-bold text-[#1F5FFF] mx-0.5">${unfinishedSelectedLevel}</span> 关 · 第 <span class="font-bold text-[#1F5FFF] mx-0.5">${unfinishedSelectedGroup}</span> 组</p>
+                            </div>
+                        `;
+                        doneNotice.style.display = 'flex';
+                    }
+                    var submitBar = document.getElementById('unfinished-queue-submit-bar');
+                    updateUnfinishedTopNav();
+                    renderUnfinishedLevelPicker();
+                    return;
+                }
+
+                // 非完成态：恢复正常显示
                 var enEl2 = document.getElementById('unfinished-score-word-en');
                 var phonEl2 = document.getElementById('unfinished-score-word-phon');
                 var cnEl2 = document.getElementById('unfinished-score-word-cn');
                 var micArea2 = document.getElementById('unfinished-mic-btn');
                 var bottomControls2 = document.getElementById('unfinished-bottom-controls');
                 var micAreaWrap2 = document.getElementById('unfinished-mic-area');
-                var doneNoticeEl = document.getElementById('unfinished-group-done-notice');
-                var doneLabelEl = document.getElementById('unfinished-group-done-label');
-                var isGroupCompleted = !!(currentGroup && currentGroup.completed);
-                if (focusArea) focusArea.style.visibility = isGroupCompleted ? 'hidden' : 'visible';
                 if (enEl2) enEl2.style.display = '';
                 if (phonEl2) phonEl2.style.display = '';
                 if (cnEl2) cnEl2.style.display = '';
                 if (micArea2) micArea2.style.display = '';
-                if (bottomControls2) bottomControls2.style.display = isGroupCompleted ? 'none' : '';
-                if (micAreaWrap2) micAreaWrap2.style.display = isGroupCompleted ? 'none' : '';
-                if (doneNoticeEl) {
-                    doneNoticeEl.classList.toggle('hidden', !isGroupCompleted);
-                    doneNoticeEl.classList.toggle('flex', isGroupCompleted);
-                }
-                if (doneLabelEl) {
-                    doneLabelEl.innerText = `第 ${unfinishedSelectedLevel} 关 · 第 ${unfinishedSelectedGroup} 组`;
-                }
+                if (bottomControls2) bottomControls2.style.display = '';
+                if (micAreaWrap2) micAreaWrap2.style.display = '';
+                var doneNoticeEl = document.getElementById('unfinished-group-done-notice');
+                if (doneNoticeEl) doneNoticeEl.style.display = 'none';
 
                 unfinishedCurrentIdx = Math.max(0, Math.min(unfinishedCurrentIdx, unfinishedScoringData.length - 1));
                 var curr = unfinishedScoringData[unfinishedCurrentIdx];
@@ -3308,47 +2926,19 @@ if(viewId === 'view-dashboard') renderDashboardUI();
 
             window.enterUnfinishedScoringView = function(taskId) {
                 var task = (state.unfinishedTasks || []).find(item => item.id === taskId) || (state.unfinishedTasks || [])[0];
-                
-                var startNormal = function() {
-                    unfinishedActiveTask = task;
-                    restoreUnfinishedTaskProgress(task);
-                    loadUnfinishedGroupProgress();
-                    unfinishedAutoPlay = true;
-                    window.switchView('view-unfinished-scoring');
-                    startUnfinishedTimer();
-                    setUnfinishedLevelPickerOpen(false);
-                    setTimeout(() => {
-                        bindUnfinishedMicEvents();
-                        window.initCustomSpeedDropdown();
-                        renderUnfinishedLevelPicker();
-                        renderUnfinishedScoringPage();
-                    }, 50);
-                };
-
-                if ((Number(task && task.current) || 0) <= 0) {
-                    window.showModal('学习提示', getUnfinishedFirstPassPromptHtml(), () => {
-                        state.currentPassingLevel = 1;
-                        window.startUnfinishedPassing(task.id);
-                    }, true, '进入过词');
-                    return;
-                }
-
-                if (isUnfinishedTaskCompleted(task)) {
-                    window.showModal('重新学习提示', getUnfinishedRelearnPromptHtml(), () => {
-                        task.awaitingRelearnPass = true;
-                        task.relearnSessionUnknownWords = [];
-                        task.relearnSessionSubmittedLevels = [];
-                        task.passLevelRecords = {};
-                        task.passCompletedLevels = [];
-                        delete task.passProgressBase;
-                        delete task.passProgressKnownByLevel;
-                        state.currentPassingLevel = 1;
-                        window.startUnfinishedPassing(task.id);
-                    }, true, '进入过词');
-                    return;
-                }
-                
-                startNormal();
+                unfinishedActiveTask = task;
+                restoreUnfinishedLearningProgress(task);
+                loadUnfinishedGroupProgress();
+                unfinishedAutoPlay = true;
+                window.switchView('view-unfinished-scoring');
+                startUnfinishedTimer();
+                setUnfinishedLevelPickerOpen(false);
+                setTimeout(() => {
+                    bindUnfinishedMicEvents();
+                    window.initCustomSpeedDropdown();
+                    renderUnfinishedLevelPicker();
+                    renderUnfinishedScoringPage();
+                }, 50);
             };
 
             window.toggleUnfinishedLevelPicker = function(event) {
@@ -3373,7 +2963,6 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 if (event) event.stopPropagation();
                 if (event && event.type === 'click' && Date.now() - unfinishedLevelActionTouchAt < 450) return;
                 unfinishedExpandedLevel = levelId;
-                persistUnfinishedTaskProgress();
                 renderUnfinishedLevelPicker();
             };
 
@@ -3395,7 +2984,6 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 unfinishedSelectedGroup = groupId;
                 unfinishedExpandedLevel = levelId;
                 loadUnfinishedGroupProgress();
-                persistUnfinishedTaskProgress();
                 renderUnfinishedLevelPicker();
                 setUnfinishedLevelPickerOpen(false);
                 renderUnfinishedScoringPage();
@@ -3600,8 +3188,6 @@ if(viewId === 'view-dashboard') renderDashboardUI();
             function enterGradingView(source) {
                 gradingSource = source || 'scoring';
                 window.switchView('view-grading');
-                if (gradingSource === 'unfinished') resumeUnfinishedTimer();
-                else resumeLearningTimer();
                 gradingMarked.clear();
                 gradingScore = scoringData.length;
                 document.getElementById('final-score-total').innerText = scoringData.length;
@@ -3612,16 +3198,11 @@ if(viewId === 'view-dashboard') renderDashboardUI();
             window.returnFromGrading = function() {
                 if (gradingSource === 'unfinished') {
                     window.switchView('view-unfinished-scoring');
-                    var timerEl = document.getElementById('unfinished-scoring-timer');
-                    if (timerEl) timerEl.innerText = formatTime(unfinishedSeconds);
-                    resumeUnfinishedTimer();
+                    startUnfinishedTimer();
                     renderUnfinishedScoringPage();
                     return;
                 }
                 window.switchView('view-scoring');
-                var learningTimerEl = document.getElementById('scoring-timer');
-                if (learningTimerEl) learningTimerEl.innerText = formatTime(learningSeconds);
-                resumeLearningTimer();
             };
 
             function renderGradingList() {
@@ -3686,6 +3267,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                     if (source === 'unfinished') {
                         gradingSource = 'scoring';
                         window.switchView('view-passing');
+                        startUnfinishedTimer();
                         
                         unfinishedMode = 'guoci';
                         resetUnfinishedRoundProgress();
@@ -3705,7 +3287,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                         renderWordList();
                         updatePassingStats();
                         window.setPassFilter('all');
-                        startPassingTimer(unfinishedSeconds);
+                        startPassingTimer();
                         return;
                     }
                     
