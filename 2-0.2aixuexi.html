@@ -172,12 +172,17 @@
             gap: 8px;
             align-items: center;
         }
-        #translate-input {
+        .translate-input-shell {
+            position: relative;
             flex: 1;
+            min-width: 0;
+        }
+        #translate-input {
+            width: 100%;
             height: 44px;
             border-radius: 14px;
             border: 1.5px solid #e2e8f0;
-            padding: 0 14px;
+            padding: 0 44px 0 14px;
             font-size: 15px;
             font-weight: 600;
             color: #1e293b;
@@ -186,6 +191,27 @@
             transition: border-color 0.2s, box-shadow 0.2s;
             font-family: Inter, system-ui, sans-serif;
         }
+        #translate-clear-btn {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            border: none;
+            background: transparent;
+            color: #94a3b8;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 15px;
+            transition: background 0.15s, color 0.15s, transform 0.1s;
+            transform: translateY(-50%);
+        }
+        #translate-clear-btn.is-visible { display: flex; }
+        #translate-clear-btn:hover { background: #e2e8f0; color: #475569; }
+        #translate-clear-btn:active { transform: translateY(-50%) scale(0.9); }
         #translate-input:focus {
             border-color: #93c5fd;
             box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
@@ -1138,7 +1164,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
             // ====== 核心数据与状态 ======
             var dataStore = {
                 stats: { 
-                    totalPlanned: 3000, totalLearned: 1730, unlearnedNew: 1270, unlearnedOld: 30, todayLearned: 120,
+                    totalPlanned: 3000, totalLearned: 1730, unlearnedNew: 1270, unlearnedOld: 30, todayLearned: 120, todayOld: 0,
                     totalPool: 5000, totalTarget: 3000, known: 1280, read: 1200, memo: 1100, dict: 1050, 
                     unknown: 450, unknownNew: 420, unlearned: 1270
                 }
@@ -1644,7 +1670,10 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                                 <i class="ph-fill ph-lock-key text-[10px] mr-1"></i>
                                 <span class="text-[10px] font-bold tracking-wide">请先完成专属关卡</span>
                             </div>
-                            <div class="absolute top-2.5 right-2.5 bg-white/20 backdrop-blur-md text-white text-[11px] font-bold px-2 py-0.5 rounded-[6px] border border-white/20 transition-opacity z-20">旧词 <span id="badgeUnlearnedOld">${dataStore.stats.unlearnedOld}</span></div>
+                            <div class="absolute top-2.5 right-2.5 flex flex-col items-end gap-1 z-20">
+                                <div class="bg-white/20 backdrop-blur-md text-white text-[10px] font-bold px-2 py-0.5 rounded-[6px] border border-white/20 transition-opacity leading-tight">可过旧词 <span id="badgeUnlearnedOld" class="font-mono text-[11px]">${dataStore.stats.unlearnedOld}</span></div>
+                                <div class="bg-white/15 backdrop-blur-md text-white/90 text-[10px] font-bold px-2 py-0.5 rounded-[6px] border border-white/15 transition-opacity leading-tight">今过旧词 <span id="badgeTodayOld" class="font-mono text-[11px]">${dataStore.stats.todayOld || 0}</span></div>
+                            </div>
                             <i class="ph-bold ph-arrows-clockwise text-white/90 text-[28px] mb-1 relative z-0"></i>
                             <h3 class="font-bold text-[15px] text-white/90 relative z-0 tracking-wide mt-0.5">过旧词</h3>`; 
                     }
@@ -1680,7 +1709,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                     document.getElementById('hubStepsContainer').innerHTML = stepsHtml;
                 } else {
                     if(btnNew) { btnNew.className = "bg-gradient-to-r from-[#508BFF] to-[#3B66FF] rounded-[16px] shadow-sm flex flex-col items-center justify-center text-center active:scale-95 transition-all relative group overflow-hidden h-full w-full cursor-pointer"; btnNew.innerHTML = `<div class="absolute top-2.5 right-2.5 bg-white/20 backdrop-blur-md text-white text-[11px] font-bold px-2 py-0.5 rounded-[6px] border border-white/20 transition-opacity">新词 <span id="badgeUnlearnedNew">${dataStore.stats.unlearnedNew}</span></div><i class="ph-bold ph-rocket text-white text-[24px] mb-1 group-hover:-translate-y-1 transition-transform duration-300 relative z-0"></i><h3 class="font-bold text-[14px] text-white relative z-0 tracking-wide mt-0.5">过新词</h3>`; }
-                    if(btnOld) { btnOld.className = "bg-gradient-to-r from-[#44D99B] to-[#12A772] rounded-[16px] shadow-sm flex flex-col items-center justify-center text-center active:scale-95 transition-all relative group overflow-hidden h-full w-full cursor-pointer"; btnOld.innerHTML = `<div class="absolute top-2.5 right-2.5 bg-white/20 backdrop-blur-md text-white text-[11px] font-bold px-2 py-0.5 rounded-[6px] border border-white/20 transition-opacity">旧词 <span id="badgeUnlearnedOld">${dataStore.stats.unlearnedOld}</span></div><i class="ph-bold ph-arrows-clockwise text-white text-[24px] mb-1 group-hover:-rotate-90 transition-transform duration-300 relative z-0"></i><h3 class="font-bold text-[14px] text-white relative z-0 tracking-wide mt-0.5">过旧词</h3>`; }
+                    if(btnOld) { btnOld.className = "bg-gradient-to-r from-[#44D99B] to-[#12A772] rounded-[16px] shadow-sm flex flex-col items-center justify-center text-center active:scale-95 transition-all relative group overflow-hidden h-full w-full cursor-pointer"; btnOld.innerHTML = `<div class="absolute top-2.5 right-2.5 flex flex-col items-end gap-1"><div class="bg-white/20 backdrop-blur-md text-white text-[10px] font-bold px-2 py-0.5 rounded-[6px] border border-white/20 transition-opacity leading-tight">可过旧词 <span id="badgeUnlearnedOld" class="font-mono text-[11px]">${dataStore.stats.unlearnedOld}</span></div><div class="bg-white/15 backdrop-blur-md text-white/90 text-[10px] font-bold px-2 py-0.5 rounded-[6px] border border-white/15 transition-opacity leading-tight">今过旧词 <span id="badgeTodayOld" class="font-mono text-[11px]">${dataStore.stats.todayOld || 0}</span></div></div><i class="ph-bold ph-arrows-clockwise text-white text-[24px] mb-1 group-hover:-rotate-90 transition-transform duration-300 relative z-0"></i><h3 class="font-bold text-[14px] text-white relative z-0 tracking-wide mt-0.5">过旧词</h3>`; }
                     if (hubIdle) {
                         hubIdle.innerHTML = `
                             <button onclick="window.generateManualByType('new')" class="w-full h-full flex flex-col items-center justify-center text-center rounded-[16px] transition-all font-bold text-[14px] shadow-sm border relative overflow-hidden ${hubNewCount === 0 ? 'bg-gray-50 text-gray-400 cursor-not-allowed opacity-70 border-gray-100' : 'bg-gradient-to-r from-blue-50 to-white text-blue-600 hover:bg-blue-100 active:scale-95 border-blue-100'}">
@@ -2168,6 +2197,10 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 if (state.currentActionType === 'new') {
                     dataStore.stats.unlearnedNew = Math.max(0, dataStore.stats.unlearnedNew - TOTAL_WORDS);
                     dataStore.stats.unlearned = dataStore.stats.unlearnedNew; 
+                }
+                if (state.currentActionType === 'old') {
+                    dataStore.stats.unlearnedOld = Math.max(0, dataStore.stats.unlearnedOld - TOTAL_WORDS);
+                    dataStore.stats.todayOld = (dataStore.stats.todayOld || 0) + TOTAL_WORDS;
                 }
 
                 if (state._tempUnknowns.length > 0 && state.currentActionType !== 'unfinishedPass') {
@@ -4046,7 +4079,10 @@ if(viewId === 'view-dashboard') renderDashboardUI();
             <button class="panel-close" id="translate-panel-close" aria-label="关闭"><i class="ph-bold ph-x"></i></button>
         </div>
         <div id="translate-input-row">
-            <input id="translate-input" type="text" placeholder="输入英文或中文..." autocomplete="off" autocorrect="off" spellcheck="false" />
+            <div class="translate-input-shell">
+                <input id="translate-input" type="text" placeholder="输入英文或中文..." autocomplete="off" autocorrect="off" spellcheck="false" />
+                <button id="translate-clear-btn" aria-label="清空输入" type="button"><i class="ph-bold ph-x"></i></button>
+            </div>
             <button id="translate-submit-btn" aria-label="翻译"><i class="ph-bold ph-arrow-right"></i></button>
         </div>
         <div id="translate-result" class="result-empty">输入单词后点击翻译</div>
@@ -4058,6 +4094,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
         var fab = document.getElementById('fab-translate');
         var panel = document.getElementById('translate-panel');
         var input = document.getElementById('translate-input');
+        var clearBtn = document.getElementById('translate-clear-btn');
         var submitBtn = document.getElementById('translate-submit-btn');
         var resultEl = document.getElementById('translate-result');
         var closeBtn = document.getElementById('translate-panel-close');
@@ -4067,6 +4104,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
         var startTouchX = 0, startTouchY = 0;
         var fabStartX = 0, fabStartY = 0;
         var panelOpen = false;
+        var translateRequestId = 0;
 
         function getFabRect() { return fab.getBoundingClientRect(); }
 
@@ -4232,9 +4270,14 @@ if(viewId === 'view-dashboard') renderDashboardUI();
             resultEl.textContent = '输入单词后点击翻译';
         }
 
+        function syncClearButton() {
+            clearBtn.classList.toggle('is-visible', !!input.value);
+        }
+
         async function doTranslate() {
             var text = (input.value || '').trim();
             if (!text) { showPlaceholder(); return; }
+            var requestId = ++translateRequestId;
 
             var isZh = isChinese(text);
             var langpair = isZh ? 'zh-CN|en' : 'en|zh-CN';
@@ -4245,6 +4288,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                 var url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text) + '&langpair=' + langpair;
                 var resp = await fetch(url);
                 var data = await resp.json();
+                if (requestId !== translateRequestId) return;
                 if (data && data.responseData && data.responseData.translatedText) {
                     var result = data.responseData.translatedText;
                     // MyMemory 有时返回全大写，做一下处理
@@ -4256,6 +4300,7 @@ if(viewId === 'view-dashboard') renderDashboardUI();
                     showError('未找到翻译结果');
                 }
             } catch (err) {
+                if (requestId !== translateRequestId) return;
                 showError('网络错误，请检查连接');
             }
         }
@@ -4263,6 +4308,15 @@ if(viewId === 'view-dashboard') renderDashboardUI();
         submitBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             doTranslate();
+        });
+
+        clearBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            translateRequestId++;
+            input.value = '';
+            syncClearButton();
+            showPlaceholder();
+            input.focus();
         });
 
         input.addEventListener('keydown', function(e) {
@@ -4274,8 +4328,14 @@ if(viewId === 'view-dashboard') renderDashboardUI();
 
         // 输入清空时恢复占位文字
         input.addEventListener('input', function() {
-            if (!input.value.trim()) showPlaceholder();
+            syncClearButton();
+            if (!input.value.trim()) {
+                translateRequestId++;
+                showPlaceholder();
+            }
         });
+
+        syncClearButton();
 
         // 窗口大小变化时重新吸边 + 修正面板位置
         window.addEventListener('resize', function() {
