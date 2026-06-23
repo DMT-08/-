@@ -78,8 +78,8 @@
         .sub-view { position: absolute; top: 0; left: 0; right: 0; bottom: 0; max-width: 100%; padding: 0 20px 100px; display: none; flex-direction: column; overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; overscroll-behavior-y: contain; }
         .sub-view::-webkit-scrollbar { display: none; }
         .sub-view.active { display: flex; animation: fadeIn 0.3s ease; }
-        #workspace-enrollment.lead-management-page-mode .sub-tab-bar { display: none; }
-        #workspace-enrollment.lead-management-page-mode #sub-view-leads { padding-bottom: 92px; }
+        #workspace-enrollment.lead-management-page-mode .sub-tab-bar, #workspace-enrollment.lead-management-page-mode .quick-menu-wrap, #workspace-enrollment.leads-view-active .quick-menu-wrap { display: none; }
+        #workspace-enrollment.lead-management-page-mode #sub-view-leads { padding-bottom: 148px; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         .glass-card { background: var(--surface-white); backdrop-filter: blur(22px); border: 1px solid rgba(255, 255, 255, 0.92); border-radius: 26px; box-shadow: 0 14px 34px rgba(31, 95, 255, 0.08), inset 0 1px 0 rgba(255,255,255,0.7); }
@@ -186,6 +186,9 @@
         .enrollment-flow-tools .record-search-wrap { flex: 1; margin: 0; }
         .enrollment-add-btn { position: absolute; left: 50%; bottom: 76px; z-index: 88; width: auto; min-width: 144px; height: 46px; padding: 0 18px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 999px; background: var(--primary-color); color: #fff; box-shadow: 0 12px 26px rgba(31,95,255,0.26); font-family: inherit; font-size: 13px; font-weight: 950; transform: translateX(-50%); }
         .enrollment-add-btn svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; }
+        .lead-management-public-entry-btn { position: absolute; left: 50%; bottom: 24px; z-index: 280; min-width: 174px; height: 48px; padding: 0 20px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid rgba(255,255,255,0.86); border-radius: 16px; background: linear-gradient(135deg, #4B82FF 0%, var(--primary-color) 100%); color: #fff; box-shadow: 0 14px 30px rgba(31,95,255,0.26), inset 0 1px 0 rgba(255,255,255,0.26); font-family: inherit; font-size: 14px; font-weight: 950; transform: translateX(-50%); touch-action: manipulation; }
+        .lead-management-public-entry-btn:active { transform: translateX(-50%) scale(0.95); }
+        .lead-management-public-entry-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
         .enrollment-record-list { display: grid; gap: 10px; padding-right: 20px; }
         .enrollment-record-row { width: 100%; min-height: 58px; display: grid; grid-template-columns: 34px minmax(0,1fr) auto 18px; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid rgba(255,255,255,0.92); border-radius: 18px; background: rgba(255,255,255,0.79); box-shadow: 0 8px 18px rgba(31,95,255,0.05); font-family: inherit; text-align: left; color: var(--text-title); }
         .enrollment-record-row:active { transform: scale(0.97); background: rgba(255,255,255,0.94); }
@@ -255,9 +258,12 @@
         .record-form-body::-webkit-scrollbar { display: none; }
         .form-footer-fixed { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 20px 24px; background: rgba(255,255,255,0.86); border-top: 1px solid rgba(255,255,255,0.9); backdrop-filter: blur(18px); box-shadow: 0 -10px 24px rgba(31,95,255,0.08); }
         .form-note { font-size: 12px; font-weight: 700; color: var(--text-secondary); line-height: 1.45; margin: -2px 4px 12px; }
-        .selector-control { width: 100%; min-height: 48px; border-radius: 18px; border: 1px solid rgba(155,169,206,0.14); background: rgba(245,248,255,0.9); padding: 13px 40px 13px 16px; display: flex; align-items: center; color: var(--text-title); font-size: 14px; font-weight: 800; position: relative; cursor: pointer; text-align: left; font-family: inherit; }
+        .selector-control { width: 100%; min-height: 48px; border-radius: 18px; border: 1px solid rgba(155,169,206,0.14); background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(245,248,255,0.90)); padding: 13px 40px 13px 16px; display: flex; align-items: center; color: var(--text-title); font-size: 14px; font-weight: 800; position: relative; cursor: pointer; text-align: left; font-family: inherit; box-shadow: 0 7px 18px rgba(31,95,255,0.055), inset 0 1px 0 rgba(255,255,255,0.86); transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, transform 0.18s ease; }
         .selector-control.placeholder { color: #94A3B8; font-weight: 700; }
         .selector-control::after { content: ''; position: absolute; right: 16px; top: 50%; width: 8px; height: 8px; border-right: 2px solid #94A3B8; border-bottom: 2px solid #94A3B8; transform: translateY(-65%) rotate(45deg); }
+        .selector-control:focus, .selector-control:focus-visible { border-color: rgba(31,95,255,0.34); background: #fff; box-shadow: 0 0 0 3px rgba(31,95,255,0.08), 0 8px 18px rgba(31,95,255,0.06); outline: none; }
+        .selector-control:focus::after, .selector-control:focus-visible::after { border-color: var(--primary-color); }
+        .selector-control:active { transform: scale(0.98); background: #fff; }
         .selector-control.locked::after { display: none; }
         .selector-control.locked { color: var(--text-secondary); background: rgba(241,245,249,0.78); cursor: default; }
         .datetime-control { width: 100%; min-height: 48px; border-radius: 18px; border: 1px solid rgba(155,169,206,0.14); background: rgba(245,248,255,0.9); padding: 13px 42px 13px 16px; display:flex; align-items:center; justify-content:space-between; gap:10px; color:var(--text-title); font-size:14px; font-weight:800; text-align:left; font-family:inherit; position:relative; cursor:pointer; transition:0.2s; }
@@ -304,9 +310,10 @@
         .picker-search input { width: 100%; height: 42px; border-radius: 14px; border: 1px solid rgba(155,169,206,0.14); background: rgba(245,248,255,0.9); padding: 0 14px; font-size: 14px; font-weight: 700; color: var(--text-title); outline: none; font-family: inherit; }
         .picker-list { display: grid; gap: 8px; overflow-y: auto; max-height: 52vh; padding: 2px 2px 4px; scrollbar-width: none; }
         .picker-list::-webkit-scrollbar { display: none; }
-        .picker-item { width: 100%; border: none; border-radius: 16px; background: rgba(245,248,255,0.9); padding: 12px 14px; text-align: left; font-family: inherit; cursor: pointer; }
+        .picker-item { width: 100%; border: 1px solid rgba(255,255,255,0.84); border-radius: 16px; background: rgba(245,248,255,0.9); padding: 12px 42px 12px 14px; text-align: left; font-family: inherit; cursor: pointer; position: relative; box-shadow: inset 0 1px 0 rgba(255,255,255,0.72); }
         .picker-item:active { transform: scale(0.98); background: rgba(31,95,255,0.1); }
-        .picker-item.selected { background: rgba(31,95,255,0.10); box-shadow: inset 0 0 0 1px rgba(31,95,255,0.18); }
+        .picker-item.selected { background: rgba(31,95,255,0.10); border-color: rgba(31,95,255,0.20); box-shadow: inset 0 0 0 1px rgba(31,95,255,0.16), 0 8px 18px rgba(31,95,255,0.06); }
+        .picker-item.selected::after { content: ''; position: absolute; right: 16px; top: 50%; width: 14px; height: 8px; border-left: 2.5px solid var(--primary-color); border-bottom: 2.5px solid var(--primary-color); transform: translateY(-70%) rotate(-45deg); border-radius: 1px; }
         .picker-item.selected .picker-item-title { color: var(--primary-color); }
         .picker-item-title { font-size: 14px; font-weight: 900; color: var(--text-title); }
         .picker-item-sub { font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-top: 3px; line-height: 1.35; }
@@ -385,19 +392,24 @@
         .form-label { font-size: 13px; font-weight: 800; color: var(--text-title); margin-bottom: 8px; display: block; }
         .form-label.required::after { content: '*'; color: var(--danger-color); margin-left: 4px; }
         .form-control { width: 100%; padding: 14px 16px; border-radius: 18px; border: 1px solid rgba(155,169,206,0.14); background: rgba(245,248,255,0.9); font-size: 14px; color: var(--text-title); outline: none; transition: 0.2s; font-family: inherit;}
-        .form-control:focus, .clearable-host.is-field-focused > .form-control { border-color: var(--primary-color); background: #fff; box-shadow: 0 0 0 3px var(--primary-light); }
+        .form-control:focus, .clearable-host.is-field-focused > .form-control, .clearable-host:focus-within > .form-control { border-color: var(--primary-color); background: #fff; box-shadow: 0 0 0 3px var(--primary-light); }
         .form-control:invalid:focus { border-color: var(--danger-color); box-shadow: 0 0 0 3px var(--danger-light); }
         .clearable-host { position: relative; }
         .clearable-host > input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([readonly]), .clearable-host > textarea:not([readonly]) { padding-right: 42px !important; }
+        .clearable-host.no-clear > input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([readonly]), .clearable-host.no-clear > textarea:not([readonly]) { padding-right: 16px !important; }
         .amount-stepper-control.clearable-host > input { padding-right: 82px !important; }
         .school-combobox.clearable-host > input { padding-right: 76px !important; }
-        .field-clear-btn { position: absolute; z-index: 6; right: 10px; top: 50%; width: 24px; height: 24px; padding: 0; transform: translateY(-50%); border: 0; border-radius: 9px; background: rgba(100,116,139,0.12); color: #64748B; display: none; align-items: center; justify-content: center; font-family: inherit; touch-action: manipulation; }
-        .field-clear-btn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-        .clearable-host.has-value > .field-clear-btn { display: flex; }
-        .clearable-host textarea + .field-clear-btn { top: 11px; transform: none; }
+        .field-clear-btn { position: absolute; z-index: 6; right: 10px; top: 50%; width: 26px; height: 26px; padding: 0; transform: translateY(-50%) scale(0.92); border: 1px solid rgba(148,163,184,0.18); border-radius: 999px; background: rgba(255,255,255,0.82); color: #64748B; display: flex; align-items: center; justify-content: center; font-family: inherit; touch-action: manipulation; opacity: 0; visibility: hidden; pointer-events: none; box-shadow: 0 6px 12px rgba(31,95,255,0.06); transition: opacity 0.16s ease, transform 0.16s ease, background 0.16s ease, color 0.16s ease; }
+        .field-clear-btn svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2.7; stroke-linecap: round; stroke-linejoin: round; }
+        .clearable-host.has-value.is-field-focused:not(.no-clear) > .field-clear-btn, .clearable-host.has-value:focus-within:not(.no-clear) > .field-clear-btn { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(-50%) scale(1); }
+        .clearable-host.no-clear > .field-clear-btn { display: none !important; }
+        .form-group.clearable-host > .field-clear-btn, .lead-edit-cell.clearable-host > .field-clear-btn, .entry-form-row.clearable-host > .field-clear-btn { top: 37px; transform: scale(0.92); }
+        .form-group.clearable-host.has-value.is-field-focused:not(.no-clear) > .field-clear-btn, .form-group.clearable-host.has-value:focus-within:not(.no-clear) > .field-clear-btn, .lead-edit-cell.clearable-host.has-value.is-field-focused:not(.no-clear) > .field-clear-btn, .lead-edit-cell.clearable-host.has-value:focus-within:not(.no-clear) > .field-clear-btn, .entry-form-row.clearable-host.has-value.is-field-focused:not(.no-clear) > .field-clear-btn, .entry-form-row.clearable-host.has-value:focus-within:not(.no-clear) > .field-clear-btn { transform: scale(1); }
+        .clearable-host textarea + .field-clear-btn { top: 37px; }
         .amount-stepper-control .field-clear-btn { right: 46px; }
         .school-combobox .field-clear-btn { right: 42px; }
-        .field-clear-btn:active { transform: translateY(-50%) scale(0.92); background: rgba(31,95,255,0.14); color: var(--primary-color); }
+        .field-clear-btn:active { transform: translateY(-50%) scale(0.88); background: rgba(31,95,255,0.14); color: var(--primary-color); }
+        .form-group.clearable-host > .field-clear-btn:active, .lead-edit-cell.clearable-host > .field-clear-btn:active, .entry-form-row.clearable-host > .field-clear-btn:active { transform: scale(0.88); }
         .clearable-host textarea + .field-clear-btn:active { transform: scale(0.92); }
         .amount-stepper-control { position: relative; }
         .amount-stepper-control .form-control { padding-right: 54px; }
@@ -429,6 +441,18 @@
                 linear-gradient(135deg, #fff, #F7FAFF);
         }
         select.form-control option, select.entry-inline-input option, select.semester-select option, select.my-lead-filter-btn option { background: #fff; color: var(--text-title); font-weight: 700; }
+        .styled-select-host { position: relative; display: block; width: 100%; min-width: 0; cursor: pointer; }
+        .styled-select-host > select { position: absolute !important; inset: 0 !important; width: 1px !important; height: 1px !important; min-height: 0 !important; opacity: 0 !important; z-index: -1 !important; pointer-events: none !important; margin: 0 !important; }
+        .select-visual-control { min-height: 48px; width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 16px; border-radius: 18px; border: 1px solid rgba(155,169,206,0.14); background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(245,248,255,0.90)); color: var(--text-title); font-size: 14px; font-weight: 800; box-shadow: 0 7px 18px rgba(31,95,255,0.055), inset 0 1px 0 rgba(255,255,255,0.86); transition: 0.18s ease; pointer-events: none; }
+        .select-visual-label { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .select-visual-arrow { width: 8px; height: 8px; flex: 0 0 8px; color: #94A3B8; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-3px) rotate(45deg); }
+        .select-visual-arrow svg { display: none; }
+        .styled-select-host:focus .select-visual-control, .styled-select-host:focus-visible .select-visual-control, .styled-select-host:focus-within .select-visual-control, .styled-select-host.open .select-visual-control { border-color: rgba(31,95,255,0.34); background: #fff; box-shadow: 0 0 0 3px rgba(31,95,255,0.08), 0 8px 18px rgba(31,95,255,0.06); }
+        .styled-select-host:focus .select-visual-arrow, .styled-select-host:focus-visible .select-visual-arrow, .styled-select-host:focus-within .select-visual-arrow, .styled-select-host.open .select-visual-arrow { color: var(--primary-color); }
+        .styled-select-host:active .select-visual-control { transform: scale(0.98); }
+        .styled-select-host.entry-inline-select .select-visual-control { min-height: 38px; padding: 0 12px; border-radius: 13px; font-size: 13px; }
+        .styled-select-host.semester-select-host .select-visual-control { min-height: 36px; padding: 0 20px 0 0; border: 0; background: transparent; box-shadow: none; color: var(--primary-color); }
+        .styled-select-host.filter-select-host .select-visual-control { min-height: 42px; padding: 0 12px; border-radius: 13px; color: var(--primary-color); font-size: 12px; justify-content: center; }
         textarea.form-control { resize: none; height: 100px; }
         .form-section { padding: 14px; margin-bottom: 14px; border-radius: 20px; background: rgba(245,248,255,0.72); border: 1px solid rgba(255,255,255,0.9); }
         .form-section-title { font-size: 14px; font-weight: 900; color: var(--primary-color); margin-bottom: 12px; }
@@ -675,7 +699,13 @@
         .assign-teacher-option.other-option.selected .assign-teacher-check { background: #0EA5E9; }
         .assign-list-locked .assign-teacher-option:not(.selected) .assign-select-control { background: rgba(241,245,249,0.76); border-color: rgba(148,163,184,0.18); color: #64748B; }
         .assign-confirm-btn { background: linear-gradient(135deg, #4B82FF 0%, var(--primary-color) 100%) !important; box-shadow: 0 8px 18px rgba(31,95,255,0.22) !important; }
+        .entry-action-form { min-height: 100%; display: flex; flex-direction: column; }
+        .entry-action-spacer { flex: 1 1 auto; min-height: 16px; }
+        .entry-fixed-actions { position: sticky; bottom: -28px; z-index: 260; margin: 14px -20px -28px; padding: 12px 20px 24px; background: rgba(255,255,255,0.92); border-top: 1px solid rgba(255,255,255,0.96); box-shadow: 0 -12px 28px rgba(31,95,255,0.11); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
         .offline-submit-actions { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 10px; margin-top: 14px; }
+        .offline-submit-actions.entry-fixed-actions { margin-top: 0; }
+        .offline-submit-actions.single { grid-template-columns: 1fr; }
+        .offline-submit-actions .submit-btn, .offline-submit-actions .offline-public-btn, .offline-submit-actions .offline-assign-btn { min-height: 50px; }
         .offline-public-btn { height: 46px; border: 1px solid rgba(31,95,255,0.18); border-radius: 13px; background: rgba(31,95,255,0.09); color: var(--primary-color); font-family: inherit; font-size: 13px; font-weight: 900; }
         .offline-assign-btn { height: 46px; border: 0; border-radius: 13px; background: var(--primary-color); color: #fff; font-family: inherit; font-size: 13px; font-weight: 900; box-shadow: 0 8px 18px rgba(31,95,255,0.22); }
         .materials-panel { padding: 4px; }
@@ -788,7 +818,7 @@
         .lead-detail-gender { min-height: 22px; padding: 2px 7px; border-radius: 8px; background: rgba(100,116,139,0.10); color: #64748B; font-size: 10px; font-weight: 900; line-height: 18px; white-space: nowrap; }
         .lead-detail-gender.known { background: rgba(31,95,255,0.09); color: var(--primary-color); }
         .detail-bottom-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; position: sticky; bottom: 0; padding: 12px 0 4px; background: linear-gradient(180deg, rgba(239,246,255,0), rgba(239,246,255,0.96) 28%, rgba(223,231,255,0.96)); backdrop-filter: blur(10px); }
-        .my-lead-detail-page > .detail-bottom-actions { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; bottom: 20px; z-index: 50; margin-top: auto; padding: 12px; border-radius: 18px; background: rgba(255,255,255,0.90); border: 1px solid rgba(255,255,255,0.94); box-shadow: 0 10px 28px rgba(31,95,255,0.13), inset 0 1px 0 rgba(255,255,255,1); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+        .my-lead-detail-page > .detail-bottom-actions { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; bottom: 20px; z-index: 260; margin-top: auto; padding: 12px; border-radius: 18px; background: rgba(255,255,255,0.90); border: 1px solid rgba(255,255,255,0.94); box-shadow: 0 10px 28px rgba(31,95,255,0.13), inset 0 1px 0 rgba(255,255,255,1); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
         .my-lead-action-btn { min-width: 0; min-height: 46px; padding: 0 6px; border-radius: 13px; font-family: inherit; font-size: 14px; font-weight: 900; letter-spacing: 0; cursor: pointer; touch-action: manipulation; transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease; }
         .my-lead-action-btn:active { transform: scale(0.95); }
         .my-lead-action-primary { border: 1px solid var(--primary-color); background: var(--primary-color); color: #fff; box-shadow: 0 7px 16px rgba(31,95,255,0.24); }
@@ -804,6 +834,8 @@
         .lead-edit-control.compact-follow { margin-top: 8px; min-height: 36px; background: rgba(255,255,255,0.86); }
         textarea.lead-edit-control { min-height: 72px; padding: 9px; line-height: 1.45; resize: none; }
         button.lead-edit-control { text-align: left; }
+        button.lead-edit-control.selector-control { min-height: 34px; border-radius: 10px; padding: 0 28px 0 9px; font-size: 12px; box-shadow: none; background: rgba(255,255,255,0.72); }
+        button.lead-edit-control.selector-control::after { right: 11px; width: 7px; height: 7px; border-width: 2px; }
         .entry-form-row { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 10px; align-items: center; padding: 11px 0; border-bottom: 1px dashed rgba(31,95,255,0.12); }
         .entry-form-row:last-child { border-bottom: none; }
         .entry-form-row label { color: var(--text-title); font-size: 13px; font-weight: 900; }
@@ -926,7 +958,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 </button>
                 <div class="quick-dropdown" id="quick-dropdown">
-                    <button class="quick-menu-item" onclick="quickAction('lead')"><span class="quick-menu-icon"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="3"></rect><path d="M9 4.5V3h6v1.5"></path><path d="M9 10h6M9 14h3"></path><path d="M16.5 14.5v5M14 17h5"></path></svg></span>线下登记线索</button>
+                    <button class="quick-menu-item" onclick="quickAction('lead')"><span class="quick-menu-icon" id="quick-dropdown-lead-icon"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="3"></rect><path d="M9 4.5V3h6v1.5"></path><path d="M9 10h6M9 14h3"></path><path d="M16.5 14.5v5M14 17h5"></path></svg></span><span id="quick-dropdown-lead-label">线下登记线索</span></button>
                     <button class="quick-menu-item" onclick="quickAction('scan')"><span class="quick-menu-icon"><svg viewBox="0 0 24 24"><path d="M4 7V4h3"></path><path d="M17 4h3v3"></path><path d="M20 17v3h-3"></path><path d="M7 20H4v-3"></path><path d="M7 12h10"></path></svg></span>扫码</button>
                 </div>
             </div>
@@ -961,6 +993,7 @@
                     </div>
                 </div>
                 <div id="leads-list-container"></div>
+                <button type="button" class="lead-management-public-entry-btn" onclick="openOfflineLeadFormFromWorkspace()" aria-label="添加公海线索"><svg viewBox="0 0 24 24"><path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5z"></path><path d="M8.5 10.5h7"></path><path d="M8.5 14h7"></path></svg>添加公海线索</button>
             </div>
 
             <div id="sub-view-follow" class="sub-view">
@@ -1231,8 +1264,8 @@
         <div class="sheet-title">快速操作</div>
         <div class="sheet-grid">
             <div class="grid-item" onclick="openOfflineLeadFormFromWorkspace()">
-                <div class="grid-icon-wrap" style="background:var(--icon-bg-blue); color:var(--icon-color-blue);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="3"></rect><path d="M9 4.5V3h6v1.5"></path><path d="M9 10h6M9 14h3"></path><path d="M16.5 14.5v5M14 17h5"></path></svg></div>
-                <div class="grid-label">线下登记线索</div>
+                <div class="grid-icon-wrap" id="quick-offline-lead-icon" style="background:var(--icon-bg-blue); color:var(--icon-color-blue);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="3"></rect><path d="M9 4.5V3h6v1.5"></path><path d="M9 10h6M9 14h3"></path><path d="M16.5 14.5v5M14 17h5"></path></svg></div>
+                <div class="grid-label" id="quick-offline-lead-label">线下登记线索</div>
             </div>
             <div class="grid-item" onclick="startVisitCheckin()">
                 <div class="grid-icon-wrap" style="background:var(--icon-bg-emerald); color:var(--icon-color-emerald);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div>
@@ -1470,6 +1503,9 @@
         '入学交接': { bg: 'var(--icon-bg-orange)', color: 'var(--icon-color-orange)', icon: '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>' }
     };
 
+    const offlineLeadIcon = '<svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="3"></rect><path d="M9 4.5V3h6v1.5"></path><path d="M9 10h6M9 14h3"></path><path d="M16.5 14.5v5M14 17h5"></path></svg>';
+    const publicLeadIcon = '<svg viewBox="0 0 24 24"><path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5z"></path><path d="M8.5 10.5h7"></path><path d="M8.5 14h7"></path><path d="M12 3v18"></path></svg>';
+
     let currentDirTab = Object.keys(dirData)[0];
     let manageMode = false;
     let schoolFeatureSearchQuery = '';
@@ -1600,6 +1636,7 @@
     function openAdmissionEntryPage(label) {
         label = label === '合作学校' ? '生源学校' : label;
         currentEntryLabel = label;
+        if (label === '我的线索') currentLeadScope = 'mine';
         if (label === '网上报名') currentOnlineTab = 'students';
         document.getElementById('entry-page-title').innerText = label;
         const action = document.getElementById('entry-page-action');
@@ -1659,12 +1696,14 @@
         const container = document.getElementById('my-leads-workspace');
         if (!container) return;
         container.innerHTML = renderMyLeadsEntry();
+        enhanceInteractiveControls(container);
     }
 
     function returnToMyLeadsWorkspace() {
         const page = document.getElementById('page-admission-entry');
         page.classList.remove('active');
         page.classList.add('hidden-right');
+        currentLeadScope = 'mine';
         currentEntryLabel = '';
         currentMyLeadId = null;
         myLeadPageState = 'list';
@@ -1676,6 +1715,7 @@
         const page = document.getElementById('page-admission-entry');
         page.classList.remove('active');
         page.classList.add('hidden-right');
+        currentLeadScope = 'public';
         currentEntryLabel = '';
         currentMyLeadId = null;
         myLeadPageState = 'list';
@@ -1888,7 +1928,7 @@
 
     function updateMyLeadSearch(value) {
         myLeadSearchQuery = value || '';
-        renderMyLeadsWorkspace();
+        refreshMyLeadListOnly();
     }
 
     function openMyLeadFilterPicker(kind) {
@@ -1929,15 +1969,19 @@
     }
 
     function renderMyLeadsEntry() {
-        const leads = getFilteredMyLeads();
         const pills = '<div class="my-lead-source-rail follow-status-rail"><div class="my-lead-source-scroll">' + myLeadStatusOptions.map(opt => '<button type="button" class="pill ' + (myLeadStatusFilter === opt ? 'active' : '') + '" onclick="updateMyLeadStatus(\'' + opt + '\')">' + opt + '</button>').join('') + '</div></div>';
 
         const toolbar = '<div class="my-lead-filter-bar"><div class="my-lead-filter-row">' +
             '<div class="my-lead-search-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg><input class="my-lead-search" value="' + escapeHtml(myLeadSearchQuery) + '" placeholder="搜索姓名 / 电话" oninput="updateMyLeadSearch(this.value)"></div>' +
             '</div>' + pills + '</div>';
 
+        return toolbar + '<div id="my-leads-list-container">' + renderMyLeadListHtml() + '</div>';
+    }
+
+    function renderMyLeadListHtml() {
+        const leads = getFilteredMyLeads();
         const emptyText = '暂无匹配线索';
-        const list = !leads.length ? '<div class="entry-empty">' + emptyText + '</div>' : '<div class="my-lead-list">' + leads.map((lead, index) => {
+        return !leads.length ? '<div class="entry-empty">' + emptyText + '</div>' : '<div class="my-lead-list">' + leads.map((lead, index) => {
             const trailing = '<div class="my-lead-status">' + getLeadBusinessStatus(lead) + '</div>';
             return '<div class="my-lead-row" onclick="openMyLeadDetail(' + lead.id + ')">' +
                 '<div class="my-lead-index">' + (index + 1) + '</div>' +
@@ -1946,7 +1990,15 @@
                 '<svg class="lead-row-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
                 '</div>';
         }).join('') + '</div>';
-        return toolbar + list;
+    }
+
+    function refreshMyLeadListOnly() {
+        const container = document.getElementById('my-leads-list-container');
+        if (!container) {
+            renderMyLeadsWorkspace();
+            return;
+        }
+        container.innerHTML = renderMyLeadListHtml();
     }
 
     function openPublicLeadAssignment(leadId, evt) {
@@ -2135,30 +2187,44 @@
         pendingOfflineSchoolSubmit = false;
         pendingOfflineLeadAction = currentLeadScope === 'public' ? 'public' : 'self';
         confirmedOfflineSchoolName = '';
-        document.getElementById('entry-page-title').innerText = currentLeadScope === 'public' ? '登记到全部线索' : '登记到我的线索';
+        document.getElementById('entry-page-title').innerText = currentLeadScope === 'public' ? '添加公海线索' : '线下登记线索';
         document.getElementById('entry-page-action').innerText = '';
         document.getElementById('entry-page-action').classList.remove('plus-action');
-        document.getElementById('entry-page-content').innerHTML = renderOfflineLeadForm();
+        const content = document.getElementById('entry-page-content');
+        content.innerHTML = renderOfflineLeadForm();
+        enhanceInteractiveControls(content);
         myLeadPageState = 'add';
     }
 
     function renderOfflineLeadForm() {
-        const submitActions = currentLeadScope === 'public'
-            ? '<div class="offline-submit-actions"><button type="button" class="offline-public-btn" onclick="submitOfflineLead(false, \'public\')">暂不分配，进入公海</button><button type="button" class="offline-assign-btn" onclick="submitOfflineLead(false, \'assign\')">选择老师并分配</button></div>'
-            : '<button type="submit" class="submit-btn">登记到我的线索</button>';
-        return '<form onsubmit="event.preventDefault(); submitOfflineLead(false, \'self\');">' +
+        const isPublic = currentLeadScope === 'public';
+        const submitActions = isPublic
+            ? '<div class="offline-submit-actions entry-fixed-actions"><button type="button" class="offline-public-btn" onclick="submitOfflineLead(false, \'public\')">进入公海</button><button type="button" class="offline-assign-btn" onclick="submitOfflineLead(false, \'assign\')">选择老师并分配</button></div>'
+            : '<div class="offline-submit-actions single entry-fixed-actions"><button type="submit" class="submit-btn">登记到我的线索</button></div>';
+        const publicFields =
+            '<div class="form-group"><label class="form-label required">招生学期</label><select id="offline-lead-semester" class="form-control" required><option>2026年秋季</option><option>2026年春季</option><option>2025年秋季</option></select></div>' +
+            '<div class="form-group"><label class="form-label required">来源类型</label><select id="offline-lead-sourceType" class="form-control" required><option>线下OFFLINE</option><option>网上报名</option><option>学校推荐</option><option>活动采集</option></select></div>' +
+            '<div class="form-group"><label class="form-label">线索状态</label><select id="offline-lead-status" class="form-control"><option>新线索</option><option>待分配</option><option>已联系</option><option>无效</option></select></div>' +
+            '<div class="form-group"><label class="form-label">意向等级</label><select id="offline-lead-intentLevel" class="form-control"><option value="">请选择意向等级</option><option>高意向</option><option>中意向</option><option>低意向</option></select></div>' +
+            '<div class="form-group"><label class="form-label">生源年级</label><button type="button" class="selector-control placeholder" id="offline-selector-grade" onclick="openOfflineFieldPicker(\'grade\')">请选择生源年级</button><input type="hidden" id="offline-lead-grade" value=""></div>';
+        const personalFields =
+            '<div class="form-group"><label class="form-label">已知学校</label><button type="button" class="selector-control" onclick="toggleOfflineSchoolSuggestions(event)">请选择已有学校</button></div>';
+        return '<form class="entry-action-form" onsubmit="event.preventDefault(); submitOfflineLead(false, \'' + (isPublic ? 'public' : 'self') + '\');">' +
             '<div class="entry-form-card">' +
+            (isPublic ? publicFields : '') +
             '<div class="form-group"><label class="form-label required">线索姓名</label><input id="offline-lead-name" class="form-control" required placeholder="请输入线索姓名"></div>' +
             '<div class="form-group"><label class="form-label required">联系电话</label><input id="offline-lead-phone" class="form-control" type="tel" inputmode="tel" required placeholder="请输入联系电话"></div>' +
             '<div class="form-group"><label class="form-label">性别</label><button type="button" class="selector-control" id="offline-selector-gender" onclick="openOfflineFieldPicker(\'gender\')">未知性别</button><input type="hidden" id="offline-lead-gender" value="未知性别"></div>' +
             '<div class="form-group"><label class="form-label">关键词</label><input id="offline-lead-keyword" class="form-control" placeholder="如：护理、住宿、升学"></div>' +
+            (!isPublic ? personalFields : '') +
             '<div class="form-group"><label class="form-label">生源学校</label>' +
             '<div class="school-combobox"><input id="offline-school-input" class="form-control" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="offline-school-suggestions" placeholder="输入或选择生源学校" onfocus="showOfflineSchoolSuggestions()" oninput="handleOfflineSchoolInput(this.value)" onblur="hideOfflineSchoolSuggestions()">' +
             '<button type="button" class="school-combo-toggle" aria-label="展开学校列表" onclick="toggleOfflineSchoolSuggestions(event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="6 9 12 15 18 9"></polyline></svg></button>' +
             '<div class="school-suggestions" id="offline-school-suggestions" role="listbox"></div></div></div>' +
-            '<div class="form-group"><label class="form-label">生源班级</label><input id="offline-lead-class" class="form-control" placeholder="如：初三 2 班"></div>' +
-            '<div class="form-group"><label class="form-label">来源细节/备注</label><textarea id="offline-lead-remark" class="form-control" maxlength="500" placeholder="如：校门口咨询 / 老生推荐；补充现场沟通要点"></textarea></div>' +
-            '</div>' + submitActions + '</form>';
+            '<div class="form-group"><label class="form-label">' + (isPublic ? '生源班级' : '生源班级') + '</label><input id="offline-lead-class" class="form-control" placeholder="如：初三 2 班"></div>' +
+            '<div class="form-group"><label class="form-label">来源细节</label><input id="offline-lead-sourceDetail" class="form-control" maxlength="' + (isPublic ? '100' : '500') + '" placeholder="请输入来源细节"></div>' +
+            '<div class="form-group"><label class="form-label">备注</label><textarea id="offline-lead-remark" class="form-control" maxlength="500" placeholder="请输入备注"></textarea></div>' +
+            '</div><div class="entry-action-spacer"></div>' + submitActions + '</form>';
     }
 
     function getOfflineSchoolMatches(query) {
@@ -2319,7 +2385,9 @@
     }
 
     function submitOfflineLead(skipSchoolConfirm = false, action = null) {
-        const resolvedAction = action || pendingOfflineLeadAction || (currentLeadScope === 'public' ? 'public' : 'self');
+        const isPublicMode = currentLeadScope === 'public';
+        const requestedAction = action || pendingOfflineLeadAction || (isPublicMode ? 'public' : 'self');
+        const resolvedAction = isPublicMode ? (requestedAction === 'assign' ? 'assign' : 'public') : 'self';
         pendingOfflineLeadAction = resolvedAction;
         const name = document.getElementById('offline-lead-name').value.trim();
         const phone = document.getElementById('offline-lead-phone').value.trim();
@@ -2335,25 +2403,32 @@
         }
         if (skipSchoolConfirm && school && !schoolExists) entryData.schools.push(school);
         const nowText = formatDateTime(nowDatetimeLocal());
+        const keyword = document.getElementById('offline-lead-keyword').value.trim();
+        const sourceType = document.getElementById('offline-lead-sourceType')?.value || '线下OFFLINE';
+        const leadStatus = document.getElementById('offline-lead-status')?.value || (resolvedAction === 'self' ? '已分配' : '新线索');
+        const sourceDetail = document.getElementById('offline-lead-sourceDetail')?.value.trim() || '';
         const newLead = {
             id: Date.now(),
             name,
             phone,
             gender: document.getElementById('offline-lead-gender').value,
-            source: '线下登记',
-            sourceType: '线下OFFLINE',
+            source: resolvedAction === 'self' ? '线下登记' : '公海登记',
+            sourceType,
+            sourceDetail,
             school: school || '待补充',
             sourceClass: document.getElementById('offline-lead-class').value.trim() || '待补充',
-            major: document.getElementById('offline-lead-keyword').value.trim() || '待补充',
-            keyword: document.getElementById('offline-lead-keyword').value.trim() || '待补充',
+            grade: document.getElementById('offline-lead-grade')?.value || '',
+            major: keyword || '待补充',
+            keyword: keyword || '待补充',
             remark: document.getElementById('offline-lead-remark').value.trim().slice(0, 500),
-            semester: '2026年秋季',
-            focus: document.getElementById('offline-lead-keyword').value.trim() || '待补充',
+            semester: document.getElementById('offline-lead-semester')?.value || '2026年秋季',
+            intentLevel: document.getElementById('offline-lead-intentLevel')?.value || '',
+            focus: keyword || '待补充',
             lastFollow: '暂无',
             createdAt: nowText,
             stage: 0,
             owner: resolvedAction === 'self' ? state.currentUser : null,
-            leadStatus: resolvedAction === 'self' ? '已分配' : '未分配',
+            leadStatus: resolvedAction === 'self' ? '已分配' : leadStatus,
             isInvalid: false,
             isOverdue: false,
             followRecords: [],
@@ -2391,6 +2466,10 @@
             gender: {
                 title: '选择性别',
                 options: ['未知性别', '男', '女'].map(value => ({ value, label: value, sub: '' }))
+            },
+            grade: {
+                title: '选择生源年级',
+                options: getLeadGradeOptions().map(value => ({ value, label: value, sub: '' }))
             }
         }[field];
         if (!config) return;
@@ -2493,7 +2572,9 @@
         document.getElementById('entry-page-title').innerText = currentLeadScope === 'public' ? '线索详情' : '我的线索详情';
         document.getElementById('entry-page-action').innerText = '保存';
         document.getElementById('entry-page-action').classList.remove('plus-action');
-        document.getElementById('entry-page-content').innerHTML = renderMyLeadDetail(lead);
+        const content = document.getElementById('entry-page-content');
+        content.innerHTML = renderMyLeadDetail(lead);
+        enhanceInteractiveControls(content);
     }
 
     function displayPhone(phone) {
@@ -2613,8 +2694,6 @@
         const sourceType = lead.sourceType || '线下OFFLINE';
         const gender = lead.gender || '未知性别';
         const grade = lead.grade || '';
-        const gradeOptions = getLeadGradeOptions();
-        const isCustomGrade = !!grade && !gradeOptions.includes(grade);
         const intentLevel = lead.intentLevel || '';
         const remarkText = getLeadRemarkText(lead);
         const cell = (label, control, wide = false) => '<div class="lead-edit-cell ' + (wide ? 'wide' : '') + '"><div class="lead-edit-label">' + label + '</div>' + control + '</div>';
@@ -2627,21 +2706,21 @@
                 '</div>' +
             '</div>' +
             '<div class="section-header" style="margin-top: 0; padding: 0 4px 8px;"><div class="section-title" style="font-size:15px;">基本资料</div></div>' +
-            '<form onsubmit="event.preventDefault(); confirmLeadEditSave();">' +
+            '<form class="entry-action-form" onsubmit="event.preventDefault(); confirmLeadEditSave();">' +
             '<div class="entry-form-card" style="margin-bottom:12px;">' +
             '<div class="lead-edit-grid">' +
             cell('招生学期', '<input class="lead-edit-control is-disabled" readonly aria-readonly="true" value="' + escapeHtml(lead.semester || '2026年夏招') + '">') +
             cell('姓名', '<input id="edit-lead-name" class="lead-edit-control" required value="' + escapeHtml(lead.name || '') + '">') +
             cell('联系电话', '<input id="edit-lead-phone" class="lead-edit-control" type="tel" required value="' + escapeHtml(displayPhone(lead.phone)) + '">') +
-            cell('性别', '<button type="button" class="lead-edit-control" id="edit-lead-selector-gender" onclick="openLeadEditFieldPicker(\'gender\')">' + escapeHtml(gender) + '</button><input type="hidden" id="edit-lead-gender" value="' + escapeHtml(gender) + '">') +
+            cell('性别', '<button type="button" class="lead-edit-control selector-control" id="edit-lead-selector-gender" onclick="openLeadEditFieldPicker(\'gender\')">' + escapeHtml(gender) + '</button><input type="hidden" id="edit-lead-gender" value="' + escapeHtml(gender) + '">') +
             cell('关键词/意向专业', '<input id="edit-lead-keyword" class="lead-edit-control" value="' + escapeHtml(lead.keyword || lead.major || lead.focus || '') + '">') +
-            cell('意向等级', '<button type="button" class="lead-edit-control" id="edit-lead-selector-intentLevel" onclick="openLeadEditFieldPicker(\'intentLevel\')">' + escapeHtml(intentLevel || '请选择') + '</button><input type="hidden" id="edit-lead-intentLevel" value="' + escapeHtml(intentLevel) + '">') +
+            cell('意向等级', '<button type="button" class="lead-edit-control selector-control' + (intentLevel ? '' : ' placeholder') + '" id="edit-lead-selector-intentLevel" onclick="openLeadEditFieldPicker(\'intentLevel\')">' + escapeHtml(intentLevel || '请选择') + '</button><input type="hidden" id="edit-lead-intentLevel" value="' + escapeHtml(intentLevel) + '">') +
             cell('生源学校', '<div class="school-combobox"><input id="edit-lead-school" class="lead-edit-control" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="edit-lead-school-suggestions" value="' + escapeHtml(lead.school || '') + '" placeholder="输入或选择生源学校" onfocus="showLeadEditSchoolSuggestions()" oninput="renderLeadEditSchoolSuggestions()" onblur="hideLeadEditSchoolSuggestions()"><button type="button" class="school-combo-toggle" aria-label="展开学校列表" onclick="toggleLeadEditSchoolSuggestions(event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div class="school-suggestions" id="edit-lead-school-suggestions" role="listbox"></div></div>') +
-            cell('生源年级', '<button type="button" class="lead-edit-control" id="edit-lead-selector-grade" onclick="openLeadEditFieldPicker(\'grade\')">' + escapeHtml(isCustomGrade ? '其他' : (grade || '请选择')) + '</button><input type="hidden" id="edit-lead-grade" value="' + escapeHtml(isCustomGrade ? '其他' : grade) + '"><input id="edit-lead-grade-custom" class="lead-edit-control compact-follow" value="' + escapeHtml(isCustomGrade ? grade : '') + '" placeholder="请输入自定义年级" style="display:' + (isCustomGrade ? 'block' : 'none') + ';">') +
+            cell('生源年级', '<button type="button" class="lead-edit-control selector-control' + (grade ? '' : ' placeholder') + '" id="edit-lead-selector-grade" onclick="openLeadEditFieldPicker(\'grade\')">' + escapeHtml(grade || '请选择生源年级') + '</button><input type="hidden" id="edit-lead-grade" value="' + escapeHtml(grade) + '">') +
             cell('生源班级', '<input id="edit-lead-class" class="lead-edit-control" value="' + escapeHtml(lead.sourceClass || '') + '">') +
-            cell('来源类型', '<button type="button" class="lead-edit-control" id="edit-lead-selector-sourceType" onclick="openLeadEditFieldPicker(\'sourceType\')">' + escapeHtml(sourceType) + '</button><input type="hidden" id="edit-lead-sourceType" value="' + escapeHtml(sourceType) + '">') +
+            cell('来源类型', '<button type="button" class="lead-edit-control selector-control" id="edit-lead-selector-sourceType" onclick="openLeadEditFieldPicker(\'sourceType\')">' + escapeHtml(sourceType) + '</button><input type="hidden" id="edit-lead-sourceType" value="' + escapeHtml(sourceType) + '">') +
             cell('来源细节/备注', '<textarea id="edit-lead-remark" class="lead-edit-control" maxlength="500" placeholder="最多500字">' + escapeHtml(remarkText) + '</textarea>', true) +
-            '</div></div><div class="offline-submit-actions"><button type="button" class="submit-btn secondary" onclick="confirmLeadEditCancel()">取消</button><button type="submit" class="submit-btn">保存修改</button></div></form>' +
+            '</div></div><div class="entry-action-spacer"></div><div class="offline-submit-actions entry-fixed-actions"><button type="button" class="submit-btn secondary" onclick="confirmLeadEditCancel()">取消</button><button type="submit" class="submit-btn">保存修改</button></div></form>' +
             '</div></div>';
     }
 
@@ -2690,16 +2769,7 @@
             return;
         }
         const keyword = document.getElementById('edit-lead-keyword').value.trim();
-        const selectedGrade = document.getElementById('edit-lead-grade').value || '';
-        const customGradeInput = document.getElementById('edit-lead-grade-custom');
-        const resolvedGrade = selectedGrade === '其他'
-            ? (customGradeInput ? customGradeInput.value.trim() : '')
-            : selectedGrade;
-        if (selectedGrade === '其他' && !resolvedGrade) {
-            showToast('请填写自定义生源年级');
-            if (customGradeInput) customGradeInput.focus();
-            return;
-        }
+        const resolvedGrade = document.getElementById('edit-lead-grade').value.trim();
         lead.name = name;
         lead.phone = phone;
         lead.gender = document.getElementById('edit-lead-gender').value || '未知性别';
@@ -2855,11 +2925,13 @@
         document.getElementById('entry-page-title').innerText = '写跟进';
         myLeadPageState = 'form';
         document.getElementById('entry-page-action').innerText = '';
-        document.getElementById('entry-page-content').innerHTML =
-            '<form onsubmit="event.preventDefault(); submitMyLeadFollow();">' +
+        const content = document.getElementById('entry-page-content');
+        content.innerHTML =
+            '<form class="entry-action-form" onsubmit="event.preventDefault(); submitMyLeadFollow();">' +
             '<div class="entry-form-card"><div class="form-group"><label class="form-label required">跟进内容</label><textarea id="my-follow-content" class="form-control" required placeholder="记录本次沟通重点"></textarea></div><div class="form-group"><label class="form-label">下次动作</label><input id="my-follow-next" class="form-control" placeholder="如：继续电话跟进 / 邀约到访"></div></div>' +
-            '<div class="offline-submit-actions"><button type="button" class="submit-btn visit-confirm-btn' + (hasInvite ? '' : ' disabled') + visitDisabledClass + '" onclick="' + visitAction + '"' + visitDisabled + '>已到访</button><button type="submit" class="submit-btn">保存跟进</button></div>' +
+            '<div class="entry-action-spacer"></div><div class="offline-submit-actions entry-fixed-actions"><button type="button" class="submit-btn visit-confirm-btn' + (hasInvite ? '' : ' disabled') + visitDisabledClass + '" onclick="' + visitAction + '"' + visitDisabled + '>已到访</button><button type="submit" class="submit-btn">保存跟进</button></div>' +
             '</form>';
+        enhanceInteractiveControls(content);
     }
 
     function submitMyLeadFollow() {
@@ -3669,7 +3741,10 @@
         document.getElementById('modal-overlay').classList.add('active');
         closeQuickMenu();
         const modal = document.getElementById(modalId);
-        if (modal) modal.classList.add('active');
+        if (modal) {
+            modal.classList.add('active');
+            enhanceInteractiveControls(modal);
+        }
     }
 
     function closeAssignConflictDialog() {
@@ -3688,6 +3763,7 @@
         document.getElementById('modal-overlay').classList.remove('active');
         closeQuickMenu();
         document.querySelectorAll('.bottom-sheet, .dialog-box').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.styled-select-host.open').forEach(el => el.classList.remove('open'));
         pendingAssignConflict = null;
     }
 
@@ -3695,8 +3771,19 @@
         if (!el || !['INPUT', 'TEXTAREA'].includes(el.tagName)) return false;
         if (el.disabled || el.readOnly) return false;
         const type = (el.getAttribute('type') || 'text').toLowerCase();
-        if (['hidden', 'checkbox', 'radio', 'file', 'button', 'submit', 'reset', 'range', 'date', 'time', 'datetime-local'].includes(type)) return false;
+        if (['hidden', 'checkbox', 'radio', 'file', 'button', 'submit', 'reset', 'range', 'date', 'time', 'datetime-local', 'number'].includes(type)) return false;
         return true;
+    }
+
+    function shouldSuppressClearButton(el) {
+        if (!el) return true;
+        const type = (el.getAttribute('type') || 'text').toLowerCase();
+        const id = (el.id || '').toLowerCase();
+        const name = (el.name || '').toLowerCase();
+        const label = el.closest('.form-group, .lead-edit-cell, .entry-form-row')?.querySelector('.form-label, .lead-edit-label, label')?.textContent || '';
+        const meta = (id + ' ' + name + ' ' + label + ' ' + (el.placeholder || '')).toLowerCase();
+        if (type === 'tel' || el.inputMode === 'tel') return true;
+        return /金额|金钱|版本|人数|次数|数量|计划|实际|比例|退费|学费|费用|amount|money|version|count|number|scale|ratio|tuition|fee|refund|planned|actual|retry/.test(meta);
     }
 
     function syncClearableFieldState(el) {
@@ -3723,12 +3810,16 @@
 
     function enhanceClearableInputs(root = document) {
         const scope = root.querySelectorAll ? root : document;
-        scope.querySelectorAll('input, textarea').forEach(input => {
+        const fields = [];
+        if (scope.matches && scope.matches('input, textarea')) fields.push(scope);
+        scope.querySelectorAll('input, textarea').forEach(input => fields.push(input));
+        fields.forEach(input => {
             if (!isManualClearableField(input)) return;
             const host = input.parentElement;
             if (!host) return;
             if (!input.id) input.id = 'clearable-field-' + Math.random().toString(36).slice(2, 10);
             host.classList.add('clearable-host');
+            host.classList.toggle('no-clear', shouldSuppressClearButton(input));
             const hasClearButton = Array.from(host.children).some(child => child.classList?.contains('field-clear-btn') && child.dataset.clearTarget === input.id);
             if (!hasClearButton) {
                 const btn = document.createElement('button');
@@ -3757,23 +3848,109 @@
         });
     }
 
+    function getSelectVisualHostClass(select) {
+        if (select.classList.contains('entry-inline-input')) return 'entry-inline-select';
+        if (select.classList.contains('semester-select')) return 'semester-select-host';
+        if (select.classList.contains('my-lead-filter-btn')) return 'filter-select-host';
+        return '';
+    }
+
+    function syncStyledSelectVisual(select) {
+        const host = select?.closest('.styled-select-host');
+        const label = host?.querySelector('.select-visual-label');
+        if (!select || !label) return;
+        const selected = select.options && select.selectedIndex >= 0 ? select.options[select.selectedIndex] : null;
+        label.textContent = selected ? selected.textContent : (select.value || '请选择');
+    }
+
+    function getStyledSelectPickerTitle(select) {
+        const label = select.closest('.form-group, .entry-form-row, .lead-edit-cell')?.querySelector('.form-label, .lead-edit-label, label')?.textContent?.replace('*', '').trim();
+        return label ? '选择' + label : '请选择';
+    }
+
+    function openStyledSelectPicker(select, evt) {
+        if (evt) {
+            evt.preventDefault();
+            evt.stopPropagation();
+        }
+        if (!select || select.disabled || select.multiple) return;
+        const options = Array.from(select.options || [])
+            .filter(option => !option.disabled)
+            .map(option => ({ value: option.value, label: option.textContent || option.value, sub: '' }));
+        if (!options.length) return;
+        document.querySelectorAll('.styled-select-host.open').forEach(el => el.classList.remove('open'));
+        const host = select.closest('.styled-select-host');
+        if (host) host.classList.add('open');
+        currentPicker = {
+            field: select.id || select.name || 'nativeSelect',
+            options,
+            searchable: options.length > 8,
+            nativeSelectId: select.id || ''
+        };
+        if (!select.id) {
+            select.id = 'styled-select-' + Math.random().toString(36).slice(2, 10);
+            currentPicker.nativeSelectId = select.id;
+        }
+        document.getElementById('record-picker-title').innerText = getStyledSelectPickerTitle(select);
+        document.getElementById('record-picker-input').value = '';
+        document.getElementById('record-picker-search').style.display = currentPicker.searchable ? 'block' : 'none';
+        renderPickerOptions();
+        showModal('sheet-record-picker');
+    }
+
+    function enhanceStyledSelects(root = document) {
+        const scope = root.querySelectorAll ? root : document;
+        const selects = [];
+        if (scope.matches && scope.matches('select.form-control, select.entry-inline-input, select.semester-select, select.my-lead-filter-btn')) selects.push(scope);
+        scope.querySelectorAll('select.form-control, select.entry-inline-input, select.semester-select, select.my-lead-filter-btn').forEach(select => selects.push(select));
+        selects.forEach(select => {
+            if (select.multiple) return;
+            if (select.closest('.styled-select-host')) {
+                syncStyledSelectVisual(select);
+                return;
+            }
+            const host = document.createElement('div');
+            host.className = 'styled-select-host ' + getSelectVisualHostClass(select);
+            host.setAttribute('role', 'button');
+            host.setAttribute('tabindex', '0');
+            const visual = document.createElement('div');
+            visual.className = 'select-visual-control';
+            visual.innerHTML = '<span class="select-visual-label"></span><span class="select-visual-arrow" aria-hidden="true"></span>';
+            select.insertAdjacentElement('beforebegin', host);
+            host.appendChild(select);
+            host.appendChild(visual);
+            select.addEventListener('change', () => syncStyledSelectVisual(select));
+            host.addEventListener('click', event => openStyledSelectPicker(select, event));
+            host.addEventListener('keydown', event => {
+                if (event.key === 'Enter' || event.key === ' ') openStyledSelectPicker(select, event);
+            });
+            syncStyledSelectVisual(select);
+        });
+    }
+
+    function enhanceInteractiveControls(root = document) {
+        enhanceClearableInputs(root);
+        enhanceStyledSelects(root);
+    }
+
     let clearableEnhanceQueued = false;
-    function scheduleEnhanceClearableInputs() {
+    const pendingEnhanceRoots = new Set();
+    function scheduleEnhanceClearableInputs(root = document) {
+        if (root && root.nodeType === 1) pendingEnhanceRoots.add(root);
+        else if (root === document) pendingEnhanceRoots.add(document);
         if (clearableEnhanceQueued) return;
         clearableEnhanceQueued = true;
-        const activeField = isManualClearableField(document.activeElement) ? document.activeElement : null;
         requestAnimationFrame(() => {
             clearableEnhanceQueued = false;
-            enhanceClearableInputs(document);
-            if (activeField && document.body.contains(activeField) && document.activeElement !== activeField) {
-                activeField.focus({ preventScroll: true });
-                syncClearableFieldFocus(activeField, true);
-            }
+            const roots = pendingEnhanceRoots.size ? Array.from(pendingEnhanceRoots) : [document];
+            pendingEnhanceRoots.clear();
+            roots.forEach(rootNode => enhanceInteractiveControls(rootNode));
         });
     }
 
     function toggleQuickMenu(evt) {
         if (evt) evt.stopPropagation();
+        syncQuickLeadEntryVisual();
         const menu = document.getElementById('quick-dropdown');
         if (menu) {
             document.querySelectorAll('.quick-dropdown').forEach(el => {
@@ -4679,6 +4856,26 @@
         }
     }
 
+    function syncQuickLeadEntryVisual() {
+        const fromLeadManagement = document.getElementById('sub-view-leads')?.classList.contains('active');
+        const label = fromLeadManagement ? '添加公海线索' : '线下登记线索';
+        const icon = fromLeadManagement ? publicLeadIcon : offlineLeadIcon;
+        const color = fromLeadManagement ? 'var(--icon-color-orange)' : 'var(--icon-color-blue)';
+        const bg = fromLeadManagement ? 'var(--icon-bg-orange)' : 'var(--icon-bg-blue)';
+        const dropdownLabel = document.getElementById('quick-dropdown-lead-label');
+        const dropdownIcon = document.getElementById('quick-dropdown-lead-icon');
+        const sheetLabel = document.getElementById('quick-offline-lead-label');
+        const sheetIcon = document.getElementById('quick-offline-lead-icon');
+        if (dropdownLabel) dropdownLabel.innerText = label;
+        if (dropdownIcon) dropdownIcon.innerHTML = icon;
+        if (sheetLabel) sheetLabel.innerText = label;
+        if (sheetIcon) {
+            sheetIcon.innerHTML = icon;
+            sheetIcon.style.color = color;
+            sheetIcon.style.background = bg;
+        }
+    }
+
     function updateReservationInvalidFields(status) {
         const visible = status === '已失效';
         document.querySelectorAll('[data-condition="reservation-invalid"]').forEach(el => el.classList.toggle('hidden', !visible));
@@ -5342,9 +5539,11 @@
         if (!currentPicker) return;
         const query = (document.getElementById('record-picker-input')?.value || '').trim().toLowerCase();
         const list = currentPicker.options.filter(item => !query || [item.label, item.sub, item.value].some(v => String(v || '').toLowerCase().includes(query)));
-        const currentValue = currentPicker.offlineField
-            ? document.getElementById('offline-lead-' + currentPicker.field)?.value
-            : (currentPicker.leadEditField ? document.getElementById('edit-lead-' + currentPicker.field)?.value : (currentPicker.visitEditField ? document.getElementById('visit-edit-' + currentPicker.field)?.value : getFieldValue(currentPicker.field)));
+        const currentValue = currentPicker.nativeSelectId
+            ? document.getElementById(currentPicker.nativeSelectId)?.value
+            : (currentPicker.offlineField
+                ? document.getElementById('offline-lead-' + currentPicker.field)?.value
+                : (currentPicker.leadEditField ? document.getElementById('edit-lead-' + currentPicker.field)?.value : (currentPicker.visitEditField ? document.getElementById('visit-edit-' + currentPicker.field)?.value : getFieldValue(currentPicker.field))));
         const html = list.length ? list.map(item => '<button type="button" class="picker-item ' + (String(currentValue || '') === String(item.value) ? 'selected' : '') + '" onclick="selectPickerOption(\'' + escapeHtml(String(item.value)) + '\')"><div class="picker-item-title">' + escapeHtml(item.label) + '</div>' + (item.sub ? '<div class="picker-item-sub">' + escapeHtml(item.sub) + '</div>' : '') + '</button>').join('') : '<div class="empty-state" style="padding:20px 0;"><p>暂无匹配结果</p></div>';
         document.getElementById('record-picker-list').innerHTML = html;
     }
@@ -5353,11 +5552,25 @@
         if (!currentPicker) return;
         const item = currentPicker.options.find(opt => String(opt.value) === String(value));
         if (!item) return;
+        if (currentPicker.nativeSelectId) {
+            const select = document.getElementById(currentPicker.nativeSelectId);
+            if (select) {
+                select.value = item.value;
+                syncStyledSelectVisual(select);
+                select.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            closeAllModals();
+            currentPicker = null;
+            return;
+        }
         if (currentPicker.offlineField) {
             const hidden = document.getElementById('offline-lead-' + currentPicker.field);
             const selector = document.getElementById('offline-selector-' + currentPicker.field);
             if (hidden) hidden.value = item.value;
-            if (selector) selector.innerText = item.label;
+            if (selector) {
+                selector.innerText = item.label;
+                selector.classList.toggle('placeholder', !item.value);
+            }
             closeAllModals();
             currentPicker = null;
             return;
@@ -5366,7 +5579,10 @@
             const hidden = document.getElementById('edit-lead-' + currentPicker.field);
             const selector = document.getElementById('edit-lead-selector-' + currentPicker.field);
             if (hidden) hidden.value = item.value;
-            if (selector) selector.innerText = item.label;
+            if (selector) {
+                selector.innerText = item.label;
+                selector.classList.toggle('placeholder', !item.value);
+            }
             if (currentPicker.field === 'grade') {
                 toggleLeadEditCustomGrade(item.value === '其他');
             }
@@ -6335,8 +6551,14 @@
         renderEnrollmentFlowList();
         refreshAllModuleLists();
         renderLogs();
-        enhanceClearableInputs(document);
-        new MutationObserver(scheduleEnhanceClearableInputs).observe(document.body, { childList: true, subtree: true });
+        enhanceInteractiveControls(document);
+        new MutationObserver(mutations => {
+            mutations.forEach(mutation => {
+                mutation.addedNodes.forEach(node => {
+                    if (node.nodeType === 1) scheduleEnhanceClearableInputs(node);
+                });
+            });
+        }).observe(document.body, { childList: true, subtree: true });
     };
 
     function switchTab(tabId, el) {
@@ -6382,6 +6604,7 @@
         document.querySelectorAll('.sub-view').forEach(view => view.classList.remove('active'));
         const targetView = document.getElementById(viewId);
         if (targetView) targetView.classList.add('active');
+        document.getElementById('workspace-enrollment').classList.toggle('leads-view-active', viewId === 'sub-view-leads');
         if (viewId !== 'sub-view-leads') {
             document.getElementById('workspace-enrollment').classList.remove('lead-management-page-mode');
         }
