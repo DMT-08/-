@@ -50,6 +50,7 @@
         .page-view.hidden-left { transform: translateX(-100%); pointer-events: none; }
         .page-view.hidden-right { transform: translateX(100%); pointer-events: none; }
         .page-view.active { transform: translateX(0); pointer-events: auto; }
+        .page-view.no-transition { transition: none !important; }
 
         .nav-bar { padding: max(48px, env(safe-area-inset-top, 48px)) 20px 12px; display: grid; grid-template-columns: 60px 1fr 60px; align-items: center; position: relative; z-index: 10; flex-shrink: 0; }
         .nav-bar.main-nav { display: flex; justify-content: center; }
@@ -269,10 +270,13 @@
         .datetime-section-title { font-size:12px; font-weight:900; color:var(--text-secondary); margin:2px 0 -4px; }
         .datetime-grid { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; }
         .datetime-grid.time { grid-template-columns:repeat(2, minmax(0, 1fr)); }
-        .datetime-column { min-width:0; max-height:176px; overflow-y:auto; scrollbar-width:none; display:grid; gap:6px; padding:2px 0; overscroll-behavior:contain; position:relative; }
+        .datetime-column-shell { min-width:0; position:relative; padding-top:29px; overflow:hidden; border-radius:15px; background:rgba(248,250,252,0.66); border:1px solid rgba(155,169,206,0.1); }
+        .datetime-column-shell::before { content:''; position:absolute; left:6px; right:6px; top:calc(50% + 14px); height:36px; transform:translateY(-50%); border-radius:13px; background:rgba(31,95,255,0.1); border:1px solid rgba(31,95,255,0.2); box-shadow:0 8px 18px rgba(31,95,255,0.08); pointer-events:none; z-index:1; }
+        .datetime-column-shell::after { content:''; position:absolute; left:0; right:0; top:29px; bottom:0; pointer-events:none; background:linear-gradient(180deg, rgba(248,250,252,0.96), rgba(248,250,252,0) 28%, rgba(248,250,252,0) 72%, rgba(248,250,252,0.96)); z-index:3; }
+        .datetime-column { min-width:0; height:190px; overflow-y:auto; scrollbar-width:none; display:grid; gap:6px; padding:77px 6px; overscroll-behavior:contain; position:relative; z-index:2; scroll-snap-type:y mandatory; }
         .datetime-column::-webkit-scrollbar { display:none; }
-        .datetime-col-title { position:sticky; top:0; z-index:1; padding:7px 4px 8px; text-align:center; font-size:11px; font-weight:900; color:#64748B; background:linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.86)); backdrop-filter:blur(12px); }
-        .datetime-option { width:100%; height:34px; border:1px solid rgba(155,169,206,0.12); border-radius:12px; background:rgba(248,250,252,0.9); color:#334155; font-size:13px; font-weight:850; font-family:inherit; }
+        .datetime-col-title { position:absolute; left:0; right:0; top:0; z-index:4; padding:8px 4px 7px; text-align:center; font-size:11px; font-weight:900; color:#64748B; background:rgba(255,255,255,0.78); backdrop-filter:blur(12px); }
+        .datetime-option { width:100%; height:34px; border:1px solid transparent; border-radius:12px; background:transparent; color:#64748B; font-size:13px; font-weight:850; font-family:inherit; scroll-snap-align:center; transition:0.16s ease; }
         .datetime-option.active { background:linear-gradient(135deg, #1F5FFF, #4F7DFF); color:#fff; border-color:rgba(31,95,255,0.2); box-shadow:0 8px 16px rgba(31,95,255,0.16); }
         .datetime-picker-scroll { max-height: calc(90vh - 128px); padding-bottom: 0; }
         .datetime-actions { position: sticky; bottom: -1px; display:grid; grid-template-columns:0.72fr 1fr; gap:10px; margin-top:4px; padding-top:10px; padding-bottom:2px; background:linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.98) 34%, rgba(255,255,255,0.98)); backdrop-filter:blur(12px); z-index:3; }
@@ -310,6 +314,9 @@
         .action-sheet-btn { width: 100%; border: none; min-height: 48px; border-radius: 16px; background: rgba(245,248,255,0.9); color: var(--text-title); font-size: 14px; font-weight: 900; font-family: inherit; cursor: pointer; }
         .action-sheet-btn.danger { background: var(--danger-light); color: var(--danger-color); }
         .action-sheet-btn.warning { background: var(--warning-light); color: var(--warning-color); }
+        .action-sheet-btn.reservation-delete { background:#fff; color:var(--danger-color); border:1px solid rgba(239,68,68,0.18); }
+        .action-sheet-btn.reservation-refund { background:#fff; color:var(--primary-color); border:1px solid rgba(31,95,255,0.18); }
+        .action-sheet-btn.reservation-invalid { background:rgba(241,245,249,0.94); color:#475569; border:1px solid rgba(100,116,139,0.12); }
         .action-sheet-btn:active { transform: scale(0.98); }
         .flow-result-page { z-index: 1450 !important; overflow: hidden; background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%); }
         .flow-result-body { flex: 1; min-height: 0; overflow-y: auto; padding: 10px 20px 28px; scrollbar-width: none; }
@@ -319,7 +326,6 @@
         .admission-success-icon svg { width: 30px; height: 30px; }
         .admission-success-title { color: var(--text-title); font-size: 20px; font-weight: 950; text-align: center; }
         .admission-success-sub { margin: 6px 0 18px; color: var(--text-secondary); font-size: 12px; font-weight: 750; text-align: center; }
-        .admission-success-code { margin-bottom: 14px; padding: 11px 12px; border-radius: 13px; background: rgba(31,95,255,0.08); color: var(--primary-color); font-size: 13px; font-weight: 900; text-align: center; }
         .admission-success-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
         .reservation-next-summary { width: 100%; margin-bottom: 18px; padding: 12px; border-radius: 14px; background: rgba(31,95,255,0.07); color: var(--text-main); font-size: 13px; font-weight: 800; line-height: 1.5; text-align: left; }
 
@@ -369,6 +375,7 @@
         .dialog-btn { flex: 1; padding: 14px; font-size: 15px; font-weight: 800; border-radius: 14px; cursor: pointer; text-align: center; transition: 0.2s; border: 0; outline: none;}
         .dialog-btn.cancel { background: #F1F5F9; color: var(--text-secondary);}
         .dialog-btn.confirm { background: var(--primary-color); color: white;}
+        .dialog-btn.visit-edit-outline { background: #fff; color: var(--primary-color); border: 1px solid rgba(31,95,255,0.38); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.85); }
         .dialog-btn.visit-confirm-primary { background: linear-gradient(135deg, #4B82FF 0%, var(--primary-color) 100%); color: #fff; box-shadow: 0 10px 20px rgba(31,95,255,0.18); }
         .dialog-btn.visit-confirm-primary.disabled, .dialog-btn.visit-confirm-primary:disabled { opacity: 1; cursor: not-allowed; color: #94A3B8; background: rgba(148,163,184,0.16); box-shadow: none; }
         .bottom-sheet button, .bottom-sheet input, .bottom-sheet textarea { outline: none; -webkit-tap-highlight-color: transparent; }
@@ -378,8 +385,26 @@
         .form-label { font-size: 13px; font-weight: 800; color: var(--text-title); margin-bottom: 8px; display: block; }
         .form-label.required::after { content: '*'; color: var(--danger-color); margin-left: 4px; }
         .form-control { width: 100%; padding: 14px 16px; border-radius: 18px; border: 1px solid rgba(155,169,206,0.14); background: rgba(245,248,255,0.9); font-size: 14px; color: var(--text-title); outline: none; transition: 0.2s; font-family: inherit;}
-        .form-control:focus { border-color: var(--primary-color); background: #fff; box-shadow: 0 0 0 3px var(--primary-light); }
+        .form-control:focus, .clearable-host.is-field-focused > .form-control { border-color: var(--primary-color); background: #fff; box-shadow: 0 0 0 3px var(--primary-light); }
         .form-control:invalid:focus { border-color: var(--danger-color); box-shadow: 0 0 0 3px var(--danger-light); }
+        .clearable-host { position: relative; }
+        .clearable-host > input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([readonly]), .clearable-host > textarea:not([readonly]) { padding-right: 42px !important; }
+        .amount-stepper-control.clearable-host > input { padding-right: 82px !important; }
+        .school-combobox.clearable-host > input { padding-right: 76px !important; }
+        .field-clear-btn { position: absolute; z-index: 6; right: 10px; top: 50%; width: 24px; height: 24px; padding: 0; transform: translateY(-50%); border: 0; border-radius: 9px; background: rgba(100,116,139,0.12); color: #64748B; display: none; align-items: center; justify-content: center; font-family: inherit; touch-action: manipulation; }
+        .field-clear-btn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+        .clearable-host.has-value > .field-clear-btn { display: flex; }
+        .clearable-host textarea + .field-clear-btn { top: 11px; transform: none; }
+        .amount-stepper-control .field-clear-btn { right: 46px; }
+        .school-combobox .field-clear-btn { right: 42px; }
+        .field-clear-btn:active { transform: translateY(-50%) scale(0.92); background: rgba(31,95,255,0.14); color: var(--primary-color); }
+        .clearable-host textarea + .field-clear-btn:active { transform: scale(0.92); }
+        .amount-stepper-control { position: relative; }
+        .amount-stepper-control .form-control { padding-right: 54px; }
+        .amount-stepper-buttons { position: absolute; right: 8px; top: 50%; width: 34px; display: grid; gap: 3px; transform: translateY(-50%); }
+        .amount-stepper-btn { height: 18px; border: 1px solid rgba(31,95,255,0.12); border-radius: 8px; background: rgba(31,95,255,0.08); color: var(--primary-color); font-family: inherit; font-size: 11px; font-weight: 950; line-height: 1; }
+        .amount-stepper-btn svg { width: 12px; height: 12px; display: block; margin: 0 auto; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+        .amount-stepper-btn:active { transform: scale(0.94); background: rgba(31,95,255,0.15); }
         select.form-control, select.entry-inline-input, select.semester-select, select.my-lead-filter-btn {
             appearance: none;
             -webkit-appearance: none;
@@ -419,7 +444,7 @@
         .submit-btn { width: 100%; padding: 16px; border-radius: 20px; background: linear-gradient(135deg, #4b82ff 0%, var(--primary-color) 100%); color: white; font-size: 16px; font-weight: 800; text-align: center; cursor: pointer; transition: 0.2s; margin-top: 8px; border: none; box-shadow: 0 12px 24px rgba(31, 95, 255, 0.2);}
         .submit-btn.secondary { background: rgba(31, 95, 255, 0.09); color: var(--primary-color); border: 1px solid rgba(31, 95, 255, 0.14); box-shadow: none; }
         .submit-btn.secondary.disabled { opacity: 0.48; cursor: not-allowed; color: var(--text-muted); background: rgba(255,255,255,0.55); border-color: rgba(148,163,184,0.2); }
-        .submit-btn.visit-confirm-btn { background: linear-gradient(135deg, #4B82FF 0%, var(--primary-color) 100%); color: #fff; border: 0; box-shadow: 0 12px 24px rgba(31,95,255,0.2); }
+        .submit-btn.visit-confirm-btn { background: #fff; color: var(--primary-color); border: 1px solid rgba(31,95,255,0.38); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.85), 0 8px 18px rgba(31,95,255,0.08); }
         .submit-btn.visit-confirm-btn.disabled, .submit-btn.visit-confirm-btn:disabled { opacity: 1; cursor: not-allowed; color: #94A3B8; background: rgba(148,163,184,0.16); border: 1px solid rgba(148,163,184,0.18); box-shadow: none; }
         .submit-btn:disabled { opacity: 0.6; pointer-events: none; }
 
@@ -602,7 +627,7 @@
         .lead-manage-status.mine { background: rgba(31,95,255,0.10); color: var(--primary-color); }
         .lead-manage-status.teacher { background: rgba(14,165,233,0.11); color: #0369A1; }
         .lead-manage-status.invited { background: rgba(99,102,241,0.11); color: #4F46E5; }
-        .lead-manage-status.reserved { background: rgba(245,158,11,0.12); color: #B45309; }
+        .lead-manage-status.reserved { background: rgba(31,95,255,0.12); color: var(--primary-color); border: 1px solid rgba(31,95,255,0.18); }
         .lead-manage-status.enrolled { background: rgba(20,184,166,0.12); color: #0F766E; }
         .lead-row-arrow { width: 16px; height: 16px; color: #94A3B8; }
         .public-lead-assign-btn { justify-self: end; width: 54px; height: 32px; border: 0; border-radius: 10px; background: var(--primary-color); color: #fff; font-size: 12px; font-weight: 950; font-family: inherit; box-shadow: 0 8px 16px rgba(31,95,255,0.22); }
@@ -624,10 +649,11 @@
         .lead-scope-option.active { color: var(--primary-color); background: rgba(31,95,255,0.09); }
         .assign-self-section { flex: 0 0 auto; margin-bottom: 10px; }
         .assign-search-wrap { position: relative; flex: 0 0 auto; margin-bottom: 10px; }
-        .assign-search-wrap svg { position: absolute; left: 13px; top: 50%; width: 17px; height: 17px; color: #94A3B8; transform: translateY(-50%); pointer-events: none; }
+        .assign-search-wrap > svg { position: absolute; left: 13px; top: 50%; width: 17px; height: 17px; color: #94A3B8; transform: translateY(-50%); pointer-events: none; }
         .assign-teacher-search { width: 100%; height: 42px; box-sizing: border-box; border: 1px solid rgba(31,95,255,0.12); border-radius: 13px; background: rgba(245,248,255,0.92); padding: 0 38px 0 40px; color: var(--text-title); font-size: 13px; font-weight: 800; font-family: inherit; outline: none; }
         .assign-teacher-search:focus { border-color: rgba(31,95,255,0.34); box-shadow: 0 0 0 3px rgba(31,95,255,0.08); background: #fff; }
-        .assign-search-clear { position: absolute; right: 8px; top: 50%; width: 28px; height: 28px; display: none; align-items: center; justify-content: center; border: 0; border-radius: 9px; background: rgba(100,116,139,0.09); color: #64748B; font-size: 17px; font-family: inherit; transform: translateY(-50%); }
+        .assign-search-clear { position: absolute; right: 8px; top: 50%; width: 28px; height: 28px; padding: 0; display: none; align-items: center; justify-content: center; border: 0; border-radius: 9px; background: rgba(100,116,139,0.09); color: #64748B; font-family: inherit; transform: translateY(-50%); }
+        .assign-search-clear svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
         .assign-search-clear.visible { display: flex; }
         .assign-teacher-list { flex: 1; min-height: 0; display: grid; align-content: start; gap: 9px; margin-bottom: 14px; overflow-y: auto; overscroll-behavior-y: contain; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
         .assign-teacher-list::-webkit-scrollbar { display: none; }
@@ -710,7 +736,13 @@
         .lead-timeline-desc.lead-next-action { margin-top: 7px; font-size: 13px; color: #172554; font-weight: 950; }
         .lead-timeline-item.current .lead-timeline-desc.lead-next-action { color: var(--primary-color); font-size: 14px; }
         .lead-timeline-current-tag { padding: 3px 7px; border-radius: 7px; background: var(--primary-color); color: #fff; font-size: 9px; font-weight: 950; white-space: nowrap; }
+        .lead-timeline-card.has-action { position: relative; padding-bottom: 42px; }
+        .flow-reservation-icon-btn { position:absolute; right:10px; bottom:9px; width:30px; height:30px; border-radius:10px; border:1px solid rgba(31,95,255,0.2); background:rgba(255,255,255,0.88); color:var(--primary-color); display:flex; align-items:center; justify-content:center; box-shadow:0 6px 14px rgba(31,95,255,0.08); font-family:inherit; }
+        .flow-reservation-icon-btn.view { border-color:rgba(100,116,139,0.18); background:rgba(241,245,249,0.86); color:#64748B; }
+        .flow-reservation-icon-btn svg { width:15px; height:15px; stroke:currentColor; }
         .lead-timeline-item.completed .lead-timeline-card { opacity: 0.82; }
+        .lead-timeline-item.follow-focus .lead-timeline-card { opacity: 1; animation: follow-focus-flash 1.78s ease both; }
+        @keyframes follow-focus-flash { 0% { transform: scale(0.988); border-color: rgba(31,95,255,0.18); box-shadow: 0 0 0 0 rgba(31,95,255,0); background: rgba(255,255,255,0.78); } 45% { transform: scale(1); border-color: rgba(31,95,255,0.42); box-shadow: 0 0 0 6px rgba(31,95,255,0.12), 0 12px 26px rgba(31,95,255,0.16); background: rgba(255,255,255,0.98); } 100% { transform: scale(1); border-color: rgba(255,255,255,0.82); box-shadow: 0 5px 14px rgba(31,95,255,0.025); background: rgba(255,255,255,0.66); } }
         .lead-timeline-item.current .lead-timeline-title { color: var(--primary-color); font-size: 14px; }
         .lead-timeline-item.current .lead-timeline-time { color: #365FAE; }
         .school-mode-toggle { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; padding: 5px; border-radius: 14px; background: rgba(31,95,255,0.08); margin-bottom: 10px; }
@@ -1082,7 +1114,7 @@
         </div>
         <div style="position:absolute; bottom:0; left:0; right:0; padding:16px 20px; background:white; box-shadow:0 -4px 20px rgba(0,0,0,0.05); display:flex; gap:12px; z-index:310;">
             <button class="btn-xs outline" style="flex:1; padding:14px; font-size:15px;" onclick="showModal('sheet-follow-up')">写跟进</button>
-            <button class="btn-xs outline" style="flex:1; padding:14px; font-size:15px;" onclick="openDynamicForm('visitAppointment')">发起邀约</button>
+            <button id="legacy-visit-invite-btn" class="btn-xs outline" style="flex:1; padding:14px; font-size:15px;" onclick="openLegacyVisitInviteAction()">发起邀约</button>
             <button class="btn-xs" style="flex:1; padding:14px; font-size:15px;" onclick="startQuickEnroll()">转录取</button>
         </div>
     </div>
@@ -1141,6 +1173,19 @@
         </div>
     </div>
 
+    <div id="dialog-confirm-reservation-submit" class="dialog-box">
+        <div class="dialog-icon-wrap" style="background:var(--primary-light); color:var(--primary-color);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v5"></path><path d="M12 17h.01"></path><path d="M10.3 3.5 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.5a2 2 0 0 0-3.4 0Z"></path></svg>
+        </div>
+        <div class="dialog-title" id="reservation-submit-confirm-title">确认提交预定？</div>
+        <div class="reservation-next-summary" id="reservation-submit-confirm-summary"></div>
+        <div class="dialog-desc" id="reservation-submit-confirm-desc" style="margin-bottom:18px;">提交后会生成预定记录，并将线索推进到预定阶段。</div>
+        <div class="dialog-actions">
+            <button type="button" class="dialog-btn cancel" onclick="closeAllModals()">再核对下</button>
+            <button type="button" class="dialog-btn confirm" onclick="confirmReservationSubmit()">确认提交</button>
+        </div>
+    </div>
+
     <div id="sheet-public-assign" class="bottom-sheet">
         <div class="sheet-indicator"></div>
         <div class="sheet-title">分配线索</div>
@@ -1149,7 +1194,7 @@
         <div class="assign-search-wrap">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
             <input id="public-assign-search" class="assign-teacher-search" type="search" inputmode="search" autocomplete="off" placeholder="搜索姓名、手机号或招生组" oninput="updatePublicAssignSearch(this.value)">
-            <button id="public-assign-search-clear" class="assign-search-clear" type="button" aria-label="清空搜索" onclick="clearPublicAssignSearch()">×</button>
+            <button id="public-assign-search-clear" class="assign-search-clear" type="button" aria-label="清空搜索" onclick="clearPublicAssignSearch()"><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="7" x2="17" y2="17"></line><line x1="17" y1="7" x2="7" y2="17"></line></svg></button>
         </div>
         <div class="assign-list-caption"><span>其他老师</span><span id="public-assign-result-count"></span></div>
         <div class="assign-teacher-list" id="public-assign-teacher-list"></div>
@@ -1349,17 +1394,6 @@
         <div class="action-sheet-list" id="record-actions-body"></div>
     </div>
 
-    <div id="sheet-reservation-status" class="bottom-sheet">
-        <div class="sheet-indicator"></div>
-        <div class="sheet-title" id="reservation-status-title">状态处理</div>
-        <div class="sheet-scroll-area">
-            <form id="reservation-status-form" onsubmit="event.preventDefault(); submitReservationStatusAction();">
-                <div id="reservation-status-body"></div>
-                <button type="submit" class="submit-btn">确认提交</button>
-            </form>
-        </div>
-    </div>
-
     <div id="dialog-confirm-enroll" class="dialog-box">
         <div class="dialog-icon-wrap" style="background:var(--success-light); color:var(--success-color);">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
@@ -1463,7 +1497,7 @@
             { id: 3003, code: 'YD20260603003', leadId: 205, name: '黄俊杰', phone: '135****8910', status: '已失效', financeConfirmed: false, major: '新能源汽车', amount: 500, advisor: '尹娣', semester: '2026年秋季', reservedAt: '2026-06-03T16:40', collector: '尹娣', paymentMethod: '现金', receiptSource: '顾问代收', receiptImageName: '', receiptImageData: '', financeStaff: '', financeConfirmedAt: '', invalidAt: '2026-06-05T12:00', refundAmount: '', refundAt: '', remark: '超过约定保留时间未补齐材料。' }
         ],
         admissionRecords: [
-            { id: 4001, code: 'LQ20260602001', leadId: 203, reservationId: 3004, reservationCode: 'YD20260602004', name: '张晓明', phone: '136****0004', major: '新能源汽车', preClass: '26秋新能源汽车预分班', headTeacher: '张伟', semester: '2026年秋季', admittedAt: '2026-06-02T18:20', needMaterials: true, materialsComplete: false, createdAt: '2026-06-02 18:22', remark: '身份证复印件待补交。', checkinGenerated: false }
+            { id: 4001, code: '', leadId: 203, reservationId: 3004, reservationCode: 'YD20260602004', name: '张晓明', phone: '136****0004', major: '新能源汽车', preClass: '26秋新能源汽车预分班', headTeacher: '张伟', semester: '2026年秋季', admittedAt: '2026-06-02T18:20', needMaterials: true, materialsComplete: false, createdAt: '2026-06-02 18:22', remark: '身份证复印件待补交。', checkinGenerated: false }
         ],
         checkinRecords: [
             { id: 5001, leadId: 203, admissionId: 4001, name: '张晓明', phone: '136****0004', checkinAt: '2026-06-15T16:39', staff: '郭晶晶', formalClass: '汽修 6 班', dorm: '3 栋 208', materialsComplete: true, photoSubmitted: true, semester: '2026年秋季', baseStudent: '基础学生 #348', requestNo: 'ADMISSION-CHECKIN-13-V1-1781512669532', handoverStatus: '未提交', handoverAt: '', handoverError: '', retryCount: 0, remark: '' }
@@ -1498,6 +1532,8 @@
     let publicAssignSearchQuery = '';
     let myLeadPageState = 'list';
     let leadDetailEditMode = false;
+    let myLeadDetailReturnScrollTop = 0;
+    let pendingFollowFocusId = null;
     const myLeadStatusOptions = ['全部', '跟进中', '已邀约', '已预定', '已缴费', '已报到'];
     const myLeadSourceOptions = ['全部来源', '巨量OCEAN', '百度BAIDU', '线下OFFLINE'];
     const allLeadAssignmentOptions = ['全部', '已分配', '未分配'];
@@ -2412,6 +2448,10 @@
         currentMyLeadId = Number(id);
         const lead = findAnyLead(id);
         if (!lead) return;
+        const options = arguments.length > 1 ? arguments[1] : null;
+        const preserveScroll = typeof options === 'number' ? options : null;
+        const focusFollowId = options && typeof options === 'object' ? options.focusFollowId : null;
+        pendingFollowFocusId = focusFollowId || null;
         currentEntryLabel = '我的线索';
         myLeadPageState = 'detail';
         leadDetailEditMode = false;
@@ -2421,8 +2461,26 @@
         document.getElementById('entry-page-title').innerText = currentLeadScope === 'public' ? '线索详情' : '我的线索详情';
         document.getElementById('entry-page-action').innerText = '编辑';
         document.getElementById('entry-page-action').classList.remove('plus-action');
-        document.getElementById('entry-page-content').innerHTML = renderMyLeadDetail(lead);
-        document.getElementById('entry-page-content').scrollTop = 0;
+        const content = document.getElementById('entry-page-content');
+        content.innerHTML = renderMyLeadDetail(lead);
+        content.scrollTop = preserveScroll === null ? 0 : Number(preserveScroll || 0);
+        if (focusFollowId) {
+            requestAnimationFrame(() => setTimeout(() => focusLeadFollowRecord(focusFollowId), 30));
+        }
+    }
+
+    function focusLeadFollowRecord(followId) {
+        const content = document.getElementById('entry-page-content');
+        const target = content?.querySelector('[data-follow-id="' + String(followId) + '"]');
+        if (!content || !target) return;
+        const contentRect = content.getBoundingClientRect();
+        const targetRect = target.getBoundingClientRect();
+        const top = Math.max(0, content.scrollTop + targetRect.top - contentRect.top - ((content.clientHeight - targetRect.height) / 2));
+        content.scrollTo({ top, behavior: 'auto' });
+        setTimeout(() => {
+            target.classList.remove('follow-focus');
+            if (String(pendingFollowFocusId) === String(followId)) pendingFollowFocusId = null;
+        }, 1900);
     }
 
     function openMyLeadInlineEdit(leadId) {
@@ -2506,9 +2564,10 @@
                 : leadStage >= 4
                     ? '<button class="my-lead-action-btn my-lead-action-tertiary" onclick="openAdmissionFromLead(' + lead.id + ')">转正式录取</button>'
                     : '<button class="my-lead-action-btn my-lead-action-tertiary" onclick="startReservationFromMyLead()">转预定</button>';
+            const inviteActionText = getVisitInviteActionText(lead);
             html += '<div class="detail-bottom-actions">' +
                 '<button class="my-lead-action-btn my-lead-action-primary" onclick="openMyLeadFollowForm()">写跟进</button>' +
-                '<button class="my-lead-action-btn my-lead-action-secondary" onclick="openVisitInviteForm()">发起邀约</button>' +
+                '<button class="my-lead-action-btn my-lead-action-secondary" onclick="openVisitInviteForm()">' + inviteActionText + '</button>' +
                 processAction +
                 '</div>';
         }
@@ -2516,6 +2575,38 @@
         html += '</div>';
 
         return html;
+    }
+
+    function openLeadReservationEdit(leadId) {
+        const record = state.reservationRecords.find(item => Number(item.leadId) === Number(leadId));
+        if (!record) {
+            showToast('暂无可修改的预定记录');
+            return;
+        }
+        if (!canEditReservationRecord(record)) {
+            openBusinessRecordDetail('reservation', record.id);
+            return;
+        }
+        openReservationForm('edit', record.id);
+    }
+
+    function getReservationTimelineAction(recordId, viewOnly = false) {
+        if (viewOnly) {
+            return '<button type="button" class="flow-reservation-icon-btn view" aria-label="查看预定信息" onclick="openBusinessRecordDetail(\'reservation\', ' + recordId + ')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>';
+        }
+        return '<button type="button" class="flow-reservation-icon-btn" aria-label="编辑预定信息" onclick="openReservationForm(\'edit\', ' + recordId + ')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></button>';
+    }
+
+    function isReservationClosed(record) {
+        if (!record) return true;
+        if (record.status !== '有效') return true;
+        if (state.admissionRecords.some(item => Number(item.reservationId) === Number(record.id) || Number(item.leadId) === Number(record.leadId))) return true;
+        const lead = findAnyLead(record.leadId);
+        return Number(lead?.stage || 0) >= 5;
+    }
+
+    function canEditReservationRecord(record) {
+        return !isReservationClosed(record);
     }
 
     function renderMyLeadInlineEdit(lead) {
@@ -2664,16 +2755,33 @@
         const reservations = state.reservationRecords.filter(r => r.leadId === lead.id);
         const admissions = state.admissionRecords.filter(r => r.leadId === lead.id);
         const checkins = admissions.filter(r => r.checkinGenerated);
+        const followRecords = (lead.followRecords || []).slice().reverse();
         const items = [];
-        const push = (title, done, time, desc) => items.push({ title, done, time: time || '待发生', desc: desc || (done ? '已完成' : '待推进') });
+        const push = (title, done, time, desc, action = '', meta = {}) => items.push({ title, done, time: time || '待发生', desc: desc || (done ? '已完成' : '待推进'), action, ...meta });
+        const pushFollowRecord = record => {
+            const content = record.content || record.remark || '已完成跟进';
+            const nextAction = record.sub || record.nextAction || '继续推进';
+            push('跟进', true, record.time || record.createdAt, content + '\n下步动作：' + nextAction, '', {
+                followId: record.id || '',
+                focus: !!record.id && String(record.id) === String(pendingFollowFocusId)
+            });
+        };
+        const getFollowFlowAfterStage = record => {
+            const hasStageAt = record.stageAt !== undefined && record.stageAt !== null;
+            const stageAt = Number(hasStageAt ? record.stageAt : getLeadCurrentProgressStage(lead));
+            if (hasStageAt) return getFollowFlowAfterStageByCurrentStage(stageAt);
+            if (record.flowAfterStage !== undefined && record.flowAfterStage !== null) return Number(record.flowAfterStage);
+            return getFollowFlowAfterStageByCurrentStage(stageAt);
+        };
+        const pushFollowRecordsAfter = stage => {
+            followRecords
+                .filter(record => getFollowFlowAfterStage(record) === stage)
+                .forEach(pushFollowRecord);
+        };
         push('公海', true, lead.createdAt || '入池时', lead.owner ? '已进入个人线索，原公海阶段完成' : '当前仍在公海池');
         push('个人', !!lead.owner, lead.createdAt || '分配时', lead.owner ? '负责人：' + lead.owner : '待分配负责人');
-        if ((lead.followRecords || []).length) {
-            lead.followRecords.slice().reverse().forEach(record => {
-                const content = record.content || record.remark || '已完成跟进';
-                const nextAction = record.sub || record.nextAction || '继续推进';
-                push('跟进', true, record.time || record.createdAt, content + '\n下步动作：' + nextAction);
-            });
+        if (followRecords.length) {
+            pushFollowRecordsAfter(1);
         } else {
             push('跟进', lead.stage >= 1, lead.lastFollow && lead.lastFollow !== '暂无' ? lead.lastFollow : '', lead.stage >= 1 ? '已联系，最近跟进时间：' + (lead.lastFollow || '刚刚') : '待写跟进记录');
         }
@@ -2682,26 +2790,31 @@
         } else {
             push('到访预约', lead.stage >= 2, '', lead.stage >= 2 ? '已发起到访预约' : '待发起到访预约');
         }
+        pushFollowRecordsAfter(2);
         if ((lead.visitRecords || []).length) {
             lead.visitRecords.forEach(record => push('到访记录', true, record.time || record.createdAt, record.content || '已到访'));
         } else {
             push('到访记录', lead.stage >= 3, '', lead.stage >= 3 ? '已完成到访记录' : '待到访确认');
         }
+        pushFollowRecordsAfter(3);
         if (reservations.length) {
-            reservations.forEach(record => push('预定', true, formatDateTime(record.reservedAt), record.status + ' · ' + record.major + ' · ' + formatMoney(record.amount)));
+            reservations.forEach(record => push('预定', true, formatDateTime(record.reservedAt), record.status + ' · ' + record.major + ' · ' + formatMoney(record.amount), getReservationTimelineAction(record.id, !canEditReservationRecord(record))));
         } else {
             push('预定', lead.stage >= 4, '', lead.stage >= 4 ? '已形成预定记录' : '待转预定');
         }
+        pushFollowRecordsAfter(4);
         if (admissions.length) {
             admissions.forEach(record => push('录取', true, formatDateTime(record.admittedAt), record.major + ' · ' + (record.preClass || '待分班')));
         } else {
             push('录取', lead.stage >= 5, '', lead.stage >= 5 ? '已录取' : '待正式录取');
         }
+        pushFollowRecordsAfter(5);
         if (checkins.length) {
             checkins.forEach(record => push('报到', true, record.createdAt || formatDateTime(record.admittedAt), '已发起入学交接'));
         } else {
             push('报到', false, '', '待发起入学交接');
         }
+        pushFollowRecordsAfter(6);
         let currentIndex = lead.owner ? items.findIndex((item, index) => index > 0 && !item.done) : 0;
         if (currentIndex < 0) currentIndex = items.length - 1;
         return '<div class="lead-timeline">' + items.map((item, index) => {
@@ -2709,7 +2822,10 @@
             const timeText = item.done || index === currentIndex ? item.time : '待推进';
             const currentTag = index === currentIndex ? '<span class="lead-timeline-current-tag">当前</span>' : '';
             const descHtml = String(item.desc || '').split('\n').map(line => '<div class="lead-timeline-desc ' + (line.indexOf('下步动作：') === 0 ? 'lead-next-action' : '') + '">' + escapeHtml(line) + '</div>').join('');
-            return '<div class="lead-timeline-item ' + stateClass + '"><div class="lead-timeline-dot"></div><div class="lead-timeline-card"><div class="lead-timeline-top"><div class="lead-timeline-title-wrap"><div class="lead-timeline-title">' + escapeHtml(item.title) + '</div>' + currentTag + '</div><div class="lead-timeline-time">' + escapeHtml(timeText) + '</div></div>' + descHtml + '</div></div>';
+            const actionHtml = item.action || '';
+            const followAttr = item.followId ? ' data-follow-id="' + escapeHtml(String(item.followId)) + '"' : '';
+            const focusClass = item.focus ? ' follow-focus' : '';
+            return '<div class="lead-timeline-item ' + stateClass + focusClass + '"' + followAttr + '><div class="lead-timeline-dot"></div><div class="lead-timeline-card' + (actionHtml ? ' has-action' : '') + '"><div class="lead-timeline-top"><div class="lead-timeline-title-wrap"><div class="lead-timeline-title">' + escapeHtml(item.title) + '</div>' + currentTag + '</div><div class="lead-timeline-time">' + escapeHtml(timeText) + '</div></div>' + descHtml + actionHtml + '</div></div>';
         }).join('') + '</div>';
     }
 
@@ -2730,6 +2846,7 @@
     function openMyLeadFollowForm() {
         const lead = findAnyLead(currentMyLeadId);
         if (!lead) return;
+        myLeadDetailReturnScrollTop = document.getElementById('entry-page-content')?.scrollTop || 0;
         const hasInvite = (lead.visitAppointments || []).length > 0;
         const alreadyVisited = isLeadVisited(lead);
         const visitAction = hasInvite && !alreadyVisited ? 'confirmMyLeadVisitedFromFollow()' : "showToast('请先发起到访邀约后再确认到访')";
@@ -2753,13 +2870,44 @@
             return;
         }
         const nowText = formatDateTime(nowDatetimeLocal());
+        const stageAtFollow = getLeadCurrentProgressStage(lead);
+        const flowAfterStage = getFollowFlowAfterStageByCurrentStage(stageAtFollow);
+        const followId = 'follow-' + Date.now();
         lead.followRecords = lead.followRecords || [];
-        lead.followRecords.unshift({ time: nowText, content, sub: document.getElementById('my-follow-next').value.trim() || '继续推进' });
+        lead.followRecords.unshift({ id: followId, time: nowText, content, sub: document.getElementById('my-follow-next').value.trim() || '继续推进', stageAt: stageAtFollow, flowAfterStage });
         lead.lastFollow = nowText;
         lead.stage = Math.max(lead.stage || 0, 1);
         showToast('跟进记录已保存', true);
-        openMyLeadDetail(lead.id);
+        openMyLeadDetail(lead.id, { focusFollowId: followId });
         refreshAllModuleLists();
+    }
+
+    function getFollowFlowAfterStageByCurrentStage(stage) {
+        const currentStage = Number(stage || 0);
+        if (currentStage >= 6) return 6;
+        if (currentStage >= 5) return 5;
+        if (currentStage >= 4) return 4;
+        if (currentStage >= 3) return 3;
+        if (currentStage >= 2) return 2;
+        return 1;
+    }
+
+    function getLeadCurrentProgressStage(lead) {
+        if (!lead) return 0;
+        const leadId = Number(lead.id);
+        const numericStage = Number(lead.stage || 0);
+        const hasCheckin = state.admissionRecords.some(record => Number(record.leadId) === leadId && record.checkinGenerated);
+        if (hasCheckin) return 6;
+        const hasAdmission = state.admissionRecords.some(record => Number(record.leadId) === leadId);
+        if (hasAdmission || numericStage >= 5) return 5;
+        const hasReservation = state.reservationRecords.some(record => Number(record.leadId) === leadId);
+        if (hasReservation || numericStage >= 4) return 4;
+        const hasVisitRecord = (lead.visitRecords || []).length > 0;
+        const hasVisitedAppointment = (lead.visitAppointments || []).some(record => record.status === '已到访');
+        if (hasVisitRecord || hasVisitedAppointment || numericStage >= 3) return 3;
+        if ((lead.visitAppointments || []).length || numericStage >= 2) return 2;
+        if ((lead.followRecords || []).length || numericStage >= 1) return 1;
+        return lead.owner ? 0 : -1;
     }
 
     function markLeadVisitedSilently(lead, content) {
@@ -2814,6 +2962,10 @@
         const lead = findAnyLead(currentMyLeadId);
         if (!lead) return;
         const existing = (lead.visitAppointments || [])[0];
+        if (isLeadVisited(lead)) {
+            showVisitedInviteReadonlyDialog(lead, existing);
+            return;
+        }
         if (existing) {
             showVisitInviteExistingDialog(lead, existing);
             return;
@@ -2826,8 +2978,34 @@
             '</div><button type="submit" class="submit-btn">确定</button></form>';
     }
 
+    function getVisitInviteActionText(lead) {
+        const alreadyVisited = isLeadVisited(lead);
+        const hasInviteRecord = (lead && lead.visitAppointments || []).length > 0;
+        return alreadyVisited ? (hasInviteRecord ? '查看邀约' : '查看到访') : (hasInviteRecord ? '邀约操作' : '发起邀约');
+    }
+
+    function openLegacyVisitInviteAction() {
+        const lead = findAnyLead(state.currentActionLeadId || currentMyLeadId);
+        if (!lead) return;
+        currentMyLeadId = Number(lead.id);
+        const existing = (lead.visitAppointments || [])[0];
+        if (isLeadVisited(lead)) {
+            showVisitedInviteReadonlyDialog(lead, existing);
+            return;
+        }
+        if (existing) {
+            showVisitInviteExistingDialog(lead, existing);
+            return;
+        }
+        openDynamicForm('visitAppointment');
+    }
+
     function showVisitInviteExistingDialog(lead, appointment) {
         const alreadyVisited = isLeadVisited(lead);
+        if (alreadyVisited) {
+            showVisitedInviteReadonlyDialog(lead, appointment);
+            return;
+        }
         const confirmButton = alreadyVisited
             ? '<button class="dialog-btn visit-confirm-primary disabled" style="grid-column:1 / -1;" disabled>已到访</button>'
             : '<button class="dialog-btn visit-confirm-primary" style="grid-column:1 / -1;" onclick="closeAllModals(); confirmMyLeadVisitedFromFollow()">确认已到访</button>';
@@ -2837,7 +3015,27 @@
             '<div class="entry-card-sub" style="margin-top:6px;">' + escapeHtml(lead.name) + ' / ' + escapeHtml(displayPhone(lead.phone)) + ' / ' + escapeHtml(appointment.status || '待到访') + '</div>' +
             '<div class="entry-info-cell full" style="margin-top:10px;">预约到访时间：<strong>' + escapeHtml(formatDateTime(appointment.visitAt)) + '</strong></div>' +
             '<div class="entry-info-cell full" style="margin-top:8px;">二维码Token：<strong>' + escapeHtml(appointment.token || appointment.code || '待生成') + '</strong></div></div>' +
-            '<div class="dialog-actions" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"><button class="dialog-btn cancel" onclick="closeAllModals()">暂不处理</button><button class="dialog-btn confirm" onclick="closeAllModals(); openVisitInviteEditForm()">编辑信息</button>' + confirmButton + '</div>';
+            '<div class="dialog-actions" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"><button class="dialog-btn cancel" onclick="closeAllModals()">暂不处理</button><button class="dialog-btn visit-edit-outline" onclick="closeAllModals(); openVisitInviteEditForm()">编辑信息</button>' + confirmButton + '</div>';
+        showModal('sheet-record-actions');
+    }
+
+    function showVisitedInviteReadonlyDialog(lead, appointment = null) {
+        const visitRecord = (lead.visitRecords || [])[0];
+        const appointmentHtml = appointment
+            ? '<div class="visit-existing-card"><div class="entry-card-title">到访邀约信息</div>' +
+                '<div class="entry-card-sub" style="margin-top:6px;">' + escapeHtml(lead.name) + ' / ' + escapeHtml(displayPhone(lead.phone)) + ' / ' + escapeHtml(appointment.status || '已到访') + '</div>' +
+                '<div class="entry-info-cell full" style="margin-top:10px;">预约到访时间：<strong>' + escapeHtml(formatDateTime(appointment.visitAt)) + '</strong></div>' +
+                '<div class="entry-info-cell full" style="margin-top:8px;">二维码Token：<strong>' + escapeHtml(appointment.token || appointment.code || '待生成') + '</strong></div></div>'
+            : '<div class="visit-existing-card"><div class="entry-card-title">到访记录</div><div class="entry-card-sub" style="margin-top:6px;">该学生已到访，当前不可再发起邀约。</div></div>';
+        const visitHtml = visitRecord
+            ? '<div class="entry-info-cell full" style="margin-top:10px;">实际到访：<strong>' + escapeHtml(visitRecord.time || '已到访') + '</strong></div>' +
+                '<div class="entry-info-cell full" style="margin-top:8px;">到访说明：<strong>' + escapeHtml(visitRecord.content || '已到访') + '</strong></div>'
+            : '<div class="entry-info-cell full" style="margin-top:10px;">到访状态：<strong>已到访</strong></div>';
+        document.getElementById('record-actions-title').innerText = '查看邀约';
+        document.getElementById('record-actions-body').innerHTML =
+            appointmentHtml +
+            visitHtml +
+            '<div class="dialog-actions" style="display:grid; grid-template-columns:1fr; gap:10px; margin-top:12px;"><button class="dialog-btn visit-edit-outline" onclick="closeAllModals()">关闭</button></div>';
         showModal('sheet-record-actions');
     }
 
@@ -2855,6 +3053,8 @@
         const lead = findAnyLead(currentMyLeadId);
         const appointment = lead && (lead.visitAppointments || [])[0];
         if (!lead || !appointment) return;
+        const visitStatus = appointment.status || '待到访';
+        const cancelReasonDisplay = visitStatus === '已取消' ? 'block' : 'none';
         document.getElementById('entry-page-title').innerText = '编辑邀约信息';
         myLeadPageState = 'form';
         document.getElementById('entry-page-action').innerText = '';
@@ -2865,10 +3065,30 @@
             dateTimeFieldHtml('预约到访时间', 'visit-edit-time', 'datetime-local', toDatetimeLocalValue(appointment.visitAt), true) +
             '<div class="form-group"><label class="form-label">二维码Token</label><input id="visit-edit-token" class="form-control" value="' + escapeHtml(appointment.token || appointment.code || '') + '" readonly></div>' +
             dateTimeFieldHtml('二维码有效期', 'visit-edit-expire', 'datetime-local', toDatetimeLocalValue(appointment.expireAt || ''), false) +
-            '<div class="form-group"><label class="form-label required">预约状态</label><select id="visit-edit-status" class="form-control"><option' + ((appointment.status || '待到访') === '待到访' ? ' selected' : '') + '>待到访</option><option' + (appointment.status === '已到访' ? ' selected' : '') + '>已到访</option><option' + (appointment.status === '已取消' ? ' selected' : '') + '>已取消</option></select></div>' +
-            '<div class="form-group"><label class="form-label">取消原因</label><textarea id="visit-edit-cancel" class="form-control">' + escapeHtml(appointment.cancelReason || '') + '</textarea></div>' +
+            '<div class="form-group"><label class="form-label required">预约状态</label><button type="button" class="selector-control" id="visit-edit-status-selector" onclick="openVisitStatusPicker()">' + escapeHtml(visitStatus) + '</button><input type="hidden" id="visit-edit-status" value="' + escapeHtml(visitStatus) + '"></div>' +
+            '<div class="form-group" id="visit-edit-cancel-wrap" style="display:' + cancelReasonDisplay + ';"><label class="form-label">取消原因</label><textarea id="visit-edit-cancel" class="form-control" placeholder="请填写取消原因">' + escapeHtml(appointment.cancelReason || '') + '</textarea></div>' +
             '<div class="form-group"><label class="form-label">备注</label><textarea id="visit-edit-remark" class="form-control">' + escapeHtml(appointment.remark || '') + '</textarea></div>' +
             '</div><button type="submit" class="submit-btn">确定</button></form>';
+    }
+
+    function openVisitStatusPicker() {
+        const options = ['待到访', '已到访', '已取消'].map(value => ({ value, label: value, sub: value === '已取消' ? '选择后填写取消原因' : '' }));
+        currentPicker = { field: 'status', options, searchable: false, visitEditField: true };
+        document.getElementById('record-picker-title').innerText = '选择预约状态';
+        document.getElementById('record-picker-input').value = '';
+        document.getElementById('record-picker-search').style.display = 'none';
+        renderPickerOptions();
+        showModal('sheet-record-picker');
+    }
+
+    function updateVisitCancelReasonVisibility(status) {
+        const wrap = document.getElementById('visit-edit-cancel-wrap');
+        const input = document.getElementById('visit-edit-cancel');
+        if (!wrap) return;
+        const show = status === '已取消';
+        wrap.style.display = show ? 'block' : 'none';
+        if (!show && input) input.value = '';
+        if (show && input) setTimeout(() => input.focus(), 80);
     }
 
     function submitVisitInviteEdit() {
@@ -2884,7 +3104,7 @@
         appointment.token = document.getElementById('visit-edit-token').value.trim() || appointment.code;
         appointment.expireAt = document.getElementById('visit-edit-expire').value;
         appointment.status = document.getElementById('visit-edit-status').value;
-        appointment.cancelReason = document.getElementById('visit-edit-cancel').value.trim();
+        appointment.cancelReason = appointment.status === '已取消' ? document.getElementById('visit-edit-cancel').value.trim() : '';
         appointment.remark = document.getElementById('visit-edit-remark').value.trim();
         appointment.content = '预约到访时间：' + formatDateTime(appointment.visitAt);
         if (appointment.status === '已到访') markLeadVisitedSilently(lead, '邀约状态更新为已到访');
@@ -3377,7 +3597,7 @@
     }
 
     function renderAdmissionRecordsEntry() {
-        const rows = state.admissionRecords.map(r => ({ title: r.name, sub: r.code + ' · ' + r.major + ' · ' + r.preClass, tag: r.materialsComplete ? '资料齐全' : '资料未齐' }));
+        const rows = state.admissionRecords.map(r => ({ title: r.name, sub: r.major + ' · ' + (r.preClass || '待分班'), tag: r.materialsComplete ? '资料齐全' : '资料未齐' }));
         return renderSimpleEntryCards(rows, '暂无录取记录');
     }
 
@@ -3469,6 +3689,87 @@
         closeQuickMenu();
         document.querySelectorAll('.bottom-sheet, .dialog-box').forEach(el => el.classList.remove('active'));
         pendingAssignConflict = null;
+    }
+
+    function isManualClearableField(el) {
+        if (!el || !['INPUT', 'TEXTAREA'].includes(el.tagName)) return false;
+        if (el.disabled || el.readOnly) return false;
+        const type = (el.getAttribute('type') || 'text').toLowerCase();
+        if (['hidden', 'checkbox', 'radio', 'file', 'button', 'submit', 'reset', 'range', 'date', 'time', 'datetime-local'].includes(type)) return false;
+        return true;
+    }
+
+    function syncClearableFieldState(el) {
+        const host = el?.parentElement;
+        if (!host || !host.classList.contains('clearable-host')) return;
+        host.classList.toggle('has-value', !!String(el.value || '').length);
+    }
+
+    function syncClearableFieldFocus(el, focused) {
+        const host = el?.parentElement;
+        if (!host || !host.classList.contains('clearable-host')) return;
+        host.classList.toggle('is-field-focused', !!focused);
+    }
+
+    function clearManualField(inputId) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        input.value = '';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        syncClearableFieldState(input);
+        input.focus();
+    }
+
+    function enhanceClearableInputs(root = document) {
+        const scope = root.querySelectorAll ? root : document;
+        scope.querySelectorAll('input, textarea').forEach(input => {
+            if (!isManualClearableField(input)) return;
+            const host = input.parentElement;
+            if (!host) return;
+            if (!input.id) input.id = 'clearable-field-' + Math.random().toString(36).slice(2, 10);
+            host.classList.add('clearable-host');
+            const hasClearButton = Array.from(host.children).some(child => child.classList?.contains('field-clear-btn') && child.dataset.clearTarget === input.id);
+            if (!hasClearButton) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'field-clear-btn';
+                btn.dataset.clearTarget = input.id;
+                btn.setAttribute('aria-label', '清空输入内容');
+                btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="7" x2="17" y2="17"></line><line x1="17" y1="7" x2="7" y2="17"></line></svg>';
+                btn.addEventListener('mousedown', event => event.preventDefault());
+                btn.addEventListener('click', event => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    clearManualField(input.id);
+                });
+                input.insertAdjacentElement('afterend', btn);
+            }
+            if (!input.dataset.clearableBound) {
+                input.addEventListener('input', () => syncClearableFieldState(input));
+                input.addEventListener('change', () => syncClearableFieldState(input));
+                input.addEventListener('focus', () => syncClearableFieldFocus(input, true));
+                input.addEventListener('blur', () => syncClearableFieldFocus(input, false));
+                input.dataset.clearableBound = '1';
+            }
+            syncClearableFieldState(input);
+            syncClearableFieldFocus(input, document.activeElement === input);
+        });
+    }
+
+    let clearableEnhanceQueued = false;
+    function scheduleEnhanceClearableInputs() {
+        if (clearableEnhanceQueued) return;
+        clearableEnhanceQueued = true;
+        const activeField = isManualClearableField(document.activeElement) ? document.activeElement : null;
+        requestAnimationFrame(() => {
+            clearableEnhanceQueued = false;
+            enhanceClearableInputs(document);
+            if (activeField && document.body.contains(activeField) && document.activeElement !== activeField) {
+                activeField.focus({ preventScroll: true });
+                syncClearableFieldFocus(activeField, true);
+            }
+        });
     }
 
     function toggleQuickMenu(evt) {
@@ -4098,8 +4399,8 @@
 
     function renderDateTimeColumn(part, title, values, suffix = '') {
         const current = currentDateTimePicker.value[part];
-        const options = values.map(value => '<button type="button" class="datetime-option ' + (Number(value) === Number(current) ? 'active' : '') + '" onclick="setDateTimePart(\'' + part + '\',' + Number(value) + ')">' + padDatePart(value) + suffix + '</button>').join('');
-        return '<div class="datetime-column"><div class="datetime-col-title">' + title + '</div>' + options + '</div>';
+        const options = values.map(value => '<button type="button" class="datetime-option ' + (Number(value) === Number(current) ? 'active' : '') + '" data-value="' + Number(value) + '" onclick="setDateTimePart(\'' + part + '\',' + Number(value) + ')">' + padDatePart(value) + suffix + '</button>').join('');
+        return '<div class="datetime-column-shell"><div class="datetime-col-title">' + title + '</div><div class="datetime-column" data-part="' + part + '" onscroll="handleDateTimeColumnScroll(this)">' + options + '</div></div>';
     }
 
     function renderDateTimePicker() {
@@ -4129,9 +4430,46 @@
         setTimeout(() => {
             document.querySelectorAll('#datetime-picker-body .datetime-column').forEach(column => {
                 const active = column.querySelector('.datetime-option.active');
-                if (active) column.scrollTop = Math.max(0, active.offsetTop - (column.clientHeight - active.clientHeight) / 2);
+                if (active) {
+                    column.dataset.syncing = '1';
+                    column.scrollTop = Math.max(0, active.offsetTop - (column.clientHeight - active.clientHeight) / 2);
+                    setTimeout(() => { column.dataset.syncing = ''; }, 120);
+                }
             });
         }, 0);
+    }
+
+    function handleDateTimeColumnScroll(column) {
+        if (!column || column.dataset.syncing === '1') return;
+        clearTimeout(column._datetimeScrollTimer);
+        column._datetimeScrollTimer = setTimeout(() => syncDateTimeColumnValue(column), 90);
+    }
+
+    function syncDateTimeColumnValue(column) {
+        if (!currentDateTimePicker || !column) return;
+        const part = column.dataset.part;
+        const options = Array.from(column.querySelectorAll('.datetime-option'));
+        const center = column.scrollTop + column.clientHeight / 2;
+        let nearest = null;
+        let nearestDistance = Infinity;
+        options.forEach(option => {
+            const optionCenter = option.offsetTop + option.offsetHeight / 2;
+            const distance = Math.abs(optionCenter - center);
+            if (distance < nearestDistance) {
+                nearest = option;
+                nearestDistance = distance;
+            }
+        });
+        if (!nearest || !part) return;
+        const value = Number(nearest.dataset.value);
+        if (Number.isNaN(value)) return;
+        if (Number(currentDateTimePicker.value[part]) === value) {
+            options.forEach(option => option.classList.toggle('active', Number(option.dataset.value) === value));
+            return;
+        }
+        currentDateTimePicker.value[part] = value;
+        currentDateTimePicker.value = clampDateTimeParts(currentDateTimePicker.value);
+        renderDateTimePicker();
     }
 
     function setDateTimePart(part, value) {
@@ -4213,11 +4551,11 @@
 
     function formatAdmissionOption(record) {
         if (!record) return '';
-        return [record.code || 'LQ待生成', record.name || '待绑定学生', record.major || '待确认专业', record.semester || '待确认学期'].join(' / ');
+        return [record.name || '待绑定学生', record.major || '待确认专业', record.semester || '待确认学期'].join(' / ');
     }
 
     function admissionRecordHint() {
-        return '<div class="form-note" style="margin-top:-8px; margin-bottom:12px;">LQ编号为录取记录编号，原型按“LQ + 录取日期 + 序号”生成；后台是否返回该编号需以接口字段为准。</div>';
+        return '';
     }
 
     function getPickerOptions(field) {
@@ -4255,7 +4593,7 @@
     }
 
     function isLongPickerField(field) {
-        return ['leadId', 'advisor', 'collector', 'financeStaff', 'reservationId', 'admissionMajor', 'major', 'semester', 'headTeacher', 'admissionId', 'checkinId', 'checkinStaff', 'transferOperator', 'baseStudent', 'newTask'].includes(field);
+        return ['leadId', 'advisor', 'collector', 'financeStaff', 'reservationId', 'admissionMajor', 'major', 'headTeacher', 'admissionId', 'checkinId', 'checkinStaff', 'transferOperator', 'baseStudent', 'newTask'].includes(field);
     }
 
     function selectorField(label, field, value, display, required = false, locked = false) {
@@ -4274,6 +4612,35 @@
         const requiredClass = required ? ' required' : '';
         const requiredAttr = required ? ' required' : '';
         return '<div class="form-group"><label class="form-label' + requiredClass + '">' + label + '</label><input id="record-field-' + field + '" type="' + type + '" class="form-control" value="' + escapeHtml(value || '') + '" placeholder="请输入' + label + '"' + requiredAttr + ' ' + attrs + '></div>';
+    }
+
+    function amountStepperField(label, field, value = '', required = false) {
+        const requiredClass = required ? ' required' : '';
+        const requiredAttr = required ? ' required' : '';
+        return '<div class="form-group"><label class="form-label' + requiredClass + '">' + label + '</label><div class="amount-stepper-control"><input id="record-field-' + field + '" type="text" inputmode="decimal" class="form-control" value="' + escapeHtml(value || '') + '" placeholder="请输入' + label + '"' + requiredAttr + '><div class="amount-stepper-buttons"><button type="button" class="amount-stepper-btn" aria-label="增加100" onclick="adjustAmountField(\'' + field + '\', 100)"><svg viewBox="0 0 24 24"><polyline points="6 15 12 9 18 15"></polyline></svg></button><button type="button" class="amount-stepper-btn" aria-label="减少100" onclick="adjustAmountField(\'' + field + '\', -100)"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></button></div></div></div>';
+    }
+
+    function amountStepperRawField(label, inputId, inputName, value = '', required = false) {
+        const requiredClass = required ? ' required' : '';
+        const requiredAttr = required ? ' required' : '';
+        const nameAttr = inputName ? ' name="' + escapeHtml(inputName) + '"' : '';
+        return '<div class="form-group"><label class="form-label' + requiredClass + '">' + label + '</label><div class="amount-stepper-control"><input id="' + escapeHtml(inputId) + '" type="text" inputmode="decimal" class="form-control" value="' + escapeHtml(value || '') + '" placeholder="请输入' + label + '"' + nameAttr + requiredAttr + '><div class="amount-stepper-buttons"><button type="button" class="amount-stepper-btn" aria-label="增加100" onclick="adjustAmountInput(\'' + inputId + '\', 100)"><svg viewBox="0 0 24 24"><polyline points="6 15 12 9 18 15"></polyline></svg></button><button type="button" class="amount-stepper-btn" aria-label="减少100" onclick="adjustAmountInput(\'' + inputId + '\', -100)"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></button></div></div></div>';
+    }
+
+    function adjustAmountInput(inputId, delta) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        const current = Number(String(input.value || '0').replace(/[^\d.-]/g, '')) || 0;
+        const next = Math.max(0, current + Number(delta || 0));
+        input.value = Number.isInteger(next) ? String(next) : String(Number(next.toFixed(2)));
+    }
+
+    function adjustAmountField(field, delta) {
+        adjustAmountInput('record-field-' + field, delta);
+    }
+
+    function adjustReservationAmount(delta) {
+        adjustAmountField('amount', delta);
     }
 
     function textareaField(label, field, value = '', placeholder = '请输入' + label, maxLength = 500) {
@@ -4309,6 +4676,19 @@
         if (selector) {
             selector.innerText = display || value || ('请选择' + selector.innerText.replace(/^请选择/, ''));
             selector.classList.toggle('placeholder', !value);
+        }
+    }
+
+    function updateReservationInvalidFields(status) {
+        const visible = status === '已失效';
+        document.querySelectorAll('[data-condition="reservation-invalid"]').forEach(el => el.classList.toggle('hidden', !visible));
+        const invalidInput = document.getElementById('record-field-invalidAt');
+        if (!invalidInput) return;
+        if (visible && !invalidInput.value) {
+            setDateTimeInputValue('record-field-invalidAt', nowDatetimeLocal());
+        }
+        if (!visible) {
+            setDateTimeInputValue('record-field-invalidAt', '');
         }
     }
 
@@ -4724,7 +5104,8 @@
         }
         document.getElementById('record-detail-title').innerText = isAdmission ? '录取详情' : '预定详情';
         const stage = isAdmission ? '录取' : '预定';
-        const hero = '<div class="record-detail-hero"><div class="record-detail-hero-top"><div><div class="record-detail-name">' + escapeHtml(record.name) + '</div><div class="record-detail-phone">' + escapeHtml(displayPhone(record.phone)) + ' · ' + escapeHtml(record.code) + '</div></div><span class="business-record-stage ' + type + '">' + stage + '</span></div></div>';
+        const heroMeta = isAdmission ? displayPhone(record.phone) : (displayPhone(record.phone) + ' · ' + record.code);
+        const hero = '<div class="record-detail-hero"><div class="record-detail-hero-top"><div><div class="record-detail-name">' + escapeHtml(record.name) + '</div><div class="record-detail-phone">' + escapeHtml(heroMeta) + '</div></div><span class="business-record-stage ' + type + '">' + stage + '</span></div></div>';
         let sections = '';
         let actions = '';
         if (isAdmission) {
@@ -4767,16 +5148,17 @@
                     { label: '财务确认', value: record.financeConfirmed ? '已确认' : '未确认' },
                     { label: '备注', value: record.remark || '暂无备注', full: true }
                 ]) + '</div>';
-            const canConvert = record.status === '有效';
+            const canEditReservation = canEditReservationRecord(record);
+            const canConvert = canEditReservation && record.status === '有效';
             actions =
                 (canConvert ? '<button class="record-detail-action primary" onclick="openAdmissionForm(' + record.id + ')">转录取</button>' : '') +
-                '<button class="record-detail-action' + (canConvert ? '' : ' primary') + '" onclick="openReservationForm(\'edit\', ' + record.id + ')">编辑</button>' +
-                '<button class="record-detail-action muted" onclick="openReservationMoreActions(' + record.id + ')">更多</button>';
+                (canEditReservation ? '<button class="record-detail-action' + (canConvert ? '' : ' primary') + '" onclick="openReservationForm(\'edit\', ' + record.id + ')">编辑</button>' : '');
         }
         document.getElementById('record-detail-body').innerHTML = hero + sections;
         const footer = document.getElementById('record-detail-footer');
         footer.innerHTML = actions;
-        footer.style.gridTemplateColumns = 'repeat(' + footer.children.length + ', minmax(0, 1fr))';
+        footer.style.display = footer.children.length ? 'grid' : 'none';
+        if (footer.children.length) footer.style.gridTemplateColumns = 'repeat(' + footer.children.length + ', minmax(0, 1fr))';
     }
 
     function openAdmissionDetailMore(id) {
@@ -4793,18 +5175,26 @@
         currentRecordForm = { type: 'reservation', mode, recordId, prefillReservationId: null };
         const editing = mode === 'edit';
         const record = editing ? state.reservationRecords.find(r => r.id === recordId) : null;
+        if (editing && !canEditReservationRecord(record)) {
+            currentRecordForm = { type: null, mode: null, recordId: null, prefillReservationId: null };
+            openBusinessRecordDetail('reservation', recordId);
+            showToast('预定已结束，仅可查看');
+            return;
+        }
         const lead = prefillLeadId ? findAnyLead(prefillLeadId) : null;
+        const leadLocked = editing || !!lead;
         receiptDraft = { name: record?.receiptImageName || '', data: record?.receiptImageData || '' };
         document.getElementById('record-form-title').innerText = editing ? '编辑预定' : '办理预定';
         document.getElementById('record-form-submit').innerText = editing ? '保存预定' : '提交预定';
         const selectedLeadDisplay = record ? (record.name + ' / ' + displayPhone(record.phone)) : (lead ? lead.name + ' / ' + displayPhone(lead.phone) : '');
         const financeOn = !!record?.financeConfirmed;
         const statusText = record?.status || '有效';
+        const invalidVisible = statusText === '已失效';
         const body = formSection('预定信息',
-            selectorField('个人线索', 'leadId', record?.leadId || lead?.id || '', selectedLeadDisplay, true, editing) +
+            selectorField('个人线索', 'leadId', record?.leadId || lead?.id || '', selectedLeadDisplay, true, leadLocked) +
             selectorField('招生顾问', 'advisor', record?.advisor || lead?.owner || state.currentUser, record?.advisor || lead?.owner || state.currentUser, true) +
             selectorField('预定专业', 'major', record?.major || lead?.major || '', record?.major || lead?.major || '', true) +
-            inputField('预定金额', 'amount', 'number', record?.amount || '', true, 'inputmode="numeric" min="0" step="100"') +
+            amountStepperField('预定金额', 'amount', record?.amount || '', true) +
             inputField('预定时间', 'reservedAt', 'datetime-local', record?.reservedAt || nowDatetimeLocal(), true) +
             selectorField('招生学期', 'semester', record?.semester || lead?.semester || optionSets.semester[0], record?.semester || lead?.semester || optionSets.semester[0], true)
         ) +
@@ -4821,12 +5211,15 @@
         ) +
         formSection('状态与异常',
             selectorField('预定状态', 'reservationStatus', statusText, statusText, false) +
+            '<div class="conditional-field ' + (invalidVisible ? '' : 'hidden') + '" data-condition="reservation-invalid">' +
             inputField('失效时间', 'invalidAt', 'datetime-local', record?.invalidAt || '') +
-            inputField('退费金额', 'refundAmount', 'number', record?.refundAmount || '', false, 'inputmode="decimal" min="0" step="0.01"') +
+            '</div>' +
+            amountStepperField('退费金额', 'refundAmount', record?.refundAmount || '', false) +
             inputField('退费时间', 'refundAt', 'datetime-local', record?.refundAt || '') +
             textareaField('备注', 'remark', record?.remark || '')
         );
         document.getElementById('record-form-body').innerHTML = body;
+        updateReservationInvalidFields(statusText);
         openRecordFormPage();
     }
 
@@ -4839,7 +5232,6 @@
             : null;
         if (duplicateAdmission) {
             showToast('该学生已生成录取记录，不能重复录取');
-            prepareReservationWorkspace('录取记录');
             showAdmissionSuccess(duplicateAdmission);
             return;
         }
@@ -4849,9 +5241,9 @@
         document.getElementById('record-form-submit').innerText = admission ? '保存录取' : '提交转录取';
         const baseLead = directLead || (admission ? findAnyLead(admission.leadId) : null);
         const reservationDisplay = reservation ? reservation.name + ' / ' + displayPhone(reservation.phone) : (admission?.reservationCode || '');
+        const admissionLeadLocked = !!(admission || reservation || baseLead);
         const body = formSection('录取信息',
-            selectorField('个人线索', 'leadId', admission?.leadId || reservation?.leadId || baseLead?.id || '', admission ? (admission.name + ' / ' + admission.phone) : (reservationDisplay || (baseLead ? baseLead.name + ' / ' + baseLead.phone : '')), true, !!admission) +
-            selectorField('预定记录', 'reservationId', reservation?.id || admission?.reservationId || '', reservation ? (reservation.code + ' · ' + reservation.name) : admission?.reservationCode, false, !!admission) +
+            selectorField('个人线索', 'leadId', admission?.leadId || reservation?.leadId || baseLead?.id || '', admission ? (admission.name + ' / ' + admission.phone) : (reservationDisplay || (baseLead ? baseLead.name + ' / ' + baseLead.phone : '')), true, admissionLeadLocked) +
             selectorField('录取专业', 'admissionMajor', admission?.major || reservation?.major || baseLead?.major || '', admission?.major || reservation?.major || baseLead?.major || '', true) +
             selectorField('招生学期', 'semester', admission?.semester || reservation?.semester || baseLead?.semester || optionSets.semester[0], admission?.semester || reservation?.semester || baseLead?.semester || optionSets.semester[0], true) +
             selectorField('预分班', 'preClass', admission?.preClass || '', admission?.preClass || '', false) +
@@ -4901,6 +5293,20 @@
         closeAllModals();
     }
 
+    function hidePageRightSilently(page) {
+        if (!page) return;
+        page.classList.add('no-transition');
+        page.classList.remove('active');
+        page.classList.add('hidden-right');
+        void page.offsetHeight;
+        requestAnimationFrame(() => page.classList.remove('no-transition'));
+    }
+
+    function hideRecordFormPageSilently() {
+        hidePageRightSilently(document.getElementById('page-record-form'));
+        closeAllModals();
+    }
+
     function prepareReservationWorkspace(tabName) {
         const entryPage = document.getElementById('page-admission-entry');
         entryPage.classList.remove('active');
@@ -4938,7 +5344,7 @@
         const list = currentPicker.options.filter(item => !query || [item.label, item.sub, item.value].some(v => String(v || '').toLowerCase().includes(query)));
         const currentValue = currentPicker.offlineField
             ? document.getElementById('offline-lead-' + currentPicker.field)?.value
-            : (currentPicker.leadEditField ? document.getElementById('edit-lead-' + currentPicker.field)?.value : getFieldValue(currentPicker.field));
+            : (currentPicker.leadEditField ? document.getElementById('edit-lead-' + currentPicker.field)?.value : (currentPicker.visitEditField ? document.getElementById('visit-edit-' + currentPicker.field)?.value : getFieldValue(currentPicker.field)));
         const html = list.length ? list.map(item => '<button type="button" class="picker-item ' + (String(currentValue || '') === String(item.value) ? 'selected' : '') + '" onclick="selectPickerOption(\'' + escapeHtml(String(item.value)) + '\')"><div class="picker-item-title">' + escapeHtml(item.label) + '</div>' + (item.sub ? '<div class="picker-item-sub">' + escapeHtml(item.sub) + '</div>' : '') + '</button>').join('') : '<div class="empty-state" style="padding:20px 0;"><p>暂无匹配结果</p></div>';
         document.getElementById('record-picker-list').innerHTML = html;
     }
@@ -4964,6 +5370,16 @@
             if (currentPicker.field === 'grade') {
                 toggleLeadEditCustomGrade(item.value === '其他');
             }
+            closeAllModals();
+            currentPicker = null;
+            return;
+        }
+        if (currentPicker.visitEditField) {
+            const hidden = document.getElementById('visit-edit-' + currentPicker.field);
+            const selector = document.getElementById('visit-edit-' + currentPicker.field + '-selector');
+            if (hidden) hidden.value = item.value;
+            if (selector) selector.innerText = item.label;
+            if (currentPicker.field === 'status') updateVisitCancelReasonVisibility(item.value);
             closeAllModals();
             currentPicker = null;
             return;
@@ -5025,6 +5441,9 @@
                 if (requestInput && !requestInput.value) requestInput.value = 'ADMISSION-CHECKIN-' + checkin.id + '-V1-' + Date.now();
             }
         }
+        if (field === 'reservationStatus') {
+            updateReservationInvalidFields(value);
+        }
     }
 
     function handleRecordSwitchChange(field) {
@@ -5067,19 +5486,26 @@
         reader.readAsDataURL(file);
     }
 
+    function parseAmountValue(value) {
+        const amount = Number(String(value || '0').replace(/[^\d.-]/g, '')) || 0;
+        return Number.isFinite(amount) ? amount : 0;
+    }
+
     function collectReservationPayload(existing) {
         const leadId = Number(getFieldValue('leadId') || existing?.leadId);
         const lead = findAnyLead(leadId);
+        const amountValue = parseAmountValue(getFieldValue('amount'));
+        const reservationStatus = getFieldValue('reservationStatus') || existing?.status || '有效';
         return {
             id: existing?.id || Date.now(),
             code: existing?.code || ('YD' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + String(state.reservationRecords.length + 1).padStart(3, '0')),
             leadId,
             name: existing?.name || lead?.name || '待绑定学生',
             phone: existing?.phone || lead?.phone || '待补充',
-            status: getFieldValue('reservationStatus') || existing?.status || '有效',
+            status: reservationStatus,
             financeConfirmed: !!getFieldValue('financeConfirmed'),
             major: getFieldValue('major'),
-            amount: Number(getFieldValue('amount') || 0),
+            amount: amountValue,
             advisor: getFieldValue('advisor'),
             semester: getFieldValue('semester'),
             reservedAt: getFieldValue('reservedAt'),
@@ -5090,8 +5516,8 @@
             receiptImageData: receiptDraft.data,
             financeStaff: getFieldValue('financeConfirmed') ? getFieldValue('financeStaff') : '',
             financeConfirmedAt: getFieldValue('financeConfirmed') ? getFieldValue('financeConfirmedAt') : '',
-            invalidAt: getFieldValue('invalidAt') || '',
-            refundAmount: getFieldValue('refundAmount') || '',
+            invalidAt: reservationStatus === '已失效' ? (getFieldValue('invalidAt') || '') : '',
+            refundAmount: parseAmountValue(getFieldValue('refundAmount')),
             refundAt: getFieldValue('refundAt') || '',
             remark: getFieldValue('remark')
         };
@@ -5109,19 +5535,25 @@
             updateData(payload.leadId, 'lastFollow', '刚刚');
         }
         closeRecordFormPage();
-        prepareReservationWorkspace('预定记录');
         refreshAllModuleLists();
         if (editing) {
-            if (currentBusinessRecordDetail.type === 'reservation' && currentBusinessRecordDetail.id === payload.id) renderBusinessRecordDetail();
+            returnToReservationLeadDetail(payload.leadId);
             showToast('预定记录已保存', true);
             return;
         }
-        pendingNextReservationId = payload.id;
-        document.getElementById('reservation-next-summary').innerHTML =
-            '<strong>' + escapeHtml(payload.name) + '</strong><br>' +
-            escapeHtml(payload.major) + ' · ' + formatMoney(payload.amount) + '<br>' +
-            '预定编号：' + escapeHtml(payload.code);
-        showModal('dialog-reservation-next');
+        pendingNextReservationId = null;
+        returnToReservationLeadDetail(payload.leadId);
+        showToast('预定记录已提交', true);
+    }
+
+    function returnToReservationLeadDetail(leadId) {
+        const detailPage = document.getElementById('page-record-detail');
+        if (detailPage && detailPage.classList.contains('active')) {
+            detailPage.classList.remove('active');
+            detailPage.classList.add('hidden-right');
+            currentBusinessRecordDetail = { type: null, id: null };
+        }
+        openMyLeadDetail(leadId);
     }
 
     function finishReservationLater() {
@@ -5142,7 +5574,7 @@
         const lead = findAnyLead(Number(getFieldValue('leadId') || reservation?.leadId || existing?.leadId));
         return {
             id: existing?.id || Date.now(),
-            code: existing?.code || ('LQ' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + String(state.admissionRecords.length + 1).padStart(3, '0')),
+            code: '',
             leadId: Number(getFieldValue('leadId') || reservation?.leadId || existing?.leadId),
             reservationId: reservation?.id || existing?.reservationId || null,
             reservationCode: reservation?.code || existing?.reservationCode || '',
@@ -5175,8 +5607,6 @@
             : null;
         if (duplicateAdmission) {
             showToast('该学生已存在录取记录，已为你打开结果');
-            closeRecordFormPage();
-            prepareReservationWorkspace('录取记录');
             showAdmissionSuccess(duplicateAdmission);
             return;
         }
@@ -5188,10 +5618,9 @@
             updateData(payload.leadId, 'stage', 5);
             updateData(payload.leadId, 'lastFollow', '刚刚');
         }
-        closeRecordFormPage();
-        prepareReservationWorkspace('录取记录');
         refreshAllModuleLists();
         if (editing) {
+            closeRecordFormPage();
             if (currentBusinessRecordDetail.type === 'admission' && currentBusinessRecordDetail.id === payload.id) renderBusinessRecordDetail();
             showToast('录取记录已保存', true);
             return;
@@ -5202,12 +5631,12 @@
     function showAdmissionSuccess(record) {
         if (!record) return;
         lastAdmissionResultId = record.id;
+        currentMyLeadId = Number(record.leadId);
         document.getElementById('admission-result-body').innerHTML =
             '<div class="admission-success-card">' +
             '<div class="admission-success-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></div>' +
             '<div class="admission-success-title">录取办理成功</div>' +
             '<div class="admission-success-sub">录取记录已生成，可继续办理报到与入学交接</div>' +
-            '<div class="admission-success-code">录取编号：' + escapeHtml(record.code) + '</div>' +
             '<div class="record-grid">' +
             '<div class="record-info"><div class="record-label">学生</div><div class="record-value">' + escapeHtml(record.name) + '</div></div>' +
             '<div class="record-info"><div class="record-label">联系电话</div><div class="record-value">' + escapeHtml(displayPhone(record.phone)) + '</div></div>' +
@@ -5220,25 +5649,29 @@
             '<button class="my-lead-action-btn my-lead-action-primary" onclick="openCheckinFormFromAdmission(' + record.id + ')">入学交接</button>' +
             '</div></div>';
         const page = document.getElementById('page-admission-result');
-        page.classList.remove('hidden-right');
-        page.classList.add('active');
+        requestAnimationFrame(() => {
+            page.classList.remove('hidden-right');
+            page.classList.add('active');
+        });
     }
 
     function closeAdmissionResult() {
-        const page = document.getElementById('page-admission-result');
-        page.classList.remove('active');
-        page.classList.add('hidden-right');
-        lastAdmissionResultId = null;
-        prepareReservationWorkspace('录取记录');
+        viewAdmissionLeadDetail();
     }
 
     function viewAdmissionLeadDetail() {
         const record = state.admissionRecords.find(item => item.id === lastAdmissionResultId);
-        if (!record) return;
         const page = document.getElementById('page-admission-result');
         page.classList.remove('active');
         page.classList.add('hidden-right');
+        hidePageRightSilently(document.getElementById('page-record-form'));
+        const detailPage = document.getElementById('page-record-detail');
+        if (detailPage) {
+            hidePageRightSilently(detailPage);
+            currentBusinessRecordDetail = { type: null, id: null };
+        }
         lastAdmissionResultId = null;
+        if (!record) return;
         openMyLeadDetail(record.leadId);
     }
 
@@ -5249,6 +5682,30 @@
         openEnrollmentRecordForm('checkin', null, admissionId);
     }
 
+    function showReservationSubmitConfirm() {
+        const editing = currentRecordForm.type === 'reservation' && currentRecordForm.mode === 'edit';
+        const title = document.getElementById('reservation-submit-confirm-title');
+        const desc = document.getElementById('reservation-submit-confirm-desc');
+        if (title) title.innerText = editing ? '确认保存预定？' : '确认提交预定？';
+        if (desc) desc.innerText = editing ? '保存后会更新预定记录，并返回该学生详情页。' : '提交后会生成预定记录，并将线索推进到预定阶段。';
+        const leadText = document.getElementById('selector-leadId')?.innerText.trim() || '当前学生';
+        const majorText = getFieldValue('major') || '待确认专业';
+        const amountText = getFieldValue('amount') || '0';
+        const summary = document.getElementById('reservation-submit-confirm-summary');
+        if (summary) {
+            summary.innerHTML =
+                '<strong>' + escapeHtml(leadText) + '</strong><br>' +
+                escapeHtml(majorText) + ' · ' + formatMoney(Number(String(amountText).replace(/[^\d.-]/g, '')) || 0) + '<br>' +
+                '预定时间：' + escapeHtml(formatDateTimeDisplay('datetime-local', getFieldValue('reservedAt') || nowDatetimeLocal()));
+        }
+        showModal('dialog-confirm-reservation-submit');
+    }
+
+    function confirmReservationSubmit() {
+        closeAllModals();
+        submitReservationRecord();
+    }
+
     function submitRecordForm() {
         if (!validateRecordForm()) return;
         if (currentRecordForm.type.startsWith('enrollment-')) {
@@ -5256,7 +5713,7 @@
             return;
         }
         if (currentRecordForm.type === 'reservation') {
-            submitReservationRecord();
+            showReservationSubmitConfirm();
             return;
         }
         if (currentRecordForm.type === 'admission') {
@@ -5268,66 +5725,6 @@
         currentReservationTab = normalizeReservationFilter(name);
         document.querySelectorAll('#pills-reservation .reservation-tab').forEach(tab => tab.classList.toggle('active', tab.innerText.trim() === currentReservationTab));
         renderReservationModule(currentReservationTab);
-    }
-
-    function openReservationMoreActions(id) {
-        const record = state.reservationRecords.find(r => r.id === id);
-        if (!record) return;
-        document.getElementById('record-actions-title').innerText = '更多操作';
-        const disabledFlow = record.status !== '有效';
-        const refundAction = disabledFlow ? "showToast('当前状态不可退费')" : "openReservationStatusSheet(" + id + ", 'refund')";
-        const invalidAction = disabledFlow ? "showToast('当前状态不可设为失效')" : "openReservationStatusSheet(" + id + ", 'invalid')";
-        const body = [
-            '<button class="action-sheet-btn danger" onclick="deleteReservationRecord(' + id + ')">删除</button>',
-            '<button class="action-sheet-btn warning" onclick="' + refundAction + '">退费</button>',
-            '<button class="action-sheet-btn" onclick="' + invalidAction + '">设为失效</button>'
-        ].join('');
-        document.getElementById('record-actions-body').innerHTML = body;
-        showModal('sheet-record-actions');
-    }
-
-    function openReservationStatusSheet(id, type) {
-        const record = state.reservationRecords.find(r => r.id === id);
-        if (!record) return;
-        document.getElementById('sheet-record-actions').classList.remove('active');
-        pendingReservationAction = { id, type };
-        document.getElementById('reservation-status-title').innerText = type === 'refund' ? '办理退费' : '设为失效';
-        const body = type === 'refund'
-            ? inputField('退费金额', 'statusRefundAmount', 'number', record.amount || '', true, 'inputmode="decimal" min="0" step="0.01"') + inputField('退费时间', 'statusRefundAt', 'datetime-local', nowDatetimeLocal(), true)
-            : inputField('失效时间', 'statusInvalidAt', 'datetime-local', nowDatetimeLocal(), true);
-        document.getElementById('reservation-status-body').innerHTML = body;
-        showModal('sheet-reservation-status');
-    }
-
-    function submitReservationStatusAction() {
-        const form = document.getElementById('reservation-status-form');
-        if (!form.checkValidity()) {
-            form.reportValidity();
-            return;
-        }
-        const record = state.reservationRecords.find(r => r.id === pendingReservationAction.id);
-        if (!record) return;
-        if (pendingReservationAction.type === 'refund') {
-            record.status = '已退费';
-            record.refundAmount = Number(getFieldValue('statusRefundAmount') || 0);
-            record.refundAt = getFieldValue('statusRefundAt');
-        } else {
-            record.status = '已失效';
-            record.invalidAt = getFieldValue('statusInvalidAt');
-        }
-        closeAllModals();
-        refreshAllModuleLists();
-        if (currentBusinessRecordDetail.type === 'reservation' && currentBusinessRecordDetail.id === record.id) renderBusinessRecordDetail();
-        showToast(pendingReservationAction.type === 'refund' ? '退费状态已更新' : '预定已设为失效', true);
-    }
-
-    function deleteReservationRecord(id) {
-        if (!window.confirm('确认删除这条预定记录？')) return;
-        state.reservationRecords = state.reservationRecords.filter(r => r.id !== id);
-        closeAllModals();
-        if (currentBusinessRecordDetail.type === 'reservation' && currentBusinessRecordDetail.id === id) closeBusinessRecordDetail();
-        refreshAllModuleLists();
-        showToast('预定记录已删除', true);
     }
 
     function deleteAdmissionRecord(id) {
@@ -5430,6 +5827,9 @@
         }
         if (['date', 'time', 'datetime-local'].includes(item.type)) {
             return dateTimeFieldHtml(item.label, 'dynamic-field-' + idx, item.type, item.value || '', !!item.required, name);
+        }
+        if (item.type === 'number' && item.label.includes('金额')) {
+            return amountStepperRawField(item.label, 'dynamic-field-' + idx, name, item.value || '', !!item.required);
         }
         const inputType = item.type === 'number' ? 'number' : 'text';
         return '<div class="form-group"><label class="form-label' + requiredClass + '">' + item.label + '</label><input type="' + inputType + '" class="form-control" name="' + name + '" value="' + (item.value || '') + '" placeholder="请输入' + item.label + '"' + required + '></div>';
@@ -5760,6 +6160,8 @@
         let summaryHtml = '<div class="detail-summary-grid"><div class="detail-summary"><div class="detail-summary-title">基础信息</div><div class="detail-summary-body">意向专业：' + (lead.major || '计算机网络技术') + '；生源学校：' + (lead.school || '待确认学校') + '；来源：' + lead.source + '。</div></div><div class="detail-summary"><div class="detail-summary-title">当前阶段</div><div class="detail-summary-body">阶段：' + getStageText(lead.stage) + '；负责人：' + (lead.owner || '待分配') + '。</div></div><div class="detail-summary"><div class="detail-summary-title">下一步动作</div><div class="detail-summary-body">' + getNextAction(lead) + '</div></div><div class="detail-summary"><div class="detail-summary-title">风险提醒</div><div class="detail-summary-body">' + (lead.isOverdue ? '已超时，请优先处理并补充跟进记录。' : '当前无超时风险，按计划推进即可。') + '</div></div></div>';
         let timelineHtml = summaryHtml + '<div class="section-header" style="padding-left:0; margin-top: 4px;"><div class="section-title" style="font-size:16px;">流程时间线</div></div>' + getDetailTimelineHtml(lead);
         document.getElementById('detail-timeline').innerHTML = timelineHtml;
+        const legacyVisitButton = document.getElementById('legacy-visit-invite-btn');
+        if (legacyVisitButton) legacyVisitButton.innerText = getVisitInviteActionText(lead);
         const detailPage = document.getElementById('page-lead-detail');
         detailPage.classList.remove('hidden-left', 'hidden-right');
         detailPage.style.cssText = 'z-index:300;background:#F8FAFC;position:absolute;left:0;top:0;right:auto;bottom:auto;width:100%;height:100%;min-width:100%;max-width:100%;';
@@ -5933,6 +6335,8 @@
         renderEnrollmentFlowList();
         refreshAllModuleLists();
         renderLogs();
+        enhanceClearableInputs(document);
+        new MutationObserver(scheduleEnhanceClearableInputs).observe(document.body, { childList: true, subtree: true });
     };
 
     function switchTab(tabId, el) {
