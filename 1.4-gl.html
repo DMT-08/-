@@ -64,15 +64,15 @@
         .main-content { flex: 1; min-height: 0; height: 0; display: flex; flex-direction: column; overflow-y: auto; padding: 0 20px 20px 20px; scrollbar-width: none; padding-bottom: 30px; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; }
         .main-content::-webkit-scrollbar { display: none; }
 
-        .tab-bar, .sub-tab-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 84px; background: #fff; border-top: 1px solid rgba(226, 232, 240, 0.72); display: flex; justify-content: space-around; align-items: flex-start; padding-top: 10px; z-index: 100; padding-bottom: 20px; box-shadow: none; isolation: isolate; overflow: hidden; }
-        .tab-bar::before, .sub-tab-bar::before { content: ''; position: absolute; inset: 0; background: #fff; z-index: 0; pointer-events: none; }
+        .tab-bar, .sub-tab-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 84px; background: rgba(255, 255, 255, 0.82); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-top: 1px solid rgba(255, 255, 255, 0.9); display: flex; justify-content: space-around; align-items: flex-start; padding-top: 10px; z-index: 100; padding-bottom: 20px; box-shadow: 0 -8px 28px rgba(31, 95, 255, 0.05); isolation: isolate; overflow: hidden; }
+        .tab-bar::before, .sub-tab-bar::before { display: none; }
         .sub-tab-bar { justify-content: space-around; gap: 4px; padding-left: 8px; padding-right: 8px; scrollbar-width: none; }
         .sub-tab-bar::-webkit-scrollbar { display: none; }
         .tab-item, .sub-tab-item { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94A3B8; cursor: pointer; width: 60px; transition: all 0.3s; }
         .sub-tab-item { flex: 0 0 62px; }
         .tab-item.active, .sub-tab-item.active { color: var(--primary-color); }
         .tab-icon { position: relative; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; }
-        .tab-icon svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+        .tab-icon svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
         .tab-label { font-size: 11px; font-weight: 700; letter-spacing: 0.2px;}
 
         .sub-view { position: absolute; top: 0; left: 0; right: 0; bottom: 0; max-width: 100%; padding: 0 20px 100px; display: none; flex-direction: column; overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; overscroll-behavior-y: contain; }
@@ -88,8 +88,8 @@
 
         .grid-menu { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 8px; padding: 16px 12px; }
         .grid-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: transform 0.2s; position: relative; }
-        .grid-icon-wrap { width: 52px; height: 52px; border-radius: 18px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.92); box-shadow: 0 10px 20px rgba(148, 169, 214, 0.08), inset 0 1px 0 rgba(255,255,255,0.72); }
-        .grid-icon-wrap svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.85; stroke-linecap: round; stroke-linejoin: round; }
+        .grid-icon-wrap { width: 52px; height: 52px; border-radius: 20px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.92); box-shadow: 0 10px 20px rgba(148, 169, 214, 0.08), inset 0 1px 0 rgba(255,255,255,0.72); }
+        .grid-icon-wrap svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
         .grid-label { font-size: 12px; font-weight: 700; color: var(--text-main); text-align: center; line-height: 1.35; }
         .grid-item.manage-mode .grid-icon-wrap { border-style: dashed; }
         .grid-item.manage-mode::after { content: attr(data-manage-label); position: absolute; top: -6px; right: 6px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 999px; background: var(--danger-color); color: white; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
@@ -97,7 +97,7 @@
         .home-directory-card { flex-shrink: 0; }
         .home-high-card { flex-shrink: 0; padding: 14px 12px; margin-bottom: 12px; }
         .home-high-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 8px; }
-        .home-high-btn { position: relative; min-height: 50px; padding: 10px 6px; border: 1px solid rgba(31,95,255,0.10); border-radius: 16px; background: rgba(255,255,255,0.74); color: var(--text-title); font-size: 13px; font-weight: 900; line-height: 1.2; font-family: inherit; cursor: pointer; transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease; display:flex; align-items:center; justify-content:center; text-align:center; box-shadow: 0 5px 14px rgba(31,95,255,0.04); }
+        .home-high-btn { position: relative; min-height: 54px; padding: 12px 6px; border: 1px solid rgba(31,95,255,0.10); border-radius: 16px; background: rgba(255,255,255,0.74); color: var(--text-title); font-size: 13px; font-weight: 900; line-height: 1.2; font-family: inherit; cursor: pointer; transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease; display:flex; align-items:center; justify-content:center; text-align:center; box-shadow: 0 5px 14px rgba(31,95,255,0.04); }
         .home-high-btn:active { transform: scale(0.96); background: var(--primary-light); color: var(--primary-color); }
         .home-high-btn.config { color: var(--primary-color); border-style: dashed; border-color: rgba(31,95,255,0.24); background: rgba(239,246,255,0.78); }
         .home-high-btn.manage-mode { animation: high-manage-wiggle 0.3s ease-in-out infinite; }
@@ -106,6 +106,8 @@
         .admission-entry-btn.manage-mode { animation: high-manage-wiggle 0.3s ease-in-out infinite; position: relative; }
         .admission-entry-btn.manage-mode:nth-child(2n) { animation-delay: -0.15s; }
         .admission-entry-btn.manage-mode::after { content: ''; position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; box-sizing: border-box; border-radius: 50%; background-color: var(--success-color); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round'%3E%3Cline x1='12' y1='5' x2='12' y2='19'/%3E%3Cline x1='5' y1='12' x2='19' y2='12'/%3E%3C/svg%3E"); background-size: 10px 10px; background-repeat: no-repeat; background-position: center center; border: 1.5px solid #fff; box-shadow: 0 4px 8px rgba(16, 185, 129, 0.25); z-index: 10; pointer-events: none; }
+        .admission-entry-btn.added-disabled { opacity: 0.45; color: #94A3B8; background: rgba(226,232,240,0.62); border-color: rgba(148,163,184,0.18); box-shadow: none; cursor: default; }
+        .admission-entry-btn.added-disabled::after { content: '已添加'; position: absolute; top: -6px; right: -6px; min-width: 38px; height: 20px; padding: 0 6px; display: flex; align-items: center; justify-content: center; border-radius: 999px; background: rgba(148,163,184,0.92); color: #fff; font-size: 10px; font-weight: 900; box-shadow: 0 4px 8px rgba(100,116,139,0.16); }
         @keyframes high-manage-wiggle {
             0%, 100% { transform: rotate(-1.2deg) translateY(0); }
             50% { transform: rotate(1.2deg) translateY(-1px); }
@@ -117,7 +119,7 @@
         .admission-entry-group-title { grid-column: 1 / -1; padding: 14px 2px 4px; color: var(--text-secondary); font-size: 12px; font-weight: 900; opacity: 0.9; display: flex; align-items: center; gap: 10px; }
         .admission-entry-group-title::after { content: ''; height: 1px; flex: 1; background: linear-gradient(90deg, rgba(100,116,139,0.24), rgba(31,95,255,0.02)); border-radius: 999px; }
         .admission-entry-group-title:first-child { padding-top: 0; }
-        .admission-entry-btn { min-height: 48px; padding: 10px 4px; border: 1px solid rgba(31, 95, 255, 0.10); border-radius: 16px; background: rgba(255,255,255,0.72); color: var(--text-title); font-size: 13px; font-weight: 800; line-height: 1.2; font-family: inherit; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; text-align: center; box-shadow: 0 4px 12px rgba(31, 95, 255, 0.03); }
+        .admission-entry-btn { min-height: 52px; padding: 12px 4px; border: 1px solid rgba(31, 95, 255, 0.10); border-radius: 16px; background: rgba(255,255,255,0.72); color: var(--text-title); font-size: 13px; font-weight: 800; line-height: 1.2; font-family: inherit; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; text-align: center; box-shadow: 0 4px 12px rgba(31, 95, 255, 0.03); }
         .admission-entry-btn:active { transform: scale(0.96); background: var(--primary-light); color: var(--primary-color); border-color: rgba(31, 95, 255, 0.1); }
         .admission-entry-empty { grid-column: 1 / -1; min-height: 82px; display:flex; align-items:center; justify-content:center; text-align:center; padding: 18px 12px; border-radius: 16px; background: rgba(255,255,255,0.62); border: 1px dashed rgba(148,163,184,0.28); color: var(--text-secondary); font-size: 13px; font-weight: 800; line-height: 1.5; }
 
@@ -141,7 +143,7 @@
         .card-title { font-size: 15px; font-weight: 800; color: var(--text-title); line-height: 1.4; display:flex; align-items:center; gap:6px;}
         .card-desc { font-size: 12px; color: var(--text-secondary); display: flex; gap: 8px; align-items: center; font-weight: 500; flex-wrap: wrap;}
 
-        .checkbox-wrap { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border: 2px solid #CBD5E1; border-radius: 6px; cursor: pointer; transition: 0.2s; background: white;}
+        .checkbox-wrap { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border: 2px solid #CBD5E1; border-radius: 50%; cursor: pointer; transition: 0.2s; background: white;}
         .checkbox-wrap.checked { background: var(--primary-color); border-color: var(--primary-color); }
         .checkbox-wrap svg { width: 14px; height: 14px; stroke: white; opacity: 0; transition: 0.2s;}
         .checkbox-wrap.checked svg { opacity: 1; }
@@ -151,6 +153,12 @@
         .tag-warning { background: var(--warning-light); color: var(--warning-color); }
         .tag-success { background: var(--success-light); color: var(--success-color); }
         .tag-danger { background: var(--danger-light); color: var(--danger-color); }
+        .tag-purple { background: rgba(99,102,241,0.11); color: #4F46E5; }
+        .tag-activated { background: rgba(16,185,129,0.12); color: #047857; }
+        .tag-inactive { background: rgba(100,116,139,0.12); color: #64748B; }
+        .tag-on-duty { background: rgba(31,95,255,0.11); color: var(--primary-color); }
+        .tag-leave { background: rgba(245,158,11,0.13); color: #B45309; }
+        .tag-offboard { background: rgba(239,68,68,0.11); color: var(--danger-color); }
         .badge-outline { border: 1px solid var(--primary-color); color: var(--primary-color); padding: 2px 6px; border-radius: 6px; font-size: 10px; font-weight: 700; white-space: nowrap;}
         .badge-outline.warning { border-color: var(--warning-color); color: var(--warning-color); }
         .badge-outline.danger { border-color: var(--danger-color); color: var(--danger-color); }
@@ -158,12 +166,12 @@
         .step-container { display: flex; align-items: center; justify-content: space-between; margin: 12px 0 16px; position: relative; width: 100%;}
         .step-container::before { content:''; position:absolute; top: 10px; left: 5%; right: 5%; height: 2px; background: rgba(0,0,0,0.08); z-index: 0;}
         .step-item { display: flex; flex-direction: column; align-items: center; gap: 6px; z-index: 1; position:relative; padding: 0 2px; border-radius: 12px; flex: 1;}
-        .step-circle { width: 20px; height: 20px; border-radius: 50%; background: #E2E8F0; color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; border: 2px solid white; box-shadow:0 2px 4px rgba(0,0,0,0.05); transition: 0.3s;}
+        .step-circle { width: 20px; height: 20px; border-radius: 50%; background: rgba(248,250,252,0.96); color: #94A3B8; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; border: 2px solid #CBD5E1; box-shadow:0 2px 4px rgba(0,0,0,0.04); transition: 0.3s;}
         .step-item.active .step-circle { background: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-light), 0 2px 4px rgba(0,0,0,0.05); border-color: transparent; animation: nodePulse 0.46s ease both;}
-        .step-item.done .step-circle { background: var(--success-color); border-color: transparent;}
+        .step-item.done .step-circle { background: #CBD5E1; color: #fff; border-color: transparent;}
         .step-label { font-size: 9px; font-weight: 800; color: #94A3B8; text-align: center; white-space: nowrap;}
         .step-item.active .step-label { color: var(--primary-color); }
-        .step-item.done .step-label { color: var(--success-color); }
+        .step-item.done .step-label { color: #64748B; }
 
         .card-actions { display: flex; gap: 8px; margin-top: 6px; padding-top: 12px; border-top: 1px dashed rgba(126, 147, 190, 0.18); align-items:center; flex-wrap: wrap;}
         .btn-xs { background: rgba(31,95,255,0.1); color: var(--primary-color); border:none; padding: 7px 13px; border-radius: 999px; font-size: 12px; font-weight: 800; cursor:pointer; transition:0.2s;}
@@ -173,8 +181,9 @@
         .btn-xs.warning { background: var(--warning-light); color: var(--warning-color); }
         .btn-xs.success { background: var(--success-light); color: var(--success-color); }
         .btn-xs.disabled { opacity: 0.5; pointer-events: none; }
+        .btn-xs.visit-disabled-hint { opacity: 0.56; color: #94A3B8; background: rgba(148,163,184,0.16); }
 
-        .follow-business-tabs { position: sticky; top: 0; z-index: 42; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; margin: 0 20px 12px 0; padding: 5px; border-radius: 16px; background: rgba(255,255,255,0.72); border: 1px solid rgba(255,255,255,0.92); box-shadow: 0 8px 20px rgba(31,95,255,0.06); backdrop-filter: blur(20px); }
+        .follow-business-tabs { position: sticky; top: 0; z-index: 86; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; margin: 0 20px 12px 0; padding: 5px; border-radius: 16px; background: rgba(255,255,255,0.94); border: 1px solid rgba(255,255,255,0.96); box-shadow: 0 10px 24px rgba(31,95,255,0.08); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); }
         .follow-business-tab { height: 38px; border: 0; border-radius: 11px; background: transparent; color: var(--text-secondary); font-family: inherit; font-size: 13px; font-weight: 850; }
         .follow-business-tab.active { background: var(--primary-color); color: #fff; box-shadow: 0 6px 14px rgba(31,95,255,0.22); }
         .follow-business-pane { display: none; min-height: 100%; }
@@ -187,29 +196,29 @@
         .enrollment-flow-tab.active { border-color: var(--primary-color); background: var(--primary-color); color: #fff; box-shadow: 0 7px 14px rgba(31,95,255,0.18); }
         .enrollment-flow-tools { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; }
         .enrollment-flow-tools .record-search-wrap { flex: 1; margin: 0; }
-        .enrollment-add-btn { position: absolute; left: 20px; right: 20px; bottom: 20px; z-index: 88; width: auto; min-width: 0; height: 50px; padding: 0 18px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 14px; background: var(--primary-color); color: #fff; box-shadow: 0 8px 18px rgba(31,95,255,0.22); font-family: inherit; font-size: 13px; font-weight: 950; transform: none; }
+        .enrollment-add-btn { position: absolute; left: 20px; right: 20px; bottom: 20px; z-index: 88; width: auto; min-width: 0; height: 52px; padding: 0 24px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 999px; background: var(--primary-color); color: #fff; box-shadow: 0 8px 18px rgba(31,95,255,0.22); font-family: inherit; font-size: 13px; font-weight: 950; transform: none; }
         .enrollment-add-btn svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; }
-        .lead-management-public-entry-btn { position: absolute; left: 20px; right: 20px; bottom: 20px; z-index: 280; min-width: 0; height: 50px; padding: 0 20px; display: none; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 14px; background: linear-gradient(135deg, #4B82FF 0%, var(--primary-color) 100%); color: #fff; box-shadow: 0 8px 18px rgba(31,95,255,0.22); font-family: inherit; font-size: 14px; font-weight: 950; transform: none; touch-action: manipulation; }
+        .lead-management-public-entry-btn { position: absolute; left: 20px; right: 20px; bottom: 20px; z-index: 280; min-width: 0; height: 50px; padding: 0 20px; display: none; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 16px; background: linear-gradient(135deg, #4B82FF 0%, var(--primary-color) 100%); color: #fff; box-shadow: 0 8px 18px rgba(31,95,255,0.22); font-family: inherit; font-size: 14px; font-weight: 950; transform: none; touch-action: manipulation; }
         #workspace-enrollment.leads-view-active .lead-management-public-entry-btn, #workspace-enrollment.lead-management-page-mode .lead-management-public-entry-btn { display: flex; }
         .lead-management-public-entry-btn:active { transform: scale(0.95); }
         #sub-view-leads.has-batch-selection + .lead-management-public-entry-btn { opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(10px); }
         .lead-management-public-entry-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
         .enrollment-record-list { display: grid; gap: 10px; padding-right: 20px; }
-        .enrollment-record-row { width: 100%; min-height: 58px; display: grid; grid-template-columns: 34px minmax(0,1fr) auto 18px; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid rgba(255,255,255,0.92); border-radius: 18px; background: rgba(255,255,255,0.79); box-shadow: 0 8px 18px rgba(31,95,255,0.05); font-family: inherit; text-align: left; color: var(--text-title); }
+        .enrollment-record-row { width: 100%; min-height: 58px; display: grid; grid-template-columns: 34px minmax(0,1fr) auto 18px; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid rgba(255,255,255,0.92); border-radius: 22px; background: rgba(255,255,255,0.79); box-shadow: 0 8px 18px rgba(31,95,255,0.05); font-family: inherit; text-align: left; color: var(--text-title); }
         .enrollment-record-row:active { transform: scale(0.97); background: rgba(255,255,255,0.94); }
         .enrollment-record-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 950; }
         .enrollment-record-sub { margin-top: 4px; color: var(--text-secondary); font-size: 11px; font-weight: 750; }
-        .enrollment-record-index { width: 28px; height: 28px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(31,95,255,0.09); color: var(--primary-color); font-size: 12px; font-weight: 950; }
+        .enrollment-record-index { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(31,95,255,0.09); color: var(--primary-color); font-size: 12px; font-weight: 950; }
         .enrollment-record-arrow { width: 16px; height: 16px; color: #94A3B8; }
-        .enrollment-status { padding: 5px 9px; border-radius: 9px; background: rgba(31,95,255,0.1); color: var(--primary-color); font-size: 11px; font-weight: 900; white-space: nowrap; }
-        .manager-lead-gold-btn { width: 100%; min-height: 50px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.42); border-radius: 18px; background: linear-gradient(135deg, #F8D36A 0%, #D99A16 48%, #B87308 100%); color: #fff; box-shadow: 0 12px 24px rgba(184,115,8,0.22), inset 0 1px 0 rgba(255,255,255,0.45); font-family: inherit; font-size: 15px; font-weight: 950; letter-spacing: 0; cursor: pointer; touch-action: manipulation; }
+        .enrollment-status { padding: 5px 9px; border-radius: 12px; background: rgba(31,95,255,0.1); color: var(--primary-color); font-size: 11px; font-weight: 900; white-space: nowrap; }
+        .manager-lead-gold-btn { width: 100%; min-height: 52px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.42); border-radius: 16px; background: linear-gradient(135deg, #F8D36A 0%, #D99A16 48%, #B87308 100%); color: #fff; box-shadow: 0 12px 24px rgba(184,115,8,0.22), inset 0 1px 0 rgba(255,255,255,0.45); font-family: inherit; font-size: 15px; font-weight: 950; letter-spacing: 0; cursor: pointer; touch-action: manipulation; }
         .manager-lead-gold-btn:active { transform: scale(0.97); filter: brightness(1.03); }
         .enrollment-status.success { background: rgba(16,185,129,0.12); color: #047857; }
         .enrollment-status.warning { background: rgba(245,158,11,0.13); color: #B45309; }
         .follow-records-toolbar { margin: 2px 20px 12px 0; }
         .record-search-wrap { position: relative; margin-bottom: 10px; }
         .record-search-wrap svg { position: absolute; left: 13px; top: 50%; width: 17px; height: 17px; color: #94A3B8; transform: translateY(-50%); pointer-events: none; }
-        .record-search-input { width: 100%; height: 42px; box-sizing: border-box; border: 1px solid rgba(31,95,255,0.1); border-radius: 13px; background: rgba(255,255,255,0.9); padding: 0 14px 0 40px; color: var(--text-title); font-family: inherit; font-size: 13px; font-weight: 800; outline: none; box-shadow: 0 6px 16px rgba(31,95,255,0.05); }
+        .record-search-input { width: 100%; height: 46px; box-sizing: border-box; border: 1px solid rgba(31,95,255,0.1); border-radius: 18px; background: rgba(255,255,255,0.9); padding: 0 14px 0 40px; color: var(--text-title); font-family: inherit; font-size: 13px; font-weight: 800; outline: none; box-shadow: 0 6px 16px rgba(31,95,255,0.05); }
         .record-search-input:focus { border-color: rgba(31,95,255,0.35); box-shadow: 0 0 0 3px rgba(31,95,255,0.08); }
         .reservation-page-bar { position: sticky; top: 0; z-index: 30; min-height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 0 12px; background: linear-gradient(135deg, rgba(239,246,255,0.92) 0%, rgba(223,231,255,0.92) 100%); backdrop-filter: blur(18px); }
         .reservation-page-title { position: absolute; left: 54px; right: 54px; text-align: center; font-size: 18px; font-weight: 900; color: var(--text-title); }
@@ -218,13 +227,13 @@
         .reservation-add-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
         .reservation-tabs { display: flex; gap: 8px; margin: 0; overflow-x: auto; scrollbar-width: none; }
         .reservation-tabs::-webkit-scrollbar { display: none; }
-        .reservation-tab { min-width: 66px; height: 34px; padding: 0 15px; border-radius: 10px; border: 1px solid rgba(31,95,255,0.1); background: rgba(255,255,255,0.76); color: var(--text-secondary); font-size: 12px; font-weight: 900; font-family: inherit; cursor: pointer; transition: 0.2s; }
+        .reservation-tab { min-width: 66px; height: 34px; padding: 0 15px; border-radius: 999px; border: 1px solid rgba(31,95,255,0.1); background: rgba(255,255,255,0.76); color: var(--text-secondary); font-size: 12px; font-weight: 900; font-family: inherit; cursor: pointer; transition: 0.2s; }
         .reservation-tab.active { background: var(--primary-color); border-color: var(--primary-color); color: #fff; box-shadow: 0 7px 14px rgba(31,95,255,0.18); }
         .business-record-list { display: grid; gap: 10px; }
-        .business-record-row { width: 100%; min-height: 58px; display: grid; grid-template-columns: minmax(0, 1fr) 64px 18px; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid rgba(255,255,255,0.92); border-radius: 18px; background: rgba(255,255,255,0.78); box-shadow: 0 8px 18px rgba(31,95,255,0.05); color: var(--text-title); font-family: inherit; text-align: left; }
+        .business-record-row { width: 100%; min-height: 58px; display: grid; grid-template-columns: minmax(0, 1fr) 64px 18px; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid rgba(255,255,255,0.92); border-radius: 22px; background: rgba(255,255,255,0.78); box-shadow: 0 8px 18px rgba(31,95,255,0.05); color: var(--text-title); font-family: inherit; text-align: left; }
         .business-record-row:active { transform: scale(0.97); background: rgba(255,255,255,0.94); }
         .business-record-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; font-weight: 950; }
-        .business-record-stage { justify-self: end; padding: 5px 10px; border-radius: 10px; font-size: 11px; font-weight: 950; text-align: center; }
+        .business-record-stage { justify-self: end; padding: 5px 10px; border-radius: 14px; font-size: 11px; font-weight: 950; text-align: center; }
         .business-record-stage.reservation { background: rgba(245,158,11,0.13); color: #B45309; }
         .business-record-stage.admission { background: rgba(16,185,129,0.13); color: #047857; }
         .business-record-arrow { width: 16px; height: 16px; color: #94A3B8; }
@@ -252,7 +261,7 @@
         .record-detail-section { padding: 15px; margin-bottom: 12px; border-radius: 20px; background: rgba(255,255,255,0.72); border: 1px solid rgba(255,255,255,0.9); box-shadow: 0 8px 20px rgba(31,95,255,0.05); }
         .record-detail-section-title { margin-bottom: 11px; color: var(--primary-color); font-size: 14px; font-weight: 950; }
         .record-detail-footer { position: absolute; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; padding: 12px 20px 24px; background: rgba(255,255,255,0.9); border-top: 1px solid rgba(255,255,255,0.94); box-shadow: 0 -10px 24px rgba(31,95,255,0.08); backdrop-filter: blur(18px); }
-        .record-detail-action { min-height: 42px; border-radius: 12px; border: 1px solid rgba(31,95,255,0.12); background: rgba(31,95,255,0.09); color: var(--primary-color); font-family: inherit; font-size: 12px; font-weight: 900; }
+        .record-detail-action { min-height: 48px; border-radius: 999px; border: 1px solid rgba(31,95,255,0.12); background: rgba(31,95,255,0.09); color: var(--primary-color); font-family: inherit; font-size: 12px; font-weight: 900; }
         .record-detail-action.primary { border-color: var(--primary-color); background: var(--primary-color); color: #fff; box-shadow: 0 7px 15px rgba(31,95,255,0.22); }
         .record-detail-action.muted { border-color: rgba(100,116,139,0.16); background: rgba(255,255,255,0.7); color: var(--text-secondary); }
         .record-detail-action:disabled { opacity: 0.48; box-shadow: none; }
@@ -263,7 +272,7 @@
         .record-form-body::-webkit-scrollbar { display: none; }
         .form-footer-fixed { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 20px 24px; background: rgba(255,255,255,0.86); border-top: 1px solid rgba(255,255,255,0.9); backdrop-filter: blur(18px); box-shadow: 0 -10px 24px rgba(31,95,255,0.08); }
         .form-note { font-size: 12px; font-weight: 700; color: var(--text-secondary); line-height: 1.45; margin: -2px 4px 12px; }
-        .selector-control { width: 100%; min-height: 48px; border-radius: 18px; border: 1px solid rgba(155,169,206,0.14); background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(245,248,255,0.90)); padding: 13px 40px 13px 16px; display: flex; align-items: center; color: var(--text-title); font-size: 14px; font-weight: 800; position: relative; cursor: pointer; text-align: left; font-family: inherit; box-shadow: 0 7px 18px rgba(31,95,255,0.055), inset 0 1px 0 rgba(255,255,255,0.86); transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, transform 0.18s ease; }
+        .selector-control { width: 100%; min-height: 52px; border-radius: 999px; border: 1px solid rgba(155,169,206,0.14); background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(245,248,255,0.90)); padding: 13px 40px 13px 16px; display: flex; align-items: center; color: var(--text-title); font-size: 14px; font-weight: 800; position: relative; cursor: pointer; text-align: left; font-family: inherit; box-shadow: 0 7px 18px rgba(31,95,255,0.055), inset 0 1px 0 rgba(255,255,255,0.86); transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, transform 0.18s ease; }
         .selector-control.placeholder { color: #94A3B8; font-weight: 700; }
         .selector-control::after { content: ''; position: absolute; right: 16px; top: 50%; width: 8px; height: 8px; border-right: 2px solid #94A3B8; border-bottom: 2px solid #94A3B8; transform: translateY(-65%) rotate(45deg); }
         .selector-control:focus, .selector-control:focus-visible { border-color: rgba(155,169,206,0.18); background: #fff; box-shadow: 0 7px 18px rgba(31,95,255,0.055), inset 0 1px 0 rgba(255,255,255,0.86); outline: none; }
@@ -271,7 +280,7 @@
         .selector-control:active { transform: scale(0.98); background: #fff; }
         .selector-control.locked::after { display: none; }
         .selector-control.locked { color: var(--text-secondary); background: rgba(241,245,249,0.78); cursor: default; }
-        .datetime-control { width: 100%; min-height: 48px; border-radius: 18px; border: 1px solid rgba(155,169,206,0.14); background: rgba(245,248,255,0.9); padding: 13px 42px 13px 16px; display:flex; align-items:center; justify-content:space-between; gap:10px; color:var(--text-title); font-size:14px; font-weight:800; text-align:left; font-family:inherit; position:relative; cursor:pointer; transition:0.2s; }
+        .datetime-control { width: 100%; min-height: 52px; border-radius: 999px; border: 1px solid rgba(155,169,206,0.14); background: rgba(245,248,255,0.9); padding: 13px 42px 13px 16px; display:flex; align-items:center; justify-content:space-between; gap:10px; color:var(--text-title); font-size:14px; font-weight:800; text-align:left; font-family:inherit; position:relative; cursor:pointer; transition:0.2s; }
         .datetime-control.placeholder { color:#94A3B8; font-weight:700; }
         .datetime-control::after { content:''; position:absolute; right:16px; top:50%; width:18px; height:18px; transform:translateY(-50%); border-radius:6px; border:2px solid #94A3B8; box-sizing:border-box; }
         .datetime-control::before { content:''; position:absolute; right:20px; top:calc(50% - 7px); width:10px; height:2px; background:#94A3B8; border-radius:99px; z-index:1; }
@@ -291,7 +300,7 @@
         .datetime-option.active { background:linear-gradient(135deg, #1F5FFF, #4F7DFF); color:#fff; border-color:rgba(31,95,255,0.2); box-shadow:0 8px 16px rgba(31,95,255,0.16); }
         .datetime-picker-scroll { max-height: calc(90vh - 128px); padding-bottom: 0; }
         .datetime-actions { position: sticky; bottom: -1px; display:grid; grid-template-columns:0.72fr 1fr; gap:10px; margin-top:4px; padding-top:10px; padding-bottom:2px; background:linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.98) 34%, rgba(255,255,255,0.98)); backdrop-filter:blur(12px); z-index:3; }
-        .datetime-actions .dialog-btn { height:44px; }
+        .datetime-actions .dialog-btn { height:48px; border-radius: 999px; }
         .mobile-switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 13px; border-radius: 15px; background: rgba(255,255,255,0.82); border: 1px solid rgba(31,95,255,0.1); margin-bottom: 10px; }
         .mobile-switch-text { min-width: 0; }
         .mobile-switch-title { font-size: 13px; font-weight: 900; color: var(--text-title); }
@@ -305,14 +314,16 @@
         .mobile-switch input:checked + .switch-track { background: rgba(31,95,255,0.12); }
         .mobile-switch input:checked + .switch-track::before { background: transparent; color: #64748B; box-shadow: none; }
         .mobile-switch input:checked + .switch-track::after { background: var(--primary-color); color: #fff; box-shadow: 0 3px 8px rgba(31,95,255,0.2); }
-        .receipt-btn { width: 100%; min-height: 48px; border-radius: 18px; border: 1px dashed rgba(31,95,255,0.28); background: rgba(31,95,255,0.08); color: var(--primary-color); font-size: 14px; font-weight: 900; font-family: inherit; cursor: pointer; }
+        .receipt-btn { width: 100%; min-height: 52px; border-radius: 18px; border: 1px dashed rgba(31,95,255,0.28); background: rgba(31,95,255,0.08); color: var(--primary-color); font-size: 14px; font-weight: 900; font-family: inherit; cursor: pointer; }
         .receipt-preview { display: none; align-items: center; gap: 10px; margin-top: 10px; padding: 10px; border-radius: 14px; background: rgba(255,255,255,0.78); border: 1px solid rgba(255,255,255,0.9); }
         .receipt-preview.active { display: flex; }
         .receipt-preview img { width: 46px; height: 46px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
         .receipt-preview span { min-width: 0; font-size: 12px; color: var(--text-main); font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .conditional-field.hidden { display: none; }
         .picker-search { position: relative; margin-bottom: 12px; }
-        .picker-search input { width: 100%; height: 42px; border-radius: 14px; border: 1px solid rgba(155,169,206,0.14); background: rgba(245,248,255,0.9); padding: 0 14px; font-size: 14px; font-weight: 700; color: var(--text-title); outline: none; font-family: inherit; }
+        .picker-search::before { content: ''; position: absolute; left: 14px; top: 50%; width: 15px; height: 15px; border: 2.3px solid #94A3B8; border-radius: 999px; transform: translateY(-56%); pointer-events: none; }
+        .picker-search::after { content: ''; position: absolute; left: 27px; top: 50%; width: 8px; height: 2.3px; border-radius: 999px; background: #94A3B8; transform: translateY(4px) rotate(45deg); pointer-events: none; }
+        .picker-search input { width: 100%; height: 46px; border-radius: 18px; border: 1px solid rgba(155,169,206,0.14); background: rgba(245,248,255,0.9); padding: 0 14px 0 42px; font-size: 14px; font-weight: 700; color: var(--text-title); outline: none; font-family: inherit; }
         .picker-list { display: grid; gap: 8px; overflow-y: auto; max-height: 52vh; padding: 2px 2px 4px; scrollbar-width: none; }
         .picker-list::-webkit-scrollbar { display: none; }
         .picker-item { width: 100%; border: 1px solid rgba(255,255,255,0.84); border-radius: 16px; background: rgba(245,248,255,0.9); padding: 12px 42px 12px 14px; text-align: left; font-family: inherit; cursor: pointer; position: relative; box-shadow: inset 0 1px 0 rgba(255,255,255,0.72); }
@@ -323,7 +334,15 @@
         .picker-item-title { font-size: 14px; font-weight: 900; color: var(--text-title); }
         .picker-item-sub { font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-top: 3px; line-height: 1.35; }
         .action-sheet-list { display: grid; gap: 10px; }
-        .action-sheet-btn { width: 100%; border: none; min-height: 48px; border-radius: 16px; background: rgba(245,248,255,0.9); color: var(--text-title); font-size: 14px; font-weight: 900; font-family: inherit; cursor: pointer; }
+        .bottom-sheet .action-sheet-list { text-align: center; }
+        .bottom-sheet .action-sheet-list .entry-card-title,
+        .bottom-sheet .action-sheet-list .entry-card-sub,
+        .bottom-sheet .action-sheet-list .entry-info-cell,
+        .bottom-sheet .action-sheet-list .sheet-list-title,
+        .bottom-sheet .action-sheet-list .sheet-list-desc { text-align: center !important; }
+        .bottom-sheet .action-sheet-list .sheet-list-item { justify-content: center; text-align: center; }
+        .bottom-sheet .action-sheet-list .sheet-list-item > div { min-width: 0; width: 100%; }
+        .action-sheet-btn { width: 100%; border: none; min-height: 54px; border-radius: 16px; background: rgba(245,248,255,0.9); color: var(--text-title); font-size: 14px; font-weight: 900; font-family: inherit; cursor: pointer; }
         .action-sheet-btn.danger { background: var(--danger-light); color: var(--danger-color); }
         .action-sheet-btn.warning { background: var(--warning-light); color: var(--warning-color); }
         .action-sheet-btn.reservation-delete { background:#fff; color:var(--danger-color); border:1px solid rgba(239,68,68,0.18); }
@@ -355,12 +374,13 @@
         .toast-undo-btn { margin-left: 12px; padding: 4px 10px; background: rgba(255,255,255,0.2); border-radius: 6px; cursor: pointer; font-size: 12px; }
 
         .primary-action-btn { background: linear-gradient(135deg, #4b82ff 0%, var(--primary-color) 100%); color: white; padding: 12px 16px; min-height: 76px; border-radius: 26px; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 16px 28px rgba(31, 95, 255, 0.24); cursor: pointer; transition: 0.2s; margin-bottom: 14px; flex-shrink: 0;}
-        .primary-action-btn svg { width: 34px; height: 34px; flex-shrink: 0; stroke-width: 1.9; }
+        .primary-action-btn svg { width: 34px; height: 34px; flex-shrink: 0; stroke-width: 2.2; }
         .primary-action-btn span { font-size: 18px; font-weight: 800; letter-spacing: 0.2px; }
         .primary-action-btn:active { transform: scale(0.98); opacity: 0.9;}
 
         .modal-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 1500; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; backdrop-filter: blur(2px);}
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-overlay.assign-conflict-overlay { z-index: 1502; background: rgba(0,0,0,0.54); backdrop-filter: blur(3px); }
 
         .bottom-sheet { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.96); border-radius: 30px 30px 0 0; padding: 24px 20px 34px; z-index: 1501; transform: translateY(100%); visibility: hidden; transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), height 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), border-radius 0.3s; display: flex; flex-direction: column; max-height: 90%; backdrop-filter: blur(24px); box-sizing: border-box; }
         .bottom-sheet.active { transform: translateY(0); visibility: visible; box-shadow: 0 -16px 40px rgba(31, 95, 255, 0.1); }
@@ -371,6 +391,7 @@
 
         .dialog-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); background: rgba(255,255,255,0.95); border-radius: 28px; width: 80%; padding: 24px 20px; z-index: 1501; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 20px 50px rgba(31, 95, 255, 0.1); backdrop-filter: blur(22px);}
         .dialog-box.active { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
+        #dialog-assign-conflict { z-index: 1503; }
         .dialog-close-btn { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border: 0; border-radius: 50%; background: rgba(241,245,249,0.92); color: #64748B; display:flex; align-items:center; justify-content:center; cursor:pointer; touch-action: manipulation; }
         .dialog-close-btn svg { width: 17px; height: 17px; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; }
         .assign-conflict-summary { width: 100%; margin: 12px 0 16px; display: grid; gap: 8px; max-height: 161px; overflow-y: auto; overscroll-behavior: contain; padding-right: 2px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
@@ -535,9 +556,11 @@
         .student-index { width: 24px; height: 24px; border-radius: 10px; background: var(--primary-light); color: var(--primary-color); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 950; flex-shrink: 0; }
         .compact-student-name { font-size: 15px; font-weight: 950; color: var(--text-title); }
         .compact-progress { flex-shrink: 0; padding: 6px 10px; border-radius: 999px; background: var(--primary-light); color: var(--primary-color); font-size: 12px; font-weight: 900; }
-        .filter-panel { position: sticky; top: 0; z-index: 60; margin: 0 -20px; padding: 0 20px 10px; background: rgba(239, 246, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .filter-panel { position: sticky; top: 0; z-index: 86; margin: 0 -20px; padding: 0 20px 10px; background: linear-gradient(135deg, rgba(239,246,255,0.98) 0%, rgba(223,231,255,0.98) 100%); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 12px 22px rgba(31,95,255,0.05); }
         .filter-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
-        .mini-search { flex: 1; min-width: 0; height: 38px; border: 1px solid rgba(255,255,255,0.88); border-radius: 999px; padding: 0 14px; background: rgba(255,255,255,0.9); outline: none; color: var(--text-title); font-weight: 700; }
+        .mini-search-wrap { position: relative; flex: 1; min-width: 0; }
+        .mini-search-wrap svg { position: absolute; left: 13px; top: 50%; width: 16px; height: 16px; color: #94A3B8; transform: translateY(-50%); pointer-events: none; }
+        .mini-search { width: 100%; min-width: 0; height: 38px; border: 1px solid rgba(255,255,255,0.88); border-radius: 999px; padding: 0 14px 0 38px; background: rgba(255,255,255,0.9); outline: none; color: var(--text-title); font-weight: 700; }
         .filter-btn { height: 38px; padding: 0 14px; border: 1px solid rgba(31,95,255,0.16); border-radius: 999px; background: rgba(255,255,255,0.86); color: var(--primary-color); font-size: 12px; font-weight: 900; cursor: pointer; }
         .meta-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 4px; }
         .meta-item { padding: 8px 10px; border-radius: 12px; background: rgba(31,95,255,0.06); color: var(--text-main); font-size: 11px; font-weight: 700; line-height: 1.35; }
@@ -568,6 +591,7 @@
         .detail-action-panel { margin-bottom: 14px; padding: 14px; border-radius: 22px; background: rgba(31,95,255,0.08); border: 1px solid rgba(31,95,255,0.14); }
         .detail-primary-btn { width: 100%; padding: 13px 16px; border: none; border-radius: 18px; background: var(--primary-color); color: #fff; font-size: 14px; font-weight: 900; font-family: inherit; cursor: pointer; box-shadow: 0 10px 22px rgba(31,95,255,0.24); }
         .detail-primary-btn:disabled { cursor: not-allowed; color: #94A3B8; background: rgba(148,163,184,0.16); box-shadow: none; }
+        .detail-primary-btn.visit-disabled-hint { cursor: pointer; color: #94A3B8; background: rgba(148,163,184,0.16); box-shadow: none; }
         .module-hint { margin: -4px 6px 12px; color: var(--text-secondary); font-size: 12px; font-weight: 700; line-height: 1.5; }
         .module-chip-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding: 0 2px 12px; }
         .module-chip { min-height: 70px; padding: 8px 4px; border-radius: 20px; background: rgba(255,255,255,0.86); color: var(--primary-color); font-size: 11px; font-weight: 900; border: 1px solid rgba(255,255,255,0.88); cursor: pointer; font-family: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 10px 22px rgba(31,95,255,0.06); }
@@ -584,7 +608,7 @@
         .entry-page-content { flex: 1; min-height: 0; height: 0; overflow-y: auto; padding: 0 20px 28px; scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; }
         .entry-page-content:has(.entry-fixed-actions), .entry-page-content:has(.detail-bottom-actions) { padding-bottom: 0; }
         .entry-page-content::-webkit-scrollbar { display: none; }
-        .entry-action-text { min-width: 50px; text-align: center; color: var(--primary-color); font-size: 13px; font-weight: 900; cursor: pointer; padding: 6px 12px; border-radius: 14px; background: rgba(31,95,255,0.08); transition: 0.2s; border: 1px solid rgba(31,95,255,0.12); }
+        .entry-action-text { min-width: 50px; text-align: center; color: var(--primary-color); font-size: 11px; line-height: 1; font-weight: 900; cursor: pointer; padding: 7px 8px; border-radius: 8px; background: rgba(31,95,255,0.08); transition: 0.2s; border: 1px solid rgba(31,95,255,0.12); white-space: nowrap; }
         .entry-action-text:empty { display: none; }
         .entry-action-text:active { transform: scale(0.95); background: rgba(31,95,255,0.15); }
         .entry-toolbar { position: sticky; top: 0; z-index: 30; margin: 0 -20px; padding: 0 20px 12px; background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%); }
@@ -627,7 +651,7 @@
         .entry-table tr:last-child td { border-bottom: none; }
         .entry-blue { color: var(--primary-color) !important; }
         .entry-up { color: #E11D48; font-weight: 950; }
-        .my-lead-filter-bar { position: sticky; top: 55px; z-index: 35; margin: 0 -20px 12px; padding: 0 0 12px; background: linear-gradient(135deg, rgba(239,246,255,0.96) 0%, rgba(223,231,255,0.96) 100%); backdrop-filter: blur(18px); }
+        .my-lead-filter-bar { position: sticky; top: 55px; z-index: 72; margin: 0 -20px 12px; padding: 0 0 12px; background: linear-gradient(135deg, rgba(239,246,255,0.98) 0%, rgba(223,231,255,0.98) 100%); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); box-shadow: 0 12px 20px rgba(31,95,255,0.045); }
         .my-lead-filter-row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; padding: 0 20px; }
         .my-lead-search { width: 100%; min-width: 0; height: 42px; box-sizing: border-box; border-radius: 13px; border: 1px solid rgba(31,95,255,0.10); background: rgba(255,255,255,0.90); padding: 0 12px 0 39px; font-size: 13px; font-weight: 800; color: var(--text-title); outline: none; box-shadow: 0 6px 16px rgba(31,95,255,0.05); }
         .my-lead-search:focus { border-color: rgba(31,95,255,0.35); box-shadow: 0 0 0 3px rgba(31,95,255,0.08), 0 8px 18px rgba(31,95,255,0.06); }
@@ -655,11 +679,13 @@
         .lead-manage-row { min-height: 54px; display: grid; grid-template-columns: 30px 34px minmax(0, 1fr) 76px 16px; align-items: center; gap: 8px; padding: 12px; border-radius: 18px; background: rgba(255,255,255,0.82); border: 1px solid rgba(255,255,255,0.92); box-shadow: 0 8px 18px rgba(31,95,255,0.045); cursor: pointer; }
         .lead-manage-row.school-filled-unconfirmed { border-color: rgba(183,121,31,0.32); background: rgba(255,252,244,0.88); box-shadow: 0 8px 18px rgba(183,121,31,0.045), inset 0 0 0 1px rgba(183,121,31,0.08); }
         .lead-manage-row.school-missing-unconfirmed { border-color: rgba(239,68,68,0.44); box-shadow: 0 8px 18px rgba(239,68,68,0.06), inset 0 0 0 1px rgba(239,68,68,0.10); }
-        .lead-manage-row.just-added { border-color: rgba(239,68,68,0.72); background: rgba(255,241,242,0.92); box-shadow: 0 10px 24px rgba(239,68,68,0.12), inset 0 0 0 1px rgba(239,68,68,0.18); animation: new-lead-red-pulse 1.8s ease both; }
-        @keyframes new-lead-red-pulse {
-            0% { transform: scale(0.985); box-shadow: 0 0 0 0 rgba(239,68,68,0.26), inset 0 0 0 1px rgba(239,68,68,0.22); }
-            45% { transform: scale(1); box-shadow: 0 0 0 6px rgba(239,68,68,0.12), 0 12px 26px rgba(239,68,68,0.13), inset 0 0 0 1px rgba(239,68,68,0.22); }
-            100% { transform: scale(1); box-shadow: 0 10px 24px rgba(239,68,68,0.08), inset 0 0 0 1px rgba(239,68,68,0.12); }
+        .lead-manage-row.just-added { outline: 2px solid transparent; outline-offset: -2px; animation: new-lead-stable-pulse 1.8s ease both; }
+        .lead-manage-row.just-added.highlight-warning { border-color: rgba(239,68,68,0.38); background: rgba(255,247,247,0.94); outline-color: rgba(239,68,68,0.72); --lead-highlight-rgb: 239,68,68; }
+        .lead-manage-row.just-added.highlight-confirmed { border-color: rgba(31,95,255,0.34); background: rgba(239,246,255,0.95); outline-color: rgba(31,95,255,0.74); --lead-highlight-rgb: 31,95,255; }
+        @keyframes new-lead-stable-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(var(--lead-highlight-rgb),0.28), 0 8px 18px rgba(var(--lead-highlight-rgb),0.08), inset 0 0 0 1px rgba(var(--lead-highlight-rgb),0.16); }
+            45% { box-shadow: 0 0 0 5px rgba(var(--lead-highlight-rgb),0.13), 0 12px 24px rgba(var(--lead-highlight-rgb),0.13), inset 0 0 0 1px rgba(var(--lead-highlight-rgb),0.18); }
+            100% { box-shadow: 0 0 0 0 rgba(var(--lead-highlight-rgb),0), 0 8px 18px rgba(var(--lead-highlight-rgb),0.08), inset 0 0 0 1px rgba(var(--lead-highlight-rgb),0.12); }
         }
         .lead-manage-row:active { transform: scale(0.98); background: rgba(255,255,255,0.94); }
         .lead-manage-row.selected { border-color: rgba(31,95,255,0.26); background: rgba(239,246,255,0.92); box-shadow: 0 10px 20px rgba(31,95,255,0.08), inset 0 0 0 1px rgba(31,95,255,0.06); }
@@ -667,6 +693,7 @@
         .lead-manage-row .checkbox-wrap { margin: 0; }
         .lead-manage-index { width: 28px; height: 28px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(31,95,255,0.09); color: var(--primary-color); font-size: 12px; font-weight: 950; border: 0; }
         .lead-manage-main { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+        .lead-manage-main.confirmed-school { justify-content: center; }
         .lead-manage-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-title); font-size: 14px; font-weight: 950; }
         .lead-manage-school-signal { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; font-weight: 950; line-height: 1.2; }
         .lead-manage-school-signal.school-filled-unconfirmed { color: #B7791F; }
@@ -675,10 +702,11 @@
         .lead-manage-status { justify-self: end; max-width: 76px; padding: 5px 8px; border-radius: 10px; background: rgba(31,95,255,0.10); color: var(--primary-color); font-size: 11px; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border: 0; }
         .lead-manage-status.unassigned { background: rgba(245,158,11,0.12); color: #B45309; }
         .lead-manage-status.mine { background: rgba(31,95,255,0.10); color: var(--primary-color); }
-        .lead-manage-status.teacher { background: rgba(14,165,233,0.11); color: #0369A1; }
+        .lead-manage-status.teacher { background: rgba(99,102,241,0.11); color: #4F46E5; }
         .lead-manage-status.invited { background: rgba(99,102,241,0.11); color: #4F46E5; }
-        .lead-manage-status.reserved { background: rgba(31,95,255,0.12); color: var(--primary-color); }
-        .lead-manage-status.enrolled { background: rgba(20,184,166,0.12); color: #0F766E; }
+        .lead-manage-status.cancelled { background: var(--danger-light); color: var(--danger-color); }
+        .lead-manage-status.reserved { background: rgba(16,185,129,0.13); color: #047857; }
+        .lead-manage-status.enrolled { background: rgba(20,184,166,0.14); color: #0F766E; }
         .lead-row-arrow { width: 16px; height: 16px; color: #94A3B8; }
         .public-lead-assign-btn { justify-self: end; width: 54px; height: 32px; border: 0; border-radius: 10px; background: var(--primary-color); color: #fff; font-size: 12px; font-weight: 950; font-family: inherit; box-shadow: 0 8px 16px rgba(31,95,255,0.22); }
         .public-lead-assign-btn:active { transform: scale(0.95); background: #174FE0; }
@@ -728,10 +756,11 @@
         .assign-confirm-btn { background: linear-gradient(135deg, #4B82FF 0%, var(--primary-color) 100%) !important; box-shadow: 0 8px 18px rgba(31,95,255,0.22) !important; }
         .entry-action-form { min-height: 100%; display: flex; flex-direction: column; }
         .entry-action-spacer { flex: 1 1 auto; min-height: 16px; }
-        .entry-fixed-actions { position: sticky; bottom: 0; z-index: 260; margin: 14px -20px 0; padding: 12px 20px 24px; background: rgba(255,255,255,0.92); border-top: 1px solid rgba(255,255,255,0.96); box-shadow: 0 -12px 28px rgba(31,95,255,0.11); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+        .entry-fixed-actions { position: sticky; bottom: 0; z-index: 260; margin: 12px -20px 0; padding: 12px 20px 24px; min-height: 86px; box-sizing: border-box; background: rgba(255,255,255,0.92); border-top: 1px solid rgba(255,255,255,0.96); box-shadow: 0 -12px 28px rgba(31,95,255,0.11); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
         .offline-submit-actions { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 10px; margin-top: 14px; }
         .offline-submit-actions.entry-fixed-actions { margin-top: 0; }
         .offline-submit-actions.single { grid-template-columns: 1fr; }
+        .entry-fixed-actions .submit-btn { min-height: 50px; margin-top: 0; padding: 0 16px; border-radius: 14px; font-size: 15px; }
         .offline-submit-actions .submit-btn, .offline-submit-actions .offline-public-btn, .offline-submit-actions .offline-assign-btn { min-height: 50px; }
         .offline-public-btn { height: 46px; border: 1px solid rgba(31,95,255,0.18); border-radius: 13px; background: rgba(31,95,255,0.09); color: var(--primary-color); font-family: inherit; font-size: 13px; font-weight: 900; }
         .offline-assign-btn { height: 46px; border: 0; border-radius: 13px; background: var(--primary-color); color: #fff; font-family: inherit; font-size: 13px; font-weight: 900; box-shadow: 0 8px 18px rgba(31,95,255,0.22); }
@@ -776,26 +805,38 @@
         .lead-school-clickable.is-confirmed .lead-compact-info-label { color: var(--text-secondary); }
         .lead-school-value-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
         .lead-school-clickable .lead-compact-info-value.missing-value { padding: 0; background: transparent; border: 0; font-size: 12px; }
-        .legacy-school-jump { display: inline-flex; align-items: center; gap: 5px; min-height: 24px; padding: 2px 8px; margin: 0 2px; border: 0; border-radius: 9px; background: rgba(31,95,255,0.10); color: var(--primary-color); font: inherit; font-weight: 950; cursor: pointer; vertical-align: baseline; }
-        .legacy-school-jump::after { content: ''; width: 6px; height: 6px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-45deg); }
-        .source-school-page { min-height: 100%; display: flex; flex-direction: column; padding-top: 4px; }
-        .source-school-hero { padding: 15px; margin-bottom: 12px; border-radius: 22px; background: rgba(255,255,255,0.86); border: 1px solid rgba(255,255,255,0.94); box-shadow: 0 10px 24px rgba(31,95,255,0.07); }
-        .source-school-student { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+        .entry-page-content:has(.source-school-page) { overflow: hidden; padding-bottom: 0; }
+        .source-school-page { height: 100%; min-height: 0; display: flex; flex-direction: column; padding-top: 0; }
+        .source-school-hero { padding: 12px 14px; margin-bottom: 8px; border-radius: 20px; background: rgba(255,255,255,0.86); border: 1px solid rgba(255,255,255,0.94); box-shadow: 0 8px 22px rgba(31,95,255,0.06); }
+        .source-school-student { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 9px; }
+        .source-school-student-main { min-width: 0; display: flex; align-items: center; gap: 10px; }
+        .source-school-avatar { flex: 0 0 36px; width: 36px; height: 36px; border-radius: 14px; display: flex; align-items: center; justify-content: center; background: rgba(31,95,255,0.10); color: var(--primary-color); border: 1px solid rgba(31,95,255,0.12); }
+        .source-school-avatar svg { width: 19px; height: 19px; stroke: currentColor; fill: none; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; }
         .source-school-name { color: var(--text-title); font-size: 18px; font-weight: 950; line-height: 1.2; }
         .source-school-phone { margin-top: 5px; color: var(--text-secondary); font-size: 12px; font-weight: 800; }
-        .source-school-origin { padding: 12px; border-radius: 16px; background: rgba(31,95,255,0.07); border: 1px solid rgba(31,95,255,0.10); }
+        .source-school-origin { padding: 10px 12px; border-radius: 16px; background: rgba(31,95,255,0.07); border: 1px solid rgba(31,95,255,0.10); }
         .source-school-origin.missing { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.16); }
         .source-school-origin-label { color: var(--text-secondary); font-size: 11px; font-weight: 900; margin-bottom: 5px; }
         .source-school-origin-value { color: var(--text-title); font-size: 14px; font-weight: 950; line-height: 1.4; }
         .source-school-origin.missing .source-school-origin-value { color: var(--danger-color); }
-        .source-school-panel { padding: 14px; margin-bottom: 12px; border-radius: 22px; background: rgba(255,255,255,0.78); border: 1px solid rgba(255,255,255,0.92); box-shadow: 0 8px 20px rgba(31,95,255,0.05); }
-        .source-school-option-list { display: grid; gap: 8px; max-height: 280px; overflow-y: auto; padding-right: 2px; scrollbar-width: none; }
+        .source-school-panel { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; overflow: hidden; padding: 14px; margin-bottom: 12px; border-radius: 20px; background: rgba(255,255,255,0.82); border: 1px solid rgba(255,255,255,0.92); box-shadow: 0 8px 20px rgba(31,95,255,0.05); }
+        .source-school-page .entry-action-spacer { display: block; flex: 0 0 10px; min-height: 10px; }
+        .source-school-page .entry-fixed-actions { position: sticky; bottom: 0; flex: 0 0 auto; margin: 0 -20px; }
+        .source-school-search-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 8px; margin-bottom: 10px; }
+        .source-school-search-row.single { grid-template-columns: minmax(0, 1fr); }
+        .source-school-search-wrap { position: relative; min-width: 0; }
+        .source-school-search-wrap .form-control { height: 42px; padding: 0 14px 0 40px; border-radius: 13px; font-size: 13px; font-weight: 800; }
+        .source-school-search-wrap svg { position: absolute; left: 13px; top: auto; bottom: 13px; width: 16px; height: 16px; color: #94A3B8; transform: none; pointer-events: none; }
+        .source-school-option-list { flex: 1 1 auto; min-height: 0; display: grid; align-content: start; gap: 8px; max-height: none; overflow-y: auto; padding-right: 2px; scrollbar-width: none; }
         .source-school-option-list::-webkit-scrollbar { display: none; }
-        .source-school-option { width: 100%; min-height: 46px; display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 14px; border: 1px solid rgba(31,95,255,0.08); background: rgba(245,248,255,0.76); color: var(--text-title); font-family: inherit; font-size: 13px; font-weight: 900; text-align: left; cursor: pointer; }
-        .source-school-option.selected { border-color: rgba(31,95,255,0.36); background: rgba(31,95,255,0.10); color: var(--primary-color); box-shadow: inset 0 0 0 1px rgba(31,95,255,0.12); }
+        .source-school-option { width: 100%; min-height: 46px; display: grid; grid-template-columns: 30px minmax(0, 1fr) 24px; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 14px; border: 1px solid rgba(31,95,255,0.08); background: rgba(245,248,255,0.76); color: var(--text-title); font-family: inherit; font-size: 13px; font-weight: 900; text-align: left; cursor: pointer; transition: background 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease, color 0.22s ease; }
+        .source-school-option:active { background: rgba(31,95,255,0.08); }
+        .source-school-option.selected { border-color: rgba(31,95,255,0.38); background: linear-gradient(180deg, rgba(31,95,255,0.12) 0%, rgba(31,95,255,0.075) 100%); color: var(--primary-color); box-shadow: 0 8px 18px rgba(31,95,255,0.09), inset 0 0 0 1px rgba(31,95,255,0.10); }
         .source-school-option span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .source-school-option-index { width: 28px; height: 28px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(31,95,255,0.10); color: var(--primary-color); font-size: 12px; font-weight: 950; }
-        .source-school-option-check { flex: 0 0 auto; color: var(--primary-color); font-size: 12px; font-weight: 950; }
+        .source-school-option-check { width: 22px; height: 22px; border-radius: 999px; display: flex; align-items: center; justify-content: center; justify-self: end; background: rgba(31,95,255,0.13); color: var(--primary-color); border: 1px solid rgba(31,95,255,0.28); opacity: 0; transform: scale(0.72); transition: opacity 0.2s ease, transform 0.22s cubic-bezier(0.2,0.8,0.2,1); }
+        .source-school-option.selected .source-school-option-check { opacity: 1; transform: scale(1); }
+        .source-school-option-check svg { width: 13px; height: 13px; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
         .source-school-create-option { width: 100%; min-height: 42px; padding: 10px 12px; border: 0; border-radius: 12px; background: rgba(31,95,255,0.07); color: var(--primary-color); font-family: inherit; font-size: 13px; font-weight: 950; text-align: left; cursor: pointer; }
         .source-school-create-option.selected { background: rgba(31,95,255,0.11); box-shadow: inset 0 0 0 1px rgba(31,95,255,0.12); }
         .source-school-create-option:active { background: rgba(31,95,255,0.12); transform: scale(0.98); }
@@ -803,8 +844,8 @@
         .lead-timeline::before { content: ''; position: absolute; left: 6px; top: 18px; bottom: 18px; width: 2px; border-radius: 999px; background: #CBD5E1; }
         .lead-timeline-item { position: relative; padding: 0 0 10px 12px; }
         .lead-timeline-item:last-child { padding-bottom: 0; }
-        .lead-timeline-dot { position: absolute; left: -19px; top: calc((100% - 10px) / 2); width: 12px; height: 12px; border-radius: 50%; background: #CBD5E1; border: 3px solid rgba(255,255,255,0.98); box-shadow: 0 0 0 2px rgba(148,163,184,0.12); transform: translateY(-50%); }
-        .lead-timeline-item.completed .lead-timeline-dot { background: #2453C4; box-shadow: 0 0 0 3px rgba(36,83,196,0.10); }
+        .lead-timeline-dot { position: absolute; left: -19px; top: calc((100% - 10px) / 2); width: 12px; height: 12px; border-radius: 50%; background: #F8FAFC; border: 3px solid #CBD5E1; box-shadow: 0 0 0 2px rgba(148,163,184,0.10); transform: translateY(-50%); }
+        .lead-timeline-item.completed .lead-timeline-dot { background: #CBD5E1; border-color: rgba(255,255,255,0.98); box-shadow: 0 0 0 3px rgba(100,116,139,0.08); }
         .lead-timeline-item.current .lead-timeline-dot { background: var(--primary-color); box-shadow: 0 0 0 5px rgba(31,95,255,0.16); animation: lead-current-breathe 1.9s ease-in-out infinite; }
         .lead-timeline-item.current .lead-timeline-card { padding: 14px; border-color: rgba(31,95,255,0.24); background: rgba(255,255,255,0.98); box-shadow: 0 10px 24px rgba(31,95,255,0.12); }
         .lead-timeline-item.pending { padding-bottom: 7px; }
@@ -860,6 +901,17 @@
         .qr-result-card { padding: 16px; border-radius: 22px; background: rgba(255,255,255,0.86); border: 1px solid rgba(255,255,255,0.9); text-align: center; }
         .qr-result-card img { width: 148px; height: 148px; border-radius: 16px; background: #fff; padding: 8px; margin: 8px auto 12px; display: block; }
         .qr-fallback { width: 148px; height: 148px; border-radius: 16px; margin: 8px auto 12px; background: linear-gradient(90deg, #111827 10px, transparent 10px) 0 0/22px 22px, linear-gradient(#111827 10px, transparent 10px) 0 0/22px 22px, #fff; border: 8px solid #fff; box-shadow: inset 0 0 0 1px rgba(15,23,42,0.08); }
+        .lead-visit-status-card { position: relative; overflow: hidden; margin-bottom: 12px; padding: 15px; border-radius: 22px; background: linear-gradient(145deg, rgba(255,255,255,0.94), rgba(236,253,245,0.78)); border: 1px solid rgba(255,255,255,0.94); box-shadow: 0 12px 26px rgba(16,185,129,0.08); }
+        .lead-visit-status-card::after { content: '已核销'; position: absolute; right: -12px; top: 16px; width: 86px; height: 30px; display: flex; align-items: center; justify-content: center; transform: rotate(18deg); border: 2px solid rgba(16,185,129,0.42); border-radius: 999px; color: #059669; font-size: 14px; font-weight: 950; letter-spacing: 0; background: rgba(236,253,245,0.72); }
+        .lead-visit-status-head { position: relative; z-index: 1; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; padding-right: 56px; }
+        .lead-visit-status-title { color: var(--text-title); font-size: 15px; font-weight: 950; line-height: 1.25; }
+        .lead-visit-status-sub { margin-top: 5px; color: var(--text-secondary); font-size: 11px; font-weight: 800; line-height: 1.35; }
+        .lead-visit-stamp { flex: 0 0 auto; padding: 5px 9px; border-radius: 10px; background: rgba(16,185,129,0.12); color: #047857; font-size: 11px; font-weight: 950; }
+        .lead-visit-time-grid { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+        .lead-visit-time-cell { min-width: 0; padding: 10px; border-radius: 14px; background: rgba(255,255,255,0.76); border: 1px solid rgba(255,255,255,0.92); }
+        .lead-visit-time-label { color: var(--text-secondary); font-size: 10px; font-weight: 900; margin-bottom: 5px; }
+        .lead-visit-time-value { color: var(--text-title); font-size: 12px; font-weight: 950; line-height: 1.32; word-break: break-word; }
+        .lead-visit-time-cell.actual .lead-visit-time-value { color: #047857; }
         .lead-qr-preview { width: 100%; display: flex; align-items: center; gap: 13px; margin-bottom: 12px; padding: 11px 13px; border: 1px solid rgba(255,255,255,0.94); border-radius: 18px; background: rgba(255,255,255,0.84); box-shadow: 0 9px 22px rgba(31,95,255,0.07); font-family: inherit; text-align: left; cursor: pointer; }
         .lead-qr-preview:active { transform: scale(0.98); }
         .lead-qr-thumb { flex: 0 0 58px; width: 58px; height: 58px; padding: 4px; border-radius: 12px; background: #fff; object-fit: cover; box-shadow: inset 0 0 0 1px rgba(15,23,42,0.07); }
@@ -873,8 +925,8 @@
         .qr-preview-overlay.active .qr-preview-panel { transform: scale(1); }
         .qr-preview-panel img { width: 232px; height: 232px; max-width: 100%; padding: 10px; border-radius: 20px; background: #fff; display: block; margin: 12px auto; }
         .qr-preview-close { width: 100%; min-height: 44px; border: 0; border-radius: 13px; background: rgba(31,95,255,0.10); color: var(--primary-color); font-family: inherit; font-size: 14px; font-weight: 900; cursor: pointer; }
-        .my-lead-detail-page { min-height: 100%; box-sizing: border-box; display: flex; flex-direction: column; padding: 8px 0 20px; }
-        .my-lead-detail-main { flex: 0 0 auto; }
+        .my-lead-detail-page { min-height: 100%; box-sizing: border-box; display: flex; flex-direction: column; padding: 8px 0 0; }
+        .my-lead-detail-main { flex: 0 0 auto; padding-bottom: 16px; }
         .lead-detail-hero { margin-bottom: 14px; padding: 15px 16px; border-radius: 20px; background: rgba(255,255,255,0.86); border: 1px solid rgba(255,255,255,0.94); box-shadow: 0 8px 22px rgba(31,95,255,0.06); }
         .lead-detail-hero-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 9px; }
         .lead-detail-name-wrap { min-width: 0; flex: 1; }
@@ -884,13 +936,23 @@
         .lead-detail-tags { flex: 0 0 auto; display: flex; align-items: center; gap: 6px; max-width: 132px; flex-wrap: wrap; justify-content: flex-end; }
         .lead-detail-gender { min-height: 22px; padding: 2px 7px; border-radius: 8px; background: rgba(100,116,139,0.10); color: #64748B; font-size: 10px; font-weight: 900; line-height: 18px; white-space: nowrap; }
         .lead-detail-gender.known { background: rgba(31,95,255,0.09); color: var(--primary-color); }
-        .detail-bottom-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; position: sticky; bottom: 0; margin: 14px -20px 0; padding: 12px 20px 24px; background: rgba(255,255,255,0.92); border-top: 1px solid rgba(255,255,255,0.96); box-shadow: 0 -12px 28px rgba(31,95,255,0.11); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
-        .my-lead-detail-page > .detail-bottom-actions { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; z-index: 260; margin-top: 14px; border-radius: 0; }
-        .my-lead-action-btn { min-width: 0; min-height: 46px; padding: 0 6px; border-radius: 13px; font-family: inherit; font-size: 14px; font-weight: 900; letter-spacing: 0; cursor: pointer; touch-action: manipulation; transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease; }
+        .detail-bottom-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; position: sticky; bottom: 0; z-index: 260; margin: 0 -20px; padding: 12px 20px 24px; min-height: 86px; box-sizing: border-box; background: rgba(255,255,255,0.92); border-top: 1px solid rgba(255,255,255,0.96); box-shadow: 0 -12px 28px rgba(31,95,255,0.11); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+        .detail-bottom-actions.owner-only { grid-template-columns: 1fr; }
+        .my-lead-detail-page > .detail-bottom-actions { grid-template-columns: repeat(3, minmax(0, 1fr)); border-radius: 0; }
+        .my-lead-detail-page > .detail-bottom-actions.owner-only { grid-template-columns: 1fr; }
+        .my-lead-action-btn { min-width: 0; min-height: 50px; padding: 0 6px; border-radius: 14px; font-family: inherit; font-size: 14px; font-weight: 900; letter-spacing: 0; cursor: pointer; touch-action: manipulation; transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease; }
         .my-lead-action-btn:active { transform: scale(0.95); }
         .my-lead-action-primary { border: 1px solid var(--primary-color); background: var(--primary-color); color: #fff; box-shadow: 0 7px 16px rgba(31,95,255,0.24); }
         .my-lead-action-secondary { border: 1px solid rgba(31,95,255,0.13); background: rgba(31,95,255,0.10); color: var(--primary-color); box-shadow: none; }
         .my-lead-action-tertiary { border: 1px solid rgba(100,116,139,0.18); background: rgba(255,255,255,0.58); color: #64748B; box-shadow: none; }
+        .assigned-teacher-summary { min-height: 54px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border-radius: 16px; background: rgba(31,95,255,0.08); border: 1px solid rgba(31,95,255,0.14); color: var(--text-title); }
+        .assigned-teacher-summary-label { color: var(--text-secondary); font-size: 11px; font-weight: 850; line-height: 1.2; }
+        .assigned-teacher-summary-name { margin-top: 3px; color: var(--primary-color); font-size: 15px; font-weight: 950; line-height: 1.2; }
+        .assigned-teacher-summary-meta { color: var(--text-secondary); font-size: 11px; font-weight: 800; text-align: right; line-height: 1.35; }
+        .owner-change-panel { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) 112px; align-items: center; gap: 10px; }
+        .owner-change-panel .assigned-teacher-summary { min-width: 0; }
+        .owner-change-btn { min-height: 48px; border: 0; border-radius: 14px; background: var(--primary-color); color: #fff; font-family: inherit; font-size: 13px; font-weight: 950; box-shadow: 0 8px 18px rgba(31,95,255,0.22); }
+        .owner-change-btn:active { transform: scale(0.96); }
         .entry-form-card { padding: 16px; border-radius: 22px; background: rgba(255,255,255,0.9); border: 1px solid rgba(255,255,255,0.92); box-shadow: 0 12px 26px rgba(31,95,255,0.07); margin-bottom: 12px; }
         .lead-edit-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
         .lead-edit-cell { min-width: 0; padding: 10px; border-radius: 14px; background: rgba(31,95,255,0.055); border: 1px solid rgba(31,95,255,0.08); }
@@ -921,14 +983,60 @@
         .coop-school-term-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 4px 0 12px; padding: 13px 14px; border-radius: 16px; background: rgba(255,255,255,0.72); border: 1px solid rgba(255,255,255,0.9); }
         .coop-school-term-summary strong { color: var(--text-title); font-size: 14px; font-weight: 900; }
         .coop-school-term-summary span { color: var(--text-secondary); font-size: 12px; font-weight: 800; }
+        .coop-school-toolbar { top: 0 !important; margin: 0 -20px 10px !important; padding: 0 0 12px !important; }
+        .coop-school-filter-row { margin-bottom: 0 !important; align-items: center !important; }
+        .coop-school-filter-row > div:first-child { flex: 0 0 98px; min-width: 0; }
+        .coop-term-trigger { display: flex; align-items: center; justify-content: center; gap: 5px; width: 98px; height: 40px; padding: 0 8px; border-radius: 14px; background: #fff; box-shadow: 0 4px 12px rgba(31,95,255,0.06); }
+        .coop-term-trigger span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
+        .coop-term-trigger .inline-chevron { width: 7px; height: 7px; flex: 0 0 7px; transform: translateY(-2px) rotate(45deg); }
+        .coop-term-dropdown { top: 48px !important; left: 0 !important; right: auto !important; width: 136px !important; padding: 6px !important; z-index: 100 !important; }
+        .coop-term-option { width: 100%; min-height: 40px; padding: 0 10px !important; justify-content: center; font-size: 12px; text-align: center; white-space: nowrap; }
+        .coop-school-toolbar .my-lead-search { font-size: 12px; }
         .coop-empty-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
-        .coop-empty-btn { min-height: 42px; border-radius: 12px; border: 1px solid rgba(31,95,255,0.14); background: rgba(31,95,255,0.09); color: var(--primary-color); font-family: inherit; font-size: 13px; font-weight: 900; }
+        .coop-empty-btn { min-height: 48px; border-radius: 999px; border: 1px solid rgba(31,95,255,0.14); background: rgba(31,95,255,0.09); color: var(--primary-color); font-family: inherit; font-size: 13px; font-weight: 900; }
         .coop-empty-btn.primary { border-color: var(--primary-color); background: var(--primary-color); color: #fff; box-shadow: 0 8px 18px rgba(31,95,255,0.20); }
         .coop-link-list { display: grid; gap: 10px; padding-top: 10px; }
         .coop-link-option { width: 100%; min-height: 54px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1px solid rgba(255,255,255,0.9); border-radius: 16px; background: rgba(255,255,255,0.78); color: var(--text-title); font-family: inherit; font-size: 13px; font-weight: 850; text-align: left; }
+        .contact-row { width: 100%; min-height: 58px; display: grid; grid-template-columns: 34px minmax(0, 1fr) 42px 18px; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 20px; background: rgba(255,255,255,0.82); border: 1px solid rgba(255,255,255,0.92); box-shadow: 0 8px 18px rgba(31,95,255,0.05); color: var(--text-title); }
+        .contact-row:active { transform: scale(0.97); background: rgba(255,255,255,0.94); }
+        .contact-index { width: 28px; height: 28px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(31,95,255,0.10); color: var(--primary-color); font-size: 12px; font-weight: 950; }
+        .contact-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 950; }
+        .contact-phone-btn { width: 38px; height: 34px; border: 0; border-radius: 12px; background: rgba(31,95,255,0.10); color: var(--primary-color); display: flex; align-items: center; justify-content: center; }
+        .contact-phone-btn:active { transform: scale(0.95); background: rgba(31,95,255,0.16); }
+        .contact-phone-btn svg, .contact-arrow svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+        .contact-arrow { color: #94A3B8; display: flex; align-items: center; justify-content: center; }
+        .entry-page-content:has(.contact-fixed-add) { padding-bottom: 112px; }
+        .contact-fixed-add { position: absolute; left: 0; right: 0; bottom: 0; z-index: 260; margin: 0; padding: 12px 20px 24px; background: rgba(255,255,255,0.92); border-top: 1px solid rgba(255,255,255,0.96); box-shadow: 0 -12px 28px rgba(31,95,255,0.11); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); display: flex; justify-content: center; }
+        .contact-add-btn { width: 168px; height: 50px; border: 0; border-radius: 16px; background: var(--primary-color); color: #fff; box-shadow: 0 8px 18px rgba(31,95,255,0.22); font-family: inherit; font-size: 14px; font-weight: 950; }
+        .contact-add-btn:active { transform: scale(0.95); }
+        .recruit-section-title { margin: 2px 4px 10px; color: var(--text-title); font-size: 15px; font-weight: 950; }
+        .recruit-section-subtitle { margin: -5px 4px 10px; color: var(--text-secondary); font-size: 11px; font-weight: 800; line-height: 1.45; }
+        .recruit-list { display: grid; gap: 10px; margin-bottom: 16px; }
+        .recruit-row { width: 100%; min-height: 56px; display: grid; grid-template-columns: 34px minmax(0, 1fr) auto 18px; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid rgba(255,255,255,0.92); border-radius: 20px; background: rgba(255,255,255,0.82); box-shadow: 0 8px 18px rgba(31,95,255,0.05); text-align: left; color: var(--text-title); font-family: inherit; }
+        .recruit-row:active { transform: scale(0.97); background: rgba(255,255,255,0.94); }
+        .recruit-row-title-wrap { min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+        .recruit-row-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 950; }
+        .recruit-row-badge { padding: 5px 9px; border-radius: 10px; background: rgba(31,95,255,0.10); color: var(--primary-color); font-size: 11px; font-weight: 900; white-space: nowrap; }
+        .recruit-row-badge.tag-activated { background: rgba(16,185,129,0.12); color: #047857; }
+        .recruit-row-badge.tag-inactive { background: rgba(100,116,139,0.12); color: #64748B; }
+        .recruit-row-badge.tag-on-duty { background: rgba(31,95,255,0.11); color: var(--primary-color); }
+        .recruit-row-badge.tag-leave { background: rgba(245,158,11,0.13); color: #B45309; }
+        .recruit-row-badge.tag-offboard { background: rgba(239,68,68,0.11); color: var(--danger-color); }
+        .recruit-row-meta { margin-top: 4px; color: var(--text-secondary); font-size: 11px; font-weight: 750; line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .recruit-detail-hero { margin-bottom: 12px; padding: 15px; border-radius: 22px; background: linear-gradient(145deg, rgba(255,255,255,0.92), rgba(239,246,255,0.78)); border: 1px solid rgba(255,255,255,0.94); box-shadow: 0 10px 24px rgba(31,95,255,0.07); }
+        .recruit-detail-hero-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 11px; }
+        .recruit-detail-name { min-width: 0; color: var(--text-title); font-size: 18px; font-weight: 950; line-height: 1.25; }
+        .recruit-detail-meta { margin-top: 5px; color: var(--text-secondary); font-size: 12px; font-weight: 800; line-height: 1.45; }
+        .recruit-mini-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+        .recruit-mini-stat { min-width: 0; padding: 9px 8px; border-radius: 14px; background: rgba(31,95,255,0.06); border: 1px solid rgba(31,95,255,0.07); }
+        .recruit-mini-stat span { display: block; color: var(--text-secondary); font-size: 10px; font-weight: 850; margin-bottom: 4px; }
+        .recruit-mini-stat strong { display: block; color: var(--text-title); font-size: 13px; font-weight: 950; line-height: 1.25; }
+        .entry-page-content:has(.recruit-detail-actions) { padding-bottom: 112px; }
+        .recruit-detail-actions { display: grid; grid-template-columns: .9fr 1.1fr; gap: 10px; position: absolute; left: 0; right: 0; bottom: 0; z-index: 260; margin: 0; padding: 12px 20px 24px; background: rgba(255,255,255,0.92); border-top: 1px solid rgba(255,255,255,0.96); box-shadow: 0 -12px 28px rgba(31,95,255,0.11); backdrop-filter: blur(18px); }
         #sub-view-follow { padding-right: 0; }
         #my-leads-workspace { padding-right: 20px; }
-        #workspace-enrollment > .nav-bar { z-index: 1600; overflow: visible; }
+        #workspace-enrollment > .nav-bar { z-index: 1600; overflow: visible; background: linear-gradient(135deg, rgba(239,246,255,0.98) 0%, rgba(223,231,255,0.98) 100%); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); box-shadow: 0 12px 24px rgba(31,95,255,0.045); }
+        #workspace-enrollment > .nav-bar::after { content: ''; position: absolute; left: 0; right: 0; bottom: -10px; height: 10px; background: linear-gradient(180deg, rgba(223,231,255,0.92), rgba(223,231,255,0)); pointer-events: none; }
         .school-detail-page { min-height: 100%; display: flex; flex-direction: column; padding: 16px 0 20px; }
         .school-detail-main { flex: 0 0 auto; }
         .school-detail-actions { position: sticky; bottom: 20px; z-index: 50; display: grid; grid-template-columns: 1fr 2fr; gap: 10px; margin-top: auto; padding: 12px; border-radius: 18px; background: rgba(255,255,255,0.92); border: 1px solid rgba(255,255,255,0.96); box-shadow: 0 10px 28px rgba(31,95,255,0.13), inset 0 1px 0 rgba(255,255,255,1); backdrop-filter: blur(18px); }
@@ -943,9 +1051,6 @@
         #workspace-enrollment { z-index: 1200; left: 100% !important; right: auto !important; top: 0 !important; bottom: auto !important; width: 100% !important; height: 100% !important; min-width: 100% !important; max-width: 100% !important; transform: none !important; visibility: hidden; transition: left 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), visibility 0.35s; }
         #workspace-enrollment.active { left: 0 !important; transform: none !important; visibility: visible; }
         #workspace-enrollment.hidden-right { left: 100% !important; transform: none !important; visibility: hidden; pointer-events: none; }
-        #page-lead-detail { z-index: 1300 !important; background: #F8FAFC; left: 100% !important; transform: none !important; visibility: hidden; right: auto !important; top: 0 !important; bottom: auto !important; width: 100% !important; height: 100% !important; min-width: 100% !important; max-width: 100% !important; transition: left 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), visibility 0.35s; }
-        #page-lead-detail.active { left: 0 !important; transform: none !important; visibility: visible; }
-        #page-lead-detail.hidden-right { left: 100% !important; transform: none !important; visibility: hidden; }
         #page-admission-entry { z-index: 1300 !important; left: 100% !important; transform: none !important; visibility: hidden; right: auto !important; top: 0 !important; bottom: auto !important; width: 100% !important; height: 100% !important; min-width: 100% !important; max-width: 100% !important; transition: left 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), visibility 0.35s; }
         #page-admission-entry.active { left: 0 !important; transform: none !important; visibility: visible; }
         #page-admission-entry.hidden-right { left: 100% !important; transform: none !important; visibility: hidden; }
@@ -959,9 +1064,8 @@
         .batch-action-bar.active { transform: translateY(0); visibility: visible; box-shadow: 0 -8px 24px rgba(31, 95, 255, 0.08); }
         .batch-action-bar .batch-action-buttons { display: flex; align-items: center; justify-content: flex-end; gap: 8px; min-width: 0; }
         .batch-action-bar .btn-xs { height: 40px; min-height: 40px; padding: 0 13px; border-radius: 13px; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; line-height: 1; }
+        .batch-action-bar .batch-action-buttons .btn-xs:last-child { border: 0; background: var(--primary-color); color: #fff; box-shadow: 0 8px 16px rgba(31,95,255,0.22); }
         .batch-action-bar .batch-summary-text { display: flex; align-items: center; white-space: nowrap; color: var(--text-title); font-size: 14px; font-weight: 900; }
-        .lead-detail-bottom-actions { position: absolute; bottom: 0; left: 0; right: 0; padding: 12px 20px 24px; background: rgba(255,255,255,0.92); border-top: 1px solid rgba(255,255,255,0.96); box-shadow: 0 -12px 28px rgba(31,95,255,0.11); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; z-index: 310; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
-        .lead-detail-bottom-actions .btn-xs { min-height: 50px; padding: 0 10px !important; border-radius: 14px; font-size: 13px !important; font-weight: 900; }
         .field-invalid-flash { animation: invalidFlash 1.15s ease both; }
         @keyframes invalidFlash { 0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); border-color: rgba(155,169,206,0.14); } 18%, 68% { border-color: rgba(239,68,68,0.62) !important; box-shadow: 0 0 0 4px rgba(239,68,68,0.13) !important; background: rgba(255,255,255,0.98) !important; } }
         .textarea-counter { position: absolute; right: 16px; bottom: 13px; padding: 0; border-radius: 0; background: transparent; color: #94A3B8; font-size: 10px; font-weight: 850; line-height: 1.4; pointer-events: none; box-shadow: none; }
@@ -1061,7 +1165,7 @@
             <div id="sub-view-leads" class="sub-view">
                 <div class="filter-panel">
                     <div class="filter-row">
-                        <input class="mini-search" id="leads-search" placeholder="搜索姓名/手机号/来源/负责人" oninput="rerenderActiveList('leads')">
+                        <div class="mini-search-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg><input class="mini-search" id="leads-search" placeholder="搜索姓名/手机号/来源/负责人" oninput="rerenderActiveList('leads')"></div>
                     </div>
                     <div class="pill-scroll" id="pills-leads">
                         <div class="pill active" onclick="switchFilter(this, 'leads', '全部线索')">全部线索</div>
@@ -1147,22 +1251,14 @@
                         <button class="manager-lead-gold-btn" onclick="openManagerPublicPool(true)">线索管理</button>
                     </div>
                     <div class="admission-entry-grid">
-                        <div class="admission-entry-group-title">关系与学校</div>
-                        <button class="admission-entry-btn" onclick="handleGridAction('联系人管理')">联系人管理</button>
-                        <button class="admission-entry-btn" onclick="handleGridAction('学校汇总')">学校汇总</button>
-                        <button class="admission-entry-btn" onclick="handleGridAction('我的联系人')">我的联系人</button>
+                        <div class="admission-entry-group-title">学习与学校</div>
                         <button class="admission-entry-btn" onclick="handleGridAction('生源学校')">生源学校</button>
+                        <button class="admission-entry-btn" onclick="handleGridAction('学校招生数据')">学校招生数据</button>
                         <div class="admission-entry-group-title">招生数据</div>
-                        <button class="admission-entry-btn" onclick="handleGridAction('工作统计')">工作统计</button>
-                        <button class="admission-entry-btn" onclick="handleGridAction('报名学生查看')">报名学生查看</button>
-                        <button class="admission-entry-btn" onclick="handleGridAction('招生人员')">招生人员</button>
-                        <button class="admission-entry-btn" onclick="handleGridAction('新生统计')">新生统计</button>
+                        <button class="admission-entry-btn" onclick="handleGridAction('招生组与人员')">招生组与人员</button>
                         <button class="admission-entry-btn" onclick="handleGridAction('意向学生汇总')">意向学生汇总</button>
                         <button class="admission-entry-btn" onclick="handleGridAction('招生汇总')">招生汇总</button>
-                        <div class="admission-entry-group-title">日志与支持</div>
-                        <button class="admission-entry-btn" onclick="handleGridAction('我的日志')">我的日志</button>
-                        <button class="admission-entry-btn" onclick="handleGridAction('日志管理')">日志管理</button>
-                        <button class="admission-entry-btn" onclick="handleGridAction('常见问题')">常见问题</button>
+                        <button class="admission-entry-btn" onclick="handleGridAction('新生统计')">新生统计</button>
                     </div>
                 </div>
             </div>
@@ -1202,32 +1298,6 @@
             <div class="entry-action-text" id="entry-page-action" onclick="handleEntryAction()"></div>
         </div>
         <div class="entry-page-content" id="entry-page-content"></div>
-    </div>
-
-    <div id="page-lead-detail" class="page-view" style="z-index: 300; background: #F8FAFC;">
-        <div class="nav-bar" style="background:white;">
-            <div class="icon-btn" style="margin-left: -8px;" onclick="closeLeadDetail()">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-            </div>
-            <div class="nav-title-group"><div class="nav-title">学生线索详情</div></div>
-            <div class="entry-action-text" id="lead-detail-action" onclick="editCurrentLeadFromLegacyDetail()">编辑</div>
-        </div>
-        <div class="detail-header" id="detail-header-info"></div>
-        <div class="detail-tabs">
-            <div class="detail-tab active">时间线与跟进</div>
-            <div class="detail-tab" onclick="showToast('暂无详尽资料')">基础资料</div>
-            <div class="detail-tab" onclick="showToast('暂无更多操作日志')">操作日志</div>
-        </div>
-        <div class="main-content" style="padding-top: 20px;">
-            <div class="glass-card" style="padding: 16px;">
-                <div class="log-timeline" id="detail-timeline"></div>
-            </div>
-        </div>
-        <div class="lead-detail-bottom-actions">
-            <button class="btn-xs outline" onclick="showModal('sheet-follow-up')">写跟进</button>
-            <button id="legacy-visit-invite-btn" class="btn-xs outline" onclick="openLegacyVisitInviteAction()">发起邀约</button>
-            <button class="btn-xs" onclick="startQuickEnroll()">转录取</button>
-        </div>
     </div>
 
     <div id="page-record-form" class="page-view hidden-right record-form-page">
@@ -1581,14 +1651,15 @@
 </div>
 
 <script>
-    const origHighFreq = ['招生工作台', '线索管理'];
+    const origHighFreq = ['线索跟进', '招生管理'];
     const dirData = {
-        招生管理: ['招生工作台', '线索管理'],
+        招生管理: ['数据看板', '线索跟进', '招生管理'],
         教学管理: ['课表编排', '课堂巡检', '成绩归档', '教师排班'],
         校园服务: ['宿舍管理', '请假审批', '安全巡检', '家校通知']
     };
     const featureMeta = {
         '招生工作台': { bg: 'var(--icon-bg-blue)', color: 'var(--icon-color-blue)', icon: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>' },
+        '数据看板': { bg: 'var(--icon-bg-blue)', color: 'var(--icon-color-blue)', icon: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>' },
         '线索池': { bg: 'var(--icon-bg-pink)', color: 'var(--icon-color-pink)', icon: '<svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><path d="M20 8v6"></path><path d="M23 11h-6"></path></svg>' },
         '跟进与到访': { bg: 'var(--icon-bg-emerald)', color: 'var(--icon-color-emerald)', icon: '<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>' },
         '预定与录取': { bg: 'var(--icon-bg-purple)', color: 'var(--icon-color-purple)', icon: '<svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>' },
@@ -1598,11 +1669,13 @@
         '学生档案': { bg: 'var(--icon-bg-emerald)', color: 'var(--icon-color-emerald)', icon: '<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
         '缴费中心': { bg: 'var(--icon-bg-orange)', color: 'var(--icon-color-orange)', icon: '<svg viewBox="0 0 24 24"><path d="M12 1v22"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>' },
         '线索管理': { bg: 'var(--icon-bg-pink)', color: 'var(--icon-color-pink)', icon: '<svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><path d="M20 8v6"></path><path d="M23 11h-6"></path></svg>' },
+        '线索跟进': { bg: 'var(--icon-bg-emerald)', color: 'var(--icon-color-emerald)', icon: '<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>' },
         '跟进到访': { bg: 'var(--icon-bg-emerald)', color: 'var(--icon-color-emerald)', icon: '<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>' },
         '报名录取': { bg: 'var(--icon-bg-purple)', color: 'var(--icon-color-purple)', icon: '<svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>' },
         '招生配置': { bg: 'var(--icon-bg-orange)', color: 'var(--icon-color-orange)', icon: '<svg viewBox="0 0 24 24"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h16"></path><circle cx="8" cy="6" r="2"></circle><circle cx="16" cy="12" r="2"></circle><circle cx="10" cy="18" r="2"></circle></svg>' },
         '生源学校': { bg: 'var(--icon-bg-blue)', color: 'var(--icon-color-blue)', icon: '<svg viewBox="0 0 24 24"><path d="M3 21h18"></path><path d="M5 21V7l8-4 6 4v14"></path><path d="M9 21v-8h6v8"></path></svg>' },
-        '入学交接': { bg: 'var(--icon-bg-orange)', color: 'var(--icon-color-orange)', icon: '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>' }
+        '入学交接': { bg: 'var(--icon-bg-orange)', color: 'var(--icon-color-orange)', icon: '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>' },
+        '招生管理': { bg: 'var(--icon-bg-teal)', color: 'var(--icon-color-teal)', icon: '<svg viewBox="0 0 24 24"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h16"></path></svg>' }
     };
 
     const offlineLeadIcon = '<svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="3"></rect><path d="M9 4.5V3h6v1.5"></path><path d="M9 10h6M9 14h3"></path><path d="M16.5 14.5v5M14 17h5"></path></svg>';
@@ -1616,6 +1689,7 @@
     let pendingSourceSchoolName = '';
     let pendingPublicLeadSourceConfirmId = null;
     let highlightedPublicLeadId = null;
+    let highlightedPublicLeadTone = 'warning';
     let highlightPublicLeadTimer = null;
 
     const state = {
@@ -1623,6 +1697,7 @@
         currentActionLeadId: null,
         selectedIds: new Set(),
         leads: [
+            { id: 100, name: '沈佳宁', phone: '138****2036', source: '公海登记', school: '待补充', initialSchoolName: '', sourceSchoolConfirmed: false, major: '护理', semester: '2026年秋季', focus: '未填写生源学校', lastFollow: '暂无', stage: -1, owner: null, leadStatus: '待分配', isInvalid: false, isOverdue: false },
             { id: 101, name: '李明', phone: '138****0001', source: '抖音信息流广告', school: '城南中学', major: '计算机网络技术', semester: '2026年秋季', focus: '就业方向 / 住宿', lastFollow: '暂无', stage: -1, owner: null, isInvalid: false, isOverdue: false },
             { id: 102, name: '王雨萌', phone: '139****0002', source: '线下校区A登记', school: '实验中学', major: '护理', semester: '2026年秋季', focus: '学费 / 护理实训', lastFollow: '暂无', stage: -1, owner: null, isInvalid: false, isOverdue: false },
             { id: 103, name: '张峰', phone: '133****1111', source: '渠道(ID:201)转介', school: '东湖中学', major: '新能源汽车', semester: '2026年秋季', focus: '就业方向 / 住宿', lastFollow: '昨天 15:30', stage: 0, owner: '我的', isInvalid: false, isOverdue: true },
@@ -1656,7 +1731,7 @@
         ]
     };
 
-    const admissionEntryNames = ['联系人管理', '学校汇总', '我的联系人', '工作统计', '报名学生查看', '网上报名', '我的日志', '日志管理', '新生报名', '班级报到', '新生搜索', '新生统计', '生源学校', '常见问题', '我的意向学生', '意向学生汇总', '招生汇总', '积分规则设置', '招生人员', '报到记录', '预定记录', '录取记录', '跟进记录', '到访预约', '到访记录'];
+    const admissionEntryNames = ['联系人管理', '学校汇总', '学校招生数据', '我的联系人', '工作统计', '网上报名', '我的日志', '日志管理', '新生报名', '班级报到', '新生搜索', '新生统计', '生源学校', '常见问题', '我的意向学生', '意向学生汇总', '招生汇总', '积分规则设置', '招生组与人员', '报到记录', '预定记录', '录取记录', '跟进记录', '到访预约', '到访记录'];
     let currentEntryLabel = '';
     let currentOnlineTab = 'students';
     let currentMyLeadId = null;
@@ -1673,10 +1748,13 @@
     let selectedAssignTeacher = '';
     let pendingAssignConflict = null;
     let publicAssignSearchQuery = '';
+    let publicAssignMode = 'assign';
     let myLeadPageState = 'list';
     let leadDetailEditMode = false;
     let myLeadDetailReturnScrollTop = 0;
     let pendingFollowFocusId = null;
+    let currentRecruitGroupIndex = null;
+    let currentRecruitStaffIndex = null;
     const myLeadStatusOptions = ['全部', '跟进中', '已邀约', '已预定', '已缴费', '已报到'];
     const myLeadSourceOptions = ['全部来源', '巨量OCEAN', '百度BAIDU', '线下OFFLINE'];
     const allLeadAssignmentOptions = ['全部', '已分配', '未分配'];
@@ -1736,6 +1814,27 @@
         ]
     };
 
+    const followMockLeads = [
+        { id: 901, name: '陈思源', phone: '137****6101', source: '巨量OCEAN', school: '深圳市龙华区龙胜实验学校', sourceSchoolConfirmed: true, major: '护理', semester: '2026年秋季', focus: '护理实训 / 住宿', lastFollow: '今天 08:46', stage: 1, owner: '我的', leadStatus: '已联系', isInvalid: false, isOverdue: false, followRecords: [{ id: 'mock-f-901', time: '今天 08:46', content: '家长关注护理实训设备，已发送专业介绍。', sub: '继续电话跟进' }] },
+        { id: 902, name: '林芷晴', phone: '139****6102', source: '百度BAIDU', school: '深圳市坪山区树人实验学校', sourceSchoolConfirmed: true, major: '幼儿保育', semester: '2026年秋季', focus: '升学路径 / 学费', lastFollow: '今天 09:12', stage: 2, owner: '我的', leadStatus: '已邀约', isInvalid: false, isOverdue: false, followRecords: [{ id: 'mock-f-902', time: '今天 09:12', content: '已与家长确认周末到校参观。', sub: '等候到访' }], visitAppointments: [{ visitAt: '2026-06-28T10:30', code: 'VISIT902', token: 'VISIT902', status: '待到访', advisor: '我的', createdAt: '今天 09:12' }] },
+        { id: 903, name: '黄俊杰', phone: '135****6103', source: '线下OFFLINE', school: '深圳市松泉中学', sourceSchoolConfirmed: true, major: '新能源汽车', semester: '2026年秋季', focus: '就业方向 / 实训车间', lastFollow: '昨天 16:20', stage: 2, owner: '我的', leadStatus: '已邀约', isInvalid: false, isOverdue: false, followRecords: [{ id: 'mock-f-903', time: '昨天 16:20', content: '预约时间已过，但学生仍可到校核销。', sub: '确认是否到访' }], visitAppointments: [{ visitAt: '2026-06-20T15:00', code: 'VISIT903', token: 'VISIT903', status: '待到访', advisor: '我的', createdAt: '昨天 16:20' }] },
+        { id: 904, name: '周雨桐', phone: '136****6104', source: '线下OFFLINE', school: '公明中学', sourceSchoolConfirmed: true, major: '计算机网络技术', semester: '2026年秋季', focus: '取消后重新评估', lastFollow: '昨天 11:18', stage: 2, owner: '我的', leadStatus: '已邀约', isInvalid: false, isOverdue: false, followRecords: [{ id: 'mock-f-904', time: '昨天 11:18', content: '家长临时取消到访，需下周重新约。', sub: '重新邀约' }], visitAppointments: [{ visitAt: '2026-06-27T14:00', code: 'VISIT904', token: 'VISIT904', status: '已取消', cancelReason: '家长临时改期', advisor: '我的', createdAt: '昨天 11:18' }] },
+        { id: 905, name: '吴嘉铭', phone: '138****6105', source: '巨量OCEAN', school: '深圳市龙岗区平安里学校', sourceSchoolConfirmed: true, major: '计算机网络技术', semester: '2026年秋季', focus: '宿舍 / 证书', lastFollow: '今天 10:05', stage: 3, owner: '我的', leadStatus: '已到访', isInvalid: false, isOverdue: false, followRecords: [{ id: 'mock-f-905', time: '今天 10:05', content: '学生已到校看机房，对课程认可。', sub: '推动预定' }], visitRecords: [{ time: '今天 10:05', content: '扫码核销到访' }] },
+        { id: 906, name: '梁嘉怡', phone: '137****6106', source: '百度BAIDU', school: '深圳市宝安区上星学校', sourceSchoolConfirmed: true, major: '护理', semester: '2026年秋季', focus: '护理升学 / 家长陪同', lastFollow: '今天 10:48', stage: 4, owner: '我的', leadStatus: '已预定', isInvalid: false, isOverdue: false, followRecords: [{ id: 'mock-f-906', time: '今天 10:48', content: '已完成预定，待补充身份证复印件。', sub: '准备录取材料' }] },
+        { id: 907, name: '郑一诺', phone: '139****6107', source: '校门口登记', school: '深圳市龙华区清泉外国语学校', sourceSchoolConfirmed: true, major: '幼儿保育', semester: '2026年秋季', focus: '面试时间 / 校园环境', lastFollow: '昨天 09:35', stage: 1, owner: '我的', leadStatus: '已联系', isInvalid: false, isOverdue: false, followRecords: [{ id: 'mock-f-907', time: '昨天 09:35', content: '学生本人意向较强，家长想先看环境。', sub: '发起到访邀约' }] },
+        { id: 908, name: '何子墨', phone: '135****6108', source: '朋友推荐', school: '深圳市福田区红岭园岭初中部', sourceSchoolConfirmed: true, major: '新能源汽车', semester: '2026年秋季', focus: '实训 / 就业', lastFollow: '前天 15:42', stage: 1, owner: '我的', leadStatus: '已联系', isInvalid: false, isOverdue: false, followRecords: [{ id: 'mock-f-908', time: '前天 15:42', content: '已发送实训基地视频，等待家长反馈。', sub: '继续电话跟进' }] },
+        { id: 909, name: '赖欣妍', phone: '136****6109', source: '线下OFFLINE', school: '深圳技术大学附属学校（光明）', sourceSchoolConfirmed: true, major: '护理', semester: '2026年秋季', focus: '费用 / 分班', lastFollow: '今天 12:16', stage: 2, owner: '我的', leadStatus: '已邀约', isInvalid: false, isOverdue: false, followRecords: [{ id: 'mock-f-909', time: '今天 12:16', content: '已约明天下午到访，家长会一起到校。', sub: '等候到访' }], visitAppointments: [{ visitAt: '2026-06-26T15:30', code: 'VISIT909', token: 'VISIT909', status: '待到访', advisor: '我的', createdAt: '今天 12:16' }] },
+        { id: 910, name: '邓浩然', phone: '138****6110', source: '抖音信息流广告', school: '深圳市龙岗区吉华实验学校', sourceSchoolConfirmed: true, major: '计算机网络技术', semester: '2026年秋季', focus: '就业企业 / 奖学金', lastFollow: '昨天 18:22', stage: 3, owner: '我的', leadStatus: '已到访', isInvalid: false, isOverdue: false, followRecords: [{ id: 'mock-f-910', time: '昨天 18:22', content: '到访后对计算机专业满意，家长回去商量。', sub: '促成预定' }], visitRecords: [{ time: '昨天 18:22', content: '现场参观后完成到访登记' }] },
+        { id: 911, name: '苏可欣', phone: '139****6111', source: '校园开放日', school: '深圳北理莫斯科大学附属龙岗园山学校', sourceSchoolConfirmed: true, major: '幼儿保育', semester: '2026年秋季', focus: '艺术活动 / 升学', lastFollow: '今天 13:05', stage: 1, owner: '我的', leadStatus: '已联系', isInvalid: false, isOverdue: false, followRecords: [{ id: 'mock-f-911', time: '今天 13:05', content: '学生喜欢幼保方向，已加微信发资料。', sub: '邀约到访' }] },
+        { id: 912, name: '许博文', phone: '137****6112', source: '公众号', school: '宝安中学（集团）实验学校', sourceSchoolConfirmed: true, major: '新能源汽车', semester: '2026年秋季', focus: '男生宿舍 / 技能证书', lastFollow: '昨天 14:08', stage: 4, owner: '我的', leadStatus: '已预定', isInvalid: false, isOverdue: false, followRecords: [{ id: 'mock-f-912', time: '昨天 14:08', content: '已交预定金，家长要求周五补录资料。', sub: '转正式录取' }] },
+        { id: 913, name: '罗奕辰', phone: '135****6113', source: '家长转介绍', school: '深圳市艺术高中民治学校', sourceSchoolConfirmed: true, major: '计算机网络技术', semester: '2026年秋季', focus: '专业课程 / 分数线', lastFollow: '今天 14:36', stage: 1, owner: '我的', leadStatus: '已联系', isInvalid: false, isOverdue: false, followRecords: [{ id: 'mock-f-913', time: '今天 14:36', content: '家长担心成绩不稳定，已说明录取路径。', sub: '二次跟进' }] },
+        { id: 914, name: '叶梓萱', phone: '136****6114', source: '百度BAIDU', school: '深圳市南山区第二外国语学校', sourceSchoolConfirmed: true, major: '护理', semester: '2026年秋季', focus: '女生宿舍 / 实训', lastFollow: '前天 17:11', stage: 2, owner: '我的', leadStatus: '已邀约', isInvalid: false, isOverdue: false, followRecords: [{ id: 'mock-f-914', time: '前天 17:11', content: '已约周六上午到访，需短信提醒。', sub: '等候到访' }], visitAppointments: [{ visitAt: '2026-06-27T09:30', code: 'VISIT914', token: 'VISIT914', status: '待到访', advisor: '我的', createdAt: '前天 17:11' }] },
+        { id: 915, name: '马嘉诚', phone: '138****6115', source: '线下OFFLINE', school: '深圳中学光明科学城学校', sourceSchoolConfirmed: true, major: '新能源汽车', semester: '2026年秋季', focus: '实训车间 / 就业薪资', lastFollow: '今天 15:20', stage: 3, owner: '我的', leadStatus: '已到访', isInvalid: false, isOverdue: false, followRecords: [{ id: 'mock-f-915', time: '今天 15:20', content: '扫码到访后重点咨询就业薪资。', sub: '预定跟进' }], visitRecords: [{ time: '今天 15:20', content: '学生已到访并参观实训区' }] },
+        { id: 916, name: '唐语桐', phone: '139****6116', source: '校友推荐', school: '深圳宝安外国语学校', sourceSchoolConfirmed: true, major: '幼儿保育', semester: '2026年秋季', focus: '校园活动 / 升学班', lastFollow: '昨天 10:46', stage: 1, owner: '我的', leadStatus: '已联系', isInvalid: false, isOverdue: false, followRecords: [{ id: 'mock-f-916', time: '昨天 10:46', content: '学生想了解幼保升学班，已预约线上说明。', sub: '继续跟进' }] },
+        { id: 917, name: '钟东良', phone: '137****6117', source: '网上报名', school: '深圳市龙华区第二外国语学校', sourceSchoolConfirmed: true, major: '计算机网络技术', semester: '2026年秋季', focus: '报名材料 / 班级', lastFollow: '今天 16:02', stage: 4, owner: '我的', leadStatus: '已预定', isInvalid: false, isOverdue: false, followRecords: [{ id: 'mock-f-917', time: '今天 16:02', content: '预定完成，等待材料齐全后转录取。', sub: '准备录取' }] }
+    ];
+    state.leads = state.leads.concat(followMockLeads);
+
     function entryBadge(text, cls = 'tag-primary') {
         return '<span class="badge-tag ' + cls + '">' + text + '</span>';
     }
@@ -1773,11 +1872,17 @@
             returnToLeadOriginWorkspace();
             return;
         }
+        if (['招生组详情', '招生人员详情', '编辑招生组', '编辑招生人员'].includes(currentEntryLabel)) {
+            openRecruitListPage();
+            return;
+        }
         if (currentEntryLabel === '学校详情') {
-            document.getElementById('entry-page-title').innerText = '生源学校';
-            document.getElementById('entry-page-action').innerText = '添加';
-            currentEntryLabel = '生源学校';
-            renderAdmissionEntryPage('生源学校');
+            const returnLabel = schoolDetailReturnLabel || '生源学校';
+            document.getElementById('entry-page-title').innerText = returnLabel;
+            document.getElementById('entry-page-action').innerText = getEntryActionText(returnLabel);
+            currentEntryLabel = returnLabel;
+            renderAdmissionEntryPage(returnLabel);
+            schoolDetailReturnLabel = '生源学校';
             return;
         }
         if (currentEntryLabel === '生源学校' && document.getElementById('entry-page-title').innerText !== '生源学校') {
@@ -1851,12 +1956,14 @@
         if (label === '我的线索') return '添加';
         if (label === '网上报名') return '积分设置';
         if (['联系人管理', '我的联系人', '生源学校', '我的日志'].includes(label)) return '添加';
-        if (['学校汇总', '工作统计', '报名学生查看', '新生统计'].includes(label)) return '筛选';
+        if (['学校汇总', '学校招生数据', '工作统计', '新生统计'].includes(label)) return '筛选';
         if (label === '新生报名') return '保存';
         return '';
     }
 
     function handleEntryAction() {
+        const actionText = document.getElementById('entry-page-action')?.innerText.trim();
+        if (!actionText) return;
         if (currentEntryLabel === '我的线索') {
             if (myLeadPageState === 'detail' && currentMyLeadId) {
                 openMyLeadInlineEdit(currentMyLeadId);
@@ -1875,6 +1982,14 @@
         }
         if (currentEntryLabel === '网上报名') {
             openAdmissionEntryPage('积分规则设置');
+            return;
+        }
+        if (currentEntryLabel === '招生组详情' && currentRecruitGroupIndex !== null) {
+            openRecruitGroupEdit(currentRecruitGroupIndex);
+            return;
+        }
+        if (currentEntryLabel === '招生人员详情' && currentRecruitStaffIndex !== null) {
+            openRecruitStaffEdit(currentRecruitStaffIndex);
             return;
         }
         if (['联系人管理', '我的联系人'].includes(currentEntryLabel)) {
@@ -1905,10 +2020,10 @@
             '联系人管理': () => renderContacts('联系人管理'),
             '我的联系人': () => renderContacts('我的联系人'),
             '生源学校': renderCoopSchools,
-            '招生人员': renderRecruitStaffEntry,
+            '招生组与人员': renderRecruitStaffEntry,
             '学校汇总': renderSchoolSummary,
+            '学校招生数据': renderSchoolSummary,
             '工作统计': renderWorkStats,
-            '报名学生查看': renderRegistrationStudents,
             '新生报名': renderNewStudentForm,
             '班级报到': renderClassCheckin,
             '报到记录': renderCheckinRecordsEntry,
@@ -1950,7 +2065,7 @@
         if (lead.stage === 3) return '已到访';
         const appointment = getLeadVisitAppointment(lead);
         const visitStatus = getVisitAppointmentStatus(appointment);
-        if (visitStatus === '已取消' || visitStatus === '已过期') return visitStatus;
+        if (visitStatus === '已取消') return visitStatus;
         if ((lead.visitAppointments || []).length || lead.stage === 2) return '已邀约';
         if (['已联系', '有意向', '已分配'].includes(lead.leadStatus) && (lead.stage || 0) <= 1) return lead.leadStatus;
         if ((lead.followRecords || []).length || lead.stage >= 1) return '已联系';
@@ -1991,7 +2106,7 @@
     function isLeadInVisitAppointmentStep(lead) {
         if (!lead || lead.isInvalid || isLeadVisited(lead)) return false;
         const stage = Number(lead.stage || 0);
-        const activeAppointment = (lead.visitAppointments || []).some(item => !['已到访', '已取消', '已过期'].includes(getVisitAppointmentStatus(item)));
+        const activeAppointment = (lead.visitAppointments || []).some(item => !['已到访', '已取消'].includes(getVisitAppointmentStatus(item)));
         return (stage === 2 && activeAppointment) || (stage < 3 && activeAppointment);
     }
 
@@ -2130,6 +2245,7 @@
         }
         pendingPublicLeadId = Number(leadId);
         selectedAssignTeacher = '';
+        publicAssignMode = 'assign';
         assignSelectionLocked = false;
         publicAssignSearchQuery = '';
         document.getElementById('public-assign-summary').innerText = '正在分配：' + lead.name + ' / ' + displayPhone(lead.phone);
@@ -2151,9 +2267,32 @@
         }
         pendingPublicLeadId = null;
         selectedAssignTeacher = '';
+        publicAssignMode = 'assign';
         assignSelectionLocked = false;
         publicAssignSearchQuery = '';
         document.getElementById('public-assign-summary').innerText = '分配线索：已选 ' + selected.length + ' 条线索';
+        document.getElementById('public-assign-search').value = '';
+        renderPublicAssignTeachers();
+        showModal('sheet-public-assign');
+    }
+
+    function openChangeLeadOwnerAssignment(leadId, evt) {
+        if (evt) evt.stopPropagation();
+        const lead = findAnyLead(leadId);
+        if (!lead || lead.isInvalid) {
+            showToast('该线索不可更换负责老师');
+            return;
+        }
+        if (!lead.owner) {
+            openPublicLeadAssignment(leadId, evt);
+            return;
+        }
+        pendingPublicLeadId = Number(leadId);
+        selectedAssignTeacher = lead.owner || '';
+        publicAssignMode = 'changeOwner';
+        assignSelectionLocked = false;
+        publicAssignSearchQuery = '';
+        document.getElementById('public-assign-summary').innerText = '当前负责老师：' + lead.owner + '，请选择新的负责老师';
         document.getElementById('public-assign-search').value = '';
         renderPublicAssignTeachers();
         showModal('sheet-public-assign');
@@ -2219,13 +2358,15 @@
     function cancelPublicLeadAssignment() {
         assignSelectionLocked = false;
         pendingAssignConflict = null;
+        publicAssignMode = 'assign';
         closeAllModals();
     }
 
     function closePublicAssignModals() {
         document.getElementById('sheet-public-assign')?.classList.remove('active');
         document.getElementById('dialog-assign-conflict')?.classList.remove('active');
-        document.getElementById('modal-overlay')?.classList.remove('active');
+        document.getElementById('modal-overlay')?.classList.remove('active', 'assign-conflict-overlay');
+        publicAssignMode = 'assign';
     }
 
     function confirmPublicLeadAssignment() {
@@ -2269,6 +2410,7 @@
     function executePublicLeadAssignment(mode = 'all') {
         const isBatch = !pendingPublicLeadId && state.selectedIds.size > 0;
         const lead = pendingPublicLeadId ? findAnyLead(pendingPublicLeadId) : null;
+        const assignMode = publicAssignMode;
         const teacher = pendingAssignConflict?.teacher || selectedAssignTeacher;
         if (!teacher) {
             showToast('请选择接收老师');
@@ -2294,26 +2436,31 @@
             targets.forEach(item => {
                 updateData(item.id, 'owner', teacher);
                 item.leadStatus = '已分配';
+                item.sourceSchoolConfirmed = true;
             });
             state.selectedIds.clear();
         } else {
             updateData(lead.id, 'owner', teacher);
             lead.leadStatus = '已分配';
+            lead.sourceSchoolConfirmed = true;
         }
         closePublicAssignModals();
         if (assignedFromDetail) returnToLeadOriginWorkspace();
         else if (document.getElementById('sub-view-leads')?.classList.contains('active')) refreshModuleList('leads');
         else renderMyLeadsWorkspace();
         updateBatchBar();
-        const msg = (isBatch || pendingAssignConflict)
-            ? (mode === 'unassigned' ? ('已将 ' + targets.length + ' 名未分配学生分配给 ' + teacher) : ('已将线索分配给 ' + teacher))
-            : ('已将 ' + lead.name + ' 分配给 ' + teacher);
+        const msg = assignMode === 'changeOwner'
+            ? ('已将负责老师更换为 ' + teacher)
+            : ((isBatch || pendingAssignConflict)
+                ? (mode === 'unassigned' ? ('已将 ' + targets.length + ' 名未分配学生分配给 ' + teacher) : ('已将线索分配给 ' + teacher))
+                : ('已将 ' + lead.name + ' 分配给 ' + teacher));
         showToast(msg, true);
         pendingPublicLeadId = null;
         selectedAssignTeacher = '';
         pendingAssignConflict = null;
         assignSelectionLocked = false;
         publicAssignSearchQuery = '';
+        publicAssignMode = 'assign';
     }
 
     function openOfflineLeadForm() {
@@ -2584,17 +2731,38 @@
         showToast(resolvedAction === 'self' ? '线索已登记到我的线索' : '线索已登记并进入公海', true);
     }
 
-    function setHighlightedPublicLead(id) {
+    function clearHighlightedPublicLead() {
+        clearTimeout(highlightPublicLeadTimer);
+        const activeId = highlightedPublicLeadId;
+        highlightedPublicLeadId = null;
+        highlightedPublicLeadTone = 'warning';
+        if (activeId) {
+            document.querySelector('.lead-manage-row.just-added[data-lead-id="' + activeId + '"]')?.classList.remove('just-added', 'highlight-warning', 'highlight-confirmed');
+        }
+    }
+
+    function setHighlightedPublicLead(id, tone = 'warning') {
         highlightedPublicLeadId = Number(id) || null;
+        highlightedPublicLeadTone = tone === 'confirmed' ? 'confirmed' : 'warning';
         clearTimeout(highlightPublicLeadTimer);
         highlightPublicLeadTimer = setTimeout(() => {
             const activeId = highlightedPublicLeadId;
             highlightedPublicLeadId = null;
-            document.querySelector('.lead-manage-row.just-added[data-lead-id="' + activeId + '"]')?.classList.remove('just-added');
+            highlightedPublicLeadTone = 'warning';
+            document.querySelector('.lead-manage-row.just-added[data-lead-id="' + activeId + '"]')?.classList.remove('just-added', 'highlight-warning', 'highlight-confirmed');
         }, 2200);
     }
 
-    function returnToLeadManagementDefault(highlightId = null) {
+    function scrollPublicLeadIntoView(id) {
+        if (!id) return;
+        requestAnimationFrame(() => {
+            const row = document.querySelector('.lead-manage-row[data-lead-id="' + Number(id) + '"]');
+            if (!row) return;
+            row.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        });
+    }
+
+    function returnToLeadManagementDefault(highlightId = null, highlightTone = 'warning') {
         const entryPage = document.getElementById('page-admission-entry');
         if (entryPage) {
             entryPage.classList.remove('active');
@@ -2609,14 +2777,16 @@
         switchEnrollmentTab('sub-view-leads', document.getElementById('tab-btn-more'));
         workspace?.classList.add('lead-management-page-mode');
         const pill = activatePill('pills-leads', '全部线索');
-        if (highlightId) setHighlightedPublicLead(highlightId);
+        if (highlightId) setHighlightedPublicLead(highlightId, highlightTone);
         execFilterRender('leads-list-container', getAllValidLeads(), 'leads', pill ? pill.innerText : '全部线索');
+        if (highlightId) scrollPublicLeadIntoView(highlightId);
         updateBatchBar();
     }
 
     function showPublicLeadSourceSchoolPrompt(leadId) {
         pendingPublicLeadSourceConfirmId = Number(leadId);
-        returnToLeadManagementDefault(leadId);
+        clearHighlightedPublicLead();
+        returnToLeadManagementDefault();
         showModal('dialog-public-lead-source-school');
     }
 
@@ -2624,15 +2794,15 @@
         const leadId = pendingPublicLeadSourceConfirmId;
         pendingPublicLeadSourceConfirmId = null;
         document.getElementById('dialog-public-lead-source-school')?.classList.remove('active');
-        document.getElementById('modal-overlay')?.classList.remove('active');
-        returnToLeadManagementDefault(leadId);
+        document.getElementById('modal-overlay')?.classList.remove('active', 'assign-conflict-overlay');
+        returnToLeadManagementDefault(leadId, 'warning');
     }
 
     function confirmPublicLeadSourceSchoolPrompt() {
         const leadId = pendingPublicLeadSourceConfirmId;
         pendingPublicLeadSourceConfirmId = null;
         document.getElementById('dialog-public-lead-source-school')?.classList.remove('active');
-        document.getElementById('modal-overlay')?.classList.remove('active');
+        document.getElementById('modal-overlay')?.classList.remove('active', 'assign-conflict-overlay');
         if (leadId) openConfirmSourceSchoolPage(leadId, 'managerList');
     }
 
@@ -2748,8 +2918,9 @@
         page.classList.remove('hidden-right');
         page.classList.add('active');
         document.getElementById('entry-page-title').innerText = currentLeadScope === 'public' ? '线索详情' : '我的线索详情';
-        document.getElementById('entry-page-action').innerText = '编辑';
-        document.getElementById('entry-page-action').classList.remove('plus-action');
+        const action = document.getElementById('entry-page-action');
+        action.innerText = isLeadAssignedToOtherTeacher(lead) ? '' : '编辑';
+        action.classList.remove('plus-action');
         const content = document.getElementById('entry-page-content');
         content.innerHTML = renderMyLeadDetail(lead);
         content.scrollTop = preserveScroll === null ? 0 : Number(preserveScroll || 0);
@@ -2807,7 +2978,7 @@
 
     function isMissingSourceSchoolName(value) {
         const text = String(value || '').trim();
-        return !text || ['待补充', '待确认学校', '未知学校', '未填写'].includes(text);
+        return !text || ['待补充', '待确认', '待确认学校', '未知学校', '未填写'].includes(text);
     }
 
     function getLeadInitialSourceSchool(lead) {
@@ -2825,7 +2996,7 @@
     function getSourceSchoolConfirmVisualState(lead) {
         if (!lead) return { cls: 'school-missing-unconfirmed', school: '', display: '待确认' };
         const school = isMissingSourceSchoolName(lead.school) ? '' : lead.school;
-        if (lead.sourceSchoolConfirmed) return { cls: 'school-confirmed', school, display: school || '待确认' };
+        if (isLeadSourceSchoolConfirmed(lead)) return { cls: 'school-confirmed', school, display: school || '待确认' };
         const initial = getLeadInitialSourceSchool(lead);
         const hadInitialValue = !isMissingSourceSchoolName(initial);
         if (hadInitialValue || school) return { cls: 'school-filled-unconfirmed', school, display: school || initial };
@@ -2833,7 +3004,17 @@
     }
 
     function isLeadSourceSchoolConfirmed(lead) {
-        return !!lead?.sourceSchoolConfirmed;
+        return !!(lead?.sourceSchoolConfirmed || lead?.owner || Number(lead?.stage ?? -1) >= 4);
+    }
+
+    function isLeadAssignedToOtherTeacher(lead) {
+        return !!(lead?.owner && lead.owner !== state.currentUser);
+    }
+
+    function truncateSourceSchoolName(name, maxLength = 13) {
+        const chars = Array.from(String(name || '').trim());
+        if (chars.length <= maxLength) return chars.join('');
+        return chars.slice(0, maxLength).join('') + '...';
     }
 
     function ensureFollowLeadsSourceSchoolConfirmed() {
@@ -2846,8 +3027,7 @@
     function renderLeadCompactInfoItem(label, value, isWide, lead) {
         if (label === '生源学校') {
             const visual = getSourceSchoolConfirmVisualState(lead);
-            const inFollowPage = document.getElementById('sub-view-follow')?.classList.contains('active');
-            if (inFollowPage || currentLeadScope !== 'public') {
+            if (isLeadAssignedToOtherTeacher(lead)) {
                 return '<div class="lead-compact-info-item"><div class="lead-compact-info-label">生源学校</div><div class="lead-school-value-row"><div class="lead-compact-info-value">' + escapeHtml(visual.display) + '</div></div></div>';
             }
             const missingClass = visual.school ? '' : ' missing-value';
@@ -2860,11 +3040,19 @@
         return '<div class="lead-compact-info-item ' + (isWide ? 'wide' : '') + '"><div class="lead-compact-info-label">' + label + '</div>' + renderLeadDetailValue(value && value !== '待补充' ? value : '') + '</div>';
     }
 
-    function renderLegacySchoolJump(lead) {
-        const school = isMissingSourceSchoolName(lead.school) ? '待确认' : lead.school;
-        const inFollowPage = document.getElementById('sub-view-follow')?.classList.contains('active');
-        if (inFollowPage || currentLeadScope !== 'public') return escapeHtml(school);
-        return '<button type="button" class="legacy-school-jump" onclick="event.stopPropagation(); openConfirmSourceSchoolPage(' + lead.id + ', \'legacy\')">' + escapeHtml(school) + '</button>';
+    function renderAssignedTeacherSummary(lead) {
+        const profile = getAssignTeacherProfile(lead?.owner || '待分配');
+        return '<div class="assigned-teacher-summary">' +
+            '<div><div class="assigned-teacher-summary-label">当前招生老师</div><div class="assigned-teacher-summary-name">' + escapeHtml(profile.name || lead?.owner || '待分配') + '</div></div>' +
+            '<div class="assigned-teacher-summary-meta">' + escapeHtml(profile.group || '未设置招生组') + '<br>' + escapeHtml(profile.role || '招生老师') + '</div>' +
+            '</div>';
+    }
+
+    function renderOwnerChangePanel(lead) {
+        return '<div class="owner-change-panel">' +
+            renderAssignedTeacherSummary(lead) +
+            '<button type="button" class="owner-change-btn" onclick="openChangeLeadOwnerAssignment(' + lead.id + ', event)">更换负责老师</button>' +
+            '</div>';
     }
 
     function openConfirmSourceSchoolPage(leadId, returnMode = 'detail') {
@@ -2910,14 +3098,16 @@
     function renderConfirmSourceSchoolPage(lead) {
         const stateInfo = sourceSchoolConfirmState;
         const originalSchool = stateInfo.originalSchool || '';
-        const originalMissing = isMissingSourceSchoolName(originalSchool);
+        const confirmedSchool = isLeadSourceSchoolConfirmed(lead) && !isMissingSourceSchoolName(lead.school);
+        const originalMissing = isMissingSourceSchoolName(originalSchool) && !confirmedSchool;
+        const originalLabel = confirmedSchool && isMissingSourceSchoolName(originalSchool) ? '已确认生源学校' : '首次添加填写';
+        const originalValue = confirmedSchool && isMissingSourceSchoolName(originalSchool) ? lead.school : originalSchool;
         const originalHtml = originalMissing
             ? '<div class="source-school-origin missing"><div class="source-school-origin-label">首次添加填写</div><div class="source-school-origin-value">未填写生源学校</div></div>'
-            : '<div class="source-school-origin"><div class="source-school-origin-label">首次添加填写</div><div class="source-school-origin-value">' + escapeHtml(originalSchool) + '</div></div>';
+            : '<div class="source-school-origin"><div class="source-school-origin-label">' + originalLabel + '</div><div class="source-school-origin-value">' + escapeHtml(originalValue) + '</div></div>';
         return '<div class="source-school-page">' +
             '<div class="source-school-hero">' +
-                '<div class="source-school-student"><div><div class="source-school-name">' + escapeHtml(lead.name || '待补充') + '</div><div class="source-school-phone">电话：' + escapeHtml(displayPhone(lead.phone)) + '</div></div><span class="badge-tag tag-primary">' + escapeHtml(lead.semester || '2026年秋季') + '</span></div>' +
-                '<div class="entry-card-grid" style="margin-bottom:10px;"><div class="entry-info-cell">来源：<strong>' + escapeHtml(lead.source || '待补充') + '</strong></div><div class="entry-info-cell">意向：<strong>' + escapeHtml(lead.major || lead.focus || '待补充') + '</strong></div></div>' +
+                '<div class="source-school-student"><div class="source-school-student-main"><div><div class="source-school-name">' + escapeHtml(lead.name || '待补充') + '</div><div class="source-school-phone">电话：' + escapeHtml(displayPhone(lead.phone)) + '</div></div></div><span class="badge-tag tag-primary">' + escapeHtml(lead.semester || '2026年秋季') + '</span></div>' +
                 originalHtml +
             '</div>' +
             '<div class="source-school-panel">' +
@@ -2931,15 +3121,22 @@
     function renderSourceSchoolAutocompletePanel() {
         const stateInfo = sourceSchoolConfirmState || {};
         const placeholder = stateInfo.defaultSchool || '输入学校名称自动联想';
-        return '<div class="form-group" style="margin-bottom:10px;"><label class="form-label">生源学校</label><input id="source-school-query" class="form-control" value="' + escapeHtml(stateInfo.query || '') + '" placeholder="' + escapeHtml(placeholder) + '" oninput="updateSourceSchoolQuery(this.value)"></div>' +
+        return '<div class="source-school-search-row single"><div class="form-group source-school-search-wrap" style="margin-bottom:0;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg><input id="source-school-query" class="form-control" value="' + escapeHtml(stateInfo.query || '') + '" placeholder="' + escapeHtml(placeholder) + '" oninput="updateSourceSchoolQuery(this.value)"></div></div>' +
             '<div class="source-school-option-list" id="source-school-option-list">' + renderSourceSchoolOptionList() + '</div>';
     }
 
     function getSourceSchoolOptionRows(query) {
         const keyword = normalizeSearchText(query || '');
+        const stateInfo = sourceSchoolConfirmState || {};
+        const pinned = stateInfo.selectedSchool || findExistingSourceSchoolName(stateInfo.defaultSchool) || '';
         return entryData.schools
             .map((name, index) => ({ name, index }))
             .filter(item => !keyword || normalizeSearchText(item.name).includes(keyword))
+            .sort((a, b) => {
+                if (pinned && a.name === pinned && b.name !== pinned) return -1;
+                if (pinned && b.name === pinned && a.name !== pinned) return 1;
+                return a.index - b.index;
+            })
             .slice(0, 30);
     }
 
@@ -2949,7 +3146,7 @@
         const rows = getSourceSchoolOptionRows(stateInfo.query || '');
         if (rows.length) return rows.map((item, visibleIndex) => {
             const selected = item.name === stateInfo.selectedSchool;
-            return '<button type="button" class="source-school-option ' + (selected ? 'selected' : '') + '" onclick="selectSourceSchoolOption(' + item.index + ')"><span class="source-school-option-index">' + (visibleIndex + 1) + '</span><span>' + escapeHtml(item.name) + '</span>' + (selected ? '<strong class="source-school-option-check">已选</strong>' : '') + '</button>';
+            return '<button type="button" class="source-school-option ' + (selected ? 'selected' : '') + '" onclick="selectSourceSchoolOption(' + item.index + ')"><span class="source-school-option-index">' + (visibleIndex + 1) + '</span><span>' + escapeHtml(item.name) + '</span><span class="source-school-option-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg></span></button>';
         }).join('');
         if (query) return '<button type="button" class="source-school-create-option ' + (stateInfo.selectedIsNew ? 'selected' : '') + '" onclick="requestNewSourceSchoolFromQuery()">新增 “' + escapeHtml(stateInfo.query || '') + '”</button>';
         return '<div class="source-school-empty">暂无生源学校数据</div>';
@@ -2979,7 +3176,7 @@
             return;
         }
         sourceSchoolConfirmState.selectedSchool = school;
-        sourceSchoolConfirmState.query = '';
+        sourceSchoolConfirmState.query = school;
         sourceSchoolConfirmState.selectedIsNew = false;
         renderConfirmSourceSchoolContent();
     }
@@ -3060,14 +3257,8 @@
         sourceSchoolConfirmState = null;
         if (!leadId) return;
         if (returnMode === 'managerList') {
-            returnToLeadManagementDefault(leadId);
-        } else if (returnMode === 'legacy') {
-            currentEntryLabel = '';
-            myLeadPageState = 'list';
-            const page = document.getElementById('page-admission-entry');
-            page.classList.remove('active');
-            page.classList.add('hidden-right');
-            openLeadDetail(leadId);
+            const lead = findAnyLead(leadId);
+            returnToLeadManagementDefault(leadId, isLeadSourceSchoolConfirmed(lead) ? 'confirmed' : 'warning');
         } else {
             currentEntryLabel = '我的线索';
             myLeadPageState = 'detail';
@@ -3121,6 +3312,8 @@
             html += '<div class="detail-bottom-actions" style="grid-template-columns:1fr;">' +
                 '<button class="my-lead-action-btn my-lead-action-primary" onclick="openPublicLeadAssignment(' + lead.id + ', event)">分配线索</button>' +
                 '</div>';
+        } else if (isLeadAssignedToOtherTeacher(lead)) {
+            html += '<div class="detail-bottom-actions owner-only">' + renderOwnerChangePanel(lead) + '</div>';
         } else {
             const leadStage = Number(lead.stage || 0);
             const processAction = leadStage >= 5
@@ -3282,12 +3475,35 @@
 
     function renderLeadQrPreview(lead) {
         const appointment = (lead.visitAppointments || [])[0];
+        if (isLeadVisited(lead)) return renderLeadVisitStatusCard(lead, appointment);
         if (!appointment) return '';
         const url = getVisitQrUrl(lead, appointment, 120);
         return '<button class="lead-qr-preview" onclick="openLeadQrPreview(' + lead.id + ')">' +
             '<img class="lead-qr-thumb" src="' + url + '" alt="到访预约二维码缩略图">' +
             '<div class="lead-qr-preview-copy"><div class="lead-qr-preview-title">到访预约二维码</div><div class="lead-qr-preview-time">预约到访：' + escapeHtml(formatDateTime(appointment.visitAt)) + '</div></div>' +
             '<span class="lead-qr-preview-arrow">点击放大</span></button>';
+    }
+
+    function getLatestVisitRecord(lead) {
+        const records = lead && lead.visitRecords ? lead.visitRecords : [];
+        return records.length ? records[records.length - 1] : null;
+    }
+
+    function renderLeadVisitStatusCard(lead, appointment = null) {
+        const visitRecord = getLatestVisitRecord(lead);
+        const bookedAt = appointment && appointment.visitAt ? formatDateTime(appointment.visitAt) : '未预约/现场登记';
+        const actualAt = formatDateTime(visitRecord?.time || lead.lastFollow || '');
+        const note = visitRecord?.content || '扫码核销到访';
+        return '<div class="lead-visit-status-card">' +
+            '<div class="lead-visit-status-head">' +
+                '<div><div class="lead-visit-status-title">到访信息</div><div class="lead-visit-status-sub">' + escapeHtml(note) + '</div></div>' +
+                '<div class="lead-visit-stamp">已到访</div>' +
+            '</div>' +
+            '<div class="lead-visit-time-grid">' +
+                '<div class="lead-visit-time-cell"><div class="lead-visit-time-label">预约到访</div><div class="lead-visit-time-value">' + escapeHtml(bookedAt) + '</div></div>' +
+                '<div class="lead-visit-time-cell actual"><div class="lead-visit-time-label">实际到访</div><div class="lead-visit-time-value">' + escapeHtml(actualAt) + '</div></div>' +
+            '</div>' +
+        '</div>';
     }
 
     function openLeadQrPreview(leadId) {
@@ -3421,7 +3637,8 @@
         if (!appointment) return '';
         const status = appointment.status || '待到访';
         if (status === '已到访' || status === '已取消') return status;
-        return isVisitAppointmentExpired(appointment) ? '已过期' : status;
+        if (status === '已过期') return '待到访';
+        return status;
     }
 
     function getVisitConfirmBlock(lead) {
@@ -3431,7 +3648,6 @@
         if (!appointment) return { message: '请先发起到访邀约后再确认到访', label: '待邀约' };
         const status = getVisitAppointmentStatus(appointment);
         if (status === '已取消') return { message: '到访邀约已取消，不能确认到访', label: '已取消' };
-        if (status === '已过期') return { message: '到访预约已过期，不能确认到访', label: '已过期' };
         return null;
     }
 
@@ -3441,7 +3657,7 @@
         myLeadDetailReturnScrollTop = document.getElementById('entry-page-content')?.scrollTop || 0;
         const visitBlock = getVisitConfirmBlock(lead);
         const visitAction = visitBlock ? "showToast('" + visitBlock.message + "')" : 'confirmMyLeadVisitedFromFollow()';
-        const visitDisabled = visitBlock ? ' disabled aria-disabled="true"' : '';
+        const visitDisabled = '';
         const visitDisabledClass = visitBlock ? ' disabled' : '';
         document.getElementById('entry-page-title').innerText = '写跟进';
         myLeadPageState = 'form';
@@ -3506,9 +3722,9 @@
         return lead.owner ? 0 : -1;
     }
 
-    function markLeadVisitedSilently(lead, content) {
+    function markLeadVisitedSilently(lead, content, actualTime = null) {
         if (!lead) return;
-        const nowText = formatDateTime(nowDatetimeLocal());
+        const nowText = formatDateTime(actualTime || nowDatetimeLocal());
         lead.visitRecords = lead.visitRecords || [];
         lead.visitRecords.push({ time: nowText, content: content || '已到访' });
         if ((lead.visitAppointments || []).length) lead.visitAppointments[0].status = '已到访';
@@ -3576,22 +3792,6 @@
         return alreadyVisited ? (hasInviteRecord ? '查看邀约' : '查看到访') : (hasInviteRecord ? '邀约操作' : '发起邀约');
     }
 
-    function openLegacyVisitInviteAction() {
-        const lead = findAnyLead(state.currentActionLeadId || currentMyLeadId);
-        if (!lead) return;
-        currentMyLeadId = Number(lead.id);
-        const existing = (lead.visitAppointments || [])[0];
-        if (isLeadVisited(lead)) {
-            showVisitedInviteReadonlyDialog(lead, existing);
-            return;
-        }
-        if (existing) {
-            showVisitInviteExistingDialog(lead, existing);
-            return;
-        }
-        openDynamicForm('visitAppointment');
-    }
-
     function showVisitInviteExistingDialog(lead, appointment) {
         const alreadyVisited = isLeadVisited(lead);
         if (alreadyVisited) {
@@ -3601,7 +3801,7 @@
         const visitBlock = getVisitConfirmBlock(lead);
         const visitStatus = getVisitAppointmentStatus(appointment) || '待到访';
         const confirmButton = visitBlock
-            ? '<button class="dialog-btn visit-confirm-primary disabled" style="grid-column:1 / -1;" disabled>' + escapeHtml(visitBlock.label) + '</button>'
+            ? '<button class="dialog-btn visit-confirm-primary disabled" style="grid-column:1 / -1;" onclick="showToast(\'' + escapeHtml(visitBlock.message) + '\')">' + escapeHtml(visitBlock.label) + '</button>'
             : '<button class="dialog-btn visit-confirm-primary" style="grid-column:1 / -1;" onclick="closeAllModals(); confirmMyLeadVisitedFromFollow()">确认已到访</button>';
         document.getElementById('record-actions-title').innerText = '邀约操作';
         document.getElementById('record-actions-body').innerHTML =
@@ -3782,7 +3982,7 @@
         return renderToolbar('请输入学校名称关键词') + '<div class="entry-card-list">' + contacts.map(c => '<div class="entry-card"><div class="entry-card-top"><div><div class="entry-card-title">' + c[0] + '</div><div class="entry-card-sub">' + c[3] + '</div></div><button class="entry-soft-btn" onclick="showToast(\'已移除联系人\')">移除</button></div><div class="entry-card-grid"><div class="entry-info-cell">性别：<strong>' + c[1] + '</strong></div><div class="entry-info-cell">电话：<strong>' + c[2] + '</strong></div><div class="entry-info-cell">创建人：<strong>' + c[4] + '</strong></div><div class="entry-info-cell">日期：' + c[5] + '</div><div class="entry-info-cell full">' + c[6] + '</div></div></div>').join('') + '</div>' + schoolPanel;
     }
 
-    const coopTerms = ['2026年秋季', '2026年春季', '2027年春季'];
+    const coopTerms = ['全部招生学期', '2026年秋季', '2026年春季', '2027年春季'];
     const regionOptions = [
         '广东省深圳市',
         '广东省深圳市福田区',
@@ -3801,8 +4001,9 @@
         '2026年春季': Array.from({ length: entryData.schools.length }, (_, index) => index).filter(index => index % 2 === 1),
         '2027年春季': []
     };
-    let currentCoopTerm = '2026年秋季';
+    let currentCoopTerm = '全部招生学期';
     let coopSearchQuery = '';
+    let schoolDetailReturnLabel = '生源学校';
 
     function updateCoopTerm(value) {
         currentCoopTerm = value;
@@ -3827,35 +4028,41 @@
     }
 
     function renderCoopSchools() {
-        const statusDropdownHtml = '<div class="quick-dropdown" id="coop-term-dropdown" style="top: 48px; left: 0; right: auto; width: 110px; padding: 6px; z-index: 100;">' +
-            coopTerms.map(opt => '<button class="quick-menu-item" style="padding: 10px; justify-content: center; font-size: 14px; text-align: center; width: 100%;" onclick="updateCoopTerm(\'' + opt + '\')">' + opt + '</button>').join('') +
+        const statusDropdownHtml = '<div class="quick-dropdown coop-term-dropdown" id="coop-term-dropdown">' +
+            coopTerms.map(opt => '<button class="quick-menu-item coop-term-option" onclick="updateCoopTerm(\'' + opt + '\')">' + opt + '</button>').join('') +
             '</div>';
 
-        const toolbar = '<div class="my-lead-filter-bar" style="padding-bottom: 0; margin-top: 0;"><div class="my-lead-filter-row" style="margin-bottom: 12px; align-items: center;">' +
+        const toolbar = '<div class="my-lead-filter-bar coop-school-toolbar"><div class="my-lead-filter-row coop-school-filter-row">' +
             '<div style="position:relative; flex-shrink:0;">' +
-            '<button class="my-lead-filter-btn" style="display:flex; align-items:center; justify-content: center; gap: 4px; width: 104px; height: 40px; padding: 0 8px; border-radius: 14px; background: #fff; box-shadow: 0 4px 12px rgba(31,95,255,0.06);" onclick="toggleCoopTermDropdown(event)">' +
-            '<span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size: 13px;">' + escapeHtml(currentCoopTerm) + '</span>' +
+            '<button class="my-lead-filter-btn coop-term-trigger" onclick="toggleCoopTermDropdown(event)">' +
+            '<span>' + escapeHtml(currentCoopTerm) + '</span>' +
             '<span class="inline-chevron" aria-hidden="true"></span>' +
             '</button>' +
             statusDropdownHtml +
             '</div>' +
-            '<div class="my-lead-search-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg><input class="my-lead-search" value="' + escapeHtml(coopSearchQuery) + '" placeholder="请输入生源学校关键词" oninput="updateCoopSearch(this.value)"></div>' +
+            '<div class="my-lead-search-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg><input class="my-lead-search" value="' + escapeHtml(coopSearchQuery) + '" placeholder="搜学校名称或联系人姓名" oninput="updateCoopSearch(this.value)"></div>' +
             '</div></div>';
 
         return toolbar + '<div id="coop-school-list-wrap">' + renderCoopSchoolList() + '</div>';
     }
 
     function renderCoopSchoolList() {
-        const relatedIndexes = coopTermRelations[currentCoopTerm] || [];
+        const relatedIndexes = currentCoopTerm === '全部招生学期'
+            ? Array.from({ length: entryData.schools.length }, (_, index) => index)
+            : (coopTermRelations[currentCoopTerm] || []);
         const query = normalizeSearchText(coopSearchQuery);
         const rows = relatedIndexes
-            .map(index => ({ index, name: entryData.schools[index] }))
-            .filter(item => item.name && (!query || normalizeSearchText(item.name).includes(query)));
+            .map(index => {
+                const detail = getSchoolDetail(index);
+                return { index, name: entryData.schools[index], contactName: detail.contactName || '' };
+            })
+            .filter(item => item.name && (!query || normalizeSearchText(item.name + item.contactName).includes(query)));
         const list = rows.length
             ? '<div class="entry-school-list">' + rows.map((item, visibleIndex) => {
+                const contactText = item.contactName && item.contactName !== '待补充' ? ('联系人：' + item.contactName) : '联系人：待补充';
                 return '<div class="entry-school-item coop-school-item" onclick="openSchoolDetail(' + item.index + ')">' +
                     '<div class="coop-school-index">' + (visibleIndex + 1) + '</div>' +
-                    '<div class="coop-school-main"><div class="coop-school-name">' + escapeHtml(item.name) + '</div></div>' +
+                    '<div class="coop-school-main"><div class="coop-school-name">' + escapeHtml(item.name) + '</div><div class="coop-school-contact">' + escapeHtml(contactText) + '</div></div>' +
                     '<span class="coop-school-arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></span></div>';
             }).join('') + '</div>'
             : '<div class="entry-card" style="padding:26px 18px; text-align:center;"><div style="font-size:15px; font-weight:900; color:var(--text-title);">' + (query ? '未找到匹配生源学校' : '本学期暂无生源学校') + '</div><div style="margin-top:7px; color:var(--text-secondary); font-size:12px; font-weight:750; line-height:1.5;">生源学校主档仍会保留，可关联已有学校，也可新建并自动加入当前学期。</div><div class="coop-empty-actions"><button class="coop-empty-btn" onclick="openLinkExistingSchool()">关联已有生源学校</button><button class="coop-empty-btn primary" onclick="openSchoolEditor()">新增生源学校</button></div></div>';
@@ -3927,7 +4134,7 @@
         document.getElementById('entry-page-title').innerText = isNew ? '新增生源学校' : '编辑生源学校';
         document.getElementById('entry-page-action').innerText = '';
         document.getElementById('entry-page-content').innerHTML =
-            '<div style="padding:16px 0 20px;">' +
+            '<div class="entry-action-form" style="min-height:100%; padding:16px 0 0;">' +
             '<div class="section-header" style="margin-top:0; padding:0 4px 10px;"><div class="section-title" style="font-size:16px;">学校资料</div></div>' +
             '<div class="entry-card" style="padding:14px; margin-bottom:16px;">' +
             '<div class="form-group"><label class="form-label required">学校名称</label><input id="edit-school-name" class="form-control" value="' + escapeHtml(schoolName) + '" placeholder="请输入学校名称"></div>' +
@@ -3942,7 +4149,7 @@
             '<div class="entry-card" style="padding:14px; margin-bottom:16px;"><div class="form-group"><label class="form-label required">责任分组</label><select id="assign-group" class="form-control"><option' + (data.assignGroup === '待分配' ? ' selected' : '') + '>待分配</option><option' + (data.assignGroup === '城南招生组' ? ' selected' : '') + '>城南招生组</option><option' + (data.assignGroup === '城北招生组' ? ' selected' : '') + '>城北招生组</option><option' + (data.assignGroup === '市区拓展组' ? ' selected' : '') + '>市区拓展组</option></select></div><div class="form-group"><label class="form-label">分配原因/备注</label><textarea id="assign-reason" class="form-control" style="min-height:70px;">' + escapeHtml(data.assignReason || '') + '</textarea></div></div>' +
             '<div class="section-header" style="padding:0 4px 10px;"><div class="section-title" style="font-size:16px;">学校简介</div></div>' +
             '<div class="entry-card" style="padding:14px; margin-bottom:16px;"><textarea id="edit-desc" class="form-control" style="min-height:90px;" placeholder="简要描述学校情况">' + escapeHtml(data.description || '') + '</textarea></div>' +
-            '<div style="display:grid; grid-template-columns:1fr 2fr; gap:10px;"><button class="my-lead-action-btn my-lead-action-tertiary" onclick="' + (isNew ? 'backToCoopSchoolList()' : 'openSchoolDetail(' + index + ')') + '">取消</button><button class="my-lead-action-btn my-lead-action-primary" onclick="saveSchoolEditor(' + (isNew ? 'null' : index) + ')">' + (isNew ? '新增并关联' : '保存资料') + '</button></div></div>';
+            '<div class="entry-action-spacer"></div><div class="offline-submit-actions entry-fixed-actions"><button class="submit-btn secondary" onclick="' + (isNew ? 'backToCoopSchoolList()' : 'openSchoolDetail(' + index + ')') + '">取消</button><button class="submit-btn" onclick="saveSchoolEditor(' + (isNew ? 'null' : index) + ')">' + (isNew ? '新增并关联' : '保存资料') + '</button></div></div>';
         document.getElementById('entry-page-content').scrollTop = 0;
     }
 
@@ -4184,8 +4391,199 @@
         return '<div class="entry-kpi-grid"><div class="entry-kpi"><span>报名学生</span><strong>500</strong></div><div class="entry-kpi"><span>意向学生</span><strong>6,644</strong></div><div class="entry-kpi"><span>生源学校</span><strong>120</strong></div></div>' + renderSchoolSummary();
     }
 
+    function getRecruitStatusClass(status) {
+        const map = {
+            '已激活': 'tag-activated',
+            '未激活': 'tag-inactive',
+            '在岗': 'tag-on-duty',
+            '休假': 'tag-leave',
+            '离职': 'tag-offboard'
+        };
+        return map[status] || 'tag-primary';
+    }
+
+    function getRecruitStaffGroup(item) {
+        return item.group || getAssignTeacherProfile(item.name).group || '未设置招生组';
+    }
+
+    function getRecruitGroupStaff(groupName) {
+        const order = { '在岗': 0, '休假': 1, '离职': 2 };
+        return recruitStaffData
+            .map((item, index) => ({ item, index, group: getRecruitStaffGroup(item) }))
+            .filter(row => row.group === groupName)
+            .sort((a, b) => (order[a.item.status] ?? 9) - (order[b.item.status] ?? 9) || a.index - b.index);
+    }
+
     function renderRecruitStaffEntry() {
-        return '<div class="entry-card-list">' + optionSets.staff.map((name, index) => '<div class="entry-card"><div class="entry-card-top"><div><div class="entry-card-title">' + name + '</div><div class="entry-card-sub">招生人员 · ' + (index === 0 ? '当前登录' : '在岗') + '</div></div>' + entryBadge(index === 0 ? '我的' : '在岗', index === 0 ? 'tag-primary' : 'tag-success') + '</div></div>').join('') + '</div><div class="module-hint">人员维护请前往后台管理端，这里提供移动端查看。</div>';
+        const activeOrder = { '已激活': 0, '未激活': 1 };
+        const groupRows = recruitGroupsData
+            .map((item, index) => ({ item, index, staffCount: getRecruitGroupStaff(item.name).length }))
+            .sort((a, b) => (activeOrder[a.item.activeStatus] ?? 9) - (activeOrder[b.item.activeStatus] ?? 9) || a.index - b.index)
+            .map((row, visibleIndex) =>
+            '<button type="button" class="recruit-row" onclick="openRecruitGroupDetail(' + row.index + ')">' +
+                '<span class="contact-index">' + (visibleIndex + 1) + '</span>' +
+                '<span class="recruit-row-title-wrap"><span class="recruit-row-title">' + escapeHtml(row.item.name) + '</span><span class="recruit-row-meta">' + row.staffCount + ' 名人员 · 当前学期：' + escapeHtml(row.item.currentTerm) + '</span></span>' +
+                '<span class="recruit-row-badge ' + getRecruitStatusClass(row.item.activeStatus) + '">' + escapeHtml(row.item.activeStatus) + '</span>' +
+                '<span class="contact-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></span>' +
+            '</button>'
+        ).join('');
+        return '<div class="recruit-section-title">招生组</div><div class="recruit-section-subtitle">招生人员在组详情中维护，已激活分组默认前置。</div><div class="recruit-list">' + groupRows + '</div>';
+    }
+
+    function renderRecruitDetailGrid(items) {
+        return '<div class="entry-card-grid">' + items.map(item =>
+            '<div class="entry-info-cell full" style="display:flex; justify-content:space-between; gap:12px;"><span style="color:var(--text-secondary);">' + escapeHtml(item[0]) + '</span><strong>' + escapeHtml(item[1]) + '</strong></div>'
+        ).join('') + '</div>';
+    }
+
+    function openRecruitListPage() {
+        currentEntryLabel = '招生组与人员';
+        currentRecruitGroupIndex = null;
+        currentRecruitStaffIndex = null;
+        document.getElementById('entry-page-title').innerText = '招生组与人员';
+        document.getElementById('entry-page-action').innerText = '';
+        renderAdmissionEntryPage('招生组与人员');
+    }
+
+    function openRecruitGroupDetail(index) {
+        const item = recruitGroupsData[index];
+        if (!item) return;
+        const staffRows = getRecruitGroupStaff(item.name);
+        const onDutyCount = staffRows.filter(row => row.item.status === '在岗').length;
+        const staffListHtml = staffRows.length
+            ? '<div class="recruit-list">' + staffRows.map((row, visibleIndex) =>
+                '<button type="button" class="recruit-row" onclick="openRecruitStaffDetail(' + row.index + ')">' +
+                    '<span class="contact-index">' + (visibleIndex + 1) + '</span>' +
+                    '<span class="recruit-row-title-wrap"><span class="recruit-row-title">' + escapeHtml(row.item.name) + '</span><span class="recruit-row-meta">' + escapeHtml(row.item.type) + ' · ' + escapeHtml(row.item.phone) + '</span></span>' +
+                    '<span class="recruit-row-badge ' + getRecruitStatusClass(row.item.status) + '">' + escapeHtml(row.item.status) + '</span>' +
+                    '<span class="contact-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></span>' +
+                '</button>'
+            ).join('') + '</div>'
+            : '<div class="entry-empty" style="min-height:90px;">暂无组内招生人员</div>';
+        currentRecruitGroupIndex = index;
+        currentEntryLabel = '招生组详情';
+        document.getElementById('entry-page-title').innerText = item.name;
+        document.getElementById('entry-page-action').innerText = '编辑';
+        document.getElementById('entry-page-content').innerHTML =
+            '<div class="recruit-detail-hero">' +
+                '<div class="recruit-detail-hero-top"><div><div class="recruit-detail-name">' + escapeHtml(item.name) + '</div><div class="recruit-detail-meta">组内人员直接在本页维护，优先展示在岗人员。</div></div><span class="recruit-row-badge ' + getRecruitStatusClass(item.activeStatus) + '">' + escapeHtml(item.activeStatus) + '</span></div>' +
+                '<div class="recruit-mini-stats">' +
+                    '<div class="recruit-mini-stat"><span>组内人员</span><strong>' + staffRows.length + ' 人</strong></div>' +
+                    '<div class="recruit-mini-stat"><span>在岗人员</span><strong>' + onDutyCount + ' 人</strong></div>' +
+                    '<div class="recruit-mini-stat"><span>当前学期</span><strong>' + escapeHtml(item.currentTerm) + '</strong></div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="section-header" style="padding:0 4px 10px;"><div class="section-title" style="font-size:16px;">组内招生人员</div></div>' +
+            staffListHtml +
+            '<div class="recruit-detail-actions"><button class="my-lead-action-btn school-detail-delete" onclick="showRecruitDeleteConfirm(\'group\', ' + index + ')">删除招生组</button><button class="my-lead-action-btn my-lead-action-primary" onclick="openRecruitGroupEdit(' + index + ')">编辑</button></div>';
+    }
+
+    function openRecruitStaffDetail(index) {
+        const item = recruitStaffData[index];
+        if (!item) return;
+        currentRecruitStaffIndex = index;
+        currentEntryLabel = '招生人员详情';
+        document.getElementById('entry-page-title').innerText = item.name;
+        document.getElementById('entry-page-action').innerText = '编辑';
+        document.getElementById('entry-page-content').innerHTML =
+            '<div class="entry-card" style="padding:14px; margin-bottom:16px;">' +
+                renderRecruitDetailGrid([
+                    ['姓名', item.name],
+                    ['电话', item.phone],
+                    ['招生组', getRecruitStaffGroup(item)],
+                    ['人员类型', item.type],
+                    ['人员状态', item.status],
+                    ['创建时间', item.createdAt]
+                ]) +
+            '</div>' +
+            '<div class="recruit-detail-actions"><button class="my-lead-action-btn school-detail-delete" onclick="showRecruitDeleteConfirm(\'staff\', ' + index + ')">删除招生人员</button><button class="my-lead-action-btn my-lead-action-primary" onclick="openRecruitStaffEdit(' + index + ')">编辑</button></div>';
+    }
+
+    function selectOptionsHtml(options, selected) {
+        return options.map(opt => '<option' + (opt === selected ? ' selected' : '') + '>' + escapeHtml(opt) + '</option>').join('');
+    }
+
+    function openRecruitGroupEdit(index) {
+        const item = recruitGroupsData[index];
+        if (!item) return;
+        currentRecruitGroupIndex = index;
+        currentEntryLabel = '编辑招生组';
+        document.getElementById('entry-page-title').innerText = '编辑招生组';
+        document.getElementById('entry-page-action').innerText = '';
+        document.getElementById('entry-page-content').innerHTML =
+            '<div class="entry-card" style="padding:14px; margin-bottom:16px;">' +
+                '<div class="form-group"><label class="form-label required">招生组名称</label><input id="recruit-group-name" class="form-control" value="' + escapeHtml(item.name) + '"></div>' +
+                '<div class="form-group"><label class="form-label required">激活状态</label><select id="recruit-group-active" class="form-control">' + selectOptionsHtml(['已激活', '未激活'], item.activeStatus) + '</select></div>' +
+                '<div class="form-group"><label class="form-label required">是否当前学期</label><select id="recruit-group-term" class="form-control">' + selectOptionsHtml(['是', '不是'], item.currentTerm) + '</select></div>' +
+            '</div><div class="recruit-detail-actions"><button class="my-lead-action-btn my-lead-action-tertiary" onclick="openRecruitGroupDetail(' + index + ')">取消</button><button class="my-lead-action-btn my-lead-action-primary" onclick="saveRecruitGroup(' + index + ')">保存</button></div>';
+        enhanceInteractiveControls(document.getElementById('entry-page-content'));
+    }
+
+    function saveRecruitGroup(index) {
+        const item = recruitGroupsData[index];
+        if (!item) return;
+        const name = document.getElementById('recruit-group-name').value.trim();
+        if (!name) return showToast('请填写招生组名称');
+        item.name = name;
+        item.activeStatus = document.getElementById('recruit-group-active').value;
+        item.currentTerm = document.getElementById('recruit-group-term').value;
+        showToast('招生组已保存', true);
+        openRecruitGroupDetail(index);
+    }
+
+    function openRecruitStaffEdit(index) {
+        const item = recruitStaffData[index];
+        if (!item) return;
+        currentRecruitStaffIndex = index;
+        currentEntryLabel = '编辑招生人员';
+        document.getElementById('entry-page-title').innerText = '编辑招生人员';
+        document.getElementById('entry-page-action').innerText = '';
+        document.getElementById('entry-page-content').innerHTML =
+            '<div class="entry-card" style="padding:14px; margin-bottom:16px;">' +
+                '<div class="form-group"><label class="form-label required">姓名</label><input id="recruit-staff-name" class="form-control" value="' + escapeHtml(item.name) + '"></div>' +
+                '<div class="form-group"><label class="form-label required">电话</label><input id="recruit-staff-phone" class="form-control" inputmode="tel" value="' + escapeHtml(item.phone) + '"></div>' +
+                '<div class="form-group"><label class="form-label required">所属招生组</label><select id="recruit-staff-group" class="form-control">' + selectOptionsHtml(recruitGroupsData.map(group => group.name), getRecruitStaffGroup(item)) + '</select></div>' +
+                '<div class="form-group"><label class="form-label required">人员类型</label><select id="recruit-staff-type" class="form-control">' + selectOptionsHtml(['正式员工', '第三方员工'], item.type) + '</select></div>' +
+                '<div class="form-group"><label class="form-label required">人员状态</label><select id="recruit-staff-status" class="form-control">' + selectOptionsHtml(['在岗', '离职', '休假'], item.status) + '</select></div>' +
+                '<div class="form-group"><label class="form-label">创建时间</label><input id="recruit-staff-created" class="form-control" value="' + escapeHtml(item.createdAt) + '"></div>' +
+            '</div><div class="recruit-detail-actions"><button class="my-lead-action-btn my-lead-action-tertiary" onclick="openRecruitStaffDetail(' + index + ')">取消</button><button class="my-lead-action-btn my-lead-action-primary" onclick="saveRecruitStaff(' + index + ')">保存</button></div>';
+        enhanceInteractiveControls(document.getElementById('entry-page-content'));
+    }
+
+    function saveRecruitStaff(index) {
+        const item = recruitStaffData[index];
+        if (!item) return;
+        const name = document.getElementById('recruit-staff-name').value.trim();
+        const phone = document.getElementById('recruit-staff-phone').value.trim();
+        if (!name || !phone) return showToast('请填写姓名和电话');
+        item.name = name;
+        item.phone = phone;
+        item.group = document.getElementById('recruit-staff-group').value;
+        item.type = document.getElementById('recruit-staff-type').value;
+        item.status = document.getElementById('recruit-staff-status').value;
+        item.createdAt = document.getElementById('recruit-staff-created').value.trim() || item.createdAt;
+        showToast('招生人员已保存', true);
+        openRecruitStaffDetail(index);
+    }
+
+    function showRecruitDeleteConfirm(type, index) {
+        const isGroup = type === 'group';
+        const item = isGroup ? recruitGroupsData[index] : recruitStaffData[index];
+        if (!item) return;
+        document.getElementById('record-actions-title').innerText = isGroup ? '删除招生组' : '删除招生人员';
+        document.getElementById('record-actions-body').innerHTML =
+            '<div class="entry-card-title">确认删除“' + escapeHtml(item.name) + '”？</div>' +
+            '<div class="entry-card-sub" style="margin-top:6px;">删除后此列表将不再显示该条记录。</div>' +
+            '<div class="dialog-actions"><button class="dialog-btn cancel" onclick="closeAllModals()">再想想</button><button class="dialog-btn confirm" onclick="deleteRecruitItem(\'' + type + '\', ' + index + ')">确认删除</button></div>';
+        showModal('sheet-record-actions');
+    }
+
+    function deleteRecruitItem(type, index) {
+        if (type === 'group') recruitGroupsData.splice(index, 1);
+        else recruitStaffData.splice(index, 1);
+        closeAllModals();
+        openRecruitListPage();
+        showToast(type === 'group' ? '招生组已删除' : '招生人员已删除', true);
     }
 
     function renderCheckinRecordsEntry() {
@@ -4268,7 +4666,9 @@
     }
 
     function showModal(modalId) {
-        document.getElementById('modal-overlay').classList.add('active');
+        const overlay = document.getElementById('modal-overlay');
+        overlay.classList.toggle('assign-conflict-overlay', modalId === 'dialog-assign-conflict');
+        overlay.classList.add('active');
         closeQuickMenu();
         const modal = document.getElementById(modalId);
         if (modal) {
@@ -4282,6 +4682,7 @@
         if (dialog) dialog.classList.remove('active');
         pendingAssignConflict = null;
         const assignSheetActive = document.getElementById('sheet-public-assign')?.classList.contains('active');
+        document.getElementById('modal-overlay').classList.remove('assign-conflict-overlay');
         if (!assignSheetActive) document.getElementById('modal-overlay').classList.remove('active');
     }
 
@@ -4294,7 +4695,7 @@
             closeAssignConflictDialog();
             return;
         }
-        document.getElementById('modal-overlay').classList.remove('active');
+        document.getElementById('modal-overlay').classList.remove('active', 'assign-conflict-overlay');
         closeQuickMenu();
         document.querySelectorAll('.bottom-sheet, .dialog-box').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.styled-select-host.open').forEach(el => el.classList.remove('open'));
@@ -4316,7 +4717,7 @@
         const name = (el.name || '').toLowerCase();
         const label = el.closest('.form-group, .lead-edit-cell, .entry-form-row')?.querySelector('.form-label, .lead-edit-label, label')?.textContent || '';
         const meta = (id + ' ' + name + ' ' + label + ' ' + (el.placeholder || '')).toLowerCase();
-        if (type === 'tel' || el.inputMode === 'tel') return true;
+        if (type === 'tel' || el.inputMode === 'tel') return false;
         return /金额|金钱|版本|人数|次数|数量|计划|实际|比例|退费|学费|费用|amount|money|version|count|number|scale|ratio|tuition|fee|refund|planned|actual|retry/.test(meta);
     }
 
@@ -4620,7 +5021,32 @@
     function quickAction(type) {
         closeQuickMenu();
         if (type === 'lead') openOfflineLeadFormFromWorkspace();
-        else if (type === 'scan') showToast('扫码功能已打开，请对准学生到访码', true);
+        else if (type === 'scan') simulateScanVisit();
+    }
+
+    function simulateScanVisit() {
+        const lead = getMyLeads().find(item => {
+            const appointment = getLeadVisitAppointment(item);
+            return appointment && getVisitAppointmentStatus(appointment) !== '已取消' && !isLeadVisited(item);
+        }) || getMyLeads().find(item => !isLeadVisited(item));
+        if (!lead) {
+            showToast('暂无可核销到访的学生');
+            return;
+        }
+        const scanBookedAt = '2026-06-25T15:12';
+        const scanActualAt = '2026-06-25T15:14';
+        if (!(lead.visitAppointments || []).length) {
+            lead.visitAppointments = [{ visitAt: scanBookedAt, code: 'SCAN' + lead.id, token: 'SCAN' + lead.id, status: '待到访', advisor: lead.owner || state.currentUser, createdAt: formatDateTime(scanBookedAt) }];
+            lead.stage = Math.max(Number(lead.stage || 0), 2);
+        } else {
+            lead.visitAppointments[0].visitAt = scanBookedAt;
+            lead.visitAppointments[0].content = '预约到访时间：' + formatDateTime(scanBookedAt);
+        }
+        markLeadVisitedSilently(lead, '扫码核销到访，系统自动确认学生已到访', scanActualAt);
+        currentLeadScope = 'mine';
+        openMyLeadDetail(lead.id);
+        showToast('扫码成功，已确认到访', true, 1200);
+        refreshAllModuleLists();
     }
 
     function simulateAction(el, loadingMsg, successMsg, isSuccess = true, callback = null) {
@@ -4718,7 +5144,7 @@
         if (Number(lead.stage || 0) >= 5) return { text: '已录取', cls: 'enrolled' };
         if (Number(lead.stage || 0) >= 4) return { text: '已预定', cls: 'reserved' };
         const visitStatus = getVisitAppointmentStatus(getLeadVisitAppointment(lead));
-        if (visitStatus === '已取消' || visitStatus === '已过期') return { text: visitStatus, cls: 'invited' };
+        if (visitStatus === '已取消') return { text: visitStatus, cls: 'cancelled' };
         if ((lead.visitAppointments || []).length || Number(lead.stage || 0) === 2) return { text: '已邀约', cls: 'invited' };
         if (lead.owner === state.currentUser) return { text: '我的', cls: 'mine' };
         return { text: lead.owner, cls: 'teacher' };
@@ -4770,11 +5196,16 @@
                 const selectedClass = state.selectedIds.has(lead.id) ? ' selected' : '';
                 const schoolVisual = getSourceSchoolConfirmVisualState(lead);
                 const schoolRowClass = schoolVisual.cls === 'school-confirmed' ? '' : ' ' + schoolVisual.cls;
-                const highlightClass = Number(highlightedPublicLeadId) === Number(lead.id) ? ' just-added' : '';
+                const highlightClass = Number(highlightedPublicLeadId) === Number(lead.id) ? ' just-added highlight-' + (highlightedPublicLeadTone === 'confirmed' ? 'confirmed' : 'warning') : '';
+                const hasSchoolSignalValue = !isMissingSourceSchoolName(schoolVisual.display);
+                const schoolSignal = schoolVisual.cls === 'school-confirmed'
+                    ? ''
+                    : '<div class="lead-manage-school-signal ' + schoolVisual.cls + '">' + (hasSchoolSignalValue ? ('待确认：' + escapeHtml(truncateSourceSchoolName(schoolVisual.display, 13))) : '待确认：生源学校') + '</div>';
+                const mainClass = schoolSignal ? 'lead-manage-main' : 'lead-manage-main confirmed-school';
                 return '<div class="lead-manage-row' + schoolRowClass + selectedClass + highlightClass + '" data-lead-id="' + lead.id + '" onclick="handleLeadManageRowClick(' + lead.id + ', event)">' +
                     checkbox +
                     '<div class="lead-manage-index">' + (index + 1) + '</div>' +
-                    '<div class="lead-manage-main"><div class="lead-manage-name">' + escapeHtml(lead.name) + '</div><div class="lead-manage-school-signal ' + schoolVisual.cls + '">生源学校：' + escapeHtml(schoolVisual.display) + '</div></div>' +
+                    '<div class="' + mainClass + '"><div class="lead-manage-name">' + escapeHtml(lead.name) + '</div>' + schoolSignal + '</div>' +
                     '<div class="lead-manage-status ' + status.cls + '">' + escapeHtml(status.text) + '</div>' +
                     '<svg class="lead-row-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
                     '</div>';
@@ -4824,7 +5255,7 @@
                 } else if (lead.stage === 2) {
                     const visitBlock = getVisitConfirmBlock(lead);
                     const visitButton = visitBlock
-                        ? '<button class="btn-xs disabled" disabled>' + escapeHtml(visitBlock.label) + '</button>'
+                        ? '<button class="btn-xs visit-disabled-hint" onclick="event.stopPropagation(); showToast(\'' + escapeHtml(visitBlock.message) + '\')">' + escapeHtml(visitBlock.label) + '</button>'
                         : '<button class="btn-xs" onclick="event.stopPropagation(); confirmVisit(' + lead.id + ')">确认到访</button>';
                     actions = visitButton + '<button class="btn-xs outline" onclick="openContextModal(\'sheet-follow-up\', ' + lead.id + ', event)">写跟进</button>';
                 } else if (lead.stage === 3) {
@@ -5098,6 +5529,21 @@
         '陈老师': { name: '陈老师', phone: '137 8890 2216', group: '', role: '班主任' }
     };
 
+    const recruitGroupsData = [
+        { name: '城南招生组', activeStatus: '已激活', currentTerm: '是' },
+        { name: '城北招生组', activeStatus: '已激活', currentTerm: '是' },
+        { name: '市区拓展组', activeStatus: '未激活', currentTerm: '不是' },
+        { name: '校企渠道组', activeStatus: '已激活', currentTerm: '是' }
+    ];
+
+    const recruitStaffData = [
+        { name: '尹娣', phone: '136 8821 1076', group: '城南招生组', type: '正式员工', status: '在岗', createdAt: '2026-05-18 09:30' },
+        { name: '张伟', phone: '139 2156 8032', group: '城北招生组', type: '正式员工', status: '在岗', createdAt: '2026-05-20 10:12' },
+        { name: '李老师', phone: '137 6048 2195', group: '城北招生组', type: '第三方员工', status: '休假', createdAt: '2026-05-26 14:18' },
+        { name: '魏海霞', phone: '135 9072 4418', group: '城南招生组', type: '正式员工', status: '在岗', createdAt: '2026-06-01 08:46' },
+        { name: '周老师', phone: '138 1122 9086', group: '校企渠道组', type: '第三方员工', status: '离职', createdAt: '2026-06-04 11:05' }
+    ];
+
     let currentReservationTab = '全部';
     let reservationSearchQuery = '';
     let currentBusinessRecordDetail = { type: null, id: null };
@@ -5313,7 +5759,7 @@
         if (sheet) sheet.classList.remove('active');
         currentDateTimePicker = null;
         const hasActiveModal = Array.from(document.querySelectorAll('.bottom-sheet, .dialog-box')).some(el => el.classList.contains('active'));
-        if (!hasActiveModal) document.getElementById('modal-overlay').classList.remove('active');
+        if (!hasActiveModal) document.getElementById('modal-overlay').classList.remove('active', 'assign-conflict-overlay');
     }
 
     function clearDateTimePicker() {
@@ -6967,21 +7413,6 @@
         renderList(listContainerId, filtered, type);
     }
 
-    function getDetailActionHtml(lead) {
-        if (!lead.owner) return '<button class="detail-primary-btn" onclick="openPublicLeadAssignment(' + lead.id + ', event)">分配顾问</button>';
-        if (lead.stage <= 1) return '<button class="detail-primary-btn" onclick="openContextModal(\'sheet-follow-up\', ' + lead.id + ', event)">写跟进记录</button>';
-        if (lead.stage === 2) {
-            const visitBlock = getVisitConfirmBlock(lead);
-            return visitBlock
-                ? '<button class="detail-primary-btn" disabled>' + escapeHtml(visitBlock.label) + '</button>'
-                : '<button class="detail-primary-btn" onclick="confirmVisit(' + lead.id + ')">确认到访</button>';
-        }
-        if (lead.stage === 3) return '<button class="detail-primary-btn" onclick="openReservationForm(\'new\', null, ' + lead.id + ')">办理预定</button>';
-        if (lead.stage === 4) return '<button class="detail-primary-btn" onclick="openAdmissionFromLead(' + lead.id + ')">转正式录取</button>';
-        if (lead.handoverStatus === 'failed') return '<button class="detail-primary-btn" onclick="handleDashboardJump(\'syncFailed\')">查看交接异常</button>';
-        return '<button class="detail-primary-btn" onclick="openDynamicForm(\'handoverTask\')">发起入学交接</button>';
-    }
-
     function confirmVisit(id) {
         const lead = findAnyLead(id);
         if (!lead) return;
@@ -6996,62 +7427,11 @@
         refreshAllModuleLists();
     }
 
-    function getDetailTimelineHtml(lead) {
-        const labels = ['线索入池', '分配', '跟进', '邀约', '到访', '预定', '录取', '报到', '交接'];
-        const doneMap = {
-            '线索入池': true,
-            '分配': !!lead.owner,
-            '跟进': lead.stage >= 1,
-            '邀约': lead.stage >= 2,
-            '到访': lead.stage >= 3,
-            '预定': lead.stage >= 4,
-            '录取': lead.stage >= 5,
-            '报到': lead.stage >= 5,
-            '交接': lead.handoverStatus !== undefined
-        };
-        return labels.map(label => {
-            const active = doneMap[label];
-            return '<div class="log-item"><div class="log-time">' + (active ? '已完成' : '待推进') + '</div><div class="log-content">' + label + '</div><div class="log-detail">' + (active ? '该节点已有业务记录。' : '下一步可根据学生状态继续推进。') + '</div></div>';
-        }).join('');
-    }
-
     function openLeadDetail(id) {
-        let lead = state.leads.find(l => l.id === id) || state.conversions.find(l => l.id === id);
+        const lead = findAnyLead(id);
         if (!lead) return;
-        if (lead.isInvalid) {
-            showToast('无效线索仅支持恢复，不进入详情页');
-            return;
-        }
-
-        state.currentActionLeadId = id;
-        currentMyLeadId = Number(id);
-        let badge = lead.owner ? '<span class="badge-tag tag-success">负责人: ' + lead.owner + '</span>' : '<span class="badge-tag tag-primary">待分配</span>';
-        let riskBadge = lead.isOverdue ? '<span class="badge-tag tag-warning">SLA 超时</span>' : '<span class="badge-tag tag-primary">SLA 正常</span>';
-        let headerHtml = '<div style="font-size:20px; font-weight:800; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between; gap:8px;"><span style="display:flex; align-items:center; gap:8px; min-width:0;"><span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + lead.name + '</span></span><span style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;">' + badge + riskBadge + '</span></div><div style="font-size:13px; color:var(--text-secondary); margin-bottom:16px;">手机号: ' + displayPhone(lead.phone) + ' | 来源: ' + lead.source + '</div>' + getStepsHtml(lead.stage, 'detail');
-        document.getElementById('detail-header-info').innerHTML = headerHtml;
-
-        let summaryHtml = '<div class="detail-summary-grid"><div class="detail-summary"><div class="detail-summary-title">基础信息</div><div class="detail-summary-body">意向专业：' + (lead.major || '计算机网络技术') + '；生源学校：' + renderLegacySchoolJump(lead) + '；来源：' + lead.source + '。</div></div><div class="detail-summary"><div class="detail-summary-title">当前阶段</div><div class="detail-summary-body">阶段：' + getStageText(lead.stage) + '；负责人：' + (lead.owner || '待分配') + '。</div></div><div class="detail-summary"><div class="detail-summary-title">下一步动作</div><div class="detail-summary-body">' + getNextAction(lead) + '</div></div><div class="detail-summary"><div class="detail-summary-title">风险提醒</div><div class="detail-summary-body">' + (lead.isOverdue ? '已超时，请优先处理并补充跟进记录。' : '当前无超时风险，按计划推进即可。') + '</div></div></div>';
-        let timelineHtml = summaryHtml + '<div class="section-header" style="padding-left:0; margin-top: 4px;"><div class="section-title" style="font-size:16px;">流程时间线</div></div>' + getDetailTimelineHtml(lead);
-        document.getElementById('detail-timeline').innerHTML = timelineHtml;
-        const legacyVisitButton = document.getElementById('legacy-visit-invite-btn');
-        if (legacyVisitButton) legacyVisitButton.innerText = getVisitInviteActionText(lead);
-        const detailPage = document.getElementById('page-lead-detail');
-        detailPage.classList.remove('hidden-left', 'hidden-right');
-        detailPage.style.cssText = 'z-index:300;background:#F8FAFC;position:absolute;left:0;top:0;right:auto;bottom:auto;width:100%;height:100%;min-width:100%;max-width:100%;';
-        detailPage.classList.add('active');
-    }
-
-    function closeLeadDetail() {
-        const detailPage = document.getElementById('page-lead-detail');
-        detailPage.classList.remove('active');
-    }
-
-    function editCurrentLeadFromLegacyDetail() {
-        const leadId = state.currentActionLeadId || currentMyLeadId;
-        if (!leadId) return;
-        closeLeadDetail();
-        openMyLeadDetail(leadId);
-        openMyLeadInlineEdit(leadId);
+        currentLeadScope = lead.owner ? 'mine' : 'public';
+        openMyLeadDetail(id);
     }
 
     function handleGridAction(label, isDirItem = false) {
@@ -7094,7 +7474,10 @@
             return;
         }
         const routeMap = {
+            '数据看板': ['sub-view-dashboard', 'tab-btn-dash'],
             '招生工作台': ['sub-view-dashboard', 'tab-btn-dash'],
+            '线索跟进': ['sub-view-follow', 'tab-btn-follow'],
+            '招生管理': ['sub-view-more', 'tab-btn-more'],
             '线索管理': ['sub-view-leads', 'tab-btn-more'],
             '线索池': ['sub-view-leads', 'tab-btn-more'],
             '跟进到访': ['sub-view-follow', 'tab-btn-follow'],
@@ -7124,6 +7507,11 @@
 
     function getSchoolFeatureAliases(label) {
         const aliases = {
+            数据看板: 'sjkb shujukanban data dashboard kanban',
+            线索跟进: 'xsgj xiansuogenjin follow clue lead genjin',
+            招生管理: 'zsgl zhaoshengguanli management manage',
+            学校招生数据: 'xxzssj xuexiaozhaoshengshuju school data summary',
+            招生组与人员: 'zszryry zhaoshengzuyurenyuan staff group',
             招生工作台: 'zsgzt zhaoshenggongzuotai zs gzt dashboard workbench',
             线索管理: 'xsgl xiansuoguanli xs clue lead leads',
             课表编排: 'kbbp kebiaobianpai kb course schedule',
@@ -7205,8 +7593,9 @@
             document.getElementById('dir-grid').innerHTML = '<div class="admission-entry-group-title">搜索结果</div>' + (matches.length
                 ? matches.map(label => {
                     const inHighFreq = origHighFreq.includes(label);
-                    const manageClass = (manageMode && !inHighFreq) ? ' manage-mode' : '';
-                    return '<button type="button" class="admission-entry-btn' + manageClass + '" onclick="handleGridAction(\'' + label + '\', true)">' + label + '</button>';
+                    const manageClass = manageMode ? (inHighFreq ? ' added-disabled' : ' manage-mode') : '';
+                    const disabledAttr = manageMode && inHighFreq ? ' disabled' : '';
+                    return '<button type="button" class="admission-entry-btn' + manageClass + '"' + disabledAttr + ' onclick="handleGridAction(\'' + label + '\', true)">' + label + '</button>';
                 }).join('')
                 : '<div class="admission-entry-empty">没有找到匹配功能<br>可尝试中文名称或拼音首字母</div>');
             return;
@@ -7216,8 +7605,9 @@
             return '<div class="admission-entry-group-title">' + group + '</div>' +
                 labels.map(label => {
                     const inHighFreq = origHighFreq.includes(label);
-                    const manageClass = (manageMode && !inHighFreq) ? ' manage-mode' : '';
-                    return '<button type="button" class="admission-entry-btn' + manageClass + '" onclick="handleGridAction(\'' + label + '\', true)">' + label + '</button>';
+                    const manageClass = manageMode ? (inHighFreq ? ' added-disabled' : ' manage-mode') : '';
+                    const disabledAttr = manageMode && inHighFreq ? ' disabled' : '';
+                    return '<button type="button" class="admission-entry-btn' + manageClass + '"' + disabledAttr + ' onclick="handleGridAction(\'' + label + '\', true)">' + label + '</button>';
                 }).join('');
         }).join('');
     }
@@ -7259,6 +7649,10 @@
     function closeEnrollmentWorkspace() {
         const page = document.getElementById('workspace-enrollment');
         const activeView = document.querySelector('#workspace-enrollment .sub-view.active');
+        if (activeView && activeView.id === 'sub-view-leads' && isLeadSelectionMode()) {
+            clearSelection();
+            return;
+        }
         if (activeView && activeView.id === 'sub-view-leads' && leadManagementReturnView === 'sub-view-more') {
             leadManagementReturnView = null;
             page.classList.remove('lead-management-page-mode');
@@ -7344,5 +7738,8 @@
 </script>
 </body>
 </html>
+
+
+
 
 
