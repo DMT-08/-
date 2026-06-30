@@ -193,12 +193,12 @@
         #follow-pane-handover { position: relative; padding-bottom: 132px; }
         #follow-pane-handover.active { flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
         #follow-pane-handover.active::-webkit-scrollbar { display: none; }
-        .enrollment-flow-toolbar { position: sticky; top: 55px; z-index: 35; margin: 0 0 12px; padding: 2px 20px 12px; border-radius: 0; background: linear-gradient(135deg, rgba(239,246,255,0.96), rgba(223,231,255,0.96)); border: 0; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
-        .enrollment-flow-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 4px; scrollbar-width: none; }
+        .enrollment-flow-toolbar { position: sticky; top: 55px; z-index: 35; margin: 0 0 12px; padding: 2px 0 12px; border-radius: 0; background: linear-gradient(135deg, rgba(239,246,255,0.96), rgba(223,231,255,0.96)); border: 0; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); overflow: hidden; }
+        .enrollment-flow-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 2px 20px 4px; scrollbar-width: none; }
         .enrollment-flow-tabs::-webkit-scrollbar { display: none; }
         .enrollment-flow-tab { flex: 0 0 auto; min-height: 34px; padding: 0 14px; border: 1px solid rgba(31,95,255,0.1); border-radius: 999px; background: rgba(255,255,255,0.78); color: var(--text-secondary); font-family: inherit; font-size: 12px; font-weight: 900; }
         .enrollment-flow-tab.active { border-color: var(--primary-color); background: var(--primary-color); color: #fff; box-shadow: none; }
-        .enrollment-flow-tools { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; }
+        .enrollment-flow-tools { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; padding: 0 20px; }
         .enrollment-flow-tools .record-search-wrap { flex: 1; margin: 0; }
         .enrollment-add-btn { position: absolute; left: 20px; right: 20px; bottom: 20px; z-index: 88; width: auto; min-width: 0; height: 52px; padding: 0 24px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 999px; background: var(--primary-color); color: #fff; box-shadow: 0 8px 18px rgba(31,95,255,0.22); font-family: inherit; font-size: 13px; font-weight: 950; transform: none; }
         .enrollment-add-btn svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; }
@@ -376,6 +376,10 @@
         .toast.show { opacity: 1; top: 25%; }
         #sys-toast-msg { display: block; min-width: 0; max-width: 286px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .toast-undo-btn { margin-left: 12px; padding: 4px 10px; background: rgba(255,255,255,0.2); border-radius: 6px; cursor: pointer; font-size: 12px; }
+        .scroll-top-fab { position: absolute; right: 22px; bottom: 104px; z-index: 1460; width: 42px; height: 42px; border: 1px solid rgba(255,255,255,0.92); border-radius: 15px; background: rgba(255,255,255,0.90); color: var(--primary-color); box-shadow: 0 12px 24px rgba(31,95,255,0.16); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(10px) scale(0.92); transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s; }
+        .scroll-top-fab.show { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0) scale(1); }
+        .scroll-top-fab:active { transform: translateY(0) scale(0.95); }
+        .scroll-top-fab svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
 
         .primary-action-btn { background: linear-gradient(135deg, #4b82ff 0%, var(--primary-color) 100%); color: white; padding: 12px 16px; min-height: 76px; border-radius: 26px; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 16px 28px rgba(31, 95, 255, 0.24); cursor: pointer; transition: 0.2s; margin-bottom: 14px; flex-shrink: 0;}
         .primary-action-btn svg { width: 34px; height: 34px; flex-shrink: 0; stroke-width: 2.2; }
@@ -496,6 +500,17 @@
         .switch-field { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 16px; background: rgba(255,255,255,0.78); margin-bottom: 12px; }
         .switch-options { display: flex; gap: 6px; flex-shrink: 0; }
         .switch-options label { font-size: 12px; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 4px; }
+        .follow-radio-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+        .follow-radio-option { min-width: 0; display: block; position: relative; }
+        .follow-radio-option input { position: absolute; opacity: 0; pointer-events: none; }
+        .follow-radio-option span { min-height: 42px; display: flex; align-items: center; justify-content: center; padding: 0 8px; border-radius: 14px; border: 1px solid rgba(31,95,255,0.12); background: rgba(255,255,255,0.78); color: var(--text-main); font-size: 12px; font-weight: 900; transition: 0.18s ease; }
+        .follow-radio-option input:checked + span { background: var(--primary-color); border-color: var(--primary-color); color: #fff; box-shadow: 0 8px 16px rgba(31,95,255,0.16); }
+        .follow-radio-option input:disabled + span { background: rgba(148,163,184,0.14); border-color: rgba(148,163,184,0.16); color: #94A3B8; box-shadow: none; }
+        .follow-radio-option.disabled-hint { cursor: pointer; }
+        .follow-radio-option.disabled-hint span { justify-content: space-between; padding: 0 12px; }
+        .follow-radio-option.disabled-hint.tap-flash span { animation: disabledTapFlash 0.56s ease both; }
+        @keyframes disabledTapFlash { 0%, 100% { background: rgba(148,163,184,0.14); box-shadow: none; } 42% { background: rgba(239,68,68,0.10); border-color: rgba(239,68,68,0.28); box-shadow: 0 0 0 4px rgba(239,68,68,0.10); color: var(--danger-color); } }
+        .follow-radio-option:active span { background: rgba(31,95,255,0.12); }
         .advanced-section { margin-bottom: 14px; border-radius: 20px; background: rgba(245,248,255,0.72); border: 1px solid rgba(255,255,255,0.9); overflow: hidden; }
         .advanced-section summary { padding: 14px; color: var(--primary-color); font-size: 14px; font-weight: 900; cursor: pointer; list-style: none; }
         .advanced-section summary::-webkit-details-marker { display: none; }
@@ -541,6 +556,7 @@
         .quick-dropdown.active { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
         .quick-menu-item { width: 100%; border: none; background: transparent; border-radius: 14px; padding: 10px; display: flex; align-items: center; gap: 10px; color: var(--text-title); font-size: 13px; font-weight: 900; font-family: inherit; cursor: pointer; }
         .quick-menu-item:active { background: var(--primary-light); }
+        .quick-menu-item.selected { background: var(--primary-color); color: #fff; }
         .quick-menu-icon { width: 28px; height: 28px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: var(--primary-light); color: var(--primary-color); flex-shrink: 0; }
         .quick-menu-icon svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
         .appointment-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
@@ -566,18 +582,19 @@
         .compact-progress.status-reserved { background: rgba(245,158,11,0.13); color: #B45309; }
         .compact-progress.status-enrolled { background: rgba(20,184,166,0.14); color: #0F766E; }
         .compact-progress.status-public { background: rgba(100,116,139,0.12); color: #64748B; }
-        .filter-panel { position: sticky; top: 0; z-index: 86; margin: 0 -20px 12px; padding: 10px 20px 8px; border-radius: 0 0 18px 18px; background: linear-gradient(135deg, rgba(239,246,255,0.98) 0%, rgba(223,231,255,0.96) 100%); border: 0; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: none; }
-        .filter-panel::before, .filter-panel::after, .enrollment-flow-toolbar::before, .enrollment-flow-toolbar::after { content: ''; position: absolute; top: 0; bottom: 0; z-index: 2; width: 16px; pointer-events: none; }
-        .filter-panel::before, .enrollment-flow-toolbar::before { left: 0; background: linear-gradient(90deg, rgba(239,246,255,0.98), rgba(239,246,255,0)); }
-        .filter-panel::after, .enrollment-flow-toolbar::after { right: 0; background: linear-gradient(270deg, rgba(223,231,255,0.96), rgba(223,231,255,0)); }
-        .filter-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+        .filter-panel { position: sticky; top: 0; z-index: 86; margin: 0 -20px 12px; padding: 10px 0 8px; border-radius: 0 0 18px 18px; background: linear-gradient(135deg, rgba(239,246,255,0.98) 0%, rgba(223,231,255,0.96) 100%); border: 0; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: none; overflow: hidden; }
+        .filter-panel::before, .filter-panel::after, .enrollment-flow-toolbar::before, .enrollment-flow-toolbar::after { content: ''; position: absolute; top: 0; bottom: 0; z-index: 2; width: 14px; pointer-events: none; }
+        .filter-panel::before, .enrollment-flow-toolbar::before { left: 0; background: linear-gradient(90deg, rgba(239,246,255,1) 0%, rgba(239,246,255,0.78) 48%, rgba(239,246,255,0) 100%); box-shadow: 8px 0 14px rgba(239,246,255,0.72); }
+        .filter-panel::after, .enrollment-flow-toolbar::after { right: 0; background: linear-gradient(270deg, rgba(223,231,255,1) 0%, rgba(223,231,255,0.78) 48%, rgba(223,231,255,0) 100%); box-shadow: -8px 0 14px rgba(223,231,255,0.72); }
+        .filter-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; padding: 0 20px; }
+        .filter-panel .pill, .enrollment-flow-tab { position: relative; z-index: 3; }
         .mini-search-wrap { position: relative; flex: 1; min-width: 0; }
         .mini-search-wrap svg { position: absolute; left: 13px; top: 50%; width: 16px; height: 16px; color: #94A3B8; transform: translateY(-50%); pointer-events: none; }
         .mini-search { width: 100%; min-width: 0; height: 38px; border: 1px solid rgba(31,95,255,0.10); border-radius: 12px; padding: 0 14px 0 38px; background: rgba(255,255,255,0.92); outline: none; color: var(--text-title); font-weight: 700; }
         .filter-btn { height: 38px; padding: 0 14px; border: 1px solid rgba(31,95,255,0.16); border-radius: 999px; background: rgba(255,255,255,0.86); color: var(--primary-color); font-size: 12px; font-weight: 900; cursor: pointer; }
         .meta-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 4px; }
         .meta-item { padding: 8px 10px; border-radius: 12px; background: rgba(31,95,255,0.06); color: var(--text-main); font-size: 11px; font-weight: 700; line-height: 1.35; }
-        .next-action { padding: 10px 12px; border-radius: 14px; background: var(--primary-light); color: var(--primary-color); font-size: 12px; font-weight: 900; }
+        .next-action { padding: 10px 12px; border-radius: 14px; background: var(--primary-light); color: var(--primary-color); font-size: 12px; font-weight: 750; }
         .lead-main { cursor: pointer; display: flex; flex-direction: column; gap: 8px; min-width: 0; flex: 1; }
         .lead-status { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
         .focus-note { font-size: 11px; color: var(--text-secondary); font-weight: 800; line-height: 1.35; }
@@ -705,8 +722,8 @@
         .entry-table tr:last-child td { border-bottom: none; }
         .entry-blue { color: var(--primary-color) !important; }
         .entry-up { color: #E11D48; font-weight: 950; }
-        .my-lead-filter-bar { position: sticky; top: 55px; z-index: 72; margin: 0 0 12px; padding: 10px; border-radius: 18px; background: rgba(255,255,255,0.82); border: 1px solid rgba(255,255,255,0.96); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); box-shadow: 0 10px 24px rgba(31,95,255,0.05); }
-        .my-lead-filter-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; padding: 0; }
+        .my-lead-filter-bar { position: sticky; top: 55px; z-index: 72; margin: 0 -20px 12px; padding: 10px 0 10px; border-radius: 0 0 18px 18px; background: linear-gradient(135deg, rgba(239,246,255,0.98), rgba(223,231,255,0.96)); border: 0; backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); box-shadow: none; overflow: hidden; }
+        .my-lead-filter-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; padding: 0 20px; }
         .my-lead-search { width: 100%; min-width: 0; height: 42px; box-sizing: border-box; border-radius: 13px; border: 1px solid rgba(31,95,255,0.10); background: rgba(255,255,255,0.90); padding: 0 12px 0 39px; font-size: 13px; font-weight: 800; color: var(--text-title); outline: none; box-shadow: 0 6px 16px rgba(31,95,255,0.05); }
         .my-lead-search:focus { border-color: rgba(31,95,255,0.35); box-shadow: 0 0 0 3px rgba(31,95,255,0.08), 0 8px 18px rgba(31,95,255,0.06); }
         .my-lead-search-wrap { position: relative; flex: 1; min-width: 0; }
@@ -715,20 +732,21 @@
         .my-lead-status-trigger { display: flex; align-items: center; justify-content: center; gap: 4px; width: 104px; padding: 0 8px; }
         .my-lead-status-trigger span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px; }
         .my-lead-status-trigger svg { width: 14px; height: 14px; opacity: 0.6; flex-shrink: 0; }
-        .my-lead-source-rail { position: relative; margin: 0 -20px; padding: 0 20px; overflow: hidden; }
-        .my-lead-source-rail::before, .my-lead-source-rail::after { content: ''; position: absolute; top: 0; bottom: 0; z-index: 2; width: 20px; pointer-events: none; }
-        .my-lead-source-rail::before { left: 0; background: linear-gradient(90deg, rgba(239,246,255,0.98), rgba(239,246,255,0)); }
-        .my-lead-source-rail::after { right: 0; background: linear-gradient(270deg, rgba(223,231,255,0.96), rgba(223,231,255,0)); }
-        .my-lead-source-scroll { display: flex; gap: 10px; overflow-x: auto; overflow-y: hidden; padding: 2px 0 4px; scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; touch-action: pan-x; }
+        .my-lead-source-rail { position: relative; margin: 0; padding: 0; overflow: hidden; }
+        .my-lead-source-rail::before, .my-lead-source-rail::after { content: ''; position: absolute; top: 0; bottom: 0; z-index: 2; width: 14px; pointer-events: none; }
+        .my-lead-source-rail::before { left: 0; background: linear-gradient(90deg, rgba(239,246,255,1) 0%, rgba(239,246,255,0.78) 50%, rgba(239,246,255,0) 100%); box-shadow: 8px 0 14px rgba(239,246,255,0.72); }
+        .my-lead-source-rail::after { right: 0; background: linear-gradient(270deg, rgba(223,231,255,1) 0%, rgba(223,231,255,0.78) 50%, rgba(223,231,255,0) 100%); box-shadow: -8px 0 14px rgba(223,231,255,0.72); }
+        .my-lead-source-scroll { position: relative; z-index: 3; display: flex; gap: 10px; overflow-x: auto; overflow-y: hidden; padding: 2px 20px 4px; scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; touch-action: pan-x; }
         .my-lead-source-scroll::-webkit-scrollbar { display: none; }
         .my-lead-source-scroll .pill { min-height: 40px; padding: 0 16px; touch-action: manipulation; }
         .follow-status-rail .pill { min-height: 34px; padding: 0 14px; border: 0; border-radius: 999px; font-family: inherit; font-size: 12px; font-weight: 900; }
-        .follow-status-rail .pill:nth-child(2) { background: rgba(59,130,246,0.12); color: #2563EB; }
-        .follow-status-rail .pill:nth-child(3) { background: rgba(99,102,241,0.12); color: #4F46E5; }
-        .follow-status-rail .pill:nth-child(4) { background: rgba(245,158,11,0.14); color: #B45309; }
-        .follow-status-rail .pill:nth-child(5) { background: rgba(20,184,166,0.14); color: #0F766E; }
-        .follow-status-rail .pill:nth-child(6) { background: rgba(16,185,129,0.13); color: #047857; }
-        .follow-status-rail .pill.active { background: linear-gradient(135deg, #3f7aff 0%, var(--primary-color) 100%); color: #fff; box-shadow: none; }
+        .follow-status-rail .status-filter-all { background: rgba(31,95,255,0.10); color: var(--primary-color); }
+        .follow-status-rail .status-filter-following { background: rgba(59,130,246,0.12); color: #2563EB; }
+        .follow-status-rail .status-filter-invited { background: rgba(245,158,11,0.13); color: #B45309; }
+        .follow-status-rail .status-filter-reserved { background: rgba(99,102,241,0.12); color: #4F46E5; }
+        .follow-status-rail .status-filter-paid { background: rgba(16,185,129,0.13); color: #047857; }
+        .follow-status-rail .status-filter-checkin { background: rgba(20,184,166,0.14); color: #0F766E; }
+        .follow-status-rail .pill.active { background: var(--primary-color) !important; color: #fff !important; box-shadow: 0 8px 16px rgba(31,95,255,0.18) !important; }
         #my-leads-list-container { flex: 1; min-height: 0; overflow-y: auto; padding-bottom: 42px; scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; }
         #my-leads-list-container::-webkit-scrollbar { display: none; }
         .my-lead-list { display: grid; gap: 10px; }
@@ -782,7 +800,7 @@
         .lead-manage-status.enrolled { background: rgba(20,184,166,0.14); color: #0F766E; }
         .lead-row-arrow { width: 16px; height: 16px; color: #94A3B8; }
         #sub-view-follow { overflow: hidden; padding-bottom: 86px; }
-        #sub-view-follow .my-lead-filter-bar { position: relative; top: auto; flex: 0 0 auto; margin: 0 0 12px; padding: 0 20px 12px; border-radius: 0 0 18px 18px; border: 0; background: linear-gradient(135deg, rgba(239,246,255,0.98) 0%, rgba(223,231,255,0.96) 100%); box-shadow: none; }
+        #sub-view-follow .my-lead-filter-bar { position: relative; top: auto; flex: 0 0 auto; margin: 0 0 12px; padding: 10px 0 12px; border-radius: 0 0 18px 18px; border: 0; background: linear-gradient(135deg, rgba(239,246,255,0.98) 0%, rgba(223,231,255,0.96) 100%); box-shadow: none; }
         #sub-view-follow .my-lead-filter-bar::before { display: none; }
         #sub-view-follow .my-lead-list, #sub-view-follow .entry-empty { margin-left: 20px; margin-right: 20px; }
         #sub-view-follow .my-lead-list { padding-top: 2px; }
@@ -960,11 +978,19 @@
         .lead-timeline-title { font-size: 13px; font-weight: 950; color: #172554; }
         .lead-timeline-time { font-size: 10px; font-weight: 800; color: #64748B; white-space: nowrap; }
         .lead-timeline-desc { font-size: 12px; color: #334155; font-weight: 750; line-height: 1.42; }
-        .lead-timeline-desc.lead-next-action { margin-top: 7px; font-size: 13px; color: #172554; font-weight: 950; }
-        .lead-timeline-item.current .lead-timeline-desc.lead-next-action { color: var(--primary-color); font-size: 14px; }
+        .lead-timeline-desc.lead-next-action { margin-top: 6px; font-size: 12px; color: #172554; font-weight: 800; }
+        .lead-next-action-label { display: block; color: inherit; font-size: 12px; font-weight: 850; line-height: 1.42; }
+        .lead-next-action-value { display: inline; color: inherit; font-size: 12px; font-weight: 850; line-height: 1.42; }
+        .lead-next-action-value.breakline { display: block; margin-top: 2px; color: #334155; font-size: 12px; font-weight: 750; }
+        .lead-timeline-item.current .lead-timeline-desc.lead-next-action { color: var(--primary-color); font-size: 12px; font-weight: 850; }
+        .lead-timeline-item.current .lead-next-action-value.breakline { color: #334155; font-size: 12px; font-weight: 750; }
+        .lead-follow-preview-btn { position: absolute; right: 12px; bottom: 10px; width: 30px; height: 30px; border: 1px solid rgba(31,95,255,0.14); border-radius: 11px; background: rgba(31,95,255,0.08); color: var(--primary-color); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .lead-follow-preview-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+        .lead-follow-preview-btn:active { transform: scale(0.95); }
+        .lead-follow-preview-card { display: grid; gap: 8px; }
         .lead-timeline-current-tag { padding: 3px 7px; border-radius: 7px; background: var(--primary-color); color: #fff; font-size: 9px; font-weight: 950; white-space: nowrap; }
-        .lead-timeline-card.has-action { position: relative; padding-bottom: 11px; }
-        .flow-reservation-icon-btn { position:static; margin:8px 0 0 auto; width:28px; height:28px; border-radius:8px; border:0; background:transparent; color:var(--primary-color); display:flex; align-items:center; justify-content:center; box-shadow:none; font-family:inherit; }
+        .lead-timeline-card.has-action { position: relative; padding-bottom: 44px; }
+        .flow-reservation-icon-btn { position:absolute; right:12px; bottom:10px; margin:0; width:30px; height:30px; border-radius:11px; border:1px solid rgba(31,95,255,0.14); background:rgba(31,95,255,0.08); color:var(--primary-color); display:flex; align-items:center; justify-content:center; box-shadow:none; font-family:inherit; }
         .flow-reservation-icon-btn.view { background:transparent; color:#64748B; }
         .flow-reservation-icon-btn svg { width:15px; height:15px; stroke:currentColor; }
         .lead-timeline-item.completed .lead-timeline-card { opacity: 0.82; }
@@ -1088,15 +1114,16 @@
         .coop-school-term-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 4px 0 12px; padding: 13px 14px; border-radius: 16px; background: rgba(255,255,255,0.72); border: 1px solid rgba(255,255,255,0.9); }
         .coop-school-term-summary strong { color: var(--text-title); font-size: 14px; font-weight: 900; }
         .coop-school-term-summary span { color: var(--text-secondary); font-size: 12px; font-weight: 800; }
-        .coop-school-toolbar { top: 0 !important; margin: 0 0 10px !important; padding: 0 0 8px !important; background: transparent !important; border: 0 !important; box-shadow: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+        .coop-school-toolbar { top: 0 !important; margin: 0 -20px 12px !important; padding: 10px 0 10px !important; border-radius: 0 0 18px 18px !important; background: linear-gradient(135deg, rgba(239,246,255,0.98), rgba(223,231,255,0.96)) !important; border: 0 !important; box-shadow: none !important; backdrop-filter: blur(22px) !important; -webkit-backdrop-filter: blur(22px) !important; overflow: visible !important; }
         .coop-school-filter-row { margin-bottom: 0 !important; align-items: center !important; }
         .coop-school-filter-row > div:first-child { flex: 0 0 98px; min-width: 0; }
         .coop-term-trigger { display: flex; align-items: center; justify-content: center; gap: 5px; width: 98px; height: 40px; padding: 0 8px; border-radius: 14px; background: #fff; box-shadow: 0 4px 12px rgba(31,95,255,0.06); }
         .coop-term-trigger span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
         .coop-term-trigger .inline-chevron { width: 7px; height: 7px; flex: 0 0 7px; transform: translateY(-2px) rotate(45deg); }
-        .coop-term-dropdown { top: 48px !important; left: 0 !important; right: auto !important; width: 136px !important; padding: 6px !important; z-index: 100 !important; }
+        .coop-term-dropdown { top: 48px !important; left: 0 !important; right: auto !important; width: 136px !important; padding: 6px !important; z-index: 1000 !important; }
         .coop-term-option { width: 100%; min-height: 40px; padding: 0 10px !important; justify-content: center; font-size: 12px; text-align: center; white-space: nowrap; }
         .coop-school-toolbar .my-lead-search { font-size: 12px; }
+        .school-summary-toolbar { top: 0 !important; margin: 0 -20px 12px !important; padding: 10px 0 10px !important; }
         .coop-empty-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
         .coop-empty-btn { min-height: 48px; border-radius: 999px; border: 1px solid rgba(31,95,255,0.14); background: rgba(31,95,255,0.09); color: var(--primary-color); font-family: inherit; font-size: 13px; font-weight: 900; }
         .coop-empty-btn.primary { border-color: var(--primary-color); background: var(--primary-color); color: #fff; box-shadow: 0 8px 18px rgba(31,95,255,0.20); }
@@ -1127,9 +1154,11 @@
         .recruit-row-badge.tag-on-duty { background: rgba(31,95,255,0.11); color: var(--primary-color); }
         .recruit-row-badge.tag-leave { background: rgba(245,158,11,0.13); color: #B45309; }
         .recruit-row-badge.tag-offboard { background: rgba(239,68,68,0.11); color: var(--danger-color); }
-        .recruit-row.leader-row { border-color: rgba(217,119,6,0.42); background: linear-gradient(135deg, rgba(255,251,235,0.92), rgba(255,255,255,0.84)); box-shadow: 0 8px 18px rgba(217,119,6,0.08); }
-        .recruit-row.leader-row .recruit-row-title, .recruit-leader-name { color: #B7791F !important; }
-        .recruit-detail-meta.leader-text { color: #B7791F; }
+        .recruit-row-badge.tag-ungrouped { background: rgba(239,68,68,0.11); color: var(--danger-color); border: 0; }
+        .recruit-leader-chip { display: inline-flex; align-items: center; min-height: 20px; padding: 0 7px; margin-left: 6px; border-radius: 7px; background: rgba(245,158,11,0.14); color: #B45309; font-size: 10px; font-weight: 950; vertical-align: middle; }
+        .recruit-row.leader-row { border-color: rgba(255,255,255,0.92); background: rgba(255,255,255,0.82); box-shadow: 0 8px 18px rgba(31,95,255,0.05); }
+        .recruit-leader-name { color: var(--text-title) !important; }
+        .recruit-detail-meta.leader-text { color: var(--text-secondary); }
         .recruit-detail-meta.leader-text .recruit-leader-name { font-weight: 950; }
         .recruit-badge-stack { display: flex; align-items: center; justify-content: flex-end; gap: 6px; flex-wrap: wrap; }
         .recruit-row-meta { margin-top: 4px; color: var(--text-secondary); font-size: 11px; font-weight: 750; line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -1143,15 +1172,39 @@
         .recruit-mini-stat strong { display: block; color: var(--text-title); font-size: 13px; font-weight: 950; line-height: 1.25; }
         .recruit-search-inline { position: relative; margin: 0 0 12px; }
         .recruit-search-inline.sticky { position: sticky; top: 0; z-index: 30; padding-bottom: 8px; background: linear-gradient(135deg, rgba(239,246,255,0.98), rgba(223,231,255,0.96)); }
-        .recruit-people-toolbar { position: sticky; top: 0; z-index: 30; display: grid; grid-template-columns: 104px minmax(0,1fr); gap: 8px; padding-bottom: 8px; background: linear-gradient(135deg, rgba(239,246,255,0.98), rgba(223,231,255,0.96)); }
+        .recruit-people-toolbar { position: sticky; top: 0; z-index: 30; display: grid; grid-template-columns: 112px minmax(0,1fr); gap: 8px; align-items: center; padding-bottom: 8px; background: linear-gradient(135deg, rgba(239,246,255,0.98), rgba(223,231,255,0.96)); }
         .recruit-people-toolbar .recruit-search-inline { margin: 0; }
-        .recruit-people-filter { width: 100%; height: 42px; border: 1px solid rgba(31,95,255,0.10); border-radius: 13px; background: rgba(255,255,255,0.90); color: var(--primary-color); font-family: inherit; font-size: 12px; font-weight: 900; padding: 0 8px; outline: none; box-shadow: 0 6px 16px rgba(31,95,255,0.05); }
+        .recruit-people-filter { width: 100%; height: 42px; line-height: normal; border: 1px solid rgba(31,95,255,0.10); border-radius: 13px; background-color: rgba(255,255,255,0.90); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-position: right 12px center; background-size: 16px 16px; background-repeat: no-repeat; color: var(--primary-color); font-family: inherit; font-size: 12px; font-weight: 900; padding: 0 34px 0 12px; outline: none; box-shadow: 0 6px 16px rgba(31,95,255,0.05); appearance: none; -webkit-appearance: none; }
         .recruit-search-inline svg { position: absolute; left: 13px; top: 50%; width: 16px; height: 16px; transform: translateY(-50%); color: #94A3B8; pointer-events: none; }
-        .recruit-search-inline input { width: 100%; min-width: 0; height: 42px; box-sizing: border-box; border-radius: 13px; border: 1px solid rgba(31,95,255,0.10); background: rgba(255,255,255,0.90); padding: 0 12px 0 39px; font-size: 13px; font-weight: 800; color: var(--text-title); outline: none; box-shadow: 0 6px 16px rgba(31,95,255,0.05); }
+        .recruit-search-inline input { width: 100%; min-width: 0; height: 42px; line-height: 42px; box-sizing: border-box; border-radius: 13px; border: 1px solid rgba(31,95,255,0.10); background: rgba(255,255,255,0.90); padding: 0 12px 0 39px; font-size: 13px; font-weight: 800; color: var(--text-title); outline: none; box-shadow: 0 6px 16px rgba(31,95,255,0.05); }
         .recruit-info-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
         .recruit-info-cell { min-width: 0; padding: 10px; border-radius: 14px; background: rgba(255,255,255,0.78); border: 1px solid rgba(255,255,255,0.92); }
         .recruit-info-cell span { display: block; color: var(--text-secondary); font-size: 10px; font-weight: 900; margin-bottom: 5px; }
         .recruit-info-cell strong { display: block; color: var(--text-title); font-size: 12px; font-weight: 950; line-height: 1.32; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .recruit-staff-profile { display: grid; gap: 12px; margin-bottom: 12px; }
+        .recruit-staff-hero { position: relative; overflow: hidden; margin-bottom: 12px; padding: 16px; border-radius: 24px; background: linear-gradient(145deg, rgba(255,255,255,0.96), rgba(239,246,255,0.82)); border: 1px solid rgba(255,255,255,0.96); box-shadow: 0 14px 30px rgba(31,95,255,0.08); }
+        .recruit-staff-hero-main { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+        .recruit-staff-identity { min-width: 0; display: flex; align-items: center; gap: 12px; }
+        .recruit-staff-avatar { flex: 0 0 46px; width: 46px; height: 46px; border-radius: 17px; display: flex; align-items: center; justify-content: center; background: rgba(31,95,255,0.10); color: var(--primary-color); border: 1px solid rgba(31,95,255,0.13); font-size: 18px; font-weight: 950; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.70); }
+        .recruit-staff-title-block { min-width: 0; }
+        .recruit-staff-name { color: var(--text-title); font-size: 20px; font-weight: 950; line-height: 1.15; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .recruit-staff-subline { margin-top: 7px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .recruit-staff-chip { min-height: 22px; display: inline-flex; align-items: center; padding: 0 8px; border-radius: 8px; background: rgba(31,95,255,0.08); color: var(--primary-color); font-size: 10px; font-weight: 950; line-height: 1; }
+        .recruit-staff-chip.muted { background: rgba(100,116,139,0.10); color: #64748B; }
+        .recruit-staff-signal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+        .recruit-staff-signal { min-width: 0; padding: 11px 12px; border-radius: 16px; background: rgba(255,255,255,0.86); border: 1px solid rgba(255,255,255,0.94); box-shadow: 0 7px 16px rgba(31,95,255,0.045); }
+        .recruit-staff-signal.primary { background: rgba(31,95,255,0.08); border-color: rgba(31,95,255,0.12); }
+        .recruit-staff-signal span { display: block; color: var(--text-secondary); font-size: 10px; font-weight: 900; margin-bottom: 6px; }
+        .recruit-staff-signal strong { display: block; color: var(--text-title); font-size: 13px; font-weight: 950; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .recruit-staff-signal.primary strong { color: var(--primary-color); font-size: 14px; }
+        .recruit-staff-section-title { margin: 2px 4px 9px; color: var(--text-title); font-size: 14px; font-weight: 950; }
+        .recruit-staff-priority { display: grid; gap: 10px; }
+        .recruit-staff-callout { min-height: 64px; padding: 13px 14px; border-radius: 18px; background: rgba(31,95,255,0.08); border: 1px solid rgba(31,95,255,0.12); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .recruit-staff-callout.group { background: rgba(255,255,255,0.86); border-color: rgba(255,255,255,0.92); }
+        .recruit-staff-callout span { color: var(--text-secondary); font-size: 11px; font-weight: 900; white-space: nowrap; }
+        .recruit-staff-callout strong { min-width: 0; color: var(--primary-color); font-size: 15px; font-weight: 950; line-height: 1.25; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .recruit-staff-callout.group strong { color: var(--text-title); }
+        .recruit-staff-meta-card { padding: 14px; margin-bottom: 0; }
         .recruit-edit-tools { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 12px 0; }
         .recruit-edit-tool { min-height: 38px; border: 1px solid rgba(31,95,255,0.12); border-radius: 12px; background: rgba(31,95,255,0.08); color: var(--primary-color); font-family: inherit; font-size: 12px; font-weight: 900; }
         .recruit-edit-tool.danger { background: rgba(239,68,68,0.08); color: var(--danger-color); border-color: rgba(239,68,68,0.16); }
@@ -1160,14 +1213,16 @@
         .recruit-edit-row.selected .recruit-edit-check { border-color: var(--primary-color); background: var(--primary-color); }
         .recruit-edit-check svg { width: 13px; height: 13px; stroke: #fff; stroke-width: 3; opacity: 0; }
         .recruit-edit-row.selected .recruit-edit-check svg { opacity: 1; }
-        .recruit-selection-bar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 270; display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; padding: 12px 20px 24px; background: rgba(255,255,255,0.94); border-top: 1px solid rgba(255,255,255,0.96); box-shadow: 0 -12px 28px rgba(31,95,255,0.11); backdrop-filter: blur(18px); transform: translateY(110%); transition: transform 0.22s ease; }
+        .recruit-selection-bar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 280; display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; min-height: 86px; padding: 12px 20px 24px; background: rgba(255,255,255,0.94); border-top: 1px solid rgba(255,255,255,0.96); box-shadow: 0 -12px 28px rgba(31,95,255,0.12); backdrop-filter: blur(18px); transform: translateY(120%); transition: transform 0.22s ease; }
         .recruit-selection-bar.active { transform: translateY(0); }
         .entry-page-content:has(.recruit-selection-bar.active) { padding-bottom: 112px; }
         .recruit-selection-btn { min-height: 42px; border: 1px solid rgba(31,95,255,0.14); border-radius: 13px; background: rgba(31,95,255,0.08); color: var(--primary-color); font-family: inherit; font-size: 12px; font-weight: 950; }
         .recruit-selection-btn.primary { background: var(--primary-color); color: #fff; border-color: var(--primary-color); box-shadow: 0 8px 16px rgba(31,95,255,0.16); }
         .recruit-selection-btn.danger { background: rgba(239,68,68,0.08); color: var(--danger-color); border-color: rgba(239,68,68,0.16); }
         .recruit-selection-btn:disabled { opacity: 0.42; box-shadow: none; }
-        .recruit-form-actions { display: grid; gap: 10px; margin: 0 0 16px; }
+        .entry-page-content:has(.recruit-form-actions) { padding-bottom: 112px; }
+        .entry-page-content:has(.recruit-form-actions):has(.recruit-selection-bar.active) { padding-bottom: 112px; }
+        .recruit-form-actions { position: absolute; left: 0; right: 0; bottom: 0; z-index: 260; display: grid; gap: 10px; margin: 0; padding: 12px 20px 24px; background: rgba(255,255,255,0.92); border-top: 1px solid rgba(255,255,255,0.96); box-shadow: 0 -12px 28px rgba(31,95,255,0.11); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
         .recruit-form-actions.two { grid-template-columns: 1fr 1fr; }
         .recruit-form-actions.three { grid-template-columns: .9fr .9fr 1.2fr; }
         .entry-page-content:has(.recruit-floating-add) { padding-bottom: 112px; }
@@ -1598,29 +1653,23 @@
                 <div class="form-section">
                     <div class="form-section-title">基础信息</div>
                     <div class="form-group"><label class="form-label required">个人线索</label><input type="text" class="form-control" value="从线索卡片/详情页选择后自动绑定" readonly></div>
-                    <div class="form-two-col">
-                        <div class="form-group"><label class="form-label required">跟进方式</label><select class="form-control" required><option>电话拨打</option><option>微信联络</option><option>面谈</option><option>短信</option></select></div>
-                        <div class="form-group"><label class="form-label required">跟进时间</label><input id="followup-time" type="hidden" class="datetime-hidden" data-datetime-type="datetime-local" data-required="1"><button type="button" id="followup-time-display" class="datetime-control placeholder" onclick="openDateTimePicker('followup-time', 'datetime-local', '跟进时间')">请选择日期时间</button></div>
-                    </div>
+                    <div class="form-group"><label class="form-label required">跟进人</label><select class="form-control" name="followOwner" required><option selected>尹娣</option><option>张伟</option><option>李老师</option><option>魏海霞</option></select></div>
+                    <div class="form-group"><label class="form-label required">跟进方式</label><select class="form-control" name="followType" required><option>电话</option><option>微信</option><option>短信</option><option>我方走访</option><option>对方到访</option><option>其他</option></select></div>
+                    <div class="form-group"><label class="form-label required">跟进时间</label><input id="followup-time" type="hidden" class="datetime-hidden" data-datetime-type="datetime-local" data-required="1" name="followTime"><button type="button" id="followup-time-display" class="datetime-control placeholder" onclick="openDateTimePicker('followup-time', 'datetime-local', '跟进时间')">请选择日期时间</button></div>
                 </div>
                 <div class="form-section">
                     <div class="form-section-title">跟进内容</div>
-                    <div class="form-group"><label class="form-label required">接触结果</label><select class="form-control" name="followResult" required><option value="note">仅记录沟通</option><option value="contacted">已有效触达</option><option value="invited">已约到访</option><option value="visited">已确认到访</option><option value="reserved">转入预定意向</option><option value="low">暂缓跟进</option><option value="invalid">标记无效</option></select></div>
-                    <div class="form-group"><label class="form-label required">跟进内容</label><textarea class="form-control" required placeholder="请记录本次沟通内容、学生关注点和风险"></textarea></div>
+                    <div class="form-group"><label class="form-label">接触结果</label><select class="form-control" name="followResult"><option value="">请选择接触结果</option><option value="phoneDone">已通电话</option><option value="phoneMissed">未通电话</option><option value="phoneRejected">客户拒接</option></select></div>
+                    <div class="form-group"><label class="form-label required">跟进内容</label><textarea class="form-control" name="followContent" required placeholder="请记录本次沟通内容、学生关注点和风险"></textarea></div>
                 </div>
                 <div class="form-section">
                     <div class="form-section-title">后续安排</div>
                     <div class="form-two-col">
-                        <div class="form-group"><label class="form-label">意向等级</label><select class="form-control" name="intentLevel"><option>高意向</option><option>中意向</option><option>低意向</option></select></div>
+                        <div class="form-group"><label class="form-label required">意向等级</label><select class="form-control" name="intentLevel" required><option>高意向</option><option selected>中意向</option><option>低意向</option></select></div>
                         <div class="form-group"><label class="form-label">下次跟进时间</label><input id="followup-next-time" type="hidden" class="datetime-hidden" data-datetime-type="datetime-local" name="nextFollowTime"><button type="button" id="followup-next-time-display" class="datetime-control placeholder" onclick="openDateTimePicker('followup-next-time', 'datetime-local', '下次跟进时间')">请选择日期时间</button></div>
                     </div>
-                    <div class="form-group"><label class="form-label">下次动作</label><select class="form-control" name="nextAction"><option>继续电话跟进</option><option>邀约到访</option><option>准备预定</option><option>暂缓跟进</option></select></div>
+                    <div class="form-group"><label class="form-label">下次动作</label><div class="follow-radio-grid"><label class="follow-radio-option"><input type="radio" name="nextAction" value="再联系" checked><span>再联系</span></label><label class="follow-radio-option"><input type="radio" name="nextAction" value="邀约"><span>邀约</span></label><label class="follow-radio-option"><input type="radio" name="nextAction" value="上门"><span>上门</span></label><label class="follow-radio-option"><input type="radio" name="nextAction" value="结束"><span>结束</span></label></div></div>
                 </div>
-                <details class="advanced-section"><summary>更多信息</summary><div class="form-section">
-                    <div class="form-group"><label class="form-label">跟进人</label><input type="text" class="form-control" value="我的" readonly></div>
-                    <div class="form-group"><label class="form-label">跟进类型</label><select class="form-control"><option>首次跟进</option><option>二次跟进</option><option>邀约确认</option><option>预定沟通</option></select></div>
-                    <div class="form-group"><label class="form-label">到访记录</label><input type="text" class="form-control" placeholder="可关联已有到访记录"></div>
-                </div></details>
                 <button type="submit" class="submit-btn">保存跟进记录</button>
             </form>
         </div>
@@ -1807,6 +1856,10 @@
         </div>
     </div>
 
+    <button type="button" class="scroll-top-fab" id="scroll-top-fab" onclick="scrollActiveListToTop()" aria-label="一键置顶">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5"></path><path d="M6 11l6-6 6 6"></path></svg>
+    </button>
+
     <div class="toast" id="sys-toast">
         <span id="sys-toast-msg"></span>
         <div id="toast-undo" class="toast-undo-btn" style="display:none;" onclick="handleUndo()">撤回操作</div>
@@ -1925,6 +1978,10 @@
     let leadDetailEditMode = false;
     let myLeadDetailReturnScrollTop = 0;
     let pendingFollowFocusId = null;
+    let myLeadStatusScrollTopMap = {};
+    let myLeadStatusRailScrollLeft = 0;
+    let moduleFilterScrollTopMap = {};
+    let activeScrollTopTarget = null;
     let currentRecruitGroupIndex = null;
     let currentRecruitStaffIndex = null;
     let recruitGroupSearchQuery = '';
@@ -2060,7 +2117,17 @@
             returnToLeadOriginWorkspace();
             return;
         }
-        if (['招生组详情', '招生人员详情', '编辑招生组', '编辑招生人员'].includes(currentEntryLabel)) {
+        if (currentEntryLabel === '招生人员详情' || currentEntryLabel === '编辑招生人员') {
+            if (recruitStaffDetailOrigin === 'people' || recruitStaffEditReturnMode === 'people') {
+                openRecruitPeoplePage();
+            } else if (currentRecruitGroupIndex !== null) {
+                openRecruitGroupDetail(currentRecruitGroupIndex);
+            } else {
+                openRecruitListPage();
+            }
+            return;
+        }
+        if (currentEntryLabel === '招生组详情' || currentEntryLabel === '编辑招生组') {
             openRecruitListPage();
             return;
         }
@@ -2256,7 +2323,7 @@
         const appointment = getLeadVisitAppointment(lead);
         const visitStatus = getVisitAppointmentStatus(appointment);
         if (visitStatus === '已取消') return visitStatus;
-        if ((lead.visitAppointments || []).length || lead.stage === 2) return '已到访';
+        if ((lead.visitAppointments || []).length || lead.stage === 2) return '已邀约';
         if (['已联系', '有意向', '已分配'].includes(lead.leadStatus) && (lead.stage || 0) <= 1) return lead.leadStatus;
         if ((lead.followRecords || []).length || lead.stage >= 1) return '已联系';
         if (lead.owner) return '已分配';
@@ -2265,7 +2332,6 @@
 
     function getLeadBusinessStatusMeta(lead) {
         const text = getLeadBusinessStatus(lead);
-        if (text === '已到访' && isLeadInVisitAppointmentStep(lead)) return { text: '已到访', cls: 'status-invited' };
         const map = {
             '公海': 'status-public',
             '已分配': 'status-assigned',
@@ -2292,7 +2358,7 @@
         ensureFollowLeadsSourceSchoolConfirmed();
         const query = myLeadSearchQuery.trim().toLowerCase();
         const scopeLeads = getMyLeads();
-        const statusOrder = { '公海': 0, '已分配': 1, '已联系': 2, '有意向': 3, '已到访': 4, '已预定': 5, '已录取': 6, '无效': 8, '已取消': 9 };
+        const statusOrder = { '公海': 0, '已分配': 1, '已联系': 2, '有意向': 3, '已邀约': 4, '已到访': 5, '已预定': 6, '已录取': 7, '无效': 8, '已取消': 9 };
         return scopeLeads.filter(lead => {
             const matchQuery = !query || [lead.name, lead.phone].some(v => String(v || '').toLowerCase().includes(query));
             const matchStatus = matchMyLeadBusinessFilter(lead);
@@ -2396,9 +2462,24 @@
     }
 
     function updateMyLeadStatus(value) {
+        rememberMyLeadListScroll();
+        rememberMyLeadStatusRailScroll();
         myLeadStatusFilter = value;
         renderMyLeadsWorkspace();
-        resetMyLeadListScroll();
+        restoreMyLeadStatusRailScroll();
+        restoreMyLeadListScroll();
+    }
+
+    function getMyLeadStatusFilterClass(value) {
+        const map = {
+            '全部': 'status-filter-all',
+            '跟进中': 'status-filter-following',
+            '已邀约': 'status-filter-invited',
+            '已预定': 'status-filter-reserved',
+            '已缴费': 'status-filter-paid',
+            '已报到': 'status-filter-checkin'
+        };
+        return map[value] || 'status-filter-all';
     }
 
     function updateAllLeadAssignmentFilter(value) {
@@ -2419,13 +2500,14 @@
     }
 
     function updateMyLeadSource(value) {
+        rememberMyLeadListScroll();
         myLeadSourceFilter = value;
         renderMyLeadsWorkspace();
         resetMyLeadListScroll();
     }
 
     function renderMyLeadsEntry() {
-        const pills = '<div class="my-lead-source-rail follow-status-rail"><div class="my-lead-source-scroll">' + myLeadStatusOptions.map(opt => '<button type="button" class="pill ' + (myLeadStatusFilter === opt ? 'active' : '') + '" onclick="updateMyLeadStatus(\'' + opt + '\')">' + opt + '</button>').join('') + '</div></div>';
+        const pills = '<div class="my-lead-source-rail follow-status-rail"><div class="my-lead-source-scroll">' + myLeadStatusOptions.map(opt => '<button type="button" class="pill ' + getMyLeadStatusFilterClass(opt) + ' ' + (myLeadStatusFilter === opt ? 'active' : '') + '" onclick="updateMyLeadStatus(\'' + opt + '\')">' + opt + '</button>').join('') + '</div></div>';
 
         const toolbar = '<div class="my-lead-filter-bar"><div class="my-lead-filter-row">' +
             '<div class="my-lead-search-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg><input class="my-lead-search" value="' + escapeHtml(myLeadSearchQuery) + '" placeholder="搜索姓名 / 电话" oninput="updateMyLeadSearch(this.value)"></div>' +
@@ -2462,6 +2544,30 @@
         requestAnimationFrame(() => {
             const container = document.getElementById('my-leads-list-container');
             if (container) container.scrollTop = 0;
+        });
+    }
+
+    function rememberMyLeadListScroll() {
+        const container = document.getElementById('my-leads-list-container');
+        if (container) myLeadStatusScrollTopMap[myLeadStatusFilter || '全部'] = container.scrollTop || 0;
+    }
+
+    function rememberMyLeadStatusRailScroll() {
+        const rail = document.querySelector('#my-leads-workspace .follow-status-rail .my-lead-source-scroll');
+        if (rail) myLeadStatusRailScrollLeft = rail.scrollLeft || 0;
+    }
+
+    function restoreMyLeadStatusRailScroll() {
+        requestAnimationFrame(() => {
+            const rail = document.querySelector('#my-leads-workspace .follow-status-rail .my-lead-source-scroll');
+            if (rail) rail.scrollLeft = myLeadStatusRailScrollLeft || 0;
+        });
+    }
+
+    function restoreMyLeadListScroll() {
+        requestAnimationFrame(() => {
+            const container = document.getElementById('my-leads-list-container');
+            if (container) container.scrollTop = myLeadStatusScrollTopMap[myLeadStatusFilter || '全部'] || 0;
         });
     }
 
@@ -2534,6 +2640,16 @@
 
     function getAssignTeacherProfile(name) {
         return teacherDirectory[name] || { name, phone: '暂无联系方式', group: '未设置招生组', role: '招生老师' };
+    }
+
+    function getStaffDisplayName(name) {
+        return name === '我的' ? '尹娣' : (name || '');
+    }
+
+    function getFollowOwnerOptions(selectedName = '') {
+        const selected = getStaffDisplayName(selectedName || state.currentUser);
+        const names = optionSets.staff.map(getStaffDisplayName).filter((name, index, list) => name && list.indexOf(name) === index);
+        return selectOptionsHtml(names, selected || names[0]);
     }
 
     function renderAssignTeacherOption(profile, isSelf = false) {
@@ -2717,8 +2833,8 @@
         const submitActions = isPublic
             ? '<div class="offline-submit-actions entry-fixed-actions"><button type="button" class="offline-public-btn" onclick="submitOfflineLead(false, \'public\')">进入公海</button><button type="button" class="offline-assign-btn" onclick="submitOfflineLead(false, \'assign\')">选择老师并分配</button></div>'
             : '<div class="offline-submit-actions single entry-fixed-actions"><button type="submit" class="submit-btn">登记到我的线索</button></div>';
+        const semesterField = '<div class="form-group"><label class="form-label required">招生学期</label><select id="offline-lead-semester" class="form-control" required><option>2026年秋季</option><option>2026年春季</option><option>2025年秋季</option></select></div>';
         const publicFields =
-            '<div class="form-group"><label class="form-label required">招生学期</label><select id="offline-lead-semester" class="form-control" required><option>2026年秋季</option><option>2026年春季</option><option>2025年秋季</option></select></div>' +
             '<div class="form-group"><label class="form-label required">来源类型</label><select id="offline-lead-sourceType" class="form-control" required><option>线下OFFLINE</option><option>网上报名</option><option>学校推荐</option><option>活动采集</option></select></div>' +
             '<div class="form-group"><label class="form-label">线索状态</label><select id="offline-lead-status" class="form-control"><option>新线索</option><option>待分配</option><option>已联系</option><option>无效</option></select></div>' +
             '<div class="form-group"><label class="form-label">意向等级</label><select id="offline-lead-intentLevel" class="form-control"><option value="">请选择意向等级</option><option>高意向</option><option>中意向</option><option>低意向</option></select></div>' +
@@ -2727,6 +2843,7 @@
             '<div class="form-group"><label class="form-label">已知学校</label><button type="button" class="selector-control" onclick="toggleOfflineSchoolSuggestions(event)">请选择已有学校</button></div>';
         return '<form class="entry-action-form" onsubmit="event.preventDefault(); submitOfflineLead(false, \'' + (isPublic ? 'public' : 'self') + '\');">' +
             '<div class="entry-form-card">' +
+            semesterField +
             (isPublic ? publicFields : '') +
             '<div class="form-group"><label class="form-label required">线索姓名</label><input id="offline-lead-name" class="form-control" required placeholder="请输入线索姓名"></div>' +
             '<div class="form-group"><label class="form-label required">联系电话</label><input id="offline-lead-phone" class="form-control" type="tel" inputmode="tel" required placeholder="请输入联系电话"></div>' +
@@ -3638,6 +3755,41 @@
         return '<button type="button" class="flow-reservation-icon-btn" aria-label="编辑预定信息" onclick="openReservationForm(\'edit\', ' + recordId + ')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></button>';
     }
 
+    function getFollowTimelineAction(leadId, followId) {
+        if (!followId) return '';
+        return '<button type="button" class="lead-follow-preview-btn" aria-label="查看跟进详情" onclick="openFollowRecordPreview(' + Number(leadId) + ', \'' + escapeJsString(followId) + '\')"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>';
+    }
+
+    function openFollowRecordPreview(leadId, followId) {
+        const lead = findAnyLead(leadId);
+        const record = lead ? (lead.followRecords || []).find(item => String(item.id || '') === String(followId)) : null;
+        if (!lead || !record) {
+            showToast('未找到跟进记录');
+            return;
+        }
+        const nextAction = record.sub || record.nextAction || '继续推进';
+        const owner = getStaffDisplayName(record.followOwner || lead.owner || state.currentUser);
+        document.getElementById('record-actions-title').innerText = '跟进详情';
+        document.getElementById('record-actions-body').innerHTML =
+            '<div class="lead-follow-preview-card">' +
+                '<div class="entry-card" style="padding:14px; margin-bottom:0;">' +
+                    '<div class="entry-card-title" style="font-size:15px;">' + escapeHtml(record.content || record.remark || '已完成跟进') + '</div>' +
+                    '<div class="entry-card-sub" style="margin-top:8px;">' + escapeHtml(formatDateTime(record.time || record.createdAt)) + '</div>' +
+                '</div>' +
+                '<div class="entry-card" style="padding:14px; margin-bottom:0;">' +
+                    renderRecordDetailGrid([
+                        { label: '跟进人', value: owner },
+                        { label: '跟进方式', value: record.followType || '未记录' },
+                        { label: '接触结果', value: record.followResult || '未记录' },
+                        { label: '意向等级', value: record.intentLevel || lead.intentLevel || '未记录' },
+                        { label: '下次动作', value: nextAction },
+                        { label: '下次跟进', value: record.nextFollowTime ? formatDateTime(record.nextFollowTime) : '未设置' }
+                    ]) +
+                '</div>' +
+            '</div>';
+        showModal('sheet-record-actions');
+    }
+
     function isReservationClosed(record) {
         if (!record) return true;
         if (record.status !== '有效') return true;
@@ -3759,7 +3911,7 @@
 
     function renderLeadQrPreview(lead) {
         const appointment = (lead.visitAppointments || [])[0];
-        if (isLeadVisited(lead)) return renderLeadVisitStatusCard(lead, appointment);
+        if (isLeadVisited(lead)) return '';
         if (!appointment) return '';
         const url = getVisitQrUrl(lead, appointment, 120);
         return '<button class="lead-qr-preview" onclick="openLeadQrPreview(' + lead.id + ')">' +
@@ -3805,6 +3957,15 @@
         document.getElementById('qr-preview-overlay').classList.remove('active');
     }
 
+    function renderLeadTimelineDesc(line) {
+        const text = String(line || '');
+        if (text.indexOf('下步动作：') === 0) {
+            const value = text.replace('下步动作：', '');
+            return '<div class="lead-timeline-desc lead-next-action"><span class="lead-next-action-label">下步动作：</span><span class="lead-next-action-value' + (value === '结束' ? ' breakline' : '') + '">' + escapeHtml(value) + '</span></div>';
+        }
+        return '<div class="lead-timeline-desc">' + escapeHtml(text) + '</div>';
+    }
+
     function renderLeadFlowEight(lead) {
         const reservations = state.reservationRecords.filter(r => r.leadId === lead.id);
         const admissions = state.admissionRecords.filter(r => r.leadId === lead.id);
@@ -3815,7 +3976,8 @@
         const pushFollowRecord = record => {
             const content = record.content || record.remark || '已完成跟进';
             const nextAction = record.sub || record.nextAction || '继续推进';
-            push('跟进', true, record.time || record.createdAt, content + '\n下步动作：' + nextAction, '', {
+            const descLines = [content, nextAction ? '下步动作：' + nextAction : ''].filter(Boolean);
+            push('跟进', true, record.time || record.createdAt, descLines.join('\n'), getFollowTimelineAction(lead.id, record.id || ''), {
                 followId: record.id || '',
                 focus: !!record.id && String(record.id) === String(pendingFollowFocusId)
             });
@@ -3875,7 +4037,7 @@
             const stateClass = index === currentIndex ? 'current' : (item.done ? 'completed' : 'pending');
             const timeText = item.done || index === currentIndex ? item.time : '待推进';
             const currentTag = index === currentIndex ? '<span class="lead-timeline-current-tag">当前</span>' : '';
-            const descHtml = String(item.desc || '').split('\n').map(line => '<div class="lead-timeline-desc ' + (line.indexOf('下步动作：') === 0 ? 'lead-next-action' : '') + '">' + escapeHtml(line) + '</div>').join('');
+            const descHtml = String(item.desc || '').split('\n').map(renderLeadTimelineDesc).join('');
             const actionHtml = item.action || '';
             const followAttr = item.followId ? ' data-follow-id="' + escapeHtml(String(item.followId)) + '"' : '';
             const focusClass = item.focus ? ' follow-focus' : '';
@@ -3934,22 +4096,60 @@
         return null;
     }
 
+    function handleMyFollowVisitedHint(event) {
+        const input = document.getElementById('my-follow-visited');
+        if (!input || !input.disabled) return;
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        const option = event?.currentTarget || input.closest('.follow-radio-option');
+        if (option) {
+            option.classList.remove('tap-flash');
+            void option.offsetWidth;
+            option.classList.add('tap-flash');
+        }
+        showToast(input.dataset.disabledMessage || '当前不可确认到访', false, 900);
+    }
+
+    function renderFollowActionRadios(name = 'nextAction', selected = '再联系') {
+        return '<div class="follow-radio-grid">' + ['再联系', '邀约', '上门', '结束'].map(option =>
+            '<label class="follow-radio-option"><input type="radio" name="' + name + '" value="' + option + '"' + (option === selected ? ' checked' : '') + '><span>' + option + '</span></label>'
+        ).join('') + '</div>';
+    }
+
+    function getCheckedRadioValue(root, name, fallback = '') {
+        return root?.querySelector('input[name="' + name + '"]:checked')?.value || fallback;
+    }
+
     function openMyLeadFollowForm() {
         const lead = findAnyLead(currentMyLeadId);
         if (!lead) return;
         myLeadDetailReturnScrollTop = document.getElementById('entry-page-content')?.scrollTop || 0;
         const visitBlock = getVisitConfirmBlock(lead);
-        const visitAction = visitBlock ? "showToast('" + visitBlock.message + "')" : 'confirmMyLeadVisitedFromFollow()';
-        const visitDisabled = '';
-        const visitDisabledClass = visitBlock ? ' disabled' : '';
         document.getElementById('entry-page-title').innerText = '写跟进';
         myLeadPageState = 'form';
         document.getElementById('entry-page-action').innerText = '';
         const content = document.getElementById('entry-page-content');
+        const owner = getStaffDisplayName(lead.owner || state.currentUser);
+        const intentLevel = lead.intentLevel || '中意向';
+        const visitOptionHtml = '<div class="form-group"><label class="form-label">到访状态</label><label class="follow-radio-option' + (visitBlock ? ' disabled-hint' : '') + '" onclick="handleMyFollowVisitedHint(event)"><input type="checkbox" id="my-follow-visited" data-disabled-message="' + escapeHtml(visitBlock?.message || '') + '" ' + (visitBlock ? 'disabled' : '') + '><span>' + (visitBlock ? ('确认已到访 · ' + visitBlock.label) : '确认已到访') + '</span></label></div>';
         content.innerHTML =
             '<form class="entry-action-form" onsubmit="event.preventDefault(); submitMyLeadFollow();">' +
-            '<div class="entry-form-card"><div class="form-group"><label class="form-label required">跟进内容</label><textarea id="my-follow-content" class="form-control" required placeholder="记录本次沟通重点"></textarea></div><div class="form-group"><label class="form-label">下次动作</label><input id="my-follow-next" class="form-control" placeholder="如：继续电话跟进 / 邀约到访"></div></div>' +
-            '<div class="entry-action-spacer"></div><div class="offline-submit-actions entry-fixed-actions"><button type="button" class="submit-btn visit-confirm-btn' + visitDisabledClass + '" onclick="' + visitAction + '"' + visitDisabled + '>已到访</button><button type="submit" class="submit-btn">保存跟进</button></div>' +
+            '<div class="entry-form-card">' +
+                '<div class="form-group"><label class="form-label required">跟进人</label><select id="my-follow-owner" class="form-control" required>' + getFollowOwnerOptions(owner) + '</select></div>' +
+                '<div class="form-group"><label class="form-label required">跟进方式</label><select id="my-follow-type" class="form-control" required>' + selectOptionsHtml(['电话', '微信', '短信', '我方走访', '对方到访', '其他'], '电话') + '</select></div>' +
+                '<div class="form-group"><label class="form-label required">跟进时间</label><input id="my-follow-time" type="hidden" class="datetime-hidden" data-datetime-type="datetime-local" data-required="1"><button type="button" id="my-follow-time-display" class="datetime-control placeholder" onclick="openDateTimePicker(\'my-follow-time\', \'datetime-local\', \'跟进时间\')">请选择日期时间</button></div>' +
+                visitOptionHtml +
+                '<div class="form-group"><label class="form-label">接触结果</label><select id="my-follow-result" class="form-control"><option value="">请选择接触结果</option><option value="phoneDone">已通电话</option><option value="phoneMissed">未通电话</option><option value="phoneRejected">客户拒接</option></select></div>' +
+                '<div class="form-group"><label class="form-label required">跟进内容</label><textarea id="my-follow-content" class="form-control" required placeholder="记录本次沟通重点"></textarea></div>' +
+                '<div class="form-two-col">' +
+                    '<div class="form-group"><label class="form-label required">意向等级</label><select id="my-follow-intent" class="form-control" required>' + selectOptionsHtml(['高意向', '中意向', '低意向'], intentLevel) + '</select></div>' +
+                    '<div class="form-group"><label class="form-label">下次跟进时间</label><input id="my-follow-next-time" type="hidden" class="datetime-hidden" data-datetime-type="datetime-local"><button type="button" id="my-follow-next-time-display" class="datetime-control placeholder" onclick="openDateTimePicker(\'my-follow-next-time\', \'datetime-local\', \'下次跟进时间\')">请选择日期时间</button></div>' +
+                '</div>' +
+                '<div class="form-group"><label class="form-label">下次动作</label>' + renderFollowActionRadios('myFollowNextAction', '再联系') + '</div>' +
+            '</div>' +
+            '<div class="entry-action-spacer"></div><div class="offline-submit-actions single entry-fixed-actions"><button type="submit" class="submit-btn">保存跟进</button></div>' +
             '</form>';
         enhanceInteractiveControls(content);
     }
@@ -3958,20 +4158,36 @@
         const lead = findAnyLead(currentMyLeadId);
         const form = document.querySelector('#entry-page-content form');
         const missing = findFirstMissingRequired(form);
-        if (missing) return focusAndFlashField(missing, '请先填写跟进内容');
+        if (missing) return focusAndFlashField(missing, '请先补齐跟进字段');
         const content = document.getElementById('my-follow-content').value.trim();
         if (!lead || !content) {
             showToast('请填写跟进内容');
             return;
         }
-        const nowText = formatDateTime(nowDatetimeLocal());
+        const followTimeValue = document.getElementById('my-follow-time').value;
+        const followTimeText = followTimeValue ? formatDateTime(followTimeValue) : formatDateTime(nowDatetimeLocal());
+        const followOwner = document.getElementById('my-follow-owner').value;
+        const followType = document.getElementById('my-follow-type').value;
+        const followResultSelect = document.getElementById('my-follow-result');
+        const followResult = followResultSelect.value;
+        const followResultText = followResult ? (followResultSelect.options[followResultSelect.selectedIndex]?.textContent || followResult) : '';
+        const intentLevel = document.getElementById('my-follow-intent').value;
+        const nextFollowTime = document.getElementById('my-follow-next-time').value;
+        const nextAction = getCheckedRadioValue(form, 'myFollowNextAction', '再联系');
+        const markVisited = !!document.getElementById('my-follow-visited')?.checked;
         const stageAtFollow = getLeadCurrentProgressStage(lead);
         const flowAfterStage = getFollowFlowAfterStageByCurrentStage(stageAtFollow);
         const followId = 'follow-' + Date.now();
         lead.followRecords = lead.followRecords || [];
-        lead.followRecords.unshift({ id: followId, time: nowText, content, sub: document.getElementById('my-follow-next').value.trim() || '继续推进', stageAt: stageAtFollow, flowAfterStage });
-        lead.lastFollow = nowText;
+        lead.followRecords.unshift({ id: followId, time: followTimeText, content, sub: nextAction, followOwner, followType, followResult: followResultText, intentLevel, nextFollowTime, stageAt: stageAtFollow, flowAfterStage });
+        lead.lastFollow = followTimeText;
+        lead.intentLevel = intentLevel;
+        lead.nextFollowTime = nextFollowTime;
+        lead.nextAction = nextAction;
         lead.stage = Math.max(lead.stage || 0, 1);
+        if (followResult === 'phoneRejected') lead.focus = '客户拒接，建议复核后再决定是否继续';
+        if (nextAction === '邀约') lead.stage = Math.max(lead.stage || 0, 2);
+        if (markVisited) markLeadVisitedSilently(lead, '写跟进时确认学生已到访', followTimeValue || nowDatetimeLocal());
         showToast('跟进记录已保存', true);
         openMyLeadDetail(lead.id, { focusFollowId: followId });
         refreshAllModuleLists();
@@ -4071,7 +4287,7 @@
     function getVisitInviteActionText(lead) {
         const alreadyVisited = isLeadVisited(lead);
         const hasInviteRecord = (lead && lead.visitAppointments || []).length > 0;
-        return alreadyVisited ? (hasInviteRecord ? '到访邀约' : '查看到访') : (hasInviteRecord ? '邀约操作' : '发起邀约');
+        return alreadyVisited ? (hasInviteRecord ? '邀约信息' : '到访信息') : (hasInviteRecord ? '邀约操作' : '发起邀约');
     }
 
     function renderVisitDialogTimeGrid(appointment, visitRecord, visitTime, visitStatus) {
@@ -4318,7 +4534,7 @@
 
     function renderCoopSchools() {
         const statusDropdownHtml = '<div class="quick-dropdown coop-term-dropdown" id="coop-term-dropdown">' +
-            coopTerms.map(opt => '<button class="quick-menu-item coop-term-option" onclick="updateCoopTerm(\'' + opt + '\')">' + opt + '</button>').join('') +
+            coopTerms.map(opt => '<button class="quick-menu-item coop-term-option ' + (currentCoopTerm === opt ? 'selected' : '') + '" onclick="updateCoopTerm(\'' + opt + '\')">' + opt + '</button>').join('') +
             '</div>';
 
         const toolbar = '<div class="my-lead-filter-bar coop-school-toolbar"><div class="my-lead-filter-row coop-school-filter-row">' +
@@ -4899,7 +5115,7 @@
 
     function renderSchoolSummary() {
         return '<div class="entry-picker-row" onclick="openEntryForm(\'semester\')"><strong>招生学期</strong><span>2026年春季 &gt;</span></div>' +
-               '<div class="my-lead-filter-bar" style="padding: 12px 16px 0;"><div class="my-lead-filter-row">' +
+               '<div class="my-lead-filter-bar school-summary-toolbar"><div class="my-lead-filter-row">' +
                '<select class="my-lead-filter-btn" style="border:1px solid var(--border-color); background:#fff; padding:6px 12px; margin-right:8px; border-radius:16px; outline:none;"><option>2026年春季</option><option>2026年秋季</option><option>全部学期</option></select>' +
                '<div class="my-lead-search-wrap" style="flex:1;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg><input class="my-lead-search" placeholder="请输入学校名称搜索"></div></div></div>' +
                '<div class="entry-table-card"><div class="entry-table-scroll"><table class="entry-table"><thead><tr><th>学校名称</th><th>报名数</th><th>意向数</th><th>在读人数</th><th>毕业人数</th><th>联系人</th></tr></thead><tbody>' + entryData.schoolSummary.map((r, i) => '<tr><td>' + r[0] + '</td><td class="entry-blue">' + r[1] + '</td><td>' + r[2] + '</td><td>' + r[3] + '</td><td>' + r[4] + '</td><td>' + r[5] + '</td></tr>').join('') + '</tbody></table></div></div>';
@@ -4957,6 +5173,14 @@
             '离职': 'tag-offboard'
         };
         return map[status] || 'tag-primary';
+    }
+
+    function getRecruitGroupBadgeClass(groupName) {
+        return groupName === '未分组' || groupName === '暂不分配招生组' ? 'tag-ungrouped' : 'tag-primary';
+    }
+
+    function renderRecruitLeaderChip(isLeader) {
+        return isLeader ? '<span class="recruit-leader-chip">当前组长</span>' : '';
     }
 
     function updateRecruitGroupSearch(value) {
@@ -5068,14 +5292,15 @@
     function renderRecruitStaffEntry() {
         const rows = getFilteredRecruitGroupRows();
         const groupRows = rows
-            .map((row, visibleIndex) =>
-            '<button type="button" class="recruit-row" onclick="openRecruitGroupDetail(' + row.index + ')">' +
-                '<span class="contact-index">' + (visibleIndex + 1) + '</span>' +
-                '<span class="recruit-row-title-wrap"><span class="recruit-row-title">' + renderMarqueeText(row.item.name, 12) + '</span></span>' +
-                '<span class="recruit-row-badge ' + getRecruitStatusClass(row.item.activeStatus) + '">' + escapeHtml(row.item.activeStatus) + '</span>' +
-                '<span class="contact-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></span>' +
-            '</button>'
-        ).join('');
+            .map((row, visibleIndex) => {
+                const leaderName = getRecruitGroupLeaderName(row.item) || '待设置';
+                return '<button type="button" class="recruit-row" onclick="openRecruitGroupDetail(' + row.index + ')">' +
+                    '<span class="contact-index">' + (visibleIndex + 1) + '</span>' +
+                    '<span class="recruit-row-title-wrap"><span class="recruit-row-title">' + renderMarqueeText(row.item.name, 12) + '</span><span class="recruit-row-meta">组长：' + escapeHtml(leaderName) + '</span></span>' +
+                    '<span class="recruit-row-badge ' + getRecruitStatusClass(row.item.activeStatus) + '">' + escapeHtml(row.item.activeStatus) + '</span>' +
+                    '<span class="contact-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></span>' +
+                '</button>';
+            }).join('');
         const toolbar = '<div class="recruit-search-inline recruit-search-bar sticky">' +
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg><input value="' + escapeHtml(recruitGroupSearchQuery) + '" placeholder="搜索招生组" oninput="updateRecruitGroupSearch(this.value)">' +
             '</div>';
@@ -5109,7 +5334,7 @@
             '<button type="button" class="recruit-row" onclick="openRecruitStaffDetail(' + row.index + ', \'people\')">' +
                 '<span class="contact-index">' + (visibleIndex + 1) + '</span>' +
                 '<span class="recruit-row-title-wrap"><span class="recruit-row-title">' + renderMarqueeText(row.item.name, 12) + '</span></span>' +
-                '<span class="recruit-row-badge">' + escapeHtml(row.group) + '</span>' +
+                '<span class="recruit-row-badge ' + getRecruitGroupBadgeClass(row.group) + '">' + escapeHtml(row.group) + '</span>' +
                 '<span class="contact-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></span>' +
             '</button>'
         ).join('') + '</div>' : '<div class="entry-empty">暂无匹配招生人员</div>';
@@ -5152,14 +5377,15 @@
             row.item.phone.toLowerCase().includes(keyword)
         );
         const staffListHtml = staffRows.length
-            ? '<div class="recruit-list">' + staffRows.map((row, visibleIndex) =>
-                '<button type="button" class="recruit-row ' + (isRecruitGroupLeader(row, item) ? 'leader-row' : '') + '" onclick="openRecruitStaffDetail(' + row.index + ', \'group\')">' +
+            ? '<div class="recruit-list">' + staffRows.map((row, visibleIndex) => {
+                const isLeader = isRecruitGroupLeader(row, item);
+                return '<button type="button" class="recruit-row ' + (isLeader ? 'leader-row' : '') + '" onclick="openRecruitStaffDetail(' + row.index + ', \'group\')">' +
                     '<span class="contact-index">' + (visibleIndex + 1) + '</span>' +
-                    '<span class="recruit-row-title-wrap"><span class="recruit-row-title">' + renderMarqueeText(row.item.name, 12) + '</span></span>' +
+                    '<span class="recruit-row-title-wrap"><span class="recruit-row-title">' + renderMarqueeText(row.item.name + (isLeader ? '（当前组长）' : ''), 12) + '</span></span>' +
                     renderRecruitStaffBadgeStack(row, item) +
                     '<span class="contact-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></span>' +
-                '</button>'
-            ).join('') + '</div>'
+                '</button>';
+            }).join('') + '</div>'
             : '<div class="entry-empty" style="min-height:90px;">暂无组内招生人员</div>';
         currentRecruitGroupIndex = index;
         currentEntryLabel = '招生组详情';
@@ -5170,8 +5396,6 @@
             '<div class="recruit-detail-hero">' +
                 '<div class="recruit-detail-hero-top"><div><div class="recruit-detail-name">' + escapeHtml(item.name) + '</div><div class="recruit-detail-meta leader-text">组长：<span class="recruit-leader-name">' + escapeHtml(getRecruitGroupLeaderName(item) || '待设置') + '</span></div></div><span class="recruit-row-badge ' + getRecruitStatusClass(item.activeStatus) + '">' + escapeHtml(item.activeStatus) + '</span></div>' +
                 '<div class="recruit-info-grid">' +
-                    '<div class="recruit-info-cell"><span>分组名称</span><strong>' + escapeHtml(item.name) + '</strong></div>' +
-                    '<div class="recruit-info-cell"><span>激活状态</span><strong>' + escapeHtml(item.activeStatus) + '</strong></div>' +
                     '<div class="recruit-info-cell"><span>是否当前学期</span><strong>' + escapeHtml(item.currentTerm || '不是') + '</strong></div>' +
                     '<div class="recruit-info-cell"><span>具体学期</span><strong>' + escapeHtml(getRecruitGroupTermName(item)) + '</strong></div>' +
                 '</div>' +
@@ -5193,6 +5417,25 @@
         document.getElementById('entry-page-action').innerText = '';
         const isEdit = recruitStaffDetailEditMode;
         const groupOptions = ['暂不分配招生组'].concat(recruitGroupsData.map(group => group.name));
+        const staffGroupName = getRecruitStaffGroup(item);
+        const staffInitial = escapeHtml(String(item.name || '招').slice(0, 1));
+        const staffHeroHtml =
+            '<div class="recruit-staff-hero">' +
+                '<div class="recruit-staff-hero-main">' +
+                    '<div class="recruit-staff-identity">' +
+                        '<div class="recruit-staff-avatar">' + staffInitial + '</div>' +
+                        '<div class="recruit-staff-title-block">' +
+                            '<div class="recruit-staff-name">' + escapeHtml(item.name) + '</div>' +
+                            '<div class="recruit-staff-subline"><span class="recruit-staff-chip">' + escapeHtml(staffGroupName) + '</span><span class="recruit-staff-chip muted">' + escapeHtml(item.type || '正式员工') + '</span></div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<span class="recruit-row-badge ' + getRecruitStatusClass(item.status) + '">' + escapeHtml(item.status) + '</span>' +
+                '</div>' +
+                '<div class="recruit-staff-signal-grid">' +
+                    '<div class="recruit-staff-signal primary"><span>联系电话</span><strong>' + escapeHtml(item.phone) + '</strong></div>' +
+                    '<div class="recruit-staff-signal"><span>所属招生组</span><strong>' + escapeHtml(staffGroupName) + '</strong></div>' +
+                '</div>' +
+            '</div>';
         const body = isEdit
             ? '<div class="entry-card" style="padding:14px; margin-bottom:16px;">' +
                 '<div class="form-group"><label class="form-label required">姓名</label><input id="recruit-staff-name" class="form-control" value="' + escapeHtml(item.name) + '"></div>' +
@@ -5201,19 +5444,19 @@
                 '<div class="form-group"><label class="form-label required">人员类型</label><select id="recruit-staff-type" class="form-control">' + selectOptionsHtml(['正式员工', '第三方员工'], item.type) + '</select></div>' +
                 '<div class="form-group"><label class="form-label required">人员状态</label><select id="recruit-staff-status" class="form-control">' + selectOptionsHtml(['在岗', '休假', '离职'], item.status) + '</select></div>' +
             '</div>'
-            : '<div class="entry-card" style="padding:14px; margin-bottom:16px;">' +
-                renderRecruitDetailGrid([
-                    ['电话', item.phone],
-                    ['招生组', getRecruitStaffGroup(item)],
-                    ['人员类型', item.type],
-                    ['创建时间', formatDateTime(item.createdAt)],
-                    ['修改时间', formatDateTime(item.modifiedAt || item.createdAt)]
-                ]) +
+            : '<div class="recruit-staff-profile">' +
+                '<div class="recruit-staff-section-title">资料维护</div>' +
+                '<div class="entry-card recruit-staff-meta-card">' +
+                    renderRecruitDetailGrid([
+                        ['人员类型', item.type],
+                        ['人员状态', item.status],
+                        ['创建时间', formatDateTime(item.createdAt)],
+                        ['修改时间', formatDateTime(item.modifiedAt || item.createdAt)]
+                    ]) +
+                '</div>' +
             '</div>';
         document.getElementById('entry-page-content').innerHTML =
-            '<div class="recruit-detail-hero">' +
-                '<div class="recruit-detail-hero-top" style="margin-bottom:0;"><div><div class="recruit-detail-name">' + escapeHtml(item.name) + '</div><div class="recruit-detail-meta">' + escapeHtml(getRecruitStaffGroup(item)) + '</div></div><span class="recruit-row-badge ' + getRecruitStatusClass(item.status) + '">' + escapeHtml(item.status) + '</span></div>' +
-            '</div>' +
+            staffHeroHtml +
             body +
             '<div class="recruit-detail-actions"><button class="my-lead-action-btn ' + (isEdit ? 'my-lead-action-tertiary' : 'school-detail-delete') + '" onclick="' + (isEdit ? 'confirmRecruitStaffEditCancel(' + index + ')' : 'showRecruitStaffDeleteOptions(' + index + ')') + '">' + (isEdit ? '取消' : '删除招生人员') + '</button><button class="my-lead-action-btn my-lead-action-primary" onclick="' + (isEdit ? 'confirmRecruitStaffInlineSave(' + index + ')' : 'openRecruitStaffDetail(' + index + ', \'' + recruitStaffDetailOrigin + '\', true)') + '">' + (isEdit ? '保存' : '编辑') + '</button></div>';
         enhanceInteractiveControls(document.getElementById('entry-page-content'));
@@ -5284,7 +5527,7 @@
             return '<button type="button" class="recruit-row recruit-edit-row ' + (isLeader ? 'leader-row ' : '') + (selected ? 'selected' : '') + '" onclick="toggleRecruitEditStaff(' + row.index + ', event)">' +
                 '<span class="recruit-edit-check"><svg viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg></span>' +
                 '<span class="contact-index">' + (visibleIndex + 1) + '</span>' +
-                '<span class="recruit-row-title-wrap"><span class="recruit-row-title">' + renderMarqueeText(row.item.name, 12) + '</span></span>' +
+                '<span class="recruit-row-title-wrap"><span class="recruit-row-title">' + renderMarqueeText(row.item.name + (isLeader ? '（当前组长）' : ''), 12) + '</span></span>' +
                 renderRecruitStaffBadgeStack(row, group) +
             '</button>';
         }).join('') + '</div>' : '<div class="entry-empty" style="min-height:90px;">暂无组内招生人员</div>';
@@ -5292,17 +5535,11 @@
     }
 
     function renderRecruitGroupSelectionBar(index) {
-        if (recruitLeaderSelectMode) {
-            return '<div class="recruit-selection-bar active">' +
-                '<button type="button" class="recruit-selection-btn" onclick="cancelRecruitLeaderSelect(' + index + ')">取消</button>' +
-                '<button type="button" class="recruit-selection-btn" disabled>删除人员</button>' +
-                '<button type="button" class="recruit-selection-btn primary" onclick="confirmSetRecruitLeader(' + index + ')">确定</button>' +
-            '</div>';
-        }
+        if (!selectedRecruitEditStaffIds.size) return '';
         return '<div class="recruit-selection-bar active">' +
-            '<button type="button" class="recruit-selection-btn primary" onclick="beginRecruitLeaderSelect(' + index + ')">设置组长</button>' +
-            '<button type="button" class="recruit-selection-btn" onclick="openRecruitStaffEdit(null, ' + index + ', false, \'groupEdit\')">添加人员</button>' +
-            '<button type="button" class="recruit-selection-btn danger" ' + (!selectedRecruitEditStaffIds.size ? 'disabled' : '') + ' onclick="confirmDeleteSelectedRecruitStaff(' + index + ')">删除人员</button>' +
+            '<button type="button" class="recruit-selection-btn primary" onclick="confirmSetRecruitLeader(' + index + ')">设置组长</button>' +
+            '<button type="button" class="recruit-selection-btn" onclick="selectedRecruitEditStaffIds.clear(); openRecruitStaffEdit(null, ' + index + ', false, \'group\')">添加人员</button>' +
+            '<button type="button" class="recruit-selection-btn danger" onclick="confirmDeleteSelectedRecruitStaff(' + index + ')">删除人员</button>' +
         '</div>';
     }
 
@@ -5317,13 +5554,11 @@
     }
 
     function beginRecruitLeaderSelect(index) {
-        recruitLeaderSelectMode = true;
         selectedRecruitEditStaffIds.clear();
         openRecruitGroupEdit(index, false);
     }
 
     function cancelRecruitLeaderSelect(index) {
-        recruitLeaderSelectMode = false;
         selectedRecruitEditStaffIds.clear();
         openRecruitGroupEdit(index, false);
     }
@@ -5396,7 +5631,7 @@
             '<div class="entry-card" style="padding:14px; margin-bottom:16px;">' +
                 '<div class="form-group"><label class="form-label required">招生组名称</label><input id="recruit-group-name" class="form-control" value="' + escapeHtml(item.name) + '"></div>' +
                 '<div class="form-group"><label class="form-label required">激活状态</label><select id="recruit-group-active" class="form-control" required>' + selectOptionsHtml(['已激活', '未激活'], item.activeStatus) + '</select></div>' +
-                '<div class="form-group"><label class="form-label">是否当前学期</label><select id="recruit-group-term" class="form-control">' + selectOptionsHtml(['暂不选择', '是', '不是'], item.currentTerm || '暂不选择') + '</select></div>' +
+                '<div class="form-group"><label class="form-label">是否当前学期</label><select id="recruit-group-term" class="form-control" onchange="syncRecruitGroupTermName(this.value)">' + selectOptionsHtml(['暂不选择', '是', '不是'], item.currentTerm || '暂不选择') + '</select></div>' +
                 '<div class="form-group"><label class="form-label">具体学期</label><select id="recruit-group-term-name" class="form-control">' + selectOptionsHtml(['暂不选择', '2026年秋季', '2026年春季', '2027年春季'], item.termName || '暂不选择') + '</select></div>' +
             '</div>' +
             '<div class="recruit-form-actions ' + (isNew ? 'two' : 'three') + '">' +
@@ -5404,6 +5639,18 @@
                 '<button class="my-lead-action-btn my-lead-action-tertiary" onclick="confirmRecruitGroupEditCancel(' + (isNew ? 'null' : index) + ')">取消</button><button class="my-lead-action-btn my-lead-action-primary" onclick="confirmRecruitGroupSave(' + (isNew ? 'null' : index) + ')">保存</button></div>' +
             staffManageHtml;
         enhanceInteractiveControls(document.getElementById('entry-page-content'));
+    }
+
+    function getLatestRecruitTermName() {
+        return optionSets.semester?.[0] || '2026年秋季';
+    }
+
+    function syncRecruitGroupTermName(value) {
+        if (value !== '是') return;
+        const select = document.getElementById('recruit-group-term-name');
+        if (!select) return;
+        select.value = getLatestRecruitTermName();
+        syncStyledSelectVisual(select);
     }
 
     function confirmRecruitGroupEditCancel(index) {
@@ -5434,6 +5681,7 @@
         if (!item.activeStatus) return showToast('请选择激活状态');
         item.currentTerm = document.getElementById('recruit-group-term')?.value || item.currentTerm || '不是';
         item.termName = document.getElementById('recruit-group-term-name')?.value || item.termName || '暂不选择';
+        if (item.currentTerm === '是' && item.termName === '暂不选择') item.termName = getLatestRecruitTermName();
         if (isNew) {
             recruitGroupsData.push(item);
             showToast('招生组已新增', true);
@@ -5640,7 +5888,49 @@
         toastTimeout = setTimeout(() => toast.classList.remove('show'), duration);
     }
 
+    const scrollTopListSelectors = '.my-lead-list, .lead-manage-row, .compact-student-card, .recruit-list, .contact-row, .entry-school-list, .business-record-list, .enrollment-record-list, .source-school-option-list, .coop-school-item, .region-group';
+
+    function hideScrollTopFab() {
+        document.getElementById('scroll-top-fab')?.classList.remove('show');
+    }
+
+    function isActiveScrollSurface(target) {
+        if (!target || !target.querySelector) return false;
+        if (target.closest('.bottom-sheet.active, .dialog-box.active')) return false;
+        const hiddenPage = target.closest('.hidden-right');
+        if (hiddenPage && !hiddenPage.classList.contains('active')) return false;
+        const tabView = target.closest('.tab-view, .sub-view, .follow-business-pane');
+        if (tabView && !tabView.classList.contains('active')) return false;
+        return true;
+    }
+
+    function isNameIndexListScrollTarget(target) {
+        if (!isActiveScrollSurface(target)) return false;
+        return target.matches?.(scrollTopListSelectors) || !!target.querySelector(scrollTopListSelectors);
+    }
+
+    function syncScrollTopButtonVisibility(target) {
+        const btn = document.getElementById('scroll-top-fab');
+        if (!btn || !(target instanceof HTMLElement)) return;
+        if (isNameIndexListScrollTarget(target) && target.scrollTop > 150) {
+            activeScrollTopTarget = target;
+            btn.classList.add('show');
+            return;
+        }
+        if (target === activeScrollTopTarget || !activeScrollTopTarget || activeScrollTopTarget.scrollTop <= 150 || !isNameIndexListScrollTarget(activeScrollTopTarget)) {
+            activeScrollTopTarget = null;
+            btn.classList.remove('show');
+        }
+    }
+
+    function scrollActiveListToTop() {
+        const target = activeScrollTopTarget;
+        if (target && target.scrollTo) target.scrollTo({ top: 0, behavior: 'smooth' });
+        hideScrollTopFab();
+    }
+
     function showModal(modalId) {
+        hideScrollTopFab();
         const overlay = document.getElementById('modal-overlay');
         overlay.classList.toggle('assign-conflict-overlay', modalId === 'dialog-assign-conflict');
         overlay.classList.add('active');
@@ -6428,25 +6718,52 @@
                 switchEnrollmentTab('sub-view-follow', document.getElementById('tab-btn-follow'));
             }
             form.reset();
+            form.querySelectorAll('select').forEach(select => syncStyledSelectVisual(select));
+            form.querySelectorAll('input.datetime-hidden').forEach(input => syncDateTimeDisplay(input.id, input.dataset.datetimeType || 'datetime-local', input.value));
         });
     }
 
     function applyFollowupResult(id, result, form = null) {
         const lead = findLead(id);
         if (!lead) return;
-        lead.lastFollow = '刚刚';
+        const followTimeValue = form?.followTime?.value || '';
+        const followTimeText = followTimeValue ? formatDateTime(followTimeValue) : '刚刚';
+        const nextActionValue = form?.nextAction?.value || '再联系';
+        const followContent = form?.followContent?.value?.trim() || '';
+        const followOwner = getStaffDisplayName(form?.followOwner?.value || state.currentUser);
+        const followType = form?.followType?.value || '电话';
+        const followResultText = result ? (form?.followResult?.options?.[form.followResult.selectedIndex]?.textContent || result) : '';
+        lead.lastFollow = followTimeText;
         lead.isOverdue = false;
         if (form && form.intentLevel) lead.intentLevel = form.intentLevel.value;
         if (form && form.nextFollowTime) lead.nextFollowTime = form.nextFollowTime.value;
-        if (form && form.nextAction) lead.nextAction = form.nextAction.value;
-        if (result === 'contacted') lead.stage = Math.max(lead.stage, 1);
+        if (form && form.nextAction) lead.nextAction = nextActionValue;
+        if (followContent) {
+            const stageAtFollow = getLeadCurrentProgressStage(lead);
+            lead.followRecords = lead.followRecords || [];
+            lead.followRecords.unshift({
+                id: 'follow-' + Date.now(),
+                time: followTimeText,
+                content: followContent,
+                sub: nextActionValue,
+                followOwner,
+                followType,
+                followResult: followResultText,
+                intentLevel: form?.intentLevel?.value || lead.intentLevel || '',
+                nextFollowTime: form?.nextFollowTime?.value || '',
+                stageAt: stageAtFollow,
+                flowAfterStage: getFollowFlowAfterStageByCurrentStage(stageAtFollow)
+            });
+        }
+        if (['contacted', 'missed', 'refused', 'sms', 'wechat', 'note', 'phoneDone', 'phoneMissed', 'phoneRejected', ''].includes(result)) lead.stage = Math.max(lead.stage, 1);
         else if (result === 'invited') lead.stage = Math.max(lead.stage, 2);
         else if (result === 'visited') lead.stage = Math.max(lead.stage, 3);
         else if (result === 'reserved') lead.stage = Math.max(lead.stage, 4);
         else if (result === 'low') lead.focus = '暂无意向，建议一周后再联系';
         else if (result === 'invalid') lead.isInvalid = true;
-        if (form && form.nextAction && form.nextAction.value === '邀约到访') lead.stage = Math.max(lead.stage, 2);
-        if (form && form.nextAction && form.nextAction.value === '准备预定') lead.stage = Math.max(lead.stage, 4);
+        if (result === 'refused' || result === 'phoneRejected') lead.focus = '客户拒接，建议复核后再决定是否继续';
+        if (['邀约', '邀约到访'].includes(nextActionValue)) lead.stage = Math.max(lead.stage, 2);
+        if (nextActionValue === '准备预定') lead.stage = Math.max(lead.stage, 4);
         if (lead.stage >= 3 && state.leads.some(l => l.id === id)) {
             state.conversions.unshift(lead);
             state.leads = state.leads.filter(l => l.id !== id);
@@ -6544,7 +6861,9 @@
         { name: '赵晓楠', phone: '138 6610 2248', group: '市区拓展组', type: '正式员工', status: '在岗', createdAt: '2026-06-03 10:36', modifiedAt: '2026-06-13 16:20' },
         { name: '马瑞', phone: '136 5109 4420', group: '市区拓展组', type: '第三方员工', status: '休假', createdAt: '2026-06-06 09:45', modifiedAt: '2026-06-15 11:18' },
         { name: '高敏', phone: '137 6650 1189', group: '校企渠道组', type: '正式员工', status: '在岗', createdAt: '2026-06-02 12:05', modifiedAt: '2026-06-18 12:05' },
-        { name: '周老师', phone: '138 1122 9086', group: '校企渠道组', type: '第三方员工', status: '离职', createdAt: '2026-06-04 11:05', modifiedAt: '2026-06-12 11:05' }
+        { name: '周老师', phone: '138 1122 9086', group: '校企渠道组', type: '第三方员工', status: '离职', createdAt: '2026-06-04 11:05', modifiedAt: '2026-06-12 11:05' },
+        { name: '梁可', phone: '136 7109 3342', group: '暂不分配招生组', type: '正式员工', status: '在岗', createdAt: '2026-06-12 09:22', modifiedAt: '2026-06-19 09:22' },
+        { name: '许嘉乐', phone: '135 6208 7713', group: '暂不分配招生组', type: '第三方员工', status: '休假', createdAt: '2026-06-14 14:06', modifiedAt: '2026-06-20 10:31' }
     ];
 
     let currentReservationTab = '全部';
@@ -6568,6 +6887,10 @@
 
     function escapeHtml(value) {
         return String(value ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+    }
+
+    function escapeJsString(value) {
+        return String(value ?? '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\r?\n/g, ' ');
     }
 
     function renderMarqueeText(value, threshold = 8) {
@@ -7712,11 +8035,13 @@
             return;
         }
         if (currentPicker.myLeadFilterKind) {
+            rememberMyLeadStatusRailScroll();
             if (currentPicker.myLeadFilterKind === 'status') myLeadStatusFilter = item.value;
             if (currentPicker.myLeadFilterKind === 'source') myLeadSourceFilter = item.value;
             closeAllModals();
             currentPicker = null;
             renderAdmissionEntryPage('我的线索');
+            restoreMyLeadStatusRailScroll();
             return;
         }
         if (currentPicker.directAdmission) {
@@ -8371,6 +8696,9 @@
         clearSelection();
         const cfg = moduleListConfig[type];
         if (!cfg) return;
+        const activeName = document.querySelector('#' + cfg.pills + ' .pill.active')?.innerText.trim() || '';
+        const oldList = document.getElementById(cfg.list);
+        if (oldList && activeName) moduleFilterScrollTopMap[type + ':' + activeName] = oldList.scrollTop || 0;
         const container = document.getElementById(cfg.pills);
         container.querySelectorAll('.pill').forEach(pill => pill.classList.remove('active'));
         el.classList.add('active');
@@ -8381,6 +8709,9 @@
 
         setTimeout(() => {
             execFilterRender(cfg.list, cfg.data(), type, filterName);
+            const restored = moduleFilterScrollTopMap[type + ':' + filterName] || 0;
+            const renderedList = document.getElementById(cfg.list);
+            if (renderedList) renderedList.scrollTop = restored;
         }, 300);
     }
 
@@ -8706,6 +9037,7 @@
     }
 
     function switchEnrollmentTab(viewId, el) {
+        hideScrollTopFab();
         const reservationRequested = viewId === 'sub-view-reservation';
         const handoverRequested = viewId === 'sub-view-handover';
         if (reservationRequested || handoverRequested) {
@@ -8731,6 +9063,10 @@
             setWorkspaceTitle(viewId === 'sub-view-more' ? '招生管理' : (viewId === 'sub-view-leads' ? '线索管理' : '招生工作台'), false);
         }
     }
+
+    document.addEventListener('scroll', event => {
+        syncScrollTopButtonVisibility(event.target);
+    }, true);
 
     // Touch logic for bottom-sheets
     document.querySelectorAll('.bottom-sheet').forEach(sheet => {
