@@ -79,11 +79,13 @@
         .sub-view::-webkit-scrollbar { display: none; }
         .sub-view.active { display: flex; animation: fadeIn 0.3s ease; }
         #workspace-enrollment.lead-management-page-mode .sub-tab-bar, #workspace-enrollment.lead-management-page-mode .quick-menu-wrap, #workspace-enrollment.leads-view-active .quick-menu-wrap { display: none; }
-        #workspace-enrollment.lead-management-page-mode #sub-view-leads { padding-top: 0; padding-bottom: 148px; }
-        #workspace-enrollment.lead-management-page-mode #sub-view-leads .filter-panel { top: -1px; padding-top: 0; overflow: hidden; margin-top: 0; margin-bottom: 0; }
-        #workspace-enrollment.lead-management-page-mode #sub-view-leads .filter-row { margin-bottom: 0; }
-        #workspace-enrollment.lead-management-page-mode #sub-view-leads .pill-scroll { margin-bottom: 0; }
-        #workspace-enrollment.lead-management-page-mode #leads-list-container { margin-top: 0; }
+        #workspace-enrollment.lead-management-page-mode #sub-view-leads { padding-top: 8px; padding-bottom: 148px; }
+        #workspace-enrollment.lead-management-page-mode #sub-view-leads .filter-panel { top: -1px; padding-top: 10px; overflow: hidden; margin-top: 4px; margin-bottom: 12px; }
+        #workspace-enrollment.lead-management-page-mode #sub-view-leads .filter-row { margin-bottom: 12px; padding: 0 20px; }
+        #workspace-enrollment.lead-management-page-mode #sub-view-leads .pill-scroll { margin-bottom: 0; padding: 0 20px 12px; gap: 10px; }
+        #workspace-enrollment.lead-management-page-mode #sub-view-leads .pill { min-height: 38px; padding: 0 15px; font-size: 12px; font-weight: 850; }
+        #workspace-enrollment.lead-management-page-mode #sub-view-leads .mini-search { height: 42px; border-radius: 13px; font-size: 12px; font-weight: 800; }
+        #workspace-enrollment.lead-management-page-mode #leads-list-container { margin-top: 4px; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         .glass-card { background: var(--surface-white); backdrop-filter: blur(22px); border: 1px solid rgba(255, 255, 255, 0.92); border-radius: 26px; box-shadow: 0 14px 34px rgba(31, 95, 255, 0.08), inset 0 1px 0 rgba(255,255,255,0.7); }
@@ -322,6 +324,17 @@
         .mobile-switch input:checked + .switch-track { background: rgba(31,95,255,0.12); }
         .mobile-switch input:checked + .switch-track::before { background: transparent; color: #64748B; box-shadow: none; }
         .mobile-switch input:checked + .switch-track::after { background: var(--primary-color); color: #fff; box-shadow: 0 3px 8px rgba(31,95,255,0.2); }
+        .receipt-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+        .receipt-tile { position: relative; aspect-ratio: 1 / 1; border-radius: 14px; overflow: hidden; background: rgba(248,250,252,0.78); border: 1px solid rgba(148,163,184,0.16); }
+        .receipt-label { display: flex; align-items: baseline; gap: 6px; }
+        .receipt-label-count { color: #94A3B8; font-size: 10px; font-weight: 900; line-height: 1; }
+        .receipt-add-tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border: 1.5px dashed rgba(148,163,184,0.42); color: #94A3B8; font-size: 11px; font-weight: 900; font-family: inherit; }
+        .receipt-add-tile svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+        .receipt-count { position: absolute; right: 7px; bottom: 6px; color: #94A3B8; font-size: 10px; font-weight: 900; line-height: 1; }
+        .receipt-thumb { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .receipt-remove-btn { position: absolute; right: 5px; top: 5px; width: 20px; height: 20px; border: 0; border-radius: 50%; background: rgba(15,23,42,0.58); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; line-height: 1; font-family: inherit; }
+        .receipt-preview-dialog { width: 315px; max-width: calc(100vw - 48px); padding: 12px; border-radius: 24px; background: rgba(15,23,42,0.82); border: 1px solid rgba(255,255,255,0.16); box-shadow: 0 24px 64px rgba(15,23,42,0.30); }
+        .receipt-preview-dialog img { width: 100%; max-height: 540px; object-fit: contain; border-radius: 18px; display: block; background: rgba(255,255,255,0.08); }
         .receipt-action-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
         .receipt-btn { width: 100%; min-height: 52px; border-radius: 18px; border: 1px dashed rgba(31,95,255,0.28); background: rgba(31,95,255,0.08); color: var(--primary-color); font-size: 14px; font-weight: 900; font-family: inherit; cursor: pointer; }
         .receipt-btn.camera { background: rgba(16,185,129,0.08); color: #047857; border-color: rgba(16,185,129,0.24); }
@@ -416,6 +429,7 @@
         .dialog-box.active { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
         .dialog-box.record-action-dialog { position: fixed; width: 315px; max-width: calc(100vw - 60px); border-radius: 24px; padding: 24px 20px 22px; box-shadow: 0 20px 54px rgba(15,23,42,0.18); }
         .dialog-box.record-action-dialog .dialog-title { margin-top: 0; margin-bottom: 14px; font-size: 17px; }
+        .dialog-box.record-action-dialog .action-sheet-list { width: 100%; }
         .dialog-box.record-action-dialog.elevated-dialog-box { z-index: 1504; }
         .dialog-box.long-text-dialog { width: 315px; max-width: calc(100vw - 54px); padding: 18px; align-items: stretch; text-align: left; border-radius: 24px; background: rgba(255,255,255,0.88); border: 1px solid rgba(255,255,255,0.92); box-shadow: 0 22px 56px rgba(15,23,42,0.18); -webkit-backdrop-filter: blur(22px); }
         .long-text-body { max-height: 300px; overflow-y: auto; padding: 0; border-radius: 0; background: transparent; border: 0; color: var(--text-main); font-size: 14px; font-weight: 850; line-height: 1.55; word-break: break-word; white-space: pre-wrap; scrollbar-width: none; }
@@ -443,6 +457,8 @@
         .dialog-btn.visit-edit-outline { background: #fff; color: var(--primary-color); border: 1px solid rgba(31,95,255,0.38); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.85); }
         .dialog-btn.visit-confirm-primary { background: linear-gradient(135deg, #4B82FF 0%, var(--primary-color) 100%); color: #fff; box-shadow: 0 10px 20px rgba(31,95,255,0.18); }
         .dialog-btn.visit-confirm-primary.disabled, .dialog-btn.visit-confirm-primary:disabled { opacity: 1; cursor: not-allowed; color: #94A3B8; background: rgba(148,163,184,0.16); box-shadow: none; }
+        .dialog-btn.visit-overdue-warning { background: rgba(245,158,11,0.13); color: #B45309; border: 1px solid rgba(245,158,11,0.22); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.65); }
+        .dialog-btn.visit-overdue-warning.disabled { color: #94A3B8; background: rgba(148,163,184,0.14); border-color: rgba(148,163,184,0.16); }
         .bottom-sheet button, .bottom-sheet input, .bottom-sheet textarea { outline: none; -webkit-tap-highlight-color: transparent; }
         .action-sheet-list button { border: 0; outline: none; }
 
@@ -476,8 +492,10 @@
         .clearable-host textarea + .field-clear-btn:active { transform: scale(0.92); }
         .amount-stepper-control { position: relative; }
         .amount-stepper-control .form-control { padding-right: 74px; }
-        .amount-swipe-pad { position: absolute; right: 8px; top: 50%; width: 52px; height: 36px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(31,95,255,0.14); border-radius: 12px; background: rgba(31,95,255,0.08); color: var(--primary-color); font-size: 11px; font-weight: 950; transform: translateY(-50%); touch-action: none; user-select: none; }
-        .amount-swipe-pad::before { content: ''; width: 18px; height: 2px; border-radius: 99px; background: currentColor; box-shadow: 0 -5px 0 currentColor, 0 5px 0 currentColor; opacity: 0.72; }
+        .amount-swipe-pad { position: absolute; right: 8px; top: 50%; width: 52px; height: 36px; display: grid; grid-template-rows: 1fr 1fr; align-items: center; justify-items: center; border: 1px solid rgba(31,95,255,0.14); border-radius: 12px; background: rgba(31,95,255,0.08); color: var(--primary-color); font-size: 11px; font-weight: 950; transform: translateY(-50%); touch-action: none; user-select: none; overflow: hidden; }
+        .amount-swipe-pad::before, .amount-swipe-pad::after { content: ''; width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; }
+        .amount-swipe-pad::before { border-bottom: 7px solid currentColor; align-self: end; margin-bottom: 3px; }
+        .amount-swipe-pad::after { border-top: 7px solid currentColor; align-self: start; margin-top: 3px; }
         .amount-swipe-pad.active { background: rgba(31,95,255,0.15); transform: translateY(-50%) scale(0.96); }
         .refund-time-field.hidden { display: none !important; }
         select.form-control, select.entry-inline-input, select.semester-select, select.my-lead-filter-btn, select.recruit-people-filter {
@@ -507,6 +525,7 @@
         .styled-select-host { position: relative; display: block; width: 100%; min-width: 0; cursor: pointer; }
         .styled-select-host > select { position: absolute !important; inset: 0 !important; width: 1px !important; height: 1px !important; min-height: 0 !important; opacity: 0 !important; z-index: -1 !important; pointer-events: none !important; margin: 0 !important; }
         .select-visual-control { min-height: 48px; width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 16px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.90); background: linear-gradient(135deg, rgba(255,255,255,0.76), rgba(239,246,255,0.62)); color: var(--text-title); font-size: 14px; font-weight: 800; box-shadow: 0 8px 24px rgba(31,95,255,0.055), inset 0 1px 0 rgba(255,255,255,0.78); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); transition: 0.18s ease; pointer-events: none; }
+        .select-visual-control.placeholder { color: #94A3B8; font-weight: 700; }
         .select-visual-label { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .select-visual-arrow { width: 8px; height: 8px; flex: 0 0 8px; color: #94A3B8; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-3px) rotate(45deg); }
         .select-visual-arrow svg { display: none; }
@@ -929,6 +948,13 @@
         .lead-compact-info-value.missing-value,
         .my-lead-info-value.missing-value { display: inline-flex; width: fit-content; max-width: 100%; padding: 3px 8px; border-radius: 9px; background: rgba(239,68,68,0.10); border: 1px solid rgba(239,68,68,0.18); color: var(--danger-color); font-size: 11px; font-weight: 950; }
         .lead-compact-info-value.source-detail-empty { display: inline-flex; width: fit-content; max-width: 100%; padding: 3px 8px; border-radius: 9px; background: rgba(148,163,184,0.10); border: 1px solid rgba(148,163,184,0.16); color: #94A3B8; font-size: 11px; font-weight: 900; }
+        .lead-detail-collapsible { position: relative; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
+        .lead-detail-collapsible.expanded { display: block; -webkit-line-clamp: initial; overflow: visible; }
+        .lead-detail-collapsible.remark-clamp { -webkit-line-clamp: 3; }
+        .lead-detail-collapsible.remark-clamp.expanded { display: block; -webkit-line-clamp: initial; overflow: visible; }
+        .lead-detail-expand-btn { margin-top: 5px; width: 26px; height: 22px; border: 0; border-radius: 8px; background: rgba(31,95,255,0.08); color: var(--primary-color); display: flex; align-items: center; justify-content: center; }
+        .lead-detail-expand-btn svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.18s ease; }
+        .lead-detail-expand-btn.expanded svg { transform: rotate(180deg); }
         .lead-compact-info-item.wide .lead-compact-info-label { margin-bottom: 0; flex-shrink: 0; }
         .lead-compact-info-item.wide .lead-compact-info-value { text-align: right; }
         button.lead-compact-info-item { width: 100%; font-family: inherit; text-align: left; cursor: pointer; }
@@ -987,7 +1013,7 @@
         .source-school-create-option { width: 100%; min-height: 42px; padding: 10px 12px; border: 0; border-radius: 12px; background: rgba(31,95,255,0.07); color: var(--primary-color); font-family: inherit; font-size: 13px; font-weight: 950; text-align: left; cursor: pointer; }
         .source-school-create-option.selected { background: rgba(31,95,255,0.11); box-shadow: inset 0 0 0 1px rgba(31,95,255,0.12); }
         .source-school-create-option:active { background: rgba(31,95,255,0.12); transform: scale(0.98); }
-        .source-school-list-footer { min-height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 0; background: transparent; border: 0; color: #64748B; font-size: 12px; font-weight: 900; }
+        .source-school-list-footer { min-height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 0; background: transparent; border: 0; color: #94A3B8; font-size: 11px; font-weight: 650; }
         .lead-timeline { position: relative; margin: 6px 0 14px; padding-left: 20px; }
         .lead-timeline::before { content: ''; position: absolute; left: 6px; top: 18px; bottom: 18px; width: 2px; border-radius: 999px; background: #CBD5E1; }
         .lead-timeline-item { position: relative; padding: 0 0 10px 12px; }
@@ -1014,7 +1040,7 @@
         .lead-timeline-title-wrap { min-width: 0; display: flex; align-items: center; gap: 7px; }
         .lead-timeline-title { font-size: 13px; font-weight: 950; color: #172554; }
         .lead-timeline-time { font-size: 10px; font-weight: 800; color: #64748B; white-space: nowrap; }
-        .lead-timeline-desc { font-size: 12px; color: #334155; font-weight: 750; line-height: 1.42; }
+        .lead-timeline-desc { font-size: 12px; color: #334155; font-weight: 750; line-height: 1.42; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
         .lead-timeline-desc.lead-next-action { margin-top: 6px; font-size: 12px; color: #334155; font-weight: 750; }
         .lead-next-action-label { display: block; color: inherit; font-size: 12px; font-weight: 850; line-height: 1.42; }
         .lead-next-action-value { display: inline; color: inherit; font-size: 12px; font-weight: 750; line-height: 1.42; }
@@ -1025,7 +1051,8 @@
         .lead-follow-preview-btn { position: absolute; right: 12px; bottom: 10px; width: 30px; height: 30px; border: 1px solid rgba(31,95,255,0.14); border-radius: 11px; background: rgba(31,95,255,0.08); color: var(--primary-color); display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .lead-follow-preview-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
         .lead-follow-preview-btn:active { transform: scale(0.95); }
-        .lead-follow-preview-card { display: grid; gap: 10px; text-align: left; }
+        .lead-follow-preview-card { display: grid; gap: 10px; text-align: left; max-height: 58vh; overflow-y: auto; overscroll-behavior: contain; padding-right: 2px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+        .lead-follow-preview-card::-webkit-scrollbar { display: none; }
         .follow-detail-hero { padding: 15px; border-radius: 20px; background: linear-gradient(145deg, rgba(255,255,255,0.96), rgba(239,246,255,0.80)); border: 1px solid rgba(255,255,255,0.94); box-shadow: 0 10px 24px rgba(31,95,255,0.07); }
         .follow-detail-hero-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
         .follow-detail-eyebrow { color: var(--text-secondary); font-size: 10px; font-weight: 950; margin-bottom: 6px; }
@@ -1307,15 +1334,18 @@
         .recruit-staff-save-actions { display: grid; grid-template-columns: 1fr; opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0); transition: opacity 0.22s ease, transform 0.26s ease, visibility 0.26s ease; }
         .recruit-staff-save-actions .submit-btn:disabled { background: rgba(148,163,184,0.18); color: #94A3B8; box-shadow: none; cursor: not-allowed; }
         .recruit-staff-save-actions.active .submit-btn:disabled { background: var(--primary-color); color: #fff; }
-        .recruit-delete-confirm-copy { min-height: 66px; display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 12px; border-radius: 16px; background: rgba(248,250,252,0.84); color: var(--text-main); font-size: 13px; font-weight: 800; line-height: 1.45; text-align: left; }
-        .recruit-delete-confirm-copy strong { color: var(--text-title); font-weight: 950; }
+        .recruit-delete-confirm-copy { min-height: 58px; display: flex; align-items: center; justify-content: center; padding: 8px 6px 12px; color: var(--text-secondary); font-size: 13px; font-weight: 700; line-height: 1.55; text-align: center; }
+        .recruit-delete-confirm-copy strong { color: var(--text-title); font-size: 14px; font-weight: 900; }
+        .recruit-delete-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; width: 100%; margin-top: 2px; }
+        .recruit-delete-actions .dialog-btn { min-width: 0; min-height: 50px; padding: 0 12px; display: flex; align-items: center; justify-content: center; border-radius: 14px; font-size: 14px; line-height: 1.2; }
         .recruit-change-list { display: grid; gap: 8px; margin-bottom: 14px; text-align: left; }
         .recruit-change-row { display: grid; gap: 5px; padding: 10px 12px; border-radius: 14px; background: rgba(248,250,252,0.88); border: 1px solid rgba(148,163,184,0.14); }
         .recruit-change-label { color: var(--text-title); font-size: 12px; font-weight: 950; }
-        .recruit-change-values { display: flex; align-items: center; gap: 7px; min-width: 0; color: var(--text-secondary); font-size: 12px; font-weight: 850; line-height: 1.35; }
+        .recruit-change-values { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1.25fr); align-items: center; gap: 7px; min-width: 0; color: var(--text-secondary); font-size: 12px; font-weight: 850; line-height: 1.35; }
         .recruit-change-values em { flex: 0 0 auto; font-style: normal; color: #94A3B8; }
         .recruit-change-values span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .recruit-change-values strong { min-width: 0; color: var(--primary-color); font-weight: 950; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .recruit-change-values .empty-change-value { color: #94A3B8; font-weight: 850; }
         .entry-page-content:has(.recruit-floating-add) { padding-bottom: 112px; }
         .recruit-floating-add { position: absolute; left: 20px; right: 20px; bottom: 20px; z-index: 260; margin: 0; padding: 0; background: transparent; border: 0; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
         .recruit-floating-add .lead-management-public-entry-btn { position: relative; left: auto; right: auto; bottom: auto; display: flex; width: 100%; }
@@ -1744,12 +1774,12 @@
                 <div class="form-section">
                     <div class="form-section-title">基础信息</div>
                     <div class="form-group"><label class="form-label required">个人线索</label><input type="text" class="form-control" value="从线索卡片/详情页选择后自动绑定" readonly></div>
-                    <div class="form-group"><label class="form-label required">跟进方式</label><select class="form-control" name="followType" required><option value="">请选择跟进方式</option><option>电话</option><option>微信</option><option>短信</option><option>我方走访</option><option>对方到访</option><option>其他</option></select></div>
+                    <div class="form-group"><label class="form-label required">跟进方式</label><select class="form-control" name="followType" required><option value="" disabled hidden selected>请选择跟进方式</option><option>电话</option><option>微信</option><option>短信</option><option>我方走访</option><option>对方到访</option><option>其他</option></select></div>
                     <div class="form-group"><label class="form-label required">跟进时间</label><input id="followup-time" type="hidden" class="datetime-hidden" data-datetime-type="datetime-local" data-required="1" name="followTime"><button type="button" id="followup-time-display" class="datetime-control placeholder" onclick="openDateTimePicker('followup-time', 'datetime-local', '跟进时间')">请选择日期时间</button></div>
                 </div>
                 <div class="form-section">
                     <div class="form-section-title">跟进内容</div>
-                    <div class="form-group"><label class="form-label">接触结果</label><select class="form-control" name="followResult"><option value="">请选择接触结果</option><option value="phoneDone">已通电话</option><option value="phoneMissed">未通电话</option><option value="phoneRejected">客户拒接</option></select></div>
+                    <div class="form-group"><label class="form-label">接触结果</label><select class="form-control" name="followResult"><option value="" disabled hidden selected>请选择接触结果</option><option value="phoneDone">已通电话</option><option value="phoneMissed">未通电话</option><option value="phoneRejected">客户拒接</option></select></div>
                     <div class="form-two-col">
                         <div class="form-group"><label class="form-label required">意向等级</label><select class="form-control" name="intentLevel" required><option>高意向</option><option selected>中意向</option><option>低意向</option></select></div>
                         <div class="form-group"><label class="form-label">到访状态</label><label class="follow-visit-check"><input type="checkbox" name="visitConfirmed"><span class="follow-visit-box" aria-hidden="true"></span><span class="follow-visit-text">确认已到访</span></label></div>
@@ -1882,6 +1912,10 @@
 
     <div id="dialog-long-text" class="dialog-box long-text-dialog">
         <div class="long-text-body" id="long-text-body"></div>
+    </div>
+
+    <div id="dialog-receipt-preview" class="dialog-box receipt-preview-dialog">
+        <img id="receipt-preview-large-img" alt="票据图片预览">
     </div>
 
     <div id="dialog-confirm-enroll" class="dialog-box">
@@ -2286,7 +2320,7 @@
         enhanceInteractiveControls(container);
     }
 
-    function returnToMyLeadsWorkspace() {
+    function returnToMyLeadsWorkspace(focusLeadId = null) {
         const page = document.getElementById('page-admission-entry');
         page.classList.remove('active');
         page.classList.add('hidden-right');
@@ -2294,8 +2328,10 @@
         currentEntryLabel = '';
         currentMyLeadId = null;
         myLeadPageState = 'list';
+        if (focusLeadId) myLeadStatusFilter = '全部';
         renderMyLeadsWorkspace();
         switchEnrollmentTab('sub-view-follow', document.getElementById('tab-btn-follow'));
+        if (focusLeadId) scrollMyLeadIntoView(focusLeadId);
     }
 
     function returnToLeadManagementWorkspace() {
@@ -2653,13 +2689,22 @@
         return !leads.length ? '<div class="entry-empty">' + emptyText + '</div>' : '<div class="my-lead-list">' + leads.map((lead, index) => {
             const status = getLeadBusinessStatusMeta(lead);
             const trailing = '<div class="my-lead-status ' + status.cls + '">' + escapeHtml(status.text) + '</div>';
-            return '<div class="my-lead-row" onclick="openMyLeadDetail(' + lead.id + ')">' +
+            return '<div class="my-lead-row" data-lead-id="' + lead.id + '" onclick="openMyLeadDetail(' + lead.id + ')">' +
                 '<div class="my-lead-index">' + (index + 1) + '</div>' +
                 '<div class="my-lead-name">' + renderMarqueeText(lead.name, 7) + '</div>' +
                 trailing +
                 '<svg class="lead-row-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
                 '</div>';
         }).join('') + '</div>';
+    }
+
+    function scrollMyLeadIntoView(id) {
+        if (!id) return;
+        requestAnimationFrame(() => {
+            const row = document.querySelector('#my-leads-list-container .my-lead-row[data-lead-id="' + Number(id) + '"]');
+            if (!row) return;
+            row.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        });
     }
 
     function refreshMyLeadListOnly() {
@@ -2893,7 +2938,8 @@
             document.getElementById('assign-conflict-desc').innerText = '当前负责老师：' + currentOwner + '\n将更换为：' + selectedAssignTeacher;
             if (list) {
                 list.classList.add('owner-change-summary');
-                list.innerHTML = '<div class="assign-conflict-row owner-change-row"><span>当前：' + escapeHtml(currentOwner) + '</span><span>更换为：' + escapeHtml(selectedAssignTeacher) + '</span></div>';
+                list.style.display = 'none';
+                list.innerHTML = '';
             }
             if (primary) primary.innerText = '确认更换';
             if (secondary) secondary.style.display = 'none';
@@ -2902,6 +2948,7 @@
             document.getElementById('assign-conflict-desc').innerText = conflicts.length + ' 名学生已有负责老师，继续会把负责老师改为 ' + selectedAssignTeacher + '。';
             if (list) {
                 list.classList.remove('owner-change-summary');
+                list.style.display = '';
                 list.innerHTML = conflicts.map(item =>
                     '<div class="assign-conflict-row"><span>' + escapeHtml(item.name) + '</span><span>当前：' + escapeHtml(item.owner || '未分配') + '</span></div>'
                 ).join('');
@@ -2995,28 +3042,26 @@
             ? '<div class="offline-submit-actions entry-fixed-actions"><button type="button" class="offline-public-btn" onclick="submitOfflineLead(false, \'public\')">进入公海</button><button type="button" class="offline-assign-btn" onclick="submitOfflineLead(false, \'assign\')">选择老师并分配</button></div>'
             : '<div class="offline-submit-actions single entry-fixed-actions"><button type="submit" class="submit-btn">登记到我的线索</button></div>';
         const semesterField = '<div class="form-group"><label class="form-label required">招生学期</label><select id="offline-lead-semester" class="form-control" required><option>2026年秋季</option><option>2026年春季</option><option>2025年秋季</option></select></div>';
-        const publicFields =
-            '<div class="form-group"><label class="form-label required">来源类型</label><select id="offline-lead-sourceType" class="form-control" required><option>线下OFFLINE</option><option>网上报名</option><option>学校推荐</option><option>活动采集</option></select></div>' +
-            '<div class="form-group"><label class="form-label">线索状态</label><select id="offline-lead-status" class="form-control"><option>新线索</option><option>待分配</option><option>已联系</option><option>无效</option></select></div>' +
-            '<div class="form-group"><label class="form-label">意向等级</label><select id="offline-lead-intentLevel" class="form-control"><option value="">请选择意向等级</option><option>高意向</option><option>中意向</option><option>低意向</option></select></div>' +
+        const sourceTypeField = isPublic
+            ? '<div class="form-group"><label class="form-label required">来源类型</label><select id="offline-lead-sourceType" class="form-control" required><option>线下OFFLINE</option><option>网上报名</option><option>学校推荐</option><option>活动采集</option></select></div>'
+            : '<input type="hidden" id="offline-lead-sourceType" value="线下OFFLINE">';
+        const sharedFields = sourceTypeField +
+            '<div class="form-group"><label class="form-label">意向等级</label><select id="offline-lead-intentLevel" class="form-control"><option value="" disabled hidden selected>请选择意向等级</option><option>高意向</option><option>中意向</option><option>低意向</option></select></div>' +
             '<div class="form-group"><label class="form-label">生源年级</label><button type="button" class="selector-control placeholder" id="offline-selector-grade" onclick="openOfflineFieldPicker(\'grade\')">请选择生源年级</button><input type="hidden" id="offline-lead-grade" value=""><input id="offline-lead-grade-custom" class="form-control" style="display:none; margin-top:8px;" placeholder="请输入生源年级"></div>';
-        const personalFields =
-            '<div class="form-group"><label class="form-label">已知学校</label><button type="button" class="selector-control" onclick="toggleOfflineSchoolSuggestions(event)">请选择已有学校</button></div>';
         return '<form class="entry-action-form" onsubmit="event.preventDefault(); submitOfflineLead(false, \'' + (isPublic ? 'public' : 'self') + '\');">' +
             '<div class="entry-form-card">' +
             semesterField +
-            (isPublic ? publicFields : '') +
+            sharedFields +
             '<div class="form-group"><label class="form-label required">线索姓名</label><input id="offline-lead-name" class="form-control" required placeholder="请输入线索姓名"></div>' +
             '<div class="form-group"><label class="form-label required">联系电话</label><input id="offline-lead-phone" class="form-control" type="tel" inputmode="tel" required placeholder="请输入联系电话"></div>' +
             '<div class="form-group"><label class="form-label">性别</label><button type="button" class="selector-control" id="offline-selector-gender" onclick="openOfflineFieldPicker(\'gender\')">未知性别</button><input type="hidden" id="offline-lead-gender" value="未知性别"></div>' +
             '<div class="form-group"><label class="form-label">关键词</label><input id="offline-lead-keyword" class="form-control" placeholder="如：护理、住宿、升学"></div>' +
-            (!isPublic ? personalFields : '') +
             '<div class="form-group"><label class="form-label">生源学校</label>' +
             '<div class="school-combobox"><input id="offline-school-input" class="form-control" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="offline-school-suggestions" placeholder="输入或选择生源学校" onfocus="showOfflineSchoolSuggestions()" oninput="handleOfflineSchoolInput(this.value)" onblur="hideOfflineSchoolSuggestions()">' +
             '<button type="button" class="school-combo-toggle" aria-label="展开学校列表" onclick="toggleOfflineSchoolSuggestions(event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="6 9 12 15 18 9"></polyline></svg></button>' +
             '<div class="school-suggestions" id="offline-school-suggestions" role="listbox"></div></div></div>' +
-            '<div class="form-group"><label class="form-label">' + (isPublic ? '生源班级' : '生源班级') + '</label><input id="offline-lead-class" class="form-control" placeholder="如：初三 2 班"></div>' +
-            '<div class="form-group"><label class="form-label">来源细节</label><input id="offline-lead-sourceDetail" class="form-control" maxlength="' + (isPublic ? '100' : '500') + '" placeholder="如校门口咨询/老生推荐等"></div>' +
+            '<div class="form-group"><label class="form-label">生源班级</label><input id="offline-lead-class" class="form-control" placeholder="如：初三 2 班"></div>' +
+            '<div class="form-group"><label class="form-label">来源细节</label><input id="offline-lead-sourceDetail" class="form-control" maxlength="500" placeholder="如校门口咨询/老生推荐等"></div>' +
             '<div class="form-group"><label class="form-label">备注</label><textarea id="offline-lead-remark" class="form-control" maxlength="500" placeholder="请输入备注"></textarea></div>' +
             '</div><div class="entry-action-spacer"></div>' + submitActions + '</form>';
     }
@@ -3204,7 +3249,7 @@
         const nowText = formatDateTime(nowDatetimeLocal());
         const keyword = document.getElementById('offline-lead-keyword').value.trim();
         const sourceType = document.getElementById('offline-lead-sourceType')?.value || '线下OFFLINE';
-        const leadStatus = document.getElementById('offline-lead-status')?.value || (resolvedAction === 'self' ? '已分配' : '新线索');
+        const leadStatus = resolvedAction === 'self' ? '已分配' : '新线索';
         const sourceDetail = document.getElementById('offline-lead-sourceDetail')?.value.trim() || '';
         const newLead = {
             id: Date.now(),
@@ -3242,8 +3287,8 @@
             return;
         }
         refreshAllModuleLists();
-        showToast('线索已登记，请确认生源学校', true);
-        openConfirmSourceSchoolPage(newLead.id, 'detail');
+        showToast('线索已登记', true);
+        returnToMyLeadsWorkspace(newLead.id);
     }
 
     function clearHighlightedPublicLead() {
@@ -3277,7 +3322,7 @@
         });
     }
 
-    function returnToLeadManagementDefault(highlightId = null, highlightTone = 'warning') {
+    function returnToLeadManagementDefault(highlightId = null, highlightTone = 'warning', useHighlight = true) {
         const entryPage = document.getElementById('page-admission-entry');
         if (entryPage) {
             entryPage.classList.remove('active');
@@ -3292,7 +3337,8 @@
         switchEnrollmentTab('sub-view-leads', document.getElementById('tab-btn-more'));
         workspace?.classList.add('lead-management-page-mode');
         const pill = activatePill('pills-leads', '全部线索');
-        if (highlightId) setHighlightedPublicLead(highlightId, highlightTone);
+        if (highlightId && useHighlight) setHighlightedPublicLead(highlightId, highlightTone);
+        if (highlightId && !useHighlight) clearHighlightedPublicLead();
         execFilterRender('leads-list-container', getAllValidLeads(), 'leads', pill ? pill.innerText : '全部线索');
         if (highlightId) scrollPublicLeadIntoView(highlightId);
         updateBatchBar();
@@ -3301,7 +3347,7 @@
     function showPublicLeadSourceSchoolPrompt(leadId) {
         pendingPublicLeadSourceConfirmId = Number(leadId);
         clearHighlightedPublicLead();
-        returnToLeadManagementDefault();
+        returnToLeadManagementDefault(leadId, 'warning', false);
         showModal('dialog-public-lead-source-school');
     }
 
@@ -3310,7 +3356,7 @@
         pendingPublicLeadSourceConfirmId = null;
         document.getElementById('dialog-public-lead-source-school')?.classList.remove('active');
         document.getElementById('modal-overlay')?.classList.remove('active', 'assign-conflict-overlay');
-        returnToLeadManagementDefault(leadId, 'warning');
+        returnToLeadManagementDefault(leadId, 'warning', false);
     }
 
     function confirmPublicLeadSourceSchoolPrompt() {
@@ -3491,6 +3537,34 @@
         return '<div class="lead-compact-info-value ' + (missing ? 'missing-value' : '') + '">' + escapeHtml(text) + '</div>';
     }
 
+    function needsLeadDetailCollapse(value, maxLines = 5) {
+        const text = String(value || '');
+        const lineLimit = Number(maxLines || 5);
+        const charLimit = lineLimit <= 3 ? 42 : 80;
+        return text.split('\n').length > lineLimit || Array.from(text).length > charLimit;
+    }
+
+    function renderCollapsibleLeadDetailValue(label, value, lead) {
+        const text = value || '待补充';
+        const missing = text === '待补充';
+        if (missing) return renderLeadDetailValue('');
+        const id = 'lead-detail-collapse-' + Number(lead?.id || 0) + '-' + label.replace(/\s+/g, '');
+        const isRemark = label === '备注';
+        const canCollapse = needsLeadDetailCollapse(text, isRemark ? 3 : 5);
+        const clampClass = isRemark ? ' remark-clamp' : '';
+        const btn = canCollapse
+            ? '<button type="button" class="lead-detail-expand-btn" onclick="toggleLeadDetailCollapse(\'' + id + '\', this)" aria-label="展开或收起"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></button>'
+            : '';
+        return '<div id="' + id + '" class="lead-compact-info-value lead-detail-collapsible' + clampClass + (canCollapse ? '' : ' expanded') + '">' + escapeHtml(text) + '</div>' + btn;
+    }
+
+    function toggleLeadDetailCollapse(id, button) {
+        const target = document.getElementById(id);
+        if (!target) return;
+        const expanded = target.classList.toggle('expanded');
+        button?.classList.toggle('expanded', expanded);
+    }
+
     function isMissingSourceSchoolName(value) {
         const text = String(value || '').trim();
         return !text || ['待补充', '待确认', '待确认学校', '未知学校', '未填写'].includes(text);
@@ -3548,10 +3622,8 @@
                 '<div class="lead-school-value-row"><div class="lead-compact-info-value' + missingClass + '">' + escapeHtml(visual.display) + '</div></div>' +
                 '</button>';
         }
-        if (label === '来源细节') {
-            const text = String(value || '').trim();
-            const display = text || '如校门口咨询/老生推荐等';
-            return '<div class="lead-compact-info-item ' + (isWide ? 'wide' : '') + '"><div class="lead-compact-info-label">来源细节</div><div class="lead-compact-info-value ' + (text ? '' : 'source-detail-empty') + '">' + escapeHtml(display) + '</div></div>';
+        if (label === '来源细节' || label === '备注') {
+            return '<div class="lead-compact-info-item"><div class="lead-compact-info-label">' + label + '</div>' + renderCollapsibleLeadDetailValue(label, value && value !== '待补充' ? value : '', lead) + '</div>';
         }
         return '<div class="lead-compact-info-item ' + (isWide ? 'wide' : '') + '"><div class="lead-compact-info-label">' + label + '</div>' + renderLeadDetailValue(value && value !== '待补充' ? value : '') + '</div>';
     }
@@ -3826,7 +3898,7 @@
         if (!leadId && !options.discarded) return;
         if (returnMode === 'managerList') {
             const lead = findAnyLead(leadId);
-            returnToLeadManagementDefault(leadId, isLeadSourceSchoolConfirmed(lead) ? 'confirmed' : 'warning');
+            returnToLeadManagementDefault(leadId, isLeadSourceSchoolConfirmed(lead) ? 'confirmed' : 'warning', false);
         } else if (options.discarded) {
             returnToMyLeadsWorkspace();
         } else {
@@ -3849,7 +3921,7 @@
             ['线索状态', getLeadBusinessStatus(lead)],
             ['最近跟进时间', lead.lastFollow || '暂无'],
             ['入池时间', lead.createdAt || '刚刚'],
-            ['来源细节', lead.sourceDetail || ''],
+            ['来源细节', lead.sourceDetail || '待补充'],
             ['备注', lead.remark || '待补充']
         ];
         const leadGender = lead.gender || '未知性别';
@@ -3872,7 +3944,7 @@
         html += '<div class="section-header" style="margin-top: 0; padding: 0 4px 8px;"><div class="section-title" style="font-size:15px;">基本资料</div></div>' +
             '<div class="entry-card" style="margin-bottom: 12px; box-shadow: 0 4px 16px rgba(31,95,255,0.05); padding: 10px;">' +
             '<div class="lead-compact-info-grid">' +
-            fields.map((item, index) => renderLeadCompactInfoItem(item[0], item[1], index === fields.length - 1, lead)).join('') +
+            fields.map((item, index) => renderLeadCompactInfoItem(item[0], item[1], false, lead)).join('') +
             '</div></div>';
 
         html += '<div class="section-header" style="padding: 0 4px 8px;"><div class="section-title" style="font-size:16px;">流程进度</div></div>' +
@@ -3924,6 +3996,10 @@
             return '<button type="button" class="flow-reservation-icon-btn view" aria-label="查看预定信息" onclick="openBusinessRecordDetail(\'reservation\', ' + recordId + ')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>';
         }
         return '<button type="button" class="flow-reservation-icon-btn" aria-label="编辑预定信息" onclick="openReservationForm(\'edit\', ' + recordId + ')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></button>';
+    }
+
+    function getAdmissionTimelineAction(recordId) {
+        return '<button type="button" class="flow-reservation-icon-btn" aria-label="编辑录取信息" onclick="openAdmissionForm(null, ' + recordId + ')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></button>';
     }
 
     function getFollowTimelineAction(leadId, followId) {
@@ -4033,8 +4109,77 @@
         showModal('sheet-record-actions');
     }
 
+    function getLeadEditDraftValues() {
+        const keyword = document.getElementById('edit-lead-keyword')?.value.trim() || '';
+        const school = document.getElementById('edit-lead-school')?.value.trim() || '待补充';
+        return {
+            name: document.getElementById('edit-lead-name')?.value.trim() || '',
+            phone: document.getElementById('edit-lead-phone')?.value.trim() || '',
+            gender: document.getElementById('edit-lead-gender')?.value || '未知性别',
+            keyword,
+            keywordDisplay: keyword || '待补充',
+            school,
+            sourceClass: document.getElementById('edit-lead-class')?.value.trim() || '待补充',
+            grade: document.getElementById('edit-lead-grade')?.value.trim() || '',
+            intentLevel: document.getElementById('edit-lead-intentLevel')?.value || '',
+            sourceType: document.getElementById('edit-lead-sourceType')?.value || '线下OFFLINE',
+            sourceDetail: document.getElementById('edit-lead-sourceDetail')?.value.trim().slice(0, 500) || '',
+            remark: document.getElementById('edit-lead-remark')?.value.trim().slice(0, 500) || ''
+        };
+    }
+
+    function normalizeLeadEditCompare(value) {
+        return String(value ?? '').trim().replace(/\s+/g, ' ');
+    }
+
+    function getLeadEditChangeRows(lead, draft) {
+        const rows = [
+            { label: '姓名', before: lead.name || '', after: draft.name },
+            { label: '联系电话', before: displayPhone(lead.phone), after: draft.phone },
+            { label: '性别', before: lead.gender || '未知性别', after: draft.gender },
+            { label: '关键词/意向专业', before: lead.keyword || lead.major || lead.focus || '待补充', after: draft.keywordDisplay },
+            { label: '生源学校', before: lead.school || '待补充', after: draft.school },
+            { label: '生源年级', before: lead.grade || '', after: draft.grade },
+            { label: '生源班级', before: lead.sourceClass || '待补充', after: draft.sourceClass },
+            { label: '意向等级', before: lead.intentLevel || '', after: draft.intentLevel },
+            { label: '来源类型', before: lead.sourceType || lead.source || '线下OFFLINE', after: draft.sourceType },
+            { label: '来源细节', before: lead.sourceDetail || '', after: draft.sourceDetail },
+            { label: '备注', before: lead.remark || '', after: draft.remark }
+        ];
+        return rows.filter(row => normalizeLeadEditCompare(row.before) !== normalizeLeadEditCompare(row.after));
+    }
+
+    function renderLeadEditChangeRows(rows) {
+        if (!rows.length) {
+            return '<div class="entry-card-sub" style="min-height:58px; display:flex; align-items:center; justify-content:center; text-align:center; margin-top:2px; line-height:1.55;">本次未检测到字段变化。</div>';
+        }
+        return '<div class="recruit-change-list">' + rows.map(row =>
+            '<div class="recruit-change-row"><div class="recruit-change-label">' + escapeHtml(row.label) + '</div><div class="recruit-change-values">' + renderLeadEditChangeValue(row.before, 'span') + '<em>→</em>' + renderLeadEditChangeValue(row.after, 'strong') + '</div></div>'
+        ).join('') + '</div>';
+    }
+
+    function renderLeadEditChangeValue(value, tagName) {
+        const raw = String(value ?? '').trim();
+        const display = raw || '空';
+        const cls = raw ? '' : ' class="empty-change-value"';
+        return '<' + tagName + cls + '>' + escapeHtml(display) + '</' + tagName + '>';
+    }
+
     function confirmLeadEditSave() {
-        showLeadEditConfirm('保存学生信息？', '确认后会更新当前详情页资料。', '保存修改', 'submitMyLeadInlineEdit()');
+        const lead = findAnyLead(currentMyLeadId);
+        const form = document.querySelector('#entry-page-content form');
+        const missing = findFirstMissingRequired(form);
+        if (missing) return focusAndFlashField(missing, '请先补齐必填字段');
+        if (!lead) return;
+        const draft = getLeadEditDraftValues();
+        const duplicateMessage = getDuplicateLeadMessage(draft.name, draft.phone, lead.id);
+        if (duplicateMessage) return showDuplicateToast(duplicateMessage);
+        const rows = getLeadEditChangeRows(lead, draft);
+        document.getElementById('record-actions-title').innerText = '确认保存修改？';
+        document.getElementById('record-actions-body').innerHTML =
+            renderLeadEditChangeRows(rows) +
+            '<div class="dialog-actions"><button class="dialog-btn cancel" onclick="closeAllModals()">继续编辑</button><button class="dialog-btn confirm" onclick="closeAllModals(); submitMyLeadInlineEdit()">确认保存</button></div>';
+        showModal('sheet-record-actions');
     }
 
     function confirmLeadEditCancel() {
@@ -4055,29 +4200,25 @@
         const form = document.querySelector('#entry-page-content form');
         const missing = findFirstMissingRequired(form);
         if (missing) return focusAndFlashField(missing, '请先补齐必填字段');
-        const name = document.getElementById('edit-lead-name').value.trim();
-        const phone = document.getElementById('edit-lead-phone').value.trim();
-        const keyword = document.getElementById('edit-lead-keyword').value.trim();
-        const duplicateMessage = getDuplicateLeadMessage(name, phone, lead.id);
+        const draft = getLeadEditDraftValues();
+        const duplicateMessage = getDuplicateLeadMessage(draft.name, draft.phone, lead.id);
         if (duplicateMessage) return showDuplicateToast(duplicateMessage);
-        const resolvedGrade = document.getElementById('edit-lead-grade').value.trim();
         const previousSchool = lead.school || '';
-        const editedSchool = document.getElementById('edit-lead-school').value.trim() || '待补充';
-        lead.name = name;
-        lead.phone = phone;
-        lead.gender = document.getElementById('edit-lead-gender').value || '未知性别';
-        lead.keyword = keyword || '待补充';
-        lead.major = keyword || lead.major || '待补充';
-        lead.focus = keyword || lead.focus || '待补充';
-        lead.school = editedSchool;
-        if (String(previousSchool || '').trim() !== String(editedSchool || '').trim()) lead.sourceSchoolConfirmed = false;
-        lead.sourceClass = document.getElementById('edit-lead-class').value.trim() || '待补充';
-        lead.grade = resolvedGrade || '';
-        lead.intentLevel = document.getElementById('edit-lead-intentLevel').value || '';
-        lead.sourceType = document.getElementById('edit-lead-sourceType').value || lead.sourceType || '线下OFFLINE';
-        lead.sourceDetail = document.getElementById('edit-lead-sourceDetail').value.trim().slice(0, 500);
+        lead.name = draft.name;
+        lead.phone = draft.phone;
+        lead.gender = draft.gender;
+        lead.keyword = draft.keywordDisplay;
+        lead.major = draft.keyword || lead.major || '待补充';
+        lead.focus = draft.keyword || lead.focus || '待补充';
+        lead.school = draft.school;
+        if (String(previousSchool || '').trim() !== String(draft.school || '').trim()) lead.sourceSchoolConfirmed = false;
+        lead.sourceClass = draft.sourceClass;
+        lead.grade = draft.grade;
+        lead.intentLevel = draft.intentLevel;
+        lead.sourceType = draft.sourceType || lead.sourceType || '线下OFFLINE';
+        lead.sourceDetail = draft.sourceDetail;
         lead.source = lead.sourceType;
-        lead.remark = document.getElementById('edit-lead-remark').value.trim().slice(0, 500);
+        lead.remark = draft.remark;
         leadDetailEditMode = false;
         showToast('学生信息已更新', true);
         openMyLeadDetail(lead.id);
@@ -4200,7 +4341,7 @@
         }
         pushFollowRecordsAfter(4);
         if (admissions.length) {
-            admissions.forEach(record => push('录取', true, formatDateTime(record.admittedAt), record.major + ' · ' + (record.preClass || '待分班')));
+            admissions.forEach(record => push('录取', true, formatDateTime(record.admittedAt), record.major + ' · ' + (record.preClass || '待分班'), getAdmissionTimelineAction(record.id)));
         } else {
             push('录取', lead.stage >= 5, '', lead.stage >= 5 ? '已录取' : '待正式录取');
         }
@@ -4253,7 +4394,7 @@
     }
 
     function isVisitAppointmentExpired(appointment) {
-        if (!appointment || ['已到访', '已取消'].includes(appointment.status || '')) return false;
+        if (!appointment || ['已到访', '已取消', '超时未到访'].includes(appointment.status || '')) return false;
         const time = getVisitAppointmentTimeMs(appointment);
         return Number.isFinite(time) && time < Date.now();
     }
@@ -4262,7 +4403,7 @@
         if (!appointment) return '';
         const status = appointment.status || '待到访';
         if (status === '已到访' || status === '已取消') return status;
-        if (status === '已过期') return '待到访';
+        if (status === '已过期') return '超时未到访';
         return status;
     }
 
@@ -4273,6 +4414,7 @@
         if (!appointment) return { message: '请先发起到访邀约后再确认到访', label: '待邀约' };
         const status = getVisitAppointmentStatus(appointment);
         if (status === '已取消') return { message: '到访邀约已取消，不能确认到访', label: '已取消' };
+        if (status === '超时未到访') return { message: '该邀约已标记超时未到访', label: '超时未到访' };
         return null;
     }
 
@@ -4344,9 +4486,9 @@
         content.innerHTML =
             '<form class="entry-action-form" onsubmit="event.preventDefault(); submitMyLeadFollow();">' +
             '<div class="entry-form-card">' +
-                '<div class="form-group"><label class="form-label required">跟进方式</label><select id="my-follow-type" class="form-control" required><option value="">请选择跟进方式</option>' + selectOptionsHtml(['电话', '微信', '短信', '我方走访', '对方到访', '其他'], '') + '</select></div>' +
+                '<div class="form-group"><label class="form-label required">跟进方式</label><select id="my-follow-type" class="form-control" required><option value="" disabled hidden selected>请选择跟进方式</option>' + selectOptionsHtml(['电话', '微信', '短信', '我方走访', '对方到访', '其他'], '') + '</select></div>' +
                 '<div class="form-group"><label class="form-label required">跟进时间</label><input id="my-follow-time" type="hidden" class="datetime-hidden" data-datetime-type="datetime-local" data-required="1"><button type="button" id="my-follow-time-display" class="datetime-control placeholder" onclick="openDateTimePicker(\'my-follow-time\', \'datetime-local\', \'跟进时间\')">请选择日期时间</button></div>' +
-                '<div class="form-group"><label class="form-label">接触结果</label><select id="my-follow-result" class="form-control"><option value="">请选择接触结果</option><option value="phoneDone">已通电话</option><option value="phoneMissed">未通电话</option><option value="phoneRejected">客户拒接</option></select></div>' +
+                '<div class="form-group"><label class="form-label">接触结果</label><select id="my-follow-result" class="form-control"><option value="" disabled hidden selected>请选择接触结果</option><option value="phoneDone">已通电话</option><option value="phoneMissed">未通电话</option><option value="phoneRejected">客户拒接</option></select></div>' +
                 '<div class="form-two-col">' +
                     '<div class="form-group"><label class="form-label required">意向等级</label><select id="my-follow-intent" class="form-control" required>' + selectOptionsHtml(['高意向', '中意向', '低意向'], intentLevel) + '</select></div>' +
                     visitOptionHtml +
@@ -4509,6 +4651,18 @@
         return '<div class="visit-dialog-time-grid ' + (cells.length <= 1 ? 'single' : '') + '">' + cells.join('') + '</div>';
     }
 
+    function markVisitInviteOverdue() {
+        const lead = findAnyLead(currentMyLeadId);
+        const appointment = lead && getLeadVisitAppointment(lead);
+        if (!lead || !appointment) return;
+        appointment.status = '超时未到访';
+        appointment.content = '已标记超时未到访，预约到访时间：' + formatDateTime(appointment.visitAt);
+        lead.stage = Math.max(Number(lead.stage || 0), 2);
+        showToast('已标记超时未到访', true);
+        openMyLeadDetail(lead.id);
+        refreshAllModuleLists();
+    }
+
     function showVisitInviteExistingDialog(lead, appointment) {
         const alreadyVisited = isLeadVisited(lead);
         if (alreadyVisited) {
@@ -4517,6 +4671,9 @@
         }
         const visitBlock = getVisitConfirmBlock(lead);
         const visitStatus = getVisitAppointmentStatus(appointment) || '待到访';
+        const overdueButton = visitStatus === '超时未到访'
+            ? '<button class="dialog-btn visit-overdue-warning disabled" onclick="showToast(\'该邀约已标记超时未到访\')">已超时未到访</button>'
+            : '<button class="dialog-btn visit-overdue-warning" onclick="closeAllModals(); markVisitInviteOverdue()">标记超时未到访</button>';
         const confirmButton = visitBlock
             ? '<button class="dialog-btn visit-confirm-primary disabled" style="grid-column:1 / -1;" onclick="showToast(\'' + escapeHtml(visitBlock.message) + '\')">' + escapeHtml(visitBlock.label) + '</button>'
             : '<button class="dialog-btn visit-confirm-primary" style="grid-column:1 / -1;" onclick="closeAllModals(); confirmMyLeadVisitedFromFollow()">确认已到访</button>';
@@ -4525,7 +4682,7 @@
             '<div class="visit-existing-card">' +
             '<div class="visit-dialog-meta">' + escapeHtml(lead.name) + ' / ' + escapeHtml(displayPhone(lead.phone)) + ' / ' + escapeHtml(visitStatus) + '</div>' +
             renderVisitDialogTimeGrid(appointment, null, '', visitStatus) + '</div>' +
-            '<div class="dialog-actions" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"><button class="dialog-btn cancel" onclick="closeAllModals()">暂不处理</button><button class="dialog-btn visit-edit-outline" onclick="closeAllModals(); openVisitInviteEditForm()">编辑信息</button>' + confirmButton + '</div>';
+            '<div class="dialog-actions" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">' + overdueButton + '<button class="dialog-btn visit-edit-outline" onclick="closeAllModals(); openVisitInviteEditForm()">编辑信息</button>' + confirmButton + '</div>';
         showModal('sheet-record-actions');
     }
 
@@ -4558,7 +4715,7 @@
         const lead = findAnyLead(currentMyLeadId);
         const appointment = lead && (lead.visitAppointments || [])[0];
         if (!lead || !appointment) return;
-        const visitStatus = appointment.status || '待到访';
+        const visitStatus = getVisitAppointmentStatus(appointment) || '待到访';
         const cancelReasonDisplay = visitStatus === '已取消' ? 'block' : 'none';
         document.getElementById('entry-page-title').innerText = '编辑邀约信息';
         myLeadPageState = 'form';
@@ -4566,7 +4723,7 @@
         const content = document.getElementById('entry-page-content');
         content.innerHTML =
             '<form class="entry-action-form" onsubmit="event.preventDefault(); submitVisitInviteEdit();"><div class="entry-form-card">' +
-            '<div class="form-group"><label class="form-label required">个人线索</label><input class="form-control" value="' + escapeHtml(lead.name + ' / ' + displayPhone(lead.phone) + ' / 已邀约') + '" readonly></div>' +
+            '<div class="form-group"><label class="form-label required">个人线索</label><input class="form-control" value="' + escapeHtml(lead.name + ' / ' + displayPhone(lead.phone) + ' / ' + visitStatus) + '" readonly></div>' +
             '<div class="form-group"><label class="form-label required">邀约顾问</label><input id="visit-edit-advisor" class="form-control" value="' + escapeHtml(appointment.advisor || lead.owner || state.currentUser) + '"></div>' +
             dateTimeFieldHtml('预约到访时间', 'visit-edit-time', 'datetime-local', toDatetimeLocalValue(appointment.visitAt), true) +
             dateTimeFieldHtml('二维码有效期', 'visit-edit-expire', 'datetime-local', toDatetimeLocalValue(appointment.expireAt || ''), false) +
@@ -4578,7 +4735,7 @@
     }
 
     function openVisitStatusPicker() {
-        const options = ['待到访', '已到访', '已取消'].map(value => ({ value, label: value, sub: value === '已取消' ? '选择后填写取消原因' : '' }));
+        const options = ['待到访', '已到访', '超时未到访', '已取消'].map(value => ({ value, label: value, sub: value === '已取消' ? '选择后填写取消原因' : (value === '超时未到访' ? '标记预约已超时未到访' : '') }));
         currentPicker = { field: 'status', options, searchable: false, visitEditField: true };
         document.getElementById('record-picker-title').innerText = '选择预约状态';
         document.getElementById('record-picker-input').value = '';
@@ -4611,7 +4768,7 @@
         appointment.status = document.getElementById('visit-edit-status').value;
         appointment.cancelReason = appointment.status === '已取消' ? document.getElementById('visit-edit-cancel').value.trim() : '';
         appointment.remark = document.getElementById('visit-edit-remark').value.trim();
-        appointment.content = '预约到访时间：' + formatDateTime(appointment.visitAt);
+        appointment.content = (appointment.status === '超时未到访' ? '已标记超时未到访，预约到访时间：' : '预约到访时间：') + formatDateTime(appointment.visitAt);
         if (appointment.status === '已到访') markLeadVisitedSilently(lead, '邀约状态更新为已到访');
         showToast('邀约信息已更新', true);
         openMyLeadDetail(lead.id);
@@ -5894,15 +6051,14 @@
 
     function confirmDeleteSelectedRecruitStaff(index) {
         if (!selectedRecruitEditStaffIds.size) return showToast('请先选择要删除的人员');
-        document.getElementById('record-actions-title').innerText = '确认删除所选人员？';
-        document.getElementById('dialog-record-actions-title').innerText = '确认删除所选人员？';
+        document.getElementById('record-actions-title').innerText = '确认要删除所选人员？';
+        document.getElementById('dialog-record-actions-title').innerText = '确认要删除所选人员？';
         document.getElementById('record-actions-body').innerHTML =
             '<div class="recruit-delete-confirm-copy">' +
                 '<span>已选择 <strong>' + selectedRecruitEditStaffIds.size + '</strong> 名人员。</span>' +
-                '<span>请选择移出本组，或从招生人员库完全删除。</span>' +
             '</div>' +
-            '<div class="dialog-actions"><button class="dialog-btn cancel" onclick="deleteSelectedRecruitStaff(' + index + ', false)">移出本组</button><button class="dialog-btn confirm" style="background:var(--danger-color);" onclick="deleteSelectedRecruitStaff(' + index + ', true)">完全删除</button></div>';
-        showRecordActionsDialog(true);
+            '<div class="recruit-delete-actions"><button class="dialog-btn cancel" onclick="deleteSelectedRecruitStaff(' + index + ', false)">移出本组</button><button class="dialog-btn confirm" style="background:var(--danger-color);" onclick="deleteSelectedRecruitStaff(' + index + ', true)">完全删除</button></div>';
+        showRecordActionsDialog(true, '确认要删除所选人员？');
     }
 
     function deleteSelectedRecruitStaff(index, removeFully = false) {
@@ -5967,7 +6123,7 @@
         document.getElementById('record-actions-body').innerHTML =
             '<div class="entry-card-sub" style="min-height:58px; display:flex; align-items:center; justify-content:center; text-align:center; line-height:1.55;">退出后，本次未保存的招生组信息将不会保留。</div>' +
             '<div class="dialog-actions"><button class="dialog-btn cancel" onclick="closeAllModals()">取消</button><button class="dialog-btn confirm" onclick="closeAllModals(); ' + (index === null ? 'openRecruitListPage()' : 'openRecruitGroupDetail(' + index + ')') + '">退出编辑</button></div>';
-        showRecordActionsDialog();
+        showRecordActionsDialog(false, '确认退出吗？');
     }
 
     function confirmRecruitGroupSave(index) {
@@ -6248,11 +6404,11 @@
         document.getElementById('modal-overlay')?.classList.remove('record-elevated-overlay');
     }
 
-    function showRecordActionsDialog(elevated = false) {
+    function showRecordActionsDialog(elevated = false, forcedTitle = '') {
         const sheet = document.getElementById('sheet-record-actions');
         const dialog = document.getElementById('dialog-record-actions');
         const overlay = document.getElementById('modal-overlay');
-        const title = document.getElementById('record-actions-title')?.innerText || '更多操作';
+        const title = forcedTitle || document.getElementById('record-actions-title')?.innerText || '更多操作';
         const bodyHtml = document.getElementById('record-actions-body')?.innerHTML || '';
         if (dialog) {
             document.getElementById('dialog-record-actions-title').innerText = title;
@@ -6303,6 +6459,7 @@
         document.getElementById('modal-overlay').classList.remove('active', 'assign-conflict-overlay', 'record-elevated-overlay');
         closeQuickMenu();
         document.querySelectorAll('.bottom-sheet, .dialog-box').forEach(el => el.classList.remove('active'));
+        document.getElementById('receipt-preview-large-img')?.removeAttribute('src');
         resetRecordActionsPresentation();
         document.querySelectorAll('.styled-select-host.open').forEach(el => el.classList.remove('open'));
         pendingAssignConflict = null;
@@ -6440,6 +6597,7 @@
         if (!select || !label) return;
         const selected = select.options && select.selectedIndex >= 0 ? select.options[select.selectedIndex] : null;
         label.textContent = selected ? selected.textContent : (select.value || '请选择');
+        host.querySelector('.select-visual-control')?.classList.toggle('placeholder', !select.value);
     }
 
     function getStyledSelectPickerTitle(select) {
@@ -7220,7 +7378,7 @@
     let pendingNextReservationId = null;
     let lastAdmissionResultId = null;
     let pendingReservationAction = { id: null, type: null };
-    let receiptDraft = { name: '', data: '' };
+    let receiptDraft = { images: [] };
     let currentEnrollmentFlowTab = 'all';
     let enrollmentFlowSearchQuery = '';
 
@@ -7629,16 +7787,39 @@
     }
 
     function receiptImageField() {
-        const hasReceipt = !!(receiptDraft.name || receiptDraft.data);
-        const preview = hasReceipt
-            ? '<div class="receipt-preview active" id="receipt-preview">' + (receiptDraft.data ? '<img src="' + escapeHtml(receiptDraft.data) + '" alt="">' : '') + '<span>' + escapeHtml(receiptDraft.name || '已选择票据图片') + '</span></div>'
-            : '<div class="receipt-preview" id="receipt-preview"></div>';
-        return '<div class="form-group"><label class="form-label">票据图片</label>' +
-            '<div class="receipt-action-grid"><button type="button" class="receipt-btn" onclick="document.getElementById(\'receipt-album-input\').click()">系统相册</button><button type="button" class="receipt-btn camera" onclick="document.getElementById(\'receipt-camera-input\').click()">拍照</button></div>' +
-            '<input id="record-field-receiptReference" type="hidden" value="' + escapeHtml(receiptDraft.name || '') + '">' +
-            '<input id="receipt-album-input" class="receipt-file-input" type="file" accept="image/*" onchange="handleReceiptFileChange(this)">' +
+        const images = getReceiptDraftImages();
+        return '<div class="form-group"><label class="form-label receipt-label">票据图片<span class="receipt-label-count">' + images.length + '/6</span></label>' +
+            '<div class="receipt-grid" id="receipt-grid">' + renderReceiptImageTiles(images) + '</div>' +
+            '<input id="record-field-receiptReference" type="hidden" value="' + escapeHtml(images.map(item => item.name).join('，')) + '">' +
+            '<input id="receipt-album-input" class="receipt-file-input" type="file" accept="image/*" multiple onchange="handleReceiptFileChange(this)">' +
             '<input id="receipt-camera-input" class="receipt-file-input" type="file" accept="image/*" capture="environment" onchange="handleReceiptFileChange(this)">' +
-            preview + '</div>';
+            '</div>';
+    }
+
+    function getReceiptDraftImages() {
+        if (Array.isArray(receiptDraft.images)) return receiptDraft.images;
+        if (receiptDraft.data || receiptDraft.name) return [{ name: receiptDraft.name || '票据图片', data: receiptDraft.data || '' }];
+        return [];
+    }
+
+    function setReceiptDraftImages(images) {
+        receiptDraft = { images: images.slice(0, 6) };
+        const hidden = document.getElementById('record-field-receiptReference');
+        if (hidden) hidden.value = receiptDraft.images.map(item => item.name).join('，');
+        const count = document.querySelector('.receipt-label-count');
+        if (count) count.innerText = receiptDraft.images.length + '/6';
+        const grid = document.getElementById('receipt-grid');
+        if (grid) grid.innerHTML = renderReceiptImageTiles(receiptDraft.images);
+    }
+
+    function renderReceiptImageTiles(images = getReceiptDraftImages()) {
+        const tiles = images.map((item, index) =>
+            '<div class="receipt-tile"><button type="button" class="receipt-remove-btn" onclick="removeReceiptImage(' + index + ', event)" aria-label="删除票据图片">×</button><img class="receipt-thumb" src="' + escapeHtml(item.data || '') + '" alt="' + escapeHtml(item.name || '票据图片') + '" onclick="openReceiptImagePreview(' + index + ')"></div>'
+        ).join('');
+        const addTile = images.length < 6
+            ? '<button type="button" class="receipt-tile receipt-add-tile" onclick="openReceiptImageSourceSheet()"><svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg><span>添加图片</span></button>'
+            : '';
+        return tiles + addTile;
     }
 
     function inputField(label, field, type, value = '', required = false, attrs = '') {
@@ -7709,6 +7890,10 @@
             step: Number(step || 1),
             startX: event.clientX,
             startY: event.clientY,
+            tapDirection: (() => {
+                const rect = pad?.getBoundingClientRect?.();
+                return rect && event.clientY > rect.top + rect.height / 2 ? -1 : 1;
+            })(),
             lastUnits: 0,
             moved: false,
             pad
@@ -7735,6 +7920,9 @@
 
     function endAmountSwipe() {
         if (!amountSwipeState) return;
+        if (!amountSwipeState.moved) {
+            adjustAmountInput(amountSwipeState.inputId, amountSwipeState.tapDirection * amountSwipeState.step);
+        }
         amountSwipeState.pad?.classList.remove('active');
         document.removeEventListener('pointermove', handleAmountSwipeMove);
         amountSwipeState = null;
@@ -7814,14 +8002,13 @@
             if (refundInput) refundInput.value = '';
             setDateTimeInputValue('record-field-refundAt', '');
         }
-        handleRefundAmountInput(false);
+        handleRefundAmountInput();
     }
 
     function handleRefundAmountInput(shouldAutofill = true) {
         const status = normalizeReservationStatus(getFieldValue('reservationStatus'));
         const refundVisible = status === '已退费';
-        const refundAmount = parseAmountValue(getFieldValue('refundAmount'));
-        const showTime = refundVisible && refundAmount > 0;
+        const showTime = refundVisible;
         document.querySelectorAll('[data-condition="reservation-refund-time"]').forEach(el => el.classList.toggle('hidden', !showTime));
         const refundAt = document.getElementById('record-field-refundAt');
         if (!refundAt) return;
@@ -8323,7 +8510,7 @@
         }
         const lead = prefillLeadId ? findAnyLead(prefillLeadId) : null;
         const leadLocked = editing || !!lead;
-        receiptDraft = { name: record?.receiptImageName || '', data: record?.receiptImageData || '' };
+        receiptDraft = { images: getReceiptImagesFromRecord(record) };
         document.getElementById('record-form-title').innerText = editing ? '编辑预定' : '办理预定';
         document.getElementById('record-form-submit').innerText = editing ? '保存预定' : '提交预定';
         const selectedLeadDisplay = record ? (record.name + ' / ' + displayPhone(record.phone)) : (lead ? lead.name + ' / ' + displayPhone(lead.phone) : '');
@@ -8331,7 +8518,7 @@
         const statusText = normalizeReservationStatus(record?.status);
         const invalidVisible = statusText === '已失效';
         const refundVisible = statusText === '已退费';
-        const refundTimeVisible = refundVisible && !!(record?.refundAmount || record?.refundAt);
+        const refundTimeVisible = refundVisible;
         const collectorValue = record ? normalizeStaffNameValue(record.collector) : '';
         const paymentValue = record?.paymentMethod || '';
         const body = formSection('预定信息',
@@ -8645,19 +8832,69 @@
         }
     }
 
-    function handleReceiptFileChange(input) {
-        const file = input.files && input.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-            receiptDraft = { name: file.name, data: String(reader.result || '') };
-            const hidden = document.getElementById('record-field-receiptReference');
-            if (hidden) hidden.value = receiptDraft.name;
-            const preview = document.getElementById('receipt-preview');
-            preview.classList.add('active');
-            preview.innerHTML = '<img src="' + receiptDraft.data + '" alt=""><span>' + escapeHtml(receiptDraft.name) + '</span>';
-        };
-        reader.readAsDataURL(file);
+    function getReceiptImagesFromRecord(record) {
+        if (!record) return [];
+        const data = String(record.receiptImageData || '');
+        if (data.trim().startsWith('[')) {
+            try {
+                const parsed = JSON.parse(data);
+                if (Array.isArray(parsed)) return parsed.filter(item => item && item.data).slice(0, 6);
+            } catch (error) {}
+        }
+        if (record.receiptImageData || record.receiptImageName) {
+            return [{ name: record.receiptImageName || '票据图片', data: record.receiptImageData || '' }];
+        }
+        return [];
+    }
+
+    function openReceiptImageSourceSheet() {
+        if (getReceiptDraftImages().length >= 6) return showToast('最多上传 6 张票据图片');
+        document.getElementById('record-actions-title').innerText = '添加票据图片';
+        document.getElementById('record-actions-body').innerHTML =
+            '<div class="action-sheet-list"><button type="button" class="sheet-list-item" onclick="triggerReceiptImageInput(\'album\')"><div><div class="sheet-list-title">系统相册</div><div class="sheet-list-desc">从手机相册选择票据图片</div></div></button><button type="button" class="sheet-list-item" onclick="triggerReceiptImageInput(\'camera\')"><div><div class="sheet-list-title">拍照</div><div class="sheet-list-desc">调用相机拍摄票据图片</div></div></button></div>';
+        showModal('sheet-record-actions');
+    }
+
+    function triggerReceiptImageInput(type) {
+        closeAllModals();
+        setTimeout(() => {
+            document.getElementById(type === 'camera' ? 'receipt-camera-input' : 'receipt-album-input')?.click();
+        }, 30);
+    }
+
+    function readReceiptFile(file) {
+        return new Promise(resolve => {
+            const reader = new FileReader();
+            reader.onload = () => resolve({ name: file.name, data: String(reader.result || '') });
+            reader.readAsDataURL(file);
+        });
+    }
+
+    async function handleReceiptFileChange(input) {
+        const files = Array.from(input.files || []);
+        if (!files.length) return;
+        const current = getReceiptDraftImages();
+        const allowed = Math.max(0, 6 - current.length);
+        if (!allowed) return showToast('最多上传 6 张票据图片');
+        const selected = files.slice(0, allowed);
+        const images = await Promise.all(selected.map(readReceiptFile));
+        setReceiptDraftImages(current.concat(images));
+        if (files.length > allowed) showToast('最多上传 6 张票据图片');
+        input.value = '';
+    }
+
+    function removeReceiptImage(index, event) {
+        if (event) event.stopPropagation();
+        const images = getReceiptDraftImages();
+        images.splice(index, 1);
+        setReceiptDraftImages(images);
+    }
+
+    function openReceiptImagePreview(index) {
+        const image = getReceiptDraftImages()[index];
+        if (!image || !image.data) return;
+        document.getElementById('receipt-preview-large-img').src = image.data;
+        showModal('dialog-receipt-preview');
     }
 
     function parseAmountValue(value) {
@@ -8670,6 +8907,7 @@
         const lead = findAnyLead(leadId);
         const amountValue = parseAmountValue(getFieldValue('amount'));
         const reservationStatus = normalizeReservationStatus(getFieldValue('reservationStatus') || existing?.status);
+        const receiptImages = getReceiptDraftImages();
         return {
             id: existing?.id || Date.now(),
             code: existing?.code || ('YD' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + String(state.reservationRecords.length + 1).padStart(3, '0')),
@@ -8686,8 +8924,8 @@
             collector: normalizeStaffNameValue(getFieldValue('collector')),
             paymentMethod: getFieldValue('paymentMethod'),
             receiptSource: getFieldValue('receiptSource'),
-            receiptImageName: getFieldValue('receiptReference') || receiptDraft.name,
-            receiptImageData: receiptDraft.data,
+            receiptImageName: receiptImages.map(item => item.name).join('，'),
+            receiptImageData: JSON.stringify(receiptImages),
             financeStaff: getFieldValue('financeConfirmed') ? getFieldValue('financeStaff') : '',
             financeConfirmedAt: getFieldValue('financeConfirmed') ? getFieldValue('financeConfirmedAt') : '',
             invalidAt: reservationStatus === '已失效' ? (getFieldValue('invalidAt') || '') : '',
@@ -8930,7 +9168,7 @@
 
     const dynamicFormConfigs = {
         visitAppointment: { title: '新增到访预约', success: '到访预约已保存', groups: [
-            { title: '预约信息', fields: [field('个人线索', 'select', optionSets.personalLeads, true), field('预约到访日期', 'date', [], true), field('预约到访时间', 'time', [], true), field('预约状态', 'select', ['待确认', '已确认', '已取消', '已到访'], true)] },
+            { title: '预约信息', fields: [field('个人线索', 'select', optionSets.personalLeads, true), field('预约到访日期', 'date', [], true), field('预约到访时间', 'time', [], true), field('预约状态', 'select', ['待确认', '已确认', '已取消', '已到访', '超时未到访'], true)] },
             { title: '更多信息', fields: [field('备注', 'textarea'), field('取消原因')] }
         ] },
         reservationRecord: { title: '办理预定', success: '预定记录已保存', groups: [
