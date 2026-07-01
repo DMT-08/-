@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>我的课堂</title>
+  <!-- 0.3：增加全部分组默认项，并验证长课件组名称的截断表现。 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <style>
+    :root {
+      --brand: #1F5FFF;
+      --page-bg-start: #EFF6FF;
+      --page-bg-end: #DFE7FF;
+      --panel-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.03), 0 2px 8px -2px rgba(0, 0, 0, 0.02);
+      --card-shadow: 0 14px 34px -18px rgba(15, 23, 42, 0.18), 0 4px 14px -8px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      touch-action: manipulation;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: #090B12;
+      background: linear-gradient(135deg, var(--page-bg-start) 0%, var(--page-bg-end) 100%);
+      letter-spacing: 0;
+    }
+
+    button,
+    input {
+      font: inherit;
+      letter-spacing: 0;
+    }
+
+    .viewport-fit {
+      width: var(--scaled-stage-width, 1300px);
+      height: var(--scaled-stage-height, 813px);
+      margin: 0 auto;
+      overflow: visible;
+    }
+
+    .stage {
+      width: 1300px;
+      height: 813px;
+      padding: 24px 32px 32px;
+      transform: scale(var(--stage-scale, 1));
+      transform-origin: top left;
+    }
+
+    .back-button {
+      width: 48px;
+      height: 48px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: var(--panel-shadow);
+      transition: transform 160ms ease;
+    }
+
+    .back-button:active,
+    .icon-button:active {
+      transform: scale(0.9);
+    }
+
+    .page-title {
+      color: #101217;
+      font-size: 32px;
+      line-height: 44px;
+      font-weight: 800;
+    }
+
+    .group-row:active {
+      transform: scale(0.95);
+    }
+
+    .search-shell {
+      width: 267px;
+      height: 36px;
+      border-radius: 12px;
+      border: 1px solid rgba(209, 216, 232, 0.92);
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.66);
+    }
+
+    .search-shell input::placeholder {
+      color: #C9D3E6;
+      opacity: 1;
+    }
+
+    .content {
+      height: calc(100% - 64px);
+      gap: 24px;
+    }
+
+    .side-panel,
+    .class-panel {
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: var(--panel-shadow);
+    }
+
+    .side-panel {
+      width: 303px;
+      padding: 24px;
+    }
+
+    .group-row {
+      width: 100%;
+      min-height: 52px;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      color: #64748B;
+      padding: 0 14px;
+      text-align: left;
+      transition: transform 160ms ease, background 160ms ease, border-color 160ms ease, color 160ms ease;
+    }
+
+    .group-name {
+      min-width: 0;
+      flex: 1 1 auto;
+      padding-right: 12px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .group-row:hover {
+      background: #F8FBFF;
+      color: #334155;
+    }
+
+    .group-row.is-active {
+      border-color: #DCE7FF;
+      background: #EEF5FF;
+      color: var(--brand);
+    }
+
+    .group-row-count {
+      min-width: 24px;
+      height: 22px;
+      flex: 0 0 auto;
+      border-radius: 999px;
+      background: #F1F5F9;
+      color: #94A3B8;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .group-row.is-active .group-row-count {
+      background: rgba(31, 95, 255, 0.1);
+      color: var(--brand);
+    }
+
+    .class-panel {
+      width: 909px;
+      padding: 48px 48px 35px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .class-panel::-webkit-scrollbar {
+      display: none;
+    }
+
+    .course-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 250px);
+      gap: 30px;
+    }
+
+    .course-card {
+      width: 250px;
+      height: 290px;
+      border-radius: 20px;
+      background: #FFFFFF;
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+    }
+
+    .course-cover {
+      width: 250px;
+      height: 138px;
+      display: block;
+      object-fit: cover;
+      object-position: center;
+      background: #F4FAFF;
+    }
+
+    .course-body {
+      height: 152px;
+      padding: 15px 14px 11px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .course-title {
+      min-height: 30px;
+      color: #05070A;
+      font-size: 18px;
+      line-height: 1.46;
+      font-weight: 800;
+    }
+
+    .clamp-2 {
+      display: -webkit-box;
+      overflow: hidden;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .publish-time {
+      margin-top: 8px;
+      color: #7E8798;
+      font-size: 15px;
+      line-height: 22px;
+      font-weight: 500;
+    }
+
+    .card-footer {
+      min-height: 44px;
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .teacher {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #374151;
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 600;
+    }
+
+    .enter-button {
+      width: 112px;
+      height: 44px;
+      flex: 0 0 auto;
+      border: 0;
+      padding: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: #FFFFFF;
+      cursor: pointer;
+      transition: transform 160ms ease;
+    }
+
+    .enter-button:active {
+      transform: scale(0.95);
+    }
+
+    .enter-button span {
+      width: 106px;
+      height: 30px;
+      border-radius: 999px;
+      background: var(--brand);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      line-height: 20px;
+      font-weight: 800;
+      box-shadow: 0 8px 18px -10px rgba(31, 95, 255, 0.72);
+    }
+  </style>
+</head>
+<body>
+  <div class="viewport-fit">
+    <main class="stage">
+      <header class="flex h-12 items-center justify-between">
+        <div class="flex items-center">
+          <button class="back-button grid place-items-center" aria-label="返回">
+            <img class="h-[18px] w-[14px] object-contain" src="lanhu_student_assets/icon-back.png" alt="">
+          </button>
+          <h1 class="page-title ml-[25px]">我的课堂</h1>
+        </div>
+
+        <label class="search-shell flex items-center px-[14px]">
+          <img class="h-[21px] w-[21px] object-contain" src="lanhu_student_assets/icon-search.png" alt="">
+          <input class="ml-[10px] h-full w-full border-0 bg-transparent text-[15px] font-semibold text-slate-700 outline-none" type="search" placeholder="搜索课堂、老师...." aria-label="搜索课堂、老师">
+        </label>
+      </header>
+
+      <section class="content mt-4 flex">
+        <aside class="side-panel">
+          <nav class="space-y-3" aria-label="课堂分组">
+            <button class="group-row is-active flex items-center justify-between" type="button" data-group="all">
+              <span class="group-name text-[15px] font-bold">全部课件组</span>
+              <span class="group-row-count grid place-items-center">20</span>
+            </button>
+
+            <button class="group-row flex items-center justify-between" type="button" data-group="argument">
+              <span class="group-name text-[15px] font-bold">论述类文本论证方法</span>
+              <span class="group-row-count grid place-items-center">5</span>
+            </button>
+
+            <button class="group-row flex items-center justify-between" type="button" data-group="literature">
+              <span class="group-name text-[15px] font-bold">文学史专题</span>
+              <span class="group-row-count grid place-items-center">4</span>
+            </button>
+
+            <button class="group-row flex items-center justify-between" type="button" data-group="senior">
+              <span class="group-name text-[15px] font-bold" title="高三语文必修整本书阅读与写作专项提升课件组">高三语文必修整本书阅读与写作专项提升课件组</span>
+              <span class="group-row-count grid place-items-center">3</span>
+            </button>
+
+            <button class="group-row flex items-center justify-between" type="button" data-group="classical">
+              <span class="group-name text-[15px] font-bold">古诗文阅读</span>
+              <span class="group-row-count grid place-items-center">3</span>
+            </button>
+
+            <button class="group-row flex items-center justify-between" type="button" data-group="physics">
+              <span class="group-name text-[15px] font-bold">物理专题突破</span>
+              <span class="group-row-count grid place-items-center">2</span>
+            </button>
+
+            <button class="group-row flex items-center justify-between" type="button" data-group="writing">
+              <span class="group-name text-[15px] font-bold">写作表达训练</span>
+              <span class="group-row-count grid place-items-center">3</span>
+            </button>
+          </nav>
+        </aside>
+
+        <section class="class-panel" aria-label="我的课堂列表">
+          <div class="course-grid" id="courseGrid"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const courseGroups = {
+      argument: [
+        {
+          title: "论述类文本结构梳理",
+          teacher: "豹子老师",
+          time: "2026-03-05 16:17 发布",
+          cover: "lanhu_student_assets/cover-literature-photo.png"
+        },
+        {
+          title: "中心论点与分论点拆解",
+          teacher: "菠萝吹雪",
+          time: "2026-03-06 10:20 发布",
+          cover: "lanhu_student_assets/cover-empty-course.png"
+        },
+        {
+          title: "论证方法综合训练",
+          teacher: "王建国",
+          time: "2026-03-07 14:05 发布",
+          cover: "lanhu_student_assets/cover-empty-course.png"
+        },
+        {
+          title: "事实论据与道理论据",
+          teacher: "欧阳",
+          time: "2026-03-08 09:35 发布",
+          cover: "lanhu_student_assets/cover-qinwen-photo.png"
+        },
+        {
+          title: "阅读题答题模板精讲",
+          teacher: "豹子老师",
+          time: "2026-03-09 16:42 发布",
+          cover: "lanhu_student_assets/cover-empty-course.png"
+        }
+      ],
+      literature: [
+        {
+          title: "中国古代文学史",
+          teacher: "豹子老师",
+          time: "2026-03-05 16:17 发布",
+          cover: "lanhu_student_assets/cover-literature-photo.png"
+        },
+        {
+          title: "先秦“文”的含义及其后世影响",
+          teacher: "王建国",
+          time: "2026-03-06 11:30 发布",
+          cover: "lanhu_student_assets/cover-qinwen-photo.png"
+        },
+        {
+          title: "唐宋文学流派速览",
+          teacher: "欧阳",
+          time: "2026-03-08 15:10 发布",
+          cover: "lanhu_student_assets/cover-empty-course.png"
+        },
+        {
+          title: "明清小说人物谱",
+          teacher: "菠萝吹雪",
+          time: "2026-03-10 08:50 发布",
+          cover: "lanhu_student_assets/cover-empty-course.png"
+        }
+      ],
+      senior: [
+        {
+          title: "语文高三必修：小说三要素分析与实战演练",
+          teacher: "豹子老师",
+          time: "2026-03-05 16:17 发布",
+          cover: "lanhu_student_assets/cover-empty-course.png"
+        },
+        {
+          title: "现代文阅读压轴训练",
+          teacher: "王建国",
+          time: "2026-03-07 13:25 发布",
+          cover: "lanhu_student_assets/cover-literature-photo.png"
+        },
+        {
+          title: "古诗词鉴赏答题路径",
+          teacher: "欧阳",
+          time: "2026-03-11 10:15 发布",
+          cover: "lanhu_student_assets/cover-qinwen-photo.png"
+        }
+      ],
+      classical: [
+        {
+          title: "文言实词虚词专题",
+          teacher: "王建国",
+          time: "2026-03-04 18:00 发布",
+          cover: "lanhu_student_assets/cover-empty-course.png"
+        },
+        {
+          title: "古诗意象与情感判断",
+          teacher: "欧阳",
+          time: "2026-03-08 12:40 发布",
+          cover: "lanhu_student_assets/cover-qinwen-photo.png"
+        },
+        {
+          title: "断句与翻译限时训练",
+          teacher: "豹子老师",
+          time: "2026-03-12 17:05 发布",
+          cover: "lanhu_student_assets/cover-empty-course.png"
+        }
+      ],
+      physics: [
+        {
+          title: "牛顿第二定律深度解析",
+          teacher: "豹子老师",
+          time: "2026-03-05 16:17 发布",
+          cover: "lanhu_student_assets/cover-empty-course.png"
+        },
+        {
+          title: "受力分析模型训练",
+          teacher: "菠萝吹雪",
+          time: "2026-03-09 09:10 发布",
+          cover: "lanhu_student_assets/cover-empty-course.png"
+        }
+      ],
+      writing: [
+        {
+          title: "议论文开头与立意",
+          teacher: "欧阳",
+          time: "2026-03-06 20:00 发布",
+          cover: "lanhu_student_assets/cover-literature-photo.png"
+        },
+        {
+          title: "素材迁移与段落展开",
+          teacher: "豹子老师",
+          time: "2026-03-10 14:40 发布",
+          cover: "lanhu_student_assets/cover-empty-course.png"
+        },
+        {
+          title: "考场作文升格练习",
+          teacher: "王建国",
+          time: "2026-03-14 08:30 发布",
+          cover: "lanhu_student_assets/cover-qinwen-photo.png"
+        }
+      ]
+    };
+
+    let activeGroup = "all";
+    const courseGrid = document.querySelector("#courseGrid");
+    const searchInput = document.querySelector('input[type="search"]');
+    const groupButtons = [...document.querySelectorAll(".group-row")];
+
+    const renderCourses = () => {
+      const keyword = searchInput.value.trim().toLowerCase();
+      const currentCourses = activeGroup === "all" ? Object.values(courseGroups).flat() : courseGroups[activeGroup];
+      const courses = currentCourses.filter((course) => {
+        const haystack = `${course.title} ${course.teacher}`.toLowerCase();
+        return haystack.includes(keyword);
+      });
+
+      courseGrid.innerHTML = courses.map((course) => `
+        <article class="course-card">
+          <img class="course-cover" src="${course.cover}" alt="">
+          <div class="course-body">
+            <h2 class="course-title clamp-2">${course.title}</h2>
+            <p class="publish-time">${course.time}</p>
+            <div class="card-footer">
+              <div class="teacher">
+                <img class="h-5 w-5 rounded-full object-cover" src="lanhu_student_assets/icon-avatar.png" alt="">
+                <span class="truncate">${course.teacher}</span>
+              </div>
+              <button class="enter-button" type="button"><span>进入课堂</span></button>
+            </div>
+          </div>
+        </article>
+      `).join("");
+    };
+
+    groupButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        activeGroup = button.dataset.group;
+        groupButtons.forEach((item) => item.classList.toggle("is-active", item === button));
+        renderCourses();
+      });
+    });
+
+    searchInput.addEventListener("input", renderCourses);
+
+    const fitStage = () => {
+      const scale = Math.min(window.innerWidth / 1300, window.innerHeight / 813, 1);
+      document.documentElement.style.setProperty("--stage-scale", String(scale));
+      document.documentElement.style.setProperty("--scaled-stage-width", `${1300 * scale}px`);
+      document.documentElement.style.setProperty("--scaled-stage-height", `${813 * scale}px`);
+    };
+
+    window.addEventListener("resize", fitStage, { passive: true });
+    renderCourses();
+    fitStage();
+  </script>
+</body>
+</html>
