@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>我的课堂</title>
-  <!-- 0.3：增加全部分组默认项，并验证长课件组名称的截断表现。 -->
+  <!-- 0.4：长课件组名称最多显示两行，超出后省略。 -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <style>
@@ -129,8 +129,12 @@
       flex: 1 1 auto;
       padding-right: 12px;
       overflow: hidden;
-      white-space: nowrap;
+      display: -webkit-box;
+      line-height: 20px;
+      white-space: normal;
       text-overflow: ellipsis;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
     }
 
     .group-row:hover {
@@ -315,7 +319,7 @@
             </button>
 
             <button class="group-row flex items-center justify-between" type="button" data-group="senior">
-              <span class="group-name text-[15px] font-bold" title="高三语文必修整本书阅读与写作专项提升课件组">高三语文必修整本书阅读与写作专项提升课件组</span>
+              <span class="group-name text-[15px] font-bold" title="高三语文必修整本书阅读与写作专项提升课件组（上册同步精讲与高频考点冲刺）">高三语文必修整本书阅读与写作专项提升课件组（上册同步精讲与高频考点冲刺）</span>
               <span class="group-row-count grid place-items-center">3</span>
             </button>
 
