@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#EFF6FF">
+    <title>学生详情 · 后台能力重构原型</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#1F5FFF',
+                        ink: '#111827',
+                        body: '#334155',
+                        muted: '#64748B'
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        :root {
+            --brand: #1F5FFF;
+            --brand-soft: rgba(31, 95, 255, 0.10);
+            --brand-border: rgba(31, 95, 255, 0.16);
+            --ink: #111827;
+            --body: #334155;
+            --muted: #64748B;
+            --danger: #EF4444;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --page: linear-gradient(135deg, #EFF6FF 0%, #DFE7FF 100%);
+            --glass: rgba(255, 255, 255, 0.72);
+            --glass-strong: rgba(255, 255, 255, 0.84);
+            --line: rgba(15, 23, 42, 0.07);
+            --shadow: 0 8px 24px rgba(31, 95, 255, 0.055);
+        }
+
+        * { box-sizing: border-box; }
+        html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+        body {
+            display: grid;
+            place-items: center;
+            background: #E8F0FF;
+            color: var(--body);
+            font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        button, input, select, textarea { font: inherit; }
+        button { -webkit-tap-highlight-color: transparent; }
+        button:active { transform: scale(0.95); }
+
+        .device {
+            position: relative;
+            width: 375px;
+            height: 812px;
+            max-width: 100vw;
+            max-height: 100vh;
+            overflow: hidden;
+            border-radius: 40px;
+            background: var(--page);
+            box-shadow: 0 24px 70px rgba(30, 64, 175, 0.16);
+            isolation: isolate;
+        }
+        .device::before,
+        .device::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            border-radius: 999px;
+            filter: blur(1px);
+            pointer-events: none;
+        }
+        .device::before {
+            width: 210px;
+            height: 210px;
+            right: -78px;
+            top: 74px;
+            background: radial-gradient(circle, rgba(31,95,255,0.18), rgba(31,95,255,0));
+        }
+        .device::after {
+            width: 180px;
+            height: 180px;
+            left: -92px;
+            bottom: 104px;
+            background: radial-gradient(circle, rgba(16,185,129,0.10), rgba(16,185,129,0));
+        }
+
+        .topbar {
+            position: absolute;
+            inset: 0 0 auto;
+            z-index: 40;
+            display: grid;
+            grid-template-columns: 60px 1fr 60px;
+            align-items: center;
+            padding: max(48px, env(safe-area-inset-top, 48px)) 20px 12px;
+            background: linear-gradient(180deg, rgba(239,246,255,0.96), rgba(239,246,255,0.76));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .nav-button {
+            width: 44px;
+            height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 0;
+            border-radius: 14px;
+            color: var(--ink);
+            background: rgba(255,255,255,0.58);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.84);
+            transition: transform .16s ease, background .16s ease;
+        }
+        .nav-button svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+        .nav-action {
+            min-width: 52px;
+            height: 36px;
+            justify-self: end;
+            border: 0;
+            border-radius: 11px;
+            color: var(--brand);
+            background: var(--brand-soft);
+            font-size: 12px;
+            font-weight: 800;
+            transition: transform .16s ease, background .16s ease;
+        }
+        .nav-action.is-saving { background: var(--brand); color: #fff; box-shadow: 0 8px 16px rgba(31,95,255,.18); }
+        .nav-title { text-align: center; color: var(--ink); font-size: 18px; font-weight: 800; letter-spacing: .02em; }
+
+        .scroll-area {
+            position: absolute;
+            inset: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 112px 20px 34px;
+            scrollbar-width: none;
+            overscroll-behavior-y: contain;
+            -webkit-overflow-scrolling: touch;
+        }
+        .scroll-area::-webkit-scrollbar { display: none; }
+
+        .glass {
+            background: var(--glass);
+            border: 1px solid rgba(255,255,255,0.88);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+        .hero {
+            position: relative;
+            overflow: hidden;
+            padding: 18px;
+            border-radius: 22px;
+        }
+        .hero::after {
+            content: "";
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            right: -48px;
+            top: -52px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(31,95,255,.16), rgba(31,95,255,0));
+            pointer-events: none;
+        }
+        .avatar {
+            width: 50px;
+            height: 50px;
+            flex: 0 0 50px;
+            display: grid;
+            place-items: center;
+            border-radius: 17px;
+            color: var(--brand);
+            background: rgba(31,95,255,.10);
+            border: 1px solid rgba(31,95,255,.13);
+        }
+        .avatar svg { width: 25px; height: 25px; fill: none; stroke: currentColor; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; }
+        .hero-name { color: var(--ink); font-size: 21px; font-weight: 900; line-height: 1.1; }
+        .hero-sub { margin-top: 5px; color: var(--muted); font-size: 12px; font-weight: 700; }
+        .pill {
+            min-height: 26px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 9px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+        .pill.success { color: #047857; background: rgba(16,185,129,.13); }
+        .pill.warning { color: #9A3412; background: rgba(245,158,11,.15); }
+        .pill.danger { color: #B91C1C; background: rgba(239,68,68,.12); }
+        .pill.info { color: #1747C8; background: rgba(31,95,255,.11); }
+        .pill.neutral { color: #475569; background: rgba(100,116,139,.10); }
+        .hero-facts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 14px;
+        }
+        .hero-fact {
+            min-width: 0;
+            padding: 10px 11px;
+            border-radius: 14px;
+            background: rgba(255,255,255,.58);
+            border: 1px solid rgba(255,255,255,.84);
+        }
+        .hero-fact span { display: block; color: var(--muted); font-size: 10px; font-weight: 750; }
+        .hero-fact strong { display: block; margin-top: 4px; overflow: hidden; color: var(--ink); font-size: 12px; font-weight: 850; text-overflow: ellipsis; white-space: nowrap; }
+        .hero-alert {
+            display: grid;
+            grid-template-columns: auto minmax(0,1fr);
+            gap: 8px;
+            align-items: start;
+            margin-top: 10px;
+            padding: 10px 11px;
+            border-radius: 14px;
+            background: rgba(255,255,255,.58);
+            border: 1px solid rgba(255,255,255,.84);
+        }
+        .hero-alert strong { color: var(--ink); font-size: 12px; font-weight: 800; line-height: 1.45; }
+        .quick-actions { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; margin-top: 12px; }
+        .quick-button {
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            border-radius: 12px;
+            border: 1px solid rgba(31,95,255,.16);
+            color: var(--brand);
+            background: rgba(255,255,255,.66);
+            font-size: 12px;
+            font-weight: 800;
+            transition: transform .16s ease, background .16s ease;
+        }
+        .quick-button.primary { color: #fff; background: var(--brand); box-shadow: 0 8px 16px rgba(31,95,255,.18); }
+        .quick-button svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+
+        .tab-dock {
+            position: sticky;
+            top: 0;
+            z-index: 25;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 6px;
+            margin: 12px 0;
+            padding: 7px;
+            border-radius: 18px;
+            background: rgba(239,246,255,.88);
+            border: 1px solid rgba(255,255,255,.86);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 8px 20px rgba(31,95,255,.05);
+        }
+        .tab-button {
+            min-height: 38px;
+            border: 1px solid transparent;
+            border-radius: 11px;
+            color: #52637E;
+            background: transparent;
+            font-size: 12px;
+            font-weight: 800;
+            transition: transform .16s ease, color .16s ease, background .16s ease, box-shadow .16s ease;
+        }
+        .tab-button[aria-selected="true"] {
+            color: #fff;
+            background: var(--brand);
+            box-shadow: 0 7px 14px rgba(31,95,255,.18);
+        }
+
+        .panel-stack { display: grid; gap: 12px; animation: panelIn .26s cubic-bezier(.2,.75,.25,1); }
+        .section-card { overflow: hidden; border-radius: 20px; }
+        .section-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 15px 16px 11px;
+        }
+        .section-title { color: var(--ink); font-size: 16px; font-weight: 900; }
+        .section-note { margin-top: 3px; color: var(--muted); font-size: 11px; font-weight: 650; line-height: 1.35; }
+        .soft-action {
+            min-height: 34px;
+            padding: 0 11px;
+            border: 1px solid var(--brand-border);
+            border-radius: 10px;
+            color: var(--brand);
+            background: var(--brand-soft);
+            font-size: 11px;
+            font-weight: 800;
+        }
+        .info-list { padding: 0 16px 4px; }
+        .info-row {
+            min-width: 0;
+            display: grid;
+            grid-template-columns: 92px minmax(0,1fr);
+            gap: 10px;
+            align-items: center;
+            min-height: 48px;
+            padding: 10px 0;
+            border-top: 1px solid var(--line);
+        }
+        .info-row.stacked { grid-template-columns: 1fr; align-items: start; gap: 7px; }
+        .info-label { color: var(--muted); font-size: 12px; font-weight: 750; line-height: 1.4; }
+        .info-value { min-width: 0; color: var(--ink); font-size: 13px; font-weight: 800; line-height: 1.5; text-align: right; word-break: break-word; }
+        .info-row.stacked .info-value { text-align: left; }
+        .empty-value { color: var(--danger); }
+        .edit-control {
+            width: 100%;
+            min-width: 0;
+            min-height: 40px;
+            padding: 9px 11px;
+            border: 1px solid rgba(31,95,255,.16);
+            border-radius: 11px;
+            outline: none;
+            color: var(--ink);
+            background: rgba(255,255,255,.76);
+            font-size: 13px;
+            font-weight: 750;
+            text-align: right;
+        }
+        textarea.edit-control { min-height: 76px; resize: vertical; text-align: left; }
+        .info-row.stacked .edit-control { text-align: left; }
+
+        .metric-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; padding: 0 16px 14px; }
+        .metric-card { padding: 12px; border-radius: 15px; background: rgba(247,250,255,.76); border: 1px solid rgba(31,95,255,.08); }
+        .metric-card span { color: var(--muted); font-size: 11px; font-weight: 750; }
+        .metric-card strong { display: block; margin-top: 5px; color: var(--ink); font-size: 18px; font-weight: 900; }
+        .metric-card small { color: var(--muted); font-size: 10px; font-weight: 700; }
+
+        .subcard-list { display: grid; gap: 9px; padding: 0 16px 14px; }
+        .subcard { padding: 13px; border-radius: 17px; background: rgba(247,250,255,.78); border: 1px solid rgba(31,95,255,.09); }
+        .subcard-title { color: var(--ink); font-size: 14px; font-weight: 900; }
+        .subcard-meta { margin-top: 5px; color: var(--muted); font-size: 11px; font-weight: 700; line-height: 1.5; }
+        .subcard-line { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 9px; color: var(--body); font-size: 12px; font-weight: 750; }
+        .score { color: var(--brand); font-size: 27px; font-weight: 950; line-height: 1; }
+
+        .material-row {
+            display: grid;
+            grid-template-columns: minmax(0,1fr) auto;
+            gap: 10px;
+            align-items: center;
+            min-height: 64px;
+            padding: 11px 0;
+            border-top: 1px solid var(--line);
+        }
+        .material-name { color: var(--ink); font-size: 13px; font-weight: 850; }
+        .material-meta { margin-top: 4px; color: var(--muted); font-size: 10px; font-weight: 650; }
+        .material-side { display: flex; align-items: center; gap: 6px; }
+
+        .permission-card { padding: 14px 16px 16px; }
+        .permission-button {
+            width: 100%;
+            min-height: 58px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 12px 13px;
+            border: 1px solid rgba(100,116,139,.18);
+            border-radius: 15px;
+            color: var(--ink);
+            background: rgba(248,250,252,.76);
+            text-align: left;
+        }
+        .permission-button span { display: block; color: var(--muted); font-size: 10px; font-weight: 750; }
+        .permission-button strong { display: block; margin-top: 3px; font-size: 12px; font-weight: 850; line-height: 1.4; }
+        .permission-button svg { width: 18px; height: 18px; flex: 0 0 auto; fill: none; stroke: var(--brand); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+
+        .edit-footer { display: grid; grid-template-columns: 1fr 1.4fr; gap: 9px; margin-top: 12px; }
+        .footer-button { min-height: 48px; border-radius: 13px; font-size: 13px; font-weight: 850; }
+        .footer-button.cancel { border: 1px solid rgba(100,116,139,.16); color: var(--muted); background: rgba(255,255,255,.66); }
+        .footer-button.save { border: 0; color: #fff; background: var(--brand); box-shadow: 0 8px 18px rgba(31,95,255,.20); }
+
+        .toast {
+            position: absolute;
+            z-index: 90;
+            left: 50%;
+            bottom: 28px;
+            max-width: calc(100% - 40px);
+            padding: 11px 15px;
+            border-radius: 13px;
+            color: #fff;
+            background: rgba(17,24,39,.88);
+            box-shadow: 0 12px 28px rgba(15,23,42,.22);
+            font-size: 12px;
+            font-weight: 750;
+            line-height: 1.4;
+            text-align: center;
+            opacity: 0;
+            visibility: hidden;
+            transform: translate(-50%, 12px);
+            transition: opacity .2s ease, transform .2s ease, visibility .2s;
+            backdrop-filter: blur(14px);
+        }
+        .toast.show { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+
+        .dialog-layer {
+            position: absolute;
+            z-index: 100;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(15,23,42,.38);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        .dialog-layer[hidden] { display: none; }
+        .dialog {
+            width: 100%;
+            max-height: 78%;
+            overflow-y: auto;
+            padding: 20px;
+            border-radius: 22px;
+            background: rgba(255,255,255,.92);
+            border: 1px solid rgba(255,255,255,.96);
+            box-shadow: 0 24px 60px rgba(15,23,42,.20);
+            scrollbar-width: none;
+        }
+        .dialog::-webkit-scrollbar { display: none; }
+        .dialog-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+        .dialog-title { color: var(--ink); font-size: 18px; font-weight: 900; }
+        .dialog-desc { margin-top: 7px; color: var(--muted); font-size: 12px; font-weight: 650; line-height: 1.55; }
+        .dialog-close { width: 36px; height: 36px; flex: 0 0 36px; display: grid; place-items: center; border: 0; border-radius: 12px; color: var(--muted); background: rgba(100,116,139,.08); }
+        .dialog-close svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; }
+        .dialog-body { display: grid; gap: 12px; margin-top: 16px; }
+        .dialog-field label { display: block; margin-bottom: 6px; color: var(--body); font-size: 12px; font-weight: 800; }
+        .dialog-field input, .dialog-field select, .dialog-field textarea {
+            width: 100%;
+            min-height: 44px;
+            padding: 10px 12px;
+            border: 1px solid rgba(31,95,255,.15);
+            border-radius: 12px;
+            outline: none;
+            color: var(--ink);
+            background: rgba(248,250,252,.88);
+            font-size: 13px;
+            font-weight: 700;
+        }
+        .dialog-field textarea { min-height: 78px; resize: vertical; }
+        .dialog-actions { display: grid; grid-template-columns: 1fr 1.35fr; gap: 9px; margin-top: 18px; }
+        .dialog-button { min-height: 46px; border-radius: 13px; font-size: 13px; font-weight: 850; }
+        .dialog-button.cancel { border: 1px solid rgba(100,116,139,.14); color: var(--muted); background: rgba(248,250,252,.88); }
+        .dialog-button.confirm { border: 0; color: #fff; background: var(--brand); box-shadow: 0 8px 16px rgba(31,95,255,.18); }
+        .dialog-button.danger { background: var(--danger); }
+
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+        :focus-visible { outline: 3px solid rgba(31,95,255,.30); outline-offset: 3px; }
+        .edit-control:focus, .dialog-field input:focus, .dialog-field select:focus, .dialog-field textarea:focus { border-color: rgba(31,95,255,.45); box-shadow: 0 0 0 3px rgba(31,95,255,.09); }
+
+        @keyframes panelIn { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+            button:active { transform: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="device" id="device">
+        <header class="topbar" aria-label="页面导航">
+            <button type="button" class="nav-button" id="backButton" aria-label="返回学生列表">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <h1 class="nav-title">学生详情</h1>
+            <button type="button" class="nav-action" id="editButton" aria-label="编辑学生档案">编辑</button>
+        </header>
+
+        <main class="scroll-area" id="scrollArea">
+            <div id="heroRoot"></div>
+
+            <div class="tab-dock" role="tablist" aria-label="学生档案分区" aria-describedby="tabHint">
+                <span class="sr-only" id="tabHint">可使用方向键、Home 和 End 键切换分区</span>
+                <button type="button" class="tab-button" id="tab-identity" role="tab" aria-selected="true" aria-controls="panelRoot" tabindex="0" data-tab="identity">身份</button>
+                <button type="button" class="tab-button" id="tab-school" role="tab" aria-selected="false" aria-controls="panelRoot" tabindex="-1" data-tab="school">学籍</button>
+                <button type="button" class="tab-button" id="tab-family" role="tab" aria-selected="false" aria-controls="panelRoot" tabindex="-1" data-tab="family">家校</button>
+                <button type="button" class="tab-button" id="tab-health" role="tab" aria-selected="false" aria-controls="panelRoot" tabindex="-1" data-tab="health">健康</button>
+                <button type="button" class="tab-button" id="tab-grades" role="tab" aria-selected="false" aria-controls="panelRoot" tabindex="-1" data-tab="grades">成绩</button>
+                <button type="button" class="tab-button" id="tab-materials" role="tab" aria-selected="false" aria-controls="panelRoot" tabindex="-1" data-tab="materials">材料</button>
+            </div>
+
+            <section id="panelRoot" role="tabpanel" aria-labelledby="tab-identity"></section>
+            <div id="editFooterRoot"></div>
+        </main>
+
+        <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+        <div class="dialog-layer" id="dialogLayer" hidden>
+            <section class="dialog" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle" aria-describedby="dialogDesc" tabindex="-1">
+                <div class="dialog-top">
+                    <div>
+                        <h2 class="dialog-title" id="dialogTitle"></h2>
+                        <p class="dialog-desc" id="dialogDesc"></p>
+                    </div>
+                    <button type="button" class="dialog-close" id="dialogClose" aria-label="关闭弹窗">
+                        <svg aria-hidden="true" viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg>
+                    </button>
+                </div>
+                <div class="dialog-body" id="dialogBody"></div>
+                <div class="dialog-actions">
+                    <button type="button" class="dialog-button cancel" id="dialogCancel">取消</button>
+                    <button type="button" class="dialog-button confirm" id="dialogConfirm">确认</button>
+                </div>
+            </section>
+        </div>
+
+        <input type="file" id="materialFileInput" class="sr-only" accept="image/*,.pdf" aria-label="选择需要补传的学生材料">
+    </div>
+
+    <script>
+        const student = {
+            id: 'STU2026240301',
+            name: '林知夏',
+            gender: '女',
+            age: '16',
+            birthDate: '2010-03-18',
+            studentNo: '2026240301',
+            phone: '138 2516 3201',
+            phoneRaw: '13825163201',
+            educationMode: '全日制',
+            admissionStatus: '通过',
+            admissionMethod: '自主招生',
+            examNo: 'ZK2026031856',
+            graduationSchool: '深圳市龙华区实验学校',
+            graduationClass: '九年级 6 班',
+            idType: '居民身份证',
+            idNumber: '440306201003182428',
+            ethnicity: '汉族',
+            politicalStatus: '群众',
+            householdType: '非农业家庭户',
+            householdLocation: '广东省深圳市龙华区',
+            major: '护理',
+            className: '护理 2403 班',
+            entryDate: '2026-09-01',
+            graduationDate: '2029-06-30',
+            studentStatus: '正常在读',
+            statusChangedAt: '2026-09-01',
+            statusReason: '新生入学建档',
+            registrationStatus: '已注册',
+            internshipStatus: '未实习',
+            suspensionStatus: '正常',
+            workStudyStatus: '参与中',
+            schoolRollNo: 'XJ440306240301',
+            registeredGrade: '2026 级',
+            registeredClass: '护理 2403 班',
+            registeredTerm: '2026-2027 学年第一学期',
+            classPlan: '护理专业人才培养方案（2026版）',
+            personalPlans: ['护理技能强化计划', '英语提升计划'],
+            guardianName: '林晓云',
+            guardianPhone: '139 5481 8123',
+            guardianPhoneRaw: '13954818123',
+            emergencyName: '林叔华',
+            emergencyPhone: '137 6108 1088',
+            emergencyPhoneRaw: '13761081088',
+            address: '广东省深圳市龙华区民治街道民丰路 28 号 3 栋 502',
+            email: 'linzhixia@example.edu.cn',
+            wechat: 'LZX_240301',
+            qq: '待补充',
+            familyEconomy: '普通家庭',
+            parentsSeparated: '否',
+            learningStyle: '视觉 + 实操型',
+            personality: '细致稳重',
+            emotion: '稳定',
+            hobbies: '手帐、羽毛球',
+            skills: '护理礼仪、基础急救',
+            family: [
+                { relation: '母亲', name: '林晓云', education: '本科', job: '会计', phone: '139 5481 8123', phoneRaw: '13954818123', guardian: true },
+                { relation: '父亲', name: '林叔华', education: '大专', job: '工程监理', phone: '137 6108 1088', phoneRaw: '13761081088', guardian: false }
+            ],
+            healthStatus: '良好',
+            height: '163',
+            weight: '52',
+            bloodType: 'A 型',
+            leftVision: '4.8',
+            rightVision: '4.9',
+            allergies: '青霉素轻微过敏',
+            medicalHistory: '无',
+            healthFollowUp: '确认视力复查结果并同步校医室',
+            healthRecords: [
+                { date: '2026-04-18', conclusion: '体检结论合格，可正常参加护理实训', height: '163', weight: '52', status: '已归档' },
+                { date: '2025-10-12', conclusion: '常规项目正常，建议控制连续用眼时长', height: '161', weight: '50', status: '已归档' }
+            ],
+            grades: [
+                { subject: '语文', score: '88', examType: '中考成绩', date: '2026-06-22' },
+                { subject: '数学', score: '91', examType: '中考成绩', date: '2026-06-22' },
+                { subject: '护理基础', score: '92', examType: '入学摸底', date: '2026-09-08' }
+            ],
+            attachments: [
+                { name: '身份证正反面', status: '审核通过', updatedAt: '2026-06-18', note: '图像清晰' },
+                { name: '报考协议', status: '审核通过', updatedAt: '2026-06-18', note: '签字页完整' },
+                { name: '户口本主页与本人页', status: '审核不通过', updatedAt: '2026-07-05', note: '缺少完整户主页' },
+                { name: '春季体检报告', status: '已上传', updatedAt: '2026-04-18', note: '等待校医室复核' }
+            ],
+            account: { username: '13825163201', enabled: true, lastLogin: '2026-07-09 20:16' },
+            updatedAt: '2026-07-10 09:42',
+            nextAction: '补传完整户口本主页，并确认视力复查结果'
+        };
+
+        const state = {
+            activeTab: 'identity',
+            editMode: false,
+            draft: null,
+            permissionUnlocked: false,
+            dialogAction: null,
+            dialogReturnFocus: null,
+            materialIndex: null
+        };
+
+        const tabOrder = ['identity', 'school', 'family', 'health', 'grades', 'materials'];
+        const heroRoot = document.getElementById('heroRoot');
+        const panelRoot = document.getElementById('panelRoot');
+        const editFooterRoot = document.getElementById('editFooterRoot');
+        const editButton = document.getElementById('editButton');
+        const scrollArea = document.getElementById('scrollArea');
+        const toast = document.getElementById('toast');
+        const dialogLayer = document.getElementById('dialogLayer');
+        const dialog = document.getElementById('dialog');
+        const dialogTitle = document.getElementById('dialogTitle');
+        const dialogDesc = document.getElementById('dialogDesc');
+        const dialogBody = document.getElementById('dialogBody');
+        const dialogConfirm = document.getElementById('dialogConfirm');
+        const materialFileInput = document.getElementById('materialFileInput');
+
+        function clone(value) { return JSON.parse(JSON.stringify(value)); }
+        function currentData() { return state.editMode ? state.draft : student; }
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]);
+        }
+        function slug(value) { return String(value).replace(/[^a-zA-Z0-9_-]/g, '-'); }
+        function getPath(source, path) {
+            return String(path).split('.').reduce((value, key) => value == null ? '' : value[key], source);
+        }
+        function setPath(source, path, value) {
+            const keys = String(path).split('.');
+            const last = keys.pop();
+            const target = keys.reduce((object, key) => object[key], source);
+            target[last] = value;
+        }
+        function maskId(value) {
+            const text = String(value || '');
+            return state.permissionUnlocked ? text.replace(/(.{6})(.*)(.{4})/, '$1 $2 $3') : text.replace(/(.{6}).*(.{4})/, '$1********$2');
+        }
+        function pill(text, tone = 'info') { return `<span class="pill ${tone}">${escapeHtml(text)}</span>`; }
+        function statusTone(text) {
+            if (/通过|正常|已注册|已归档|良好|启用/.test(text)) return 'success';
+            if (/不通过|异常|停用|休学/.test(text)) return 'danger';
+            if (/待|参与|实习/.test(text)) return 'warning';
+            return 'info';
+        }
+        function icon(name) {
+            const paths = {
+                phone: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.11 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.72c.12.9.35 1.78.68 2.62a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.46-1.24a2 2 0 0 1 2.11-.45c.84.33 1.72.56 2.62.68A2 2 0 0 1 22 16.92z"></path>',
+                guardian: '<circle cx="12" cy="7" r="4"></circle><path d="M5.5 21a6.5 6.5 0 0 1 13 0"></path>',
+                export: '<path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M5 21h14"></path>'
+            };
+            return `<svg aria-hidden="true" viewBox="0 0 24 24">${paths[name] || ''}</svg>`;
+        }
+
+        function renderHero() {
+            const data = currentData();
+            heroRoot.innerHTML = `
+                <section class="hero glass" aria-label="学生概览">
+                    <div class="flex items-start gap-3 relative z-10">
+                        <div class="avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <h2 class="hero-name">${escapeHtml(data.name)}</h2>
+                                ${pill(data.studentStatus, statusTone(data.studentStatus))}
+                            </div>
+                            <p class="hero-sub">${escapeHtml(data.className)} · ${escapeHtml(data.major)}</p>
+                        </div>
+                    </div>
+                    <div class="hero-facts">
+                        <div class="hero-fact"><span>学生学号</span><strong>${escapeHtml(data.studentNo)}</strong></div>
+                        <div class="hero-fact"><span>最近更新</span><strong>${escapeHtml(data.updatedAt)}</strong></div>
+                    </div>
+                    <div class="hero-alert"><span class="pill warning">待补充</span><strong>${escapeHtml(data.nextAction)}</strong></div>
+                    <div class="quick-actions">
+                        <button type="button" class="quick-button primary" data-action="call-student">${icon('phone')}<span>拨打学生</span></button>
+                        <button type="button" class="quick-button" data-action="call-guardian">${icon('guardian')}<span>联系监护</span></button>
+                        <button type="button" class="quick-button" data-action="export">${icon('export')}<span>导出档案</span></button>
+                    </div>
+                </section>`;
+        }
+
+        function renderControl(label, path, options = {}) {
+            const data = currentData();
+            const value = getPath(data, path);
+            const stacked = options.stacked ? ' stacked' : '';
+            const id = `edit-${slug(path)}`;
+            if (!state.editMode || options.readonly) {
+                const display = options.display ? options.display(value, data) : (value || '待补充');
+                const empty = !value || value === '待补充' ? ' empty-value' : '';
+                return `<div class="info-row${stacked}"><span class="info-label">${escapeHtml(label)}</span><strong class="info-value${empty}">${options.rawHtml ? display : escapeHtml(display)}</strong></div>`;
+            }
+            let control;
+            if (options.type === 'select') {
+                control = `<select class="edit-control" id="${id}" data-path="${escapeHtml(path)}">${(options.choices || []).map(choice => `<option${String(value) === String(choice) ? ' selected' : ''}>${escapeHtml(choice)}</option>`).join('')}</select>`;
+            } else if (options.type === 'textarea') {
+                control = `<textarea class="edit-control" id="${id}" data-path="${escapeHtml(path)}">${escapeHtml(value)}</textarea>`;
+            } else {
+                control = `<input class="edit-control" id="${id}" type="${escapeHtml(options.type || 'text')}" data-path="${escapeHtml(path)}" value="${escapeHtml(value)}">`;
+            }
+            return `<div class="info-row${stacked}"><label class="info-label" for="${id}">${escapeHtml(label)}</label><div class="info-value">${control}</div></div>`;
+        }
+
+        function card(title, subtitle, content, action = '') {
+            return `<section class="section-card glass"><div class="section-head"><div><h2 class="section-title">${escapeHtml(title)}</h2>${subtitle ? `<p class="section-note">${escapeHtml(subtitle)}</p>` : ''}</div>${action}</div>${content}</section>`;
+        }
+
+        function renderIdentity() {
+            const basic = `<div class="info-list">
+                ${renderControl('学生姓名', 'name')}${renderControl('性别', 'gender', { type: 'select', choices: ['男','女'] })}
+                ${renderControl('出生日期', 'birthDate', { type: 'date' })}${renderControl('年龄', 'age')}
+                ${renderControl('学生学号', 'studentNo')}${renderControl('就读方式', 'educationMode', { type: 'select', choices: ['全日制','校企协同'] })}
+                ${renderControl('专业', 'major')}${renderControl('联系电话', 'phone', { type: 'tel' })}
+            </div>`;
+            const identity = `<div class="info-list">
+                ${renderControl('证件类型', 'idType', { type: 'select', choices: ['居民身份证','户口本','护照','其他'] })}
+                ${renderControl('证件号码', 'idNumber', { readonly: !state.permissionUnlocked, display: value => maskId(value) })}
+                ${renderControl('民族', 'ethnicity')}${renderControl('政治面貌', 'politicalStatus')}
+                ${renderControl('户口性质', 'householdType')}${renderControl('户口所在地', 'householdLocation', { stacked: true })}
+                ${renderControl('招生方式', 'admissionMethod')}${renderControl('准考证号', 'examNo')}
+                ${renderControl('毕业学校', 'graduationSchool', { stacked: true })}${renderControl('原毕业班级', 'graduationClass')}
+            </div>`;
+            const permission = !state.permissionUnlocked ? `<div class="permission-card"><button type="button" class="permission-button" data-action="unlock-sensitive" aria-describedby="identityPermissionHint"><div><span>受保护字段</span><strong id="identityPermissionHint">证件号码已脱敏，确认权限后可查看与编辑</strong></div><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="9" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg></button></div>` : '';
+            return `<div class="panel-stack">${card('个人基本信息','学生主档的高频识别信息',basic)}${card('身份与生源','后台身份、户籍和招生字段',identity + permission)}</div>`;
+        }
+
+        function renderSchool() {
+            const data = currentData();
+            const status = `<div class="px-4 pb-3 flex flex-wrap gap-2">${pill(data.studentStatus,statusTone(data.studentStatus))}${pill(data.registrationStatus,statusTone(data.registrationStatus))}${pill(data.internshipStatus,statusTone(data.internshipStatus))}${pill(data.suspensionStatus,statusTone(data.suspensionStatus))}${pill(data.workStudyStatus,statusTone(data.workStudyStatus))}</div>`;
+            const roll = `<div class="info-list">
+                ${renderControl('学生状态','studentStatus',{type:'select',choices:['正常在读','顶岗实习','休学保留学籍','已毕业']})}
+                ${renderControl('入学日期','entryDate',{type:'date'})}${renderControl('毕业日期','graduationDate',{type:'date'})}
+                ${renderControl('变动日期','statusChangedAt',{type:'date'})}${renderControl('变动原因','statusReason',{type:'textarea',stacked:true})}
+                ${renderControl('学籍号','schoolRollNo')}${renderControl('学籍注册','registrationStatus',{type:'select',choices:['已注册','未注册','暂停注册']})}
+                ${renderControl('实习状态','internshipStatus',{type:'select',choices:['未实习','实习中','已完成']})}
+                ${renderControl('休学状态','suspensionStatus',{type:'select',choices:['正常','休学中']})}
+                ${renderControl('勤工俭学','workStudyStatus',{type:'select',choices:['未申请','参与中']})}
+            </div>`;
+            const classInfo = `<div class="info-list">
+                ${renderControl('注册年级','registeredGrade')}${renderControl('注册班级','registeredClass')}
+                ${renderControl('注册学期','registeredTerm',{stacked:true})}${renderControl('班级培养计划','classPlan',{type:'textarea',stacked:true})}
+                ${renderControl('个人培养计划','personalPlans',{type:'textarea',stacked:true,display:value => Array.isArray(value) ? value.join('、') : value})}
+            </div>`;
+            return `<div class="panel-stack">${card('学籍状态','查看与维护完整学籍生命周期',status + roll)}${card('班级与培养计划','班级归属及培养方案配置结果',classInfo)}</div>`;
+        }
+
+        function renderFamily() {
+            const data = currentData();
+            const contact = `<div class="info-list">
+                ${renderControl('学生电话','phone',{type:'tel'})}${renderControl('现居地址','address',{type:'textarea',stacked:true})}
+                ${renderControl('电子邮箱','email',{type:'email'})}${renderControl('微信号','wechat')}${renderControl('QQ号','qq')}
+                ${renderControl('紧急联系人','emergencyName')}${renderControl('紧急电话','emergencyPhone',{type:'tel'})}
+            </div>`;
+            const members = data.family.map((member,index) => `<article class="subcard"><div class="flex items-start justify-between gap-2"><div><div class="flex items-center gap-2 flex-wrap">${pill(member.relation,'neutral')}${member.guardian ? pill('监护人','info') : ''}</div><h3 class="subcard-title mt-2">${escapeHtml(member.name)}</h3><p class="subcard-meta">${escapeHtml(member.education)} · ${escapeHtml(member.job)}</p></div><button type="button" class="soft-action" data-action="call-family" data-phone="${escapeHtml(member.phoneRaw)}" aria-label="拨打${escapeHtml(member.relation)}${escapeHtml(member.name)}电话">拨打</button></div><div class="subcard-line"><span>${escapeHtml(member.phone)}</span><button type="button" class="soft-action" data-action="copy" data-copy="${escapeHtml(member.phoneRaw)}" aria-label="复制${escapeHtml(member.relation)}电话">复制号码</button></div></article>`).join('');
+            let protectedContent;
+            if (state.permissionUnlocked) {
+                protectedContent = `<div class="info-list">${renderControl('家庭经济','familyEconomy')}${renderControl('父母情况','parentsSeparated',{type:'select',choices:['否','是']})}${renderControl('学习风格','learningStyle')}${renderControl('个性特征','personality')}${renderControl('情绪状态','emotion')}${renderControl('兴趣爱好','hobbies',{type:'textarea',stacked:true})}${renderControl('擅长技能','skills',{type:'textarea',stacked:true})}</div>`;
+            } else {
+                protectedContent = `<div class="permission-card"><button type="button" class="permission-button" data-action="unlock-sensitive" aria-describedby="familyPermissionHint"><div><span>敏感信息</span><strong id="familyPermissionHint">家庭经济、父母情况和情绪状态已隐藏</strong></div><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="9" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg></button></div>`;
+            }
+            return `<div class="panel-stack">${card('联系方式','学生与紧急联系人多渠道信息',contact)}${card('家庭成员','共 '+data.family.length+' 位家庭联系人',`<div class="subcard-list">${members}</div>`)}${card('综合档案','人文、学习和家庭敏感字段',protectedContent)}</div>`;
+        }
+
+        function renderHealth() {
+            const data = currentData();
+            const metrics = `<div class="metric-grid"><div class="metric-card"><span>身高</span><strong>${escapeHtml(data.height)}<small> cm</small></strong></div><div class="metric-card"><span>体重</span><strong>${escapeHtml(data.weight)}<small> kg</small></strong></div><div class="metric-card"><span>左 / 右视力</span><strong>${escapeHtml(data.leftVision)} / ${escapeHtml(data.rightVision)}</strong></div><div class="metric-card"><span>血型</span><strong>${escapeHtml(data.bloodType)}</strong></div></div>`;
+            const details = `<div class="info-list">${renderControl('健康状况','healthStatus')}${renderControl('身高（cm）','height',{type:'number'})}${renderControl('体重（kg）','weight',{type:'number'})}${renderControl('血型','bloodType')}${renderControl('左眼视力','leftVision')}${renderControl('右眼视力','rightVision')}${renderControl('过敏信息','allergies',{type:'textarea',stacked:true})}${renderControl('既往病史','medicalHistory',{type:'textarea',stacked:true})}${renderControl('后续提醒','healthFollowUp',{type:'textarea',stacked:true})}</div>`;
+            const records = data.healthRecords.map(record => `<article class="subcard"><div class="flex items-start justify-between gap-2"><div><h3 class="subcard-title">${escapeHtml(record.date)} 体检</h3><p class="subcard-meta">身高 ${escapeHtml(record.height)} cm · 体重 ${escapeHtml(record.weight)} kg</p></div>${pill(record.status,statusTone(record.status))}</div><p class="subcard-meta mt-2">${escapeHtml(record.conclusion)}</p></article>`).join('');
+            const add = `<button type="button" class="soft-action" data-action="add-health">新增记录</button>`;
+            return `<div class="panel-stack">${card('健康概览','最近一次体检核心指标',metrics + details)}${card('历史体检','按时间归档的健康记录',`<div class="subcard-list">${records}</div>`,add)}</div>`;
+        }
+
+        function renderGrades() {
+            const data = currentData();
+            const records = data.grades.map(record => `<article class="subcard"><div class="flex items-start justify-between gap-3"><div><h3 class="subcard-title">${escapeHtml(record.subject)}</h3><p class="subcard-meta">${escapeHtml(record.examType)} · ${escapeHtml(record.date)}</p></div><strong class="score">${escapeHtml(record.score)}</strong></div></article>`).join('');
+            const add = `<button type="button" class="soft-action" data-action="add-grade">新增成绩</button>`;
+            return `<div class="panel-stack">${card('中考与入学成绩','后台科目成绩档案，共 '+data.grades.length+' 条',`<div class="subcard-list">${records}</div>`,add)}</div>`;
+        }
+
+        function renderMaterials() {
+            const data = currentData();
+            const materials = data.attachments.map((item,index) => `<div class="material-row"><div><div class="material-name">${escapeHtml(item.name)}</div><div class="material-meta">${escapeHtml(item.updatedAt)} · ${escapeHtml(item.note)}</div></div><div class="material-side">${pill(item.status,statusTone(item.status))}<button type="button" class="soft-action" data-action="material" data-index="${index}" aria-label="${/不通过|未上传/.test(item.status) ? '补传' : '查看'}${escapeHtml(item.name)}">${/不通过|未上传/.test(item.status) ? '补传' : '查看'}</button></div></div>`).join('');
+            const accountStatus = data.account.enabled ? pill('已启用','success') : pill('已停用','danger');
+            const account = `<div class="info-list"><div class="info-row"><span class="info-label">登录用户名</span><strong class="info-value">${escapeHtml(data.account.username)}</strong></div><div class="info-row"><span class="info-label">账号状态</span><span class="info-value">${accountStatus}</span></div><div class="info-row"><span class="info-label">最后登录</span><strong class="info-value">${escapeHtml(data.account.lastLogin)}</strong></div></div><div class="px-4 pb-4 grid grid-cols-2 gap-2"><button type="button" class="quick-button" data-action="toggle-account">${data.account.enabled ? '停用账号' : '启用账号'}</button><button type="button" class="quick-button" data-action="reset-password">重置密码</button></div>`;
+            return `<div class="panel-stack">${card('证件与材料','材料状态来自后台审核结果',`<div class="info-list">${materials}</div>`)}${card('学生账号','账号启用状态与登录信息',account)}</div>`;
+        }
+
+        function renderPanel() {
+            const renderers = { identity: renderIdentity, school: renderSchool, family: renderFamily, health: renderHealth, grades: renderGrades, materials: renderMaterials };
+            panelRoot.innerHTML = renderers[state.activeTab]();
+            renderEditFooter();
+        }
+
+        function renderEditFooter() {
+            editFooterRoot.innerHTML = state.editMode ? `<div class="edit-footer"><button type="button" class="footer-button cancel" data-action="cancel-edit">取消编辑</button><button type="button" class="footer-button save" data-action="save-edit">保存学生档案</button></div>` : '';
+        }
+
+        function renderAll() {
+            editButton.textContent = state.editMode ? '保存' : '编辑';
+            editButton.classList.toggle('is-saving', state.editMode);
+            editButton.setAttribute('aria-label', state.editMode ? '保存学生档案' : '编辑学生档案');
+            renderHero();
+            renderPanel();
+        }
+
+        function switchTab(tab, focus = false) {
+            if (!tabOrder.includes(tab)) return;
+            state.activeTab = tab;
+            panelRoot.setAttribute('aria-labelledby', `tab-${tab}`);
+            document.querySelectorAll('[role="tab"]').forEach(button => {
+                const active = button.dataset.tab === tab;
+                button.setAttribute('aria-selected', active ? 'true' : 'false');
+                button.tabIndex = active ? 0 : -1;
+            });
+            renderPanel();
+            if (focus) document.getElementById(`tab-${tab}`).focus();
+        }
+
+        let toastTimer;
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 1900);
+        }
+
+        function enterEdit() {
+            state.draft = clone(student);
+            state.editMode = true;
+            renderAll();
+            showToast('已进入编辑模式');
+        }
+
+        function cancelEdit() {
+            state.editMode = false;
+            state.draft = null;
+            renderAll();
+            showToast('已放弃本次修改');
+        }
+
+        function confirmSave() {
+            openDialog({
+                title: '确认保存学生档案？',
+                desc: '保存后会更新基础信息、学籍、家校和健康字段。敏感字段仍受权限控制。',
+                body: `<div class="subcard"><div class="subcard-title">${escapeHtml(state.draft.name)}</div><div class="subcard-meta">${escapeHtml(state.draft.studentNo)} · ${escapeHtml(state.draft.className)}</div></div>`,
+                confirmLabel: '确认保存',
+                onConfirm: () => {
+                    Object.keys(student).forEach(key => delete student[key]);
+                    Object.assign(student, clone(state.draft));
+                    student.updatedAt = new Date().toLocaleString('zh-CN', { hour12: false }).replaceAll('/', '-');
+                    state.editMode = false;
+                    state.draft = null;
+                    renderAll();
+                    showToast('学生档案已保存');
+                }
+            });
+        }
+
+        function openDialog({ title, desc = '', body = '', confirmLabel = '确认', cancelLabel = '取消', danger = false, onConfirm }) {
+            state.dialogReturnFocus = document.activeElement;
+            state.dialogAction = onConfirm || null;
+            dialogTitle.textContent = title;
+            dialogDesc.textContent = desc;
+            dialogBody.innerHTML = body;
+            dialogConfirm.textContent = confirmLabel;
+            document.getElementById('dialogCancel').textContent = cancelLabel;
+            dialogConfirm.classList.toggle('danger', danger);
+            dialogLayer.hidden = false;
+            requestAnimationFrame(() => dialog.focus());
+        }
+
+        function closeDialog() {
+            dialogLayer.hidden = true;
+            dialogBody.innerHTML = '';
+            state.dialogAction = null;
+            if (state.dialogReturnFocus && typeof state.dialogReturnFocus.focus === 'function') state.dialogReturnFocus.focus();
+        }
+
+        function unlockSensitive() {
+            openDialog({
+                title: '查看敏感信息',
+                desc: '证件号码、家庭经济和情绪信息仅限具备学生档案权限的人员查看。',
+                body: '<div class="subcard"><div class="subcard-title">权限提示</div><div class="subcard-meta">本原型以确认操作模拟后台权限校验，正式接入时必须由服务端返回权限结果。</div></div>',
+                confirmLabel: '确认我有权限',
+                onConfirm: () => { state.permissionUnlocked = true; renderPanel(); showToast('敏感信息已解锁'); }
+            });
+        }
+
+        function addHealthDialog() {
+            openDialog({
+                title: '新增体检记录',
+                desc: '记录会追加到学生健康档案中。',
+                body: `<div class="grid grid-cols-2 gap-3"><div class="dialog-field col-span-2"><label for="healthDate">体检日期 *</label><input id="healthDate" type="date" required></div><div class="dialog-field"><label for="healthHeight">身高（cm）</label><input id="healthHeight" type="number" inputmode="decimal" value="${escapeHtml(student.height)}"></div><div class="dialog-field"><label for="healthWeight">体重（kg）</label><input id="healthWeight" type="number" inputmode="decimal" value="${escapeHtml(student.weight)}"></div><div class="dialog-field col-span-2"><label for="healthConclusion">体检结论 *</label><textarea id="healthConclusion" required placeholder="请输入体检结论"></textarea></div></div>`,
+                confirmLabel: '保存记录',
+                onConfirm: () => {
+                    const date = document.getElementById('healthDate');
+                    const conclusion = document.getElementById('healthConclusion');
+                    if (!date.value || !conclusion.value.trim()) { (date.value ? conclusion : date).focus(); showToast('请填写必填项'); return false; }
+                    const data = currentData();
+                    data.healthRecords.unshift({ date: date.value, conclusion: conclusion.value.trim(), height: document.getElementById('healthHeight').value || data.height, weight: document.getElementById('healthWeight').value || data.weight, status: '已归档' });
+                    renderPanel(); showToast(state.editMode ? '体检记录已加入草稿' : '体检记录已新增');
+                }
+            });
+        }
+
+        function addGradeDialog() {
+            openDialog({
+                title: '新增成绩',
+                desc: '用于录入中考或入学考试的单科成绩。',
+                body: `<div class="dialog-field"><label for="gradeSubject">科目名称 *</label><input id="gradeSubject" required placeholder="例如：英语"></div><div class="grid grid-cols-2 gap-3"><div class="dialog-field"><label for="gradeScore">成绩 *</label><input id="gradeScore" type="number" inputmode="decimal" required min="0" max="150"></div><div class="dialog-field"><label for="gradeType">考试类型</label><select id="gradeType"><option>中考成绩</option><option>入学摸底</option></select></div></div><div class="dialog-field"><label for="gradeDate">考试日期 *</label><input id="gradeDate" type="date" required></div>`,
+                confirmLabel: '保存成绩',
+                onConfirm: () => {
+                    const subject = document.getElementById('gradeSubject');
+                    const score = document.getElementById('gradeScore');
+                    const date = document.getElementById('gradeDate');
+                    if (!subject.value.trim() || !score.value || !date.value) { (!subject.value.trim() ? subject : (!score.value ? score : date)).focus(); showToast('请填写必填项'); return false; }
+                    currentData().grades.unshift({ subject: subject.value.trim(), score: score.value, examType: document.getElementById('gradeType').value, date: date.value });
+                    renderPanel(); showToast(state.editMode ? '成绩记录已加入草稿' : '成绩记录已新增');
+                }
+            });
+        }
+
+        function resetPassword() {
+            openDialog({
+                title: '确认重置密码？',
+                desc: '重置后学生需要使用初始密码重新登录。',
+                body: `<div class="subcard"><div class="subcard-title">账号 ${escapeHtml(currentData().account.username)}</div><div class="subcard-meta">该操作应由后台记录操作者与操作时间。</div></div>`,
+                confirmLabel: '重置密码',
+                danger: true,
+                onConfirm: () => showToast('密码已重置为初始密码')
+            });
+        }
+
+        function toggleAccount() {
+            const next = !currentData().account.enabled;
+            openDialog({
+                title: next ? '启用学生账号？' : '停用学生账号？',
+                desc: next ? '启用后学生可正常登录掌上校园。' : '停用后学生将无法登录，但历史数据会保留。',
+                confirmLabel: next ? '确认启用' : '确认停用',
+                danger: !next,
+                onConfirm: () => { currentData().account.enabled = next; renderPanel(); showToast(state.editMode ? '账号状态已加入草稿' : (next ? '学生账号已启用' : '学生账号已停用')); }
+            });
+        }
+
+        function exportProfile() {
+            const data = currentData();
+            const exportData = clone(data);
+            exportData.idNumber = maskId(data.idNumber);
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${data.studentNo}-${data.name}-学生档案.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+            showToast('学生档案已导出');
+        }
+
+        function handleAction(button) {
+            const action = button.dataset.action;
+            if (action === 'call-student') showToast(`正在拨打学生电话 ${currentData().phone}`);
+            if (action === 'call-guardian') showToast(`正在拨打监护人电话 ${currentData().guardianPhone}`);
+            if (action === 'export') exportProfile();
+            if (action === 'unlock-sensitive') unlockSensitive();
+            if (action === 'call-family') showToast(`正在拨打 ${button.dataset.phone}`);
+            if (action === 'copy') navigator.clipboard?.writeText(button.dataset.copy).then(() => showToast('号码已复制')).catch(() => showToast('复制失败，请手动复制'));
+            if (action === 'add-health') addHealthDialog();
+            if (action === 'add-grade') addGradeDialog();
+            if (action === 'reset-password') resetPassword();
+            if (action === 'toggle-account') toggleAccount();
+            if (action === 'cancel-edit') cancelEdit();
+            if (action === 'save-edit') confirmSave();
+            if (action === 'material') {
+                const index = Number(button.dataset.index);
+                const item = currentData().attachments[index];
+                if (/不通过|未上传/.test(item.status)) { state.materialIndex = index; materialFileInput.click(); }
+                else showToast(`已打开 ${item.name}`);
+            }
+        }
+
+        document.querySelectorAll('[role="tab"]').forEach(button => {
+            button.addEventListener('click', () => switchTab(button.dataset.tab));
+            button.addEventListener('keydown', event => {
+                const index = tabOrder.indexOf(button.dataset.tab);
+                let next = index;
+                if (event.key === 'ArrowRight') next = (index + 1) % tabOrder.length;
+                else if (event.key === 'ArrowLeft') next = (index - 1 + tabOrder.length) % tabOrder.length;
+                else if (event.key === 'ArrowDown') next = (index + 3) % tabOrder.length;
+                else if (event.key === 'ArrowUp') next = (index - 3 + tabOrder.length) % tabOrder.length;
+                else if (event.key === 'Home') next = 0;
+                else if (event.key === 'End') next = tabOrder.length - 1;
+                else return;
+                event.preventDefault();
+                switchTab(tabOrder[next], true);
+            });
+        });
+
+        editButton.addEventListener('click', () => state.editMode ? confirmSave() : enterEdit());
+        document.getElementById('backButton').addEventListener('click', () => {
+            if (state.editMode) {
+                openDialog({ title: '放弃本次修改？', desc: '返回后未保存的内容将不会保留。', confirmLabel: '放弃修改', danger: true, onConfirm: cancelEdit });
+            } else showToast('已返回学生列表');
+        });
+
+        document.getElementById('device').addEventListener('click', event => {
+            const button = event.target.closest('[data-action]');
+            if (button) handleAction(button);
+        });
+
+        panelRoot.addEventListener('input', event => {
+            const control = event.target.closest('[data-path]');
+            if (!control || !state.editMode) return;
+            const path = control.dataset.path;
+            if (path === 'personalPlans') state.draft.personalPlans = control.value.split(/[、,，\n]/).map(item => item.trim()).filter(Boolean);
+            else setPath(state.draft, path, control.value);
+            renderHero();
+        });
+
+        materialFileInput.addEventListener('change', () => {
+            const file = materialFileInput.files?.[0];
+            if (!file || state.materialIndex == null) return;
+            const item = currentData().attachments[state.materialIndex];
+            item.status = '待审核';
+            item.updatedAt = new Date().toLocaleDateString('zh-CN').replaceAll('/', '-');
+            item.note = `已补传 ${file.name}`;
+            state.materialIndex = null;
+            materialFileInput.value = '';
+            renderPanel();
+            showToast('材料已补传，等待审核');
+        });
+
+        document.getElementById('dialogClose').addEventListener('click', closeDialog);
+        document.getElementById('dialogCancel').addEventListener('click', closeDialog);
+        dialogConfirm.addEventListener('click', () => {
+            const result = state.dialogAction?.();
+            if (result !== false) closeDialog();
+        });
+        dialogLayer.addEventListener('click', event => { if (event.target === dialogLayer) closeDialog(); });
+        document.addEventListener('keydown', event => {
+            if (dialogLayer.hidden) return;
+            if (event.key === 'Escape') { event.preventDefault(); closeDialog(); return; }
+            if (event.key !== 'Tab') return;
+            const focusable = Array.from(dialog.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')).filter(element => !element.hidden);
+            if (!focusable.length) return;
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+            else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+        });
+
+        renderAll();
+    </script>
+</body>
+</html>
