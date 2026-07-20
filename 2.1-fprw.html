@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#EFF6FF">
-    <title>掌上校园 · 头像日志假条宿舍与考勤体验优化 7.34</title>
+    <title>掌上校园 · 考勤记录与班级日志体验优化 7.36</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -2190,6 +2190,356 @@
         .attendance-table-lock { min-height: 32px; display: grid; place-items: center; color: #94A3B8; font-size: 11px; }
         .attendance-history-empty { padding: 34px 16px; border: 1px solid rgba(255,255,255,.92); border-radius: 18px; color: var(--muted); background: rgba(255,255,255,.70); font-size: 12px; font-weight: 800; text-align: center; }
 
+        /* 7.35：点名、假条、违纪、日志、宿舍与班级看板闭环。 */
+        #rollcallHistoryView,
+        #rollcallRecordView,
+        #disciplineDetailView,
+        #disciplineAddView,
+        #studentLogHistoryView { background: linear-gradient(135deg, #EFF6FF 0%, #DFE7FF 100%); }
+        .workflow-page-scroll {
+            position: absolute;
+            inset: 0;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: 112px 20px 36px;
+            scrollbar-width: none;
+            overscroll-behavior-y: contain;
+            -webkit-overflow-scrolling: touch;
+        }
+        .workflow-page-scroll::-webkit-scrollbar { display: none; }
+
+        /* 全校班级：统计压成一条紧凑信息带。 */
+        .class-summary-card { margin-bottom: 7px; padding: 7px 10px; border-radius: 14px; }
+        .class-summary-inline { min-height: 30px; display: flex; align-items: center; justify-content: space-between; gap: 9px; }
+        .class-summary-inline > strong { flex: 0 0 auto; color: var(--ink); font-size: 11px; font-weight: 950; }
+        .class-summary-inline .class-summary-stats { flex: 1; justify-content: flex-end; gap: 10px; margin: 0; padding: 0; border: 0; }
+        .class-summary-inline .class-summary-stat { gap: 3px; }
+        .class-summary-inline .class-summary-stat strong { font-size: 13px; }
+        .class-summary-inline .class-summary-stat span { font-size: 8.5px; }
+
+        /* 班级概览：均分分段着色、排名变化置顶、考勤分母统一。 */
+        .class-dashboard-focus { transition: border-color .2s ease, background .2s ease; }
+        .class-dashboard-focus.score-excellent { border-color: rgba(16,185,129,.18); background: linear-gradient(145deg,rgba(16,185,129,.14),rgba(255,255,255,.76)); }
+        .class-dashboard-focus.score-good { border-color: rgba(31,95,255,.18); background: linear-gradient(145deg,rgba(31,95,255,.14),rgba(255,255,255,.76)); }
+        .class-dashboard-focus.score-watch { border-color: rgba(245,158,11,.20); background: linear-gradient(145deg,rgba(245,158,11,.15),rgba(255,255,255,.76)); }
+        .class-dashboard-focus.score-risk { border-color: rgba(239,68,68,.18); background: linear-gradient(145deg,rgba(239,68,68,.13),rgba(255,255,255,.76)); }
+        .class-dashboard-focus.score-excellent .class-dashboard-focus-value strong { color: #059669; }
+        .class-dashboard-focus.score-good .class-dashboard-focus-value strong { color: var(--brand); }
+        .class-dashboard-focus.score-watch .class-dashboard-focus-value strong { color: #D97706; }
+        .class-dashboard-focus.score-risk .class-dashboard-focus-value strong { color: #DC2626; }
+        .class-dashboard-rank { justify-content: center; }
+        .class-dashboard-rank > span { position: absolute; top: 13px; left: 11px; }
+        .class-dashboard-rank > em { position: absolute; top: 10px; right: 9px; margin: 0; }
+        .class-dashboard-rank > div { margin-top: 18px; }
+        .class-dashboard-secondary { align-items: stretch; }
+        .class-attendance-day { min-width: 0; padding: 9px 10px; border: 1px solid rgba(31,95,255,.07); border-radius: 13px; background: rgba(255,255,255,.60); }
+        .class-attendance-day > span { display: block; margin-bottom: 6px; color: var(--ink); font-size: 9.5px; font-weight: 950; }
+        .class-attendance-line { display: flex; align-items: baseline; justify-content: space-between; gap: 7px; }
+        .class-attendance-line + .class-attendance-line { margin-top: 5px; padding-top: 5px; border-top: 1px solid rgba(15,23,42,.055); }
+        .class-attendance-line small { color: var(--muted); font-size: 8.5px; font-weight: 850; }
+        .class-attendance-line strong { color: var(--ink); font-size: 12px; font-weight: 950; font-variant-numeric: tabular-nums; }
+        .class-attendance-line.late strong { color: #D97706; }
+        .class-attendance-line.absent strong { color: #DC2626; }
+
+        /* 班级信息：培养方案、开班日期与教室合并为单张紧凑名片。 */
+        .class-info-compact { min-height: 104px; display: grid; grid-template-columns: minmax(0,1fr) 112px; grid-template-rows: 1fr 1fr; gap: 0; }
+        .class-info-plan { grid-row: 1 / 3; display: flex; flex-direction: column; justify-content: center; padding: 18px; border-right: 1px solid rgba(15,23,42,.06); }
+        .class-info-plan span { color: var(--brand); font-size: 10px; font-weight: 900; }
+        .class-info-plan strong { margin-top: 7px; color: var(--ink); font-size: 19px; font-weight: 950; line-height: 1.2; }
+        .class-info-date,
+        .class-info-room { min-width: 0; display: flex; align-items: center; justify-content: flex-end; gap: 5px; padding: 0 14px; text-align: right; }
+        .class-info-date { border-bottom: 1px solid rgba(15,23,42,.06); }
+        .class-info-date strong { color: var(--ink); font-size: 11px; font-weight: 950; font-variant-numeric: tabular-nums; }
+        .class-info-date small { color: var(--muted); font-size: 8px; font-weight: 850; }
+        .class-info-room strong { overflow: hidden; color: var(--brand); font-size: 12px; font-weight: 950; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* 实时点名：课次、看板、异常姓名与批量操作。 */
+        .rollcall-session-card { position: relative; overflow: hidden; padding: 15px 16px; border: 1px solid rgba(255,255,255,.92); border-radius: 21px; background: linear-gradient(145deg,rgba(31,95,255,.13),rgba(255,255,255,.76)); box-shadow: var(--shadow); }
+        .rollcall-session-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+        .rollcall-session-copy { min-width: 0; }
+        .rollcall-session-copy span { display: block; color: var(--brand); font-size: 10px; font-weight: 950; letter-spacing: .08em; }
+        .rollcall-session-copy strong { display: block; margin-top: 5px; overflow: hidden; color: var(--ink); font-size: 18px; font-weight: 950; text-overflow: ellipsis; white-space: nowrap; }
+        .rollcall-session-copy small { display: block; margin-top: 4px; color: var(--muted); font-size: 9.5px; font-weight: 800; }
+        .rollcall-session-trigger { flex: 0 0 auto; min-height: 32px; display: inline-flex; align-items: center; gap: 5px; padding: 0 10px; border: 1px solid rgba(31,95,255,.15); border-radius: 10px; color: var(--brand); background: rgba(255,255,255,.72); font-size: 9.5px; font-weight: 950; }
+        .rollcall-session-trigger svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+        .rollcall-dashboard { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 6px; margin-top: 12px; }
+        .rollcall-metric { min-width: 0; padding: 9px 3px 8px; border: 1px solid rgba(255,255,255,.90); border-radius: 12px; background: rgba(255,255,255,.66); text-align: center; }
+        .rollcall-metric strong { display: block; color: var(--ink); font-size: 18px; font-weight: 950; line-height: 1; font-variant-numeric: tabular-nums; }
+        .rollcall-metric span { display: block; margin-top: 4px; color: var(--muted); font-size: 8.5px; font-weight: 850; }
+        .rollcall-metric.present strong { color: #059669; }
+        .rollcall-metric.late strong { color: #D97706; }
+        .rollcall-metric.leave strong { color: var(--brand); }
+        .rollcall-metric.absent strong { color: #DC2626; }
+        .rollcall-exceptions { margin-top: 9px; padding: 10px 11px; border: 1px solid rgba(255,255,255,.88); border-radius: 14px; background: rgba(255,255,255,.56); }
+        .rollcall-exception-row { display: grid; grid-template-columns: 40px minmax(0,1fr); gap: 8px; align-items: start; }
+        .rollcall-exception-row + .rollcall-exception-row { margin-top: 7px; }
+        .rollcall-exception-row > span { padding: 3px 5px; border-radius: 6px; font-size: 8px; font-weight: 950; text-align: center; }
+        .rollcall-exception-row > p { margin: 1px 0 0; color: var(--body); font-size: 9.5px; font-weight: 850; line-height: 1.45; }
+        .rollcall-exception-row.late > span { color: #B45309; background: rgba(245,158,11,.13); }
+        .rollcall-exception-row.leave > span { color: #1747C8; background: rgba(31,95,255,.11); }
+        .rollcall-exception-row.absent > span { color: #B91C1C; background: rgba(239,68,68,.11); }
+        .rollcall-all-present { display: flex; align-items: center; gap: 7px; color: #047857; font-size: 10px; font-weight: 900; }
+        .rollcall-all-present::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 4px rgba(16,185,129,.10); }
+        .rollcall-bulk-actions { display: grid; grid-template-columns: 1fr 1fr 1.18fr; gap: 7px; margin-top: 10px; }
+        .rollcall-bulk-button { min-width: 0; height: 35px; padding: 0 6px; border: 1px solid rgba(31,95,255,.14); border-radius: 11px; color: var(--brand); background: rgba(255,255,255,.70); font-size: 9.5px; font-weight: 950; }
+        .rollcall-bulk-button.present { color: #047857; border-color: rgba(16,185,129,.18); background: rgba(16,185,129,.10); }
+        .rollcall-bulk-button.absent { color: #B91C1C; border-color: rgba(239,68,68,.18); background: rgba(239,68,68,.09); }
+        .rollcall-bulk-button.history { color: #fff; border-color: var(--brand); background: var(--brand); box-shadow: 0 7px 15px rgba(31,95,255,.18); }
+        .rollcall-toolbar { margin-top: 11px; padding-top: 9px; }
+        .rollcall-session-editor { display: grid; gap: 14px; text-align: left; }
+        .rollcall-session-field label { display: block; margin-bottom: 7px; color: var(--ink); font-size: 11px; font-weight: 950; }
+        .rollcall-week-input { width: 100%; height: 44px; padding: 0 13px; border: 1px solid rgba(31,95,255,.14); border-radius: 12px; outline: none; color: var(--ink); background: rgba(248,250,252,.88); font-size: 14px; font-weight: 950; }
+        .rollcall-course-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 7px; }
+        .rollcall-course-choice { min-width: 0; min-height: 43px; padding: 7px 9px; border: 1px solid rgba(100,116,139,.11); border-radius: 11px; color: var(--body); background: rgba(248,250,252,.82); text-align: left; }
+        .rollcall-course-choice strong,
+        .rollcall-course-choice small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .rollcall-course-choice strong { font-size: 10px; font-weight: 950; }
+        .rollcall-course-choice small { margin-top: 3px; color: var(--muted); font-size: 8px; font-weight: 800; }
+        .rollcall-course-choice.active { color: var(--brand); border-color: rgba(31,95,255,.27); background: rgba(31,95,255,.10); box-shadow: 0 0 0 3px rgba(31,95,255,.04); }
+
+        /* 点名历史与详情。 */
+        .rollcall-history-list { display: grid; gap: 10px; }
+        .rollcall-history-card { width: 100%; min-width: 0; padding: 14px; border: 1px solid rgba(255,255,255,.92); border-radius: 20px; color: inherit; background: rgba(255,255,255,.73); box-shadow: var(--shadow); text-align: left; }
+        .rollcall-history-card:active { transform: scale(.97); background: rgba(255,255,255,.91); }
+        .rollcall-history-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 9px; }
+        .rollcall-history-head strong { color: var(--ink); font-size: 14px; font-weight: 950; }
+        .rollcall-history-head span { flex: 0 0 auto; padding: 4px 7px; border-radius: 7px; color: var(--brand); background: rgba(31,95,255,.09); font-size: 9px; font-weight: 900; }
+        .rollcall-history-meta { margin-top: 5px; color: var(--muted); font-size: 10px; font-weight: 800; }
+        .rollcall-history-counts { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 5px; margin-top: 11px; }
+        .rollcall-history-counts span { min-width: 0; padding: 6px 2px; border-radius: 9px; color: var(--muted); background: rgba(239,246,255,.70); font-size: 8.5px; font-weight: 900; text-align: center; }
+        .rollcall-record-summary { margin-bottom: 12px; padding: 15px 16px; border: 1px solid rgba(255,255,255,.92); border-radius: 20px; background: linear-gradient(145deg,rgba(31,95,255,.12),rgba(255,255,255,.76)); box-shadow: var(--shadow); }
+        .rollcall-record-summary span { color: var(--brand); font-size: 10px; font-weight: 900; }
+        .rollcall-record-summary strong { display: block; margin-top: 5px; color: var(--ink); font-size: 17px; font-weight: 950; }
+        .rollcall-record-summary small { display: block; margin-top: 5px; color: var(--muted); font-size: 10px; font-weight: 800; }
+        .rollcall-record-roster { overflow: hidden; border: 1px solid rgba(255,255,255,.92); border-radius: 20px; background: rgba(255,255,255,.72); box-shadow: var(--shadow); }
+        .rollcall-record-row { display: grid; grid-template-columns: 30px minmax(0,1fr) auto; align-items: center; gap: 10px; min-height: 54px; padding: 8px 12px; }
+        .rollcall-record-row + .rollcall-record-row { border-top: 1px solid rgba(15,23,42,.055); }
+        .rollcall-record-row strong { color: var(--ink); font-size: 12px; font-weight: 950; }
+        .rollcall-record-state { min-width: 46px; padding: 5px 8px; border-radius: 8px; font-size: 9px; font-weight: 950; text-align: center; }
+        .rollcall-record-state.present { color: #047857; background: rgba(16,185,129,.11); }
+        .rollcall-record-state.late { color: #B45309; background: rgba(245,158,11,.13); }
+        .rollcall-record-state.leave { color: #1747C8; background: rgba(31,95,255,.11); }
+        .rollcall-record-state.absent { color: #B91C1C; background: rgba(239,68,68,.11); }
+
+        /* 假条：搜索下方的状态筛选与文字申请说明。 */
+        .leave-status-filters { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 7px; margin-top: 8px; }
+        .leave-status-chip { height: 31px; border: 1px solid rgba(100,116,139,.13); border-radius: 10px; color: var(--muted); background: rgba(255,255,255,.64); font-size: 10px; font-weight: 900; }
+        .leave-status-chip.active { color: #fff; border-color: var(--brand); background: var(--brand); box-shadow: 0 6px 13px rgba(31,95,255,.15); }
+        .leave-application-text { display: -webkit-box; margin: 8px 0 0; overflow: hidden; color: var(--body); font-size: 10px; font-weight: 750; line-height: 1.55; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+
+        /* 违纪：带头像序号的筛选列表、全屏详情和全屏添加。 */
+        .discipline-toolbar { position: sticky; top: -1px; z-index: 24; margin: 0 -20px 10px; padding: 0 20px 10px; background: rgba(239,246,255,.90); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .discipline-toolbar-row { display: grid; grid-template-columns: minmax(0,1fr) 112px; gap: 8px; }
+        .discipline-search { position: relative; min-width: 0; }
+        .discipline-search svg { position: absolute; left: 12px; top: 50%; width: 16px; height: 16px; transform: translateY(-50%); fill: none; stroke: #94A3B8; stroke-width: 2.3; stroke-linecap: round; pointer-events: none; }
+        .discipline-search input { width: 100%; height: 40px; padding: 0 12px 0 37px; border: 1px solid rgba(255,255,255,.92); border-radius: 12px; outline: none; color: var(--ink); background: rgba(255,255,255,.80); font-size: 12px; font-weight: 800; }
+        .discipline-time-trigger { min-width: 0; height: 40px; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0 9px; border: 1px solid rgba(31,95,255,.13); border-radius: 12px; color: var(--brand); background: rgba(255,255,255,.80); font-size: 10px; font-weight: 950; }
+        .discipline-time-trigger svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+        .discipline-list { display: grid; gap: 9px; }
+        .discipline-card { width: 100%; min-width: 0; display: grid; grid-template-columns: 30px 42px minmax(0,1fr) 18px; align-items: center; gap: 9px; padding: 12px; border: 1px solid rgba(255,255,255,.92); border-radius: 20px; color: inherit; background: rgba(255,255,255,.73); box-shadow: var(--shadow); text-align: left; }
+        .discipline-card:active { transform: scale(.97); background: rgba(255,255,255,.91); }
+        .discipline-avatar { width: 42px; height: 42px; display: grid; place-items: center; overflow: hidden; border: 1px solid rgba(255,255,255,.94); border-radius: 14px; }
+        .discipline-avatar.male { color: #2563EB; background: linear-gradient(145deg,rgba(59,130,246,.17),rgba(219,234,254,.86)); }
+        .discipline-avatar.female { color: #DB2777; background: linear-gradient(145deg,rgba(236,72,153,.14),rgba(252,231,243,.88)); }
+        .discipline-avatar svg { width: 25px; height: 25px; fill: none; stroke: currentColor; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; }
+        .discipline-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .discipline-card-copy { min-width: 0; }
+        .discipline-card-copy strong { display: block; overflow: hidden; color: var(--ink); font-size: 12px; font-weight: 950; text-overflow: ellipsis; white-space: nowrap; }
+        .discipline-card-copy span { display: block; margin-top: 4px; overflow: hidden; color: var(--muted); font-size: 9px; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+        .discipline-card-copy small { display: inline-block; margin-top: 6px; padding: 3px 6px; border-radius: 7px; color: #B45309; background: rgba(245,158,11,.11); font-size: 8px; font-weight: 900; }
+        .discipline-card-arrow svg { width: 17px; height: 17px; fill: none; stroke: #94A3B8; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+        .discipline-detail-page { display: grid; gap: 12px; }
+        .discipline-detail-hero { padding: 16px; border: 1px solid rgba(255,255,255,.92); border-radius: 21px; background: linear-gradient(145deg,rgba(245,158,11,.13),rgba(255,255,255,.76)); box-shadow: var(--shadow); }
+        .discipline-detail-person { display: flex; align-items: center; gap: 11px; }
+        .discipline-detail-person-copy { min-width: 0; }
+        .discipline-detail-person-copy span { color: #B45309; font-size: 9px; font-weight: 900; }
+        .discipline-detail-person-copy strong { display: block; margin-top: 4px; color: var(--ink); font-size: 17px; font-weight: 950; }
+        .discipline-detail-event { margin-top: 13px; padding-top: 12px; border-top: 1px solid rgba(15,23,42,.06); }
+        .discipline-detail-event strong { display: block; color: var(--ink); font-size: 15px; font-weight: 950; }
+        .discipline-detail-event span { display: block; margin-top: 5px; color: var(--muted); font-size: 10px; font-weight: 800; }
+        .discipline-detail-section { padding: 16px; border: 1px solid rgba(255,255,255,.92); border-radius: 20px; background: rgba(255,255,255,.72); box-shadow: var(--shadow); }
+        .discipline-detail-section h2 { margin: 0; color: var(--ink); font-size: 14px; font-weight: 950; }
+        .discipline-detail-section p { margin: 9px 0 0; color: var(--body); font-size: 13px; font-weight: 700; line-height: 1.75; }
+        .discipline-photo-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin-top: 10px; }
+        .discipline-photo { min-width: 0; aspect-ratio: 4/3; overflow: hidden; border: 1px solid rgba(31,95,255,.10); border-radius: 13px; background: #EAF0F8; }
+        .discipline-photo img,
+        .discipline-photo svg { width: 100%; height: 100%; display: block; object-fit: cover; }
+        .discipline-add-scroll { padding-bottom: 116px; }
+        .discipline-form { display: grid; gap: 12px; }
+        .discipline-form-card { padding: 16px; border: 1px solid rgba(255,255,255,.92); border-radius: 20px; background: rgba(255,255,255,.72); box-shadow: var(--shadow); }
+        .discipline-form-field + .discipline-form-field { margin-top: 13px; }
+        .discipline-datetime .discipline-form-field + .discipline-form-field { margin-top: 0; }
+        .discipline-form-field label { display: block; margin-bottom: 7px; color: var(--ink); font-size: 12px; font-weight: 950; }
+        .discipline-form-field input,
+        .discipline-form-field select,
+        .discipline-form-field textarea { width: 100%; min-height: 45px; padding: 11px 12px; border: 1px solid rgba(31,95,255,.12); border-radius: 12px; outline: none; color: var(--ink); background: rgba(248,250,252,.86); font-size: 12px; font-weight: 800; }
+        .discipline-form-field textarea { min-height: 88px; resize: none; line-height: 1.55; }
+        .discipline-form-field input:focus,
+        .discipline-form-field select:focus,
+        .discipline-form-field textarea:focus { border-color: rgba(31,95,255,.38); box-shadow: 0 0 0 3px rgba(31,95,255,.07); }
+        .discipline-datetime { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .discipline-photo-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+        .discipline-photo-action { min-height: 42px; display: flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid rgba(31,95,255,.15); border-radius: 12px; color: var(--brand); background: rgba(31,95,255,.08); font-size: 11px; font-weight: 950; }
+        .discipline-photo-action svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+        .discipline-draft-photos { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 7px; margin-top: 10px; }
+        .discipline-draft-photo { position: relative; aspect-ratio: 1; overflow: hidden; border-radius: 11px; background: #EAF0F8; }
+        .discipline-draft-photo img { width: 100%; height: 100%; display: block; object-fit: cover; }
+        .discipline-draft-photo button { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.84); border-radius: 8px; color: #fff; background: rgba(15,23,42,.64); }
+        .discipline-draft-photo button svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; }
+
+        /* 班级日志：待批阅优先，学生历史改为全屏页。 */
+        .student-log-page-head { display: flex; align-items: center; gap: 11px; margin-bottom: 12px; padding: 15px 16px; border: 1px solid rgba(255,255,255,.92); border-radius: 20px; background: rgba(255,255,255,.72); box-shadow: var(--shadow); }
+        .student-log-page-head-copy { min-width: 0; }
+        .student-log-page-head-copy strong { display: block; color: var(--ink); font-size: 16px; font-weight: 950; }
+        .student-log-page-head-copy span { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; font-weight: 800; }
+        .student-log-page-list { display: grid; gap: 9px; }
+        .student-log-page-card { width: 100%; min-width: 0; display: grid; grid-template-columns: minmax(0,1fr) auto 16px; align-items: center; gap: 9px; padding: 13px 14px; border: 1px solid rgba(255,255,255,.92); border-radius: 18px; color: inherit; background: rgba(255,255,255,.72); box-shadow: var(--shadow); text-align: left; }
+        .student-log-page-card:active { transform: scale(.97); background: rgba(255,255,255,.91); }
+        .student-log-page-card strong { display: block; overflow: hidden; color: var(--ink); font-size: 12px; font-weight: 950; text-overflow: ellipsis; white-space: nowrap; }
+        .student-log-page-card small { display: block; margin-top: 5px; color: var(--muted); font-size: 9px; font-weight: 800; line-height: 1.45; }
+        .student-log-page-card em { padding: 4px 7px; border-radius: 7px; color: #047857; background: rgba(16,185,129,.10); font-size: 8px; font-style: normal; font-weight: 900; }
+        .student-log-page-card.pending em { color: #B45309; background: rgba(245,158,11,.12); }
+        .student-log-page-card svg { width: 16px; height: 16px; fill: none; stroke: #94A3B8; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+
+        /* 宿舍：单外框大床位、主页面红空绿住、安排页未分配黄棕/已分配黑灰。 */
+        .dorm-room-preview,
+        .dorm-unassigned-list { animation: none !important; will-change: auto; }
+        .dorm-plan { padding: 12px; }
+        .dorm-plan > .dorm-plan-balcony { margin-top: -12px; }
+        .dorm-layout-grid .dorm-bed-option { min-height: 57px; padding: 7px 6px; }
+        .dorm-bed-number { font-size: 14px; }
+        .dorm-bed-bunk { font-size: 9.5px; }
+        .dorm-bed-state { font-size: 9px; }
+        .dorm-unassigned-copy strong { font-size: 16px; }
+        .dorm-unassigned-copy small { font-size: 9.5px; }
+        .class-module-scroll .dorm-bed-option.vacant:not(:disabled):not(.active) { color: #B91C1C; border-color: rgba(239,68,68,.22); background: rgba(254,226,226,.58); box-shadow: 0 5px 12px rgba(239,68,68,.06); }
+        .class-module-scroll .dorm-bed-option.vacant:not(:disabled):not(.active) .dorm-bed-state { color: #B91C1C; }
+        .class-module-scroll .dorm-bed-option.occupied:not(:disabled):not(.active) { color: #047857; border-color: rgba(16,185,129,.22); background: rgba(209,250,229,.58); box-shadow: 0 5px 12px rgba(16,185,129,.06); }
+        .class-module-scroll .dorm-bed-option.occupied:not(:disabled):not(.active) .dorm-bed-state { color: #047857; }
+        .picker-body .dorm-bed-option.vacant:not(.active),
+        .dorm-bed-student-option:not(.assigned):not(.active) { color: #92400E; border-color: rgba(245,158,11,.24); background: rgba(254,243,199,.72); }
+        .picker-body .dorm-bed-option.vacant:not(.active) .dorm-bed-state,
+        .dorm-bed-student-option:not(.assigned):not(.active) small { color: #A16207; }
+        .picker-body .dorm-bed-option.occupied,
+        .dorm-bed-student-option.assigned:not(.active) { color: #374151; border-color: rgba(71,85,105,.18); background: rgba(203,213,225,.66); }
+        .picker-body .dorm-bed-option.occupied .dorm-bed-state,
+        .dorm-bed-student-option.assigned:not(.active) small { color: #475569; }
+        .dorm-room-chip,
+        .dorm-room-option { position: relative; overflow: hidden; }
+        .dorm-room-chip.active::after,
+        .dorm-room-option.active::after { content: ''; position: absolute; left: 10px; right: 10px; bottom: 0; height: 4px; border-radius: 4px 4px 0 0; background: var(--brand); }
+
+        /* 7.36：本周考勤表、整日全屏考勤编辑与高频日志折叠。 */
+        #attendanceEditorView { background: linear-gradient(135deg, #EFF6FF 0%, #DFE7FF 100%); }
+        .attendance-edit-scroll {
+            position: absolute;
+            inset: 0;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: 112px 20px 118px;
+            scrollbar-width: none;
+            overscroll-behavior-y: contain;
+            -webkit-overflow-scrolling: touch;
+        }
+        .attendance-edit-scroll::-webkit-scrollbar { display: none; }
+        .attendance-tools { margin-top: 14px; padding-top: 12px; padding-bottom: 12px; }
+        .attendance-filter-section { display: grid; grid-template-columns: 54px minmax(0,1fr); align-items: center; gap: 8px; }
+        .attendance-filter-section + .attendance-filter-section { margin-top: 9px; }
+        .attendance-filter-label { color: var(--ink); font-size: 12px; font-weight: 900; }
+        .attendance-filter-section .attendance-filter-group { gap: 6px; overflow: visible; flex-wrap: wrap; }
+        .attendance-filter-chip { min-height: 34px; padding: 0 12px; border-radius: 11px; font-size: 11px; }
+        .attendance-result-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 14px 2px 9px; }
+        .attendance-result-head h2 { color: var(--ink); font-size: 16px; font-weight: 950; }
+        .attendance-result-head span { color: var(--muted); font-size: 12px; font-weight: 800; }
+        .attendance-day-table-wrap { overflow: hidden; border: 1px solid rgba(255,255,255,.94); border-radius: 20px; background: rgba(255,255,255,.74); box-shadow: 0 8px 24px rgba(31,95,255,.05); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+        .attendance-day-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .attendance-day-table col:nth-child(1) { width: 64px; }
+        .attendance-day-table col:nth-child(2) { width: 58px; }
+        .attendance-day-table col:nth-child(3) { width: 56px; }
+        .attendance-day-table col:nth-child(4) { width: 68px; }
+        .attendance-day-table col:nth-child(5) { width: 48px; }
+        .attendance-day-table th { height: 40px; padding: 0 5px; color: var(--muted); background: rgba(239,246,255,.82); font-size: 11px; font-weight: 900; text-align: left; }
+        .attendance-day-table th:first-child,
+        .attendance-day-table td:first-child { padding-left: 12px; }
+        .attendance-day-table th:last-child,
+        .attendance-day-table td:last-child { padding-right: 8px; text-align: center; }
+        .attendance-day-table td { height: 56px; padding: 9px 5px; border-top: 1px solid rgba(15,23,42,.06); color: var(--body); font-size: 12px; font-weight: 800; vertical-align: middle; }
+        .attendance-day-table tr.day-start:not(:first-child) td { border-top-color: rgba(31,95,255,.14); }
+        .attendance-day-date { vertical-align: top !important; padding-top: 13px !important; background: rgba(239,246,255,.38); }
+        .attendance-day-date strong { display: block; color: var(--ink); font-size: 13px; font-weight: 950; font-variant-numeric: tabular-nums; }
+        .attendance-day-date small { display: block; margin-top: 5px; color: var(--muted); font-size: 10px; font-weight: 800; }
+        .attendance-day-period { color: var(--ink) !important; font-size: 12px !important; font-weight: 900 !important; }
+        .attendance-day-recorder { overflow: hidden; color: var(--body); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+        .attendance-day-action { vertical-align: top !important; padding-top: 12px !important; }
+        .attendance-row-status,
+        .attendance-lesson-status { display: inline-flex; align-items: center; justify-content: center; min-width: 46px; min-height: 27px; padding: 4px 8px; border: 0; border-radius: 8px; font-size: 11px; font-weight: 900; white-space: nowrap; }
+        .attendance-row-status.present,
+        .attendance-lesson-status.present { color: #047857; background: rgba(16,185,129,.12); }
+        .attendance-row-status.late,
+        .attendance-lesson-status.late { color: #B45309; background: rgba(245,158,11,.14); }
+        .attendance-row-status.leave,
+        .attendance-lesson-status.leave { color: #1D4ED8; background: rgba(59,130,246,.13); }
+        .attendance-row-status.absent,
+        .attendance-lesson-status.absent { color: #DC2626; background: rgba(239,68,68,.12); }
+        .attendance-day-edit { width: 38px; height: 32px; border: 1px solid rgba(31,95,255,.14); border-radius: 9px; color: var(--brand); background: rgba(31,95,255,.09); font-size: 11px; font-weight: 950; }
+        .attendance-day-edit:active { transform: scale(.95); }
+        .attendance-day-lock { color: #94A3B8; font-size: 11px; font-weight: 850; }
+
+        .attendance-edit-summary { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 12px; padding: 17px 18px; border: 1px solid rgba(255,255,255,.92); border-radius: 20px; background: rgba(255,255,255,.72); box-shadow: var(--shadow); }
+        .attendance-edit-summary span { display: block; color: var(--muted); font-size: 12px; font-weight: 800; }
+        .attendance-edit-summary strong { display: block; margin-top: 4px; color: var(--ink); font-size: 18px; font-weight: 950; font-variant-numeric: tabular-nums; }
+        .attendance-edit-summary-badge { display: grid; place-items: center; min-width: 70px; height: 34px; padding: 0 12px; border-radius: 10px; color: var(--brand); background: rgba(31,95,255,.10); font-size: 12px; font-weight: 900; }
+        .attendance-default-note,
+        .rollcall-default-note { display: grid; grid-template-columns: 30px minmax(0,1fr); align-items: center; gap: 10px; margin-top: 12px; padding: 12px 13px; border: 1px solid rgba(16,185,129,.18); border-radius: 15px; color: #065F46; background: rgba(209,250,229,.60); }
+        .attendance-default-note svg,
+        .rollcall-default-note svg { width: 30px; height: 30px; padding: 6px; border-radius: 10px; fill: none; stroke: #059669; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; background: rgba(255,255,255,.64); }
+        .attendance-default-note strong,
+        .rollcall-default-note strong { display: block; font-size: 12px; font-weight: 950; }
+        .attendance-default-note span,
+        .rollcall-default-note span { display: block; margin-top: 3px; color: #047857; font-size: 11px; font-weight: 750; line-height: 1.45; }
+        .rollcall-default-note { margin-top: 13px; }
+        .attendance-lesson-groups { display: grid; gap: 16px; margin-top: 18px; }
+        .attendance-lesson-group-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 2px 8px; }
+        .attendance-lesson-group-head h2 { color: var(--ink); font-size: 16px; font-weight: 950; }
+        .attendance-lesson-group-head span { color: var(--muted); font-size: 11px; font-weight: 800; }
+        .attendance-lesson-list { overflow: hidden; border: 1px solid rgba(255,255,255,.94); border-radius: 20px; background: rgba(255,255,255,.72); box-shadow: 0 8px 22px rgba(31,95,255,.05); }
+        .attendance-lesson-row { padding: 15px 16px; }
+        .attendance-lesson-row + .attendance-lesson-row { border-top: 1px solid rgba(15,23,42,.06); }
+        .attendance-lesson-main { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 12px; }
+        .attendance-lesson-title { min-width: 0; }
+        .attendance-lesson-title strong { display: block; color: var(--ink); font-size: 15px; font-weight: 950; }
+        .attendance-lesson-title span { display: block; margin-top: 4px; overflow: hidden; color: var(--body); font-size: 13px; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+        .attendance-lesson-meta { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-top: 9px; color: var(--muted); font-size: 12px; font-weight: 750; }
+        .attendance-lesson-meta span { display: inline-flex; align-items: center; gap: 4px; }
+        .attendance-lesson-meta svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; }
+        .attendance-lesson-status { min-width: 54px; min-height: 32px; cursor: pointer; }
+        .attendance-lesson-status:active { transform: scale(.95); }
+        .attendance-lesson-choices { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 7px; margin-top: 13px; padding-top: 13px; border-top: 1px solid rgba(15,23,42,.06); animation: filterIn .22s ease both; }
+        .attendance-lesson-choice { min-width: 0; height: 36px; border: 1px solid rgba(100,116,139,.13); border-radius: 10px; color: var(--muted); background: rgba(248,250,252,.82); font-size: 11px; font-weight: 900; }
+        .attendance-lesson-choice.active { color: #fff; border-color: var(--brand); background: var(--brand); box-shadow: 0 6px 14px rgba(31,95,255,.17); }
+        .attendance-edit-actions { grid-template-columns: 1fr; }
+        .attendance-edit-actions .fixed-action-button { min-height: 48px; font-size: 14px; }
+
+        .student-log-filter { position: sticky; top: -1px; z-index: 15; margin: 0 -20px 12px; padding: 10px 20px 12px; background: rgba(239,246,255,.88); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .student-log-filter-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+        .student-log-filter-head strong { color: var(--ink); font-size: 12px; font-weight: 950; }
+        .student-log-filter-head span { color: var(--muted); font-size: 11px; font-weight: 800; }
+        .student-log-filter-options { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 6px; }
+        .student-log-filter-chip { min-width: 0; height: 34px; border: 1px solid rgba(100,116,139,.13); border-radius: 10px; color: var(--muted); background: rgba(255,255,255,.70); font-size: 11px; font-weight: 900; }
+        .student-log-filter-chip.active { color: #fff; border-color: var(--brand); background: var(--brand); box-shadow: 0 6px 14px rgba(31,95,255,.15); }
+        .student-log-page-head-copy span { font-size: 11px; }
+        .student-log-page-card strong { font-size: 14px; }
+        .student-log-page-card small { font-size: 11px; }
+        .student-log-page-card em { font-size: 10px; }
+        .log-pending-shell { position: relative; }
+        .log-pending-shell.is-collapsed .log-pending-list { max-height: 252px; overflow: hidden; }
+        .log-pending-more-surface { position: static; display: flex; justify-content: center; margin-top: 10px; }
+        .log-pending-shell.is-collapsed .log-pending-more-surface { position: absolute; left: 0; right: 0; bottom: 0; height: 108px; align-items: flex-end; padding-bottom: 8px; background: linear-gradient(180deg,rgba(239,246,255,0),rgba(231,239,255,.90) 54%,rgba(228,236,255,.98) 100%); pointer-events: none; }
+        .log-pending-more { min-width: 218px; min-height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 0 17px; border: 1px solid rgba(31,95,255,.15); border-radius: 13px; color: var(--brand); background: rgba(255,255,255,.90); box-shadow: 0 9px 22px rgba(31,95,255,.12); font-size: 12px; font-weight: 950; pointer-events: auto; }
+        .log-pending-more svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; transition: transform .22s ease; }
+        .log-pending-shell:not(.is-collapsed) .log-pending-more svg { transform: rotate(180deg); }
+        .log-pending-more:active { transform: scale(.95); }
+
         .qa-static .app-view { transition: none !important; }
     </style>
 </head>
@@ -2321,6 +2671,77 @@
             </div>
         </section>
 
+        <section class="app-view" id="studentLogHistoryView" aria-label="学生日志记录">
+            <header class="topbar" aria-label="学生日志记录导航">
+                <button type="button" class="nav-button" id="studentLogHistoryBackButton" aria-label="返回班级日志">
+                    <svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <h1 class="nav-title" id="studentLogHistoryTitle">学生日志</h1>
+                <div aria-hidden="true"></div>
+            </header>
+            <main class="workflow-page-scroll" id="studentLogHistoryScroll">
+                <div id="studentLogHistoryRoot"></div>
+            </main>
+        </section>
+
+        <section class="app-view" id="rollcallHistoryView" aria-label="过往点名记录">
+            <header class="topbar" aria-label="过往点名记录导航">
+                <button type="button" class="nav-button" id="rollcallHistoryBackButton" aria-label="返回实时点名">
+                    <svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <h1 class="nav-title">过往点名</h1>
+                <div aria-hidden="true"></div>
+            </header>
+            <main class="workflow-page-scroll" id="rollcallHistoryScroll">
+                <div id="rollcallHistoryRoot"></div>
+            </main>
+        </section>
+
+        <section class="app-view" id="rollcallRecordView" aria-label="点名记录详情">
+            <header class="topbar" aria-label="点名记录详情导航">
+                <button type="button" class="nav-button" id="rollcallRecordBackButton" aria-label="返回过往点名">
+                    <svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <h1 class="nav-title">点名详情</h1>
+                <div aria-hidden="true"></div>
+            </header>
+            <main class="workflow-page-scroll" id="rollcallRecordScroll">
+                <div id="rollcallRecordRoot"></div>
+            </main>
+        </section>
+
+        <section class="app-view" id="disciplineDetailView" aria-label="违纪详情">
+            <header class="topbar" aria-label="违纪详情导航">
+                <button type="button" class="nav-button" id="disciplineDetailBackButton" aria-label="返回学生违纪">
+                    <svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <h1 class="nav-title">违纪详情</h1>
+                <div aria-hidden="true"></div>
+            </header>
+            <main class="workflow-page-scroll" id="disciplineDetailScroll">
+                <div id="disciplineDetailRoot"></div>
+            </main>
+        </section>
+
+        <section class="app-view" id="disciplineAddView" aria-label="添加违纪记录">
+            <header class="topbar" aria-label="添加违纪记录导航">
+                <button type="button" class="nav-button" id="disciplineAddBackButton" data-action="cancel-discipline-add" aria-label="返回学生违纪">
+                    <svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <h1 class="nav-title">添加违纪</h1>
+                <div aria-hidden="true"></div>
+            </header>
+            <main class="workflow-page-scroll discipline-add-scroll" id="disciplineAddScroll">
+                <form class="discipline-form" id="disciplineAddForm" novalidate></form>
+            </main>
+            <div class="fixed-action-surface" aria-label="添加违纪记录操作">
+                <button type="button" class="fixed-action-button cancel" data-action="cancel-discipline-add">取消</button>
+                <button type="button" class="fixed-action-button confirm" data-action="save-discipline-record">保存记录</button>
+            </div>
+            <input type="file" id="disciplineCameraInput" class="sr-only" accept="image/*" capture="environment" aria-label="拍摄违纪现场照片">
+            <input type="file" id="disciplinePhotoInput" class="sr-only" accept="image/*" multiple aria-label="选择违纪记录照片">
+        </section>
+
         <section class="app-view" id="listView" aria-label="全校学生">
             <header class="topbar" aria-label="全校学生导航">
                 <button type="button" class="nav-button" id="listBackButton" aria-label="返回学校管理">
@@ -2396,7 +2817,7 @@
                 <section id="panelRoot" role="tabpanel" aria-labelledby="tab-identity"></section>
             </main>
             <div class="student-attendance-dock" id="studentAttendanceDock" aria-label="学生当前点名与考勤记录">
-                <button type="button" class="attendance-status-trigger" id="studentAttendanceStatus" data-action="open-student-attendance-status" aria-haspopup="dialog" aria-controls="pickerLayer" aria-expanded="false"><span>今日点名 · 到课</span><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+                <button type="button" class="attendance-status-trigger" id="studentAttendanceStatus" data-action="open-student-attendance-status" aria-controls="attendanceEditorView"><span>今日考勤 · 到课</span><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
                 <button type="button" class="attendance-history-trigger" id="studentAttendanceHistory" data-action="open-student-attendance"><span>考勤记录</span><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
             </div>
         </section>
@@ -2412,6 +2833,22 @@
             <main class="attendance-scroll" id="attendanceScroll">
                 <div id="attendanceRoot"></div>
             </main>
+        </section>
+
+        <section class="app-view" id="attendanceEditorView" aria-label="修改考勤记录">
+            <header class="topbar" aria-label="修改考勤记录导航">
+                <button type="button" class="nav-button" id="attendanceEditorBackButton" aria-label="返回考勤记录">
+                    <svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <h1 class="nav-title">修改考勤记录</h1>
+                <div aria-hidden="true"></div>
+            </header>
+            <main class="attendance-edit-scroll" id="attendanceEditorScroll">
+                <div id="attendanceEditorRoot"></div>
+            </main>
+            <div class="fixed-action-surface attendance-edit-actions" aria-label="保存考勤记录操作">
+                <button type="button" class="fixed-action-button confirm" data-action="save-student-attendance">保存考勤记录</button>
+            </div>
         </section>
 
         <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
@@ -2550,12 +2987,19 @@
             avatarUrl: '',
             currentAttendance: '到课',
             attendanceRecords: [
-                { date: '2026-07-17', time: '10:18', status: '到课', course: '护理基础实训', period: '第 3 节' },
-                { date: '2026-07-16', time: '08:09', status: '迟到', course: '护理礼仪', period: '第 1 节' },
-                { date: '2026-07-15', time: '09:02', status: '到课', course: '语文', period: '第 2 节' },
-                { date: '2026-07-14', time: '11:04', status: '请假', course: '护理基础', period: '第 4 节' },
-                { date: '2026-06-28', time: '19:06', status: '缺勤', course: '晚自习', period: '晚间点名' },
-                { date: '2026-05-20', time: '09:08', status: '到课', course: '数学', period: '第 2 节' }
+                { date: shiftedDateValue(0), time: '08:03', status: '到课', course: '护理礼仪', period: '第 1 节', recordedBy: '周老师' },
+                { date: shiftedDateValue(0), time: '08:57', status: '到课', course: '语文', period: '第 2 节', recordedBy: '周老师' },
+                { date: shiftedDateValue(0), time: '10:07', status: '迟到', course: '护理基础实训', period: '第 3 节', recordedBy: '陈老师' },
+                { date: shiftedDateValue(0), time: '10:56', status: '到课', course: '护理基础', period: '第 4 节', recordedBy: '陈老师' },
+                { date: shiftedDateValue(0), time: '14:02', status: '到课', course: '数学', period: '第 5 节', recordedBy: '李老师' },
+                { date: shiftedDateValue(0), time: '14:57', status: '到课', course: '英语', period: '第 6 节', recordedBy: '李老师' },
+                { date: shiftedDateValue(0), time: '15:51', status: '请假', course: '班会', period: '第 7 节', recordedBy: '王老师' },
+                { date: shiftedDateValue(0), time: '19:02', status: '到课', course: '晚自习', period: '晚间点名', recordedBy: '王老师' },
+                { date: shiftedDateValue(-3), time: '08:06', status: '到课', course: '护理礼仪', period: '第 1 节', recordedBy: '周老师' },
+                { date: shiftedDateValue(-3), time: '09:01', status: '迟到', course: '语文', period: '第 2 节', recordedBy: '周老师' },
+                { date: shiftedDateValue(-8), time: '10:01', status: '到课', course: '护理基础实训', period: '第 3 节', recordedBy: '陈老师' },
+                { date: shiftedDateValue(-24), time: '19:06', status: '缺勤', course: '晚自习', period: '晚间点名', recordedBy: '王老师' },
+                { date: shiftedDateValue(-50), time: '09:08', status: '到课', course: '数学', period: '第 5 节', recordedBy: '李老师' }
             ],
             account: { username: '13825163201', enabled: true, lastLogin: '2026-07-09 20:16' },
             updatedAt: '2026-07-10 09:42',
@@ -2680,25 +3124,63 @@
         const maleNames = ['陈柏安','徐明哲','谢承宇','顾怀川','周景行','沈亦辰','林予安','江叙白','陆星野','许嘉木','程屿','宋知远','叶修远','梁慕辰','何砚舟','秦朗','高亦凡','唐一航','罗子谦','郑嘉树','邓云开','彭昱辰','韩旭','冯书言','余思远','苏沐阳','曹景澄','魏星河','杜明轩','陶知行','袁嘉泽','夏屿'];
         const femaleNames = ['林知夏','周以宁','赵思妍','叶清欢','许安宁','苏晚晴','沈念初','顾星遥','梁诗语','陈语桐','何嘉怡','宋予希','唐若溪','江婉宁','罗书瑶','韩雨薇','邓可欣','彭心悦','余静姝','高思妤','秦诗涵','曹语柔','魏清妍','杜若安','陶欣然','袁知意','夏芷晴','程安歌','陆清禾','冯佳宁','郑雅琪','谢梦瑶','周沐晴','林书妍','许依诺','顾言溪'];
         const classRosters = new Map();
+        const ACADEMIC_TERM_START = '2026-03-02';
+        function shiftedDateValue(dayOffset = 0) {
+            const date = new Date();
+            date.setHours(12,0,0,0);
+            date.setDate(date.getDate() + Number(dayOffset || 0));
+            return formatLocalDate(date);
+        }
+        function parseLocalDate(value) {
+            const date = new Date(`${value || ''}T00:00:00`);
+            return Number.isNaN(date.getTime()) ? null : date;
+        }
+        function getLocalWeekStart(date = new Date()) {
+            const start = new Date(date);
+            start.setHours(0,0,0,0);
+            const mondayOffset = (start.getDay() + 6) % 7;
+            start.setDate(start.getDate() - mondayOffset);
+            return start;
+        }
+        function isDateInCurrentWeek(value) {
+            const date = parseLocalDate(value);
+            if (!date) return false;
+            const start = getLocalWeekStart();
+            const end = new Date(start);
+            end.setDate(end.getDate() + 7);
+            return date >= start && date < end;
+        }
+        function getAcademicWeekNumber(date = new Date()) {
+            const termStart = new Date(`${ACADEMIC_TERM_START}T00:00:00`);
+            const target = new Date(date);
+            target.setHours(0,0,0,0);
+            if (Number.isNaN(termStart.getTime()) || Number.isNaN(target.getTime())) return 1;
+            return Math.max(1, Math.floor((target.getTime() - termStart.getTime()) / 604800000) + 1);
+        }
+        function formatWorkflowDate(value) {
+            const date = new Date(`${value}T00:00:00`);
+            if (Number.isNaN(date.getTime())) return String(value || '未记录日期');
+            return `${date.getMonth() + 1}月${date.getDate()}日`;
+        }
         const classWorkflowState = {
             leave: [
-                { id: 'leave-1', name: '林知夏', reason: '发热就医', period: '今天 08:00—17:30', startDate: '2026-07-17', endDate: '2026-07-17', status: '待审批', evidenceLabel: '门诊挂号凭证' },
-                { id: 'leave-2', name: '顾怀川', reason: '家庭事务', period: '明天 08:00—12:00', startDate: '2026-07-18', endDate: '2026-07-18', status: '待审批', evidenceLabel: '监护人说明' },
-                { id: 'leave-3', name: '周以宁', reason: '复诊', period: '7月14日 全天', startDate: '2026-07-14', endDate: '2026-07-14', status: '已通过', evidenceLabel: '复诊预约单' },
-                { id: 'leave-4', name: '叶清欢', reason: '门诊复查', period: '7月13日 13:00—17:30', startDate: '2026-07-13', endDate: '2026-07-13', status: '已驳回', evidenceLabel: '门诊病历', rejectReason: '请假时段与门诊凭证不一致，请核实后重新提交。' }
+                { id: 'leave-1', name: '林知夏', reason: '发热就医', description: '今早体温升高并伴有咽痛，家长已预约门诊，希望请假一天完成检查并在返校后补交诊断结果。', period: '今天 08:00—17:30', startDate: shiftedDateValue(0), endDate: shiftedDateValue(0), status: '待审批', evidenceLabel: '门诊挂号凭证' },
+                { id: 'leave-2', name: '顾怀川', reason: '家庭事务', description: '需由本人陪同家长办理重要家庭事务，预计中午前完成，结束后将及时返校。', period: '明天 08:00—12:00', startDate: shiftedDateValue(1), endDate: shiftedDateValue(1), status: '待审批', evidenceLabel: '监护人说明' },
+                { id: 'leave-3', name: '周以宁', reason: '复诊', description: '按医院预约前往复查上次检查结果，家长全程陪同，当日完成后返校。', period: '昨天 全天', startDate: shiftedDateValue(-1), endDate: shiftedDateValue(-1), status: '已通过', evidenceLabel: '复诊预约单' },
+                { id: 'leave-4', name: '叶清欢', reason: '门诊复查', description: '申请下午离校前往门诊复查，并由监护人负责接送。', period: '上周五 13:00—17:30', startDate: shiftedDateValue(-3), endDate: shiftedDateValue(-3), status: '已驳回', evidenceLabel: '门诊病历', rejectReason: '请假时段与门诊凭证不一致，请核实后重新提交。' }
             ],
             discipline: [
-                { id: 'discipline-1', name: '陈柏安', event: '晚自习迟到', time: '7月14日 19:06' },
-                { id: 'discipline-2', name: '徐明哲', event: '课堂使用手机', time: '7月13日 10:24' },
-                { id: 'discipline-3', name: '谢承宇', event: '宿舍熄灯后喧哗', time: '7月10日 22:38' }
+                { id: 'discipline-1', name: '陈柏安', event: '晚自习迟到', date: shiftedDateValue(0), clock: '19:06', details: '晚自习开始后 6 分钟到达教室。学生说明因归还实训器材耽误，已完成口头提醒并要求补登记器材交接时间。', photoCount: 2 },
+                { id: 'discipline-2', name: '徐明哲', event: '课堂使用手机', date: shiftedDateValue(-1), clock: '10:24', details: '护理基础课期间未经允许使用手机，任课教师现场暂存并完成第一次课堂纪律提醒。', photoCount: 1 },
+                { id: 'discipline-3', name: '谢承宇', event: '宿舍熄灯后喧哗', date: shiftedDateValue(-8), clock: '22:38', details: '熄灯后与同寝同学持续交谈，影响其他学生休息。宿管现场制止并完成情况记录。', photoCount: 2 }
             ],
             logs: [
-                { id: 'log-1', date: '2026-07-16', name: '林知夏', title: '护理实训周记', summary: '完成无菌操作练习与复盘。', content: '本周完成了无菌操作的分组练习，重点复盘了洗手、铺无菌盘和物品传递三个步骤。第一次练习时容易忽略操作顺序，经过同伴提醒后已经能够独立完成。下周计划继续练习速度与动作稳定性。', status: '待批阅', review: '' },
-                { id: 'log-1-history', date: '2026-07-09', name: '林知夏', title: '基础护理学习记录', summary: '记录生命体征测量练习。', content: '完成了体温、脉搏和呼吸测量练习，并整理了容易出错的读数步骤。', status: '已批阅', review: '记录完整，下次可补充异常数据判断。' },
-                { id: 'log-2', date: '2026-07-15', name: '叶清欢', title: '本周成长记录', summary: '调整了技能练习计划。', content: '根据本周课堂反馈，我把每天的技能练习拆分为基础动作、限时练习和错项复盘三部分，并记录每次练习中出现的问题。新的安排更容易坚持，也能更快发现薄弱环节。', status: '待批阅', review: '' },
-                { id: 'log-2-history', date: '2026-07-08', name: '叶清欢', title: '阶段计划复盘', summary: '回顾上周学习计划完成情况。', content: '上周计划中的晨读和技能复习基本完成，周末错题整理进度稍慢，已经重新安排时间。', status: '已批阅', review: '计划清晰，注意给错题复盘保留固定时段。' },
-                { id: 'log-3', date: '2026-07-14', name: '顾怀川', title: '班级服务日志', summary: '协助整理实训器材。', content: '周三实训结束后协助生活委员清点器材，并按照标签重新整理储物柜。发现两套器材缺少记录卡，已经反馈给实训老师并完成补充。', status: '待批阅', review: '' },
-                { id: 'log-4', date: '2026-07-12', name: '周景行', title: '学习反思', summary: '复盘了阶段测验错题。', content: '阶段测验中主要失分在概念辨析和审题。已经把错题按知识点整理，并为每道题补充错误原因和正确思路，准备在周末再做一次同类题检测。', status: '已批阅', review: '复盘思路清晰，建议下周补充同类题二次检测结果。' }
+                { id: 'log-1', date: shiftedDateValue(-1), name: '林知夏', title: '护理实训周记', summary: '完成无菌操作练习与复盘。', content: '本周完成了无菌操作的分组练习，重点复盘了洗手、铺无菌盘和物品传递三个步骤。第一次练习时容易忽略操作顺序，经过同伴提醒后已经能够独立完成。下周计划继续练习速度与动作稳定性。', status: '待批阅', review: '' },
+                { id: 'log-1-history', date: shiftedDateValue(-8), name: '林知夏', title: '基础护理学习记录', summary: '记录生命体征测量练习。', content: '完成了体温、脉搏和呼吸测量练习，并整理了容易出错的读数步骤。', status: '已批阅', review: '记录完整，下次可补充异常数据判断。' },
+                { id: 'log-2', date: shiftedDateValue(-2), name: '叶清欢', title: '本周成长记录', summary: '调整了技能练习计划。', content: '根据本周课堂反馈，我把每天的技能练习拆分为基础动作、限时练习和错项复盘三部分，并记录每次练习中出现的问题。新的安排更容易坚持，也能更快发现薄弱环节。', status: '待批阅', review: '' },
+                { id: 'log-2-history', date: shiftedDateValue(-9), name: '叶清欢', title: '阶段计划复盘', summary: '回顾上周学习计划完成情况。', content: '上周计划中的晨读和技能复习基本完成，周末错题整理进度稍慢，已经重新安排时间。', status: '已批阅', review: '计划清晰，注意给错题复盘保留固定时段。' },
+                { id: 'log-3', date: shiftedDateValue(-3), name: '顾怀川', title: '班级服务日志', summary: '协助整理实训器材。', content: '周三实训结束后协助生活委员清点器材，并按照标签重新整理储物柜。发现两套器材缺少记录卡，已经反馈给实训老师并完成补充。', status: '待批阅', review: '' },
+                { id: 'log-4', date: shiftedDateValue(-5), name: '周景行', title: '学习反思', summary: '复盘了阶段测验错题。', content: '阶段测验中主要失分在概念辨析和审题。已经把错题按知识点整理，并为每道题补充错误原因和正确思路，准备在周末再做一次同类题检测。', status: '已批阅', review: '复盘思路清晰，建议下周补充同类题二次检测结果。' }
             ],
             dorm: [
                 { id: 'dorm-1', name: '林知夏', gender: '女', roomId: 'F402', bedNumber: 2, assignment: '女生 402 · 近外廊侧 · 2号床（下铺）' },
@@ -2707,7 +3189,14 @@
                 { id: 'dorm-4', name: '徐明哲', gender: '男', roomId: '', bedNumber: '', assignment: '' },
                 { id: 'dorm-5', name: '顾星遥', gender: '女', roomId: '', bedNumber: '', assignment: '' }
             ],
-            rollcall: {}
+            rollcall: {},
+            rollcallSessionDrafts: {},
+            rollcallHistory: [
+                { id: 'rollcall-history-1', date: shiftedDateValue(-1), week: getAcademicWeekNumber(new Date(Date.now() - 86400000)), course: '护理基础实训', period: '第 3 节', exceptions: [{ name: '顾怀川', status: '迟到' }, { name: '叶清欢', status: '请假' }] },
+                { id: 'rollcall-history-2', date: shiftedDateValue(-2), week: getAcademicWeekNumber(new Date(Date.now() - 172800000)), course: '语文', period: '第 2 节', exceptions: [{ name: '陈柏安', status: '缺勤' }, { name: '林知夏', status: '迟到' }] },
+                { id: 'rollcall-history-3', date: shiftedDateValue(-3), week: getAcademicWeekNumber(new Date(Date.now() - 259200000)), course: '护理礼仪', period: '第 1 节', exceptions: [] },
+                { id: 'rollcall-history-4', date: shiftedDateValue(-7), week: getAcademicWeekNumber(new Date(Date.now() - 604800000)), course: '班会', period: '第 7 节', exceptions: [{ name: '周景行', status: '请假' }] }
+            ]
         };
 
         const makeDormBeds = names => names.map((studentName, index) => ({
@@ -2757,10 +3246,21 @@
             classModule: null,
             classModuleReturnTab: 'management',
             logDetailId: '',
+            logDetailOrigin: 'class-module',
+            logHistoryStudentId: '',
+            logHistoryTimeFilter: 'term',
+            logsPendingExpanded: false,
             leaveSearch: '',
-            leaveTimeFilter: 'all',
+            leaveTimeFilter: 'week',
+            leaveStatusFilter: 'all',
             leaveCustomStart: '',
             leaveCustomEnd: '',
+            disciplineSearch: '',
+            disciplineTimeFilter: 'week',
+            disciplineCustomStart: '',
+            disciplineCustomEnd: '',
+            selectedDisciplineId: '',
+            disciplineDraftPhotos: [],
             dormRoomId: 'F402',
             dormTransitionDirection: '',
             dormPickerTransitionDirection: '',
@@ -2768,11 +3268,17 @@
             rollcallSearch: '',
             rollcallFilter: 'all',
             rollcallExpandedId: '',
+            rollcallWeek: getAcademicWeekNumber(),
+            rollcallCourseIndex: 0,
+            rollcallSessionKey: '',
+            selectedRollcallHistoryId: '',
             studentDetailOrigin: 'list',
             callReturnFocus: null,
             activeTab: 'identity',
-            attendancePeriodFilter: 'all',
+            attendancePeriodFilter: 'week',
             attendanceStatusFilter: 'all',
+            attendanceEditContext: null,
+            attendanceEditOrigin: 'attendance',
             homeReturnFeature: '全校学生',
             detailReturnStudentId: null,
             editMode: false,
@@ -2795,6 +3301,28 @@
         const logDetailRoot = document.getElementById('logDetailRoot');
         const logDetailStatus = document.getElementById('logDetailStatus');
         const logDetailReviewButton = document.getElementById('logDetailReviewButton');
+        const studentLogHistoryView = document.getElementById('studentLogHistoryView');
+        const studentLogHistoryBackButton = document.getElementById('studentLogHistoryBackButton');
+        const studentLogHistoryTitle = document.getElementById('studentLogHistoryTitle');
+        const studentLogHistoryScroll = document.getElementById('studentLogHistoryScroll');
+        const studentLogHistoryRoot = document.getElementById('studentLogHistoryRoot');
+        const rollcallHistoryView = document.getElementById('rollcallHistoryView');
+        const rollcallHistoryBackButton = document.getElementById('rollcallHistoryBackButton');
+        const rollcallHistoryScroll = document.getElementById('rollcallHistoryScroll');
+        const rollcallHistoryRoot = document.getElementById('rollcallHistoryRoot');
+        const rollcallRecordView = document.getElementById('rollcallRecordView');
+        const rollcallRecordBackButton = document.getElementById('rollcallRecordBackButton');
+        const rollcallRecordScroll = document.getElementById('rollcallRecordScroll');
+        const rollcallRecordRoot = document.getElementById('rollcallRecordRoot');
+        const disciplineDetailView = document.getElementById('disciplineDetailView');
+        const disciplineDetailBackButton = document.getElementById('disciplineDetailBackButton');
+        const disciplineDetailScroll = document.getElementById('disciplineDetailScroll');
+        const disciplineDetailRoot = document.getElementById('disciplineDetailRoot');
+        const disciplineAddView = document.getElementById('disciplineAddView');
+        const disciplineAddScroll = document.getElementById('disciplineAddScroll');
+        const disciplineAddForm = document.getElementById('disciplineAddForm');
+        const disciplineCameraInput = document.getElementById('disciplineCameraInput');
+        const disciplinePhotoInput = document.getElementById('disciplinePhotoInput');
         const listView = document.getElementById('listView');
         const addView = document.getElementById('addView');
         const detailView = document.getElementById('detailView');
@@ -2802,6 +3330,10 @@
         const attendanceBackButton = document.getElementById('attendanceBackButton');
         const attendanceScroll = document.getElementById('attendanceScroll');
         const attendanceRoot = document.getElementById('attendanceRoot');
+        const attendanceEditorView = document.getElementById('attendanceEditorView');
+        const attendanceEditorBackButton = document.getElementById('attendanceEditorBackButton');
+        const attendanceEditorScroll = document.getElementById('attendanceEditorScroll');
+        const attendanceEditorRoot = document.getElementById('attendanceEditorRoot');
         const studentAttendanceDock = document.getElementById('studentAttendanceDock');
         const studentAttendanceStatus = document.getElementById('studentAttendanceStatus');
         const studentList = document.getElementById('studentList');
@@ -3095,16 +3627,25 @@
 
         function setView(nextView) {
             state.view = nextView;
+            const classChildViews = ['class-todo','class-module','student-log-history','log-detail','rollcall-history','rollcall-record','discipline-detail','discipline-add'];
+            const moduleChildViews = ['student-log-history','log-detail','rollcall-history','rollcall-record','discipline-detail','discipline-add'];
+            const inClassFlow = nextView === 'class-detail' || classChildViews.includes(nextView) || (/detail|attendance/.test(nextView) && state.studentDetailOrigin === 'class-detail');
             homeView.className = `app-view school-home-view${nextView === 'home' ? ' active' : ' behind'}`;
-            classListView.className = `app-view${nextView === 'class-list' ? ' active' : (/class-detail|class-todo|class-module|log-detail/.test(nextView) || (/detail|attendance/.test(nextView) && state.studentDetailOrigin === 'class-detail') ? ' behind' : '')}`;
-            classDetailView.className = `app-view${nextView === 'class-detail' ? ' active' : (/class-todo|class-module|log-detail/.test(nextView) || (/detail|attendance/.test(nextView) && state.studentDetailOrigin === 'class-detail') ? ' behind' : '')}`;
-            classTodoView.className = `app-view${nextView === 'class-todo' ? ' active' : (nextView === 'class-module' && state.classModuleReturnTab === 'todo' ? ' behind' : '')}`;
-            classModuleView.className = `app-view${nextView === 'class-module' ? ' active' : (nextView === 'log-detail' ? ' behind' : '')}`;
+            classListView.className = `app-view${nextView === 'class-list' ? ' active' : (inClassFlow ? ' behind' : '')}`;
+            classDetailView.className = `app-view${nextView === 'class-detail' ? ' active' : (classChildViews.includes(nextView) || (/detail|attendance/.test(nextView) && state.studentDetailOrigin === 'class-detail') ? ' behind' : '')}`;
+            classTodoView.className = `app-view${nextView === 'class-todo' ? ' active' : ((nextView === 'class-module' || moduleChildViews.includes(nextView)) && state.classModuleReturnTab === 'todo' ? ' behind' : '')}`;
+            classModuleView.className = `app-view${nextView === 'class-module' ? ' active' : (moduleChildViews.includes(nextView) ? ' behind' : '')}`;
+            studentLogHistoryView.className = `app-view${nextView === 'student-log-history' ? ' active' : (nextView === 'log-detail' && state.logDetailOrigin === 'student-log-history' ? ' behind' : '')}`;
             logDetailView.className = `app-view${nextView === 'log-detail' ? ' active' : ''}`;
-            listView.className = `app-view${nextView === 'list' ? ' active' : (/detail|attendance|add/.test(nextView) && state.studentDetailOrigin !== 'class-detail' ? ' behind' : '')}`;
+            rollcallHistoryView.className = `app-view${nextView === 'rollcall-history' ? ' active' : (nextView === 'rollcall-record' ? ' behind' : '')}`;
+            rollcallRecordView.className = `app-view${nextView === 'rollcall-record' ? ' active' : ''}`;
+            disciplineDetailView.className = `app-view${nextView === 'discipline-detail' ? ' active' : ''}`;
+            disciplineAddView.className = `app-view${nextView === 'discipline-add' ? ' active' : ''}`;
+            listView.className = `app-view${nextView === 'list' ? ' active' : (['detail','attendance','attendance-edit','add'].includes(nextView) && state.studentDetailOrigin !== 'class-detail' ? ' behind' : '')}`;
             addView.className = `app-view${nextView === 'add' ? ' active' : ''}`;
-            detailView.className = `app-view${nextView === 'detail' ? ' active' : (nextView === 'attendance' ? ' behind' : '')}${state.editMode ? ' is-editing' : ''}`;
-            attendanceView.className = `app-view${nextView === 'attendance' ? ' active' : ''}`;
+            detailView.className = `app-view${nextView === 'detail' ? ' active' : (['attendance','attendance-edit'].includes(nextView) ? ' behind' : '')}${state.editMode ? ' is-editing' : ''}`;
+            attendanceView.className = `app-view${nextView === 'attendance' ? ' active' : (nextView === 'attendance-edit' && state.attendanceEditOrigin === 'attendance' ? ' behind' : '')}`;
+            attendanceEditorView.className = `app-view${nextView === 'attendance-edit' ? ' active' : ''}`;
         }
 
         function initializeClassFilter() {
@@ -3207,9 +3748,44 @@
 
         const workflowClassId = 'CLS2403';
 
+        function ensurePendingClassLogs(classInfo = getSelectedClass()) {
+            if (!classInfo || classInfo.id !== workflowClassId) return;
+            if (classWorkflowState.pendingLogsSeeded) return;
+            const roster = ensureClassRoster(classInfo);
+            const targetCount = Math.max(0, roster.length - 2);
+            let pendingCount = classWorkflowState.logs.filter(item => item.status === '待批阅').length;
+            if (pendingCount >= targetCount) {
+                classWorkflowState.pendingLogsSeeded = true;
+                return;
+            }
+            const pendingNames = new Set(classWorkflowState.logs.filter(item => item.status === '待批阅').map(item => item.name));
+            const titles = ['本周成长记录','护理技能练习复盘','学习计划完成情况','班级生活周记','课堂收获与反思'];
+            const summaries = ['复盘了本周学习任务与完成情况。','记录技能练习中的进步和待改进项。','整理课堂重点并制定下周计划。','记录本周班级生活与个人感受。','总结课堂收获与课后练习情况。'];
+            roster.forEach((studentItem, index) => {
+                if (pendingCount >= targetCount || pendingNames.has(studentItem.name)) return;
+                const id = `log-auto-${studentItem.id}`;
+                if (classWorkflowState.logs.some(item => item.id === id)) return;
+                const templateIndex = index % titles.length;
+                classWorkflowState.logs.push({
+                    id,
+                    date: shiftedDateValue(-(index % 5)),
+                    name: studentItem.name,
+                    title: titles[templateIndex],
+                    summary: summaries[templateIndex],
+                    content: `${summaries[templateIndex]}本周按要求完成了每日记录，并结合老师与同学的反馈梳理了需要继续加强的部分。下周会按照计划持续练习并补充具体结果。`,
+                    status: '待批阅',
+                    review: ''
+                });
+                pendingNames.add(studentItem.name);
+                pendingCount += 1;
+            });
+            classWorkflowState.pendingLogsSeeded = true;
+        }
+
         function getClassPendingCounts(classInfo = getSelectedClass()) {
             if (!classInfo || classInfo.id !== workflowClassId) return { leave: 0, dorm: 0, auth: 0, discipline: 0, logs: 0, total: 0 };
             const roster = ensureClassRoster(classInfo);
+            ensurePendingClassLogs(classInfo);
             const counts = {
                 leave: classWorkflowState.leave.filter(item => item.status === '待审批').length,
                 dorm: classWorkflowState.dorm.filter(item => !item.assignment).length,
@@ -3275,12 +3851,11 @@
         function renderClassSchoolSummary() {
             const totals = schoolClasses.reduce((sum, item) => ({ total: sum.total + item.total, male: sum.male + item.male, female: sum.female + item.female }), { total: 0, male: 0, female: 0 });
             classSchoolSummary.innerHTML = `
-                <div class="class-summary-head"><strong>${schoolClasses.length} 个行政班</strong><span>全校在籍看板</span></div>
-                <div class="class-summary-stats">
+                <div class="class-summary-inline"><strong>${schoolClasses.length} 个行政班</strong><div class="class-summary-stats">
                     <div class="class-summary-stat"><strong>${totals.total}</strong><span>总人数</span></div>
                     <div class="class-summary-stat male"><strong>${totals.male}</strong><span>男生</span></div>
                     <div class="class-summary-stat female"><strong>${totals.female}</strong><span>女生</span></div>
-                </div>`;
+                </div></div>`;
         }
 
         function getFilteredClasses() {
@@ -3333,10 +3908,10 @@
 
         function getClassScoreEvaluation(score) {
             const value = Number(score);
-            if (value >= 90) return { label: '整体表现优秀', tone: 'excellent' };
-            if (value >= 80) return { label: '整体表现稳定', tone: 'steady' };
-            if (value >= 70) return { label: '整体表现有提升空间', tone: 'watch' };
-            return { label: '整体表现需重点关注', tone: 'risk' };
+            if (value >= 90) return { tone: 'excellent' };
+            if (value >= 80) return { tone: 'good' };
+            if (value >= 60) return { tone: 'watch' };
+            return { tone: 'risk' };
         }
 
         function renderClassOverview() {
@@ -3352,10 +3927,9 @@
                         <div class="class-dashboard-title"><span>班级看板</span><strong>${escapeHtml(getClassDisplayName(classInfo))}</strong></div>
                     </div>
                     <div class="class-dashboard-primary">
-                        <div class="class-dashboard-focus">
+                        <div class="class-dashboard-focus score-${scoreEvaluation.tone}">
                             <span class="class-dashboard-focus-label">昨日班级均分</span>
                             <div class="class-dashboard-focus-value"><strong>${classInfo.yesterdayScore}</strong><small>分</small></div>
-                            <span class="class-dashboard-focus-note ${scoreEvaluation.tone}">${scoreEvaluation.label}</span>
                         </div>
                         <div class="class-dashboard-rank">
                             <span>本周排名</span>
@@ -3364,8 +3938,8 @@
                         </div>
                     </div>
                     <div class="class-dashboard-secondary">
-                        <div class="class-dashboard-mini"><span>今日迟到 / 缺勤</span><strong>${classInfo.todayLate || 0}/${classInfo.todayAbsent || 0}<small>人</small></strong></div>
-                        <div class="class-dashboard-mini"><span>昨日迟到 / 缺勤</span><strong>${classInfo.yesterdayLate || 0}/${classInfo.yesterdayAbsent || 0}<small>人</small></strong></div>
+                        <div class="class-attendance-day"><span>今日考勤</span><div class="class-attendance-line late"><small>迟到</small><strong>${classInfo.todayLate || 0}/${classInfo.total}人</strong></div><div class="class-attendance-line absent"><small>缺勤</small><strong>${classInfo.todayAbsent || 0}/${classInfo.total}人</strong></div></div>
+                        <div class="class-attendance-day"><span>昨日考勤</span><div class="class-attendance-line late"><small>迟到</small><strong>${classInfo.yesterdayLate || 0}/${classInfo.total}人</strong></div><div class="class-attendance-line absent"><small>缺勤</small><strong>${classInfo.yesterdayAbsent || 0}/${classInfo.total}人</strong></div></div>
                     </div>
                 </section>
                 <div class="class-section-head" id="classStudentSection"><h2>${state.classStudentFilter === 'auth' ? '未认证学生' : '学生列表'}（${filteredRoster.length}）</h2></div>
@@ -3490,10 +4064,7 @@
             const sortedCadres = getSortedClassCadres();
             classInfoPanel.innerHTML = `
                 <section class="class-info-card" aria-label="班级基础信息">
-                    <div class="class-info-card-head"><span class="class-info-heading"><small>班级档案</small><strong>${escapeHtml(getClassDisplayName(classInfo))}</strong></span><span class="class-info-head-tag">基础信息</span></div>
-                    <div class="class-info-row"><span class="class-info-label">培养方案</span><span class="class-info-value">${escapeHtml(classInfo.plan)}</span></div>
-                    <div class="class-info-row"><span class="class-info-label">开班日期</span><span class="class-info-value">${escapeHtml(classInfo.openedAt)}</span></div>
-                    <div class="class-info-row"><span class="class-info-label">上课教室</span><span class="class-info-value">${escapeHtml(classInfo.room)}</span></div>
+                    <div class="class-info-compact"><div class="class-info-plan"><span>培养方案</span><strong>${escapeHtml(classInfo.plan)}</strong></div><div class="class-info-date"><strong>${escapeHtml(classInfo.openedAt)}</strong><small>开班</small></div><div class="class-info-room"><strong>${escapeHtml(classInfo.room)}</strong></div></div>
                 </section>
                 <div class="class-section-head"><h2>班级老师（${getClassTeachers(classInfo).length}）</h2></div>
                 <section class="contact-list">${getClassTeachers(classInfo).map((item, index) => contactRow(item, 'teacher', index)).join('')}</section>
@@ -3587,8 +4158,10 @@
             const query = state.leaveSearch.trim().toLowerCase();
             const range = getLeaveFilterRange();
             return classWorkflowState.leave.filter(item => {
-                const matchesQuery = !query || [item.name,item.reason,item.period,item.status].some(value => String(value || '').toLowerCase().includes(query));
-                if (!matchesQuery || !range) return matchesQuery;
+                const matchesQuery = !query || [item.name,item.reason,item.description,item.period,item.status].some(value => String(value || '').toLowerCase().includes(query));
+                const matchesStatus = state.leaveStatusFilter === 'all' || item.status === state.leaveStatusFilter;
+                if (!matchesQuery || !matchesStatus) return false;
+                if (!range) return true;
                 const start = parseLocalDateValue(item.startDate);
                 const end = parseLocalDateValue(item.endDate || item.startDate);
                 return Boolean(start && end && end >= range.start && start <= range.end);
@@ -3605,13 +4178,14 @@
             if (!records.length) return '<div class="leave-empty-result">没有找到匹配的请假申请<br>可调整关键词或时间范围</div>';
             return records.map((item, index) => {
                 const statusClass = item.status === '已驳回' ? ' rejected' : (item.status === '待审批' ? '' : ' done');
-                return `<article class="module-card leave-card" role="button" tabindex="0" data-action="open-leave-detail" data-leave-id="${escapeHtml(item.id)}" aria-label="查看${escapeHtml(item.name)}的请假详情"><div class="leave-card-main"><div><div class="module-card-head"><div><div class="module-card-name">${escapeHtml(item.name)} · ${escapeHtml(item.reason)}</div><div class="module-card-sub">${escapeHtml(item.period)}</div></div><span class="module-status${statusClass}">${escapeHtml(item.status)}</span></div></div><button type="button" class="leave-thumb-button" data-action="preview-leave-image" data-leave-id="${escapeHtml(item.id)}" aria-label="放大${escapeHtml(item.evidenceLabel || '请假凭证')}">${leaveEvidenceMarkup(item, index)}</button></div>${item.rejectReason ? `<div class="module-reject-reason"><strong>驳回原因</strong><span>${escapeHtml(item.rejectReason)}</span></div>` : ''}${item.status === '待审批' ? `<div class="module-card-actions"><button type="button" class="module-action danger" data-workflow="leave" data-workflow-id="${item.id}" data-workflow-value="已驳回">驳回</button><button type="button" class="module-action primary" data-workflow="leave" data-workflow-id="${item.id}" data-workflow-value="已通过">通过</button></div>${pendingBadgeMarkup(1)}` : ''}</article>`;
+                return `<article class="module-card leave-card" role="button" tabindex="0" data-action="open-leave-detail" data-leave-id="${escapeHtml(item.id)}" aria-label="查看${escapeHtml(item.name)}的请假详情"><div class="leave-card-main"><div><div class="module-card-head"><div><div class="module-card-name">${escapeHtml(item.name)} · ${escapeHtml(item.reason)}</div><div class="module-card-sub">${escapeHtml(item.period)}</div></div><span class="module-status${statusClass}">${escapeHtml(item.status)}</span></div><p class="leave-application-text">${escapeHtml(item.description || item.reason)}</p></div><button type="button" class="leave-thumb-button" data-action="preview-leave-image" data-leave-id="${escapeHtml(item.id)}" aria-label="放大${escapeHtml(item.evidenceLabel || '请假凭证')}">${leaveEvidenceMarkup(item, index)}</button></div>${item.rejectReason ? `<div class="module-reject-reason"><strong>驳回原因</strong><span>${escapeHtml(item.rejectReason)}</span></div>` : ''}${item.status === '待审批' ? `<div class="module-card-actions"><button type="button" class="module-action danger" data-workflow="leave" data-workflow-id="${item.id}" data-workflow-value="已驳回">驳回</button><button type="button" class="module-action primary" data-workflow="leave" data-workflow-id="${item.id}" data-workflow-value="已通过">通过</button></div>${pendingBadgeMarkup(1)}` : ''}</article>`;
             }).join('');
         }
 
         function renderLeaveModule() {
             const records = getFilteredLeaveRecords();
-            return `<section class="leave-toolbar" aria-label="请假申请搜索与时间筛选"><div class="leave-toolbar-row"><div class="leave-search"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="leaveSearch" type="search" value="${escapeHtml(state.leaveSearch)}" placeholder="搜索姓名 / 原因 / 状态" autocomplete="off" aria-label="搜索请假申请"><button type="button" class="leave-search-clear${state.leaveSearch ? ' visible' : ''}" data-action="clear-leave-search" aria-label="清空请假搜索"><svg aria-hidden="true" viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg></button></div><button type="button" class="leave-time-trigger" id="leaveTimeTrigger" data-action="open-leave-time-filter" aria-haspopup="dialog" aria-controls="pickerLayer" aria-expanded="false"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M8 3v4M16 3v4M3 10h18"></path></svg><span>${escapeHtml(getLeaveTimeFilterLabel())}</span><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></button></div></section><div class="class-section-head"><h2 id="leaveResultTitle">请假申请（${records.length}）</h2></div><div class="module-list" id="leaveList">${renderLeaveCards(records)}</div>`;
+            const statusOptions = [{ value: 'all', label: '全部' }, { value: '已通过', label: '已通过' }, { value: '已驳回', label: '已驳回' }];
+            return `<section class="leave-toolbar" aria-label="请假申请搜索与筛选"><div class="leave-toolbar-row"><div class="leave-search"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="leaveSearch" type="search" value="${escapeHtml(state.leaveSearch)}" placeholder="搜索姓名 / 原因 / 状态" autocomplete="off" aria-label="搜索请假申请"><button type="button" class="leave-search-clear${state.leaveSearch ? ' visible' : ''}" data-action="clear-leave-search" aria-label="清空请假搜索"><svg aria-hidden="true" viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg></button></div><button type="button" class="leave-time-trigger" id="leaveTimeTrigger" data-action="open-leave-time-filter" aria-haspopup="dialog" aria-controls="pickerLayer" aria-expanded="false"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M8 3v4M16 3v4M3 10h18"></path></svg><span>${escapeHtml(getLeaveTimeFilterLabel())}</span><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></button></div><div class="leave-status-filters" aria-label="按审批状态筛选">${statusOptions.map(option => `<button type="button" class="leave-status-chip${state.leaveStatusFilter === option.value ? ' active' : ''}" data-action="set-leave-status-filter" data-leave-status="${option.value}" aria-pressed="${state.leaveStatusFilter === option.value ? 'true' : 'false'}">${option.label}</button>`).join('')}</div></section><div class="class-section-head"><h2 id="leaveResultTitle">请假申请（${records.length}）</h2></div><div class="module-list" id="leaveList">${renderLeaveCards(records)}</div>`;
         }
 
         function updateLeaveList() {
@@ -3666,7 +4240,96 @@
             requestAnimationFrame(() => document.getElementById('leaveTimeTrigger')?.focus());
         }
 
-        const rollcallStatuses = ['缺勤','迟到','请假','到课'];
+        const rollcallStatuses = ['到课','迟到','请假','缺勤'];
+
+        function getAutoRollcallSession(date = new Date()) {
+            const course = getCurrentAttendanceCourse(date) || attendanceCourseSchedule[0];
+            const courseIndex = Math.max(0, attendanceCourseSchedule.findIndex(item => item.period === course.period && item.course === course.course));
+            return { week: getAcademicWeekNumber(date), courseIndex };
+        }
+
+        function getRollcallSessionKey(week = state.rollcallWeek, courseIndex = state.rollcallCourseIndex) {
+            return `${state.selectedClassId}-${Number(week) || 1}-${Number(courseIndex) || 0}`;
+        }
+
+        function switchRollcallSession(week, courseIndex) {
+            if (state.rollcallSessionKey) classWorkflowState.rollcallSessionDrafts[state.rollcallSessionKey] = clone(classWorkflowState.rollcall);
+            state.rollcallWeek = Math.max(1, Math.min(30, Number(week) || 1));
+            state.rollcallCourseIndex = Math.max(0, Math.min(attendanceCourseSchedule.length - 1, Number(courseIndex) || 0));
+            state.rollcallSessionKey = getRollcallSessionKey();
+            classWorkflowState.rollcall = clone(classWorkflowState.rollcallSessionDrafts[state.rollcallSessionKey] || {});
+            state.rollcallExpandedId = '';
+        }
+
+        function initializeRollcallSession() {
+            const automatic = getAutoRollcallSession();
+            const sessionKey = getRollcallSessionKey(automatic.week, automatic.courseIndex);
+            if (!Object.prototype.hasOwnProperty.call(classWorkflowState.rollcallSessionDrafts, sessionKey)) {
+                classWorkflowState.rollcallSessionDrafts[sessionKey] = {};
+            }
+            switchRollcallSession(automatic.week, automatic.courseIndex);
+        }
+
+        function getRollcallStatusCounts(statusMap = classWorkflowState.rollcall) {
+            const roster = ensureClassRoster(getSelectedClass());
+            return roster.reduce((counts, item) => {
+                const status = statusMap[item.id] || '到课';
+                counts[status] = (counts[status] || 0) + 1;
+                return counts;
+            }, { '到课': 0, '迟到': 0, '请假': 0, '缺勤': 0 });
+        }
+
+        function getRollcallExceptions() {
+            const roster = ensureClassRoster(getSelectedClass());
+            return ['迟到','缺勤','请假'].map(status => ({
+                status,
+                students: roster.filter(item => (classWorkflowState.rollcall[item.id] || '到课') === status)
+            })).filter(group => group.students.length);
+        }
+
+        function applyRollcallToAll(status) {
+            if (!['到课','缺勤'].includes(status)) return;
+            ensureClassRoster(getSelectedClass()).forEach(item => { classWorkflowState.rollcall[item.id] = status; });
+            classWorkflowState.rollcallSessionDrafts[state.rollcallSessionKey] = clone(classWorkflowState.rollcall);
+            state.rollcallExpandedId = '';
+            renderClassModule();
+            showToast(status === '到课' ? '已将全班设为到课' : '已将全班设为缺勤');
+        }
+
+        function renderRollcallSessionPicker() {
+            const context = state.pickerContext;
+            if (context?.type !== 'rollcall-session') return;
+            pickerBody.removeAttribute('role');
+            pickerBody.removeAttribute('aria-label');
+            pickerBody.innerHTML = `<div class="rollcall-session-editor"><div class="rollcall-session-field"><label for="rollcallWeekInput">周次</label><input class="rollcall-week-input" id="rollcallWeekInput" type="number" inputmode="numeric" min="1" max="30" value="${context.week}" aria-label="输入周次"></div><div class="rollcall-session-field"><label>课次</label><div class="rollcall-course-grid">${attendanceCourseSchedule.map((item, index) => `<button type="button" class="rollcall-course-choice${context.courseIndex === index ? ' active' : ''}" data-action="select-rollcall-course" data-rollcall-course-index="${index}" aria-pressed="${context.courseIndex === index ? 'true' : 'false'}"><strong>${escapeHtml(item.period)}</strong><small>${escapeHtml(item.course)} · ${item.start}</small></button>`).join('')}</div></div><button type="button" class="leave-range-apply" data-action="confirm-rollcall-session">应用周次与课次</button></div>`;
+        }
+
+        function openRollcallSessionPicker(trigger) {
+            state.pickerContext = { type: 'rollcall-session', trigger, week: state.rollcallWeek, courseIndex: state.rollcallCourseIndex };
+            renderRollcallSessionPicker();
+            showPicker('切换点名课次');
+        }
+
+        function selectRollcallPickerCourse(index) {
+            if (state.pickerContext?.type !== 'rollcall-session') return;
+            state.pickerContext.courseIndex = Math.max(0, Math.min(attendanceCourseSchedule.length - 1, Number(index) || 0));
+            renderRollcallSessionPicker();
+            requestAnimationFrame(() => pickerBody.querySelector(`[data-rollcall-course-index="${state.pickerContext.courseIndex}"]`)?.focus());
+        }
+
+        function confirmRollcallSession() {
+            if (state.pickerContext?.type !== 'rollcall-session') return;
+            const weekInput = document.getElementById('rollcallWeekInput');
+            const week = Number(weekInput?.value);
+            if (!Number.isInteger(week) || week < 1 || week > 30) {
+                weekInput?.focus();
+                return showToast('周次请输入 1—30');
+            }
+            switchRollcallSession(week, state.pickerContext.courseIndex);
+            closePicker(false);
+            renderClassModule();
+            requestAnimationFrame(() => document.getElementById('rollcallSessionTrigger')?.focus());
+        }
 
         function getFilteredRollcallRoster() {
             const query = state.rollcallSearch.trim().toLowerCase();
@@ -3697,47 +4360,312 @@
             const count = document.getElementById('rollcallCount');
             if (list) list.innerHTML = renderRollcallListMarkup();
             if (count) count.textContent = `点名名单（${getFilteredRollcallRoster().length}）`;
+            const session = document.getElementById('rollcallSessionCard');
+            if (session) session.outerHTML = renderRollcallSessionCard();
+        }
+
+        function renderRollcallSessionCard() {
+            const course = attendanceCourseSchedule[state.rollcallCourseIndex] || attendanceCourseSchedule[0];
+            const counts = getRollcallStatusCounts();
+            const exceptionGroups = getRollcallExceptions();
+            return `<section class="rollcall-session-card" id="rollcallSessionCard" aria-label="当前点名课次与数据看板"><div class="rollcall-session-head"><div class="rollcall-session-copy"><span>当前点名</span><strong>第 ${state.rollcallWeek} 周 · ${escapeHtml(course.period)}</strong><small>${escapeHtml(course.course)} · ${course.start}—${course.end}</small></div><button type="button" class="rollcall-session-trigger" id="rollcallSessionTrigger" data-action="open-rollcall-session-picker" aria-haspopup="dialog" aria-controls="pickerLayer" aria-expanded="false">切换<svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></button></div><div class="rollcall-dashboard"><div class="rollcall-metric present"><strong>${counts['到课']}</strong><span>到课</span></div><div class="rollcall-metric late"><strong>${counts['迟到']}</strong><span>迟到</span></div><div class="rollcall-metric leave"><strong>${counts['请假']}</strong><span>请假</span></div><div class="rollcall-metric absent"><strong>${counts['缺勤']}</strong><span>缺勤</span></div></div><div class="rollcall-default-note"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"></path></svg><span><strong>全班已默认标记为到课</strong><span>仅需调整迟到、请假或缺勤学生。</span></span></div><div class="rollcall-exceptions">${exceptionGroups.length ? exceptionGroups.map(group => `<div class="rollcall-exception-row ${rollcallStatusTone(group.status)}"><span>${group.status}</span><p>${group.students.map(item => escapeHtml(item.name)).join('、')}</p></div>`).join('') : '<div class="rollcall-all-present">本节课全员到课</div>'}</div><div class="rollcall-bulk-actions"><button type="button" class="rollcall-bulk-button present" data-action="rollcall-all-present">全部到课</button><button type="button" class="rollcall-bulk-button absent" data-action="rollcall-all-absent">全部缺勤</button><button type="button" class="rollcall-bulk-button history" data-action="open-rollcall-history">过往记录</button></div></section>`;
         }
 
         function renderRollcallModule() {
-            return `<section class="rollcall-toolbar" aria-label="点名搜索与筛选"><div class="rollcall-search"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="rollcallSearch" type="search" value="${escapeHtml(state.rollcallSearch)}" placeholder="搜索学生姓名" autocomplete="off" aria-label="搜索点名学生"></div><div class="rollcall-filters" aria-label="按点名状态筛选"><button type="button" class="rollcall-filter-chip${state.rollcallFilter === 'all' ? ' active' : ''}" data-action="set-rollcall-filter" data-rollcall-filter="all">全部</button>${rollcallStatuses.map(status => `<button type="button" class="rollcall-filter-chip${state.rollcallFilter === status ? ' active' : ''}" data-action="set-rollcall-filter" data-rollcall-filter="${status}">${status}</button>`).join('')}</div></section><div class="class-section-head"><h2 id="rollcallCount">点名名单（${getFilteredRollcallRoster().length}）</h2></div><div class="module-list rollcall-grid" id="rollcallList">${renderRollcallListMarkup()}</div>`;
+            return `${renderRollcallSessionCard()}<section class="rollcall-toolbar" aria-label="点名搜索与筛选"><div class="rollcall-search"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="rollcallSearch" type="search" value="${escapeHtml(state.rollcallSearch)}" placeholder="搜索学生姓名" autocomplete="off" aria-label="搜索点名学生"></div><div class="rollcall-filters" aria-label="按点名状态筛选"><button type="button" class="rollcall-filter-chip${state.rollcallFilter === 'all' ? ' active' : ''}" data-action="set-rollcall-filter" data-rollcall-filter="all">全部</button>${rollcallStatuses.map(status => `<button type="button" class="rollcall-filter-chip${state.rollcallFilter === status ? ' active' : ''}" data-action="set-rollcall-filter" data-rollcall-filter="${status}">${status}</button>`).join('')}</div></section><div class="class-section-head"><h2 id="rollcallCount">点名名单（${getFilteredRollcallRoster().length}）</h2></div><div class="module-list rollcall-grid" id="rollcallList">${renderRollcallListMarkup()}</div>`;
+        }
+
+        function getRollcallHistoryStatus(session, studentItem) {
+            return session.exceptions?.find(item => item.name === studentItem.name)?.status || '到课';
+        }
+
+        function getRollcallHistoryCounts(session) {
+            const roster = ensureClassRoster(getSelectedClass());
+            return roster.reduce((counts, studentItem) => {
+                const status = getRollcallHistoryStatus(session, studentItem);
+                counts[status] = (counts[status] || 0) + 1;
+                return counts;
+            }, { '到课': 0, '迟到': 0, '请假': 0, '缺勤': 0 });
+        }
+
+        function renderRollcallHistoryPage() {
+            const records = [...classWorkflowState.rollcallHistory].sort((a, b) => String(b.date).localeCompare(String(a.date)));
+            rollcallHistoryRoot.innerHTML = `<div class="class-section-head"><h2>历史课次（${records.length}）</h2><span>按时间倒序</span></div><div class="rollcall-history-list">${records.map(item => {
+                const counts = getRollcallHistoryCounts(item);
+                return `<button type="button" class="rollcall-history-card" data-action="open-rollcall-record" data-rollcall-history-id="${escapeHtml(item.id)}"><span class="rollcall-history-head"><strong>${escapeHtml(item.course)} · ${escapeHtml(item.period)}</strong><span>第 ${item.week} 周</span></span><span class="rollcall-history-meta">${escapeHtml(formatWorkflowDate(item.date))} · 全班 ${getSelectedClass().total} 人</span><span class="rollcall-history-counts"><span>到课 ${counts['到课']}</span><span>迟到 ${counts['迟到']}</span><span>请假 ${counts['请假']}</span><span>缺勤 ${counts['缺勤']}</span></span></button>`;
+            }).join('')}</div>`;
+        }
+
+        function openRollcallHistory() {
+            classWorkflowState.rollcallSessionDrafts[state.rollcallSessionKey] = clone(classWorkflowState.rollcall);
+            renderRollcallHistoryPage();
+            setView('rollcall-history');
+            rollcallHistoryScroll.scrollTop = 0;
+            focusAfterViewChange(rollcallHistoryBackButton);
+        }
+
+        function renderRollcallRecordPage() {
+            const record = classWorkflowState.rollcallHistory.find(item => item.id === state.selectedRollcallHistoryId);
+            if (!record) return;
+            const roster = ensureClassRoster(getSelectedClass());
+            const counts = getRollcallHistoryCounts(record);
+            rollcallRecordRoot.innerHTML = `<section class="rollcall-record-summary"><span>第 ${record.week} 周 · ${escapeHtml(record.period)}</span><strong>${escapeHtml(record.course)}</strong><small>${escapeHtml(formatWorkflowDate(record.date))} · 到课 ${counts['到课']} · 迟到 ${counts['迟到']} · 请假 ${counts['请假']} · 缺勤 ${counts['缺勤']}</small></section><div class="class-section-head"><h2>点名名单（${roster.length}）</h2></div><section class="rollcall-record-roster">${roster.map((studentItem, index) => {
+                const status = getRollcallHistoryStatus(record, studentItem);
+                return `<div class="rollcall-record-row"><span class="student-sequence" aria-hidden="true">${String(index + 1).padStart(2,'0')}</span><strong>${escapeHtml(studentItem.name)}</strong><span class="rollcall-record-state ${rollcallStatusTone(status)}">${status}</span></div>`;
+            }).join('')}</section>`;
+        }
+
+        function openRollcallRecord(recordId) {
+            const record = classWorkflowState.rollcallHistory.find(item => item.id === recordId);
+            if (!record) return;
+            state.selectedRollcallHistoryId = record.id;
+            renderRollcallRecordPage();
+            setView('rollcall-record');
+            rollcallRecordScroll.scrollTop = 0;
+            focusAfterViewChange(rollcallRecordBackButton);
+        }
+
+        function getDisciplineFilterRange(filter = state.disciplineTimeFilter) {
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            if (filter === 'all') return null;
+            if (filter === 'week') {
+                const start = new Date(today);
+                start.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+                const end = new Date(start);
+                end.setDate(start.getDate() + 6);
+                return { start, end };
+            }
+            if (filter === 'month') return { start: new Date(today.getFullYear(), today.getMonth(), 1), end: new Date(today.getFullYear(), today.getMonth() + 1, 0) };
+            if (filter === 'custom') {
+                const start = parseLocalDateValue(state.disciplineCustomStart);
+                const end = parseLocalDateValue(state.disciplineCustomEnd);
+                return start && end ? { start, end } : null;
+            }
+            return null;
+        }
+
+        function getDisciplineTimeFilterLabel() {
+            if (state.disciplineTimeFilter === 'week') return '本周';
+            if (state.disciplineTimeFilter === 'month') return '本月';
+            if (state.disciplineTimeFilter === 'custom' && state.disciplineCustomStart && state.disciplineCustomEnd) return `${formatLeaveDateShort(state.disciplineCustomStart)}—${formatLeaveDateShort(state.disciplineCustomEnd)}`;
+            return '全部时间';
+        }
+
+        function getFilteredDisciplineRecords() {
+            const keyword = state.disciplineSearch.trim().toLowerCase();
+            const range = getDisciplineFilterRange();
+            return classWorkflowState.discipline.filter(item => {
+                const matchesSearch = !keyword || [item.name,item.event,item.details].some(value => String(value || '').toLowerCase().includes(keyword));
+                if (!matchesSearch || !range) return matchesSearch;
+                const date = parseLocalDateValue(item.date);
+                return Boolean(date && date >= range.start && date <= range.end);
+            }).sort((a, b) => `${b.date} ${b.clock}`.localeCompare(`${a.date} ${a.clock}`));
+        }
+
+        function getClassRosterStudentByName(name) {
+            return ensureClassRoster(getSelectedClass()).find(item => item.name === name) || { name, gender: maleNames.includes(name) ? '男' : '女', avatarUrl: '' };
+        }
+
+        function disciplineEvidenceMarkup(item, index = 0) {
+            const uploaded = item.photoUrls?.[index];
+            if (uploaded) return `<img src="${escapeHtml(uploaded)}" alt="${escapeHtml(item.name)}的违纪记录照片 ${index + 1}">`;
+            const warm = index % 2 === 0;
+            return `<svg role="img" aria-label="${escapeHtml(item.name)}的违纪现场示意图 ${index + 1}" viewBox="0 0 160 120"><defs><linearGradient id="discipline-bg-${slug(item.id)}-${index}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${warm ? '#FEF3C7' : '#E2E8F0'}"/><stop offset="1" stop-color="${warm ? '#FDE68A' : '#CBD5E1'}"/></linearGradient></defs><rect width="160" height="120" fill="url(#discipline-bg-${slug(item.id)}-${index})"/><path d="M0 88 44 58l34 20 31-27 51 37v32H0Z" fill="${warm ? '#D6A24A' : '#64748B'}" opacity=".28"/><rect x="18" y="18" width="124" height="74" rx="8" fill="#fff" opacity=".74"/><path d="M31 78V32h43v46M86 78V43h43v35" fill="none" stroke="${warm ? '#92400E' : '#334155'}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity=".72"/><circle cx="104" cy="29" r="8" fill="${warm ? '#F59E0B' : '#475569'}" opacity=".7"/><path d="M20 98h120" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".72"/></svg>`;
+        }
+
+        function renderDisciplinePhotoGrid(item) {
+            const count = Math.max(1, item.photoUrls?.length || item.photoCount || 1);
+            return `<div class="discipline-photo-grid">${Array.from({ length: count }, (_, index) => `<div class="discipline-photo">${disciplineEvidenceMarkup(item, index)}</div>`).join('')}</div>`;
         }
 
         function renderDisciplineModule() {
-            const records = classWorkflowState.discipline;
-            return `<div class="class-section-head"><h2>违纪记录（${records.length}）</h2></div><div class="module-list">${records.map(item => `<article class="module-card"><div class="module-card-name">${escapeHtml(item.name)} · ${escapeHtml(item.event)}</div><div class="module-card-sub">发生时间 ${escapeHtml(item.time)}</div></article>`).join('')}</div>`;
+            const records = getFilteredDisciplineRecords();
+            return `<section class="discipline-toolbar" aria-label="违纪记录搜索与时间筛选"><div class="discipline-toolbar-row"><div class="discipline-search"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="disciplineSearch" type="search" value="${escapeHtml(state.disciplineSearch)}" placeholder="搜索学生 / 事项" autocomplete="off" aria-label="搜索违纪记录"></div><button type="button" class="discipline-time-trigger" data-action="open-discipline-time-filter" aria-haspopup="dialog" aria-controls="pickerLayer" aria-expanded="false"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M8 3v4M16 3v4M3 10h18"></path></svg><span>${escapeHtml(getDisciplineTimeFilterLabel())}</span></button></div></section><div class="class-section-head"><h2>违纪记录（${records.length}）</h2></div><div class="discipline-list">${records.length ? records.map((item, index) => {
+                const rosterStudent = getClassRosterStudentByName(item.name);
+                const photoCount = Math.max(1, item.photoUrls?.length || item.photoCount || 1);
+                return `<button type="button" class="discipline-card" data-action="open-discipline-detail" data-discipline-id="${escapeHtml(item.id)}" aria-label="第${index + 1}条，查看${escapeHtml(item.name)}的违纪详情"><span class="student-sequence" aria-hidden="true">${String(index + 1).padStart(2,'0')}</span><span class="discipline-avatar ${rosterStudent.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(rosterStudent)}</span><span class="discipline-card-copy"><strong>${escapeHtml(item.name)} · ${escapeHtml(item.event)}</strong><span>${escapeHtml(formatWorkflowDate(item.date))} ${escapeHtml(item.clock || '')}</span><small>${photoCount} 张图片</small></span><span class="discipline-card-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></span></button>`;
+            }).join('') : '<div class="leave-empty-result">本周没有匹配的违纪记录<br>可调整关键词或时间范围</div>'}</div>`;
+        }
+
+        function renderDisciplineTimeFilterPicker() {
+            const context = state.pickerContext;
+            if (context?.type !== 'discipline-time') return;
+            const today = localDateValue(new Date());
+            const options = [{ value: 'all', label: '全部时间' }, { value: 'week', label: '本周' }, { value: 'month', label: '本月' }];
+            pickerBody.removeAttribute('role');
+            pickerBody.removeAttribute('aria-label');
+            pickerBody.innerHTML = `<div class="leave-filter-selection">${options.map(option => `<button type="button" class="leave-filter-option${state.disciplineTimeFilter === option.value ? ' active' : ''}" data-action="select-discipline-time-filter" data-discipline-time-filter="${option.value}"><span>${option.label}</span>${state.disciplineTimeFilter === option.value ? '<svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="5 12 10 17 19 7"></polyline></svg>' : ''}</button>`).join('')}</div><div class="leave-range-title">自定义日期范围</div><div class="leave-range-fields"><div class="leave-range-field"><label for="disciplineRangeStart">开始日期</label><input id="disciplineRangeStart" type="date" value="${escapeHtml(state.disciplineCustomStart || today)}"></div><div class="leave-range-field"><label for="disciplineRangeEnd">结束日期</label><input id="disciplineRangeEnd" type="date" value="${escapeHtml(state.disciplineCustomEnd || today)}"></div></div><button type="button" class="leave-range-apply" data-action="apply-discipline-custom-range">应用自定义范围</button>`;
+        }
+
+        function openDisciplineTimeFilter(trigger) {
+            state.pickerContext = { type: 'discipline-time', trigger };
+            renderDisciplineTimeFilterPicker();
+            showPicker('筛选违纪时间');
+        }
+
+        function applyDisciplineTimeFilter(filter) {
+            if (!['all','week','month'].includes(filter)) return;
+            state.disciplineTimeFilter = filter;
+            closePicker(false);
+            renderClassModule();
+        }
+
+        function applyDisciplineCustomRange() {
+            const start = document.getElementById('disciplineRangeStart')?.value || '';
+            const end = document.getElementById('disciplineRangeEnd')?.value || '';
+            if (!start || !end) return showToast('请选择完整的开始与结束日期');
+            if (start > end) return showToast('开始日期不能晚于结束日期');
+            state.disciplineCustomStart = start;
+            state.disciplineCustomEnd = end;
+            state.disciplineTimeFilter = 'custom';
+            closePicker(false);
+            renderClassModule();
+        }
+
+        function renderDisciplineDetailPage() {
+            const item = classWorkflowState.discipline.find(record => record.id === state.selectedDisciplineId);
+            if (!item) return;
+            const rosterStudent = getClassRosterStudentByName(item.name);
+            disciplineDetailRoot.innerHTML = `<article class="discipline-detail-page"><section class="discipline-detail-hero"><div class="discipline-detail-person"><span class="discipline-avatar ${rosterStudent.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(rosterStudent)}</span><span class="discipline-detail-person-copy"><span>违纪学生</span><strong>${escapeHtml(item.name)}</strong></span></div><div class="discipline-detail-event"><strong>${escapeHtml(item.event)}</strong><span>${escapeHtml(formatWorkflowDate(item.date))} · ${escapeHtml(item.clock || '未记录时间')}</span></div></section><section class="discipline-detail-section"><h2>情况说明</h2><p>${escapeHtml(item.details || item.event)}</p></section><section class="discipline-detail-section"><h2>现场图片</h2>${renderDisciplinePhotoGrid(item)}</section></article>`;
+        }
+
+        function openDisciplineDetail(recordId) {
+            const item = classWorkflowState.discipline.find(record => record.id === recordId);
+            if (!item) return;
+            state.selectedDisciplineId = item.id;
+            renderDisciplineDetailPage();
+            setView('discipline-detail');
+            disciplineDetailScroll.scrollTop = 0;
+            focusAfterViewChange(disciplineDetailBackButton);
+        }
+
+        function renderDisciplineDraftPhotos() {
+            const root = document.getElementById('disciplineDraftPhotos');
+            if (!root) return;
+            root.innerHTML = state.disciplineDraftPhotos.map((item, index) => `<div class="discipline-draft-photo"><img src="${escapeHtml(item.url)}" alt="待上传照片 ${index + 1}"><button type="button" data-action="remove-discipline-photo" data-discipline-photo-index="${index}" aria-label="移除第${index + 1}张照片"><svg aria-hidden="true" viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg></button></div>`).join('');
+        }
+
+        function renderDisciplineAddPage() {
+            const roster = ensureClassRoster(getSelectedClass());
+            disciplineAddForm.innerHTML = `<section class="discipline-form-card"><div class="discipline-form-field"><label for="disciplineStudentSelect">学生姓名</label><select id="disciplineStudentSelect" required><option value="">请选择学生</option>${roster.map(item => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.name)}</option>`).join('')}</select></div><div class="discipline-form-field"><label for="disciplineEventInput">违纪事项</label><input id="disciplineEventInput" maxlength="40" required placeholder="例如：课堂使用手机"></div><div class="discipline-form-field"><label for="disciplineDetailsInput">情况说明</label><textarea id="disciplineDetailsInput" maxlength="300" required placeholder="请说明发生经过、现场处理与后续安排"></textarea></div><div class="discipline-datetime"><div class="discipline-form-field"><label for="disciplineDateInput">发生日期</label><input id="disciplineDateInput" type="date" value="${formatLocalDate()}" required></div><div class="discipline-form-field"><label for="disciplineClockInput">发生时间</label><input id="disciplineClockInput" type="time" value="${formatLocalTime()}" required></div></div></section><section class="discipline-form-card"><div class="discipline-form-field"><label>现场图片</label><div class="discipline-photo-actions"><button type="button" class="discipline-photo-action" data-action="capture-discipline-photo"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h3l2-3h6l2 3h3v13H4z"></path><circle cx="12" cy="13" r="4"></circle></svg>拍照</button><button type="button" class="discipline-photo-action" data-action="choose-discipline-photo"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="8.5" cy="9" r="1.5"></circle><path d="m4 17 5-5 4 4 2-2 5 4"></path></svg>选取照片</button></div><div class="discipline-draft-photos" id="disciplineDraftPhotos"></div></div></section>`;
+            renderDisciplineDraftPhotos();
+        }
+
+        function openDisciplineAddPage() {
+            state.disciplineDraftPhotos.forEach(item => { if (item.url?.startsWith('blob:')) URL.revokeObjectURL(item.url); });
+            state.disciplineDraftPhotos = [];
+            renderDisciplineAddPage();
+            setView('discipline-add');
+            disciplineAddScroll.scrollTop = 0;
+            focusAfterViewChange(disciplineAddBackButton);
+        }
+
+        function cancelDisciplineAddPage() {
+            state.disciplineDraftPhotos.forEach(item => { if (item.url?.startsWith('blob:')) URL.revokeObjectURL(item.url); });
+            state.disciplineDraftPhotos = [];
+            renderClassModule();
+            setView('class-module');
+            focusAfterViewChange(classModuleFloatingAction);
+        }
+
+        function appendDisciplinePhotos(files) {
+            const imageFiles = Array.from(files || []).filter(file => String(file.type || '').startsWith('image/'));
+            if (!imageFiles.length) return showToast('请选择图片文件');
+            const remaining = Math.max(0, 6 - state.disciplineDraftPhotos.length);
+            imageFiles.slice(0, remaining).forEach(file => state.disciplineDraftPhotos.push({ name: file.name, url: URL.createObjectURL(file) }));
+            renderDisciplineDraftPhotos();
+            if (imageFiles.length > remaining) showToast('最多可添加 6 张图片');
+        }
+
+        function removeDisciplineDraftPhoto(index) {
+            const [removed] = state.disciplineDraftPhotos.splice(Number(index), 1);
+            if (removed?.url?.startsWith('blob:')) URL.revokeObjectURL(removed.url);
+            renderDisciplineDraftPhotos();
+        }
+
+        function saveDisciplineRecord() {
+            const roster = ensureClassRoster(getSelectedClass());
+            const studentItem = roster.find(item => item.id === document.getElementById('disciplineStudentSelect')?.value);
+            const eventInput = document.getElementById('disciplineEventInput');
+            const detailsInput = document.getElementById('disciplineDetailsInput');
+            const dateInput = document.getElementById('disciplineDateInput');
+            const clockInput = document.getElementById('disciplineClockInput');
+            if (!studentItem) { document.getElementById('disciplineStudentSelect')?.focus(); return showToast('请选择学生'); }
+            if (!eventInput?.value.trim()) { eventInput?.focus(); return showToast('请填写违纪事项'); }
+            if (!detailsInput?.value.trim()) { detailsInput?.focus(); return showToast('请填写情况说明'); }
+            if (!dateInput?.value || !clockInput?.value) { (!dateInput?.value ? dateInput : clockInput)?.focus(); return showToast('请选择发生日期与时间'); }
+            const photos = state.disciplineDraftPhotos.map(item => ({ ...item }));
+            const record = { id: `discipline-${Date.now()}`, studentId: studentItem.id, name: studentItem.name, event: eventInput.value.trim(), details: detailsInput.value.trim(), date: dateInput.value, clock: clockInput.value, photoUrls: photos.map(item => item.url), photoNames: photos.map(item => item.name), photoCount: photos.length };
+            classWorkflowState.discipline.unshift(record);
+            state.disciplineDraftPhotos = [];
+            state.selectedDisciplineId = record.id;
+            renderClassModule();
+            setView('class-module');
+            classModuleScroll.scrollTop = 0;
+            focusAfterViewChange(() => classModuleRoot.querySelector(`[data-discipline-id="${record.id}"]`) || classModuleBackButton);
+            showToast('违纪记录已保存');
         }
 
         function renderLogsModule() {
+            const classInfo = getSelectedClass();
+            ensurePendingClassLogs(classInfo);
             const records = classWorkflowState.logs;
-            const pending = records.filter(item => item.status === '待批阅').length;
-            const roster = ensureClassRoster(getSelectedClass());
+            const pendingRecords = records.filter(item => item.status === '待批阅').sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+            const pending = pendingRecords.length;
+            const roster = ensureClassRoster(classInfo);
             const submittedStudents = new Set(records.map(item => item.name)).size;
-            const pendingRecords = records.filter(item => item.status === '待批阅');
+            const canCollapse = pendingRecords.length > 3;
+            const collapsed = canCollapse && !state.logsPendingExpanded;
+            const pendingCards = pendingRecords.map(item => `<article class="module-card log-card" role="button" tabindex="0" data-action="open-log-detail" data-log-id="${escapeHtml(item.id)}" aria-label="查看${escapeHtml(item.name)}的日志详情"><div class="log-card-main"><div class="module-card-head"><div><div class="module-card-name">${escapeHtml(item.name)} · ${escapeHtml(item.title)}</div><div class="module-card-sub">${escapeHtml(item.date || '')} · ${escapeHtml(item.summary)}</div></div><span class="module-status">待批阅</span></div><p class="log-content-preview">${escapeHtml(item.content || item.summary)}</p></div>${pendingBadgeMarkup(1)}</article>`).join('');
             return `${moduleHero('班级日志','按学生查看历史记录，并集中处理本周待批阅日志。',[{value:pending,label:'待批阅'},{value:records.length-pending,label:'已批阅'},{value:submittedStudents,label:'已提交学生'}])}
+                <div class="class-section-head"><h2>待批阅日志（${pendingRecords.length}）</h2></div>
+                ${pendingRecords.length ? `<section class="log-pending-shell${collapsed ? ' is-collapsed' : ''}" aria-label="待批阅日志列表"><div class="module-list log-pending-list">${pendingCards}</div>${canCollapse ? `<div class="log-pending-more-surface"><button type="button" class="log-pending-more" data-action="toggle-log-pending" aria-expanded="${state.logsPendingExpanded ? 'true' : 'false'}"><span>${state.logsPendingExpanded ? '收起待批阅日志' : `查看全部 ${pendingRecords.length} 篇待批阅日志`}</span><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></button></div>` : ''}</section>` : '<div class="todo-empty">当前没有待批阅日志</div>'}
                 <div class="class-section-head"><h2>学生日志（${roster.length}）</h2><span>点击头像查看历史</span></div>
                 <section class="log-student-section" aria-label="学生日志入口"><div class="log-student-grid">${roster.map(item => {
                     const studentPending = records.filter(record => record.name === item.name && record.status === '待批阅').length;
                     return `<button type="button" class="log-student-option" data-action="open-student-log-history" data-log-student-id="${escapeHtml(item.id)}" aria-label="查看${escapeHtml(item.name)}的过往日志${studentPending ? `，${studentPending}篇待批阅` : ''}"><span class="log-student-avatar ${item.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(item)}</span><strong>${escapeHtml(item.name)}</strong>${studentPending ? pendingBadgeMarkup(studentPending) : ''}</button>`;
-                }).join('')}</div></section>
-                <div class="class-section-head"><h2>待批阅日志（${pendingRecords.length}）</h2></div>
-                ${pendingRecords.length ? `<div class="module-list">${pendingRecords.map(item => `<article class="module-card log-card" role="button" tabindex="0" data-action="open-log-detail" data-log-id="${escapeHtml(item.id)}" aria-label="查看${escapeHtml(item.name)}的日志详情"><div class="log-card-main"><div class="module-card-head"><div><div class="module-card-name">${escapeHtml(item.name)} · ${escapeHtml(item.title)}</div><div class="module-card-sub">${escapeHtml(item.date || '')} · ${escapeHtml(item.summary)}</div></div><span class="module-status">待批阅</span></div><p class="log-content-preview">${escapeHtml(item.content || item.summary)}</p></div><div class="module-card-actions"><button type="button" class="module-action primary" data-action="open-log-review" data-log-id="${escapeHtml(item.id)}">写评语</button></div>${pendingBadgeMarkup(1)}</article>`).join('')}</div>` : '<div class="todo-empty">当前没有待批阅日志</div>'}`;
+                }).join('')}</div></section>`;
         }
 
-        function openStudentLogHistory(studentId) {
+        function filterStudentLogRecords(records) {
+            const now = new Date();
+            const currentMonth = formatLocalDate(now).slice(0,7);
+            return records.filter(item => {
+                if (state.logHistoryTimeFilter === 'week') return isDateInCurrentWeek(item.date);
+                if (state.logHistoryTimeFilter === 'month') return String(item.date || '').startsWith(currentMonth);
+                if (state.logHistoryTimeFilter === 'term') return String(item.date || '') >= ACADEMIC_TERM_START;
+                return true;
+            });
+        }
+
+        function getLogHistoryFilterLabel() {
+            return ({ week: '本周', month: '本月', term: '本学期', all: '全部' })[state.logHistoryTimeFilter] || '本学期';
+        }
+
+        function renderStudentLogHistoryPage() {
             const roster = ensureClassRoster(getSelectedClass());
-            const rosterStudent = roster.find(item => item.id === studentId);
+            ensurePendingClassLogs(getSelectedClass());
+            const rosterStudent = roster.find(item => item.id === state.logHistoryStudentId);
             if (!rosterStudent) return;
             const records = classWorkflowState.logs
                 .filter(item => item.name === rosterStudent.name)
                 .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
-            openDialog({
-                title: `${rosterStudent.name}的日志记录`,
-                desc: records.length ? `共 ${records.length} 篇，按时间倒序排列` : '当前还没有提交过日志',
-                body: records.length ? `<div class="student-log-history">${records.map(item => `<button type="button" class="student-log-history-card${item.status === '待批阅' ? ' pending' : ''}" data-action="open-log-detail" data-log-id="${escapeHtml(item.id)}"><span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.date || '未记录日期')} · ${escapeHtml(item.summary)}</small></span><em>${escapeHtml(item.status)}</em></button>`).join('')}</div>` : '<div class="todo-empty">暂无过往日志记录</div>',
-                confirmLabel: '完成',
-                cancelLabel: '取消'
-            });
+            const filteredRecords = filterStudentLogRecords(records);
+            const filterOptions = [{value:'week',label:'本周'},{value:'month',label:'本月'},{value:'term',label:'本学期'},{value:'all',label:'全部'}];
+            studentLogHistoryTitle.textContent = `${rosterStudent.name}的日志`;
+            studentLogHistoryRoot.innerHTML = `<section class="student-log-page-head"><span class="log-student-avatar ${rosterStudent.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(rosterStudent)}</span><span class="student-log-page-head-copy"><strong>${escapeHtml(rosterStudent.name)}</strong><span>${records.length ? `共 ${records.length} 篇日志` : '暂未提交日志'}</span></span></section><section class="student-log-filter" aria-label="日志时间筛选"><div class="student-log-filter-head"><strong>时间筛选</strong><span>${escapeHtml(getLogHistoryFilterLabel())} · ${filteredRecords.length} 篇</span></div><div class="student-log-filter-options">${filterOptions.map(option => `<button type="button" class="student-log-filter-chip${state.logHistoryTimeFilter === option.value ? ' active' : ''}" data-action="set-student-log-time-filter" data-log-time-filter="${option.value}" aria-pressed="${state.logHistoryTimeFilter === option.value ? 'true' : 'false'}">${option.label}</button>`).join('')}</div></section>${filteredRecords.length ? `<div class="student-log-page-list">${filteredRecords.map(item => `<button type="button" class="student-log-page-card${item.status === '待批阅' ? ' pending' : ''}" data-action="open-log-detail" data-log-id="${escapeHtml(item.id)}"><span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.date || '未记录日期')} · ${escapeHtml(item.summary)}</small></span><em>${escapeHtml(item.status)}</em><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></button>`).join('')}</div>` : '<div class="todo-empty">当前时间范围内暂无日志记录</div>'}`;
+        }
+
+        function openStudentLogHistory(studentId) {
+            const rosterStudent = ensureClassRoster(getSelectedClass()).find(item => item.id === studentId);
+            if (!rosterStudent) return;
+            state.logHistoryStudentId = rosterStudent.id;
+            state.logHistoryTimeFilter = 'term';
+            renderStudentLogHistoryPage();
+            setView('student-log-history');
+            studentLogHistoryScroll.scrollTop = 0;
+            focusAfterViewChange(studentLogHistoryBackButton);
         }
 
         function getAllDormRooms() {
@@ -3773,7 +4701,7 @@
         function renderDormPlan(room, context = null) {
             if (!room) return '<div class="todo-empty">暂无宿舍床位信息</div>';
             const record = context ? classWorkflowState.dorm.find(item => item.id === context.recordId) : null;
-            return `<div class="dorm-plan" aria-label="${escapeHtml(room.name)}床位分布图"><div class="dorm-room-shell"><div class="dorm-plan-balcony">阳台</div><div class="dorm-bed-grid dorm-layout-grid">${getDormDisplayBeds(room.beds).map(bed => {
+            return `<div class="dorm-plan" aria-label="${escapeHtml(room.name)}床位分布图"><div class="dorm-plan-balcony">阳台</div><div class="dorm-bed-grid dorm-layout-grid">${getDormDisplayBeds(room.beds).map(bed => {
                 const placement = getBedPlacement(bed.number, room.beds.length);
                 const isCurrentBed = Boolean(record && record.roomId === room.id && Number(record.bedNumber) === bed.number);
                 const selected = Number(context?.bedNumber) === bed.number;
@@ -3783,7 +4711,7 @@
                     ? ` data-action="select-dorm-bed" data-bed-number="${bed.number}"`
                     : (bed.occupied ? ` data-action="open-occupied-bed-actions" data-room-id="${room.id}" data-bed-number="${bed.number}"` : ` data-action="open-vacant-bed-picker" data-room-id="${room.id}" data-bed-number="${bed.number}"`);
                 return `<button type="button" class="dorm-bed-option ${bed.occupied ? 'occupied' : 'vacant'}${selected ? ' active' : ''}"${actionAttrs}${disabled ? ' disabled' : ''} aria-label="${escapeHtml(placement.position)}，${bed.number}号床，${placement.bunk}，${escapeHtml(stateText)}"><span class="dorm-bed-number">${String(bed.number).padStart(2,'0')}</span><span class="dorm-bed-bunk">${placement.bunk}</span><span class="dorm-bed-state">${escapeHtml(stateText)}</span></button>`;
-            }).join('')}</div></div><div class="dorm-plan-corridor">宿舍外 · 公共走廊</div></div>`;
+            }).join('')}</div><div class="dorm-plan-corridor">宿舍外 · 公共走廊</div></div>`;
         }
 
         function renderDormModule() {
@@ -3792,8 +4720,7 @@
             state.dormRoomId = selectedRoom?.id || '';
             const selectedGender = getDormRoomGender(selectedRoom?.id);
             const unassigned = getUnassignedDormStudents(selectedGender);
-            const transition = dormTransitionClass(state.dormTransitionDirection);
-            const markup = `<div class="dorm-module-shell"><section class="dorm-room-directory" aria-label="本班所有宿舍"><div class="dorm-room-directory-head"><strong>本班全部宿舍（${rooms.length}）</strong></div><div class="dorm-room-list">${rooms.map(room => { const occupied = room.beds.filter(bed => bed.occupied).length; return `<button type="button" class="dorm-room-chip${room.id === state.dormRoomId ? ' active' : ''}" data-action="select-dorm-overview-room" data-room-id="${room.id}" aria-pressed="${room.id === state.dormRoomId ? 'true' : 'false'}"><strong>${escapeHtml(room.name)}</strong><span class="dorm-occupancy">已住 <b>${occupied}</b>/${room.beds.length}</span></button>`; }).join('')}</div><div class="dorm-room-preview${transition}">${renderDormPlan(selectedRoom)}</div></section><div class="class-section-head dorm-unassigned-head"><h2>未分配宿舍学生（${unassigned.length}）</h2><span>${selectedGender}生</span></div><div class="dorm-unassigned-list${transition}">${unassigned.length ? unassigned.map((item, index) => `<article class="dorm-unassigned-card"><span class="student-sequence" aria-hidden="true">${String(index + 1).padStart(2,'0')}</span><span class="dorm-unassigned-copy"><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(item.gender)}生 · 尚未分配宿舍与床位</small></span><button type="button" class="dorm-student-action" data-action="open-dorm-picker" data-dorm-id="${item.id}" data-preferred-room-id="${selectedRoom.id}">安排</button></article>`).join('') : '<div class="dorm-unassigned-empty"><strong>当前暂无未分配学生</strong><span>该宿舍对应学生均已完成床位安排</span></div>'}</div></div>`;
+            const markup = `<div class="dorm-module-shell"><section class="dorm-room-directory" aria-label="本班所有宿舍"><div class="dorm-room-directory-head"><strong>本班全部宿舍（${rooms.length}）</strong></div><div class="dorm-room-list">${rooms.map(room => { const occupied = room.beds.filter(bed => bed.occupied).length; return `<button type="button" class="dorm-room-chip${room.id === state.dormRoomId ? ' active' : ''}" data-action="select-dorm-overview-room" data-room-id="${room.id}" aria-pressed="${room.id === state.dormRoomId ? 'true' : 'false'}"><strong>${escapeHtml(room.name)}</strong><span class="dorm-occupancy">已住 <b>${occupied}</b>/${room.beds.length}</span></button>`; }).join('')}</div><div class="dorm-room-preview">${renderDormPlan(selectedRoom)}</div></section><div class="class-section-head dorm-unassigned-head"><h2>未分配宿舍学生（${unassigned.length}）</h2></div><div class="dorm-unassigned-list">${unassigned.length ? unassigned.map((item, index) => `<article class="dorm-unassigned-card"><span class="student-sequence" aria-hidden="true">${String(index + 1).padStart(2,'0')}</span><span class="dorm-unassigned-copy"><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(item.gender)}生 · 尚未分配宿舍与床位</small></span><button type="button" class="dorm-student-action" data-action="open-dorm-picker" data-dorm-id="${item.id}" data-preferred-room-id="${selectedRoom.id}">安排</button></article>`).join('') : '<div class="dorm-unassigned-empty"><strong>当前暂无未分配学生</strong><span>该宿舍对应学生均已完成床位安排</span></div>'}</div></div>`;
             state.dormTransitionDirection = '';
             return markup;
         }
@@ -3827,11 +4754,22 @@
         function openClassModule(module, returnTab = 'management') {
             state.classModule = module;
             state.classModuleReturnTab = returnTab;
+            if (module === 'leave') {
+                state.leaveSearch = '';
+                state.leaveTimeFilter = 'week';
+                state.leaveStatusFilter = 'all';
+            }
             if (module === 'rollcall') {
                 state.rollcallSearch = '';
                 state.rollcallFilter = 'all';
                 state.rollcallExpandedId = '';
+                initializeRollcallSession();
             }
+            if (module === 'discipline') {
+                state.disciplineSearch = '';
+                state.disciplineTimeFilter = 'week';
+            }
+            if (module === 'logs') state.logsPendingExpanded = false;
             renderClassModule();
             setView('class-module');
             classModuleScroll.scrollTop = 0;
@@ -3881,7 +4819,7 @@
             openDialog({
                 title: `${item.name}的请假详情`,
                 desc: '请假时段、原因与凭证信息',
-                body: `<div class="leave-detail-grid"><div class="leave-detail-row"><span>请假原因</span><strong>${escapeHtml(item.reason)}</strong></div><div class="leave-detail-row"><span>请假时段</span><strong>${escapeHtml(item.period)}</strong></div><div class="leave-detail-row"><span>当前状态</span><strong>${escapeHtml(item.status)}</strong></div>${item.rejectReason ? `<div class="leave-detail-row"><span>驳回原因</span><strong>${escapeHtml(item.rejectReason)}</strong></div>` : ''}<div class="image-preview-large">${leaveEvidenceMarkup(item)}</div></div>`,
+                body: `<div class="leave-detail-grid"><div class="leave-detail-row"><span>请假原因</span><strong>${escapeHtml(item.reason)}</strong></div><div class="leave-detail-row"><span>申请说明</span><strong>${escapeHtml(item.description || item.reason)}</strong></div><div class="leave-detail-row"><span>请假时段</span><strong>${escapeHtml(item.period)}</strong></div><div class="leave-detail-row"><span>当前状态</span><strong>${escapeHtml(item.status)}</strong></div>${item.rejectReason ? `<div class="leave-detail-row"><span>驳回原因</span><strong>${escapeHtml(item.rejectReason)}</strong></div>` : ''}<div class="image-preview-large">${leaveEvidenceMarkup(item)}</div></div>`,
                 confirmLabel: '关闭',
                 cancelLabel: '返回'
             });
@@ -3908,6 +4846,7 @@
                 state.dialogAction = null;
                 state.dialogReturnFocus = null;
             }
+            state.logDetailOrigin = state.view === 'student-log-history' ? 'student-log-history' : 'class-module';
             state.logDetailId = item.id;
             renderLogDetailPage();
             setView('log-detail');
@@ -3927,6 +4866,12 @@
 
         function closeLogDetailPage() {
             const item = classWorkflowState.logs.find(record => record.id === state.logDetailId);
+            if (state.logDetailOrigin === 'student-log-history') {
+                renderStudentLogHistoryPage();
+                setView('student-log-history');
+                focusAfterViewChange(() => studentLogHistoryRoot.querySelector(`[data-log-id="${state.logDetailId}"]`) || studentLogHistoryBackButton);
+                return;
+            }
             renderClassModule();
             setView('class-module');
             focusAfterViewChange(() => {
@@ -3957,6 +4902,7 @@
                     item.status = '已批阅';
                     refreshClassWorkflowViews();
                     if (state.view === 'log-detail') {
+                        if (state.logDetailOrigin === 'student-log-history') renderStudentLogHistoryPage();
                         renderLogDetailPage();
                         requestAnimationFrame(() => logDetailReviewButton.focus({ preventScroll: true }));
                     }
@@ -3968,25 +4914,7 @@
         }
 
         function addDisciplineDialog() {
-            openDialog({
-                title: '添加违纪记录',
-                desc: '记录会直接加入本班学生违纪列表。',
-                body: `<div class="dialog-field"><label for="disciplineStudent">学生姓名<span class="required-star" aria-hidden="true">*</span></label><input id="disciplineStudent" required placeholder="请输入学生姓名"></div><div class="dialog-field"><label for="disciplineEvent">违纪事项<span class="required-star" aria-hidden="true">*</span></label><textarea id="disciplineEvent" required maxlength="120" placeholder="请简要描述违纪事项"></textarea></div><div class="dialog-field"><label for="disciplineTime">发生时间</label><input id="disciplineTime" placeholder="例如：7月17日 10:20"></div>`,
-                confirmLabel: '添加记录',
-                onConfirm: () => {
-                    const name = document.getElementById('disciplineStudent');
-                    const event = document.getElementById('disciplineEvent');
-                    const time = document.getElementById('disciplineTime');
-                    if (!name.value.trim() || !event.value.trim()) {
-                        (!name.value.trim() ? name : event).focus();
-                        showToast('请填写必填项');
-                        return false;
-                    }
-                    classWorkflowState.discipline.unshift({ id: `discipline-${Date.now()}`, name: name.value.trim(), event: event.value.trim(), time: time.value.trim() || '刚刚' });
-                    renderClassModule();
-                    showToast('违纪记录已添加');
-                }
-            });
+            openDisciplineAddPage();
         }
 
         function getDormPickerRecord() {
@@ -4019,7 +4947,6 @@
             const selectedBed = selectedRoom?.beds.find(bed => bed.number === Number(context.bedNumber));
             const selectedPlacement = selectedBed ? getBedPlacement(selectedBed.number, selectedRoom.beds.length) : null;
             const availableCount = room => room.beds.filter(bed => !bed.occupied || (record.roomId === room.id && Number(record.bedNumber) === bed.number)).length;
-            const transition = dormTransitionClass(state.dormPickerTransitionDirection);
             pickerBody.removeAttribute('role');
             pickerBody.removeAttribute('aria-label');
             pickerBody.innerHTML = `
@@ -4031,7 +4958,7 @@
                     return `<button type="button" class="dorm-room-option${room.id === context.roomId ? ' active' : ''}" data-action="select-dorm-room" data-room-id="${room.id}"${vacancies ? '' : ' disabled'}>${escapeHtml(room.name)}<span>已住 <b>${occupied}</b>/${room.beds.length} · ${vacancies ? `空余 ${vacancies} 床` : '已满'}</span></button>`;
                 }).join('')}</div>
                 <div class="dorm-picker-label">选择床位</div>
-                <div class="dorm-picker-bed-stage${transition}">${selectedRoom ? `${renderDormPlan(selectedRoom, context)}${selectedPlacement ? `<div class="dorm-selection-summary">已选 <strong>${escapeHtml(selectedRoom.name)} · ${escapeHtml(selectedPlacement.position)} · ${selectedBed.number}号床（${selectedPlacement.bunk}）</strong></div>` : ''}` : '<div class="todo-empty">请先选择可用宿舍</div>'}</div>
+                <div class="dorm-picker-bed-stage">${selectedRoom ? `${renderDormPlan(selectedRoom, context)}${selectedPlacement ? `<div class="dorm-selection-summary">已选 <strong>${escapeHtml(selectedRoom.name)} · ${escapeHtml(selectedPlacement.position)} · ${selectedBed.number}号床（${selectedPlacement.bunk}）</strong></div>` : ''}` : '<div class="todo-empty">请先选择可用宿舍</div>'}</div>
                 <div class="dorm-picker-actions"><button type="button" class="dorm-confirm" data-action="confirm-dorm-assignment"${context.roomId && context.bedNumber ? '' : ' disabled'}>确认安排</button></div>`;
             state.dormPickerTransitionDirection = '';
         }
@@ -4134,11 +5061,11 @@
                 onConfirm: () => {
                     bed.occupied = false;
                     bed.studentName = '';
-                    if (record) {
-                        record.assignment = '';
-                        record.roomId = '';
-                        record.bedNumber = '';
-                    }
+                    const releasedRecord = record || { id: `dorm-${Date.now()}`, name: studentName, gender: getDormRoomGender(room.id), roomId: '', bedNumber: '', assignment: '' };
+                    if (!record) classWorkflowState.dorm.push(releasedRecord);
+                    releasedRecord.assignment = '';
+                    releasedRecord.roomId = '';
+                    releasedRecord.bedNumber = '';
                     refreshClassWorkflowViews();
                     requestAnimationFrame(() => scrollDormRoomIntoCenter(state.dormRoomId, 'auto'));
                     showToast(`${studentName}已从当前床位移除`);
@@ -4158,9 +5085,6 @@
             if (state.pickerContext?.type !== 'dorm') return;
             const record = getDormPickerRecord();
             const rooms = dormInventory[record?.gender] || [];
-            const currentIndex = rooms.findIndex(room => room.id === state.pickerContext.roomId);
-            const nextIndex = rooms.findIndex(room => room.id === roomId);
-            state.dormPickerTransitionDirection = nextIndex > currentIndex ? 'next' : (nextIndex < currentIndex ? 'previous' : '');
             state.pickerContext.roomId = roomId;
             state.pickerContext.bedNumber = record?.roomId === roomId ? record.bedNumber : '';
             renderDormPicker();
@@ -4275,6 +5199,7 @@
             }
             if (type === 'rollcall') {
                 classWorkflowState.rollcall[id] = rollcallStatuses.includes(button.dataset.workflowValue) ? button.dataset.workflowValue : '到课';
+                classWorkflowState.rollcallSessionDrafts[state.rollcallSessionKey] = clone(classWorkflowState.rollcall);
                 state.rollcallExpandedId = '';
             }
             refreshClassWorkflowViews();
@@ -4722,8 +5647,8 @@
             const data = currentData();
             const status = data.currentAttendance || '到课';
             studentAttendanceDock.hidden = state.editMode;
-            studentAttendanceStatus.innerHTML = `<span>当前点名 · ${escapeHtml(status)}</span><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
-            studentAttendanceStatus.setAttribute('aria-label', `编辑${data.name}当前点名状态，当前${status}`);
+            studentAttendanceStatus.innerHTML = `<span>今日考勤 · ${escapeHtml(status)}</span><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+            studentAttendanceStatus.setAttribute('aria-label', `编辑${data.name}今日考勤记录，当前${status}`);
         }
 
         function getAttendanceRecords(data = currentData()) {
@@ -4732,14 +5657,32 @@
 
         function getFilteredAttendanceRecords() {
             const records = getAttendanceRecords();
-            const latestMonth = records[0]?.date?.slice(0, 7) || '';
+            const currentMonth = formatLocalDate().slice(0, 7);
             return records.filter(record => {
                 const matchesPeriod = state.attendancePeriodFilter === 'all'
-                    || (state.attendancePeriodFilter === 'month' && record.date?.startsWith(latestMonth))
-                    || (state.attendancePeriodFilter === 'term' && String(record.date || '') >= '2026-02-01');
+                    || (state.attendancePeriodFilter === 'week' && isDateInCurrentWeek(record.date))
+                    || (state.attendancePeriodFilter === 'month' && record.date?.startsWith(currentMonth))
+                    || (state.attendancePeriodFilter === 'term' && String(record.date || '') >= ACADEMIC_TERM_START);
                 const matchesStatus = state.attendanceStatusFilter === 'all' || record.status === state.attendanceStatusFilter;
                 return matchesPeriod && matchesStatus;
+            }).sort((a, b) => {
+                const dateOrder = String(b.date || '').localeCompare(String(a.date || ''));
+                if (dateOrder) return dateOrder;
+                const courseA = attendanceCourseSchedule.findIndex(item => item.period === a.period && item.course === a.course);
+                const courseB = attendanceCourseSchedule.findIndex(item => item.period === b.period && item.course === b.course);
+                return (courseA < 0 ? 99 : courseA) - (courseB < 0 ? 99 : courseB);
             });
+        }
+
+        function formatAttendanceDay(value) {
+            const date = parseLocalDate(value);
+            if (!date) return { date: value || '未记录', weekday: '' };
+            const weekdays = ['周日','周一','周二','周三','周四','周五','周六'];
+            return { date: `${date.getMonth() + 1}/${date.getDate()}`, weekday: weekdays[date.getDay()] };
+        }
+
+        function getAttendancePeriodLabel() {
+            return ({ week: '本周', month: '本月', term: '本学期', all: '全部时间' })[state.attendancePeriodFilter] || '本周';
         }
 
         function renderAttendancePage() {
@@ -4749,91 +5692,139 @@
             const present = records.filter(record => record.status === '到课').length;
             const rate = records.length ? Math.round(present / records.length * 100) : 0;
             const statusCounts = status => records.filter(record => record.status === status).length;
-            const historyCards = filtered.map(record => {
-                const dateParts = String(record.date || '').split('-');
-                const recordIndex = records.indexOf(record);
-                const editable = isAttendanceRecordEditable(record);
-                const late = record.status === '迟到';
-                const displayDate = dateParts.length === 3 ? `${Number(dateParts[0])}年${Number(dateParts[1])}月${Number(dateParts[2])}日` : (record.date || '未记录日期');
-                return `<article class="attendance-history-card"><div class="attendance-history-date"><strong>${escapeHtml(displayDate)}</strong><span>${escapeHtml(record.time || '--:--')}</span></div><div class="attendance-history-fields"><div class="attendance-history-field"><span class="attendance-history-label">课程</span><strong class="attendance-history-value" title="${escapeHtml(record.course || '日常点名')}">${escapeHtml(record.course || '日常点名')}</strong></div><div class="attendance-history-field"><span class="attendance-history-label">当日迟到</span><strong class="attendance-late-state${late ? ' yes' : ''}">${late ? '是' : '否'}</strong></div><div class="attendance-history-field action"><span class="attendance-history-label">操作</span>${editable ? `<button type="button" class="attendance-table-edit" data-action="edit-attendance-record" data-attendance-record-index="${recordIndex}" aria-label="修改${escapeHtml(record.date)}${escapeHtml(record.course || '点名')}记录">修改</button>` : '<span class="attendance-table-lock" aria-label="超过一周不可修改">不可改</span>'}</div></div></article>`;
+            const grouped = new Map();
+            filtered.forEach(record => {
+                const date = record.date || '未记录日期';
+                if (!grouped.has(date)) grouped.set(date, []);
+                grouped.get(date).push(record);
+            });
+            const tableRows = Array.from(grouped.entries()).map(([date, dayRecords]) => {
+                const display = formatAttendanceDay(date);
+                const editable = dayRecords.some(isAttendanceRecordEditable);
+                return dayRecords.map((record, index) => `<tr class="${index === 0 ? 'day-start' : ''}">${index === 0 ? `<td class="attendance-day-date" rowspan="${dayRecords.length}"><strong>${escapeHtml(display.date)}</strong><small>${escapeHtml(display.weekday)}</small></td>` : ''}<td class="attendance-day-period">${escapeHtml(record.period || '日常')}</td><td><span class="attendance-row-status ${rollcallStatusTone(record.status)}">${escapeHtml(record.status || '到课')}</span></td><td><div class="attendance-day-recorder" title="${escapeHtml(record.recordedBy || '班主任')}">${escapeHtml(record.recordedBy || '班主任')}</div></td>${index === 0 ? `<td class="attendance-day-action" rowspan="${dayRecords.length}">${editable ? `<button type="button" class="attendance-day-edit" data-action="open-attendance-day-editor" data-attendance-date="${escapeHtml(date)}" aria-label="修改${escapeHtml(date)}全天考勤记录">修改</button>` : '<span class="attendance-day-lock" aria-label="超过一周不可修改">不可改</span>'}</td>` : ''}</tr>`).join('');
             }).join('');
-            attendanceRoot.innerHTML = `<section class="attendance-dashboard" aria-label="考勤数据看板"><div class="attendance-dashboard-head"><div class="attendance-dashboard-person"><span class="attendance-dashboard-avatar${data.gender === '男' ? ' male' : ''}">${studentAvatarMarkup(data)}</span><strong>${escapeHtml(data.name)}</strong></div><span>累计 ${records.length} 条</span></div><div class="attendance-metrics"><div class="attendance-metric"><strong>${rate}%</strong><span>到课率</span></div><div class="attendance-metric"><strong>${statusCounts('到课')}</strong><span>到课</span></div><div class="attendance-metric"><strong>${statusCounts('迟到')}</strong><span>迟到</span></div><div class="attendance-metric"><strong>${statusCounts('缺勤')}</strong><span>缺勤</span></div></div></section><section class="attendance-tools" aria-label="考勤筛选"><div class="attendance-filter-group" aria-label="按时间筛选"><button type="button" class="attendance-filter-chip${state.attendancePeriodFilter === 'all' ? ' active' : ''}" data-action="set-attendance-filter" data-attendance-filter-kind="period" data-attendance-filter-value="all">全部时间</button><button type="button" class="attendance-filter-chip${state.attendancePeriodFilter === 'month' ? ' active' : ''}" data-action="set-attendance-filter" data-attendance-filter-kind="period" data-attendance-filter-value="month">本月</button><button type="button" class="attendance-filter-chip${state.attendancePeriodFilter === 'term' ? ' active' : ''}" data-action="set-attendance-filter" data-attendance-filter-kind="period" data-attendance-filter-value="term">本学期</button></div><div class="attendance-filter-group" aria-label="按状态筛选"><button type="button" class="attendance-filter-chip${state.attendanceStatusFilter === 'all' ? ' active' : ''}" data-action="set-attendance-filter" data-attendance-filter-kind="status" data-attendance-filter-value="all">全部状态</button>${rollcallStatuses.map(status => `<button type="button" class="attendance-filter-chip${state.attendanceStatusFilter === status ? ' active' : ''}" data-action="set-attendance-filter" data-attendance-filter-kind="status" data-attendance-filter-value="${status}">${status}</button>`).join('')}</div></section><div class="class-section-head"><h2>过往记录（${filtered.length}）</h2><span>近一周可修改</span></div><div class="attendance-history-list">${historyCards || '<div class="attendance-history-empty">没有符合筛选条件的考勤记录</div>'}</div>`;
+            const timeOptions = [{value:'week',label:'本周'},{value:'month',label:'本月'},{value:'term',label:'本学期'},{value:'all',label:'全部'}];
+            attendanceRoot.innerHTML = `<section class="attendance-dashboard" aria-label="考勤数据看板"><div class="attendance-dashboard-head"><div class="attendance-dashboard-person"><span class="attendance-dashboard-avatar${data.gender === '男' ? ' male' : ''}">${studentAvatarMarkup(data)}</span><strong>${escapeHtml(data.name)}</strong></div><span>累计 ${records.length} 节</span></div><div class="attendance-metrics"><div class="attendance-metric"><strong>${rate}%</strong><span>到课率</span></div><div class="attendance-metric"><strong>${statusCounts('到课')}</strong><span>到课</span></div><div class="attendance-metric"><strong>${statusCounts('迟到')}</strong><span>迟到</span></div><div class="attendance-metric"><strong>${statusCounts('缺勤')}</strong><span>缺勤</span></div></div></section><section class="attendance-tools" aria-label="考勤筛选"><div class="attendance-filter-section"><span class="attendance-filter-label">时间范围</span><div class="attendance-filter-group" aria-label="按时间筛选">${timeOptions.map(option => `<button type="button" class="attendance-filter-chip${state.attendancePeriodFilter === option.value ? ' active' : ''}" data-action="set-attendance-filter" data-attendance-filter-kind="period" data-attendance-filter-value="${option.value}" aria-pressed="${state.attendancePeriodFilter === option.value ? 'true' : 'false'}">${option.label}</button>`).join('')}</div></div><div class="attendance-filter-section"><span class="attendance-filter-label">考勤状态</span><div class="attendance-filter-group" aria-label="按状态筛选"><button type="button" class="attendance-filter-chip${state.attendanceStatusFilter === 'all' ? ' active' : ''}" data-action="set-attendance-filter" data-attendance-filter-kind="status" data-attendance-filter-value="all" aria-pressed="${state.attendanceStatusFilter === 'all' ? 'true' : 'false'}">全部</button>${rollcallStatuses.map(status => `<button type="button" class="attendance-filter-chip${state.attendanceStatusFilter === status ? ' active' : ''}" data-action="set-attendance-filter" data-attendance-filter-kind="status" data-attendance-filter-value="${status}" aria-pressed="${state.attendanceStatusFilter === status ? 'true' : 'false'}">${status}</button>`).join('')}</div></div></section><div class="attendance-result-head"><h2>考勤明细</h2><span>${escapeHtml(getAttendancePeriodLabel())} · ${grouped.size} 天 ${filtered.length} 节</span></div>${tableRows ? `<div class="attendance-day-table-wrap"><table class="attendance-day-table"><colgroup><col><col><col><col><col></colgroup><thead><tr><th>日期</th><th>课次</th><th>状态</th><th>记录人</th><th>操作</th></tr></thead><tbody>${tableRows}</tbody></table></div>` : '<div class="attendance-history-empty">没有符合筛选条件的考勤记录</div>'}`;
         }
 
         function renderAttendanceEditor() {
-            const context = state.pickerContext;
-            if (context?.type !== 'student-attendance') return;
-            pickerBody.removeAttribute('role');
-            pickerBody.removeAttribute('aria-label');
-            pickerBody.innerHTML = `<div class="attendance-editor"><div class="attendance-editor-time"><span>${context.recordIndex >= 0 ? '记录时间' : '当前时间'}</span><strong>${escapeHtml(`${context.date} ${context.time}`)}</strong></div><section><div class="attendance-editor-label"><span>选择课次</span><small>${context.autoDetected ? '已按今日课表自动识别' : '已手动调整'}</small></div><div class="attendance-course-grid">${attendanceCourseSchedule.map((item, index) => `<button type="button" class="attendance-course-option${item.course === context.course && item.period === context.period ? ' active' : ''}" data-action="select-attendance-course" data-attendance-course-index="${index}"><strong>${escapeHtml(item.course)}</strong><small>${escapeHtml(item.period)} · ${item.start}—${item.end}</small></button>`).join('')}</div></section><section><div class="attendance-editor-label"><span>点名状态</span><small>最多修改一周内数据</small></div><div class="attendance-status-grid">${rollcallStatuses.map(status => `<button type="button" class="attendance-status-option${status === context.status ? ' active' : ''}" data-action="select-attendance-editor-status" data-attendance-status="${status}" aria-pressed="${status === context.status ? 'true' : 'false'}">${status}</button>`).join('')}</div></section><button type="button" class="attendance-save-button" data-action="save-student-attendance">保存点名记录</button></div>`;
+            const context = state.attendanceEditContext;
+            if (!context) return;
+            const date = parseLocalDate(context.date);
+            const dateLabel = date ? `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日` : context.date;
+            const groups = [
+                { title: '上午', indices: [0,1,2,3], meta: '4 节课' },
+                { title: '下午', indices: [4,5,6], meta: '3 节课' },
+                { title: '晚自习', indices: [7], meta: '晚间点名' }
+            ];
+            const groupMarkup = groups.map(group => `<section class="attendance-lesson-group"><div class="attendance-lesson-group-head"><h2>${group.title}</h2><span>${group.meta}</span></div><div class="attendance-lesson-list">${group.indices.map(index => {
+                const lesson = context.lessons[index];
+                const expanded = context.activeLessonIndex === index;
+                return `<article class="attendance-lesson-row"><div class="attendance-lesson-main"><div class="attendance-lesson-title"><strong>${escapeHtml(lesson.period)}</strong><span>${escapeHtml(lesson.course)}</span></div><button type="button" class="attendance-lesson-status ${rollcallStatusTone(lesson.status)}" data-action="toggle-attendance-lesson-status" data-attendance-lesson-index="${index}" aria-expanded="${expanded ? 'true' : 'false'}" aria-label="${escapeHtml(lesson.period)}当前${escapeHtml(lesson.status)}，点击修改">${escapeHtml(lesson.status)}</button></div><div class="attendance-lesson-meta"><span><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>记录时间 ${escapeHtml(lesson.time)}</span><span><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M5 21a7 7 0 0 1 14 0"></path></svg>记录人 ${escapeHtml(lesson.recordedBy)}</span></div>${expanded ? `<div class="attendance-lesson-choices" aria-label="选择${escapeHtml(lesson.period)}考勤状态">${rollcallStatuses.map(status => `<button type="button" class="attendance-lesson-choice${lesson.status === status ? ' active' : ''}" data-action="set-attendance-lesson-status" data-attendance-lesson-index="${index}" data-attendance-status="${status}" aria-pressed="${lesson.status === status ? 'true' : 'false'}">${status}</button>`).join('')}</div>` : ''}</article>`;
+            }).join('')}</div></section>`).join('');
+            attendanceEditorRoot.innerHTML = `<section class="attendance-edit-summary"><span><span>考勤日期</span><strong>${escapeHtml(dateLabel)}</strong></span><span class="attendance-edit-summary-badge">全天 8 节</span></section><div class="attendance-default-note"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"></path></svg><span><strong>每节课已默认标记为到课</strong><span>只需点开状态标签，调整迟到、请假或缺勤课次。</span></span></div><div class="attendance-lesson-groups">${groupMarkup}</div>`;
         }
 
-        function openStudentAttendanceStatusPicker(button, recordIndex = -1) {
+        function openStudentAttendanceStatusPicker(button, recordDate = '') {
             const records = getAttendanceRecords();
-            const normalizedIndex = Number(recordIndex);
-            const record = normalizedIndex >= 0 ? records[normalizedIndex] : null;
-            if (record && !isAttendanceRecordEditable(record)) return showToast('仅支持修改一周内的考勤数据');
-            const now = new Date();
-            const detected = getCurrentAttendanceCourse(now);
-            const matchedCourse = record ? attendanceCourseSchedule.find(item => item.course === record.course && item.period === record.period) : detected;
-            state.pickerContext = {
-                type: 'student-attendance',
+            const date = recordDate || formatLocalDate();
+            const dateRecords = records.filter(record => record.date === date);
+            if (dateRecords.length && !dateRecords.some(isAttendanceRecordEditable)) return showToast('仅支持修改一周内的考勤数据');
+            const defaultRecorder = getSelectedClass()?.teacher || '班主任';
+            state.attendanceEditOrigin = state.view === 'attendance' ? 'attendance' : 'detail';
+            state.attendanceEditContext = {
                 trigger: button,
-                recordIndex: record ? normalizedIndex : -1,
-                date: record?.date || formatLocalDate(now),
-                time: record?.time || formatLocalTime(now),
-                course: matchedCourse?.course || record?.course || detected.course,
-                period: matchedCourse?.period || record?.period || detected.period,
-                status: record?.status || currentData().currentAttendance || '到课',
-                autoDetected: !record
+                date,
+                activeLessonIndex: -1,
+                lessons: attendanceCourseSchedule.map(item => {
+                    const existing = dateRecords.find(record => record.course === item.course && record.period === item.period);
+                    return {
+                        course: item.course,
+                        period: item.period,
+                        time: existing?.time || item.start,
+                        recordedBy: existing?.recordedBy || defaultRecorder,
+                        status: existing?.status || '到课'
+                    };
+                })
             };
             renderAttendanceEditor();
-            showPicker(record ? '修改考勤记录' : '编辑当前点名状态');
+            setView('attendance-edit');
+            attendanceEditorScroll.scrollTop = 0;
+            focusAfterViewChange(attendanceEditorBackButton);
         }
 
-        function selectAttendanceEditorCourse(index) {
-            const context = state.pickerContext;
-            const course = attendanceCourseSchedule[Number(index)];
-            if (context?.type !== 'student-attendance' || !course) return;
-            context.course = course.course;
-            context.period = course.period;
-            context.autoDetected = false;
+        function toggleAttendanceLessonStatus(index) {
+            const context = state.attendanceEditContext;
+            const normalizedIndex = Number(index);
+            if (!context?.lessons?.[normalizedIndex]) return;
+            context.activeLessonIndex = context.activeLessonIndex === normalizedIndex ? -1 : normalizedIndex;
             renderAttendanceEditor();
-            requestAnimationFrame(() => pickerBody.querySelector(`[data-attendance-course-index="${index}"]`)?.focus());
+            requestAnimationFrame(() => attendanceEditorRoot.querySelector(`[data-action="toggle-attendance-lesson-status"][data-attendance-lesson-index="${normalizedIndex}"]`)?.focus());
         }
 
-        function selectAttendanceEditorStatus(status) {
-            if (state.pickerContext?.type !== 'student-attendance' || !rollcallStatuses.includes(status)) return;
-            state.pickerContext.status = status;
+        function selectAttendanceEditorStatus(index, status) {
+            const context = state.attendanceEditContext;
+            const normalizedIndex = Number(index);
+            if (!context?.lessons?.[normalizedIndex] || !rollcallStatuses.includes(status)) return;
+            context.lessons[normalizedIndex].status = status;
+            context.activeLessonIndex = -1;
             renderAttendanceEditor();
-            requestAnimationFrame(() => pickerBody.querySelector(`[data-attendance-status="${status}"]`)?.focus());
+            requestAnimationFrame(() => attendanceEditorRoot.querySelector(`[data-action="toggle-attendance-lesson-status"][data-attendance-lesson-index="${normalizedIndex}"]`)?.focus());
         }
 
         function saveStudentAttendanceEditor() {
-            const context = state.pickerContext;
-            if (context?.type !== 'student-attendance' || !rollcallStatuses.includes(context.status)) return;
+            const context = state.attendanceEditContext;
+            if (!context?.lessons?.length) return;
             const data = currentData();
             const records = getAttendanceRecords(data);
-            const payload = { date: context.date, time: context.time, status: context.status, course: context.course, period: context.period };
-            if (context.recordIndex >= 0) {
-                const record = records[context.recordIndex];
-                if (!isAttendanceRecordEditable(record)) return showToast('仅支持修改一周内的考勤数据');
-                Object.assign(record, payload);
-            } else {
-                const existing = records.find(record => record.date === context.date && record.course === context.course && record.period === context.period);
+            context.lessons.forEach(lesson => {
+                const payload = { date: context.date, time: lesson.time, status: lesson.status, course: lesson.course, period: lesson.period, recordedBy: lesson.recordedBy };
+                const existing = records.find(record => record.date === context.date && record.course === lesson.course && record.period === lesson.period);
                 if (existing) Object.assign(existing, payload);
-                else records.unshift(payload);
+                else records.push(payload);
+            });
+            records.sort((a, b) => {
+                const dateOrder = String(b.date || '').localeCompare(String(a.date || ''));
+                if (dateOrder) return dateOrder;
+                return attendanceCourseSchedule.findIndex(item => item.period === a.period) - attendanceCourseSchedule.findIndex(item => item.period === b.period);
+            });
+            if (context.date === formatLocalDate()) {
+                const activeCourse = getCurrentAttendanceCourse();
+                data.currentAttendance = context.lessons.find(lesson => lesson.period === activeCourse.period)?.status || '到课';
             }
-            if (context.date === formatLocalDate()) data.currentAttendance = context.status;
-            const editedExisting = context.recordIndex >= 0;
-            closePicker(false);
+            const origin = state.attendanceEditOrigin;
+            const editedDate = context.date;
+            state.attendanceEditContext = null;
             renderStudentAttendanceDock();
-            if (state.view === 'attendance') renderAttendancePage();
-            showToast(editedExisting ? '考勤记录已更新' : `${context.course}点名已保存为${context.status}`);
+            if (origin === 'attendance') {
+                renderAttendancePage();
+                setView('attendance');
+                focusAfterViewChange(() => attendanceRoot.querySelector(`[data-attendance-date="${editedDate}"]`) || attendanceBackButton);
+            } else {
+                renderAll();
+                setView('detail');
+                focusAfterViewChange(studentAttendanceStatus);
+            }
+            showToast('考勤记录已保存');
+        }
+
+        function closeAttendanceEditorPage() {
+            const origin = state.attendanceEditOrigin;
+            const trigger = state.attendanceEditContext?.trigger;
+            const editedDate = state.attendanceEditContext?.date || '';
+            state.attendanceEditContext = null;
+            if (origin === 'attendance') {
+                renderAttendancePage();
+                setView('attendance');
+                focusAfterViewChange(() => attendanceRoot.querySelector(`[data-attendance-date="${editedDate}"]`) || (trigger?.isConnected ? trigger : attendanceBackButton));
+            } else {
+                setView('detail');
+                focusAfterViewChange(studentAttendanceStatus);
+            }
         }
 
         function openStudentAttendance() {
-            state.attendancePeriodFilter = 'all';
+            state.attendancePeriodFilter = 'week';
             state.attendanceStatusFilter = 'all';
             renderAttendancePage();
             setView('attendance');
@@ -5287,11 +6278,34 @@
             if (action === 'open-leave-time-filter') openLeaveTimeFilter(button);
             if (action === 'select-leave-time-filter') applyLeaveTimeFilter(button.dataset.leaveTimeFilter);
             if (action === 'apply-leave-custom-range') applyLeaveCustomRange();
+            if (action === 'set-leave-status-filter') {
+                state.leaveStatusFilter = button.dataset.leaveStatus || 'all';
+                renderClassModule();
+            }
             if (action === 'open-log-detail') openLogDetail(button.dataset.logId);
             if (action === 'open-student-log-history') openStudentLogHistory(button.dataset.logStudentId);
+            if (action === 'set-student-log-time-filter') {
+                state.logHistoryTimeFilter = button.dataset.logTimeFilter || 'term';
+                renderStudentLogHistoryPage();
+                requestAnimationFrame(() => studentLogHistoryRoot.querySelector(`[data-log-time-filter="${state.logHistoryTimeFilter}"]`)?.focus());
+            }
+            if (action === 'toggle-log-pending') {
+                state.logsPendingExpanded = !state.logsPendingExpanded;
+                renderClassModule();
+                requestAnimationFrame(() => classModuleRoot.querySelector('[data-action="toggle-log-pending"]')?.focus());
+            }
             if (action === 'open-log-review') openLogReviewDialog(button.dataset.logId);
             if (action === 'open-log-review-from-detail') openLogReviewDialog(state.logDetailId);
             if (action === 'add-discipline') addDisciplineDialog();
+            if (action === 'open-discipline-time-filter') openDisciplineTimeFilter(button);
+            if (action === 'select-discipline-time-filter') applyDisciplineTimeFilter(button.dataset.disciplineTimeFilter);
+            if (action === 'apply-discipline-custom-range') applyDisciplineCustomRange();
+            if (action === 'open-discipline-detail') openDisciplineDetail(button.dataset.disciplineId);
+            if (action === 'cancel-discipline-add') cancelDisciplineAddPage();
+            if (action === 'save-discipline-record') saveDisciplineRecord();
+            if (action === 'capture-discipline-photo') disciplineCameraInput.click();
+            if (action === 'choose-discipline-photo') disciplinePhotoInput.click();
+            if (action === 'remove-discipline-photo') removeDisciplineDraftPhoto(button.dataset.disciplinePhotoIndex);
             if (action === 'open-dorm-picker') openDormPicker(button);
             if (action === 'open-vacant-bed-picker') openVacantBedStudentPicker(button);
             if (action === 'open-occupied-bed-actions') openOccupiedBedActions(button);
@@ -5299,21 +6313,25 @@
             if (action === 'select-student-for-dorm-bed') selectStudentForDormBed(button.dataset.dormId);
             if (action === 'confirm-student-for-dorm-bed') confirmStudentForDormBed();
             if (action === 'select-dorm-overview-room') {
-                const rooms = getAllDormRooms();
                 const previousScrollLeft = classModuleRoot.querySelector('.dorm-room-list')?.scrollLeft || 0;
-                const currentIndex = rooms.findIndex(room => room.id === state.dormRoomId);
-                const nextIndex = rooms.findIndex(room => room.id === button.dataset.roomId);
-                state.dormTransitionDirection = nextIndex > currentIndex ? 'next' : (nextIndex < currentIndex ? 'previous' : '');
+                state.dormTransitionDirection = '';
                 state.dormRoomId = button.dataset.roomId;
                 renderClassModule();
                 const nextScroller = classModuleRoot.querySelector('.dorm-room-list');
                 if (nextScroller) nextScroller.scrollLeft = previousScrollLeft;
-                requestAnimationFrame(() => scrollDormRoomIntoCenter(state.dormRoomId));
+                requestAnimationFrame(() => scrollDormRoomIntoCenter(state.dormRoomId, 'auto'));
             }
             if (action === 'remove-dorm-assignment') removeDormAssignment(button.dataset.dormId);
             if (action === 'select-dorm-room') selectDormRoom(button.dataset.roomId);
             if (action === 'select-dorm-bed') selectDormBed(button.dataset.bedNumber);
             if (action === 'confirm-dorm-assignment') confirmDormAssignment();
+            if (action === 'open-rollcall-session-picker') openRollcallSessionPicker(button);
+            if (action === 'select-rollcall-course') selectRollcallPickerCourse(button.dataset.rollcallCourseIndex);
+            if (action === 'confirm-rollcall-session') confirmRollcallSession();
+            if (action === 'rollcall-all-present') applyRollcallToAll('到课');
+            if (action === 'rollcall-all-absent') applyRollcallToAll('缺勤');
+            if (action === 'open-rollcall-history') openRollcallHistory();
+            if (action === 'open-rollcall-record') openRollcallRecord(button.dataset.rollcallHistoryId);
             if (action === 'set-rollcall-filter') {
                 state.rollcallFilter = button.dataset.rollcallFilter || 'all';
                 state.rollcallExpandedId = '';
@@ -5326,9 +6344,9 @@
                 requestAnimationFrame(() => classModuleRoot.querySelector(`[data-rollcall-id="${rollcallId}"]`)?.focus());
             }
             if (action === 'open-student-attendance-status') openStudentAttendanceStatusPicker(button);
-            if (action === 'edit-attendance-record') openStudentAttendanceStatusPicker(button, button.dataset.attendanceRecordIndex);
-            if (action === 'select-attendance-course') selectAttendanceEditorCourse(button.dataset.attendanceCourseIndex);
-            if (action === 'select-attendance-editor-status') selectAttendanceEditorStatus(button.dataset.attendanceStatus);
+            if (action === 'open-attendance-day-editor') openStudentAttendanceStatusPicker(button, button.dataset.attendanceDate);
+            if (action === 'toggle-attendance-lesson-status') toggleAttendanceLessonStatus(button.dataset.attendanceLessonIndex);
+            if (action === 'set-attendance-lesson-status') selectAttendanceEditorStatus(button.dataset.attendanceLessonIndex, button.dataset.attendanceStatus);
             if (action === 'save-student-attendance') saveStudentAttendanceEditor();
             if (action === 'open-student-attendance') openStudentAttendance();
             if (action === 'set-attendance-filter') {
@@ -5402,6 +6420,10 @@
         });
 
         editButton.addEventListener('click', () => state.editMode ? confirmSave() : enterEdit());
+        disciplineAddForm.addEventListener('submit', event => {
+            event.preventDefault();
+            saveDisciplineRecord();
+        });
         backButton.addEventListener('click', () => {
             if (state.editMode) {
                 confirmDiscardChanges(() => {
@@ -5433,7 +6455,33 @@
             focusAfterViewChange(document.getElementById('studentAttendanceHistory'));
         });
 
+        attendanceEditorBackButton.addEventListener('click', closeAttendanceEditorPage);
+
         logDetailBackButton.addEventListener('click', closeLogDetailPage);
+
+        studentLogHistoryBackButton.addEventListener('click', () => {
+            renderClassModule();
+            setView('class-module');
+            focusAfterViewChange(() => classModuleRoot.querySelector(`[data-log-student-id="${state.logHistoryStudentId}"]`) || classModuleBackButton);
+        });
+
+        rollcallHistoryBackButton.addEventListener('click', () => {
+            renderClassModule();
+            setView('class-module');
+            focusAfterViewChange(() => classModuleRoot.querySelector('[data-action="open-rollcall-history"]') || classModuleBackButton);
+        });
+
+        rollcallRecordBackButton.addEventListener('click', () => {
+            renderRollcallHistoryPage();
+            setView('rollcall-history');
+            focusAfterViewChange(() => rollcallHistoryRoot.querySelector(`[data-rollcall-history-id="${state.selectedRollcallHistoryId}"]`) || rollcallHistoryBackButton);
+        });
+
+        disciplineDetailBackButton.addEventListener('click', () => {
+            renderClassModule();
+            setView('class-module');
+            focusAfterViewChange(() => classModuleRoot.querySelector(`[data-discipline-id="${state.selectedDisciplineId}"]`) || classModuleBackButton);
+        });
 
         listBackButton.addEventListener('click', () => {
             renderSchoolHome();
@@ -5602,6 +6650,18 @@
                 updateRollcallList();
                 return;
             }
+            if (event.target.id === 'disciplineSearch') {
+                state.disciplineSearch = event.target.value;
+                renderClassModule();
+                requestAnimationFrame(() => {
+                    const input = document.getElementById('disciplineSearch');
+                    if (input) {
+                        input.focus({ preventScroll: true });
+                        input.setSelectionRange(input.value.length, input.value.length);
+                    }
+                });
+                return;
+            }
             if (event.target.id === 'dormStudentSearch') {
                 state.dormStudentSearch = event.target.value;
                 const keyword = event.target.value.trim().toLowerCase();
@@ -5655,6 +6715,15 @@
             showToast(name === '近期证件照' ? '证件照已上传并同步更新头像' : '材料图片已补传');
         });
 
+        disciplineCameraInput.addEventListener('change', () => {
+            appendDisciplinePhotos(disciplineCameraInput.files);
+            disciplineCameraInput.value = '';
+        });
+        disciplinePhotoInput.addEventListener('change', () => {
+            appendDisciplinePhotos(disciplinePhotoInput.files);
+            disciplinePhotoInput.value = '';
+        });
+
         document.getElementById('dialogClose').addEventListener('click', closeDialog);
         document.getElementById('dialogCancel').addEventListener('click', closeDialog);
         document.getElementById('pickerClose').addEventListener('click', () => closePicker());
@@ -5704,9 +6773,15 @@
         else if (previewRoute === 'student-detail') { openStudentList(); openStudentDetail(students[0].id); }
         else if (previewRoute === 'student-materials') { openStudentList(); openStudentDetail(students[0].id); switchTab('materials'); }
         else if (previewRoute === 'student-attendance') { openStudentList(); openStudentDetail(students[0].id); openStudentAttendance(); }
+        else if (previewRoute === 'student-attendance-edit') { openStudentList(); openStudentDetail(students[0].id); openStudentAttendanceStatusPicker(studentAttendanceStatus, formatLocalDate()); }
         else if (previewRoute === 'student-edit') { openStudentList(); openStudentDetail(students[0].id); enterEdit(); switchTab('identity'); }
         else if (previewRoute === 'student-edit-phone') { openStudentList(); openStudentDetail(students[0].id); enterEdit(); switchTab('family'); }
         else if (previewRoute === 'log-detail') { openClassDetail('CLS2403'); openClassModule('logs'); openLogDetail('log-1'); }
+        else if (previewRoute === 'student-log-history') { openClassDetail('CLS2403'); openClassModule('logs'); const logStudent = ensureClassRoster(getSelectedClass()).find(item => item.name === '林知夏') || ensureClassRoster(getSelectedClass())[0]; openStudentLogHistory(logStudent.id); }
+        else if (previewRoute === 'rollcall-history') { openClassDetail('CLS2403'); openClassModule('rollcall'); openRollcallHistory(); }
+        else if (previewRoute === 'rollcall-record') { openClassDetail('CLS2403'); openClassModule('rollcall'); openRollcallHistory(); openRollcallRecord('rollcall-history-1'); }
+        else if (previewRoute === 'discipline-detail') { openClassDetail('CLS2403'); openClassModule('discipline'); openDisciplineDetail('discipline-1'); }
+        else if (previewRoute === 'discipline-add') { openClassDetail('CLS2403'); openClassModule('discipline'); openDisciplineAddPage(); }
         else if (previewRoute === 'leave-filter') { openClassDetail('CLS2403'); openClassModule('leave'); openLeaveTimeFilter(document.getElementById('leaveTimeTrigger')); }
         else if (previewRoute === 'dorm-occupied') { openClassDetail('CLS2403'); openClassModule('dorm'); const occupiedBed = classModuleRoot.querySelector('[data-action="open-occupied-bed-actions"]'); if (occupiedBed) openOccupiedBedActions(occupiedBed); }
         else if (['leave','rollcall','discipline','logs','dorm'].includes(previewRoute)) { openClassDetail('CLS2403'); openClassModule(previewRoute); }
