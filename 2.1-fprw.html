@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#EFF6FF">
-    <title>掌上校园 · 考勤记录与班级日志体验优化 7.36</title>
+    <title>掌上校园 · 宿舍规格请假日志与日期筛选优化 7.40</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -1250,60 +1250,12 @@
         .phone-input-shell input { padding-right: 52px !important; }
         .phone-counter { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: #94A3B8; font-size: 10px; font-weight: 850; font-variant-numeric: tabular-nums; pointer-events: none; }
         .info-value .phone-counter { right: 11px; }
-        /* 7.28：班级详情信息密度、独立待办页与班务操作闭环。 */
-        #classTodoView { background: linear-gradient(135deg, #EFF6FF 0%, #DFE7FF 100%); }
-        .class-todo-scroll {
-            position: absolute;
-            inset: 0;
-            overflow-x: hidden;
-            overflow-y: auto;
-            padding: 112px 20px 34px;
-            scrollbar-width: none;
-            overscroll-behavior-y: contain;
-            -webkit-overflow-scrolling: touch;
-        }
-        .class-todo-scroll::-webkit-scrollbar { display: none; }
-
+        /* 7.28：班级详情信息密度与班务操作闭环。 */
         .class-list-tools {
             top: -20px;
             margin-bottom: 10px;
             padding-top: 0;
         }
-
-        .class-todo-nav {
-            position: relative;
-            min-width: 54px;
-            height: 32px;
-            justify-self: end;
-            padding: 0 8px;
-            border: 1px solid rgba(31,95,255,.13);
-            border-radius: 9px;
-            color: var(--brand);
-            background: rgba(255,255,255,.68);
-            box-shadow: 0 5px 13px rgba(31,95,255,.05);
-            font-size: 11px;
-            font-weight: 900;
-        }
-        .class-todo-nav.has-pending { color: #DC2626; border-color: rgba(239,68,68,.15); }
-        .class-todo-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            min-width: 17px;
-            height: 17px;
-            display: grid;
-            place-items: center;
-            padding: 0 4px;
-            border: 1.5px solid #fff;
-            border-radius: 999px;
-            color: #fff;
-            background: var(--danger);
-            box-shadow: 0 3px 8px rgba(239,68,68,.28);
-            font-size: 8px;
-            font-weight: 950;
-            line-height: 1;
-        }
-        .class-todo-badge:empty { display: none; }
 
         .class-dashboard { padding: 14px; }
         .class-metric-grid { gap: 7px; margin-top: 0; }
@@ -1639,31 +1591,6 @@
         .hero-avatar svg { width: 34px; height: 34px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         #detailView .scroll-area { padding-bottom: 104px; }
         #detailView.is-editing .scroll-area { padding-bottom: 34px; }
-        .student-attendance-dock {
-            position: absolute;
-            left: 50%;
-            bottom: 24px;
-            z-index: 48;
-            width: calc(100% - 40px);
-            display: grid;
-            grid-template-columns: minmax(0,1fr) auto;
-            gap: 7px;
-            padding: 7px;
-            border: 1px solid rgba(255,255,255,.94);
-            border-radius: 18px;
-            background: rgba(255,255,255,.76);
-            box-shadow: 0 13px 30px rgba(31,95,255,.13);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            transform: translateX(-50%);
-        }
-        .student-attendance-dock[hidden] { display: none; }
-        .attendance-status-trigger, .attendance-history-trigger { min-height: 38px; border: 0; border-radius: 12px; font-size: 11px; font-weight: 900; }
-        .attendance-status-trigger { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 12px; color: var(--brand); background: rgba(31,95,255,.10); }
-        .attendance-status-trigger span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .attendance-status-trigger svg, .attendance-history-trigger svg { width: 15px; height: 15px; flex: 0 0 15px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
-        .attendance-history-trigger { display: inline-flex; align-items: center; justify-content: center; gap: 3px; padding: 0 11px; color: #fff; background: var(--brand); box-shadow: 0 7px 14px rgba(31,95,255,.18); }
-
         #attendanceView { background: var(--page); }
         .attendance-scroll { position: absolute; inset: 0; overflow-x: hidden; overflow-y: auto; padding: 112px 20px 36px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
         .attendance-scroll::-webkit-scrollbar { display: none; }
@@ -1802,8 +1729,6 @@
         }
         .school-home-view .home-high-btn > .feature-pending-dot.dot-only,
         .school-home-view .admission-entry-btn > .feature-pending-dot.dot-only { top: 7px; right: 7px; width: 8px; min-width: 8px; height: 8px; }
-        .class-todo-badge.dot-only:empty { width: 8px; min-width: 8px; height: 8px; display: grid; padding: 0; }
-
         .school-home-view .home-high-btn.class-shortcut { color: #1747C8; border-color: rgba(31,95,255,.18); background: linear-gradient(145deg,rgba(31,95,255,.12),rgba(255,255,255,.80)); }
         .school-home-view .home-high-btn.class-shortcut span { display: block; }
         .school-home-view .home-high-class-kicker { margin-bottom: 3px; color: var(--muted); font-size: 8px; font-weight: 850; letter-spacing: .06em; }
@@ -2457,7 +2382,7 @@
         .attendance-day-table col:nth-child(2) { width: 58px; }
         .attendance-day-table col:nth-child(3) { width: 56px; }
         .attendance-day-table col:nth-child(4) { width: 68px; }
-        .attendance-day-table col:nth-child(5) { width: 48px; }
+        .attendance-day-table col:nth-child(5) { width: 52px; }
         .attendance-day-table th { height: 40px; padding: 0 5px; color: var(--muted); background: rgba(239,246,255,.82); font-size: 11px; font-weight: 900; text-align: left; }
         .attendance-day-table th:first-child,
         .attendance-day-table td:first-child { padding-left: 12px; }
@@ -2540,6 +2465,473 @@
         .log-pending-shell:not(.is-collapsed) .log-pending-more svg { transform: rotate(180deg); }
         .log-pending-more:active { transform: scale(.95); }
 
+        /* 7.37：日志摘要、宿舍方位、考勤查看态与班级排名层级优化。 */
+        .log-pending-more {
+            min-width: 112px;
+            min-height: 38px;
+            padding: 0 12px;
+            border: 0;
+            color: #64748B;
+            background: transparent;
+            box-shadow: none;
+        }
+        .log-pending-more:hover { color: #475569; background: rgba(100,116,139,.06); }
+
+        .dorm-plan {
+            border-color: rgba(255,255,255,.88);
+            background: linear-gradient(145deg,rgba(255,255,255,.70),rgba(239,246,255,.58));
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.88),0 8px 22px rgba(31,95,255,.05);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+        .dorm-plan > .dorm-plan-corridor {
+            height: 28px;
+            margin: -2px 0 10px;
+            border: 1px dashed rgba(100,116,139,.22);
+            border-radius: 10px;
+            color: #52627A;
+            background: repeating-linear-gradient(90deg,rgba(148,163,184,.09) 0 10px,rgba(255,255,255,.52) 10px 19px);
+        }
+        .dorm-plan > .dorm-plan-balcony {
+            width: 100%;
+            height: 28px;
+            margin: 10px 0 -12px;
+            border-color: rgba(59,130,246,.16);
+            border-radius: 10px 10px 0 0;
+            color: #2563EB;
+            background: linear-gradient(180deg,rgba(219,234,254,.76),rgba(239,246,255,.54));
+        }
+        .dorm-layout-grid .dorm-bed-option {
+            border-color: rgba(255,255,255,.88);
+            border-radius: 14px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.78),0 7px 16px rgba(31,95,255,.055);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .class-module-scroll .dorm-bed-option.vacant:not(:disabled):not(.active) {
+            color: #BE4560;
+            border-color: rgba(255,255,255,.88);
+            background: linear-gradient(145deg,rgba(255,231,236,.86),rgba(255,247,249,.68));
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.88),0 7px 16px rgba(190,69,96,.07);
+        }
+        .class-module-scroll .dorm-bed-option.vacant:not(:disabled):not(.active) .dorm-bed-state { color: #B9435D; }
+        .class-module-scroll .dorm-bed-option.occupied:not(:disabled):not(.active) {
+            color: #2C8A69;
+            border-color: rgba(255,255,255,.88);
+            background: linear-gradient(145deg,rgba(218,246,233,.88),rgba(244,253,249,.70));
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.88),0 7px 16px rgba(44,138,105,.07);
+        }
+        .class-module-scroll .dorm-bed-option.occupied:not(:disabled):not(.active) .dorm-bed-state { color: #267C60; }
+        .picker-body .dorm-bed-option.vacant:not(.active),
+        .dorm-bed-student-option:not(.assigned):not(.active) {
+            color: #9A671C;
+            border-color: rgba(255,255,255,.86);
+            background: linear-gradient(145deg,rgba(255,241,199,.88),rgba(255,250,235,.70));
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.82),0 7px 16px rgba(154,103,28,.06);
+        }
+        .picker-body .dorm-bed-option.occupied,
+        .dorm-bed-student-option.assigned:not(.active) {
+            color: #475569;
+            border-color: rgba(255,255,255,.82);
+            background: linear-gradient(145deg,rgba(226,232,240,.82),rgba(248,250,252,.68));
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.78),0 7px 16px rgba(71,85,105,.05);
+        }
+        .dorm-bed-option.active,
+        .dorm-bed-student-option.active {
+            color: #fff;
+            border-color: rgba(255,255,255,.76);
+            background: linear-gradient(145deg,#477BFF,#1F5FFF);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.28),0 9px 20px rgba(31,95,255,.20);
+        }
+        .dorm-room-chip.active,
+        .dorm-room-option.active {
+            color: #fff;
+            border-color: #1F5FFF;
+            background: #1F5FFF;
+            box-shadow: 0 8px 18px rgba(31,95,255,.22),inset 0 1px 0 rgba(255,255,255,.22);
+        }
+        .dorm-room-chip.active strong,
+        .dorm-room-chip.active span,
+        .dorm-room-chip.active .dorm-occupancy,
+        .dorm-room-chip.active .dorm-occupancy b,
+        .dorm-room-option.active span,
+        .dorm-room-option.active span b { color: #fff; }
+        .dorm-room-chip.active .dorm-occupancy { background: rgba(255,255,255,.18); }
+        .dorm-room-chip.active::after,
+        .dorm-room-option.active::after { display: none; }
+
+        #detailView .scroll-area,
+        #detailView.is-editing .scroll-area { padding-bottom: 36px; }
+        .hero-attendance-entry {
+            width: 100%;
+            min-height: 48px;
+            display: grid;
+            grid-template-columns: 34px minmax(0,1fr) 18px;
+            align-items: center;
+            gap: 10px;
+            margin-top: 12px;
+            padding: 7px 11px;
+            border: 1px solid rgba(31,95,255,.15);
+            border-radius: 14px;
+            color: var(--brand);
+            background: linear-gradient(145deg,rgba(31,95,255,.11),rgba(255,255,255,.66));
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.82),0 7px 16px rgba(31,95,255,.07);
+            text-align: left;
+        }
+        .hero-attendance-entry:active { transform: scale(.97); background: rgba(255,255,255,.88); }
+        .hero-attendance-entry-icon { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 11px; color: #fff; background: var(--brand); box-shadow: 0 6px 13px rgba(31,95,255,.18); }
+        .hero-attendance-entry-icon svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+        .hero-attendance-entry-copy strong { display: block; color: var(--ink); font-size: 13px; font-weight: 950; }
+        .hero-attendance-entry-copy span { display: block; margin-top: 3px; color: var(--muted); font-size: 9px; font-weight: 800; }
+        .hero-attendance-entry > svg { width: 17px; height: 17px; fill: none; stroke: var(--brand); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+
+        .attendance-day-table col:nth-child(1) { width: 64px; }
+        .attendance-day-table col:nth-child(2),
+        .attendance-day-table col:nth-child(3) { width: 56px; }
+        .attendance-day-table col:nth-child(4) { width: 72px; }
+        .attendance-day-table col:nth-child(5) { width: 48px; }
+        .attendance-day-table td { height: 58px; }
+        .attendance-day-date { vertical-align: middle !important; padding-top: 9px !important; }
+        .attendance-day-action { vertical-align: middle !important; padding-top: 9px !important; }
+        .attendance-day-count { display: inline-flex; align-items: baseline; justify-content: center; gap: 2px; min-width: 42px; padding: 6px 5px; border-radius: 9px; font-variant-numeric: tabular-nums; }
+        .attendance-day-count strong { font-size: 14px; font-weight: 950; }
+        .attendance-day-count span { font-size: 9px; font-weight: 850; }
+        .attendance-day-count.late { color: #B45309; background: rgba(245,158,11,.13); }
+        .attendance-day-count.absent { color: #DC2626; background: rgba(239,68,68,.11); }
+        .attendance-day-count.is-zero { color: #94A3B8; background: rgba(226,232,240,.55); }
+        .attendance-day-edit { color: #475569; border-color: rgba(100,116,139,.14); background: rgba(226,232,240,.58); }
+
+        .attendance-edit-scroll { padding-bottom: 36px; }
+        .attendance-editor-action { min-width: 48px; }
+        .attendance-editor-action.is-saving { color: #fff; border-color: var(--brand); background: var(--brand); box-shadow: 0 6px 14px rgba(31,95,255,.18); }
+        .attendance-editor-action.is-locked { color: #94A3B8; background: rgba(226,232,240,.58); }
+        .attendance-editing-note { display: flex; align-items: center; gap: 7px; margin-top: 11px; padding: 9px 11px; border: 1px solid rgba(31,95,255,.12); border-radius: 12px; color: #1747C8; background: rgba(219,234,254,.62); font-size: 11px; font-weight: 850; }
+        .attendance-editing-note svg { width: 16px; height: 16px; flex: 0 0 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+        .attendance-lesson-time-range { color: var(--body); font-variant-numeric: tabular-nums; }
+        .attendance-lesson-status.is-static { cursor: default; }
+        .attendance-lesson-status.is-editable { gap: 5px; padding-right: 7px; cursor: pointer; }
+        .attendance-lesson-status.is-editable svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; transition: transform .18s ease; }
+        .attendance-lesson-status.is-editable[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+        .class-dashboard-rank { justify-content: flex-start; }
+        .class-dashboard-rank > span { position: static; }
+        .class-dashboard-rank > div { margin-top: 10px; }
+        .class-dashboard-rank > em { position: static; display: inline-flex; align-items: center; gap: 5px; margin-top: 9px; padding: 4px 7px; }
+        .class-dashboard-rank > em span { color: #64748B; font-size: 8px; font-weight: 850; }
+        .class-dashboard-rank > em b { color: #047857; font-size: 9px; font-weight: 950; }
+
+        .leave-toolbar-row { grid-template-columns: 118px minmax(0,1fr); }
+        .discipline-toolbar-row { grid-template-columns: 112px minmax(0,1fr); }
+
+        .student-status-row .filter-chips {
+            flex-wrap: wrap;
+            gap: 7px;
+            overflow: visible;
+        }
+        .student-status-row .filter-chip {
+            min-height: 32px;
+            padding: 0 11px;
+            font-size: 11px;
+        }
+
+        .student-log-filter {
+            padding-top: 9px;
+            padding-bottom: 10px;
+        }
+        .student-log-toolbar-row {
+            display: grid;
+            grid-template-columns: 136px minmax(0,1fr);
+            align-items: center;
+            gap: 8px;
+        }
+        .student-log-time-trigger {
+            width: 100%;
+            min-width: 0;
+            height: 40px;
+            display: grid;
+            grid-template-columns: 15px minmax(0,1fr) 12px;
+            align-items: center;
+            gap: 5px;
+            padding: 0 8px;
+            border: 1px solid rgba(31,95,255,.14);
+            border-radius: 12px;
+            color: var(--brand);
+            background: rgba(255,255,255,.80);
+            box-shadow: 0 7px 18px rgba(31,95,255,.05);
+            font-size: 9.5px;
+            font-weight: 900;
+            text-align: left;
+        }
+        .student-log-time-trigger:active { transform: scale(.96); }
+        .student-log-time-trigger span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .student-log-time-trigger svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+        .student-log-time-trigger svg:last-child { width: 12px; height: 12px; }
+        .student-log-search { position: relative; min-width: 0; }
+        .student-log-search > svg {
+            position: absolute;
+            left: 11px;
+            top: 50%;
+            width: 16px;
+            height: 16px;
+            transform: translateY(-50%);
+            fill: none;
+            stroke: #94A3B8;
+            stroke-width: 2.3;
+            stroke-linecap: round;
+            pointer-events: none;
+        }
+        .student-log-search input {
+            width: 100%;
+            height: 40px;
+            padding: 0 36px 0 35px;
+            border: 1px solid rgba(255,255,255,.92);
+            border-radius: 12px;
+            outline: 0;
+            color: var(--ink);
+            background: rgba(255,255,255,.80);
+            box-shadow: 0 7px 18px rgba(31,95,255,.045);
+            font-size: 11px;
+            font-weight: 800;
+        }
+        .student-log-search input:focus { border-color: rgba(31,95,255,.30); background: rgba(255,255,255,.94); box-shadow: 0 0 0 3px rgba(31,95,255,.07); }
+        .student-log-search-clear {
+            position: absolute;
+            right: 5px;
+            top: 4px;
+            width: 32px;
+            height: 32px;
+            display: none;
+            place-items: center;
+            border: 0;
+            border-radius: 9px;
+            color: #64748B;
+            background: rgba(226,232,240,.72);
+        }
+        .student-log-search-clear.visible { display: grid; }
+        .student-log-search-clear svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; }
+        .student-log-filter-head { margin: 8px 2px 0; }
+        .student-log-filter-head strong { color: #1747C8; font-size: 10px; }
+        .student-log-filter-head span { font-size: 10px; }
+        .log-student-avatar-wrap { position: relative; display: block; width: 42px; height: 42px; }
+        .log-student-avatar-wrap > .pending-count-badge { top: -4px; right: -5px; }
+        .student-log-page-card em { display: inline-flex; align-items: center; gap: 5px; }
+        .inline-pending-dot { width: 7px; height: 7px; flex: 0 0 7px; border-radius: 50%; background: var(--danger); box-shadow: 0 2px 6px rgba(239,68,68,.34); }
+        #logDetailReviewButton,
+        .pending-leaf-action { position: relative; overflow: visible; }
+        #logDetailReviewButton > .pending-count-badge { top: 7px; right: 9px; }
+        .pending-leaf-action > .pending-count-badge { top: -5px; right: -5px; }
+        .module-card-actions .pending-leaf-action > .pending-count-badge { top: -4px; right: -4px; }
+
+        .guardian-call-root { margin: 0 2px 4px; }
+        .call-sheet [hidden] { display: none !important; }
+        .guardian-call-list { display: grid; gap: 8px; }
+        .guardian-call-card {
+            min-width: 0;
+            display: grid;
+            grid-template-columns: 32px minmax(0,1fr) 78px;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 12px;
+            border: 1px solid rgba(255,255,255,.94);
+            border-radius: 16px;
+            background: rgba(255,255,255,.78);
+            box-shadow: 0 7px 18px rgba(31,95,255,.05);
+        }
+        .guardian-call-index { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 10px; color: var(--brand); background: rgba(31,95,255,.10); font-size: 10px; font-weight: 950; }
+        .guardian-call-copy { min-width: 0; }
+        .guardian-call-copy > span { display: block; color: var(--muted); font-size: 9px; font-weight: 800; }
+        .guardian-call-copy strong { display: block; margin-top: 2px; overflow: hidden; color: var(--ink); font-size: 13px; font-weight: 950; text-overflow: ellipsis; white-space: nowrap; }
+        .guardian-call-copy em { display: block; margin-top: 3px; color: var(--body); font-size: 10px; font-style: normal; font-weight: 850; font-variant-numeric: tabular-nums; }
+        .guardian-call-actions { display: grid; grid-template-columns: 34px 38px; gap: 6px; }
+        .guardian-copy-action,
+        .guardian-dial-action { height: 34px; display: grid; place-items: center; border-radius: 10px; }
+        .guardian-copy-action { border: 1px solid rgba(31,95,255,.13); color: var(--brand); background: rgba(31,95,255,.08); }
+        .guardian-dial-action { color: #fff; background: var(--brand); box-shadow: 0 6px 14px rgba(31,95,255,.18); }
+        .guardian-copy-action:active,
+        .guardian-dial-action:active { transform: scale(.94); }
+        .guardian-copy-action svg,
+        .guardian-dial-action svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; }
+
+        .material-thumb-open { width: 100%; display: block; padding: 0; border: 0; color: inherit; background: transparent; text-align: left; }
+        .material-thumb-open:active { transform: scale(.98); }
+        .material-thumb-caption strong,
+        .material-thumb-caption small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .material-thumb-caption strong { color: var(--ink); font-size: 11px; font-weight: 950; }
+        .material-thumb-caption small { margin-top: 4px; color: var(--muted); font-size: 9px; font-weight: 800; }
+        .material-thumb-card.needs-action { padding-bottom: 9px; border-color: rgba(239,68,68,.18); background: rgba(255,255,255,.76); }
+        .material-reupload-button { min-width: 74px; height: 30px; display: block; margin: 0 auto; padding: 0 10px; border: 1px solid rgba(239,68,68,.18); border-radius: 9px; color: #B91C1C; background: rgba(239,68,68,.09); font-size: 10px; font-weight: 950; }
+        .material-reupload-button:active { transform: scale(.95); }
+
+        .dorm-layout-grid .dorm-bed-option {
+            min-height: 88px;
+            display: grid;
+            grid-template-rows: auto auto auto;
+            align-content: center;
+            align-items: center;
+            justify-items: stretch;
+            gap: 6px;
+            padding: 9px 10px;
+            text-align: left;
+        }
+        .dorm-bed-head { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .dorm-bed-number { color: currentColor; font-size: 18px; font-weight: 950; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: .03em; }
+        .dorm-bed-bunk { flex: 0 0 auto; padding: 3px 6px; border-radius: 7px; color: currentColor; background: rgba(255,255,255,.58); font-size: 8px; font-weight: 900; }
+        .dorm-bed-status { display: inline-flex; align-items: center; gap: 5px; color: currentColor; font-size: 8.5px; font-weight: 900; }
+        .dorm-bed-status i { width: 6px; height: 6px; flex: 0 0 6px; border-radius: 50%; background: currentColor; box-shadow: 0 0 0 3px rgba(255,255,255,.42); }
+        .dorm-bed-student-name { width: 100%; overflow: hidden; color: var(--ink); font-size: 11.5px; font-weight: 950; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
+        .class-module-scroll .dorm-bed-option.vacant:not(:disabled):not(.active) .dorm-bed-student-name { color: #991B1B; }
+        .class-module-scroll .dorm-bed-option.occupied:not(:disabled):not(.active) .dorm-bed-student-name { color: #065F46; }
+        .picker-body .dorm-bed-option.vacant:not(.active) .dorm-bed-student-name { color: #78350F; }
+        .picker-body .dorm-bed-option.occupied:not(.active) .dorm-bed-student-name { color: #334155; }
+        .picker-body .dorm-bed-option.active {
+            color: #fff !important;
+            border-color: #1747C8 !important;
+            background: linear-gradient(145deg,#1F5FFF,#1747C8) !important;
+            box-shadow: 0 9px 20px rgba(31,95,255,.24) !important;
+        }
+        .picker-body .dorm-bed-option.active .dorm-bed-number,
+        .picker-body .dorm-bed-option.active .dorm-bed-bunk,
+        .picker-body .dorm-bed-option.active .dorm-bed-status,
+        .picker-body .dorm-bed-option.active .dorm-bed-student-name { color: #fff !important; }
+        .picker-body .dorm-bed-option.active .dorm-bed-bunk { background: rgba(255,255,255,.19); }
+        .picker-body .dorm-bed-option.active .dorm-bed-status { color: rgba(255,255,255,.90) !important; }
+        .picker-body .dorm-bed-option.active .dorm-bed-status i { background: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,.18); }
+        .dorm-bed-option:disabled .dorm-bed-student-name { color: #64748B; }
+        .dorm-confirm > .pending-count-badge { top: -5px; right: -5px; }
+
+        /* 7.39：床号与上下铺重组、请假二级全屏、整班名单统一搜索。 */
+        #leaveDetailView { background: linear-gradient(135deg, #EFF6FF 0%, #DFE7FF 100%); }
+        .leave-detail-scroll {
+            position: absolute;
+            inset: 0;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: 112px 20px 36px;
+            scrollbar-width: none;
+            overscroll-behavior-y: contain;
+            -webkit-overflow-scrolling: touch;
+        }
+        .leave-detail-scroll.has-actions { padding-bottom: 112px; }
+        .leave-detail-scroll::-webkit-scrollbar { display: none; }
+        .leave-detail-status {
+            min-width: 54px;
+            height: 26px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            justify-self: end;
+            padding: 0 8px;
+            border: 1px solid rgba(245,158,11,.18);
+            border-radius: 8px;
+            color: #B45309;
+            background: rgba(245,158,11,.12);
+            font-size: 10px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+        .leave-detail-status.approved { color: #047857; border-color: rgba(16,185,129,.18); background: rgba(16,185,129,.11); }
+        .leave-detail-status.rejected { color: #B91C1C; border-color: rgba(239,68,68,.18); background: rgba(239,68,68,.10); }
+        .leave-detail-page { display: grid; gap: 12px; }
+        .leave-detail-hero {
+            position: relative;
+            display: grid;
+            grid-template-columns: 48px minmax(0,1fr);
+            align-items: center;
+            gap: 12px;
+            padding: 17px 18px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,.92);
+            border-radius: 22px;
+            background: linear-gradient(145deg,rgba(31,95,255,.14),rgba(255,255,255,.76));
+            box-shadow: 0 9px 24px rgba(31,95,255,.055);
+        }
+        .leave-detail-hero::after { content: ''; position: absolute; width: 112px; height: 112px; right: -48px; top: -56px; border-radius: 50%; background: radial-gradient(circle,rgba(31,95,255,.16),rgba(31,95,255,0)); pointer-events: none; }
+        .leave-detail-hero > * { position: relative; z-index: 1; }
+        .leave-detail-avatar { width: 48px; height: 48px; display: grid; place-items: center; overflow: hidden; border: 1px solid rgba(255,255,255,.94); border-radius: 15px; color: #DB2777; background: linear-gradient(145deg,rgba(236,72,153,.14),rgba(252,231,243,.88)); box-shadow: 0 6px 14px rgba(31,95,255,.08); }
+        .leave-detail-avatar.male { color: #2563EB; background: linear-gradient(145deg,rgba(59,130,246,.17),rgba(219,234,254,.86)); }
+        .leave-detail-avatar img { width: 100%; height: 100%; display: block; object-fit: cover; }
+        .leave-detail-avatar svg { width: 27px; height: 27px; fill: none; stroke: currentColor; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; }
+        .leave-detail-hero-copy { min-width: 0; }
+        .leave-detail-hero-copy span { color: var(--brand); font-size: 10px; font-weight: 900; }
+        .leave-detail-hero-copy h2 { margin: 4px 0 0; overflow: hidden; color: var(--ink); font-size: 18px; font-weight: 950; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
+        .leave-detail-hero-copy p { margin: 6px 0 0; color: var(--muted); font-size: 11px; font-weight: 800; line-height: 1.45; }
+        .leave-detail-section { padding: 17px 18px; border: 1px solid rgba(255,255,255,.92); border-radius: 20px; background: rgba(255,255,255,.72); box-shadow: 0 8px 22px rgba(31,95,255,.045); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+        .leave-detail-section-title { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; color: var(--muted); font-size: 11px; font-weight: 900; }
+        .leave-detail-section-title::after { content: ''; height: 1px; flex: 1; background: linear-gradient(90deg,rgba(100,116,139,.18),rgba(100,116,139,0)); }
+        .leave-detail-info-row { display: grid; grid-template-columns: 72px minmax(0,1fr); gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(15,23,42,.06); }
+        .leave-detail-info-row:last-child { border-bottom: 0; padding-bottom: 2px; }
+        .leave-detail-info-row > span { color: var(--muted); font-size: 11px; font-weight: 800; }
+        .leave-detail-info-row > strong { color: var(--ink); font-size: 13px; font-weight: 850; line-height: 1.65; }
+        .leave-detail-section.reject { border-color: rgba(239,68,68,.14); background: rgba(254,242,242,.68); }
+        .leave-detail-section.reject p { margin: 11px 0 0; color: #991B1B; font-size: 13px; font-weight: 750; line-height: 1.7; }
+        .leave-detail-evidence-button { width: 100%; display: block; margin-top: 12px; padding: 0; overflow: hidden; border: 1px solid rgba(31,95,255,.10); border-radius: 16px; background: #F8FAFC; text-align: left; }
+        .leave-detail-evidence-button:active { transform: scale(.97); }
+        .leave-detail-evidence-button svg { width: 100%; height: auto; display: block; }
+        .leave-detail-evidence-caption { min-height: 38px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 12px; color: var(--body); background: rgba(255,255,255,.86); font-size: 11px; font-weight: 900; }
+        .leave-detail-evidence-caption small { color: var(--brand); font-size: 9px; font-weight: 900; }
+        .leave-detail-actions { grid-template-columns: .9fr 1.1fr; }
+        .leave-detail-actions[hidden] { display: none; }
+        .leave-detail-actions .fixed-action-button { min-height: 48px; }
+        .leave-detail-actions .fixed-action-button.reject { border: 1px solid rgba(239,68,68,.18); color: #DC2626; background: rgba(254,226,226,.92); }
+
+        .roster-search { position: relative; min-width: 0; margin-bottom: 12px; }
+        .roster-search > svg { position: absolute; left: 12px; top: 50%; width: 16px; height: 16px; transform: translateY(-50%); fill: none; stroke: #94A3B8; stroke-width: 2.3; stroke-linecap: round; pointer-events: none; }
+        .roster-search input { width: 100%; height: 40px; padding: 0 38px 0 37px; border: 1px solid rgba(255,255,255,.92); border-radius: 12px; outline: 0; color: var(--ink); background: rgba(255,255,255,.78); box-shadow: 0 7px 18px rgba(31,95,255,.045); font-size: 12px; font-weight: 750; }
+        .roster-search input:focus { border-color: rgba(31,95,255,.28); background: rgba(255,255,255,.94); box-shadow: 0 0 0 3px rgba(31,95,255,.075); }
+        .roster-search-clear { position: absolute; right: 5px; top: 4px; width: 32px; height: 32px; display: none; place-items: center; border: 0; border-radius: 9px; color: #64748B; background: rgba(226,232,240,.72); }
+        .roster-search-clear.visible { display: grid; }
+        .roster-search-clear svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; }
+        .class-roster-search { margin-top: -2px; }
+        .log-student-section .roster-search { margin: 0 0 13px; }
+        .roster-empty { padding: 24px 12px; border: 1px dashed rgba(31,95,255,.15); border-radius: 15px; color: var(--muted); background: rgba(255,255,255,.48); font-size: 11px; font-weight: 800; line-height: 1.55; text-align: center; }
+        .class-student-list > .roster-empty,
+        .log-student-grid > .roster-empty { grid-column: 1/-1; }
+
+        .dorm-plan { padding: 12px; }
+        .dorm-room-list { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; overflow: visible; padding: 0; scroll-snap-type: none; }
+        .dorm-room-chip { width: 100%; min-width: 0; min-height: 56px; padding: 8px; scroll-snap-align: none; }
+        .dorm-room-chip .dorm-occupancy { width: auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .dorm-plan-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+        .dorm-plan-current { min-width: 0; }
+        .dorm-plan-current span { display: block; color: var(--muted); font-size: 8.5px; font-weight: 900; letter-spacing: .08em; }
+        .dorm-plan-current strong { display: block; margin-top: 3px; overflow: hidden; color: var(--ink); font-size: 15px; font-weight: 950; text-overflow: ellipsis; white-space: nowrap; }
+        .dorm-plan-legend { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 8px; font-weight: 850; }
+        .dorm-plan-legend span { display: inline-flex; align-items: center; gap: 4px; }
+        .dorm-plan-legend i { width: 6px; height: 6px; border-radius: 50%; background: #10B981; }
+        .dorm-plan-legend span:last-child i { background: #EF4444; }
+        .dorm-plan-corridor { height: 25px; margin: 0 0 9px; }
+        .dorm-layout-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9px; }
+        .dorm-bunk-unit { min-width: 0; padding: 0; overflow: hidden; border: 1px solid rgba(255,255,255,.92); border-radius: 15px; background: rgba(255,255,255,.60); box-shadow: inset 0 1px 0 rgba(255,255,255,.84),0 7px 16px rgba(31,95,255,.05); }
+        .dorm-bunk-unit-head { min-height: 35px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 9px; border-bottom: 1px solid rgba(31,95,255,.07); background: linear-gradient(145deg,rgba(31,95,255,.10),rgba(255,255,255,.66)); }
+        .dorm-bunk-unit-head > span { display: inline-flex; align-items: baseline; gap: 3px; }
+        .dorm-bunk-unit-head strong { color: var(--brand); font-size: 17px; font-weight: 950; line-height: 1; font-variant-numeric: tabular-nums; }
+        .dorm-bunk-unit-head small { color: var(--muted); font-size: 8px; font-weight: 900; }
+        .dorm-bunk-unit-head em { padding: 3px 6px; border-radius: 7px; color: var(--muted); background: rgba(255,255,255,.70); font-size: 8px; font-style: normal; font-weight: 900; }
+        .dorm-bunk-stack { display: grid; }
+        .dorm-layout-grid .dorm-bed-option {
+            min-height: 53px;
+            display: grid;
+            grid-template-columns: 34px minmax(0,1fr) auto;
+            grid-template-rows: auto;
+            align-content: center;
+            align-items: center;
+            justify-items: stretch;
+            gap: 7px;
+            margin: 0;
+            padding: 7px 8px;
+            border: 0;
+            border-radius: 0;
+            box-shadow: none;
+            text-align: left;
+        }
+        .dorm-layout-grid .dorm-bed-option + .dorm-bed-option { margin-top: 0; border-top: 1px solid rgba(15,23,42,.06); }
+        .dorm-layout-grid .dorm-bed-bunk { min-width: 34px; display: grid; place-items: center; padding: 4px 3px; border-radius: 7px; color: currentColor; background: rgba(255,255,255,.58); font-size: 8.5px; font-weight: 950; }
+        .dorm-layout-grid .dorm-bed-student-name { min-width: 0; color: var(--ink); font-size: 10.5px; font-weight: 950; line-height: 1.25; }
+        .dorm-layout-grid .dorm-bed-status { justify-self: end; gap: 4px; font-size: 7.5px; white-space: nowrap; }
+        .dorm-layout-grid .dorm-bed-status i { width: 5px; height: 5px; flex-basis: 5px; box-shadow: 0 0 0 2px rgba(255,255,255,.42); }
+        .picker-body .dorm-bed-option.active .dorm-bed-bunk { color: #fff; background: rgba(255,255,255,.19); }
+        .dorm-plan > .dorm-plan-balcony { width: 100%; height: 26px; margin: 9px 0 0; border-radius: 9px 9px 0 0; }
+
         .qa-static .app-view { transition: none !important; }
     </style>
 </head>
@@ -2607,9 +2999,7 @@
                     <svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
                 </button>
                 <h1 class="nav-title" id="classDetailTitle">班级详情</h1>
-                <button type="button" class="class-todo-nav" id="classTodoButton" aria-label="查看班级待办">
-                    待办<span class="class-todo-badge" id="classTodoBadge"></span>
-                </button>
+                <div aria-hidden="true"></div>
             </header>
             <main class="class-detail-scroll" id="classDetailScroll">
                 <nav class="class-detail-tabs" aria-label="班级详情分区">
@@ -2622,19 +3012,6 @@
                 <section class="class-tab-panel active" id="classOverviewPanel" aria-label="班级概览"></section>
                 <section class="class-tab-panel" id="classManagementPanel" aria-label="班级管理"></section>
                 <section class="class-tab-panel" id="classInfoPanel" aria-label="班级信息"></section>
-            </main>
-        </section>
-
-        <section class="app-view" id="classTodoView" aria-label="班级待办">
-            <header class="topbar" aria-label="班级待办导航">
-                <button type="button" class="nav-button" id="classTodoBackButton" aria-label="返回班级详情">
-                    <svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                </button>
-                <h1 class="nav-title">班级待办</h1>
-                <div aria-hidden="true"></div>
-            </header>
-            <main class="class-todo-scroll" id="classTodoScroll">
-                <div id="classTodoRoot"></div>
             </main>
         </section>
 
@@ -2653,6 +3030,23 @@
                 <svg aria-hidden="true" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 <span>添加记录</span>
             </button>
+        </section>
+
+        <section class="app-view" id="leaveDetailView" aria-label="请假详情">
+            <header class="topbar" aria-label="请假详情导航">
+                <button type="button" class="nav-button" id="leaveDetailBackButton" aria-label="返回学生假条">
+                    <svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <h1 class="nav-title">请假详情</h1>
+                <span class="leave-detail-status" id="leaveDetailStatus">待审批</span>
+            </header>
+            <main class="leave-detail-scroll" id="leaveDetailScroll">
+                <div id="leaveDetailRoot"></div>
+            </main>
+            <div class="fixed-action-surface leave-detail-actions" id="leaveDetailActions" aria-label="请假审批操作" hidden>
+                <button type="button" class="fixed-action-button reject pending-leaf-action" id="leaveDetailRejectButton" data-workflow="leave" data-workflow-value="已驳回">驳回</button>
+                <button type="button" class="fixed-action-button confirm pending-leaf-action" id="leaveDetailApproveButton" data-workflow="leave" data-workflow-value="已通过">通过</button>
+            </div>
         </section>
 
         <section class="app-view" id="logDetailView" aria-label="日志详情">
@@ -2761,9 +3155,11 @@
                     <div class="student-status-row">
                         <div class="filter-chips" id="statusFilters" aria-label="筛选学生状态">
                             <button type="button" class="filter-chip active" data-status="all" aria-pressed="true">全部</button>
-                            <button type="button" class="filter-chip" data-status="正常在读" aria-pressed="false">正常在读</button>
-                            <button type="button" class="filter-chip" data-status="顶岗实习" aria-pressed="false">顶岗实习</button>
-                            <button type="button" class="filter-chip" data-status="休学保留学籍" aria-pressed="false">休学</button>
+                            <button type="button" class="filter-chip" data-status="新生注册" aria-pressed="false">新生注册</button>
+                            <button type="button" class="filter-chip" data-status="在读" aria-pressed="false">在读</button>
+                            <button type="button" class="filter-chip" data-status="退学" aria-pressed="false">退学</button>
+                            <button type="button" class="filter-chip" data-status="休学" aria-pressed="false">休学</button>
+                            <button type="button" class="filter-chip" data-status="毕业" aria-pressed="false">毕业</button>
                         </div>
                     </div>
                 </section>
@@ -2799,7 +3195,7 @@
                 <button type="button" class="nav-button" id="backButton" aria-label="返回学生列表">
                     <svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
                 </button>
-                <h1 class="nav-title">学生详情</h1>
+                <h1 class="nav-title" id="detailTitle">学生姓名</h1>
                 <button type="button" class="nav-action" id="editButton" aria-label="编辑学生档案">编辑</button>
             </header>
 
@@ -2816,10 +3212,6 @@
                 </div>
                 <section id="panelRoot" role="tabpanel" aria-labelledby="tab-identity"></section>
             </main>
-            <div class="student-attendance-dock" id="studentAttendanceDock" aria-label="学生当前点名与考勤记录">
-                <button type="button" class="attendance-status-trigger" id="studentAttendanceStatus" data-action="open-student-attendance-status" aria-controls="attendanceEditorView"><span>今日考勤 · 到课</span><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
-                <button type="button" class="attendance-history-trigger" id="studentAttendanceHistory" data-action="open-student-attendance"><span>考勤记录</span><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
-            </div>
         </section>
 
         <section class="app-view" id="attendanceView" aria-label="学生考勤记录">
@@ -2835,20 +3227,17 @@
             </main>
         </section>
 
-        <section class="app-view" id="attendanceEditorView" aria-label="修改考勤记录">
-            <header class="topbar" aria-label="修改考勤记录导航">
+        <section class="app-view" id="attendanceEditorView" aria-label="学生当天考勤详情">
+            <header class="topbar" aria-label="学生当天考勤详情导航">
                 <button type="button" class="nav-button" id="attendanceEditorBackButton" aria-label="返回考勤记录">
                     <svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
                 </button>
-                <h1 class="nav-title">修改考勤记录</h1>
-                <div aria-hidden="true"></div>
+                <h1 class="nav-title" id="attendanceEditorTitle">当天详情</h1>
+                <button type="button" class="nav-action attendance-editor-action" id="attendanceEditorActionButton" data-action="toggle-attendance-edit-mode">编辑</button>
             </header>
             <main class="attendance-edit-scroll" id="attendanceEditorScroll">
                 <div id="attendanceEditorRoot"></div>
             </main>
-            <div class="fixed-action-surface attendance-edit-actions" aria-label="保存考勤记录操作">
-                <button type="button" class="fixed-action-button confirm" data-action="save-student-attendance">保存考勤记录</button>
-            </div>
         </section>
 
         <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
@@ -2885,14 +3274,15 @@
         </div>
 
         <div class="call-layer" id="callLayer" hidden>
-            <section class="call-sheet" role="dialog" aria-modal="true" aria-labelledby="callPersonName">
+            <section class="call-sheet" role="dialog" aria-modal="true" aria-labelledby="callSheetTitle">
                 <div class="call-grabber"></div>
-                <div class="call-person">
+                <div class="call-person" id="callSingleRoot">
                     <span id="callPersonRole">确认联系</span>
-                    <strong id="callPersonName">联系人</strong>
+                    <strong id="callSheetTitle"><span id="callPersonName">联系人</span></strong>
                     <div class="call-phone-line"><em id="callPersonPhone">138 0000 0000</em><button type="button" class="phone-copy-button" id="callPhoneCopyButton" data-action="copy" data-copy="13800000000" aria-label="复制电话号码"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="11" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path></svg>复制</button></div>
                 </div>
                 <a class="call-confirm" id="callConfirmLink" href="tel:13800000000"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.11 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.72c.12.9.35 1.78.68 2.62a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.46-1.24a2 2 0 0 1 2.11-.45c.84.33 1.72.56 2.62.68A2 2 0 0 1 22 16.92z"></path></svg>拨打电话</a>
+                <div class="guardian-call-root" id="guardianCallRoot" hidden></div>
                 <button type="button" class="call-cancel" id="callCancelButton">取消</button>
             </section>
         </div>
@@ -2926,7 +3316,7 @@
             className: '护理 2403 班',
             entryDate: '2026-09-01',
             graduationDate: '2029-06-30',
-            studentStatus: '正常在读',
+            studentStatus: '在读',
             statusChangedAt: '2026-09-01',
             statusReason: '新生入学建档',
             registrationStatus: '已注册',
@@ -2948,7 +3338,7 @@
             address: '广东省深圳市龙华区民治街道民丰路 28 号 3 栋 502',
             email: 'linzhixia@example.edu.cn',
             wechat: 'LZX_240301',
-            qq: '待补充',
+            qq: '',
             familyEconomy: '普通家庭',
             parentsSeparated: '否',
             learningStyle: '视觉 + 实操型',
@@ -3035,7 +3425,7 @@
             student,
             createStudent({
                 id: 'STU2026240412', name: '陈柏安', gender: '男', studentNo: '2026240412', phone: '136 2662 6621', phoneRaw: '13626626621',
-                major: '新能源汽车运用与维修', className: '新能源汽车 2404 班', registeredGrade: '2026 级', studentStatus: '正常在读',
+                major: '新能源汽车运用与维修', className: '新能源汽车 2404 班', registeredGrade: '2026 级', studentStatus: '新生注册',
                 guardianName: '陈慧玲', guardianPhone: '138 7261 6508', guardianPhoneRaw: '13872616508', updatedAt: '2026-07-08 09:54',
                 nextAction: '实训课前复核运动限制，并催办户口本材料审核结果',
                 family: [
@@ -3045,21 +3435,21 @@
             }),
             createStudent({
                 id: 'STU2026240218', name: '周以宁', gender: '女', studentNo: '2026240218', phone: '137 8861 3102', phoneRaw: '13788613102',
-                major: '电子商务', className: '电子商务 2402 班', studentStatus: '顶岗实习', internshipStatus: '实习中',
+                major: '电子商务', className: '电子商务 2402 班', studentStatus: '在读', internshipStatus: '实习中',
                 guardianName: '周敏', guardianPhone: '139 2206 7813', guardianPhoneRaw: '13922067813', updatedAt: '2026-07-09 16:28',
                 nextAction: '确认企业实习周报，并补录本月指导教师评价',
                 family: [{ relation: '母亲', name: '周敏', idNumber: '440304198106207426', education: '本科', job: '招商主管', phone: '139 2206 7813', phoneRaw: '13922067813', guardian: true }]
             }),
             createStudent({
                 id: 'STU2026240107', name: '徐明哲', gender: '男', studentNo: '2026240107', phone: '135 6120 8477', phoneRaw: '13561208477',
-                major: '计算机应用', className: '计算机应用 2401 班', studentStatus: '正常在读',
+                major: '计算机应用', className: '计算机应用 2401 班', studentStatus: '毕业',
                 guardianName: '徐丽', guardianPhone: '137 9918 6420', guardianPhoneRaw: '13799186420', updatedAt: '2026-07-10 08:12',
                 nextAction: '完成个人培养计划确认，并核对计算机实训分组',
                 family: [{ relation: '母亲', name: '徐丽', idNumber: '440307198309126542', education: '大专', job: '财务', phone: '137 9918 6420', phoneRaw: '13799186420', guardian: true }]
             }),
             createStudent({
                 id: 'STU2026240526', name: '赵思妍', gender: '女', studentNo: '2026240526', phone: '134 7280 6635', phoneRaw: '13472806635',
-                major: '幼儿保育', className: '幼儿保育 2405 班', studentStatus: '休学保留学籍', suspensionStatus: '休学中', registrationStatus: '暂停注册',
+                major: '幼儿保育', className: '幼儿保育 2405 班', studentStatus: '休学', suspensionStatus: '休学中', registrationStatus: '暂停注册',
                 guardianName: '赵海燕', guardianPhone: '136 3055 9821', guardianPhoneRaw: '13630559821', updatedAt: '2026-07-07 14:06',
                 nextAction: '联系监护人确认复学计划，并跟进复诊材料归档',
                 family: [
@@ -3069,7 +3459,7 @@
             }),
             createStudent({
                 id: 'STU2026240611', name: '谢承宇', gender: '男', studentNo: '2026240611', phone: '132 5068 1934', phoneRaw: '13250681934',
-                major: '新能源汽车运用与维修', className: '新能源汽车 2406 班', studentStatus: '正常在读',
+                major: '新能源汽车运用与维修', className: '新能源汽车 2406 班', studentStatus: '退学',
                 guardianName: '谢文静', guardianPhone: '135 8013 9927', guardianPhoneRaw: '13580139927', updatedAt: '2026-07-10 10:20',
                 nextAction: '补充体检报告，并完成学生账号首次登录确认',
                 family: [{ relation: '母亲', name: '谢文静', idNumber: '440308198508019927', education: '高中', job: '个体经营', phone: '135 8013 9927', phoneRaw: '13580139927', guardian: true }]
@@ -3164,10 +3554,10 @@
         }
         const classWorkflowState = {
             leave: [
-                { id: 'leave-1', name: '林知夏', reason: '发热就医', description: '今早体温升高并伴有咽痛，家长已预约门诊，希望请假一天完成检查并在返校后补交诊断结果。', period: '今天 08:00—17:30', startDate: shiftedDateValue(0), endDate: shiftedDateValue(0), status: '待审批', evidenceLabel: '门诊挂号凭证' },
-                { id: 'leave-2', name: '顾怀川', reason: '家庭事务', description: '需由本人陪同家长办理重要家庭事务，预计中午前完成，结束后将及时返校。', period: '明天 08:00—12:00', startDate: shiftedDateValue(1), endDate: shiftedDateValue(1), status: '待审批', evidenceLabel: '监护人说明' },
-                { id: 'leave-3', name: '周以宁', reason: '复诊', description: '按医院预约前往复查上次检查结果，家长全程陪同，当日完成后返校。', period: '昨天 全天', startDate: shiftedDateValue(-1), endDate: shiftedDateValue(-1), status: '已通过', evidenceLabel: '复诊预约单' },
-                { id: 'leave-4', name: '叶清欢', reason: '门诊复查', description: '申请下午离校前往门诊复查，并由监护人负责接送。', period: '上周五 13:00—17:30', startDate: shiftedDateValue(-3), endDate: shiftedDateValue(-3), status: '已驳回', evidenceLabel: '门诊病历', rejectReason: '请假时段与门诊凭证不一致，请核实后重新提交。' }
+                { id: 'leave-1', name: '林知夏', reason: '发热就医', description: '今早体温升高并伴有咽痛，家长已预约门诊，希望请假一天完成检查并在返校后补交诊断结果。', period: '今天 08:00—17:30', submittedAt: `${shiftedDateValue(0)} 07:18`, startDate: shiftedDateValue(0), endDate: shiftedDateValue(0), status: '待审批', evidenceLabel: '门诊挂号凭证' },
+                { id: 'leave-2', name: '顾怀川', reason: '家庭事务', description: '需由本人陪同家长办理重要家庭事务，预计中午前完成，结束后将及时返校。', period: '明天 08:00—12:00', submittedAt: `${shiftedDateValue(0)} 09:26`, startDate: shiftedDateValue(1), endDate: shiftedDateValue(1), status: '待审批', evidenceLabel: '监护人说明' },
+                { id: 'leave-3', name: '周以宁', reason: '复诊', description: '按医院预约前往复查上次检查结果，家长全程陪同，当日完成后返校。', period: '昨天 全天', submittedAt: `${shiftedDateValue(-2)} 18:40`, startDate: shiftedDateValue(-1), endDate: shiftedDateValue(-1), status: '已通过', evidenceLabel: '复诊预约单' },
+                { id: 'leave-4', name: '叶清欢', reason: '门诊复查', description: '申请下午离校前往门诊复查，并由监护人负责接送。', period: '上周五 13:00—17:30', submittedAt: `${shiftedDateValue(-4)} 21:05`, startDate: shiftedDateValue(-3), endDate: shiftedDateValue(-3), status: '已驳回', evidenceLabel: '门诊病历', rejectReason: '请假时段与门诊凭证不一致，请核实后重新提交。' }
             ],
             discipline: [
                 { id: 'discipline-1', name: '陈柏安', event: '晚自习迟到', date: shiftedDateValue(0), clock: '19:06', details: '晚自习开始后 6 分钟到达教室。学生说明因归还实训器材耽误，已完成口头提醒并要求补登记器材交接时间。', photoCount: 2 },
@@ -3183,9 +3573,9 @@
                 { id: 'log-4', date: shiftedDateValue(-5), name: '周景行', title: '学习反思', summary: '复盘了阶段测验错题。', content: '阶段测验中主要失分在概念辨析和审题。已经把错题按知识点整理，并为每道题补充错误原因和正确思路，准备在周末再做一次同类题检测。', status: '已批阅', review: '复盘思路清晰，建议下周补充同类题二次检测结果。' }
             ],
             dorm: [
-                { id: 'dorm-1', name: '林知夏', gender: '女', roomId: 'F402', bedNumber: 2, assignment: '女生 402 · 近外廊侧 · 2号床（下铺）' },
+                { id: 'dorm-1', name: '林知夏', gender: '女', roomId: 'F402', bedNumber: 2, assignment: '女生 402 · 近外廊侧 · 1号床（下铺）' },
                 { id: 'dorm-2', name: '苏晚晴', gender: '女', roomId: 'F403', bedNumber: 1, assignment: '女生 403 · 近外廊侧 · 1号床（上铺）' },
-                { id: 'dorm-3', name: '顾怀川', gender: '男', roomId: 'M302', bedNumber: 2, assignment: '男生 302 · 近外廊侧 · 2号床（下铺）' },
+                { id: 'dorm-3', name: '顾怀川', gender: '男', roomId: 'M302', bedNumber: 2, assignment: '男生 302 · 近外廊侧 · 1号床（下铺）' },
                 { id: 'dorm-4', name: '徐明哲', gender: '男', roomId: '', bedNumber: '', assignment: '' },
                 { id: 'dorm-5', name: '顾星遥', gender: '女', roomId: '', bedNumber: '', assignment: '' }
             ],
@@ -3207,12 +3597,12 @@
         const dormInventory = {
             '女': [
                 { id: 'F401', name: '女生 401', beds: makeDormBeds(['叶清欢','许安宁','周以宁','赵思妍','陈语桐','何嘉怡','彭心悦','余静姝']) },
-                { id: 'F402', name: '女生 402', beds: makeDormBeds(['梁诗语','林知夏','', '唐若溪','', '']) },
+                { id: 'F402', name: '女生 402', beds: makeDormBeds(['梁诗语','林知夏','唐若溪','']) },
                 { id: 'F403', name: '女生 403', beds: makeDormBeds(['苏晚晴','宋予希','', '', '罗书瑶','', '江婉宁','韩雨薇']) }
             ],
             '男': [
                 { id: 'M301', name: '男生 301', beds: makeDormBeds(['陈柏安','谢承宇','周景行','沈亦辰','林予安','江叙白','高亦凡','唐一航']) },
-                { id: 'M302', name: '男生 302', beds: makeDormBeds(['陆星野','顾怀川','', '', '许嘉木','']) },
+                { id: 'M302', name: '男生 302', beds: makeDormBeds(['陆星野','顾怀川','许嘉木','']) },
                 { id: 'M303', name: '男生 303', beds: makeDormBeds(['', '', '程屿','', '', '宋知远','叶修远','梁慕辰']) }
             ]
         };
@@ -3243,12 +3633,18 @@
             classTab: 'overview',
             classDetailOrigin: 'class-list',
             classStudentFilter: 'all',
+            classStudentSearch: '',
             classModule: null,
             classModuleReturnTab: 'management',
+            leaveDetailId: '',
             logDetailId: '',
             logDetailOrigin: 'class-module',
+            logRosterSearch: '',
             logHistoryStudentId: '',
-            logHistoryTimeFilter: 'term',
+            logHistoryTimeFilter: 'week',
+            logHistorySearch: '',
+            logHistoryCustomStart: '',
+            logHistoryCustomEnd: '',
             logsPendingExpanded: false,
             leaveSearch: '',
             leaveTimeFilter: 'week',
@@ -3279,6 +3675,7 @@
             attendanceStatusFilter: 'all',
             attendanceEditContext: null,
             attendanceEditOrigin: 'attendance',
+            attendanceEditorEditing: false,
             homeReturnFeature: '全校学生',
             detailReturnStudentId: null,
             editMode: false,
@@ -3293,8 +3690,15 @@
         const homeView = document.getElementById('homeView');
         const classListView = document.getElementById('classListView');
         const classDetailView = document.getElementById('classDetailView');
-        const classTodoView = document.getElementById('classTodoView');
         const classModuleView = document.getElementById('classModuleView');
+        const leaveDetailView = document.getElementById('leaveDetailView');
+        const leaveDetailBackButton = document.getElementById('leaveDetailBackButton');
+        const leaveDetailScroll = document.getElementById('leaveDetailScroll');
+        const leaveDetailRoot = document.getElementById('leaveDetailRoot');
+        const leaveDetailStatus = document.getElementById('leaveDetailStatus');
+        const leaveDetailActions = document.getElementById('leaveDetailActions');
+        const leaveDetailRejectButton = document.getElementById('leaveDetailRejectButton');
+        const leaveDetailApproveButton = document.getElementById('leaveDetailApproveButton');
         const logDetailView = document.getElementById('logDetailView');
         const logDetailBackButton = document.getElementById('logDetailBackButton');
         const logDetailScroll = document.getElementById('logDetailScroll');
@@ -3332,10 +3736,10 @@
         const attendanceRoot = document.getElementById('attendanceRoot');
         const attendanceEditorView = document.getElementById('attendanceEditorView');
         const attendanceEditorBackButton = document.getElementById('attendanceEditorBackButton');
+        const attendanceEditorTitle = document.getElementById('attendanceEditorTitle');
+        const attendanceEditorActionButton = document.getElementById('attendanceEditorActionButton');
         const attendanceEditorScroll = document.getElementById('attendanceEditorScroll');
         const attendanceEditorRoot = document.getElementById('attendanceEditorRoot');
-        const studentAttendanceDock = document.getElementById('studentAttendanceDock');
-        const studentAttendanceStatus = document.getElementById('studentAttendanceStatus');
         const studentList = document.getElementById('studentList');
         const classListBackButton = document.getElementById('classListBackButton');
         const classListScroll = document.getElementById('classListScroll');
@@ -3350,11 +3754,6 @@
         const classOverviewPanel = document.getElementById('classOverviewPanel');
         const classManagementPanel = document.getElementById('classManagementPanel');
         const classInfoPanel = document.getElementById('classInfoPanel');
-        const classTodoButton = document.getElementById('classTodoButton');
-        const classTodoBadge = document.getElementById('classTodoBadge');
-        const classTodoBackButton = document.getElementById('classTodoBackButton');
-        const classTodoScroll = document.getElementById('classTodoScroll');
-        const classTodoRoot = document.getElementById('classTodoRoot');
         const classModuleBackButton = document.getElementById('classModuleBackButton');
         const classModuleTitle = document.getElementById('classModuleTitle');
         const classModuleScroll = document.getElementById('classModuleScroll');
@@ -3371,6 +3770,7 @@
         const manageSchoolFeatures = document.getElementById('manage-btn-text');
         const heroRoot = document.getElementById('heroRoot');
         const panelRoot = document.getElementById('panelRoot');
+        const detailTitle = document.getElementById('detailTitle');
         const editButton = document.getElementById('editButton');
         const tabDock = document.querySelector('#detailView .tab-dock');
         const listBackButton = document.getElementById('listBackButton');
@@ -3389,6 +3789,7 @@
         const pickerLayer = document.getElementById('pickerLayer');
         const pickerTitle = document.getElementById('pickerTitle');
         const pickerBody = document.getElementById('pickerBody');
+        const guardianCallRoot = document.getElementById('guardianCallRoot');
         const materialFileInput = document.getElementById('materialFileInput');
         const wheelScrollTimers = new WeakMap();
 
@@ -3396,6 +3797,9 @@
         function currentData() { return state.editMode ? state.draft : student; }
         function escapeHtml(value) {
             return String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]);
+        }
+        function rosterSearchMarkup({ id, value = '', placeholder = '搜索学生姓名', clearAction, label = '搜索班级学生' }) {
+            return `<div class="roster-search"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="${escapeHtml(id)}" type="search" value="${escapeHtml(value)}" placeholder="${escapeHtml(placeholder)}" autocomplete="off" aria-label="${escapeHtml(label)}"><button type="button" class="roster-search-clear${value ? ' visible' : ''}" data-action="${escapeHtml(clearAction)}" aria-label="清空学生搜索"><svg aria-hidden="true" viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg></button></div>`;
         }
         function slug(value) { return String(value).replace(/[^a-zA-Z0-9_-]/g, '-'); }
         function getPath(source, path) {
@@ -3423,9 +3827,9 @@
         }
         function pill(text, tone = 'info') { return `<span class="pill ${tone}">${escapeHtml(text)}</span>`; }
         function statusTone(text) {
-            if (/不通过|异常|停用|休学|未上传|缺勤/.test(text)) return 'danger';
-            if (/通过|正常|已注册|已归档|良好|启用|到课/.test(text)) return 'success';
-            if (/待|参与|实习|迟到/.test(text)) return 'warning';
+            if (/退学|不通过|异常|停用|未上传|缺勤/.test(text)) return 'danger';
+            if (/在读|毕业|通过|正常|已注册|已归档|良好|启用|到课/.test(text)) return 'success';
+            if (/新生注册|休学|待|参与|实习|迟到/.test(text)) return 'warning';
             return 'info';
         }
         function icon(name) {
@@ -3444,7 +3848,7 @@
 
         function phoneDisplayMarkup(phone, label = '电话号码') {
             const raw = String(phone || '').replace(/\D/g, '');
-            if (!raw) return '<span class="empty-value">待补充</span>';
+            if (!raw) return '';
             return `<span class="phone-value-text">${escapeHtml(formatPhone(raw))}</span>${phoneCopyButton(raw, label)}`;
         }
 
@@ -3627,14 +4031,14 @@
 
         function setView(nextView) {
             state.view = nextView;
-            const classChildViews = ['class-todo','class-module','student-log-history','log-detail','rollcall-history','rollcall-record','discipline-detail','discipline-add'];
-            const moduleChildViews = ['student-log-history','log-detail','rollcall-history','rollcall-record','discipline-detail','discipline-add'];
+            const classChildViews = ['class-module','leave-detail','student-log-history','log-detail','rollcall-history','rollcall-record','discipline-detail','discipline-add'];
+            const moduleChildViews = ['leave-detail','student-log-history','log-detail','rollcall-history','rollcall-record','discipline-detail','discipline-add'];
             const inClassFlow = nextView === 'class-detail' || classChildViews.includes(nextView) || (/detail|attendance/.test(nextView) && state.studentDetailOrigin === 'class-detail');
             homeView.className = `app-view school-home-view${nextView === 'home' ? ' active' : ' behind'}`;
             classListView.className = `app-view${nextView === 'class-list' ? ' active' : (inClassFlow ? ' behind' : '')}`;
             classDetailView.className = `app-view${nextView === 'class-detail' ? ' active' : (classChildViews.includes(nextView) || (/detail|attendance/.test(nextView) && state.studentDetailOrigin === 'class-detail') ? ' behind' : '')}`;
-            classTodoView.className = `app-view${nextView === 'class-todo' ? ' active' : ((nextView === 'class-module' || moduleChildViews.includes(nextView)) && state.classModuleReturnTab === 'todo' ? ' behind' : '')}`;
             classModuleView.className = `app-view${nextView === 'class-module' ? ' active' : (moduleChildViews.includes(nextView) ? ' behind' : '')}`;
+            leaveDetailView.className = `app-view${nextView === 'leave-detail' ? ' active' : ''}`;
             studentLogHistoryView.className = `app-view${nextView === 'student-log-history' ? ' active' : (nextView === 'log-detail' && state.logDetailOrigin === 'student-log-history' ? ' behind' : '')}`;
             logDetailView.className = `app-view${nextView === 'log-detail' ? ' active' : ''}`;
             rollcallHistoryView.className = `app-view${nextView === 'rollcall-history' ? ' active' : (nextView === 'rollcall-record' ? ' behind' : '')}`;
@@ -3722,7 +4126,7 @@
                         registeredClass: classInfo.name,
                         classPlan: `${classInfo.major}专业人才培养方案（20${classInfo.grade}版）`,
                         entryDate: classInfo.openedAt,
-                        studentStatus: '正常在读',
+                        studentStatus: '在读',
                         guardianName: `${name.slice(0,1)}女士`,
                         guardianPhoneRaw: `139${String(52000000 + sequence * 173 + Number(classInfo.code)).slice(-8)}`,
                         guardianPhone: formatPhone(`139${String(52000000 + sequence * 173 + Number(classInfo.code)).slice(-8)}`),
@@ -3803,7 +4207,7 @@
         }
 
         function hasStudentPending(item) {
-            return Boolean(item?.nextAction) || (item?.attachments || []).some(record => /待|未|不通过/.test(record.status || ''));
+            return getMaterialSlots(item).some(slot => requiredMaterialNames.includes(slot.name) && (!slot.item || /不通过/.test(slot.item.status || '')));
         }
 
         function getSchoolFeaturePendingCount(label) {
@@ -3838,14 +4242,6 @@
             managementTab?.classList.toggle('has-pending', pending);
             setPendingBadge(managementTab, pendingCount);
             if (managementTab) managementTab.setAttribute('aria-label', `班级管理${pending ? '，有待处理内容' : ''}`);
-        }
-
-        function updateClassTodoButton() {
-            const total = getClassPendingCounts().total;
-            classTodoButton.classList.toggle('has-pending', total > 0);
-            classTodoBadge.classList.toggle('dot-only', total === 1);
-            classTodoBadge.textContent = total > 1 ? String(total) : '';
-            classTodoButton.setAttribute('aria-label', total ? `查看班级待办，共${total}项` : '查看班级待办，当前无待办');
         }
 
         function renderClassSchoolSummary() {
@@ -3920,7 +4316,6 @@
             const scoreEvaluation = getClassScoreEvaluation(classInfo.yesterdayScore);
             const filteredRoster = state.classStudentFilter === 'auth' ? roster.filter(item => !item.authenticated) : roster;
             updateClassTabPendingState();
-            updateClassTodoButton();
             classOverviewPanel.innerHTML = `
                 <section class="class-dashboard" aria-label="班级数据看板">
                     <div class="class-dashboard-head">
@@ -3932,9 +4327,9 @@
                             <div class="class-dashboard-focus-value"><strong>${classInfo.yesterdayScore}</strong><small>分</small></div>
                         </div>
                         <div class="class-dashboard-rank">
-                            <span>本周排名</span>
+                            <span>综合排名</span>
                             <div><strong>${classInfo.rank}</strong><small>/ ${classInfo.rankTotal}</small></div>
-                            <em>较上周 ↑ ${classInfo.rankShift}</em>
+                            <em><span>较上次</span><b>↑ ${classInfo.rankShift}</b></em>
                         </div>
                     </div>
                     <div class="class-dashboard-secondary">
@@ -3942,41 +4337,34 @@
                         <div class="class-attendance-day"><span>昨日考勤</span><div class="class-attendance-line late"><small>迟到</small><strong>${classInfo.yesterdayLate || 0}/${classInfo.total}人</strong></div><div class="class-attendance-line absent"><small>缺勤</small><strong>${classInfo.yesterdayAbsent || 0}/${classInfo.total}人</strong></div></div>
                     </div>
                 </section>
-                <div class="class-section-head" id="classStudentSection"><h2>${state.classStudentFilter === 'auth' ? '未认证学生' : '学生列表'}（${filteredRoster.length}）</h2></div>
+                <div class="class-section-head" id="classStudentSection"><h2 id="classRosterTitle">${state.classStudentFilter === 'auth' ? '未认证学生' : '学生列表'}（${filteredRoster.length}）</h2></div>
                 ${state.classStudentFilter === 'auth' ? '<div class="class-filter-notice"><span>当前仅显示未完成身份认证的学生</span><button type="button" data-action="clear-class-student-filter">查看全部</button></div>' : ''}
+                <div class="class-roster-search">${rosterSearchMarkup({ id: 'classRosterSearch', value: state.classStudentSearch, placeholder: '搜索班级学生姓名', clearAction: 'clear-class-roster-search', label: '搜索班级学生姓名' })}</div>
                 <div class="class-student-list">${filteredRoster.map(item => `
-                    <button type="button" class="class-student-row${item.authenticated ? '' : ' has-pending'}" data-student-id="${escapeHtml(item.id)}" aria-label="${escapeHtml(item.name)}，查看学生详情${item.authenticated ? '' : '，身份认证待处理'}">
+                    <button type="button" class="class-student-row${item.authenticated ? '' : ' has-pending'}" data-student-id="${escapeHtml(item.id)}" data-roster-search="${escapeHtml(item.name.toLowerCase())}" aria-label="${escapeHtml(item.name)}，查看学生详情${item.authenticated ? '' : '，身份认证待处理'}">
                         <span class="student-avatar ${item.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(item)}</span>
                         <span class="class-student-copy"><span class="class-student-name">${escapeHtml(item.name)}</span></span>
                         ${item.authenticated ? '' : pendingBadgeMarkup(1)}
-                    </button>`).join('')}</div>`;
+                    </button>`).join('')}<div class="roster-empty" id="classRosterEmpty" hidden>没有找到匹配的学生<br>请尝试其他姓名关键词</div></div>`;
+            updateClassRosterSearchResults();
         }
 
-        function renderClassTodos() {
-            const classInfo = getSelectedClass();
-            const counts = getClassPendingCounts(classInfo);
-            const entries = [
-                { type: 'leave', tone: 'warning', count: counts.leave, label: '学生假条待审批', meta: '核对请假时段与原因后完成审批' },
-                { type: 'dorm', tone: 'warning', count: counts.dorm, label: '未安排宿舍或床位', meta: '选择可用宿舍与空闲床位' },
-                { type: 'auth', tone: '', count: counts.auth, label: '未进行身份认证', meta: '进入学生列表继续处理认证' },
-                { type: 'logs', tone: 'success', count: counts.logs, label: '班级日志待批阅', meta: '完成本周班级日志批阅' }
-            ].filter(item => item.count > 0);
-            updateClassTodoButton();
-            classTodoRoot.innerHTML = `
-                <div class="class-section-head"><h2>待办分类（${entries.length}）</h2></div>
-                ${entries.length ? `<div class="todo-page-list">${entries.map(item => `
-                    <button type="button" class="reminder-item ${item.tone} has-pending" data-class-reminder="${item.type}">
-                        <span class="reminder-copy"><span class="reminder-label">${item.label}</span><small>${item.meta}</small></span>
-                        <span class="reminder-arrow"><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></span>
-                        ${pendingBadgeMarkup(item.count)}
-                    </button>`).join('')}</div>` : '<div class="todo-empty">当前没有待处理事项</div>'}`;
-        }
-
-        function openClassTodos() {
-            renderClassTodos();
-            setView('class-todo');
-            classTodoScroll.scrollTop = 0;
-            focusAfterViewChange(classTodoBackButton);
+        function updateClassRosterSearchResults() {
+            const query = state.classStudentSearch.trim().toLowerCase();
+            const rows = Array.from(classOverviewPanel.querySelectorAll('.class-student-row'));
+            let visible = 0;
+            rows.forEach(row => {
+                const matched = !query || String(row.dataset.rosterSearch || '').includes(query);
+                row.hidden = !matched;
+                if (matched) visible += 1;
+            });
+            const title = document.getElementById('classRosterTitle');
+            const label = state.classStudentFilter === 'auth' ? '未认证学生' : '学生列表';
+            if (title) title.textContent = `${label}（${query ? `${visible}/${rows.length}` : rows.length}）`;
+            const clear = classOverviewPanel.querySelector('.roster-search-clear');
+            if (clear) clear.classList.toggle('visible', Boolean(state.classStudentSearch));
+            const empty = document.getElementById('classRosterEmpty');
+            if (empty) empty.hidden = visible > 0;
         }
 
         const classManagementGroups = {
@@ -4095,6 +4483,7 @@
             state.selectedClassId = classInfo.id;
             state.classDetailOrigin = origin;
             state.classStudentFilter = 'all';
+            state.classStudentSearch = '';
             ensureClassRoster(classInfo);
             classDetailTitle.textContent = getClassDisplayName(classInfo);
             renderClassOverview();
@@ -4107,7 +4496,7 @@
         }
 
         function moduleHero(title, meta, stats) {
-            return `<section class="module-hero"><div class="module-hero-label">${escapeHtml(getClassDisplayName(getSelectedClass()))}</div><div class="module-hero-title">${escapeHtml(title)}</div><div class="module-hero-meta">${escapeHtml(meta)}</div><div class="module-stat-grid">${stats.map(item => `<div class="module-stat"><strong>${escapeHtml(item.value)}</strong><span>${escapeHtml(item.label)}</span></div>`).join('')}</div></section>`;
+            return `<section class="module-hero"><div class="module-hero-label">${escapeHtml(getClassDisplayName(getSelectedClass()))}</div><div class="module-hero-title">${escapeHtml(title)}</div>${meta ? `<div class="module-hero-meta">${escapeHtml(meta)}</div>` : ''}<div class="module-stat-grid">${stats.map(item => `<div class="module-stat"><strong>${escapeHtml(item.value)}</strong><span>${escapeHtml(item.label)}</span></div>`).join('')}</div></section>`;
         }
 
         function parseLocalDateValue(value) {
@@ -4142,16 +4531,25 @@
         }
 
         function formatLeaveDateShort(value) {
-            const date = parseLocalDateValue(value);
-            return date ? `${date.getMonth() + 1}月${date.getDate()}日` : '';
+            const date = value instanceof Date ? value : parseLocalDateValue(value);
+            return date ? `${date.getMonth() + 1}.${date.getDate()}` : '';
+        }
+
+        function formatDateRangeShort(range) {
+            if (!range?.start || !range?.end) return '全部时间';
+            const start = formatLeaveDateShort(range.start);
+            const end = formatLeaveDateShort(range.end);
+            return localDateValue(range.start) === localDateValue(range.end) ? start : `${start}—${end}`;
+        }
+
+        function formatLeaveApplicationTime(value) {
+            const match = String(value || '').match(/^(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2})$/);
+            if (!match) return String(value || '未记录');
+            return `${formatLeaveDateShort(match[1])} ${match[2]}`;
         }
 
         function getLeaveTimeFilterLabel() {
-            if (state.leaveTimeFilter === 'today') return '今天';
-            if (state.leaveTimeFilter === 'week') return '本周';
-            if (state.leaveTimeFilter === 'month') return '本月';
-            if (state.leaveTimeFilter === 'custom' && state.leaveCustomStart && state.leaveCustomEnd) return `${formatLeaveDateShort(state.leaveCustomStart)}—${formatLeaveDateShort(state.leaveCustomEnd)}`;
-            return '全部时间';
+            return formatDateRangeShort(getLeaveFilterRange());
         }
 
         function getFilteredLeaveRecords() {
@@ -4185,7 +4583,7 @@
         function renderLeaveModule() {
             const records = getFilteredLeaveRecords();
             const statusOptions = [{ value: 'all', label: '全部' }, { value: '已通过', label: '已通过' }, { value: '已驳回', label: '已驳回' }];
-            return `<section class="leave-toolbar" aria-label="请假申请搜索与筛选"><div class="leave-toolbar-row"><div class="leave-search"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="leaveSearch" type="search" value="${escapeHtml(state.leaveSearch)}" placeholder="搜索姓名 / 原因 / 状态" autocomplete="off" aria-label="搜索请假申请"><button type="button" class="leave-search-clear${state.leaveSearch ? ' visible' : ''}" data-action="clear-leave-search" aria-label="清空请假搜索"><svg aria-hidden="true" viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg></button></div><button type="button" class="leave-time-trigger" id="leaveTimeTrigger" data-action="open-leave-time-filter" aria-haspopup="dialog" aria-controls="pickerLayer" aria-expanded="false"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M8 3v4M16 3v4M3 10h18"></path></svg><span>${escapeHtml(getLeaveTimeFilterLabel())}</span><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></button></div><div class="leave-status-filters" aria-label="按审批状态筛选">${statusOptions.map(option => `<button type="button" class="leave-status-chip${state.leaveStatusFilter === option.value ? ' active' : ''}" data-action="set-leave-status-filter" data-leave-status="${option.value}" aria-pressed="${state.leaveStatusFilter === option.value ? 'true' : 'false'}">${option.label}</button>`).join('')}</div></section><div class="class-section-head"><h2 id="leaveResultTitle">请假申请（${records.length}）</h2></div><div class="module-list" id="leaveList">${renderLeaveCards(records)}</div>`;
+            return `<section class="leave-toolbar" aria-label="请假申请搜索与筛选"><div class="leave-toolbar-row"><button type="button" class="leave-time-trigger" id="leaveTimeTrigger" data-action="open-leave-time-filter" aria-haspopup="dialog" aria-controls="pickerLayer" aria-expanded="false"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M8 3v4M16 3v4M3 10h18"></path></svg><span>${escapeHtml(getLeaveTimeFilterLabel())}</span><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div class="leave-search"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="leaveSearch" type="search" value="${escapeHtml(state.leaveSearch)}" placeholder="搜索姓名 / 原因 / 状态" autocomplete="off" aria-label="搜索请假申请"><button type="button" class="leave-search-clear${state.leaveSearch ? ' visible' : ''}" data-action="clear-leave-search" aria-label="清空请假搜索"><svg aria-hidden="true" viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg></button></div></div><div class="leave-status-filters" aria-label="按审批状态筛选">${statusOptions.map(option => `<button type="button" class="leave-status-chip${state.leaveStatusFilter === option.value ? ' active' : ''}" data-action="set-leave-status-filter" data-leave-status="${option.value}" aria-pressed="${state.leaveStatusFilter === option.value ? 'true' : 'false'}">${option.label}</button>`).join('')}</div></section><div class="class-section-head"><h2 id="leaveResultTitle">请假申请（${records.length}）</h2></div><div class="module-list" id="leaveList">${renderLeaveCards(records)}</div>`;
         }
 
         function updateLeaveList() {
@@ -4446,10 +4844,7 @@
         }
 
         function getDisciplineTimeFilterLabel() {
-            if (state.disciplineTimeFilter === 'week') return '本周';
-            if (state.disciplineTimeFilter === 'month') return '本月';
-            if (state.disciplineTimeFilter === 'custom' && state.disciplineCustomStart && state.disciplineCustomEnd) return `${formatLeaveDateShort(state.disciplineCustomStart)}—${formatLeaveDateShort(state.disciplineCustomEnd)}`;
-            return '全部时间';
+            return formatDateRangeShort(getDisciplineFilterRange());
         }
 
         function getFilteredDisciplineRecords() {
@@ -4481,11 +4876,11 @@
 
         function renderDisciplineModule() {
             const records = getFilteredDisciplineRecords();
-            return `<section class="discipline-toolbar" aria-label="违纪记录搜索与时间筛选"><div class="discipline-toolbar-row"><div class="discipline-search"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="disciplineSearch" type="search" value="${escapeHtml(state.disciplineSearch)}" placeholder="搜索学生 / 事项" autocomplete="off" aria-label="搜索违纪记录"></div><button type="button" class="discipline-time-trigger" data-action="open-discipline-time-filter" aria-haspopup="dialog" aria-controls="pickerLayer" aria-expanded="false"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M8 3v4M16 3v4M3 10h18"></path></svg><span>${escapeHtml(getDisciplineTimeFilterLabel())}</span></button></div></section><div class="class-section-head"><h2>违纪记录（${records.length}）</h2></div><div class="discipline-list">${records.length ? records.map((item, index) => {
+            return `<section class="discipline-toolbar" aria-label="违纪记录搜索与时间筛选"><div class="discipline-toolbar-row"><button type="button" class="discipline-time-trigger" data-action="open-discipline-time-filter" aria-haspopup="dialog" aria-controls="pickerLayer" aria-expanded="false"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M8 3v4M16 3v4M3 10h18"></path></svg><span>${escapeHtml(getDisciplineTimeFilterLabel())}</span></button><div class="discipline-search"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="disciplineSearch" type="search" value="${escapeHtml(state.disciplineSearch)}" placeholder="搜索学生 / 事项" autocomplete="off" aria-label="搜索违纪记录"></div></div></section><div class="class-section-head"><h2>违纪记录（${records.length}）</h2></div><div class="discipline-list">${records.length ? records.map((item, index) => {
                 const rosterStudent = getClassRosterStudentByName(item.name);
                 const photoCount = Math.max(1, item.photoUrls?.length || item.photoCount || 1);
                 return `<button type="button" class="discipline-card" data-action="open-discipline-detail" data-discipline-id="${escapeHtml(item.id)}" aria-label="第${index + 1}条，查看${escapeHtml(item.name)}的违纪详情"><span class="student-sequence" aria-hidden="true">${String(index + 1).padStart(2,'0')}</span><span class="discipline-avatar ${rosterStudent.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(rosterStudent)}</span><span class="discipline-card-copy"><strong>${escapeHtml(item.name)} · ${escapeHtml(item.event)}</strong><span>${escapeHtml(formatWorkflowDate(item.date))} ${escapeHtml(item.clock || '')}</span><small>${photoCount} 张图片</small></span><span class="discipline-card-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></span></button>`;
-            }).join('') : '<div class="leave-empty-result">本周没有匹配的违纪记录<br>可调整关键词或时间范围</div>'}</div>`;
+            }).join('') : '<div class="leave-empty-result">当前范围内没有匹配的违纪记录<br>可调整关键词或时间范围</div>'}</div>`;
         }
 
         function renderDisciplineTimeFilterPicker() {
@@ -4614,33 +5009,79 @@
             const pendingRecords = records.filter(item => item.status === '待批阅').sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
             const pending = pendingRecords.length;
             const roster = ensureClassRoster(classInfo);
-            const submittedStudents = new Set(records.map(item => item.name)).size;
+            const todaySubmittedStudents = new Set(records.filter(item => item.date === formatLocalDate()).map(item => item.name)).size;
             const canCollapse = pendingRecords.length > 3;
             const collapsed = canCollapse && !state.logsPendingExpanded;
             const pendingCards = pendingRecords.map(item => `<article class="module-card log-card" role="button" tabindex="0" data-action="open-log-detail" data-log-id="${escapeHtml(item.id)}" aria-label="查看${escapeHtml(item.name)}的日志详情"><div class="log-card-main"><div class="module-card-head"><div><div class="module-card-name">${escapeHtml(item.name)} · ${escapeHtml(item.title)}</div><div class="module-card-sub">${escapeHtml(item.date || '')} · ${escapeHtml(item.summary)}</div></div><span class="module-status">待批阅</span></div><p class="log-content-preview">${escapeHtml(item.content || item.summary)}</p></div>${pendingBadgeMarkup(1)}</article>`).join('');
-            return `${moduleHero('班级日志','按学生查看历史记录，并集中处理本周待批阅日志。',[{value:pending,label:'待批阅'},{value:records.length-pending,label:'已批阅'},{value:submittedStudents,label:'已提交学生'}])}
+            return `${moduleHero('班级日志','',[{value:pending,label:'待批阅'},{value:records.length-pending,label:'已批阅'},{value:`${todaySubmittedStudents}/${roster.length}`,label:'今日已提交'}])}
                 <div class="class-section-head"><h2>待批阅日志（${pendingRecords.length}）</h2></div>
-                ${pendingRecords.length ? `<section class="log-pending-shell${collapsed ? ' is-collapsed' : ''}" aria-label="待批阅日志列表"><div class="module-list log-pending-list">${pendingCards}</div>${canCollapse ? `<div class="log-pending-more-surface"><button type="button" class="log-pending-more" data-action="toggle-log-pending" aria-expanded="${state.logsPendingExpanded ? 'true' : 'false'}"><span>${state.logsPendingExpanded ? '收起待批阅日志' : `查看全部 ${pendingRecords.length} 篇待批阅日志`}</span><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></button></div>` : ''}</section>` : '<div class="todo-empty">当前没有待批阅日志</div>'}
-                <div class="class-section-head"><h2>学生日志（${roster.length}）</h2><span>点击头像查看历史</span></div>
-                <section class="log-student-section" aria-label="学生日志入口"><div class="log-student-grid">${roster.map(item => {
+                ${pendingRecords.length ? `<section class="log-pending-shell${collapsed ? ' is-collapsed' : ''}" aria-label="待批阅日志列表"><div class="module-list log-pending-list">${pendingCards}</div>${canCollapse ? `<div class="log-pending-more-surface"><button type="button" class="log-pending-more" data-action="toggle-log-pending" aria-expanded="${state.logsPendingExpanded ? 'true' : 'false'}"><span>${state.logsPendingExpanded ? '收起' : '查看全部'}</span><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></button></div>` : ''}</section>` : '<div class="todo-empty">当前没有待批阅日志</div>'}
+                <div class="class-section-head"><h2 id="logRosterTitle">学生日志（${roster.length}）</h2></div>
+                <section class="log-student-section" aria-label="学生日志入口">
+                    ${rosterSearchMarkup({ id: 'logRosterSearch', value: state.logRosterSearch, placeholder: '搜索班级学生姓名', clearAction: 'clear-log-roster-search', label: '搜索班级日志学生' })}
+                    <div class="log-student-grid">${roster.map(item => {
                     const studentPending = records.filter(record => record.name === item.name && record.status === '待批阅').length;
-                    return `<button type="button" class="log-student-option" data-action="open-student-log-history" data-log-student-id="${escapeHtml(item.id)}" aria-label="查看${escapeHtml(item.name)}的过往日志${studentPending ? `，${studentPending}篇待批阅` : ''}"><span class="log-student-avatar ${item.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(item)}</span><strong>${escapeHtml(item.name)}</strong>${studentPending ? pendingBadgeMarkup(studentPending) : ''}</button>`;
-                }).join('')}</div></section>`;
+                    return `<button type="button" class="log-student-option" data-action="open-student-log-history" data-log-student-id="${escapeHtml(item.id)}" data-roster-search="${escapeHtml(item.name.toLowerCase())}" aria-label="查看${escapeHtml(item.name)}的过往日志${studentPending ? `，${studentPending}篇待批阅` : ''}"><span class="log-student-avatar-wrap"><span class="log-student-avatar ${item.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(item)}</span>${studentPending ? pendingBadgeMarkup(studentPending) : ''}</span><strong>${escapeHtml(item.name)}</strong></button>`;
+                }).join('')}<div class="roster-empty" id="logRosterEmpty" hidden>没有找到匹配的学生<br>请尝试其他姓名关键词</div></div></section>`;
         }
 
-        function filterStudentLogRecords(records) {
-            const now = new Date();
-            const currentMonth = formatLocalDate(now).slice(0,7);
-            return records.filter(item => {
-                if (state.logHistoryTimeFilter === 'week') return isDateInCurrentWeek(item.date);
-                if (state.logHistoryTimeFilter === 'month') return String(item.date || '').startsWith(currentMonth);
-                if (state.logHistoryTimeFilter === 'term') return String(item.date || '') >= ACADEMIC_TERM_START;
-                return true;
+        function updateLogRosterSearchResults() {
+            const query = state.logRosterSearch.trim().toLowerCase();
+            const rows = Array.from(classModuleRoot.querySelectorAll('.log-student-option'));
+            let visible = 0;
+            rows.forEach(row => {
+                const matched = !query || String(row.dataset.rosterSearch || '').includes(query);
+                row.hidden = !matched;
+                if (matched) visible += 1;
             });
+            const title = document.getElementById('logRosterTitle');
+            if (title) title.textContent = `学生日志（${query ? `${visible}/${rows.length}` : rows.length}）`;
+            const clear = classModuleRoot.querySelector('.log-student-section .roster-search-clear');
+            if (clear) clear.classList.toggle('visible', Boolean(state.logRosterSearch));
+            const empty = document.getElementById('logRosterEmpty');
+            if (empty) empty.hidden = visible > 0;
+        }
+
+        function getLogHistoryFilterRange(filter = state.logHistoryTimeFilter) {
+            if (filter === 'all') return null;
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            if (filter === 'week') {
+                const start = new Date(today);
+                start.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+                const end = new Date(start);
+                end.setDate(start.getDate() + 6);
+                return { start, end };
+            }
+            if (filter === 'month') return { start: new Date(today.getFullYear(), today.getMonth(), 1), end: new Date(today.getFullYear(), today.getMonth() + 1, 0) };
+            if (filter === 'term') return { start: parseLocalDateValue(ACADEMIC_TERM_START), end: today };
+            if (filter === 'custom') {
+                const start = parseLocalDateValue(state.logHistoryCustomStart);
+                const end = parseLocalDateValue(state.logHistoryCustomEnd);
+                return start && end ? { start, end } : null;
+            }
+            return null;
+        }
+
+        function formatLogHistoryDateShort(date) {
+            return date ? `${date.getMonth() + 1}.${date.getDate()}` : '';
         }
 
         function getLogHistoryFilterLabel() {
-            return ({ week: '本周', month: '本月', term: '本学期', all: '全部' })[state.logHistoryTimeFilter] || '本学期';
+            const range = getLogHistoryFilterRange();
+            return formatDateRangeShort(range);
+        }
+
+        function filterStudentLogRecords(records) {
+            const keyword = state.logHistorySearch.trim().toLowerCase();
+            const range = getLogHistoryFilterRange();
+            return records.filter(item => {
+                const matchesSearch = !keyword || [item.title,item.summary,item.content,item.status,item.date].some(value => String(value || '').toLowerCase().includes(keyword));
+                if (!matchesSearch) return false;
+                if (!range) return true;
+                const date = parseLocalDateValue(item.date);
+                return Boolean(date && date >= range.start && date <= range.end);
+            });
         }
 
         function renderStudentLogHistoryPage() {
@@ -4652,16 +5093,80 @@
                 .filter(item => item.name === rosterStudent.name)
                 .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
             const filteredRecords = filterStudentLogRecords(records);
-            const filterOptions = [{value:'week',label:'本周'},{value:'month',label:'本月'},{value:'term',label:'本学期'},{value:'all',label:'全部'}];
+            const pendingCount = filteredRecords.filter(item => item.status === '待批阅').length;
             studentLogHistoryTitle.textContent = `${rosterStudent.name}的日志`;
-            studentLogHistoryRoot.innerHTML = `<section class="student-log-page-head"><span class="log-student-avatar ${rosterStudent.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(rosterStudent)}</span><span class="student-log-page-head-copy"><strong>${escapeHtml(rosterStudent.name)}</strong><span>${records.length ? `共 ${records.length} 篇日志` : '暂未提交日志'}</span></span></section><section class="student-log-filter" aria-label="日志时间筛选"><div class="student-log-filter-head"><strong>时间筛选</strong><span>${escapeHtml(getLogHistoryFilterLabel())} · ${filteredRecords.length} 篇</span></div><div class="student-log-filter-options">${filterOptions.map(option => `<button type="button" class="student-log-filter-chip${state.logHistoryTimeFilter === option.value ? ' active' : ''}" data-action="set-student-log-time-filter" data-log-time-filter="${option.value}" aria-pressed="${state.logHistoryTimeFilter === option.value ? 'true' : 'false'}">${option.label}</button>`).join('')}</div></section>${filteredRecords.length ? `<div class="student-log-page-list">${filteredRecords.map(item => `<button type="button" class="student-log-page-card${item.status === '待批阅' ? ' pending' : ''}" data-action="open-log-detail" data-log-id="${escapeHtml(item.id)}"><span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.date || '未记录日期')} · ${escapeHtml(item.summary)}</small></span><em>${escapeHtml(item.status)}</em><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></button>`).join('')}</div>` : '<div class="todo-empty">当前时间范围内暂无日志记录</div>'}`;
+            studentLogHistoryRoot.innerHTML = `
+                <section class="student-log-page-head">
+                    <span class="log-student-avatar ${rosterStudent.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(rosterStudent)}</span>
+                    <span class="student-log-page-head-copy"><strong>${escapeHtml(rosterStudent.name)}</strong><span>${records.length ? `共 ${records.length} 篇日志` : '暂未提交日志'}</span></span>
+                </section>
+                <section class="student-log-filter" aria-label="日志搜索与时间筛选">
+                    <div class="student-log-toolbar-row">
+                        <button type="button" class="student-log-time-trigger" data-action="open-student-log-time-filter" aria-haspopup="dialog" aria-controls="pickerLayer" aria-expanded="false">
+                            <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M8 3v4M16 3v4M3 10h18"></path></svg>
+                            <span>${escapeHtml(getLogHistoryFilterLabel())}</span>
+                            <svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
+                        <div class="student-log-search">
+                            <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+                            <input id="studentLogSearch" type="search" value="${escapeHtml(state.logHistorySearch)}" placeholder="搜索标题 / 内容 / 状态" autocomplete="off" aria-label="搜索该学生的日志">
+                            <button type="button" class="student-log-search-clear${state.logHistorySearch ? ' visible' : ''}" data-action="clear-student-log-search" aria-label="清空日志搜索"><svg aria-hidden="true" viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg></button>
+                        </div>
+                    </div>
+                    <div class="student-log-filter-head"><strong>${escapeHtml(getLogHistoryFilterLabel())}</strong><span>${filteredRecords.length} 篇${pendingCount ? ` · ${pendingCount} 篇待批阅` : ''}</span></div>
+                </section>
+                ${filteredRecords.length ? `<div class="student-log-page-list">${filteredRecords.map(item => {
+                    const pending = item.status === '待批阅';
+                    return `<button type="button" class="student-log-page-card${pending ? ' pending' : ''}" data-action="open-log-detail" data-log-id="${escapeHtml(item.id)}" aria-label="${escapeHtml(item.title)}，${escapeHtml(item.status)}">
+                        <span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.date || '未记录日期')} · ${escapeHtml(item.summary)}</small></span>
+                        <em>${pending ? '<i class="inline-pending-dot" aria-hidden="true"></i>' : ''}${escapeHtml(item.status)}</em>
+                        <svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>`;
+                }).join('')}</div>` : '<div class="todo-empty">当前时间范围内没有匹配的日志记录</div>'}`;
+        }
+
+        function renderLogHistoryTimeFilterPicker() {
+            if (state.pickerContext?.type !== 'student-log-time') return;
+            const today = localDateValue(new Date());
+            const options = [{ value: 'week', label: '本周' }, { value: 'month', label: '本月' }, { value: 'term', label: '本学期' }, { value: 'all', label: '全部时间' }];
+            pickerBody.removeAttribute('role');
+            pickerBody.removeAttribute('aria-label');
+            pickerBody.innerHTML = `<div class="leave-filter-selection">${options.map(option => `<button type="button" class="leave-filter-option${state.logHistoryTimeFilter === option.value ? ' active' : ''}" data-action="select-student-log-time-filter" data-log-time-filter="${option.value}"><span>${option.label}</span>${state.logHistoryTimeFilter === option.value ? '<svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="5 12 10 17 19 7"></polyline></svg>' : ''}</button>`).join('')}</div><div class="leave-range-title">自定义日期范围</div><div class="leave-range-fields"><div class="leave-range-field"><label for="studentLogRangeStart">开始日期</label><input id="studentLogRangeStart" type="date" value="${escapeHtml(state.logHistoryCustomStart || today)}"></div><div class="leave-range-field"><label for="studentLogRangeEnd">结束日期</label><input id="studentLogRangeEnd" type="date" value="${escapeHtml(state.logHistoryCustomEnd || today)}"></div></div><button type="button" class="leave-range-apply" data-action="apply-student-log-custom-range">应用自定义范围</button>`;
+        }
+
+        function openLogHistoryTimeFilter(trigger) {
+            state.pickerContext = { type: 'student-log-time', trigger };
+            renderLogHistoryTimeFilterPicker();
+            showPicker('筛选日志时间');
+        }
+
+        function applyLogHistoryTimeFilter(filter) {
+            if (!['week','month','term','all'].includes(filter)) return;
+            state.logHistoryTimeFilter = filter;
+            closePicker(false);
+            renderStudentLogHistoryPage();
+        }
+
+        function applyLogHistoryCustomRange() {
+            const start = document.getElementById('studentLogRangeStart')?.value || '';
+            const end = document.getElementById('studentLogRangeEnd')?.value || '';
+            if (!start || !end) return showToast('请选择完整的开始与结束日期');
+            if (start > end) return showToast('开始日期不能晚于结束日期');
+            state.logHistoryCustomStart = start;
+            state.logHistoryCustomEnd = end;
+            state.logHistoryTimeFilter = 'custom';
+            closePicker(false);
+            renderStudentLogHistoryPage();
         }
 
         function openStudentLogHistory(studentId) {
             const rosterStudent = ensureClassRoster(getSelectedClass()).find(item => item.id === studentId);
             if (!rosterStudent) return;
             state.logHistoryStudentId = rosterStudent.id;
-            state.logHistoryTimeFilter = 'term';
+            state.logHistoryTimeFilter = 'week';
+            state.logHistorySearch = '';
+            state.logHistoryCustomStart = '';
+            state.logHistoryCustomEnd = '';
             renderStudentLogHistoryPage();
             setView('student-log-history');
             studentLogHistoryScroll.scrollTop = 0;
@@ -4701,17 +5206,34 @@
         function renderDormPlan(room, context = null) {
             if (!room) return '<div class="todo-empty">暂无宿舍床位信息</div>';
             const record = context ? classWorkflowState.dorm.find(item => item.id === context.recordId) : null;
-            return `<div class="dorm-plan" aria-label="${escapeHtml(room.name)}床位分布图"><div class="dorm-plan-balcony">阳台</div><div class="dorm-bed-grid dorm-layout-grid">${getDormDisplayBeds(room.beds).map(bed => {
+            const occupiedCount = room.beds.filter(bed => bed.occupied).length;
+            const groups = getDormBunkGroups(room.beds);
+            const renderBed = bed => {
                 const placement = getBedPlacement(bed.number, room.beds.length);
                 const isCurrentBed = Boolean(record && record.roomId === room.id && Number(record.bedNumber) === bed.number);
                 const selected = Number(context?.bedNumber) === bed.number;
                 const disabled = Boolean(context && bed.occupied && !isCurrentBed);
-                const stateText = bed.occupied ? (bed.studentName || '已住学生') : '空床';
+                const stateText = bed.occupied ? '已住' : '空床';
+                const studentText = bed.occupied ? (bed.studentName || '已住学生') : '待安排';
                 const actionAttrs = context
                     ? ` data-action="select-dorm-bed" data-bed-number="${bed.number}"`
                     : (bed.occupied ? ` data-action="open-occupied-bed-actions" data-room-id="${room.id}" data-bed-number="${bed.number}"` : ` data-action="open-vacant-bed-picker" data-room-id="${room.id}" data-bed-number="${bed.number}"`);
-                return `<button type="button" class="dorm-bed-option ${bed.occupied ? 'occupied' : 'vacant'}${selected ? ' active' : ''}"${actionAttrs}${disabled ? ' disabled' : ''} aria-label="${escapeHtml(placement.position)}，${bed.number}号床，${placement.bunk}，${escapeHtml(stateText)}"><span class="dorm-bed-number">${String(bed.number).padStart(2,'0')}</span><span class="dorm-bed-bunk">${placement.bunk}</span><span class="dorm-bed-state">${escapeHtml(stateText)}</span></button>`;
-            }).join('')}</div><div class="dorm-plan-corridor">宿舍外 · 公共走廊</div></div>`;
+                return `<button type="button" class="dorm-bed-option ${bed.occupied ? 'occupied' : 'vacant'}${selected ? ' active' : ''}"${actionAttrs}${disabled ? ' disabled' : ''} aria-label="${placement.unitNumber}号床，${placement.bunk}，${escapeHtml(stateText)}，${escapeHtml(studentText)}">
+                    <span class="dorm-bed-bunk">${placement.bunk}</span>
+                    <strong class="dorm-bed-student-name">${escapeHtml(studentText)}</strong>
+                    <span class="dorm-bed-status"><i aria-hidden="true"></i>${escapeHtml(stateText)}</span>
+                </button>`;
+            };
+            const planMarkup = `<div class="dorm-plan" aria-label="${escapeHtml(room.name)}床位分布图">
+                <div class="dorm-plan-head"><div class="dorm-plan-current"><span>床位图 · 已住 ${occupiedCount}/${room.beds.length}</span><strong>${escapeHtml(room.name)}</strong></div><div class="dorm-plan-legend" aria-label="床位状态图例"><span><i aria-hidden="true"></i>已住</span><span><i aria-hidden="true"></i>空床</span></div></div>
+                <div class="dorm-plan-corridor">宿舍门口 · 公共走廊</div>
+                <div class="dorm-bed-grid dorm-layout-grid">${groups.map(group => {
+                    const groupOccupied = group.beds.filter(bed => bed.occupied).length;
+                    return `<section class="dorm-bunk-unit" aria-label="${group.unitNumber}号床，上下铺"><div class="dorm-bunk-unit-head"><span><strong>${String(group.unitNumber).padStart(2,'0')}</strong><small>号床</small></span><em>${groupOccupied}/${group.beds.length} 已住</em></div><div class="dorm-bunk-stack">${group.beds.map(renderBed).join('')}</div></section>`;
+                }).join('')}</div>
+                <div class="dorm-plan-balcony">阳台</div>
+            </div>`;
+            return planMarkup.replace('床位图 · ', `${room.beds.length}人间 · `);
         }
 
         function renderDormModule() {
@@ -4720,9 +5242,9 @@
             state.dormRoomId = selectedRoom?.id || '';
             const selectedGender = getDormRoomGender(selectedRoom?.id);
             const unassigned = getUnassignedDormStudents(selectedGender);
-            const markup = `<div class="dorm-module-shell"><section class="dorm-room-directory" aria-label="本班所有宿舍"><div class="dorm-room-directory-head"><strong>本班全部宿舍（${rooms.length}）</strong></div><div class="dorm-room-list">${rooms.map(room => { const occupied = room.beds.filter(bed => bed.occupied).length; return `<button type="button" class="dorm-room-chip${room.id === state.dormRoomId ? ' active' : ''}" data-action="select-dorm-overview-room" data-room-id="${room.id}" aria-pressed="${room.id === state.dormRoomId ? 'true' : 'false'}"><strong>${escapeHtml(room.name)}</strong><span class="dorm-occupancy">已住 <b>${occupied}</b>/${room.beds.length}</span></button>`; }).join('')}</div><div class="dorm-room-preview">${renderDormPlan(selectedRoom)}</div></section><div class="class-section-head dorm-unassigned-head"><h2>未分配宿舍学生（${unassigned.length}）</h2></div><div class="dorm-unassigned-list">${unassigned.length ? unassigned.map((item, index) => `<article class="dorm-unassigned-card"><span class="student-sequence" aria-hidden="true">${String(index + 1).padStart(2,'0')}</span><span class="dorm-unassigned-copy"><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(item.gender)}生 · 尚未分配宿舍与床位</small></span><button type="button" class="dorm-student-action" data-action="open-dorm-picker" data-dorm-id="${item.id}" data-preferred-room-id="${selectedRoom.id}">安排</button></article>`).join('') : '<div class="dorm-unassigned-empty"><strong>当前暂无未分配学生</strong><span>该宿舍对应学生均已完成床位安排</span></div>'}</div></div>`;
+            const markup = `<div class="dorm-module-shell"><section class="dorm-room-directory" aria-label="本班所有宿舍"><div class="dorm-room-directory-head"><strong>本班宿舍</strong><span>${rooms.length} 间 · 点击切换床位图</span></div><div class="dorm-room-list">${rooms.map(room => { const occupied = room.beds.filter(bed => bed.occupied).length; return `<button type="button" class="dorm-room-chip${room.id === state.dormRoomId ? ' active' : ''}" data-action="select-dorm-overview-room" data-room-id="${room.id}" aria-pressed="${room.id === state.dormRoomId ? 'true' : 'false'}"><strong>${escapeHtml(room.name)}</strong><span class="dorm-occupancy">${room.beds.length}人间 · <b>${occupied}</b>/${room.beds.length}</span></button>`; }).join('')}</div><div class="dorm-room-preview">${renderDormPlan(selectedRoom)}</div></section><div class="class-section-head dorm-unassigned-head"><h2>未分配宿舍学生（${unassigned.length}）</h2></div><div class="dorm-unassigned-list">${unassigned.length ? unassigned.map((item, index) => `<article class="dorm-unassigned-card"><span class="student-sequence" aria-hidden="true">${String(index + 1).padStart(2,'0')}</span><span class="dorm-unassigned-copy"><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(item.gender)}生 · 尚未分配宿舍与床位</small></span><button type="button" class="dorm-student-action pending-leaf-action" data-action="open-dorm-picker" data-dorm-id="${item.id}" data-preferred-room-id="${selectedRoom.id}">安排${pendingBadgeMarkup(1)}</button></article>`).join('') : '<div class="dorm-unassigned-empty"><strong>当前暂无未分配学生</strong><span>该宿舍对应学生均已完成床位安排</span></div>'}</div></div>`;
             state.dormTransitionDirection = '';
-            return markup;
+            return markup.replace('点击切换床位图', '仅 4 / 8 人间');
         }
 
         function scrollDormRoomIntoCenter(roomId = state.dormRoomId, behavior = 'smooth') {
@@ -4746,6 +5268,7 @@
             if (state.classModule === 'discipline') classModuleRoot.innerHTML = renderDisciplineModule();
             if (state.classModule === 'logs') classModuleRoot.innerHTML = renderLogsModule();
             if (state.classModule === 'dorm') classModuleRoot.innerHTML = renderDormModule();
+            if (state.classModule === 'logs') updateLogRosterSearchResults();
             const discipline = state.classModule === 'discipline';
             classModuleFloatingAction.hidden = !discipline;
             classModuleScroll.classList.toggle('has-floating-action', discipline);
@@ -4769,7 +5292,10 @@
                 state.disciplineSearch = '';
                 state.disciplineTimeFilter = 'week';
             }
-            if (module === 'logs') state.logsPendingExpanded = false;
+            if (module === 'logs') {
+                state.logsPendingExpanded = false;
+                state.logRosterSearch = '';
+            }
             renderClassModule();
             setView('class-module');
             classModuleScroll.scrollTop = 0;
@@ -4782,9 +5308,8 @@
             renderClassManagement();
             renderClassDirectory();
             renderSchoolHome();
-            renderClassTodos();
             updateClassTabPendingState();
-            updateClassTodoButton();
+            if (state.view === 'leave-detail') renderLeaveDetailPage();
         }
 
         function openLeaveRejectDialog(id, trigger) {
@@ -4816,13 +5341,54 @@
         function openLeaveDetail(leaveId) {
             const item = classWorkflowState.leave.find(record => record.id === leaveId);
             if (!item) return;
-            openDialog({
-                title: `${item.name}的请假详情`,
-                desc: '请假时段、原因与凭证信息',
-                body: `<div class="leave-detail-grid"><div class="leave-detail-row"><span>请假原因</span><strong>${escapeHtml(item.reason)}</strong></div><div class="leave-detail-row"><span>申请说明</span><strong>${escapeHtml(item.description || item.reason)}</strong></div><div class="leave-detail-row"><span>请假时段</span><strong>${escapeHtml(item.period)}</strong></div><div class="leave-detail-row"><span>当前状态</span><strong>${escapeHtml(item.status)}</strong></div>${item.rejectReason ? `<div class="leave-detail-row"><span>驳回原因</span><strong>${escapeHtml(item.rejectReason)}</strong></div>` : ''}<div class="image-preview-large">${leaveEvidenceMarkup(item)}</div></div>`,
-                confirmLabel: '关闭',
-                cancelLabel: '返回'
-            });
+            state.leaveDetailId = item.id;
+            renderLeaveDetailPage();
+            setView('leave-detail');
+            leaveDetailScroll.scrollTop = 0;
+            focusAfterViewChange(leaveDetailBackButton);
+        }
+
+        function renderLeaveDetailPage() {
+            const item = classWorkflowState.leave.find(record => record.id === state.leaveDetailId);
+            if (!item) return;
+            const rosterStudent = getClassRosterStudentByName(item.name);
+            const pending = item.status === '待审批';
+            const statusClass = item.status === '已通过' ? 'approved' : (item.status === '已驳回' ? 'rejected' : '');
+            leaveDetailStatus.textContent = item.status;
+            leaveDetailStatus.className = `leave-detail-status${statusClass ? ` ${statusClass}` : ''}`;
+            leaveDetailScroll.classList.toggle('has-actions', pending);
+            leaveDetailActions.hidden = !pending;
+            [leaveDetailRejectButton, leaveDetailApproveButton].forEach(button => { button.dataset.workflowId = item.id; });
+            leaveDetailRejectButton.textContent = '驳回';
+            leaveDetailApproveButton.textContent = '通过';
+            leaveDetailRoot.innerHTML = `
+                <article class="leave-detail-page">
+                    <section class="leave-detail-hero">
+                        <span class="leave-detail-avatar ${rosterStudent.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(rosterStudent)}</span>
+                        <div class="leave-detail-hero-copy"><span>${escapeHtml(item.name)}的请假申请</span><h2>${escapeHtml(item.reason)}</h2><p>申请时间 · ${escapeHtml(formatLeaveApplicationTime(item.submittedAt))}</p></div>
+                    </section>
+                    <section class="leave-detail-section">
+                        <div class="leave-detail-section-title">申请信息</div>
+                        <div class="leave-detail-info-row"><span>申请人</span><strong>${escapeHtml(item.name)}</strong></div>
+                        <div class="leave-detail-info-row"><span>请假时段</span><strong>${escapeHtml(item.period)}</strong></div>
+                        <div class="leave-detail-info-row"><span>请假原因</span><strong>${escapeHtml(item.reason)}</strong></div>
+                        <div class="leave-detail-info-row"><span>申请说明</span><strong>${escapeHtml(item.description || item.reason)}</strong></div>
+                    </section>
+                    ${item.rejectReason ? `<section class="leave-detail-section reject"><div class="leave-detail-section-title">驳回原因</div><p>${escapeHtml(item.rejectReason)}</p></section>` : ''}
+                    <section class="leave-detail-section">
+                        <div class="leave-detail-section-title">申请凭证</div>
+                        <button type="button" class="leave-detail-evidence-button" data-action="preview-leave-image" data-leave-id="${escapeHtml(item.id)}" aria-label="查看${escapeHtml(item.evidenceLabel || '请假凭证')}大图">
+                            ${leaveEvidenceMarkup(item)}
+                            <span class="leave-detail-evidence-caption"><span>${escapeHtml(item.evidenceLabel || '请假凭证')}</span><small>点击查看大图</small></span>
+                        </button>
+                    </section>
+                </article>`;
+        }
+
+        function closeLeaveDetailPage() {
+            renderClassModule();
+            setView('class-module');
+            focusAfterViewChange(() => classModuleRoot.querySelector(`[data-leave-id="${state.leaveDetailId}"]`) || classModuleBackButton);
         }
 
         function previewLeaveImage(leaveId) {
@@ -4857,11 +5423,13 @@
         function renderLogDetailPage() {
             const item = classWorkflowState.logs.find(record => record.id === state.logDetailId);
             if (!item) return;
+            const detailTitle = item.title === '本周成长记录' ? '成长记录' : item.title;
             logDetailStatus.textContent = item.status;
             logDetailStatus.classList.toggle('done', item.status === '已批阅');
-            logDetailReviewButton.textContent = item.review ? '修改评语' : '写评语';
+            logDetailReviewButton.innerHTML = `${item.review ? '修改评语' : '写评语'}${item.status === '待批阅' ? pendingBadgeMarkup(1) : ''}`;
+            logDetailReviewButton.classList.toggle('has-pending', item.status === '待批阅');
             logDetailReviewButton.setAttribute('aria-label', `${item.review ? '修改' : '填写'}${item.name}的日志评语`);
-            logDetailRoot.innerHTML = `<article class="log-detail-page"><section class="log-detail-hero"><div class="log-detail-kicker">${escapeHtml(item.name)}的成长日志</div><h2>${escapeHtml(item.title)}</h2><div class="log-detail-meta"><span>${escapeHtml(item.date || '未记录日期')}</span><i aria-hidden="true"></i><span>${escapeHtml(item.status)}</span></div></section><section class="log-page-section"><div class="log-page-section-label">日志正文</div><p>${escapeHtml(item.content || item.summary)}</p></section><section class="log-page-section review${item.review ? '' : ' empty'}"><div class="log-page-section-label">班主任评语</div><p>${item.review ? escapeHtml(item.review) : '暂未填写评语，可通过底部按钮补充。'}</p></section></article>`;
+            logDetailRoot.innerHTML = `<article class="log-detail-page"><section class="log-detail-hero"><div class="log-detail-kicker">${escapeHtml(item.name)}的成长日志</div><h2>${escapeHtml(detailTitle)}</h2><div class="log-detail-meta"><span>${escapeHtml(item.date || '未记录日期')}</span><i aria-hidden="true"></i><span>${escapeHtml(item.status)}</span></div></section><section class="log-page-section"><div class="log-page-section-label">日志正文</div><p>${escapeHtml(item.content || item.summary)}</p></section><section class="log-page-section review${item.review ? '' : ' empty'}"><div class="log-page-section-label">班主任评语</div><p>${item.review ? escapeHtml(item.review) : '暂未填写评语，可通过底部按钮补充。'}</p></section></article>`;
         }
 
         function closeLogDetailPage() {
@@ -4922,20 +5490,37 @@
         }
 
         function getDormDisplayBeds(beds = []) {
-            return [...beds].sort((a, b) => {
-                const rowDifference = Math.ceil(Number(b.number) / 2) - Math.ceil(Number(a.number) / 2);
-                return rowDifference || Number(a.number) - Number(b.number);
-            });
+            return [...beds].sort((a, b) => Number(a.number) - Number(b.number));
         }
 
-        function getBedPlacement(number, bedCount = 6) {
+        function getDormBunkGroups(beds = []) {
+            return getDormDisplayBeds(beds).reduce((groups, bed) => {
+                const unitNumber = Math.max(1, Math.ceil(Number(bed.number) / 2));
+                let group = groups.find(item => item.unitNumber === unitNumber);
+                if (!group) {
+                    group = { unitNumber, beds: [] };
+                    groups.push(group);
+                }
+                group.beds.push(bed);
+                return groups;
+            }, []);
+        }
+
+        function getBedPlacement(number, bedCount = 4) {
             const rowIndex = Math.max(0, Math.ceil(Number(number) / 2) - 1);
-            const rows = Math.max(3, Math.ceil(Number(bedCount) / 2));
+            const rows = Math.max(2, Math.ceil(Number(bedCount) / 2));
             const position = rowIndex === 0 ? '近外廊侧' : (rowIndex >= rows - 1 ? '阳台侧' : '宿舍中部');
             return {
                 position,
+                unitNumber: rowIndex + 1,
                 bunk: Number(number) % 2 === 1 ? '上铺' : '下铺'
             };
+        }
+
+        function formatDormBedLabel(room, bed) {
+            if (!room || !bed) return '';
+            const placement = getBedPlacement(bed.number, room.beds.length);
+            return `${room.name} · ${placement.position} · ${placement.unitNumber}号床（${placement.bunk}）`;
         }
 
         function renderDormPicker() {
@@ -4955,11 +5540,11 @@
                 <div class="dorm-room-grid">${rooms.map(room => {
                     const vacancies = availableCount(room);
                     const occupied = room.beds.filter(bed => bed.occupied).length;
-                    return `<button type="button" class="dorm-room-option${room.id === context.roomId ? ' active' : ''}" data-action="select-dorm-room" data-room-id="${room.id}"${vacancies ? '' : ' disabled'}>${escapeHtml(room.name)}<span>已住 <b>${occupied}</b>/${room.beds.length} · ${vacancies ? `空余 ${vacancies} 床` : '已满'}</span></button>`;
+                    return `<button type="button" class="dorm-room-option${room.id === context.roomId ? ' active' : ''}" data-action="select-dorm-room" data-room-id="${room.id}"${vacancies ? '' : ' disabled'}>${escapeHtml(room.name)}<span>${room.beds.length}人间 · 已住 <b>${occupied}</b>/${room.beds.length} · ${vacancies ? `空余 ${vacancies} 床` : '已满'}</span></button>`;
                 }).join('')}</div>
                 <div class="dorm-picker-label">选择床位</div>
-                <div class="dorm-picker-bed-stage">${selectedRoom ? `${renderDormPlan(selectedRoom, context)}${selectedPlacement ? `<div class="dorm-selection-summary">已选 <strong>${escapeHtml(selectedRoom.name)} · ${escapeHtml(selectedPlacement.position)} · ${selectedBed.number}号床（${selectedPlacement.bunk}）</strong></div>` : ''}` : '<div class="todo-empty">请先选择可用宿舍</div>'}</div>
-                <div class="dorm-picker-actions"><button type="button" class="dorm-confirm" data-action="confirm-dorm-assignment"${context.roomId && context.bedNumber ? '' : ' disabled'}>确认安排</button></div>`;
+                <div class="dorm-picker-bed-stage">${selectedRoom ? `${renderDormPlan(selectedRoom, context)}${selectedPlacement ? `<div class="dorm-selection-summary">已选 <strong>${escapeHtml(formatDormBedLabel(selectedRoom, selectedBed))}</strong></div>` : ''}` : '<div class="todo-empty">请先选择可用宿舍</div>'}</div>
+                <div class="dorm-picker-actions"><button type="button" class="dorm-confirm${context.roomId && context.bedNumber ? ' pending-leaf-action' : ''}" data-action="confirm-dorm-assignment"${context.roomId && context.bedNumber ? '' : ' disabled'}>确认安排${context.roomId && context.bedNumber ? pendingBadgeMarkup(1) : ''}</button></div>`;
             state.dormPickerTransitionDirection = '';
         }
 
@@ -4993,14 +5578,14 @@
             pickerBody.removeAttribute('role');
             pickerBody.removeAttribute('aria-label');
             pickerBody.innerHTML = `
-                <div class="dorm-bed-target"><span class="dorm-bed-target-number">${String(bed.number).padStart(2,'0')}</span><span><small>${escapeHtml(room.name)}</small><strong>${escapeHtml(placement.position)} · ${bed.number}号床（${placement.bunk}）</strong></span><em>空床</em></div>
+                <div class="dorm-bed-target"><span class="dorm-bed-target-number">${String(placement.unitNumber).padStart(2,'0')}</span><span><small>${escapeHtml(room.name)}</small><strong>${escapeHtml(placement.position)} · ${placement.unitNumber}号床（${placement.bunk}）</strong></span><em>空床</em></div>
                 <div class="dorm-picker-label">选择学生 <span id="dormStudentResultCount">${students.length} 人</span></div>
                 <div class="dorm-student-search"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="dormStudentSearch" type="search" value="${escapeHtml(state.dormStudentSearch)}" placeholder="搜索学生姓名 / 当前宿舍" autocomplete="off" aria-label="搜索可安排学生"></div>
                 <div class="dorm-bed-student-list">${students.length ? students.map((item, index) => {
                     const active = item.id === context.recordId;
                     return `<button type="button" class="dorm-bed-student-option${item.assignment ? ' assigned' : ''}${active ? ' active' : ''}" data-action="select-student-for-dorm-bed" data-dorm-id="${item.id}" data-dorm-search="${escapeHtml(`${item.name} ${item.assignment || ''}`.toLowerCase())}" aria-pressed="${active ? 'true' : 'false'}"><span class="student-sequence" aria-hidden="true">${String(index + 1).padStart(2,'0')}</span><span><strong>${escapeHtml(item.name)}</strong><small>${item.assignment ? `已分配 · ${escapeHtml(item.assignment)}` : `${escapeHtml(item.gender)}生 · 未分配宿舍`}</small></span><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="5 12 10 17 19 7"></polyline></svg></button>`;
                 }).join('') : '<div class="dorm-unassigned-empty"><strong>没有匹配的学生</strong><span>请更换姓名或宿舍关键词</span></div>'}<div class="dorm-unassigned-empty" id="dormStudentSearchEmpty" hidden><strong>没有匹配的学生</strong><span>请更换姓名或宿舍关键词</span></div></div>
-                <div class="dorm-picker-actions"><button type="button" class="dorm-confirm" data-action="confirm-student-for-dorm-bed"${context.recordId ? '' : ' disabled'}>确认安排到此床位</button></div>`;
+                <div class="dorm-picker-actions"><button type="button" class="dorm-confirm${context.recordId ? ' pending-leaf-action' : ''}" data-action="confirm-student-for-dorm-bed"${context.recordId ? '' : ' disabled'}>确认安排到此床位${context.recordId ? pendingBadgeMarkup(1) : ''}</button></div>`;
         }
 
         function openVacantBedStudentPicker(button) {
@@ -5025,7 +5610,6 @@
             if (!room || !bed?.occupied) return showToast('该床位当前为空');
             const record = classWorkflowState.dorm.find(item => item.roomId === room.id && Number(item.bedNumber) === bed.number)
                 || classWorkflowState.dorm.find(item => item.name === bed.studentName);
-            const placement = getBedPlacement(bed.number, room.beds.length);
             state.pickerContext = {
                 type: 'occupied-bed-actions',
                 trigger: button,
@@ -5035,7 +5619,7 @@
             };
             pickerBody.removeAttribute('role');
             pickerBody.removeAttribute('aria-label');
-            pickerBody.innerHTML = `<div class="dorm-occupied-summary"><span class="dorm-occupied-icon"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M5 21a7 7 0 0 1 14 0"></path></svg></span><span class="dorm-occupied-copy"><strong>${escapeHtml(bed.studentName || '已住学生')}</strong><span>${escapeHtml(room.name)} · ${escapeHtml(placement.position)} · ${bed.number}号床（${placement.bunk}）</span></span></div><button type="button" class="dorm-occupied-remove" data-action="request-remove-occupied-student">移除学生</button>`;
+            pickerBody.innerHTML = `<div class="dorm-occupied-summary"><span class="dorm-occupied-icon"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M5 21a7 7 0 0 1 14 0"></path></svg></span><span class="dorm-occupied-copy"><strong>${escapeHtml(bed.studentName || '已住学生')}</strong><span>${escapeHtml(formatDormBedLabel(room, bed))}</span></span></div><button type="button" class="dorm-occupied-remove" data-action="request-remove-occupied-student">移除学生</button>`;
             showPicker(`床位操作 · ${room.name}`);
         }
 
@@ -5048,13 +5632,12 @@
             const record = classWorkflowState.dorm.find(item => item.id === context.recordId)
                 || classWorkflowState.dorm.find(item => item.roomId === room.id && Number(item.bedNumber) === bed.number);
             const studentName = bed.studentName || record?.name || '该学生';
-            const placement = getBedPlacement(bed.number, room.beds.length);
             const returnFocus = context.trigger;
             closePicker(false);
             openDialog({
                 title: `确认移除${studentName}？`,
                 desc: '移除后该床位会立即恢复为空床。',
-                body: `<div class="leave-detail-grid"><div class="leave-detail-row"><span>当前学生</span><strong>${escapeHtml(studentName)}</strong></div><div class="leave-detail-row"><span>当前床位</span><strong>${escapeHtml(`${room.name} · ${placement.position} · ${bed.number}号床（${placement.bunk}）`)}</strong></div></div>`,
+                body: `<div class="leave-detail-grid"><div class="leave-detail-row"><span>当前学生</span><strong>${escapeHtml(studentName)}</strong></div><div class="leave-detail-row"><span>当前床位</span><strong>${escapeHtml(formatDormBedLabel(room, bed))}</strong></div></div>`,
                 confirmLabel: '确认移除',
                 cancelLabel: '暂不移除',
                 danger: true,
@@ -5107,8 +5690,7 @@
                 previousBed.occupied = false;
                 previousBed.studentName = '';
             }
-            const placement = getBedPlacement(bed.number, room.beds.length);
-            record.assignment = `${room.name} · ${placement.position} · ${bed.number}号床（${placement.bunk}）`;
+            record.assignment = formatDormBedLabel(room, bed);
             record.roomId = room.id;
             record.bedNumber = bed.number;
             bed.occupied = true;
@@ -5144,16 +5726,16 @@
                 closePicker(false);
                 refreshClassWorkflowViews();
                 requestAnimationFrame(() => scrollDormRoomIntoCenter(state.dormRoomId));
-                showToast(`${record.name}已安排到${room.name} ${bed.number}号床`);
+                const placement = getBedPlacement(bed.number, room.beds.length);
+                showToast(`${record.name}已安排到${room.name} ${placement.unitNumber}号床${placement.bunk}`);
             };
             if (record.assignment) {
-                const placement = getBedPlacement(bed.number, room.beds.length);
                 const returnFocus = context.trigger;
                 closePicker(false);
                 openDialog({
                     title: `确认调整${record.name}的床位？`,
                     desc: '该学生已有宿舍，确认后原床位会自动释放。',
-                    body: `<div class="leave-detail-grid"><div class="leave-detail-row"><span>当前床位</span><strong>${escapeHtml(record.assignment)}</strong></div><div class="leave-detail-row"><span>调整至</span><strong>${escapeHtml(`${room.name} · ${placement.position} · ${bed.number}号床（${placement.bunk}）`)}</strong></div></div>`,
+                    body: `<div class="leave-detail-grid"><div class="leave-detail-row"><span>当前床位</span><strong>${escapeHtml(record.assignment)}</strong></div><div class="leave-detail-row"><span>调整至</span><strong>${escapeHtml(formatDormBedLabel(room, bed))}</strong></div></div>`,
                     confirmLabel: '确认调整',
                     cancelLabel: '暂不调整',
                     onConfirm: completeAssignment
@@ -5205,26 +5787,14 @@
             refreshClassWorkflowViews();
         }
 
-        function handleClassReminder(type) {
-            const returnTarget = state.view === 'class-todo' ? 'todo' : 'overview';
-            if (type === 'leave') return openClassModule('leave', returnTarget);
-            if (type === 'dorm') return openClassModule('dorm', returnTarget);
-            if (type === 'discipline') return openClassModule('discipline', returnTarget);
-            if (type === 'logs') return openClassModule('logs', returnTarget);
-            if (type === 'auth') {
-                state.classStudentFilter = 'auth';
-                switchClassTab('overview');
-                setView('class-detail');
-                requestAnimationFrame(() => {
-                    const target = document.getElementById('classStudentSection');
-                    if (target) classDetailScroll.scrollTo({ top: Math.max(0, target.offsetTop - 58), behavior: 'smooth' });
-                });
-            }
-        }
-
         function openCallSheet(button) {
             const phone = String(button.dataset.callPhone || '').replace(/\D/g,'');
+            if (!phone) return showToast('该联系人暂未登记手机号');
             state.callReturnFocus = button;
+            document.querySelector('#callSingleRoot .call-phone-line').hidden = false;
+            document.getElementById('callConfirmLink').hidden = false;
+            guardianCallRoot.hidden = true;
+            guardianCallRoot.innerHTML = '';
             document.getElementById('callPersonRole').textContent = button.dataset.callRole || '确认联系';
             document.getElementById('callPersonName').textContent = button.dataset.callName || '联系人';
             document.getElementById('callPersonPhone').textContent = formatPhone(phone);
@@ -5236,8 +5806,34 @@
             document.getElementById('callCancelButton').focus({ preventScroll: true });
         }
 
+        function openGuardianCallSheet(button) {
+            const parents = (currentData().family || []).filter(item => item.phoneRaw || item.phone);
+            if (!parents.length) return showToast('该学生暂未添加监护人电话');
+            state.callReturnFocus = button;
+            document.getElementById('callPersonRole').textContent = '联系监护人';
+            document.getElementById('callPersonName').textContent = '选择联系人';
+            document.querySelector('#callSingleRoot .call-phone-line').hidden = true;
+            document.getElementById('callConfirmLink').hidden = true;
+            guardianCallRoot.hidden = false;
+            guardianCallRoot.innerHTML = `<div class="guardian-call-list">${parents.map((item, index) => {
+                const phone = String(item.phoneRaw || item.phone || '').replace(/\D/g,'');
+                return `<article class="guardian-call-card">
+                    <span class="guardian-call-index" aria-hidden="true">${String(index + 1).padStart(2,'0')}</span>
+                    <span class="guardian-call-copy"><span>${escapeHtml(item.relation || '监护人')}</span><strong>${escapeHtml(item.name || '未填写姓名')}</strong><em>${escapeHtml(formatPhone(phone))}</em></span>
+                    <span class="guardian-call-actions">
+                        <button type="button" class="guardian-copy-action" data-action="copy" data-copy="${escapeHtml(phone)}" aria-label="复制${escapeHtml(item.name || '监护人')}的手机号"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="11" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path></svg></button>
+                        <a class="guardian-dial-action" href="tel:${escapeHtml(phone)}" data-guardian-dial data-guardian-name="${escapeHtml(item.name || '监护人')}" data-guardian-phone="${escapeHtml(phone)}" aria-label="拨打${escapeHtml(item.name || '监护人')}的电话"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.11 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.72c.12.9.35 1.78.68 2.62a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.46-1.24a2 2 0 0 1 2.11-.45c.84.33 1.72.56 2.62.68A2 2 0 0 1 22 16.92z"></path></svg></a>
+                    </span>
+                </article>`;
+            }).join('')}</div>`;
+            callLayer.hidden = false;
+            requestAnimationFrame(() => guardianCallRoot.querySelector('.guardian-dial-action')?.focus({ preventScroll: true }));
+        }
+
         function closeCallSheet() {
             callLayer.hidden = true;
+            guardianCallRoot.innerHTML = '';
+            guardianCallRoot.hidden = true;
             if (state.callReturnFocus?.isConnected) state.callReturnFocus.focus({ preventScroll: true });
             state.callReturnFocus = null;
         }
@@ -5285,12 +5881,8 @@
             focusAfterViewChange(backButton);
         }
 
-        function openParentPicker() {
-            const parents = (currentData().family || []).map((item, familyIndex) => ({ ...item, familyIndex })).filter(item => item.phoneRaw || item.phone);
-            if (!parents.length) return showToast('该学生暂未添加监护人电话');
-            if (parents.length === 1) return showToast(`正在拨打监护人${parents[0].name} ${parents[0].phone}`);
-            const body = `<div class="parent-options">${parents.map(item => `<div class="parent-option"><span class="parent-option-icon">${icon('guardian')}</span><span><strong>${escapeHtml(item.name || '未填写姓名')}</strong><span>${escapeHtml(formatPhone(item.phone))}</span></span><span class="parent-option-actions"><button type="button" class="parent-call-action" data-action="call-parent" data-parent-index="${item.familyIndex}">拨打</button>${phoneCopyButton(item.phone, `${item.name || '监护人'}的电话号码`)}</span></div>`).join('')}</div>`;
-            openDialog({ title: '选择联系监护人', desc: '请选择要拨打的监护人电话', body, confirmLabel: '关闭' });
+        function openParentPicker(button) {
+            openGuardianCallSheet(button);
         }
 
         function calculateAge(birthDate, now = new Date()) {
@@ -5372,7 +5964,7 @@
                 phone: formatPhone(phoneRaw), phoneRaw, educationMode: '', admissionStatus: '通过', admissionMethod: '',
                 examNo: '', graduationSchool: '', graduationClass: '', idType: value('addStudentIdType'), idNumber, ethnicity: '',
                 politicalStatus: '', householdType: '', householdLocation: '', major: '', className: '',
-                entryDate: '', graduationDate: '', studentStatus: '正常在读', statusChangedAt: '', statusReason: '快速登记学生档案',
+                entryDate: '', graduationDate: '', studentStatus: '新生注册', statusChangedAt: '', statusReason: '快速登记学生档案',
                 registrationStatus: '未注册', internshipStatus: '未实习', suspensionStatus: '正常', workStudyStatus: '未申请', schoolRollNo: '',
                 registeredGrade: '', registeredClass: '', registeredTerm: '', classPlan: '', personalPlans: [],
                 guardianName: '', guardianIdNumber: '', guardianPhone: '', guardianPhoneRaw: '',
@@ -5409,7 +6001,8 @@
 
         function renderHero() {
             const data = currentData();
-            const classAndMajor = [data.className || '待分班', data.major || '专业待补充'].join(' · ');
+            const classLabel = data.className || '待分班';
+            detailTitle.textContent = data.name || '学生详情';
             heroRoot.innerHTML = `
                 <section class="hero glass" aria-label="学生概览">
                     <div class="hero-profile">
@@ -5419,16 +6012,20 @@
                                 <h2 class="hero-name">${escapeHtml(data.name)}</h2>
                                 ${pill(data.studentStatus, statusTone(data.studentStatus))}
                             </div>
-                            <p class="hero-sub">${escapeHtml(classAndMajor)}</p>
+                            <p class="hero-sub">${escapeHtml(classLabel)}</p>
                         </div>
                     </div>
                     <div class="hero-facts">
                         <div class="hero-fact"><span>学生学号</span><strong>${escapeHtml(data.studentNo)}</strong></div>
                         <div class="hero-fact"><span>最近更新</span><strong>${escapeHtml(data.updatedAt)}</strong></div>
                     </div>
-                    <div class="hero-alert"><span class="pill warning">待补充</span><strong>${escapeHtml(data.nextAction)}</strong></div>
+                    <button type="button" class="hero-attendance-entry" data-action="open-student-attendance" aria-label="查看${escapeHtml(data.name)}的考勤记录">
+                        <span class="hero-attendance-entry-icon"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="3"></rect><path d="M8 8h8M8 12h5M8 16h7"></path></svg></span>
+                        <span class="hero-attendance-entry-copy"><strong>考勤记录</strong><span>查看每日迟到与缺勤明细</span></span>
+                        <svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
                     <div class="quick-actions">
-                        <button type="button" class="quick-button primary" data-action="call-student">${icon('phone')}<span>拨打学生</span></button>
+                        <button type="button" class="quick-button primary" data-action="call-student" data-call-name="${escapeHtml(data.name)}" data-call-role="学生电话" data-call-phone="${escapeHtml(data.phone)}">${icon('phone')}<span>拨打学生</span></button>
                         <button type="button" class="quick-button" data-action="call-guardian">${icon('guardian')}<span>联系监护人</span></button>
                     </div>
                 </section>`;
@@ -5440,8 +6037,10 @@
             const multiline = options.type === 'textarea' ? ' multiline' : '';
             const id = `edit-${slug(path)}`;
             if (!state.editMode || options.readonly) {
-                const display = options.display ? options.display(value, data) : (value || '待补充');
-                const empty = !value || value === '待补充' ? ' empty-value' : '';
+                const display = options.display ? options.display(value, data) : value;
+                const missing = value == null || (Array.isArray(value) ? value.length === 0 : !String(value).trim() || String(value).trim() === '待补充');
+                if (!state.editMode && (missing || display == null || !String(display).trim() || String(display).trim() === '待补充')) return '';
+                const empty = missing ? ' empty-value' : '';
                 if (options.type === 'tel') {
                     return `<div class="info-row"><span class="info-label">${escapeHtml(label)}</span><div class="info-value phone-value${empty}">${phoneDisplayMarkup(value, label)}</div></div>`;
                 }
@@ -5464,15 +6063,16 @@
         }
 
         function card(title, subtitle, content, action = '') {
+            if (!state.editMode && /^<div class="info-list">\s*<\/div>$/.test(String(content || '').trim()) && !action) return '';
             return `<section class="section-card glass"><div class="section-head"><h2 class="section-title">${escapeHtml(title)}</h2>${action}</div>${content}</section>`;
         }
 
         function renderIdentity() {
             const basic = `<div class="info-list">
-                ${renderControl('学生姓名', 'name')}${renderControl('性别', 'gender', { type: 'select', choices: ['男','女'] })}
+                ${state.editMode ? renderControl('学生姓名', 'name') : ''}${renderControl('性别', 'gender', { type: 'select', choices: ['男','女'] })}
                 ${renderControl('出生日期', 'birthDate', { type: 'date' })}${renderControl('年龄', 'age', { readonly: true })}
-                ${renderControl('学生学号', 'studentNo')}${renderControl('就读方式', 'educationMode', { type: 'select', choices: ['全日制','校企协同'] })}
-                ${renderControl('专业', 'major')}${renderControl('联系电话', 'phone', { type: 'tel' })}
+                ${state.editMode ? renderControl('学生学号', 'studentNo') : ''}${renderControl('就读方式', 'educationMode', { type: 'select', choices: ['全日制','校企协同'] })}
+                ${renderControl('联系电话', 'phone', { type: 'tel' })}
             </div>`;
             const identity = `<div class="info-list">
                 ${renderControl('证件类型', 'idType', { type: 'select', choices: ['身份证','户口本','华侨证','其他'] })}
@@ -5485,10 +6085,8 @@
         }
 
         function renderSchool() {
-            const data = currentData();
-            const status = `<div class="status-overview"><div class="status-overview-main"><div class="status-overview-copy"><span>当前学籍状态</span><strong>主状态用于列表与统计</strong></div>${pill(data.studentStatus,statusTone(data.studentStatus))}</div><div class="status-overview-meta"><div><span>学籍注册</span><strong>${escapeHtml(data.registrationStatus)}</strong></div><div><span>实习进度</span><strong>${escapeHtml(data.internshipStatus)}</strong></div><div><span>休学情况</span><strong>${escapeHtml(data.suspensionStatus)}</strong></div></div></div>`;
             const roll = `<div class="info-list">
-                ${renderControl('学生状态','studentStatus',{type:'select',choices:['正常在读','顶岗实习','休学保留学籍','已毕业']})}
+                ${state.editMode ? renderControl('学生状态','studentStatus',{type:'select',choices:['新生注册','在读','退学','休学','毕业']}) : ''}
                 ${renderControl('入学日期','entryDate',{type:'date'})}${renderControl('毕业日期','graduationDate',{type:'date'})}
                 ${renderControl('变动日期','statusChangedAt',{type:'date'})}${renderControl('变动原因','statusReason',{type:'textarea'})}
                 ${renderControl('学籍号','schoolRollNo')}${renderControl('学籍注册','registrationStatus',{type:'select',choices:['已注册','未注册','暂停注册']})}
@@ -5498,16 +6096,16 @@
             </div>`;
             const classInfo = `<div class="info-list">
                 ${renderControl('毕业学校','graduationSchool')}${renderControl('原毕业班级','graduationClass')}
-                ${renderControl('注册年级','registeredGrade')}${renderControl('注册班级','registeredClass')}
+                ${renderControl('注册年级','registeredGrade')}
                 ${renderControl('注册学期','registeredTerm')}${renderControl('班级培养计划','classPlan',{type:'textarea'})}
                 ${renderControl('个人培养计划','personalPlans',{type:'textarea',display:value => Array.isArray(value) ? value.join('、') : value})}
             </div>`;
-            return `<div class="panel-stack">${card('学籍状态','',status + roll)}${card('班级与培养计划','',classInfo)}</div>`;
+            return `<div class="panel-stack">${card('学籍信息','',roll)}${card('培养计划','',classInfo)}</div>`;
         }
 
         function renderFamily() {
             const contact = `<div class="info-list">
-                ${renderControl('学生电话','phone',{type:'tel'})}${renderControl('现居地址','address',{type:'textarea'})}
+                ${renderControl('现居地址','address',{type:'textarea'})}
                 ${renderControl('电子邮箱','email',{type:'email'})}${renderControl('微信号','wechat')}${renderControl('QQ号','qq')}
                 ${renderControl('紧急联系人','emergencyName')}${renderControl('紧急电话','emergencyPhone',{type:'tel'})}
             </div>`;
@@ -5522,13 +6120,18 @@
 
         function renderHealth() {
             const data = currentData();
-            const metricText = (value, unit = '') => value ? `${escapeHtml(value)}${unit ? `<small> ${unit}</small>` : ''}` : '<span class="empty-value">待补充</span>';
+            const viewMetrics = [
+                data.height ? `<div class="metric-card"><span>身高</span><strong>${escapeHtml(data.height)}<small> cm</small></strong></div>` : '',
+                data.weight ? `<div class="metric-card"><span>体重</span><strong>${escapeHtml(data.weight)}<small> kg</small></strong></div>` : '',
+                data.leftVision || data.rightVision ? `<div class="metric-card"><span>视力</span><strong>${[data.leftVision ? `左 ${escapeHtml(data.leftVision)}` : '', data.rightVision ? `右 ${escapeHtml(data.rightVision)}` : ''].filter(Boolean).join(' / ')}</strong></div>` : '',
+                data.bloodType ? `<div class="metric-card"><span>血型</span><strong>${escapeHtml(data.bloodType)}</strong></div>` : ''
+            ].filter(Boolean).join('');
             const metrics = state.editMode ? `<div class="metric-grid">
                 <div class="metric-card editable"><span>身高（cm）</span><input class="metric-edit-control" type="number" inputmode="decimal" data-path="height" value="${escapeHtml(data.height)}" aria-label="编辑身高"></div>
                 <div class="metric-card editable"><span>体重（kg）</span><input class="metric-edit-control" type="number" inputmode="decimal" data-path="weight" value="${escapeHtml(data.weight)}" aria-label="编辑体重"></div>
                 <div class="metric-card editable"><span>左 / 右视力</span><div class="metric-vision-edit"><input class="metric-edit-control" type="text" inputmode="decimal" data-path="leftVision" value="${escapeHtml(data.leftVision)}" aria-label="编辑左眼视力"><span>/</span><input class="metric-edit-control" type="text" inputmode="decimal" data-path="rightVision" value="${escapeHtml(data.rightVision)}" aria-label="编辑右眼视力"></div></div>
                 <div class="metric-card editable"><span>血型</span><button type="button" class="custom-field-trigger metric-edit-control" data-action="open-select-picker" data-picker-path="bloodType" data-picker-label="选择血型" data-picker-options='["A 型","B 型","AB 型","O 型","不详"]' aria-haspopup="dialog" aria-controls="pickerLayer" aria-expanded="false"><span>${escapeHtml(data.bloodType || '请选择')}</span><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></button></div>
-            </div>` : `<div class="metric-grid"><div class="metric-card"><span>身高</span><strong>${metricText(data.height,'cm')}</strong></div><div class="metric-card"><span>体重</span><strong>${metricText(data.weight,'kg')}</strong></div><div class="metric-card"><span>左 / 右视力</span><strong>${data.leftVision || data.rightVision ? `${escapeHtml(data.leftVision || '待补充')} / ${escapeHtml(data.rightVision || '待补充')}` : '<span class="empty-value">待补充</span>'}</strong></div><div class="metric-card"><span>血型</span><strong>${metricText(data.bloodType)}</strong></div></div>`;
+            </div>` : (viewMetrics ? `<div class="metric-grid">${viewMetrics}</div>` : '');
             const details = `<div class="info-list">${renderControl('健康状况','healthStatus')}${renderControl('过敏信息','allergies',{type:'textarea'})}${renderControl('既往病史','medicalHistory',{type:'textarea'})}</div>`;
             const records = data.healthRecords.map(record => `<article class="subcard health-record"><div class="record-head"><div class="record-copy"><div class="record-eyebrow">${escapeHtml(record.date)}</div><h3 class="subcard-title">健康体检记录</h3></div>${pill(record.status,statusTone(record.status))}</div><div class="health-record-core"><div><span>身高</span><strong>${escapeHtml(record.height)} cm</strong></div><div><span>体重</span><strong>${escapeHtml(record.weight)} kg</strong></div></div></article>`).join('');
             const add = `<button type="button" class="soft-action" data-action="add-health">新增记录</button>`;
@@ -5551,7 +6154,7 @@
         }
 
         function hasStudentMaterialPending(data = currentData()) {
-            return getMaterialSlots(data).some(slot => requiredMaterialNames.includes(slot.name) && !slot.item);
+            return getMaterialSlots(data).some(slot => requiredMaterialNames.includes(slot.name) && (!slot.item || /不通过/.test(slot.item.status || '')));
         }
 
         function materialPreviewMarkup(item, index) {
@@ -5568,10 +6171,17 @@
 
         function renderMaterials() {
             const data = currentData();
-            const materials = getMaterialSlots(data).map((slot, index) => slot.item
-                ? `<button type="button" class="material-thumb-card" data-action="material-preview" data-index="${data.attachments.indexOf(slot.item)}" aria-label="查看${escapeHtml(slot.name)}图片"><span class="material-thumb-visual">${materialPreviewMarkup(slot.item, index)}</span><span class="material-thumb-caption">${escapeHtml(slot.name)}</span></button>`
-                : `<div class="material-missing-card"><span>${escapeHtml(slot.name)}</span><button type="button" class="material-upload-button" data-action="material-upload" data-material-name="${escapeHtml(slot.name)}" aria-label="补传${escapeHtml(slot.name)}">补传</button></div>`
-            ).join('');
+            const materials = getMaterialSlots(data).map((slot, index) => {
+                if (!slot.item) return `<div class="material-missing-card"><span>${escapeHtml(slot.name)}</span><button type="button" class="material-upload-button pending-leaf-action" data-action="material-upload" data-material-name="${escapeHtml(slot.name)}" aria-label="补传${escapeHtml(slot.name)}">补传${pendingBadgeMarkup(1)}</button></div>`;
+                const rejected = /不通过/.test(slot.item.status || '');
+                return `<article class="material-thumb-card${rejected ? ' needs-action' : ''}">
+                    <button type="button" class="material-thumb-open" data-action="material-preview" data-index="${data.attachments.indexOf(slot.item)}" aria-label="查看${escapeHtml(slot.name)}图片">
+                        <span class="material-thumb-visual">${materialPreviewMarkup(slot.item, index)}</span>
+                        <span class="material-thumb-caption"><strong>${escapeHtml(slot.name)}</strong><small>${escapeHtml(slot.item.status || '已上传')}</small></span>
+                    </button>
+                    ${rejected ? `<button type="button" class="material-reupload-button pending-leaf-action" data-action="material-upload" data-material-name="${escapeHtml(slot.name)}" aria-label="重新上传${escapeHtml(slot.name)}">重新上传${pendingBadgeMarkup(1)}</button>` : ''}
+                </article>`;
+            }).join('');
             const accountStatus = data.account.enabled ? pill('已启用','success') : pill('已停用','danger');
             const account = `<div class="account-summary"><div class="account-summary-head"><div><span>登录用户名</span><span class="account-username-line"><strong>${escapeHtml(data.account.username)}</strong>${/^1\d{10}$/.test(String(data.account.username || '').replace(/\D/g,'')) ? phoneCopyButton(data.account.username, '登录手机号') : ''}</span></div></div><div class="info-list"><div class="info-row"><span class="info-label">最后登录</span><strong class="info-value">${escapeHtml(data.account.lastLogin)}</strong></div></div><div class="px-4 pb-4 grid grid-cols-2 gap-2"><button type="button" class="quick-button" data-action="toggle-account">${data.account.enabled ? '停用账号' : '启用账号'}</button><button type="button" class="quick-button" data-action="reset-password">重置密码</button></div></div>`;
             return `<div class="panel-stack">${card('证件与材料','',`<div class="material-gallery">${materials}</div>`)}${card('学生账号','',account,accountStatus)}</div>`;
@@ -5579,7 +6189,7 @@
 
         function updateStudentDetailPendingState() {
             const tab = document.getElementById('tab-materials');
-            const pendingCount = getMaterialSlots().filter(slot => requiredMaterialNames.includes(slot.name) && !slot.item).length;
+            const pendingCount = getMaterialSlots().filter(slot => requiredMaterialNames.includes(slot.name) && (!slot.item || /不通过/.test(slot.item.status || ''))).length;
             const pending = pendingCount > 0;
             tab.classList.toggle('has-pending', pending);
             setPendingBadge(tab, pendingCount);
@@ -5643,14 +6253,6 @@
             return difference >= 0 && difference <= 7 * 24 * 60 * 60 * 1000;
         }
 
-        function renderStudentAttendanceDock() {
-            const data = currentData();
-            const status = data.currentAttendance || '到课';
-            studentAttendanceDock.hidden = state.editMode;
-            studentAttendanceStatus.innerHTML = `<span>今日考勤 · ${escapeHtml(status)}</span><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
-            studentAttendanceStatus.setAttribute('aria-label', `编辑${data.name}今日考勤记录，当前${status}`);
-        }
-
         function getAttendanceRecords(data = currentData()) {
             return Array.isArray(data.attendanceRecords) ? data.attendanceRecords : [];
         }
@@ -5681,8 +6283,22 @@
             return { date: `${date.getMonth() + 1}/${date.getDate()}`, weekday: weekdays[date.getDay()] };
         }
 
-        function getAttendancePeriodLabel() {
-            return ({ week: '本周', month: '本月', term: '本学期', all: '全部时间' })[state.attendancePeriodFilter] || '本周';
+        function getAttendanceFilterRange(filter = state.attendancePeriodFilter) {
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            if (filter === 'week') {
+                const start = getLocalWeekStart(today);
+                const end = new Date(start);
+                end.setDate(start.getDate() + 6);
+                return { start, end };
+            }
+            if (filter === 'month') return { start: new Date(today.getFullYear(), today.getMonth(), 1), end: new Date(today.getFullYear(), today.getMonth() + 1, 0) };
+            if (filter === 'term') return { start: parseLocalDateValue(ACADEMIC_TERM_START), end: today };
+            return null;
+        }
+
+        function getAttendancePeriodLabel(filter = state.attendancePeriodFilter) {
+            return formatDateRangeShort(getAttendanceFilterRange(filter));
         }
 
         function renderAttendancePage() {
@@ -5695,23 +6311,34 @@
             const grouped = new Map();
             filtered.forEach(record => {
                 const date = record.date || '未记录日期';
-                if (!grouped.has(date)) grouped.set(date, []);
-                grouped.get(date).push(record);
+                if (!grouped.has(date)) grouped.set(date, records.filter(item => (item.date || '未记录日期') === date));
             });
             const tableRows = Array.from(grouped.entries()).map(([date, dayRecords]) => {
                 const display = formatAttendanceDay(date);
-                const editable = dayRecords.some(isAttendanceRecordEditable);
-                return dayRecords.map((record, index) => `<tr class="${index === 0 ? 'day-start' : ''}">${index === 0 ? `<td class="attendance-day-date" rowspan="${dayRecords.length}"><strong>${escapeHtml(display.date)}</strong><small>${escapeHtml(display.weekday)}</small></td>` : ''}<td class="attendance-day-period">${escapeHtml(record.period || '日常')}</td><td><span class="attendance-row-status ${rollcallStatusTone(record.status)}">${escapeHtml(record.status || '到课')}</span></td><td><div class="attendance-day-recorder" title="${escapeHtml(record.recordedBy || '班主任')}">${escapeHtml(record.recordedBy || '班主任')}</div></td>${index === 0 ? `<td class="attendance-day-action" rowspan="${dayRecords.length}">${editable ? `<button type="button" class="attendance-day-edit" data-action="open-attendance-day-editor" data-attendance-date="${escapeHtml(date)}" aria-label="修改${escapeHtml(date)}全天考勤记录">修改</button>` : '<span class="attendance-day-lock" aria-label="超过一周不可修改">不可改</span>'}</td>` : ''}</tr>`).join('');
+                const lateCount = dayRecords.filter(record => record.status === '迟到').length;
+                const absentCount = dayRecords.filter(record => record.status === '缺勤').length;
+                const recorders = [...new Set(dayRecords.map(record => record.recordedBy || '班主任'))];
+                const recorderLabel = recorders.length > 1 ? `${recorders.length} 人` : (recorders[0] || '班主任');
+                return `<tr class="day-start"><td class="attendance-day-date"><strong>${escapeHtml(display.date)}</strong><small>${escapeHtml(display.weekday)}</small></td><td><span class="attendance-day-count late${lateCount ? '' : ' is-zero'}"><strong>${lateCount}</strong><span>节</span></span></td><td><span class="attendance-day-count absent${absentCount ? '' : ' is-zero'}"><strong>${absentCount}</strong><span>节</span></span></td><td><div class="attendance-day-recorder" title="${escapeHtml(recorders.join('、'))}">${escapeHtml(recorderLabel)}</div></td><td class="attendance-day-action"><button type="button" class="attendance-day-edit" data-action="open-attendance-day-editor" data-attendance-date="${escapeHtml(date)}" aria-label="查看${escapeHtml(date)}全天考勤详情">查看</button></td></tr>`;
             }).join('');
-            const timeOptions = [{value:'week',label:'本周'},{value:'month',label:'本月'},{value:'term',label:'本学期'},{value:'all',label:'全部'}];
-            attendanceRoot.innerHTML = `<section class="attendance-dashboard" aria-label="考勤数据看板"><div class="attendance-dashboard-head"><div class="attendance-dashboard-person"><span class="attendance-dashboard-avatar${data.gender === '男' ? ' male' : ''}">${studentAvatarMarkup(data)}</span><strong>${escapeHtml(data.name)}</strong></div><span>累计 ${records.length} 节</span></div><div class="attendance-metrics"><div class="attendance-metric"><strong>${rate}%</strong><span>到课率</span></div><div class="attendance-metric"><strong>${statusCounts('到课')}</strong><span>到课</span></div><div class="attendance-metric"><strong>${statusCounts('迟到')}</strong><span>迟到</span></div><div class="attendance-metric"><strong>${statusCounts('缺勤')}</strong><span>缺勤</span></div></div></section><section class="attendance-tools" aria-label="考勤筛选"><div class="attendance-filter-section"><span class="attendance-filter-label">时间范围</span><div class="attendance-filter-group" aria-label="按时间筛选">${timeOptions.map(option => `<button type="button" class="attendance-filter-chip${state.attendancePeriodFilter === option.value ? ' active' : ''}" data-action="set-attendance-filter" data-attendance-filter-kind="period" data-attendance-filter-value="${option.value}" aria-pressed="${state.attendancePeriodFilter === option.value ? 'true' : 'false'}">${option.label}</button>`).join('')}</div></div><div class="attendance-filter-section"><span class="attendance-filter-label">考勤状态</span><div class="attendance-filter-group" aria-label="按状态筛选"><button type="button" class="attendance-filter-chip${state.attendanceStatusFilter === 'all' ? ' active' : ''}" data-action="set-attendance-filter" data-attendance-filter-kind="status" data-attendance-filter-value="all" aria-pressed="${state.attendanceStatusFilter === 'all' ? 'true' : 'false'}">全部</button>${rollcallStatuses.map(status => `<button type="button" class="attendance-filter-chip${state.attendanceStatusFilter === status ? ' active' : ''}" data-action="set-attendance-filter" data-attendance-filter-kind="status" data-attendance-filter-value="${status}" aria-pressed="${state.attendanceStatusFilter === status ? 'true' : 'false'}">${status}</button>`).join('')}</div></div></section><div class="attendance-result-head"><h2>考勤明细</h2><span>${escapeHtml(getAttendancePeriodLabel())} · ${grouped.size} 天 ${filtered.length} 节</span></div>${tableRows ? `<div class="attendance-day-table-wrap"><table class="attendance-day-table"><colgroup><col><col><col><col><col></colgroup><thead><tr><th>日期</th><th>课次</th><th>状态</th><th>记录人</th><th>操作</th></tr></thead><tbody>${tableRows}</tbody></table></div>` : '<div class="attendance-history-empty">没有符合筛选条件的考勤记录</div>'}`;
+            const timeOptions = ['week','month','term','all'].map(value => ({ value, label: getAttendancePeriodLabel(value) }));
+            const exceptionOptions = [{value:'迟到',label:'迟到'},{value:'缺勤',label:'缺勤'}];
+            attendanceRoot.innerHTML = `<section class="attendance-dashboard" aria-label="考勤数据看板"><div class="attendance-dashboard-head"><div class="attendance-dashboard-person"><span class="attendance-dashboard-avatar${data.gender === '男' ? ' male' : ''}">${studentAvatarMarkup(data)}</span><strong>${escapeHtml(data.name)}</strong></div><span>累计 ${records.length} 节</span></div><div class="attendance-metrics"><div class="attendance-metric"><strong>${rate}%</strong><span>到课率</span></div><div class="attendance-metric"><strong>${statusCounts('到课')}</strong><span>到课</span></div><div class="attendance-metric"><strong>${statusCounts('迟到')}</strong><span>迟到</span></div><div class="attendance-metric"><strong>${statusCounts('缺勤')}</strong><span>缺勤</span></div></div></section><section class="attendance-tools" aria-label="考勤筛选"><div class="attendance-filter-section"><span class="attendance-filter-label">时间范围</span><div class="attendance-filter-group" aria-label="按时间筛选">${timeOptions.map(option => `<button type="button" class="attendance-filter-chip${state.attendancePeriodFilter === option.value ? ' active' : ''}" data-action="set-attendance-filter" data-attendance-filter-kind="period" data-attendance-filter-value="${option.value}" aria-pressed="${state.attendancePeriodFilter === option.value ? 'true' : 'false'}">${option.label}</button>`).join('')}</div></div><div class="attendance-filter-section"><span class="attendance-filter-label">异常状态</span><div class="attendance-filter-group" aria-label="按异常状态筛选"><button type="button" class="attendance-filter-chip${state.attendanceStatusFilter === 'all' ? ' active' : ''}" data-action="set-attendance-filter" data-attendance-filter-kind="status" data-attendance-filter-value="all" aria-pressed="${state.attendanceStatusFilter === 'all' ? 'true' : 'false'}">全部</button>${exceptionOptions.map(option => `<button type="button" class="attendance-filter-chip${state.attendanceStatusFilter === option.value ? ' active' : ''}" data-action="set-attendance-filter" data-attendance-filter-kind="status" data-attendance-filter-value="${option.value}" aria-pressed="${state.attendanceStatusFilter === option.value ? 'true' : 'false'}">${option.label}</button>`).join('')}</div></div></section><div class="attendance-result-head"><h2>考勤明细</h2><span>${escapeHtml(getAttendancePeriodLabel())} · ${grouped.size} 天</span></div>${tableRows ? `<div class="attendance-day-table-wrap"><table class="attendance-day-table"><colgroup><col><col><col><col><col></colgroup><thead><tr><th>日期</th><th>迟到</th><th>缺勤</th><th>记录人</th><th>操作</th></tr></thead><tbody>${tableRows}</tbody></table></div>` : '<div class="attendance-history-empty">没有符合筛选条件的考勤记录</div>'}`;
         }
 
         function renderAttendanceEditor() {
             const context = state.attendanceEditContext;
             if (!context) return;
+            const data = currentData();
+            const editing = state.attendanceEditorEditing;
             const date = parseLocalDate(context.date);
             const dateLabel = date ? `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日` : context.date;
+            attendanceEditorTitle.textContent = `${data.name} · 当天详情`;
+            attendanceEditorActionButton.textContent = editing ? '保存' : '编辑';
+            attendanceEditorActionButton.classList.toggle('is-saving', editing);
+            attendanceEditorActionButton.classList.toggle('is-locked', !context.canEdit && !editing);
+            attendanceEditorActionButton.setAttribute('aria-pressed', editing ? 'true' : 'false');
+            attendanceEditorActionButton.setAttribute('aria-label', context.canEdit ? (editing ? `保存${data.name}${dateLabel}的考勤记录` : `编辑${data.name}${dateLabel}的考勤记录`) : `${dateLabel}的考勤记录已超过可编辑时限`);
             const groups = [
                 { title: '上午', indices: [0,1,2,3], meta: '4 节课' },
                 { title: '下午', indices: [4,5,6], meta: '3 节课' },
@@ -5719,28 +6346,35 @@
             ];
             const groupMarkup = groups.map(group => `<section class="attendance-lesson-group"><div class="attendance-lesson-group-head"><h2>${group.title}</h2><span>${group.meta}</span></div><div class="attendance-lesson-list">${group.indices.map(index => {
                 const lesson = context.lessons[index];
-                const expanded = context.activeLessonIndex === index;
-                return `<article class="attendance-lesson-row"><div class="attendance-lesson-main"><div class="attendance-lesson-title"><strong>${escapeHtml(lesson.period)}</strong><span>${escapeHtml(lesson.course)}</span></div><button type="button" class="attendance-lesson-status ${rollcallStatusTone(lesson.status)}" data-action="toggle-attendance-lesson-status" data-attendance-lesson-index="${index}" aria-expanded="${expanded ? 'true' : 'false'}" aria-label="${escapeHtml(lesson.period)}当前${escapeHtml(lesson.status)}，点击修改">${escapeHtml(lesson.status)}</button></div><div class="attendance-lesson-meta"><span><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>记录时间 ${escapeHtml(lesson.time)}</span><span><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M5 21a7 7 0 0 1 14 0"></path></svg>记录人 ${escapeHtml(lesson.recordedBy)}</span></div>${expanded ? `<div class="attendance-lesson-choices" aria-label="选择${escapeHtml(lesson.period)}考勤状态">${rollcallStatuses.map(status => `<button type="button" class="attendance-lesson-choice${lesson.status === status ? ' active' : ''}" data-action="set-attendance-lesson-status" data-attendance-lesson-index="${index}" data-attendance-status="${status}" aria-pressed="${lesson.status === status ? 'true' : 'false'}">${status}</button>`).join('')}</div>` : ''}</article>`;
+                const expanded = editing && context.activeLessonIndex === index;
+                const statusMarkup = editing
+                    ? `<button type="button" class="attendance-lesson-status is-editable ${rollcallStatusTone(lesson.status)}" data-action="toggle-attendance-lesson-status" data-attendance-lesson-index="${index}" aria-expanded="${expanded ? 'true' : 'false'}" aria-label="${escapeHtml(lesson.period)}当前${escapeHtml(lesson.status)}，点击选择状态"><span>${escapeHtml(lesson.status)}</span><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></button>`
+                    : `<span class="attendance-lesson-status is-static ${rollcallStatusTone(lesson.status)}">${escapeHtml(lesson.status)}</span>`;
+                return `<article class="attendance-lesson-row"><div class="attendance-lesson-main"><div class="attendance-lesson-title"><strong>${escapeHtml(lesson.period)}</strong><span>${escapeHtml(lesson.course)}</span></div>${statusMarkup}</div><div class="attendance-lesson-meta"><span class="attendance-lesson-time-range"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>${escapeHtml(lesson.start)}–${escapeHtml(lesson.end)}</span><span><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M5 21a7 7 0 0 1 14 0"></path></svg>记录人 ${escapeHtml(lesson.recordedBy)}</span></div>${expanded ? `<div class="attendance-lesson-choices" aria-label="选择${escapeHtml(lesson.period)}考勤状态">${rollcallStatuses.map(status => `<button type="button" class="attendance-lesson-choice${lesson.status === status ? ' active' : ''}" data-action="set-attendance-lesson-status" data-attendance-lesson-index="${index}" data-attendance-status="${status}" aria-pressed="${lesson.status === status ? 'true' : 'false'}">${status}</button>`).join('')}</div>` : ''}</article>`;
             }).join('')}</div></section>`).join('');
-            attendanceEditorRoot.innerHTML = `<section class="attendance-edit-summary"><span><span>考勤日期</span><strong>${escapeHtml(dateLabel)}</strong></span><span class="attendance-edit-summary-badge">全天 8 节</span></section><div class="attendance-default-note"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"></path></svg><span><strong>每节课已默认标记为到课</strong><span>只需点开状态标签，调整迟到、请假或缺勤课次。</span></span></div><div class="attendance-lesson-groups">${groupMarkup}</div>`;
+            const editingNote = editing ? '<div class="attendance-editing-note"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"></path></svg><span>编辑模式：点击每节课右侧状态进行修改</span></div>' : '';
+            attendanceEditorRoot.innerHTML = `<section class="attendance-edit-summary"><span><span>考勤日期</span><strong>${escapeHtml(dateLabel)}</strong></span><span class="attendance-edit-summary-badge">全天 8 节</span></section>${editingNote}<div class="attendance-lesson-groups">${groupMarkup}</div>`;
         }
 
         function openStudentAttendanceStatusPicker(button, recordDate = '') {
             const records = getAttendanceRecords();
             const date = recordDate || formatLocalDate();
             const dateRecords = records.filter(record => record.date === date);
-            if (dateRecords.length && !dateRecords.some(isAttendanceRecordEditable)) return showToast('仅支持修改一周内的考勤数据');
             const defaultRecorder = getSelectedClass()?.teacher || '班主任';
             state.attendanceEditOrigin = state.view === 'attendance' ? 'attendance' : 'detail';
+            state.attendanceEditorEditing = false;
             state.attendanceEditContext = {
                 trigger: button,
                 date,
+                canEdit: !dateRecords.length || dateRecords.some(isAttendanceRecordEditable),
                 activeLessonIndex: -1,
                 lessons: attendanceCourseSchedule.map(item => {
                     const existing = dateRecords.find(record => record.course === item.course && record.period === item.period);
                     return {
                         course: item.course,
                         period: item.period,
+                        start: item.start,
+                        end: item.end,
                         time: existing?.time || item.start,
                         recordedBy: existing?.recordedBy || defaultRecorder,
                         status: existing?.status || '到课'
@@ -5756,7 +6390,7 @@
         function toggleAttendanceLessonStatus(index) {
             const context = state.attendanceEditContext;
             const normalizedIndex = Number(index);
-            if (!context?.lessons?.[normalizedIndex]) return;
+            if (!state.attendanceEditorEditing || !context?.lessons?.[normalizedIndex]) return;
             context.activeLessonIndex = context.activeLessonIndex === normalizedIndex ? -1 : normalizedIndex;
             renderAttendanceEditor();
             requestAnimationFrame(() => attendanceEditorRoot.querySelector(`[data-action="toggle-attendance-lesson-status"][data-attendance-lesson-index="${normalizedIndex}"]`)?.focus());
@@ -5765,16 +6399,30 @@
         function selectAttendanceEditorStatus(index, status) {
             const context = state.attendanceEditContext;
             const normalizedIndex = Number(index);
-            if (!context?.lessons?.[normalizedIndex] || !rollcallStatuses.includes(status)) return;
+            if (!state.attendanceEditorEditing || !context?.lessons?.[normalizedIndex] || !rollcallStatuses.includes(status)) return;
             context.lessons[normalizedIndex].status = status;
             context.activeLessonIndex = -1;
             renderAttendanceEditor();
             requestAnimationFrame(() => attendanceEditorRoot.querySelector(`[data-action="toggle-attendance-lesson-status"][data-attendance-lesson-index="${normalizedIndex}"]`)?.focus());
         }
 
+        function toggleAttendanceEditorMode() {
+            const context = state.attendanceEditContext;
+            if (!context) return;
+            if (state.attendanceEditorEditing) {
+                saveStudentAttendanceEditor();
+                return;
+            }
+            if (!context.canEdit) return showToast('仅支持修改一周内的考勤数据');
+            state.attendanceEditorEditing = true;
+            context.activeLessonIndex = -1;
+            renderAttendanceEditor();
+            focusAfterViewChange(attendanceEditorActionButton);
+        }
+
         function saveStudentAttendanceEditor() {
             const context = state.attendanceEditContext;
-            if (!context?.lessons?.length) return;
+            if (!state.attendanceEditorEditing || !context?.lessons?.length) return;
             const data = currentData();
             const records = getAttendanceRecords(data);
             context.lessons.forEach(lesson => {
@@ -5792,19 +6440,11 @@
                 const activeCourse = getCurrentAttendanceCourse();
                 data.currentAttendance = context.lessons.find(lesson => lesson.period === activeCourse.period)?.status || '到课';
             }
-            const origin = state.attendanceEditOrigin;
-            const editedDate = context.date;
-            state.attendanceEditContext = null;
-            renderStudentAttendanceDock();
-            if (origin === 'attendance') {
-                renderAttendancePage();
-                setView('attendance');
-                focusAfterViewChange(() => attendanceRoot.querySelector(`[data-attendance-date="${editedDate}"]`) || attendanceBackButton);
-            } else {
-                renderAll();
-                setView('detail');
-                focusAfterViewChange(studentAttendanceStatus);
-            }
+            state.attendanceEditorEditing = false;
+            context.activeLessonIndex = -1;
+            renderAttendancePage();
+            renderAttendanceEditor();
+            focusAfterViewChange(attendanceEditorActionButton);
             showToast('考勤记录已保存');
         }
 
@@ -5812,6 +6452,8 @@
             const origin = state.attendanceEditOrigin;
             const trigger = state.attendanceEditContext?.trigger;
             const editedDate = state.attendanceEditContext?.date || '';
+            const discardedChanges = state.attendanceEditorEditing;
+            state.attendanceEditorEditing = false;
             state.attendanceEditContext = null;
             if (origin === 'attendance') {
                 renderAttendancePage();
@@ -5819,8 +6461,9 @@
                 focusAfterViewChange(() => attendanceRoot.querySelector(`[data-attendance-date="${editedDate}"]`) || (trigger?.isConnected ? trigger : attendanceBackButton));
             } else {
                 setView('detail');
-                focusAfterViewChange(studentAttendanceStatus);
+                focusAfterViewChange(() => heroRoot.querySelector('[data-action="open-student-attendance"]') || editButton);
             }
+            if (discardedChanges) showToast('未保存的修改已取消');
         }
 
         function openStudentAttendance() {
@@ -5840,7 +6483,6 @@
             editButton.setAttribute('aria-label', '编辑学生档案');
             renderHero();
             renderPanel();
-            renderStudentAttendanceDock();
         }
 
         function getDetailTabAnchorTop() {
@@ -6042,7 +6684,7 @@
 
         function trapFocusWithin(event, container) {
             if (event.key !== 'Tab') return false;
-            const focusable = Array.from(container.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'))
+            const focusable = Array.from(container.querySelectorAll('button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'))
                 .filter(element => !element.hidden && element.getAttribute('aria-hidden') !== 'true');
             if (!focusable.length) return false;
             const first = focusable[0];
@@ -6205,14 +6847,15 @@
         function addGradeDialog() {
             openDialog({
                 title: '新增成绩',
-                desc: '用于录入中考或入学考试的单科成绩。',
-                body: `<div class="dialog-field"><label for="gradeSubject">科目名称<span class="required-star" aria-hidden="true">*</span></label><input id="gradeSubject" required placeholder="例如：英语"></div><div class="grid grid-cols-2 gap-3"><div class="dialog-field"><label for="gradeScore">成绩<span class="required-star" aria-hidden="true">*</span></label><input id="gradeScore" type="number" inputmode="decimal" required min="0" max="150"></div><div class="dialog-field"><label>考试类型</label><input id="gradeType" type="hidden" value="中考成绩"><button type="button" class="dialog-picker-trigger" data-action="open-select-picker" data-picker-target="gradeType" data-picker-label="选择考试类型" data-picker-options="${escapeHtml(JSON.stringify(['中考成绩','入学摸底']))}" aria-haspopup="dialog" aria-controls="pickerLayer" aria-expanded="false"><span>中考成绩</span><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></button></div></div>`,
+                desc: '考试类型支持直接填写，便于记录校内外不同考试。',
+                body: `<div class="dialog-field"><label for="gradeSubject">科目名称<span class="required-star" aria-hidden="true">*</span></label><input id="gradeSubject" required placeholder="例如：英语"></div><div class="grid grid-cols-2 gap-3"><div class="dialog-field"><label for="gradeScore">成绩<span class="required-star" aria-hidden="true">*</span></label><input id="gradeScore" type="number" inputmode="decimal" required min="0" max="150" placeholder="例如：92"></div><div class="dialog-field"><label for="gradeType">考试类型<span class="required-star" aria-hidden="true">*</span></label><input id="gradeType" type="text" required maxlength="30" placeholder="例如：期中考试"></div></div>`,
                 confirmLabel: '保存成绩',
                 onConfirm: () => {
                     const subject = document.getElementById('gradeSubject');
                     const score = document.getElementById('gradeScore');
-                    if (!subject.value.trim() || !score.value) { (!subject.value.trim() ? subject : score).focus(); showToast('请填写必填项'); return false; }
-                    currentData().grades.unshift({ subject: subject.value.trim(), score: score.value, examType: document.getElementById('gradeType').value });
+                    const examType = document.getElementById('gradeType');
+                    if (!subject.value.trim() || !score.value || !examType.value.trim()) { (!subject.value.trim() ? subject : (!score.value ? score : examType)).focus(); showToast('请填写所有必填项'); return false; }
+                    currentData().grades.unshift({ subject: subject.value.trim(), score: score.value, examType: examType.value.trim() });
                     renderPanel(); showToast(state.editMode ? '成绩记录已加入草稿' : '成绩记录已新增');
                 }
             });
@@ -6242,13 +6885,8 @@
 
         function handleAction(button) {
             const action = button.dataset.action;
-            if (action === 'call-student') showToast(`正在拨打学生电话 ${currentData().phone}`);
-            if (action === 'call-guardian') openParentPicker();
-            if (action === 'call-family') showToast(`正在拨打 ${button.dataset.phone}`);
-            if (action === 'call-parent') {
-                const parent = (currentData().family || [])[Number(button.dataset.parentIndex)];
-                if (parent) { closeDialog(); showToast(`正在拨打监护人${parent.name} ${parent.phone}`); }
-            }
+            if (action === 'call-student') openCallSheet(button);
+            if (action === 'call-guardian') openParentPicker(button);
             if (action === 'add-student') openAddStudentDialog();
             if (action === 'close-add-student') closeAddStudentPage();
             if (action === 'submit-add-student') addStudentFromDialog();
@@ -6265,9 +6903,22 @@
             if (action === 'school-add-function') startSchoolFunctionAdd();
             if (action === 'school-add-class') openSchoolClassAddPicker();
             if (action === 'add-school-class-shortcut') addSchoolClassShortcut(button.dataset.schoolShortcutAdd);
-            if (action === 'toggle-class-todos') openClassTodos();
             if (action === 'open-leave-detail') openLeaveDetail(button.dataset.leaveId);
             if (action === 'preview-leave-image') previewLeaveImage(button.dataset.leaveId);
+            if (action === 'clear-class-roster-search') {
+                state.classStudentSearch = '';
+                const input = document.getElementById('classRosterSearch');
+                if (input) input.value = '';
+                updateClassRosterSearchResults();
+                input?.focus();
+            }
+            if (action === 'clear-log-roster-search') {
+                state.logRosterSearch = '';
+                const input = document.getElementById('logRosterSearch');
+                if (input) input.value = '';
+                updateLogRosterSearchResults();
+                input?.focus();
+            }
             if (action === 'clear-leave-search') {
                 state.leaveSearch = '';
                 const input = document.getElementById('leaveSearch');
@@ -6284,11 +6935,14 @@
             }
             if (action === 'open-log-detail') openLogDetail(button.dataset.logId);
             if (action === 'open-student-log-history') openStudentLogHistory(button.dataset.logStudentId);
-            if (action === 'set-student-log-time-filter') {
-                state.logHistoryTimeFilter = button.dataset.logTimeFilter || 'term';
+            if (action === 'clear-student-log-search') {
+                state.logHistorySearch = '';
                 renderStudentLogHistoryPage();
-                requestAnimationFrame(() => studentLogHistoryRoot.querySelector(`[data-log-time-filter="${state.logHistoryTimeFilter}"]`)?.focus());
+                requestAnimationFrame(() => document.getElementById('studentLogSearch')?.focus());
             }
+            if (action === 'open-student-log-time-filter') openLogHistoryTimeFilter(button);
+            if (action === 'select-student-log-time-filter') applyLogHistoryTimeFilter(button.dataset.logTimeFilter);
+            if (action === 'apply-student-log-custom-range') applyLogHistoryCustomRange();
             if (action === 'toggle-log-pending') {
                 state.logsPendingExpanded = !state.logsPendingExpanded;
                 renderClassModule();
@@ -6343,11 +6997,10 @@
                 renderClassModule();
                 requestAnimationFrame(() => classModuleRoot.querySelector(`[data-rollcall-id="${rollcallId}"]`)?.focus());
             }
-            if (action === 'open-student-attendance-status') openStudentAttendanceStatusPicker(button);
             if (action === 'open-attendance-day-editor') openStudentAttendanceStatusPicker(button, button.dataset.attendanceDate);
+            if (action === 'toggle-attendance-edit-mode') toggleAttendanceEditorMode();
             if (action === 'toggle-attendance-lesson-status') toggleAttendanceLessonStatus(button.dataset.attendanceLessonIndex);
             if (action === 'set-attendance-lesson-status') selectAttendanceEditorStatus(button.dataset.attendanceLessonIndex, button.dataset.attendanceStatus);
-            if (action === 'save-student-attendance') saveStudentAttendanceEditor();
             if (action === 'open-student-attendance') openStudentAttendance();
             if (action === 'set-attendance-filter') {
                 if (button.dataset.attendanceFilterKind === 'period') state.attendancePeriodFilter = button.dataset.attendanceFilterValue || 'all';
@@ -6457,6 +7110,8 @@
 
         attendanceEditorBackButton.addEventListener('click', closeAttendanceEditorPage);
 
+        leaveDetailBackButton.addEventListener('click', closeLeaveDetailPage);
+
         logDetailBackButton.addEventListener('click', closeLogDetailPage);
 
         studentLogHistoryBackButton.addEventListener('click', () => {
@@ -6508,21 +7163,7 @@
             focusAfterViewChange(() => classDirectory.querySelector(`[data-class-id="${state.selectedClassId}"]`) || classListBackButton);
         });
 
-        classTodoButton.addEventListener('click', openClassTodos);
-
-        classTodoBackButton.addEventListener('click', () => {
-            renderClassOverview();
-            setView('class-detail');
-            focusAfterViewChange(classTodoButton);
-        });
-
         classModuleBackButton.addEventListener('click', () => {
-            if (state.classModuleReturnTab === 'todo') {
-                renderClassTodos();
-                setView('class-todo');
-                focusAfterViewChange(() => classTodoRoot.querySelector(`[data-class-reminder="${state.classModule}"]`) || classTodoBackButton);
-                return;
-            }
             renderClassOverview();
             switchClassTab(state.classModuleReturnTab || 'management');
             setView('class-detail');
@@ -6606,8 +7247,6 @@
             if (classModule) { openClassModule(classModule.dataset.classModule); return; }
             const classFeature = event.target.closest('[data-class-feature]');
             if (classFeature) { showToast(`${classFeature.dataset.classFeature}入口已保留`); return; }
-            const classReminder = event.target.closest('[data-class-reminder]');
-            if (classReminder) { handleClassReminder(classReminder.dataset.classReminder); return; }
             const workflow = event.target.closest('[data-workflow]');
             if (workflow) { handleClassWorkflow(workflow); return; }
             const callButton = event.target.closest('[data-call-phone]');
@@ -6639,9 +7278,31 @@
         });
 
         document.getElementById('device').addEventListener('input', event => {
+            if (event.target.id === 'classRosterSearch') {
+                state.classStudentSearch = event.target.value;
+                updateClassRosterSearchResults();
+                return;
+            }
+            if (event.target.id === 'logRosterSearch') {
+                state.logRosterSearch = event.target.value;
+                updateLogRosterSearchResults();
+                return;
+            }
             if (event.target.id === 'leaveSearch') {
                 state.leaveSearch = event.target.value;
                 updateLeaveList();
+                return;
+            }
+            if (event.target.id === 'studentLogSearch') {
+                state.logHistorySearch = event.target.value;
+                renderStudentLogHistoryPage();
+                requestAnimationFrame(() => {
+                    const input = document.getElementById('studentLogSearch');
+                    if (input) {
+                        input.focus({ preventScroll: true });
+                        input.setSelectionRange(input.value.length, input.value.length);
+                    }
+                });
                 return;
             }
             if (event.target.id === 'rollcallSearch') {
@@ -6732,7 +7393,15 @@
             showToast(`正在调用系统拨号 ${document.getElementById('callPersonPhone').textContent}`);
             setTimeout(closeCallSheet, 160);
         });
-        callLayer.addEventListener('click', event => { if (event.target === callLayer) closeCallSheet(); });
+        callLayer.addEventListener('click', event => {
+            const dial = event.target.closest('[data-guardian-dial]');
+            if (dial) {
+                showToast(`正在调用系统拨号 ${formatPhone(dial.dataset.guardianPhone)}`);
+                setTimeout(closeCallSheet, 160);
+                return;
+            }
+            if (event.target === callLayer) closeCallSheet();
+        });
         dialogConfirm.addEventListener('click', () => {
             const result = state.dialogAction?.();
             if (result !== false) closeDialog();
@@ -6765,7 +7434,6 @@
         if (previewRoute === 'class-list') openClassList();
         else if (previewRoute === 'class-list-scrolled') { openClassList(); requestAnimationFrame(() => requestAnimationFrame(() => { classListScroll.scrollTop = 108; })); }
         else if (previewRoute === 'class-overview') openClassDetail('CLS2403');
-        else if (previewRoute === 'class-overview-todos' || previewRoute === 'class-todos') { openClassDetail('CLS2403'); openClassTodos(); }
         else if (previewRoute === 'class-management') { openClassDetail('CLS2403'); switchClassTab('management'); }
         else if (previewRoute === 'class-info') { openClassDetail('CLS2403'); switchClassTab('info'); }
         else if (previewRoute === 'students') openStudentList();
@@ -6773,9 +7441,10 @@
         else if (previewRoute === 'student-detail') { openStudentList(); openStudentDetail(students[0].id); }
         else if (previewRoute === 'student-materials') { openStudentList(); openStudentDetail(students[0].id); switchTab('materials'); }
         else if (previewRoute === 'student-attendance') { openStudentList(); openStudentDetail(students[0].id); openStudentAttendance(); }
-        else if (previewRoute === 'student-attendance-edit') { openStudentList(); openStudentDetail(students[0].id); openStudentAttendanceStatusPicker(studentAttendanceStatus, formatLocalDate()); }
+        else if (previewRoute === 'student-attendance-edit') { openStudentList(); openStudentDetail(students[0].id); openStudentAttendance(); openStudentAttendanceStatusPicker(attendanceBackButton, formatLocalDate()); toggleAttendanceEditorMode(); }
         else if (previewRoute === 'student-edit') { openStudentList(); openStudentDetail(students[0].id); enterEdit(); switchTab('identity'); }
         else if (previewRoute === 'student-edit-phone') { openStudentList(); openStudentDetail(students[0].id); enterEdit(); switchTab('family'); }
+        else if (previewRoute === 'leave-detail') { openClassDetail('CLS2403'); openClassModule('leave'); openLeaveDetail('leave-1'); }
         else if (previewRoute === 'log-detail') { openClassDetail('CLS2403'); openClassModule('logs'); openLogDetail('log-1'); }
         else if (previewRoute === 'student-log-history') { openClassDetail('CLS2403'); openClassModule('logs'); const logStudent = ensureClassRoster(getSelectedClass()).find(item => item.name === '林知夏') || ensureClassRoster(getSelectedClass())[0]; openStudentLogHistory(logStudent.id); }
         else if (previewRoute === 'rollcall-history') { openClassDetail('CLS2403'); openClassModule('rollcall'); openRollcallHistory(); }
