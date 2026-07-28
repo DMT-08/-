@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#EFF6FF">
-    <title>掌上校园 · 班级看板学生状态宿舍与列表优化 7.48</title>
+    <title>掌上校园 · 学校管理宿舍关注学生与状态密度优化 7.49</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -4713,6 +4713,327 @@
         .school-class-picker-counts .male { color: #2563EB; background: rgba(59,130,246,.10); }
         .school-class-picker-counts .female { color: #DB2777; background: rgba(236,72,153,.09); }
 
+        /* 7.49：首页四列无外框、关注学生、班级轻表格、宿舍三级页与高密学生状态。 */
+        .device {
+            overflow: hidden;
+            overflow-x: clip;
+        }
+        .school-home-view .home-high-card,
+        .school-home-view .home-directory-card {
+            margin-bottom: 10px !important;
+            padding: 0 !important;
+            overflow: visible;
+            border: 0 !important;
+            border-radius: 0 !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+        }
+        .school-home-view .home-high-grid,
+        .school-home-view .admission-entry-grid {
+            grid-template-columns: repeat(4,minmax(0,1fr));
+            gap: 8px 6px;
+        }
+        .school-home-view .home-high-btn,
+        .school-home-view .admission-entry-btn {
+            min-height: 50px;
+            padding: 9px 2px;
+            border-radius: 14px;
+            font-size: 11.5px;
+            line-height: 1.18;
+        }
+        .school-home-view .admission-entry-group-title {
+            padding: 13px 2px 3px;
+        }
+        .school-home-view.feature-add-transition .admission-entry-btn.manage-mode {
+            animation: featureEntryPop .38s cubic-bezier(.2,.78,.24,1) both;
+        }
+        .school-home-view.feature-add-transition .admission-entry-btn.manage-mode:nth-of-type(2n) { animation-delay: .035s; }
+        .school-home-view.feature-add-transition .admission-entry-btn.manage-mode:nth-of-type(3n) { animation-delay: .07s; }
+        @keyframes featureEntryPop {
+            0% { opacity: .15; transform: translateY(9px) scale(.92); }
+            65% { opacity: 1; transform: translateY(-2px) scale(1.025); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .followed-student-summary {
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 8px;
+            padding: 0 13px;
+            border: 1px solid rgba(255,255,255,.88);
+            border-radius: 14px;
+            background: rgba(255,255,255,.62);
+            box-shadow: 0 8px 20px rgba(31,95,255,.04);
+        }
+        .followed-student-summary span {
+            color: var(--body);
+            font-size: 12px;
+            font-weight: 900;
+        }
+        .followed-student-summary strong {
+            color: var(--brand);
+            font-size: 12px;
+            font-weight: 950;
+        }
+        .privacy-student-scroll .exact-search-panel {
+            position: sticky;
+            top: -1px;
+            z-index: 20;
+            margin: 0 -20px 10px;
+            padding: 8px 20px 10px;
+            background: rgba(239,246,255,.90);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .class-directory {
+            overflow: visible;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+        .class-table-head,
+        .class-table .class-row {
+            grid-template-columns: 25px minmax(0,1fr) 43px 29px 29px;
+            gap: 3px;
+        }
+        .class-table-head {
+            padding: 0 3px;
+            border: 0;
+            border-bottom: 1px solid rgba(15,23,42,.07);
+            background: transparent;
+        }
+        .class-table .class-row {
+            min-height: 54px;
+            padding: 9px 3px;
+            background: transparent;
+        }
+        .class-table .class-row:active { background: rgba(255,255,255,.66); }
+        .class-table .class-index {
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+        .class-table-name-line {
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 0;
+            overflow: hidden;
+            color: var(--ink);
+            font-size: 12px;
+            font-weight: 950;
+            white-space: nowrap;
+        }
+        .class-table-name-line .class-name-short {
+            min-width: 0;
+            overflow: hidden;
+            color: inherit;
+            font: inherit;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .class-table-name-line .class-teacher-full {
+            flex: 0 0 auto;
+            color: inherit;
+            font: inherit;
+            white-space: nowrap;
+        }
+
+        .school-dorm-level {
+            display: grid;
+            gap: 10px;
+            animation: dormLevelIn .28s cubic-bezier(.2,.72,.25,1) both;
+        }
+        .school-dorm-level-head {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 2px 2px 0;
+        }
+        .school-dorm-level-head span,
+        .school-dorm-level-head strong,
+        .school-dorm-level-head small { display: block; }
+        .school-dorm-level-head span {
+            color: var(--brand);
+            font-size: 9px;
+            font-weight: 950;
+            letter-spacing: .08em;
+        }
+        .school-dorm-level-head strong {
+            margin-top: 4px;
+            color: var(--ink);
+            font-size: 17px;
+            font-weight: 950;
+        }
+        .school-dorm-level-head small {
+            color: var(--muted);
+            font-size: 9px;
+            font-weight: 850;
+            text-align: right;
+        }
+        .school-dorm-level-list { display: grid; gap: 9px; }
+        .school-dorm-level-card {
+            width: 100%;
+            min-height: 68px;
+            display: grid;
+            grid-template-columns: 38px minmax(0,1fr) auto;
+            align-items: center;
+            gap: 11px;
+            padding: 11px 13px;
+            border: 1px solid rgba(255,255,255,.90);
+            border-radius: 18px;
+            color: inherit;
+            background: rgba(255,255,255,.70);
+            box-shadow: 0 8px 22px rgba(31,95,255,.05);
+            text-align: left;
+            transition: transform .18s ease, background .18s ease;
+        }
+        .school-dorm-level-card:active {
+            transform: scale(.97);
+            background: rgba(255,255,255,.90);
+        }
+        .school-dorm-level-icon {
+            width: 38px;
+            height: 38px;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            color: var(--brand);
+            background: rgba(31,95,255,.10);
+        }
+        .school-dorm-level-icon svg,
+        .school-dorm-level-arrow {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .school-dorm-level-copy { min-width: 0; }
+        .school-dorm-level-copy strong,
+        .school-dorm-level-copy small {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .school-dorm-level-copy strong { color: var(--ink); font-size: 14px; font-weight: 950; }
+        .school-dorm-level-copy small { margin-top: 4px; color: var(--muted); font-size: 9px; font-weight: 820; }
+        .school-dorm-level-side {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--muted);
+            font-size: 9px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+        .school-dorm-room-grid {
+            display: grid;
+            grid-template-columns: repeat(2,minmax(0,1fr));
+            gap: 8px;
+        }
+        .school-dorm-room-grid .school-room-card {
+            min-height: 58px;
+            padding: 10px 11px;
+            border-radius: 16px;
+        }
+        .school-dorm-room-preview { margin-top: 2px; }
+        @keyframes dormLevelIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .student-status-scroll .status-manager-hero {
+            padding: 10px 12px;
+            border-radius: 16px;
+        }
+        .student-status-scroll .status-manager-head strong { margin-top: 2px; font-size: 13px; }
+        .student-status-scroll .status-manager-head > span > span { font-size: 8px; }
+        .student-status-scroll .status-manager-head em { padding: 4px 7px; font-size: 8px; }
+        .student-status-scroll .status-manager-metrics { gap: 5px; margin-top: 8px; }
+        .student-status-scroll .status-manager-metric { min-height: 34px; padding: 5px 3px; }
+        .student-status-scroll .status-manager-metric strong { font-size: 14px; }
+        .student-status-scroll .status-manager-metric span { margin-top: 2px; font-size: 7.5px; }
+        .student-status-scroll .status-toolbar {
+            margin-top: 6px;
+            margin-bottom: 6px;
+            padding-top: 6px;
+            padding-bottom: 7px;
+        }
+        .student-status-scroll .rollcall-search input { height: 34px; }
+        .student-status-scroll .status-filter-row { gap: 5px; margin-top: 6px; }
+        .student-status-scroll .status-filter-chip {
+            min-height: 26px;
+            padding: 0 9px;
+            font-size: 8.5px;
+        }
+        .student-status-scroll .class-section-head { min-height: 28px; margin: 0; }
+        .student-status-scroll .class-section-head h2 { font-size: 11px; }
+        .student-status-scroll .live-status-list {
+            grid-template-columns: repeat(3,minmax(0,1fr));
+            gap: 6px;
+        }
+        .student-status-scroll .live-status-card {
+            min-height: 60px;
+            padding: 7px 6px 6px;
+            overflow: hidden;
+            border-radius: 13px;
+            box-shadow: 0 5px 14px rgba(31,95,255,.04);
+        }
+        .student-status-scroll .live-status-card-head {
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 3px;
+        }
+        .student-status-scroll .compact-status-name {
+            min-width: 0;
+            overflow: hidden;
+            color: var(--ink);
+            font-size: 9.5px;
+            font-weight: 950;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .student-status-scroll .compact-status-dot {
+            width: 6px;
+            height: 6px;
+            flex: 0 0 6px;
+            border-radius: 50%;
+            background: #CBD5E1;
+        }
+        .student-status-scroll .status-school .compact-status-dot { background: #10B981; }
+        .student-status-scroll .status-leave .compact-status-dot { background: #F59E0B; }
+        .student-status-scroll .status-meal .compact-status-dot { background: #3B82F6; }
+        .student-status-scroll .live-status-actions {
+            grid-template-columns: repeat(3,minmax(0,1fr));
+            gap: 2px;
+            margin-top: 6px;
+        }
+        .student-status-scroll .live-status-action {
+            min-width: 0;
+            height: 25px;
+            padding: 0 1px;
+            border-radius: 7px;
+            font-size: 8px;
+        }
+        .student-status-scroll .live-status-action.active { gap: 0; }
+
         .qa-static .app-view { transition: none !important; }
     </style>
 </head>
@@ -4914,54 +5235,26 @@
             <input type="file" id="disciplinePhotoInput" class="sr-only" accept="image/*" multiple aria-label="选择违纪记录照片">
         </section>
 
-        <section class="app-view" id="listView" aria-label="全校学生">
-            <header class="topbar" aria-label="全校学生导航">
+        <section class="app-view" id="listView" aria-label="关注学生">
+            <header class="topbar" aria-label="关注学生导航">
                 <button type="button" class="nav-button" id="listBackButton" aria-label="返回学校管理">
                     <svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
                 </button>
-                <h1 class="nav-title">全校学生</h1>
-                <button type="button" class="nav-action nav-add-action" id="addStudentButton" data-action="add-student" aria-label="添加学生">
-                    <svg aria-hidden="true" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                </button>
+                <h1 class="nav-title">关注学生</h1>
+                <div aria-hidden="true"></div>
             </header>
             <main class="list-scroll privacy-student-scroll">
-                <section class="student-directory-tabs" role="tablist" aria-label="全校学生查看方式">
-                    <button type="button" class="student-directory-tab active" role="tab" aria-selected="true" data-action="set-student-directory-mode" data-student-mode="all">全部学生</button>
-                    <button type="button" class="student-directory-tab" role="tab" aria-selected="false" data-action="set-student-directory-mode" data-student-mode="following">我的关注 <span id="followedStudentCount">0</span></button>
-                </section>
                 <section class="exact-search-panel" id="exactSearchPanel" aria-label="按完整姓名精确查询学生">
                     <div class="exact-search-row">
                         <div class="student-search"><label class="sr-only" for="studentSearch">输入学生完整姓名</label><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="studentSearch" type="search" placeholder="输入完整姓名" autocomplete="off"><button type="button" class="student-search-clear" id="studentSearchButton" aria-label="清空学生姓名"><svg aria-hidden="true" viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg></button></div>
                         <button type="button" class="exact-search-submit" id="studentSearchSubmit" data-action="submit-exact-student-search">精确搜索</button>
                     </div>
                 </section>
+                <section class="followed-student-summary" aria-label="关注学生数量"><span>关注学生列表</span><strong><span id="followedStudentCount">1</span> 人</strong></section>
                 <button type="button" id="classFilterTrigger" hidden><span>全部班级</span></button>
                 <div id="statusFilters" hidden><button type="button" data-status="all">全部</button></div>
                 <div class="student-list" id="studentList"></div>
             </main>
-        </section>
-
-        <section class="app-view" id="addView" aria-label="添加学生">
-            <header class="topbar" aria-label="添加学生导航">
-                <button type="button" class="nav-button" id="addBackButton" data-action="close-add-student" aria-label="返回全校学生">
-                    <svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                </button>
-                <h1 class="nav-title">添加学生</h1>
-                <div aria-hidden="true"></div>
-            </header>
-            <main class="add-student-content" id="addStudentContent">
-                <section class="page-form-card" aria-label="学生快速登记表单">
-                    <div class="page-form-field"><label class="required" for="addStudentName">学生姓名</label><input id="addStudentName" autocomplete="name" maxlength="20" placeholder="请输入学生姓名"></div>
-                    <div class="page-form-field"><label class="required" for="addStudentPhone">学生电话</label><div class="phone-input-shell"><input id="addStudentPhone" type="tel" inputmode="numeric" maxlength="11" data-phone-input placeholder="请输入学生电话"><span class="phone-counter" aria-hidden="true">0/11</span></div></div>
-                    <div class="page-form-field"><label class="required">证件类型</label><input id="addStudentIdType" type="hidden" value="身份证"><button type="button" class="dialog-picker-trigger" data-action="open-select-picker" data-picker-target="addStudentIdType" data-picker-label="选择证件类型" data-picker-options='["身份证","户口本","华侨证","其他"]' aria-haspopup="dialog" aria-controls="pickerLayer" aria-expanded="false"><span>身份证</span><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></button></div>
-                    <div class="page-form-field"><label class="required" for="addStudentIdNumber">证件号码</label><input id="addStudentIdNumber" maxlength="30" placeholder="请输入证件号码"></div>
-                    <div class="page-form-field"><label>出生日期（选填）</label><input id="addStudentBirthDate" type="hidden" value=""><button type="button" class="dialog-picker-trigger" id="addStudentBirthDateTrigger" data-action="open-date-picker" data-picker-target="addStudentBirthDate" data-picker-label="选择出生日期" aria-haspopup="dialog" aria-controls="pickerLayer" aria-expanded="false"><span>请选择日期</span><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M8 3v4M16 3v4M3 10h18"></path></svg></button></div>
-                </section>
-            </main>
-            <div class="fixed-action-surface" aria-label="添加学生操作">
-                <button type="button" class="fixed-action-button cancel" data-action="close-add-student">取消</button>
-                <button type="button" class="fixed-action-button confirm" data-action="submit-add-student">确认添加</button>
-            </div>
         </section>
 
         <section class="app-view" id="detailView" aria-label="学生详情">
@@ -5211,6 +5504,26 @@
         const students = [
             student,
             createStudent({
+                id: 'STU2026240318', name: '林恒', gender: '男', studentNo: '2026240318', phone: '138 6721 3058', phoneRaw: '13867213058',
+                major: '护理', className: '护理 2403 班', registeredGrade: '2026 级', studentStatus: '在读',
+                guardianName: '林海峰', guardianPhone: '139 4268 1035', guardianPhoneRaw: '13942681035', updatedAt: '2026-07-28 09:20',
+                nextAction: '确认本周实训安排，并完成学生状态复核',
+                family: [
+                    { relation: '父亲', name: '林海峰', idNumber: '440306197901163415', education: '大专', job: '设备工程师', phone: '139 4268 1035', phoneRaw: '13942681035', guardian: true },
+                    { relation: '母亲', name: '周岚', idNumber: '440306198206083426', education: '本科', job: '行政主管', phone: '136 5182 9074', phoneRaw: '13651829074', guardian: false }
+                ]
+            }),
+            createStudent({
+                id: 'STU2026240221', name: '郭晶晶', gender: '女', studentNo: '2026240221', phone: '137 9056 2184', phoneRaw: '13790562184',
+                major: '电子商务', className: '电子商务 2402 班', registeredGrade: '2026 级', studentStatus: '在读',
+                guardianName: '郭文华', guardianPhone: '138 2604 7195', guardianPhoneRaw: '13826047195', updatedAt: '2026-07-28 09:18',
+                nextAction: '跟进电商实训作业，并确认家校联系记录',
+                family: [
+                    { relation: '父亲', name: '郭文华', idNumber: '440305197810126518', education: '本科', job: '物流经理', phone: '138 2604 7195', phoneRaw: '13826047195', guardian: true },
+                    { relation: '母亲', name: '蒋敏', idNumber: '440305198104226527', education: '大专', job: '会计', phone: '135 7812 4609', phoneRaw: '13578124609', guardian: false }
+                ]
+            }),
+            createStudent({
                 id: 'STU2026240412', name: '陈柏安', gender: '男', studentNo: '2026240412', phone: '136 2662 6621', phoneRaw: '13626626621',
                 major: '新能源汽车运用与维修', className: '新能源汽车 2404 班', registeredGrade: '2026 级', studentStatus: '新生注册',
                 guardianName: '陈慧玲', guardianPhone: '138 7261 6508', guardianPhoneRaw: '13872616508', updatedAt: '2026-07-08 09:54',
@@ -5458,15 +5771,15 @@
 
         const schoolDirectory = {
             '招生管理': ['招生管理'],
-            '教学管理': ['全校学生', '全校班级', '课表编排', '课堂巡检', '成绩归档', '教师排班'],
+            '教学管理': ['关注学生', '全校班级', '课表编排', '课堂巡检', '成绩归档', '教师排班'],
             '校园服务': ['全校宿舍', '违纪管理', '请假审批', '安全巡检', '家校通知']
         };
         const schoolFeatureAliases = {
-            '招生管理': 'zsgl zhaoshengguanli', '全校学生': 'xsgl xueshengguanli quanxiaoxuesheng student', '全校班级': 'qxbj quanxiaobanji class', '课表编排': 'kbbp kebiao',
+            '招生管理': 'zsgl zhaoshengguanli', '关注学生': 'gzxs guanzhuxuesheng xsgl student', '全校班级': 'qxbj quanxiaobanji class', '课表编排': 'kbbp kebiao',
             '课堂巡检': 'ktxj ketang', '成绩归档': 'cjgd chengji', '教师排班': 'jspb jiaoshi', '全校宿舍': 'qxss quanxiaosushe ssgl sushe',
             '违纪管理': 'wjgl weijiguanli discipline', '请假审批': 'qjsp qingjia', '安全巡检': 'aqxj anquan', '家校通知': 'jxtz jiaxiao'
         };
-        let schoolHighFeatures = ['招生管理', '全校班级'];
+        let schoolHighFeatures = ['招生管理', '全校班级', '关注学生'];
         let schoolHighClasses = [];
         let schoolManageMode = false;
         let schoolFeatureQuery = '';
@@ -5515,6 +5828,8 @@
             dormPickerTransitionDirection: '',
             dormStudentSearch: '',
             schoolDormBuilding: 'all',
+            schoolDormLevel: 'buildings',
+            schoolDormFloor: '',
             schoolDormSearch: '',
             schoolDormExpandedBuildings: [],
             schoolDormExpandedFloors: [],
@@ -5538,7 +5853,7 @@
             attendanceEditContext: null,
             attendanceEditOrigin: 'attendance',
             attendanceEditorEditing: false,
-            homeReturnFeature: '全校学生',
+            homeReturnFeature: '关注学生',
             detailReturnStudentId: null,
             editMode: false,
             draft: null,
@@ -5777,7 +6092,7 @@
                 return `<button type="button" class="home-high-btn class-shortcut${schoolManageMode ? ' manage-mode' : ''}" data-school-class-shortcut="${escapeHtml(classInfo.id)}" aria-label="${escapeHtml(accessibleLabel)}"><span><span class="home-high-class-kicker">班级</span><span class="home-high-class-name">${escapeHtml(getClassDisplayName(classInfo))}</span></span>${pendingCount ? pendingDotMarkup(pendingCount) : ''}</button>`;
             }).join('');
             highFreqGrid.innerHTML = featureEntries + classEntries +
-                `<button type="button" class="home-high-btn config" data-action="open-school-add-menu" aria-label="添加功能入口或具体班级">${plusIcon}</button>`;
+                `<button type="button" class="home-high-btn config" data-action="school-add-function" aria-label="添加高频功能入口">${plusIcon}</button>`;
 
             const renderDirectoryButtons = labels => labels.map(label => {
                     const alreadyAdded = schoolHighFeatures.includes(label);
@@ -5814,7 +6129,7 @@
                 renderSchoolHome();
                 return;
             }
-            if (label === '全校学生') { openStudentList(); return; }
+            if (label === '关注学生') { openStudentList(); return; }
             if (label === '全校班级') { openClassList(); return; }
             if (label === '招生管理') { showToast('招生管理业务内容已移除，入口按原版保留'); return; }
             showToast(`${label}入口已保留`);
@@ -5834,17 +6149,15 @@
         }
 
         function openSchoolAddMenu(trigger) {
-            state.pickerContext = { type: 'school-add-menu', trigger };
-            pickerBody.removeAttribute('role');
-            pickerBody.removeAttribute('aria-label');
-            pickerBody.innerHTML = `<button type="button" class="picker-option" data-action="school-add-function"><span>添加功能入口</span><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></button><button type="button" class="picker-option" data-action="school-add-class"><span>添加具体班级</span><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></button>`;
-            showPicker('添加到学校管理');
+            startSchoolFunctionAdd();
         }
 
         function startSchoolFunctionAdd() {
-            closePicker(false);
+            if (pickerLayer.classList.contains('show')) closePicker(false);
             schoolManageMode = true;
+            homeView.classList.add('feature-add-transition');
             renderSchoolHome();
+            window.setTimeout(() => homeView.classList.remove('feature-add-transition'), 460);
             showToast('请从功能目录中选择要添加的入口');
         }
 
@@ -5932,7 +6245,7 @@
             disciplineDetailView.className = `app-view${nextView === 'discipline-detail' ? ' active' : ''}`;
             disciplineAddView.className = `app-view${nextView === 'discipline-add' ? ' active' : ''}`;
             listView.className = `app-view${nextView === 'list' ? ' active' : (['detail','student-status-detail','attendance','attendance-edit','add'].includes(nextView) && state.studentDetailOrigin !== 'class-detail' ? ' behind' : '')}`;
-            addView.className = `app-view${nextView === 'add' ? ' active' : ''}`;
+            if (addView) addView.className = `app-view${nextView === 'add' ? ' active' : ''}`;
             detailView.className = `app-view${nextView === 'detail' ? ' active' : (['student-status-detail','attendance','attendance-edit'].includes(nextView) ? ' behind' : '')}${state.editMode ? ' is-editing' : ''}`;
             studentStatusDetailView.className = `app-view${nextView === 'student-status-detail' ? ' active' : ''}`;
             attendanceView.className = `app-view${nextView === 'attendance' ? ' active' : (nextView === 'attendance-edit' && state.attendanceEditOrigin === 'attendance' ? ' behind' : '')}`;
@@ -7764,7 +8077,7 @@
         }
 
         function openStudentList() {
-            state.homeReturnFeature = document.activeElement?.dataset?.schoolFeature || '全校学生';
+            state.homeReturnFeature = document.activeElement?.dataset?.schoolFeature || '关注学生';
             state.studentDetailOrigin = 'list';
             state.editMode = false;
             state.draft = null;
@@ -8920,16 +9233,18 @@
 
         function loadFollowedStudentIds() {
             try {
-                const value = JSON.parse(localStorage.getItem('pocket-campus-followed-students') || '[]');
-                return Array.isArray(value) ? value.filter(Boolean) : [];
+                const saved = localStorage.getItem('pocket-campus-followed-students-v749');
+                if (saved === null) return ['STU2026240318'];
+                const value = JSON.parse(saved);
+                return Array.isArray(value) ? value.filter(Boolean) : ['STU2026240318'];
             } catch (error) {
-                return [];
+                return ['STU2026240318'];
             }
         }
 
         function persistFollowedStudentIds() {
             try {
-                localStorage.setItem('pocket-campus-followed-students', JSON.stringify(state.followedStudentIds));
+                localStorage.setItem('pocket-campus-followed-students-v749', JSON.stringify(state.followedStudentIds));
             } catch (error) {
                 /* 本地存储不可用时仍保留当前会话状态。 */
             }
@@ -8980,33 +9295,26 @@
         }
 
         function getFilteredStudents() {
-            if (state.studentDirectoryMode === 'following') {
-                return state.followedStudentIds
-                    .map(id => students.find(item => item.id === id))
-                    .filter(Boolean);
-            }
             const query = state.search.trim();
-            if (!state.studentSearchSubmitted || !query) return students;
-            return students.filter(item => String(item.name || '').trim() === query);
+            if (state.studentSearchSubmitted && query) {
+                return students.filter(item => String(item.name || '').trim() === query);
+            }
+            return state.followedStudentIds
+                .map(id => students.find(item => item.id === id))
+                .filter(Boolean);
         }
 
         function renderStudentList() {
             const result = getFilteredStudents();
-            const followingMode = state.studentDirectoryMode === 'following';
             const exactSearchPanel = document.getElementById('exactSearchPanel');
             const followedStudentCount = document.getElementById('followedStudentCount');
-            if (exactSearchPanel) exactSearchPanel.hidden = followingMode;
+            if (exactSearchPanel) exactSearchPanel.hidden = false;
             if (followedStudentCount) followedStudentCount.textContent = String(state.followedStudentIds.length);
-            listView.querySelectorAll('[data-student-mode]').forEach(button => {
-                const active = button.dataset.studentMode === state.studentDirectoryMode;
-                button.classList.toggle('active', active);
-                button.setAttribute('aria-selected', active ? 'true' : 'false');
-            });
             studentSearchButton.classList.toggle('visible', Boolean(studentSearch.value));
             if (!result.length) {
-                const empty = followingMode
-                    ? { title: '还没有关注学生', icon: '<path d="M20.8 4.8a5.4 5.4 0 0 0-7.7 0L12 5.9l-1.1-1.1a5.4 5.4 0 0 0-7.7 7.7L12 21l8.8-8.5a5.4 5.4 0 0 0 0-7.7Z"></path>' }
-                    : { title: '未找到完全同名学生', icon: '<circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4M8.5 11h5"></path>' };
+                const empty = state.studentSearchSubmitted
+                    ? { title: '未找到完全同名学生', icon: '<circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4M8.5 11h5"></path>' }
+                    : { title: '还没有关注学生', icon: '<path d="M20.8 4.8a5.4 5.4 0 0 0-7.7 0L12 5.9l-1.1-1.1a5.4 5.4 0 0 0-7.7 7.7L12 21l8.8-8.5a5.4 5.4 0 0 0 0-7.7Z"></path>' };
                 studentList.innerHTML = `<div class="privacy-empty"><span class="privacy-empty-icon"><svg aria-hidden="true" viewBox="0 0 24 24">${empty.icon}</svg></span><strong>${empty.title}</strong></div>`;
                 return;
             }
@@ -9023,11 +9331,11 @@
         }
 
         function openStudentList() {
-            state.homeReturnFeature = document.activeElement?.dataset?.schoolFeature || '全校学生';
+            state.homeReturnFeature = document.activeElement?.dataset?.schoolFeature || '关注学生';
             state.studentDetailOrigin = 'list';
             state.editMode = false;
             state.draft = null;
-            state.studentDirectoryMode = 'all';
+            state.studentDirectoryMode = 'following';
             state.studentSearchSubmitted = false;
             state.search = '';
             studentSearch.value = '';
@@ -9062,6 +9370,11 @@
             return schoolClasses.filter(item => !query || [item.name, item.teacher, item.major, item.code].some(value => String(value).toLowerCase().includes(query)));
         }
 
+        function getCompactClassName(value, maxLength = 9) {
+            const characters = Array.from(String(value || ''));
+            return characters.length > maxLength ? `${characters.slice(0, maxLength).join('')}…` : characters.join('');
+        }
+
         function renderClassDirectory() {
             const result = getFilteredClasses();
             renderClassSchoolSummary(result);
@@ -9074,7 +9387,7 @@
                 const pending = getClassPendingCounts(item).total;
                 return `<button type="button" class="class-row${pending ? ' has-pending' : ''}" data-class-id="${escapeHtml(item.id)}" aria-label="第${index + 1}个班级，${escapeHtml(getClassDisplayName(item))}，班主任${escapeHtml(item.teacher)}，总人数${item.total}人，男生${item.male}人，女生${item.female}人${pending ? `，有${pending}项待处理` : ''}">
                     <span class="class-index" aria-hidden="true">${String(index + 1).padStart(2,'0')}</span>
-                    <span class="class-table-class"><strong>${escapeHtml(getClassDisplayName(item))}</strong><small>${escapeHtml(item.teacher)}</small></span>
+                    <span class="class-table-class"><span class="class-table-name-line" title="${escapeHtml(getClassDisplayName(item))}"><strong class="class-name-short">${escapeHtml(getCompactClassName(getClassDisplayName(item)))}</strong><strong class="class-teacher-full">（${escapeHtml(item.teacher)}）</strong></span></span>
                     <span class="class-table-count total">${item.total}</span>
                     <span class="class-table-count male">${item.male}</span>
                     <span class="class-table-count female">${item.female}</span>
@@ -9263,8 +9576,8 @@
                 const isHandled = handled.has(item.id) && rollcallStatuses.includes(statusMap[item.id]);
                 const status = isHandled ? statusMap[item.id] : '';
                 const sequence = sequenceById.get(item.id) || 0;
-                return `<article class="live-status-card status-${studentStatusTone(status)}${isHandled ? ' is-handled' : ''}" data-live-status-id="${escapeHtml(item.id)}">
-                    <div class="live-status-card-head"><span class="live-status-student"><span class="student-avatar ${item.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(item)}</span><span class="live-status-copy"><strong>${String(sequence).padStart(2,'0')} · ${escapeHtml(item.name)}</strong></span></span><span class="handled-chip${isHandled ? ' done' : ''}">${isHandled ? '已处理' : '未处理'}</span></div>
+                return `<article class="live-status-card status-${studentStatusTone(status)}${isHandled ? ' is-handled' : ''}" data-live-status-id="${escapeHtml(item.id)}" aria-label="${String(sequence).padStart(2,'0')}号${escapeHtml(item.name)}，${isHandled ? `当前${escapeHtml(status)}` : '状态未处理'}">
+                    <div class="live-status-card-head"><strong class="compact-status-name">${String(sequence).padStart(2,'0')} · ${escapeHtml(item.name)}</strong><span class="compact-status-dot" aria-hidden="true"></span></div>
                     <div class="live-status-actions" aria-label="设置${escapeHtml(item.name)}当前状态">${rollcallStatuses.map(option => `<button type="button" class="live-status-action ${studentStatusTone(option)}${isHandled && status === option ? ' active' : ''}" data-workflow="rollcall" data-workflow-id="${escapeHtml(item.id)}" data-workflow-value="${option}" aria-pressed="${isHandled && status === option ? 'true' : 'false'}"><span>${option}</span></button>`).join('')}</div>
                 </article>`;
             }).join('');
@@ -9415,65 +9728,94 @@
             return `${room?.building || '其他楼栋'}::${getDormFloorNumber(room) || '其他'}`;
         }
 
+        function updateSchoolDormNavigation() {
+            if (state.classModule !== 'school-dorm') return;
+            const level = state.schoolDormLevel || 'buildings';
+            if (level === 'floors') classModuleTitle.textContent = `${state.schoolDormBuilding || '宿舍楼'} · 选择楼层`;
+            else if (level === 'rooms') classModuleTitle.textContent = `${state.schoolDormBuilding || '宿舍楼'} · ${state.schoolDormFloor === '其他' ? '其他楼层' : `${state.schoolDormFloor}层`}`;
+            else classModuleTitle.textContent = '全校宿舍';
+            const backLabel = level === 'rooms'
+                ? '返回楼层选择'
+                : (level === 'floors' ? '返回楼栋选择' : '返回学校管理');
+            classModuleBackButton.setAttribute('aria-label', backLabel);
+        }
+
         function renderSchoolDormModule() {
             ensureDormMasterRecords();
             const allRooms = getAllDormRooms();
-            const buildings = [...new Set(allRooms.map(room => room.building).filter(Boolean))];
-            const keyword = state.schoolDormSearch.trim().toLowerCase();
-            const rooms = allRooms.filter(room => {
-                const matchesBuilding = state.schoolDormBuilding === 'all' || room.building === state.schoolDormBuilding;
-                const matchesSearch = !keyword || [room.building, room.roomNo, room.name, ...room.beds.map(bed => bed.studentName)].some(value => String(value || '').toLowerCase().includes(keyword));
-                return matchesBuilding && matchesSearch;
-            });
-            const selectedRoom = rooms.find(room => room.id === state.dormRoomId) || rooms[0] || (!keyword ? allRooms[0] : null);
-            state.dormRoomId = selectedRoom?.id || '';
             const totalBeds = allRooms.reduce((sum, room) => sum + room.beds.length, 0);
             const occupied = allRooms.reduce((sum, room) => sum + room.beds.filter(bed => bed.occupied).length, 0);
-            const expandedBuildings = new Set(state.schoolDormExpandedBuildings || []);
-            const expandedFloors = new Set(state.schoolDormExpandedFloors || []);
-            if (keyword) rooms.forEach(room => {
-                expandedBuildings.add(room.building || '其他楼栋');
-                expandedFloors.add(getDormFloorKey(room));
-            });
-            state.schoolDormExpandedBuildings = [...expandedBuildings];
-            state.schoolDormExpandedFloors = [...expandedFloors];
-            const buildingGroups = [...rooms.reduce((map, room) => {
+            const buildingGroups = [...allRooms.reduce((map, room) => {
                 const building = room.building || '其他楼栋';
                 if (!map.has(building)) map.set(building, []);
                 map.get(building).push(room);
                 return map;
             }, new Map()).entries()].sort((left, right) => left[0].localeCompare(right[0], 'zh-CN', { numeric: true }));
-            const directoryMarkup = buildingGroups.length ? buildingGroups.map(([building, buildingRooms]) => {
-                const buildingBeds = buildingRooms.reduce((sum, room) => sum + room.beds.length, 0);
-                const buildingOccupied = buildingRooms.reduce((sum, room) => sum + room.beds.filter(bed => bed.occupied).length, 0);
-                const buildingExpanded = expandedBuildings.has(building);
-                const floorGroups = [...buildingRooms.reduce((map, room) => {
-                    const floorNumber = getDormFloorNumber(room) || '其他';
-                    if (!map.has(floorNumber)) map.set(floorNumber, []);
-                    map.get(floorNumber).push(room);
-                    return map;
-                }, new Map()).entries()].sort((left, right) => String(left[0]).localeCompare(String(right[0]), 'zh-CN', { numeric: true }));
-                return `<section class="school-dorm-building${buildingExpanded ? ' expanded' : ''}" aria-label="${escapeHtml(building)}宿舍楼层">
-                    <button type="button" class="school-dorm-building-head" data-action="toggle-school-dorm-building-panel" data-building-panel="${escapeHtml(building)}" aria-expanded="${buildingExpanded ? 'true' : 'false'}"><span class="school-dorm-building-title"><strong>${escapeHtml(building)}</strong><small>${buildingRooms.length} 间 · ${buildingBeds} 个床位</small></span><span class="school-dorm-building-toggle">已住 ${buildingOccupied}/${buildingBeds}<svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button>
-                    <div class="school-dorm-floor-list"${buildingExpanded ? '' : ' hidden'}>${floorGroups.map(([floorNumber, floorRooms]) => {
-                        const floorKey = `${building}::${floorNumber}`;
-                        const expanded = expandedFloors.has(floorKey);
-                        const floorBeds = floorRooms.reduce((sum, room) => sum + room.beds.length, 0);
-                        const floorOccupied = floorRooms.reduce((sum, room) => sum + room.beds.filter(bed => bed.occupied).length, 0);
-                        return `<section class="school-dorm-floor${expanded ? ' expanded' : ''}">
-                            <button type="button" class="school-dorm-floor-trigger" data-action="toggle-school-dorm-floor" data-floor-key="${escapeHtml(floorKey)}" aria-expanded="${expanded ? 'true' : 'false'}">
-                                <span class="school-dorm-floor-title"><strong>${escapeHtml(floorNumber === '其他' ? '其他楼层' : `${floorNumber}层`)}</strong><small>${floorRooms.length} 间宿舍</small></span>
-                                <span class="school-dorm-floor-summary">已住 ${floorOccupied}/${floorBeds}<svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
-                            </button>
-                            <div class="school-dorm-floor-rooms"${expanded ? '' : ' hidden'}>${floorRooms.sort((left, right) => String(left.roomNo).localeCompare(String(right.roomNo), 'zh-CN', { numeric: true })).map(room => `<button type="button" class="school-room-card${room.id === state.dormRoomId ? ' active' : ''}" data-action="select-dorm-overview-room" data-room-id="${escapeHtml(room.id)}" aria-pressed="${room.id === state.dormRoomId ? 'true' : 'false'}"><strong>${escapeHtml(room.roomNo)}室</strong><span>已住 ${room.beds.filter(bed => bed.occupied).length}/${room.beds.length}</span></button>`).join('')}</div>
-                        </section>`;
-                    }).join('')}</div>
-                </section>`;
-            }).join('') : '<div class="todo-empty">没有匹配的宿舍</div>';
-            return `<div class="school-dorm-overview"><div class="school-dorm-stat"><strong>${allRooms.length}</strong><span>宿舍</span></div><div class="school-dorm-stat"><strong>${occupied}</strong><span>已住床位</span></div><div class="school-dorm-stat"><strong>${totalBeds - occupied}</strong><span>空余床位</span></div></div>
-                <section class="school-dorm-toolbar"><div class="school-dorm-search"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="schoolDormSearch" type="search" value="${escapeHtml(state.schoolDormSearch)}" placeholder="搜索楼栋 / 宿舍号 / 学生姓名" autocomplete="off"></div><div class="school-building-row"><button type="button" class="school-building-chip${state.schoolDormBuilding === 'all' ? ' active' : ''}" data-action="set-school-dorm-building" data-building="all">全部楼栋</button>${buildings.map(building => `<button type="button" class="school-building-chip${state.schoolDormBuilding === building ? ' active' : ''}" data-action="set-school-dorm-building" data-building="${escapeHtml(building)}">${escapeHtml(building)}</button>`).join('')}</div></section>
-                <div class="school-dorm-directory">${directoryMarkup}</div>
-                <div class="dorm-room-preview">${renderDormPlan(selectedRoom)}</div>`;
+
+            const overview = `<div class="school-dorm-overview"><div class="school-dorm-stat"><strong>${allRooms.length}</strong><span>宿舍</span></div><div class="school-dorm-stat"><strong>${occupied}</strong><span>已住床位</span></div><div class="school-dorm-stat"><strong>${totalBeds - occupied}</strong><span>空余床位</span></div></div>`;
+            const buildingIcon = '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"></path><path d="M16 9h2a2 2 0 0 1 2 2v10M8 7h4M8 11h4M8 15h4M3 21h18"></path></svg>';
+            const floorIcon = '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 19h5v-4h5v-4h6"></path><path d="M4 5h16v14H4z"></path></svg>';
+            const arrow = '<svg class="school-dorm-level-arrow" aria-hidden="true" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>';
+            const level = ['buildings','floors','rooms'].includes(state.schoolDormLevel) ? state.schoolDormLevel : 'buildings';
+            state.schoolDormLevel = level;
+
+            if (level === 'buildings') {
+                const cards = buildingGroups.map(([building, buildingRooms]) => {
+                    const beds = buildingRooms.reduce((sum, room) => sum + room.beds.length, 0);
+                    const used = buildingRooms.reduce((sum, room) => sum + room.beds.filter(bed => bed.occupied).length, 0);
+                    const floors = new Set(buildingRooms.map(getDormFloorNumber).filter(Boolean));
+                    return `<button type="button" class="school-dorm-level-card" data-action="open-school-dorm-building" data-school-dorm-building="${escapeHtml(building)}" aria-label="${escapeHtml(building)}，${floors.size}个楼层，${buildingRooms.length}间宿舍，已住${used}/${beds}">
+                        <span class="school-dorm-level-icon">${buildingIcon}</span>
+                        <span class="school-dorm-level-copy"><strong>${escapeHtml(building)}</strong><small>${floors.size} 个楼层 · ${buildingRooms.length} 间宿舍</small></span>
+                        <span class="school-dorm-level-side">已住 ${used}/${beds}${arrow}</span>
+                    </button>`;
+                }).join('');
+                return `<div class="school-dorm-level level-buildings">${overview}<div class="school-dorm-level-head"><span><span>第 1 级</span><strong>选择楼栋</strong></span><small>共 ${buildingGroups.length} 栋</small></div><div class="school-dorm-level-list">${cards}</div></div>`;
+            }
+
+            const selectedBuildingGroup = buildingGroups.find(([building]) => building === state.schoolDormBuilding);
+            if (!selectedBuildingGroup) {
+                state.schoolDormLevel = 'buildings';
+                state.schoolDormBuilding = 'all';
+                state.schoolDormFloor = '';
+                return renderSchoolDormModule();
+            }
+            const buildingRooms = selectedBuildingGroup[1];
+            const floorGroups = [...buildingRooms.reduce((map, room) => {
+                const floorNumber = getDormFloorNumber(room) || '其他';
+                if (!map.has(floorNumber)) map.set(floorNumber, []);
+                map.get(floorNumber).push(room);
+                return map;
+            }, new Map()).entries()].sort((left, right) => String(left[0]).localeCompare(String(right[0]), 'zh-CN', { numeric: true }));
+
+            if (level === 'floors') {
+                const cards = floorGroups.map(([floorNumber, floorRooms]) => {
+                    const beds = floorRooms.reduce((sum, room) => sum + room.beds.length, 0);
+                    const used = floorRooms.reduce((sum, room) => sum + room.beds.filter(bed => bed.occupied).length, 0);
+                    const floorLabel = floorNumber === '其他' ? '其他楼层' : `${floorNumber}层`;
+                    return `<button type="button" class="school-dorm-level-card" data-action="open-school-dorm-floor" data-school-dorm-floor="${escapeHtml(floorNumber)}" aria-label="${escapeHtml(state.schoolDormBuilding)}${escapeHtml(floorLabel)}，${floorRooms.length}间宿舍，已住${used}/${beds}">
+                        <span class="school-dorm-level-icon">${floorIcon}</span>
+                        <span class="school-dorm-level-copy"><strong>${escapeHtml(floorLabel)}</strong><small>${floorRooms.length} 间宿舍 · ${beds} 个床位</small></span>
+                        <span class="school-dorm-level-side">已住 ${used}/${beds}${arrow}</span>
+                    </button>`;
+                }).join('');
+                return `<div class="school-dorm-level level-floors"><div class="school-dorm-level-head"><span><span>第 2 级 · ${escapeHtml(state.schoolDormBuilding)}</span><strong>选择楼层</strong></span><small>共 ${floorGroups.length} 层</small></div><div class="school-dorm-level-list">${cards}</div></div>`;
+            }
+
+            const selectedFloorGroup = floorGroups.find(([floorNumber]) => String(floorNumber) === String(state.schoolDormFloor));
+            if (!selectedFloorGroup) {
+                state.schoolDormLevel = 'floors';
+                state.schoolDormFloor = '';
+                return renderSchoolDormModule();
+            }
+            const floorRooms = [...selectedFloorGroup[1]].sort((left, right) => String(left.roomNo).localeCompare(String(right.roomNo), 'zh-CN', { numeric: true }));
+            const selectedRoom = floorRooms.find(room => room.id === state.dormRoomId) || floorRooms[0];
+            state.dormRoomId = selectedRoom?.id || '';
+            const roomCards = floorRooms.map(room => {
+                const used = room.beds.filter(bed => bed.occupied).length;
+                return `<button type="button" class="school-room-card${room.id === state.dormRoomId ? ' active' : ''}" data-action="select-dorm-overview-room" data-room-id="${escapeHtml(room.id)}" aria-pressed="${room.id === state.dormRoomId ? 'true' : 'false'}"><strong>${escapeHtml(room.roomNo)}室</strong><span>已住 ${used}/${room.beds.length}</span></button>`;
+            }).join('');
+            return `<div class="school-dorm-level level-rooms"><div class="school-dorm-level-head"><span><span>第 3 级 · ${escapeHtml(state.schoolDormBuilding)}</span><strong>选择具体房间</strong></span><small>${state.schoolDormFloor === '其他' ? '其他楼层' : `${escapeHtml(state.schoolDormFloor)} 层`} · ${floorRooms.length} 间</small></div><div class="school-dorm-room-grid">${roomCards}</div><div class="school-dorm-room-preview">${renderDormPlan(selectedRoom)}</div></div>`;
         }
 
         function renderDisciplineSetupModule() {
@@ -9536,6 +9878,7 @@
             if (state.classModule === 'checkin-home') classModuleRoot.innerHTML = renderCheckinModule('home');
             if (state.classModule === 'school-dorm') classModuleRoot.innerHTML = renderSchoolDormModule();
             if (state.classModule === 'discipline-setup') classModuleRoot.innerHTML = renderDisciplineSetupModule();
+            if (state.classModule === 'school-dorm') updateSchoolDormNavigation();
             if (state.classModule === 'logs') updateLogRosterSearchResults();
             const discipline = state.classModuleOrigin === 'class' && state.classModule === 'discipline';
             classModuleFloatingAction.hidden = !discipline;
@@ -9583,6 +9926,8 @@
             state.classModule = module;
             if (module === 'school-dorm') {
                 state.schoolDormBuilding = 'all';
+                state.schoolDormLevel = 'buildings';
+                state.schoolDormFloor = '';
                 state.schoolDormSearch = '';
                 state.schoolDormExpandedBuildings = [];
                 state.schoolDormExpandedFloors = [];
@@ -9691,7 +10036,7 @@
                 renderSchoolHome();
                 return;
             }
-            if (label === '全校学生') { openStudentList(); return; }
+            if (label === '关注学生') { openStudentList(); return; }
             if (label === '全校班级') { openClassList(); return; }
             if (label === '全校宿舍') { openSchoolModule('school-dorm'); return; }
             if (label === '违纪管理') { openSchoolModule('discipline-setup'); return; }
@@ -9717,9 +10062,6 @@
             if (action === 'toggle-follow-student') toggleFollowedStudent(button.dataset.followId);
             if (action === 'call-student') openCallSheet(button);
             if (action === 'call-guardian') openParentPicker(button);
-            if (action === 'add-student') openAddStudentDialog();
-            if (action === 'close-add-student') closeAddStudentPage();
-            if (action === 'submit-add-student') addStudentFromDialog();
             if (action === 'copy') copyPhoneNumber(button.dataset.copy);
             if (action === 'add-health') addHealthDialog();
             if (action === 'add-grade') addGradeDialog();
@@ -9727,7 +10069,7 @@
             if (action === 'toggle-account') toggleAccount();
             if (action === 'cancel-edit') cancelEdit();
             if (action === 'save-edit') confirmSave();
-            if (action === 'placeholder') showToast('该功能入口已保留，本版聚焦全校学生');
+            if (action === 'placeholder') showToast('该功能入口已保留，本版聚焦关注学生');
             if (action === 'bottom-placeholder') showToast('该底部导航按原版保留');
             if (action === 'open-school-add-menu') openSchoolAddMenu(button);
             if (action === 'school-add-function') startSchoolFunctionAdd();
@@ -9846,6 +10188,25 @@
                     renderClassModule();
                     showToast(task.checkedIds.includes(studentId) ? '已完成点到' : '已撤销点到');
                 }
+            }
+            if (action === 'open-school-dorm-building') {
+                state.schoolDormBuilding = button.dataset.schoolDormBuilding || 'all';
+                state.schoolDormFloor = '';
+                state.schoolDormLevel = 'floors';
+                renderClassModule();
+                classModuleScroll.scrollTop = 0;
+                requestAnimationFrame(() => classModuleRoot.querySelector('[data-action="open-school-dorm-floor"]')?.focus({ preventScroll: true }));
+            }
+            if (action === 'open-school-dorm-floor') {
+                state.schoolDormFloor = button.dataset.schoolDormFloor || '';
+                state.schoolDormLevel = 'rooms';
+                const firstRoom = getAllDormRooms()
+                    .filter(room => room.building === state.schoolDormBuilding && String(getDormFloorNumber(room) || '其他') === String(state.schoolDormFloor))
+                    .sort((left, right) => String(left.roomNo).localeCompare(String(right.roomNo), 'zh-CN', { numeric: true }))[0];
+                state.dormRoomId = firstRoom?.id || '';
+                renderClassModule();
+                classModuleScroll.scrollTop = 0;
+                requestAnimationFrame(() => classModuleRoot.querySelector('[data-action="select-dorm-overview-room"]')?.focus({ preventScroll: true }));
             }
             if (action === 'set-school-dorm-building') {
                 state.schoolDormBuilding = button.dataset.building || 'all';
@@ -10056,6 +10417,21 @@
         });
 
         classModuleBackButton.addEventListener('click', () => {
+            if (state.classModuleOrigin === 'school' && state.classModule === 'school-dorm' && state.schoolDormLevel !== 'buildings') {
+                state.schoolDormLevel = state.schoolDormLevel === 'rooms' ? 'floors' : 'buildings';
+                if (state.schoolDormLevel === 'buildings') {
+                    state.schoolDormBuilding = 'all';
+                    state.schoolDormFloor = '';
+                } else {
+                    state.schoolDormFloor = '';
+                }
+                renderClassModule();
+                classModuleScroll.scrollTop = 0;
+                focusAfterViewChange(() => state.schoolDormLevel === 'buildings'
+                    ? classModuleRoot.querySelector('[data-action="open-school-dorm-building"]')
+                    : classModuleRoot.querySelector('[data-action="open-school-dorm-floor"]'));
+                return;
+            }
             if (state.classModuleOrigin === 'school') {
                 const returnModule = state.classModule;
                 renderSchoolHome();
@@ -10123,7 +10499,15 @@
             renderStudentList();
         });
 
-        document.getElementById('device').addEventListener('click', event => {
+        const appDevice = document.getElementById('device');
+        function resetDeviceHorizontalOffset() {
+            if (appDevice.scrollLeft !== 0) appDevice.scrollLeft = 0;
+        }
+        appDevice.addEventListener('scroll', resetDeviceHorizontalOffset, { passive: true });
+        appDevice.addEventListener('focusin', () => requestAnimationFrame(resetDeviceHorizontalOffset));
+        appDevice.addEventListener('click', event => {
+            resetDeviceHorizontalOffset();
+            requestAnimationFrame(resetDeviceHorizontalOffset);
             const schoolTab = event.target.closest('[data-school-tab]');
             if (schoolTab) { switchSchoolTab(schoolTab.dataset.schoolTab, schoolTab); return; }
             const classTab = event.target.closest('[data-class-tab]');
@@ -10159,7 +10543,7 @@
             if (button) handleAction(button);
         });
 
-        document.getElementById('device').addEventListener('keydown', event => {
+        appDevice.addEventListener('keydown', event => {
             const leaveCard = event.target.closest('.leave-card[data-action="open-leave-detail"]');
             const logCard = event.target.closest('.log-card[data-action="open-log-detail"]');
             const card = leaveCard || logCard;
@@ -10358,7 +10742,7 @@
         else if (previewRoute === 'student-following') { openStudentList(); setStudentDirectoryMode('following'); }
         else if (previewRoute === 'school-dorm') openSchoolModule('school-dorm');
         else if (previewRoute === 'discipline-setup') openSchoolModule('discipline-setup');
-        else if (previewRoute === 'add-student') { openStudentList(); openAddStudentDialog(); }
+        else if (previewRoute === 'add-student') openStudentList();
         else if (previewRoute === 'student-detail') { openStudentList(); openStudentDetail(students[0].id); }
         else if (previewRoute === 'student-status') { openStudentList(); openStudentDetail(students[0].id); openStudentStatusDetail(); }
         else if (previewRoute === 'student-materials') { openStudentList(); openStudentDetail(students[0].id); switchTab('materials'); }
