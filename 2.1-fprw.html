@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#EFF6FF">
-    <title>掌上校园 · 学校管理宿舍关注学生与状态密度优化 7.49</title>
+    <title>掌上校园 · 首页去图标与入口层级优化 7.53</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -5035,6 +5035,1605 @@
         .student-status-scroll .live-status-action.active { gap: 0; }
 
         .qa-static .app-view { transition: none !important; }
+
+        /* 7.50：入口轻量分组，列表与详情统一为渐变顶部和连续白色内容面。 */
+        :root {
+            --content-surface: #FFFFFF;
+            --content-soft: #F5F8FD;
+            --content-soft-strong: #EEF3FA;
+            --content-line: rgba(15,23,42,.075);
+        }
+
+        body {
+            background: linear-gradient(135deg, #EFF6FF 0%, #DFE7FF 100%);
+        }
+        .device {
+            width: 375px;
+            height: 812px;
+            overflow: hidden;
+            overflow-x: clip;
+            background: linear-gradient(135deg, #EFF6FF 0%, #DFE7FF 100%);
+        }
+        .app-view:not(#homeView) {
+            background: linear-gradient(135deg, #EFF6FF 0%, #DFE7FF 100%);
+        }
+        .app-view:not(#homeView)::before {
+            content: "";
+            position: absolute;
+            z-index: 0;
+            inset: 150px 0 0;
+            border-radius: 28px 28px 0 0;
+            background: var(--content-surface);
+            box-shadow: 0 -1px 0 rgba(255,255,255,.94);
+            pointer-events: none;
+        }
+        .topbar {
+            z-index: 50;
+            background: linear-gradient(180deg, rgba(239,246,255,.98), rgba(239,246,255,.78));
+            box-shadow: none;
+        }
+        .nav-button {
+            width: 44px;
+            height: 44px;
+            border: 1px solid rgba(100,116,139,.08);
+            color: #26344A;
+            background: rgba(245,248,253,.78);
+            box-shadow: none;
+        }
+        .nav-action {
+            min-width: 52px;
+            min-height: 38px;
+            border: 1px solid rgba(31,95,255,.10);
+            background: rgba(31,95,255,.075);
+        }
+        .scroll-area,
+        .list-scroll,
+        .class-list-scroll,
+        .class-detail-scroll,
+        .class-module-scroll,
+        .leave-detail-scroll,
+        .log-detail-scroll,
+        .workflow-page-scroll,
+        .student-status-detail-scroll,
+        .attendance-scroll,
+        .attendance-edit-scroll {
+            z-index: 1;
+            background: transparent;
+        }
+
+        /* 入口页：去除整组套框，功能按钮改为低反差灰蓝白。 */
+        .school-home-view .main-content {
+            padding-inline: 20px;
+        }
+        .school-home-view .school-search-sticky {
+            margin-bottom: 4px;
+            padding-bottom: 10px;
+            box-shadow: none;
+        }
+        .school-home-view .search-input-pill {
+            min-height: 44px;
+            border-color: rgba(100,116,139,.09);
+            color: var(--ink);
+            background: rgba(245,248,253,.82);
+            box-shadow: none;
+        }
+        .school-home-view .search-input-pill:focus {
+            border-color: rgba(31,95,255,.24);
+            background: rgba(248,250,252,.96);
+            box-shadow: 0 0 0 3px rgba(31,95,255,.07);
+        }
+        .school-home-view .section-header {
+            min-height: 44px;
+            margin-top: 8px;
+            padding: 0;
+            border-bottom: 1px solid rgba(100,116,139,.13);
+        }
+        .school-home-view .section-title {
+            font-size: 16px;
+            font-weight: 850;
+            letter-spacing: .02em;
+        }
+        .school-home-view .manage-btn {
+            min-width: 48px;
+            min-height: 44px;
+            margin-right: -8px;
+            padding: 0 8px;
+        }
+        .school-home-view .home-high-card,
+        .school-home-view .home-directory-card {
+            margin-bottom: 8px !important;
+            padding: 10px 0 2px !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+        .school-home-view .home-high-grid,
+        .school-home-view .admission-entry-grid {
+            gap: 8px 6px;
+        }
+        .school-home-view .home-high-btn,
+        .school-home-view .admission-entry-btn {
+            min-height: 52px;
+            padding: 9px 3px;
+            border: 1px solid rgba(100,116,139,.085);
+            border-radius: 13px;
+            color: #26344A;
+            background: rgba(245,248,253,.80);
+            box-shadow: none;
+        }
+        .school-home-view .home-high-btn.class-shortcut,
+        .school-home-view .home-high-btn.config {
+            color: #1747C8;
+            border-color: rgba(31,95,255,.13);
+            background: rgba(238,243,250,.88);
+        }
+        .school-home-view .home-high-btn:active,
+        .school-home-view .admission-entry-btn:active {
+            transform: scale(.95);
+            color: var(--brand);
+            background: rgba(231,238,249,.96);
+            border-color: rgba(31,95,255,.14);
+        }
+        .school-home-view .admission-entry-group-title {
+            min-height: 38px;
+            padding: 10px 0 2px;
+            color: #52627A;
+        }
+        .school-home-view .admission-entry-group-title::after {
+            background: linear-gradient(90deg, rgba(100,116,139,.18), rgba(100,116,139,0));
+        }
+
+        /* 顶部统计和搜索保留轻卡片，但降低对比、边框和阴影。 */
+        .class-list-tools,
+        .exact-search-panel,
+        .followed-student-summary,
+        .attendance-tools,
+        .status-toolbar,
+        .leave-toolbar {
+            border-color: rgba(100,116,139,.08);
+            background: rgba(244,247,252,.88);
+            box-shadow: none;
+        }
+        .class-search input,
+        .student-search input,
+        .rollcall-search input,
+        .leave-search input,
+        .roster-search input,
+        .school-home-view .search-input-pill {
+            border-color: rgba(100,116,139,.10);
+            background: rgba(248,250,252,.90);
+            box-shadow: none;
+        }
+        .class-list-tools,
+        .privacy-student-scroll .exact-search-panel {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .exact-search-panel {
+            border-radius: 16px;
+        }
+        .followed-student-summary {
+            min-height: 44px;
+            border-radius: 13px;
+        }
+        .class-summary-card,
+        .school-dorm-overview,
+        .module-hero,
+        .class-dashboard,
+        .status-manager-hero,
+        .student-live-summary,
+        .student-status-profile,
+        .hero,
+        .log-detail-hero,
+        .leave-detail-hero,
+        .discipline-foundation-hero,
+        .attendance-dashboard,
+        .attendance-edit-summary,
+        .todo-page-summary,
+        .rollcall-session-card,
+        .rollcall-record-summary,
+        .discipline-detail-hero,
+        .checkin-source-card {
+            border-color: rgba(255,255,255,.80);
+            background: linear-gradient(145deg, rgba(247,250,255,.86), rgba(231,238,249,.78));
+            box-shadow: 0 7px 20px rgba(31,95,255,.035);
+        }
+        .module-stat,
+        .class-dashboard-rank,
+        .class-dashboard-focus,
+        .hero-fact,
+        .metric-card,
+        .status-manager-metric,
+        .school-dorm-stat {
+            border-color: rgba(100,116,139,.07);
+            background: rgba(248,250,252,.72);
+            box-shadow: none;
+        }
+
+        /* 列表统一为连续白色内容面上的行与分割线。 */
+        .student-list,
+        .module-list,
+        .todo-page-list,
+        .attendance-history-list,
+        .student-log-history-list,
+        .discipline-item-list,
+        .discipline-rule-list,
+        .rollcall-history-list,
+        .discipline-list,
+        .checkin-task-list {
+            gap: 0;
+        }
+        .student-result-card,
+        .class-table .class-row,
+        .class-student-row,
+        .module-card,
+        .reminder-item,
+        .attendance-history-card,
+        .student-log-history-card,
+        .discipline-item-card,
+        .discipline-rule-card,
+        .dorm-unassigned-card,
+        .rollcall-history-card,
+        .discipline-card,
+        .checkin-task-card {
+            border: 0;
+            border-bottom: 1px solid var(--content-line);
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+        .student-result-card {
+            grid-template-columns: minmax(0,1fr) 78px;
+            gap: 8px;
+            padding: 10px 0;
+        }
+        .student-result-main {
+            min-height: 58px;
+            padding: 4px 2px;
+        }
+        .student-follow-button {
+            min-height: 44px;
+            align-self: center;
+            border-radius: 12px;
+            background: rgba(31,95,255,.07);
+        }
+        .class-directory {
+            overflow: visible;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+        .class-table-head {
+            border-bottom: 1px solid rgba(15,23,42,.09);
+            background: rgba(245,248,253,.78);
+        }
+        .class-table .class-row {
+            min-height: 56px;
+        }
+        .class-table .class-row:active,
+        .student-result-card:active,
+        .class-student-row:active,
+        .module-card:active,
+        .student-log-history-card:active {
+            transform: scale(.98);
+            background: #F4F7FC;
+        }
+        .class-student-list {
+            grid-template-columns: minmax(0,1fr);
+            gap: 0;
+        }
+        .class-student-row {
+            min-height: 60px;
+            grid-template-columns: 40px minmax(0,1fr) auto;
+            grid-template-rows: minmax(0,1fr);
+            align-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 2px;
+        }
+        .class-student-row .student-avatar {
+            grid-row: auto;
+            width: 40px;
+            height: 40px;
+        }
+        .class-student-row .class-student-copy {
+            align-self: center;
+        }
+        .class-student-live-state {
+            justify-self: end;
+        }
+        .module-card {
+            padding: 15px 2px;
+        }
+        .rollcall-history-card,
+        .discipline-card,
+        .checkin-task-card {
+            min-height: 60px;
+            padding: 12px 2px;
+        }
+        .module-list .module-card:last-child,
+        .student-list .student-result-card:last-child,
+        .class-student-list .class-student-row:last-of-type,
+        .attendance-history-list .attendance-history-card:last-child,
+        .rollcall-history-list .rollcall-history-card:last-child,
+        .discipline-list .discipline-card:last-child,
+        .checkin-task-list .checkin-task-card:last-child {
+            border-bottom: 0;
+        }
+
+        /* 详情字段、联系人和普通信息不再各自成卡。 */
+        .panel-stack,
+        .class-profile-stack,
+        .leave-detail-page,
+        .log-detail-page,
+        .student-status-detail-stack {
+            gap: 0;
+        }
+        .panel-stack .section-card,
+        .class-info-card,
+        .contact-list,
+        .account-summary,
+        .log-page-section,
+        .leave-detail-section,
+        .student-status-panel,
+        .discipline-form-card,
+        .page-form-card,
+        .discipline-detail-section,
+        .rollcall-record-roster,
+        .log-student-section {
+            overflow: visible;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+        .panel-stack .section-card + .section-card,
+        .log-page-section,
+        .leave-detail-section,
+        .student-status-panel + .student-status-panel,
+        .discipline-form-card + .discipline-form-card,
+        .page-form-card + .page-form-card,
+        .discipline-detail-section {
+            border-top: 1px solid var(--content-line);
+        }
+        .section-head,
+        .class-info-card-head {
+            padding: 18px 0 10px;
+            background: transparent;
+        }
+        .info-list {
+            padding: 0 0 4px;
+        }
+        .info-row {
+            min-height: 50px;
+            padding: 11px 0;
+        }
+        .class-info-card {
+            padding-inline: 0;
+        }
+        .class-info-card-head {
+            padding-inline: 0;
+        }
+        .class-info-row,
+        .class-info-compact {
+            padding-inline: 0;
+        }
+        .contact-list {
+            margin: 0;
+        }
+        .contact-row {
+            min-height: 60px;
+            padding: 10px 0;
+        }
+        .contact-call {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+        }
+        .class-profile-stack .class-section-head {
+            min-height: 44px;
+            margin: 12px 0 0;
+            padding-top: 4px;
+            border-bottom: 1px solid var(--content-line);
+        }
+        .account-summary {
+            margin: 0;
+        }
+        .account-summary-head {
+            padding: 18px 0 6px;
+        }
+        .subcard-list,
+        .material-list {
+            gap: 0;
+            padding: 0;
+        }
+        .subcard,
+        .material-card {
+            padding: 14px 0;
+            border: 0;
+            border-top: 1px solid var(--content-line);
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+        .family-card::before {
+            display: none;
+        }
+        .record-note,
+        .health-record-core div {
+            border-color: rgba(100,116,139,.07);
+            background: var(--content-soft);
+        }
+        .log-detail-hero,
+        .leave-detail-hero,
+        .student-status-profile {
+            margin-bottom: 12px;
+        }
+        .log-page-section,
+        .leave-detail-section,
+        .student-status-panel,
+        .discipline-detail-section {
+            padding: 18px 2px;
+        }
+        .discipline-detail-page {
+            gap: 0;
+        }
+        .discipline-detail-hero {
+            margin-bottom: 12px;
+        }
+        .rollcall-record-roster .rollcall-record-row {
+            padding-inline: 2px;
+        }
+        .log-student-section {
+            padding: 14px 0;
+        }
+        .log-page-section.review,
+        .log-page-section.review.empty,
+        .leave-detail-section.reject {
+            border-color: var(--content-line);
+            background: transparent;
+        }
+        .log-page-section.review p {
+            color: var(--body);
+        }
+        .log-page-section.review .log-page-section-label {
+            color: #047857;
+        }
+
+        /* 分区与功能入口只保留必要的交互底色。 */
+        .class-detail-tabs {
+            box-shadow: none;
+        }
+        .class-tab-shell,
+        .tab-dock {
+            border-color: rgba(100,116,139,.08);
+            background: rgba(239,243,249,.92);
+            box-shadow: none;
+        }
+        .class-tab.active {
+            color: #fff;
+            background: var(--brand);
+            box-shadow: none;
+        }
+        .class-tab,
+        .tab-button {
+            min-height: 40px;
+        }
+        .management-group {
+            margin-top: 0;
+            padding: 16px 0;
+            border: 0;
+            border-bottom: 1px solid var(--content-line);
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+        .management-group-title {
+            min-height: 32px;
+            margin-inline: 0;
+        }
+        .management-entry {
+            min-height: 48px;
+            border-color: rgba(100,116,139,.08);
+            background: var(--content-soft);
+        }
+        .management-entry.disabled,
+        .management-entry:disabled {
+            color: #98A4B5;
+            background: #F7F9FC;
+        }
+        .module-action,
+        .soft-action,
+        .student-live-manage {
+            min-height: 40px;
+        }
+        .class-live-status-card,
+        .student-live-metric,
+        .student-status-option,
+        .live-status-action,
+        .dorm-bed-option,
+        .school-room-card,
+        .school-dorm-level-card {
+            box-shadow: none;
+        }
+        .student-status-option,
+        .live-status-action,
+        .school-room-card,
+        .school-dorm-level-card {
+            border-color: rgba(100,116,139,.09);
+            background: var(--content-soft);
+        }
+        .student-status-option {
+            min-height: 44px;
+        }
+        .school-dorm-level-card {
+            min-height: 68px;
+        }
+        .school-dorm-building,
+        .school-dorm-floor {
+            border-color: rgba(100,116,139,.09);
+            background: rgba(245,248,253,.78);
+            box-shadow: none;
+        }
+        .school-dorm-floor.expanded,
+        .school-dorm-building.expanded {
+            background: rgba(238,244,252,.94);
+        }
+
+        /* 表格与记录使用一体化内容面。 */
+        .attendance-history-card,
+        .attendance-day-table-wrap,
+        .attendance-table-wrap {
+            border: 0;
+            border-bottom: 1px solid var(--content-line);
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+        .attendance-history-date {
+            border-bottom-color: var(--content-line);
+            background: rgba(245,248,253,.72);
+        }
+        .attendance-history-fields {
+            padding-inline: 2px;
+        }
+        .attendance-day-table-wrap,
+        .attendance-table-wrap {
+            overflow: hidden;
+        }
+        .attendance-table,
+        .attendance-day-table {
+            background: transparent;
+        }
+        .discipline-form-card {
+            padding: 16px 0;
+        }
+        .discipline-form-field input,
+        .discipline-form-field select,
+        .discipline-form-field textarea,
+        .page-form-field input,
+        .page-form-field .dialog-picker-trigger {
+            border-color: rgba(100,116,139,.11);
+            background: var(--content-soft);
+        }
+
+        /* 状态色只用于标签、数字和选中态，不铺满普通信息区域。 */
+        .pill,
+        .module-status,
+        .leave-detail-status,
+        .log-detail-status,
+        .class-student-live-state,
+        .handled-chip,
+        .discipline-level,
+        .discipline-scope {
+            box-shadow: none;
+        }
+        .live-status-card,
+        .live-status-card.is-handled {
+            border-color: rgba(100,116,139,.08);
+            background: rgba(248,250,252,.76);
+            box-shadow: none;
+        }
+        .live-status-card::before {
+            content: none;
+        }
+        .status-filter-chip,
+        .live-status-action {
+            min-height: 40px;
+        }
+        .status-filter-chip.active,
+        .status-filter-chip.filter-school.active,
+        .status-filter-chip.filter-leave.active,
+        .status-filter-chip.filter-meal.active,
+        .status-filter-chip.filter-unhandled.active,
+        .status-filter-chip.filter-handled.active,
+        .live-status-action.active,
+        .live-status-action.active.school,
+        .live-status-action.active.leave,
+        .live-status-action.active.meal {
+            border-color: var(--brand);
+            color: #fff;
+            background: var(--brand);
+            box-shadow: none;
+        }
+
+        button,
+        [role="button"] {
+            touch-action: manipulation;
+        }
+        .exact-search-submit {
+            min-height: 44px;
+        }
+        .filter-chips,
+        .attendance-filter-group,
+        .dorm-room-list,
+        .rollcall-filters,
+        .status-filter-row,
+        .school-building-row {
+            flex-wrap: wrap;
+            overflow-x: visible;
+        }
+        @media (min-width: 768px) {
+            body {
+                background: linear-gradient(135deg, #EFF6FF 0%, #DFE7FF 100%);
+            }
+            .device {
+                box-shadow: 0 24px 70px rgba(30,64,175,.12);
+            }
+        }
+
+        /* 7.51：顶部功能区与随内容滚动的白色主内容区。 */
+        .app-view:not(#homeView)::before {
+            display: none;
+        }
+        #detailView #panelRoot,
+        #listView #studentList,
+        #classModuleView:not(.student-status-mode) #classModuleRoot,
+        #leaveDetailRoot,
+        #logDetailRoot,
+        #studentLogHistoryRoot,
+        #rollcallHistoryRoot,
+        #rollcallRecordRoot,
+        #disciplineDetailRoot,
+        #disciplineAddForm,
+        #attendanceRoot,
+        #attendanceEditorRoot {
+            position: relative;
+            margin-inline: -20px;
+            padding-inline: 20px;
+            border-radius: 24px 24px 0 0;
+            background: #FFFFFF;
+            box-shadow: 0 -1px 0 rgba(255,255,255,.96);
+        }
+        #detailView #panelRoot {
+            margin-top: 12px;
+            padding-top: 8px;
+            padding-bottom: 38px;
+        }
+        #listView #studentList {
+            min-height: 580px;
+            align-content: start;
+            grid-auto-rows: max-content;
+            padding-bottom: 34px;
+        }
+        #classModuleView:not(.student-status-mode) #classModuleRoot,
+        #leaveDetailRoot,
+        #logDetailRoot,
+        #studentLogHistoryRoot,
+        #rollcallHistoryRoot,
+        #rollcallRecordRoot,
+        #disciplineDetailRoot,
+        #disciplineAddForm,
+        #attendanceRoot,
+        #attendanceEditorRoot {
+            min-height: calc(100% + 1px);
+            padding-top: 16px;
+            padding-bottom: 34px;
+        }
+
+        /* 全校班级：统计随页面滚走，搜索与表头组成连续吸顶区。 */
+        .class-list-scroll {
+            inset: 92px 0 0;
+            padding: 12px 0 34px;
+            background: transparent;
+        }
+        .class-summary-card {
+            margin: 0 20px 8px;
+        }
+        .class-list-tools {
+            top: 0;
+            z-index: 34;
+            min-height: 56px;
+            margin: 0;
+            padding: 8px 20px;
+            border: 0;
+            border-radius: 0;
+            background: linear-gradient(135deg, rgba(239,246,255,.97), rgba(223,231,255,.94));
+            box-shadow: none;
+        }
+        .class-directory {
+            position: relative;
+            z-index: 1;
+            min-height: calc(100% - 56px);
+            padding: 0 0 28px;
+            overflow: visible;
+            border: 0;
+            border-radius: 24px 24px 0 0;
+            background: #FFFFFF;
+            box-shadow: 0 -1px 0 rgba(255,255,255,.96);
+        }
+        .class-table-head,
+        .class-table .class-row {
+            grid-template-columns: 24px minmax(0,1fr) 42px 28px 28px;
+            gap: 4px;
+            padding-inline: 20px;
+        }
+        .class-table-head {
+            position: sticky;
+            top: 56px;
+            z-index: 32;
+            min-height: 42px;
+            border-bottom: 1px solid rgba(15,23,42,.09);
+            border-radius: 24px 24px 0 0;
+            background: #FFFFFF;
+            box-shadow: none;
+            transition: border-radius .18s ease, box-shadow .18s ease;
+        }
+        .class-table-head.is-stuck {
+            border-radius: 0;
+            box-shadow: 0 7px 16px rgba(31,95,255,.055);
+        }
+        .class-table .class-row {
+            min-height: 62px;
+            padding-block: 9px;
+            background: #FFFFFF;
+        }
+        .class-table .class-row:active {
+            background: #F4F7FC;
+        }
+        .class-table-name-line {
+            min-width: 0;
+            display: grid;
+            align-content: center;
+            gap: 4px;
+            overflow: hidden;
+            white-space: normal;
+        }
+        .class-table-name-line .class-name-short {
+            min-width: 0;
+            max-width: 100%;
+            display: block;
+            overflow: hidden;
+            color: var(--ink);
+            font-size: 12px;
+            font-weight: 950;
+            line-height: 1.2;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .class-table-name-line .class-teacher-full {
+            min-width: 0;
+            display: block;
+            overflow: hidden;
+            color: var(--muted);
+            font-size: 9px;
+            font-weight: 820;
+            line-height: 1.2;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* 班级详情：分区导航固定在标题下，正文从独立内容面开始。 */
+        .class-detail-tabs {
+            position: absolute;
+            inset: 104px 0 auto;
+            z-index: 45;
+            margin: 0;
+            padding: 6px 20px 8px;
+            background: linear-gradient(135deg, rgba(239,246,255,.97), rgba(223,231,255,.94));
+            box-shadow: none;
+        }
+        .class-tab-shell {
+            min-height: 50px;
+        }
+        .class-tab {
+            height: 40px;
+        }
+        .class-detail-scroll {
+            inset: 168px 0 0;
+            padding: 12px 0 34px;
+            background: transparent;
+        }
+        .class-detail-surface {
+            min-height: calc(100% + 1px);
+            padding: 18px 20px 38px;
+            border-radius: 24px 24px 0 0;
+            background: #FFFFFF;
+            box-shadow: 0 -1px 0 rgba(255,255,255,.96);
+        }
+
+        /* 学生信息：班级人数与实时状态合并为一个统一蓝色看板。 */
+        .student-roster-board {
+            position: relative;
+            overflow: hidden;
+            padding: 14px;
+            border: 1px solid rgba(31,95,255,.08);
+            border-radius: 18px;
+            background: linear-gradient(145deg, #F7FAFF, #EEF3FA);
+        }
+        .student-roster-board::after {
+            content: "";
+            position: absolute;
+            width: 112px;
+            height: 112px;
+            right: -58px;
+            top: -64px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(31,95,255,.13), rgba(31,95,255,0) 72%);
+            pointer-events: none;
+        }
+        .student-roster-board-head {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .student-roster-board-title {
+            min-width: 0;
+        }
+        .student-roster-board-title span,
+        .student-roster-board-title strong {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .student-roster-board-title span {
+            color: var(--brand);
+            font-size: 9px;
+            font-weight: 950;
+            letter-spacing: .09em;
+        }
+        .student-roster-board-title strong {
+            margin-top: 3px;
+            color: var(--ink);
+            font-size: 15px;
+            font-weight: 950;
+        }
+        .student-roster-board .student-live-manage {
+            position: relative;
+            z-index: 1;
+            min-width: 72px;
+            height: 34px;
+            border-radius: 10px;
+            font-size: 10px;
+        }
+        .student-roster-demographics {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: repeat(3,minmax(0,1fr));
+            margin-top: 11px;
+            border-top: 1px solid rgba(15,23,42,.065);
+            border-bottom: 1px solid rgba(15,23,42,.065);
+        }
+        .student-roster-demographic {
+            min-width: 0;
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 4px;
+            padding: 9px 4px;
+            color: var(--body);
+        }
+        .student-roster-demographic + .student-roster-demographic {
+            border-left: 1px solid rgba(15,23,42,.065);
+        }
+        .student-roster-demographic strong {
+            color: var(--ink);
+            font-size: 17px;
+            font-weight: 950;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+        .student-roster-demographic span {
+            color: var(--muted);
+            font-size: 9px;
+            font-weight: 850;
+        }
+        .student-roster-statuses {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: 52px repeat(3,minmax(0,1fr));
+            align-items: center;
+            gap: 5px;
+            margin-top: 9px;
+        }
+        .student-roster-statuses > span {
+            color: var(--muted);
+            font-size: 9px;
+            font-weight: 900;
+        }
+        .student-roster-status {
+            min-width: 0;
+            min-height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 0 4px;
+            border: 1px solid rgba(31,95,255,.10);
+            border-radius: 9px;
+            color: var(--brand);
+            background: rgba(31,95,255,.07);
+            font-size: 9px;
+            font-weight: 850;
+        }
+        .student-roster-status strong {
+            color: var(--brand);
+            font-size: 13px;
+            font-weight: 950;
+            font-variant-numeric: tabular-nums;
+        }
+        .class-live-status-metric,
+        .class-live-status-metric.school,
+        .class-live-status-metric.leave,
+        .class-live-status-metric.meal {
+            border-color: rgba(31,95,255,.10);
+            color: var(--brand);
+            background: rgba(31,95,255,.07);
+        }
+
+        /* 四列高密学生网格：整格可点，40 人控制在两屏内。 */
+        .class-info-panel .class-section-head,
+        #classInfoPanel .class-section-head {
+            min-height: 38px;
+            margin: 12px 0 6px;
+            padding: 0;
+        }
+        #classInfoPanel .class-roster-search {
+            margin: 0 0 8px;
+        }
+        #classInfoPanel .roster-search {
+            margin-bottom: 0;
+        }
+        #classInfoPanel .class-student-list {
+            display: grid;
+            grid-template-columns: repeat(4,minmax(0,1fr));
+            gap: 6px;
+        }
+        #classInfoPanel .class-student-row {
+            min-width: 0;
+            min-height: 58px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 6px 2px;
+            border: 1px solid rgba(100,116,139,.075);
+            border-radius: 13px;
+            background: #F5F8FD;
+            text-align: center;
+        }
+        #classInfoPanel .class-student-row:active {
+            transform: scale(.95);
+            background: #EAF1FC;
+        }
+        #classInfoPanel .class-student-row .student-avatar {
+            width: 28px;
+            height: 28px;
+            flex: 0 0 28px;
+            border: 0;
+            border-radius: 9px;
+            box-shadow: none;
+        }
+        #classInfoPanel .class-student-row .student-avatar svg {
+            width: 17px;
+            height: 17px;
+        }
+        #classInfoPanel .class-student-copy {
+            width: 100%;
+            min-width: 0;
+        }
+        #classInfoPanel .class-student-name {
+            width: 100%;
+            overflow: hidden;
+            font-size: 10.5px;
+            line-height: 1.15;
+            text-align: center;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        #classInfoPanel .class-student-live-state {
+            display: none;
+        }
+        #classInfoPanel .class-student-row > .pending-count-badge {
+            top: 4px;
+            right: 4px;
+        }
+        #classInfoPanel .roster-empty {
+            grid-column: 1 / -1;
+        }
+
+        /* 班级学生状态：单列紧凑行，姓名与三个大点击区清晰分离。 */
+        .class-module-scroll.student-status-scroll {
+            inset: 92px 0 0;
+            padding: 12px 20px 34px;
+        }
+        .student-status-scroll .status-manager-hero {
+            padding: 13px 14px;
+            border-radius: 18px;
+        }
+        .student-status-scroll .status-manager-metric,
+        .student-status-scroll .status-manager-metric.school,
+        .student-status-scroll .status-manager-metric.leave,
+        .student-status-scroll .status-manager-metric.meal {
+            border-color: rgba(31,95,255,.09);
+            color: var(--brand);
+            background: rgba(31,95,255,.065);
+        }
+        .student-status-scroll .status-manager-metric strong,
+        .student-status-scroll .status-manager-metric span {
+            color: var(--brand);
+        }
+        .student-status-scroll .status-toolbar {
+            top: 0;
+            z-index: 34;
+            margin: 8px -20px 0;
+            padding: 8px 20px 10px;
+            background: linear-gradient(135deg, rgba(239,246,255,.97), rgba(223,231,255,.94));
+        }
+        .status-roster-surface {
+            margin: 0 -20px;
+            padding: 4px 20px 30px;
+            border-radius: 24px 24px 0 0;
+            background: #FFFFFF;
+        }
+        .status-roster-surface .class-section-head {
+            min-height: 40px;
+            margin: 0;
+            padding: 0 2px;
+            border-bottom: 1px solid var(--content-line);
+        }
+        .student-status-scroll .live-status-list {
+            display: grid;
+            grid-template-columns: minmax(0,1fr);
+            gap: 0;
+        }
+        .student-status-scroll .live-status-card {
+            min-height: 58px;
+            display: grid;
+            grid-template-columns: 86px minmax(0,1fr);
+            align-items: center;
+            gap: 8px;
+            padding: 8px 2px;
+            overflow: visible;
+            border: 0;
+            border-bottom: 1px solid var(--content-line);
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+        .student-status-scroll .live-status-card:last-child {
+            border-bottom: 0;
+        }
+        .student-status-scroll .live-status-card-head {
+            min-width: 0;
+            justify-content: flex-start;
+            gap: 6px;
+        }
+        .student-status-scroll .compact-status-name {
+            min-width: 0;
+            overflow: hidden;
+            color: var(--ink);
+            font-size: 11.5px;
+            line-height: 1.25;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .student-status-scroll .compact-status-dot,
+        .student-status-scroll .status-school .compact-status-dot,
+        .student-status-scroll .status-leave .compact-status-dot,
+        .student-status-scroll .status-meal .compact-status-dot {
+            width: 7px;
+            height: 7px;
+            flex: 0 0 7px;
+            background: rgba(31,95,255,.62);
+        }
+        .student-status-scroll .status-unset .compact-status-dot {
+            background: #CBD5E1;
+        }
+        .student-status-scroll .live-status-actions {
+            grid-template-columns: repeat(3,minmax(0,1fr));
+            gap: 5px;
+            margin-top: 0;
+        }
+        .student-status-scroll .live-status-action,
+        .student-status-scroll .live-status-action.school,
+        .student-status-scroll .live-status-action.leave,
+        .student-status-scroll .live-status-action.meal {
+            min-width: 0;
+            height: 38px;
+            padding: 0 3px;
+            border: 1px solid rgba(31,95,255,.11);
+            border-radius: 10px;
+            color: #52627A;
+            background: #F5F8FD;
+            font-size: 10.5px;
+            font-weight: 900;
+        }
+        .student-status-scroll .live-status-action.active,
+        .student-status-scroll .live-status-action.active.school,
+        .student-status-scroll .live-status-action.active.leave,
+        .student-status-scroll .live-status-action.active.meal {
+            border-color: var(--brand);
+            color: #FFFFFF;
+            background: var(--brand);
+        }
+
+        /* 7.52：首页分级、班级单行信息、固定编辑底栏与数据型床位卡。 */
+        .school-home-view .home-high-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 9px;
+        }
+        .school-home-view .home-high-btn {
+            min-height: 72px;
+            display: grid;
+            grid-template-columns: 38px minmax(0, 1fr) 14px;
+            align-items: center;
+            justify-content: stretch;
+            gap: 9px;
+            padding: 10px 11px;
+            border: 1px solid rgba(31,95,255,.09);
+            border-radius: 16px;
+            color: var(--ink);
+            background: rgba(255,255,255,.68);
+            text-align: left;
+        }
+        .school-home-view .home-high-btn.config {
+            grid-template-columns: 38px minmax(0,1fr);
+            border-style: dashed;
+            background: rgba(239,246,255,.58);
+        }
+        .school-home-view .home-high-btn.class-shortcut {
+            background: rgba(255,255,255,.72);
+        }
+        .home-high-copy {
+            min-width: 0;
+            display: block;
+        }
+        .home-high-copy small,
+        .home-high-copy strong {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .home-high-copy small {
+            color: var(--muted);
+            font-size: 8.5px;
+            font-weight: 850;
+            letter-spacing: .05em;
+        }
+        .home-high-copy strong {
+            margin-top: 4px;
+            color: var(--ink);
+            font-size: 12px;
+            font-weight: 950;
+        }
+        .school-home-view .admission-entry-grid {
+            grid-template-columns: repeat(3, minmax(0,1fr));
+            gap: 10px 5px;
+        }
+        .school-home-view .admission-entry-group-title {
+            min-height: 42px;
+            margin-top: 6px;
+            padding: 14px 0 4px;
+            font-size: 12px;
+        }
+        .school-home-view .admission-entry-group-title:first-child {
+            margin-top: 0;
+            padding-top: 4px;
+        }
+        .school-home-view .admission-entry-btn {
+            min-height: 72px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 7px 2px;
+            border: 0;
+            border-radius: 12px;
+            color: #334155;
+            background: transparent;
+            box-shadow: none;
+            font-size: 11px;
+            font-weight: 850;
+        }
+        .school-home-view .admission-entry-btn:active {
+            color: var(--brand);
+            background: rgba(255,255,255,.48);
+        }
+
+        .class-table-head,
+        .class-table .class-row {
+            grid-template-columns: 22px minmax(0,1fr) 36px 23px 23px;
+            gap: 2px;
+            padding-inline: 16px;
+        }
+        .class-table .class-row {
+            min-height: 56px;
+        }
+        .class-table-name-line {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            white-space: nowrap;
+        }
+        .class-table-name-line .class-name-short {
+            display: block;
+            color: var(--ink);
+            font-size: 11.5px;
+            font-weight: 900;
+            line-height: 1.25;
+        }
+        .class-table-name-line .class-teacher-full {
+            display: none;
+        }
+
+        .contact-name-line {
+            min-width: 0;
+            display: block;
+            overflow: hidden;
+        }
+        .contact-name {
+            max-width: 100%;
+            display: block;
+            overflow: hidden;
+            color: var(--ink);
+            font-size: 13px;
+            font-weight: 900;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .contact-detail-inline {
+            color: inherit;
+            font: inherit;
+            font-weight: inherit;
+        }
+        .contact-meta {
+            margin-top: 4px;
+        }
+
+        .class-dashboard-rank {
+            border: 0;
+            border-left: 1px solid rgba(15,23,42,.065);
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+        .class-live-status-card {
+            margin-top: 14px;
+            padding: 13px 0 0;
+            overflow: visible;
+            border: 0;
+            border-top: 1px solid rgba(15,23,42,.07);
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+        .class-live-status-card::after {
+            display: none;
+        }
+        .class-live-status-card:active {
+            transform: scale(.98);
+            background: transparent;
+        }
+
+        #classInfoPanel .class-student-list {
+            display: grid;
+            grid-template-columns: minmax(0,1fr);
+            gap: 0;
+            padding: 0;
+            overflow: visible;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+        #classInfoPanel .class-student-row {
+            min-width: 0;
+            min-height: 56px;
+            display: grid;
+            grid-template-columns: 34px minmax(0,1fr) auto;
+            grid-template-rows: minmax(0,1fr);
+            align-items: center;
+            justify-items: stretch;
+            gap: 10px;
+            padding: 9px 2px;
+            border: 0;
+            border-bottom: 1px solid var(--content-line);
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+            text-align: left;
+        }
+        #classInfoPanel .class-student-row:last-of-type {
+            border-bottom: 0;
+        }
+        #classInfoPanel .class-student-row:active {
+            transform: scale(.98);
+            background: #F4F7FC;
+        }
+        #classInfoPanel .class-student-row .student-avatar {
+            width: 34px;
+            height: 34px;
+            flex: 0 0 34px;
+            border-radius: 11px;
+        }
+        #classInfoPanel .class-student-copy {
+            width: 100%;
+            align-self: center;
+        }
+        #classInfoPanel .class-student-name {
+            width: 100%;
+            display: block;
+            color: var(--ink);
+            font-size: 12.5px;
+            font-weight: 900;
+            line-height: 1.25;
+            text-align: left;
+        }
+        #classInfoPanel .class-student-row > .pending-count-badge {
+            position: static;
+            justify-self: end;
+        }
+
+        #detailView.is-editing .scroll-area {
+            padding-bottom: 116px;
+        }
+        #studentEditDock.edit-inline-actions {
+            position: absolute;
+            inset: auto 0 0;
+            z-index: 90;
+            min-height: 88px;
+            display: grid;
+            grid-template-columns: .9fr 1.1fr;
+            gap: 10px;
+            padding: 12px 20px 24px;
+            border-top: 1px solid rgba(15,23,42,.07);
+            background: #FFFFFF;
+            box-shadow: 0 -10px 24px rgba(31,95,255,.07);
+        }
+        .fixed-action-surface,
+        .dialog-actions {
+            z-index: 90;
+            border-top: 1px solid rgba(15,23,42,.07);
+            background: #FFFFFF;
+            box-shadow: 0 -10px 24px rgba(31,95,255,.07);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+        .dialog-actions {
+            background: rgba(255,255,255,.98);
+        }
+        .footer-button.cancel,
+        .fixed-action-button.cancel,
+        .dialog-button.cancel {
+            background: #F1F5F9;
+        }
+
+        .dorm-plan.dorm-bed-directory {
+            padding: 12px 0 0;
+            overflow: visible;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+        .dorm-bed-directory .dorm-plan-head {
+            margin-bottom: 10px;
+            padding-inline: 2px;
+        }
+        .dorm-bed-grid.dorm-card-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0,1fr));
+            gap: 8px;
+        }
+        .dorm-bed-option.dorm-bed-card {
+            min-width: 0;
+            min-height: 88px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 11px;
+            border: 1px solid rgba(100,116,139,.09);
+            border-radius: 14px;
+            color: inherit;
+            background: #F8FAFC;
+            box-shadow: none;
+            text-align: left;
+        }
+        .dorm-bed-option.dorm-bed-card.occupied {
+            border-color: rgba(16,185,129,.13);
+            background: rgba(240,253,250,.72);
+        }
+        .dorm-bed-option.dorm-bed-card.vacant {
+            border-color: rgba(239,68,68,.11);
+            background: rgba(254,242,242,.64);
+        }
+        .dorm-bed-option.dorm-bed-card.active {
+            border-color: var(--brand);
+            background: #EFF6FF;
+            box-shadow: 0 0 0 3px rgba(31,95,255,.08);
+        }
+        .dorm-bed-option.dorm-bed-card:active {
+            transform: scale(.97);
+        }
+        .dorm-bed-card-head {
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .dorm-bed-name {
+            min-width: 0;
+            overflow: hidden;
+            color: var(--ink);
+            font-size: 12px;
+            font-weight: 950;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .dorm-bed-card .dorm-bed-status {
+            flex: 0 0 auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #047857;
+            font-size: 9px;
+            font-weight: 900;
+        }
+        .dorm-bed-card.vacant .dorm-bed-status {
+            color: #B91C1C;
+        }
+        .dorm-bed-card .dorm-bed-status i {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+        .dorm-bed-occupant {
+            min-width: 0;
+            display: block;
+        }
+        .dorm-bed-occupant small,
+        .dorm-bed-occupant strong {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .dorm-bed-occupant small {
+            color: var(--muted);
+            font-size: 8.5px;
+            font-weight: 850;
+        }
+        .dorm-bed-occupant .dorm-bed-student-name {
+            margin-top: 4px;
+            color: var(--ink);
+            font-size: 11.5px;
+            font-weight: 900;
+        }
+        .dorm-bed-card.vacant .dorm-bed-student-name {
+            color: #94A3B8;
+        }
+
+        /* 7.53：首页功能入口不使用图标，仅通过文字层级、尺寸和分组建立主次。 */
+        .school-home-view .home-high-btn {
+            min-height: 64px;
+            display: block;
+            padding: 12px 14px;
+            text-align: left;
+        }
+        .school-home-view .home-high-btn.config {
+            display: block;
+        }
+        .school-home-view .home-high-btn .home-high-copy {
+            width: 100%;
+        }
+        .school-home-view .home-high-btn .home-high-copy small {
+            font-size: 9px;
+            letter-spacing: .06em;
+        }
+        .school-home-view .home-high-btn .home-high-copy strong {
+            margin-top: 5px;
+            font-size: 13px;
+        }
+        .school-home-view .admission-entry-grid {
+            grid-template-columns: repeat(2, minmax(0,1fr));
+            gap: 0 14px;
+        }
+        .school-home-view .admission-entry-group-title {
+            margin-top: 10px;
+            padding: 16px 0 6px;
+        }
+        .school-home-view .admission-entry-btn {
+            min-height: 48px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 0;
+            padding: 0 2px;
+            border: 0;
+            border-bottom: 1px solid rgba(100,116,139,.12);
+            border-radius: 0;
+            color: #334155;
+            background: transparent;
+            font-size: 12px;
+            font-weight: 850;
+            text-align: left;
+        }
+        .school-home-view .home-high-btn.manage-mode::after {
+            content: "移除";
+            top: 6px;
+            right: 7px;
+            width: auto;
+            height: 20px;
+            padding: 0 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 0;
+            border-radius: 6px;
+            color: #B91C1C;
+            background: #FEE2E2;
+            background-image: none;
+            box-shadow: none;
+            font-size: 8px;
+            font-weight: 900;
+        }
+        .school-home-view .admission-entry-btn.manage-mode::after {
+            content: "添加";
+            top: 50%;
+            right: 2px;
+            width: auto;
+            height: 20px;
+            padding: 0 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transform: translateY(-50%);
+            border: 0;
+            border-radius: 6px;
+            color: #047857;
+            background: #D1FAE5;
+            background-image: none;
+            box-shadow: none;
+            font-size: 8px;
+            font-weight: 900;
+        }
     </style>
 </head>
 <body>
@@ -5097,17 +6696,19 @@
                 <h1 class="nav-title" id="classDetailTitle">班级详情</h1>
                 <div aria-hidden="true"></div>
             </header>
+            <nav class="class-detail-tabs" aria-label="班级详情分区">
+                <div class="class-tab-shell" role="tablist">
+                    <button type="button" class="class-tab active" role="tab" aria-selected="true" data-class-tab="overview">班级概览</button>
+                    <button type="button" class="class-tab" role="tab" aria-selected="false" data-class-tab="management">班级管理</button>
+                    <button type="button" class="class-tab" role="tab" aria-selected="false" data-class-tab="info">学生信息</button>
+                </div>
+            </nav>
             <main class="class-detail-scroll" id="classDetailScroll">
-                <nav class="class-detail-tabs" aria-label="班级详情分区">
-                    <div class="class-tab-shell" role="tablist">
-                        <button type="button" class="class-tab active" role="tab" aria-selected="true" data-class-tab="overview">班级概览</button>
-                        <button type="button" class="class-tab" role="tab" aria-selected="false" data-class-tab="management">班级管理</button>
-                        <button type="button" class="class-tab" role="tab" aria-selected="false" data-class-tab="info">学生信息</button>
-                    </div>
-                </nav>
-                <section class="class-tab-panel active" id="classOverviewPanel" aria-label="班级概览"></section>
-                <section class="class-tab-panel" id="classManagementPanel" aria-label="班级管理"></section>
-                <section class="class-tab-panel" id="classInfoPanel" aria-label="学生信息"></section>
+                <div class="class-detail-surface">
+                    <section class="class-tab-panel active" id="classOverviewPanel" aria-label="班级概览"></section>
+                    <section class="class-tab-panel" id="classManagementPanel" aria-label="班级管理"></section>
+                    <section class="class-tab-panel" id="classInfoPanel" aria-label="学生信息"></section>
+                </div>
             </main>
         </section>
 
@@ -5278,19 +6879,6 @@
                     <button type="button" class="tab-button" id="tab-materials" role="tab" aria-selected="false" aria-controls="panelRoot" tabindex="-1" data-tab="materials">材料</button>
                 </div>
                 <section id="panelRoot" role="tabpanel" aria-labelledby="tab-identity"></section>
-            </main>
-        </section>
-
-        <section class="app-view" id="studentStatusDetailView" aria-label="学生状态">
-            <header class="topbar" aria-label="学生状态导航">
-                <button type="button" class="nav-button" id="studentStatusDetailBackButton" aria-label="返回学生详情">
-                    <svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                </button>
-                <h1 class="nav-title" id="studentStatusDetailTitle">学生状态</h1>
-                <div aria-hidden="true"></div>
-            </header>
-            <main class="student-status-detail-scroll" id="studentStatusDetailScroll">
-                <div id="studentStatusDetailRoot"></div>
             </main>
         </section>
 
@@ -5673,9 +7261,9 @@
                 { id: 'log-4', date: shiftedDateValue(-5), name: '周景行', title: '学习反思', summary: '复盘了阶段测验错题。', content: '阶段测验中主要失分在概念辨析和审题。已经把错题按知识点整理，并为每道题补充错误原因和正确思路，准备在周末再做一次同类题检测。', status: '已批阅', review: '复盘思路清晰，建议下周补充同类题二次检测结果。' }
             ],
             dorm: [
-                { id: 'dorm-1', name: '林知夏', gender: '女', roomId: 'F402', bedNumber: 2, assignment: '女生 402 · 近外廊侧 · 1号床（下铺）' },
-                { id: 'dorm-2', name: '苏晚晴', gender: '女', roomId: 'F403', bedNumber: 1, assignment: '女生 403 · 近外廊侧 · 1号床（上铺）' },
-                { id: 'dorm-3', name: '顾怀川', gender: '男', roomId: 'M302', bedNumber: 2, assignment: '男生 302 · 近外廊侧 · 1号床（下铺）' },
+                { id: 'dorm-1', name: '林知夏', gender: '女', roomId: 'F402', bedNumber: 2, assignment: 'F栋 402 · 1号床下' },
+                { id: 'dorm-2', name: '苏晚晴', gender: '女', roomId: 'F403', bedNumber: 1, assignment: 'G栋 403 · 1号床上' },
+                { id: 'dorm-3', name: '顾怀川', gender: '男', roomId: 'M302', bedNumber: 2, assignment: 'A栋 302 · 1号床下' },
                 { id: 'dorm-4', name: '徐明哲', gender: '男', roomId: '', bedNumber: '', assignment: '' },
                 { id: 'dorm-5', name: '顾星遥', gender: '女', roomId: '', bedNumber: '', assignment: '' }
             ],
@@ -5697,8 +7285,15 @@
             ]
         };
 
-        const makeDormBeds = names => names.map((studentName, index) => ({
+        const schoolDormBedNameTemplates = {
+            4: ['1号床上', '1号床下', '2号床上', '2号床下'],
+            5: ['1号床上', '1号床下', '2号床上', '2号床下', '3号床上'],
+            6: ['1号床上', '1号床下', '2号床上', '2号床下', '3号床上', '3号床下'],
+            8: ['1号床上', '1号床下', '2号床上', '2号床下', '3号床上', '3号床下', '4号床上', '4号床下']
+        };
+        const makeDormBeds = (names, configuredNames = schoolDormBedNameTemplates[names.length] || []) => names.map((studentName, index) => ({
             number: index + 1,
+            name: configuredNames[index] || `床位${index + 1}`,
             occupied: Boolean(studentName),
             studentName: studentName || ''
         }));
@@ -5907,11 +7502,6 @@
         const listView = document.getElementById('listView');
         const addView = document.getElementById('addView');
         const detailView = document.getElementById('detailView');
-        const studentStatusDetailView = document.getElementById('studentStatusDetailView');
-        const studentStatusDetailBackButton = document.getElementById('studentStatusDetailBackButton');
-        const studentStatusDetailTitle = document.getElementById('studentStatusDetailTitle');
-        const studentStatusDetailScroll = document.getElementById('studentStatusDetailScroll');
-        const studentStatusDetailRoot = document.getElementById('studentStatusDetailRoot');
         const attendanceView = document.getElementById('attendanceView');
         const attendanceBackButton = document.getElementById('attendanceBackButton');
         const attendanceScroll = document.getElementById('attendanceScroll');
@@ -6080,19 +7670,18 @@
         }
 
         function renderSchoolHome() {
-            const plusIcon = '<svg aria-hidden="true" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
             const featureEntries = schoolHighFeatures.map(label => {
                 const pendingCount = getSchoolFeaturePendingCount(label);
                 const accessibleLabel = schoolManageMode ? `从高频功能移除${label}` : `${label}${pendingCount ? `，有${pendingCount}项待处理内容` : ''}`;
-                return `<button type="button" class="home-high-btn${schoolManageMode ? ' manage-mode' : ''}" data-school-feature="${escapeHtml(label)}" data-feature-source="high" aria-label="${escapeHtml(accessibleLabel)}">${escapeHtml(label)}${pendingCount ? pendingDotMarkup(pendingCount) : ''}</button>`;
+                return `<button type="button" class="home-high-btn${schoolManageMode ? ' manage-mode' : ''}" data-school-feature="${escapeHtml(label)}" data-feature-source="high" aria-label="${escapeHtml(accessibleLabel)}"><span class="home-high-copy"><small>高频入口</small><strong>${escapeHtml(label)}</strong></span>${pendingCount ? pendingDotMarkup(pendingCount) : ''}</button>`;
             }).join('');
             const classEntries = schoolHighClasses.map(classId => schoolClasses.find(item => item.id === classId)).filter(Boolean).map(classInfo => {
                 const pendingCount = getClassPendingCounts(classInfo).total;
                 const accessibleLabel = schoolManageMode ? `从首页移除${getClassDisplayName(classInfo)}` : `打开${getClassDisplayName(classInfo)}${pendingCount ? `，有${pendingCount}项待处理` : ''}`;
-                return `<button type="button" class="home-high-btn class-shortcut${schoolManageMode ? ' manage-mode' : ''}" data-school-class-shortcut="${escapeHtml(classInfo.id)}" aria-label="${escapeHtml(accessibleLabel)}"><span><span class="home-high-class-kicker">班级</span><span class="home-high-class-name">${escapeHtml(getClassDisplayName(classInfo))}</span></span>${pendingCount ? pendingDotMarkup(pendingCount) : ''}</button>`;
+                return `<button type="button" class="home-high-btn class-shortcut${schoolManageMode ? ' manage-mode' : ''}" data-school-class-shortcut="${escapeHtml(classInfo.id)}" aria-label="${escapeHtml(accessibleLabel)}"><span class="home-high-copy"><small>常用班级</small><strong class="home-high-class-name">${escapeHtml(getClassDisplayName(classInfo))}</strong></span>${pendingCount ? pendingDotMarkup(pendingCount) : ''}</button>`;
             }).join('');
             highFreqGrid.innerHTML = featureEntries + classEntries +
-                `<button type="button" class="home-high-btn config" data-action="school-add-function" aria-label="添加高频功能入口">${plusIcon}</button>`;
+                `<button type="button" class="home-high-btn config" data-action="school-add-function" aria-label="添加高频功能入口"><span class="home-high-copy"><small>自定义首页</small><strong>添加入口</strong></span></button>`;
 
             const renderDirectoryButtons = labels => labels.map(label => {
                     const alreadyAdded = schoolHighFeatures.includes(label);
@@ -6100,7 +7689,7 @@
                     const modeClass = schoolManageMode ? (alreadyAdded ? ' added-disabled' : ' manage-mode') : '';
                     const pendingCount = getSchoolFeaturePendingCount(label);
                     const accessibleLabel = !schoolManageMode ? `${label}${pendingCount ? `，有${pendingCount}项待处理内容` : ''}` : (alreadyAdded ? `${label}已在高频功能中` : `添加${label}到高频功能`);
-                    return `<button type="button" class="admission-entry-btn${modeClass}" data-school-feature="${escapeHtml(label)}" data-feature-source="directory" aria-label="${escapeHtml(accessibleLabel)}"${disabled ? ' disabled aria-disabled="true"' : ''}>${escapeHtml(label)}${pendingCount ? pendingDotMarkup(pendingCount) : ''}</button>`;
+                    return `<button type="button" class="admission-entry-btn${modeClass}" data-school-feature="${escapeHtml(label)}" data-feature-source="directory" aria-label="${escapeHtml(accessibleLabel)}"${disabled ? ' disabled aria-disabled="true"' : ''}><span>${escapeHtml(label)}</span>${pendingCount ? pendingDotMarkup(pendingCount) : ''}</button>`;
                 }).join('');
             const groups = [];
             if (schoolFeatureQuery.trim()) {
@@ -6236,7 +7825,7 @@
             homeView.className = `app-view school-home-view${nextView === 'home' ? ' active' : ' behind'}`;
             classListView.className = `app-view${nextView === 'class-list' ? ' active' : (inClassFlow ? ' behind' : '')}`;
             classDetailView.className = `app-view${nextView === 'class-detail' ? ' active' : (classChildViews.includes(nextView) || (/detail|attendance/.test(nextView) && state.studentDetailOrigin === 'class-detail') ? ' behind' : '')}`;
-            classModuleView.className = `app-view${nextView === 'class-module' ? ' active' : (moduleChildViews.includes(nextView) ? ' behind' : '')}`;
+            classModuleView.className = `app-view${state.classModule === 'rollcall' ? ' student-status-mode' : ''}${nextView === 'class-module' ? ' active' : (moduleChildViews.includes(nextView) ? ' behind' : '')}`;
             leaveDetailView.className = `app-view${nextView === 'leave-detail' ? ' active' : ''}`;
             studentLogHistoryView.className = `app-view${nextView === 'student-log-history' ? ' active' : (nextView === 'log-detail' && state.logDetailOrigin === 'student-log-history' ? ' behind' : '')}`;
             logDetailView.className = `app-view${nextView === 'log-detail' ? ' active' : ''}`;
@@ -6244,10 +7833,9 @@
             rollcallRecordView.className = `app-view${nextView === 'rollcall-record' ? ' active' : ''}`;
             disciplineDetailView.className = `app-view${nextView === 'discipline-detail' ? ' active' : ''}`;
             disciplineAddView.className = `app-view${nextView === 'discipline-add' ? ' active' : ''}`;
-            listView.className = `app-view${nextView === 'list' ? ' active' : (['detail','student-status-detail','attendance','attendance-edit','add'].includes(nextView) && state.studentDetailOrigin !== 'class-detail' ? ' behind' : '')}`;
+            listView.className = `app-view${nextView === 'list' ? ' active' : (['detail','attendance','attendance-edit','add'].includes(nextView) && state.studentDetailOrigin !== 'class-detail' ? ' behind' : '')}`;
             if (addView) addView.className = `app-view${nextView === 'add' ? ' active' : ''}`;
-            detailView.className = `app-view${nextView === 'detail' ? ' active' : (['student-status-detail','attendance','attendance-edit'].includes(nextView) ? ' behind' : '')}${state.editMode ? ' is-editing' : ''}`;
-            studentStatusDetailView.className = `app-view${nextView === 'student-status-detail' ? ' active' : ''}`;
+            detailView.className = `app-view${nextView === 'detail' ? ' active' : (['attendance','attendance-edit'].includes(nextView) ? ' behind' : '')}${state.editMode ? ' is-editing' : ''}`;
             attendanceView.className = `app-view${nextView === 'attendance' ? ' active' : (nextView === 'attendance-edit' && state.attendanceEditOrigin === 'attendance' ? ' behind' : '')}`;
             attendanceEditorView.className = `app-view${nextView === 'attendance-edit' ? ' active' : ''}`;
             requestAnimationFrame(updateStudentStatusTopButton);
@@ -6655,7 +8243,7 @@
             const displayPhone = formatPhone(item.phone);
             return `<div class="contact-row">
                 <span class="contact-sequence" aria-hidden="true">${String(index + 1).padStart(2,'0')}</span>
-                <span class="contact-copy"><span class="contact-name-line"><span class="contact-name">${escapeHtml(item.name)}</span></span><span class="contact-meta"><span class="contact-meta-primary">${escapeHtml(detail)}</span><span class="contact-phone-line"><span>${escapeHtml(displayPhone)}</span>${phoneCopyButton(item.phone, `${item.name}的电话号码`)}</span></span></span>
+                <span class="contact-copy"><span class="contact-name-line"><span class="contact-name">${escapeHtml(item.name)}<span class="contact-detail-inline">（${escapeHtml(detail)}）</span></span></span><span class="contact-meta"><span class="contact-phone-line"><span>${escapeHtml(displayPhone)}</span>${phoneCopyButton(item.phone, `${item.name}的电话号码`)}</span></span></span>
                 <button type="button" class="contact-call" data-call-name="${escapeHtml(item.name)}" data-call-role="${escapeHtml(item.role)}" data-call-phone="${escapeHtml(item.phone)}" aria-label="拨打${escapeHtml(item.name)}的电话"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.11 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.72c.12.9.35 1.78.68 2.62a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.46-1.24a2 2 0 0 1 2.11-.45c.84.33 1.72.56 2.62.68A2 2 0 0 1 22 16.92z"></path></svg></button>
             </div>`;
         }
@@ -7416,39 +9004,6 @@
             return direction === 'next' ? ' dorm-content-next' : (direction === 'previous' ? ' dorm-content-previous' : '');
         }
 
-        function renderDormPlan(room, context = null) {
-            if (!room) return '<div class="todo-empty">暂无宿舍床位信息</div>';
-            const record = context ? classWorkflowState.dorm.find(item => item.id === context.recordId) : null;
-            const occupiedCount = room.beds.filter(bed => bed.occupied).length;
-            const groups = getDormBunkGroups(room.beds);
-            const renderBed = bed => {
-                const placement = getBedPlacement(bed.number, room.beds.length);
-                const isCurrentBed = Boolean(record && record.roomId === room.id && Number(record.bedNumber) === bed.number);
-                const selected = Number(context?.bedNumber) === bed.number;
-                const disabled = Boolean(context && bed.occupied && !isCurrentBed);
-                const stateText = bed.occupied ? '已住' : '空床';
-                const studentText = bed.occupied ? (bed.studentName || '已住学生') : '待安排';
-                const actionAttrs = context
-                    ? ` data-action="select-dorm-bed" data-bed-number="${bed.number}"`
-                    : (bed.occupied ? ` data-action="open-occupied-bed-actions" data-room-id="${room.id}" data-bed-number="${bed.number}"` : ` data-action="open-vacant-bed-picker" data-room-id="${room.id}" data-bed-number="${bed.number}"`);
-                return `<button type="button" class="dorm-bed-option ${bed.occupied ? 'occupied' : 'vacant'}${selected ? ' active' : ''}"${actionAttrs}${disabled ? ' disabled' : ''} aria-label="${placement.unitNumber}号床，${placement.bunk}，${escapeHtml(stateText)}，${escapeHtml(studentText)}">
-                    <span class="dorm-bed-bunk">${placement.bunk}</span>
-                    <strong class="dorm-bed-student-name">${escapeHtml(studentText)}</strong>
-                    <span class="dorm-bed-status"><i aria-hidden="true"></i>${escapeHtml(stateText)}</span>
-                </button>`;
-            };
-            const planMarkup = `<div class="dorm-plan" aria-label="${escapeHtml(room.name)}床位分布图">
-                <div class="dorm-plan-head"><div class="dorm-plan-current"><strong>${escapeHtml(room.building ? `${room.building} · ${room.roomNo}` : room.name)}</strong><span>已住 ${occupiedCount}/${room.beds.length}</span></div><div class="dorm-plan-legend" aria-label="床位状态图例"><span><i aria-hidden="true"></i>已住</span><span><i aria-hidden="true"></i>空床</span></div></div>
-                <div class="dorm-plan-corridor">宿舍门口 · 公共走廊</div>
-                <div class="dorm-bed-grid dorm-layout-grid">${groups.map(group => {
-                    const groupOccupied = group.beds.filter(bed => bed.occupied).length;
-                    return `<section class="dorm-bunk-unit" aria-label="${group.unitNumber}号床，上下铺"><div class="dorm-bunk-unit-head"><span><strong>${String(group.unitNumber).padStart(2,'0')}</strong><small>号床</small></span><em>${groupOccupied}/${group.beds.length} 已住</em></div><div class="dorm-bunk-stack">${group.beds.map(renderBed).join('')}</div></section>`;
-                }).join('')}</div>
-                <div class="dorm-plan-balcony">阳台</div>
-            </div>`;
-            return planMarkup;
-        }
-
         function renderDormModule() {
             const rooms = getAllDormRooms();
             const selectedRoom = getDormRoom(state.dormRoomId) || rooms[0];
@@ -7706,35 +9261,14 @@
             return [...beds].sort((a, b) => Number(a.number) - Number(b.number));
         }
 
-        function getDormBunkGroups(beds = []) {
-            return getDormDisplayBeds(beds).reduce((groups, bed) => {
-                const unitNumber = Math.max(1, Math.ceil(Number(bed.number) / 2));
-                let group = groups.find(item => item.unitNumber === unitNumber);
-                if (!group) {
-                    group = { unitNumber, beds: [] };
-                    groups.push(group);
-                }
-                group.beds.push(bed);
-                return groups;
-            }, []);
-        }
-
-        function getBedPlacement(number, bedCount = 4) {
-            const rowIndex = Math.max(0, Math.ceil(Number(number) / 2) - 1);
-            const rows = Math.max(2, Math.ceil(Number(bedCount) / 2));
-            const position = rowIndex === 0 ? '近外廊侧' : (rowIndex >= rows - 1 ? '阳台侧' : '宿舍中部');
-            return {
-                position,
-                unitNumber: rowIndex + 1,
-                bunk: Number(number) % 2 === 1 ? '上铺' : '下铺'
-            };
+        function getDormBedName(bed) {
+            return String(bed?.name || bed?.label || `床位${bed?.number || ''}`).trim();
         }
 
         function formatDormBedLabel(room, bed) {
             if (!room || !bed) return '';
-            const placement = getBedPlacement(bed.number, room.beds.length);
             const roomLabel = room.building ? `${room.building} ${room.roomNo}` : room.name;
-            return `${roomLabel} · ${placement.position} · ${placement.unitNumber}号床（${placement.bunk}）`;
+            return `${roomLabel} · ${getDormBedName(bed)}`;
         }
 
         function getDormPickerRooms(record) {
@@ -7752,7 +9286,6 @@
             const rooms = getDormPickerRooms(record);
             const selectedRoom = rooms.find(room => room.id === context.roomId);
             const selectedBed = selectedRoom?.beds.find(bed => bed.number === Number(context.bedNumber));
-            const selectedPlacement = selectedBed ? getBedPlacement(selectedBed.number, selectedRoom.beds.length) : null;
             const availableCount = room => room.beds.filter(bed => !bed.occupied || (record.roomId === room.id && Number(record.bedNumber) === bed.number)).length;
             pickerBody.removeAttribute('role');
             pickerBody.removeAttribute('aria-label');
@@ -7765,7 +9298,7 @@
                     return `<button type="button" class="dorm-room-option${room.id === context.roomId ? ' active' : ''}" data-action="select-dorm-room" data-room-id="${room.id}"${vacancies ? '' : ' disabled'}>${escapeHtml(room.building ? `${room.building} · ${room.roomNo}` : room.name)}<span>已住 <b>${occupied}</b>/${room.beds.length}</span></button>`;
                 }).join('') : '<div class="todo-empty">本班尚未关联可安排的宿舍</div>'}</div>
                 <div class="dorm-picker-label">选择床位</div>
-                <div class="dorm-picker-bed-stage">${selectedRoom ? `${renderDormPlan(selectedRoom, context)}${selectedPlacement ? `<div class="dorm-selection-summary">已选 <strong>${escapeHtml(formatDormBedLabel(selectedRoom, selectedBed))}</strong></div>` : ''}` : '<div class="todo-empty">请先选择可用宿舍</div>'}</div>
+                <div class="dorm-picker-bed-stage">${selectedRoom ? `${renderDormPlan(selectedRoom, context)}${selectedBed ? `<div class="dorm-selection-summary">已选 <strong>${escapeHtml(formatDormBedLabel(selectedRoom, selectedBed))}</strong></div>` : ''}` : '<div class="todo-empty">请先选择可用宿舍</div>'}</div>
                 <div class="dorm-picker-actions"><button type="button" class="dorm-confirm${context.roomId && context.bedNumber ? ' pending-leaf-action' : ''}" data-action="confirm-dorm-assignment"${context.roomId && context.bedNumber ? '' : ' disabled'}>确认安排${context.roomId && context.bedNumber ? pendingBadgeMarkup(1) : ''}</button></div>`;
             state.dormPickerTransitionDirection = '';
         }
@@ -7796,11 +9329,10 @@
             if (!room || !bed) return;
             const gender = getDormRoomGender(room.id);
             const students = getDormStudentCandidates(gender, state.dormStudentSearch);
-            const placement = getBedPlacement(bed.number, room.beds.length);
             pickerBody.removeAttribute('role');
             pickerBody.removeAttribute('aria-label');
             pickerBody.innerHTML = `
-                <div class="dorm-bed-target"><span class="dorm-bed-target-number">${String(placement.unitNumber).padStart(2,'0')}</span><span><small>${escapeHtml(room.name)}</small><strong>${escapeHtml(placement.position)} · ${placement.unitNumber}号床（${placement.bunk}）</strong></span><em>空床</em></div>
+                <div class="dorm-bed-target"><span class="dorm-bed-target-number">${String(bed.number).padStart(2,'0')}</span><span><small>${escapeHtml(room.name)}</small><strong>${escapeHtml(getDormBedName(bed))}</strong></span><em>空床</em></div>
                 <div class="dorm-picker-label">选择学生 <span id="dormStudentResultCount">${students.length} 人</span></div>
                 <div class="dorm-student-search"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="dormStudentSearch" type="search" value="${escapeHtml(state.dormStudentSearch)}" placeholder="搜索学生姓名 / 当前宿舍" autocomplete="off" aria-label="搜索可安排学生"></div>
                 <div class="dorm-bed-student-list">${students.length ? students.map((item, index) => {
@@ -7948,8 +9480,7 @@
                 closePicker(false);
                 refreshClassWorkflowViews();
                 requestAnimationFrame(() => scrollDormRoomIntoCenter(state.dormRoomId));
-                const placement = getBedPlacement(bed.number, room.beds.length);
-                showToast(`${record.name}已安排到${room.name} ${placement.unitNumber}号床${placement.bunk}`);
+                showToast(`${record.name}已安排到${room.name} ${getDormBedName(bed)}`);
             };
             if (record.assignment) {
                 const returnFocus = context.trigger;
@@ -8223,97 +9754,12 @@
                 : classAvatarSvg(data.gender);
         }
 
-        function getStudentClassInfo(data = student) {
-            return schoolClasses.find(item => item.name === data?.className) || null;
-        }
-
-        function getStudentLiveStatusContext(data = student) {
-            const classInfo = getStudentClassInfo(data);
-            if (!classInfo || !data?.id) return { classInfo: null, dayKey: '', handled: false, status: '' };
-            const dayKey = `${classInfo.id}-${formatLocalDate()}`;
-            const handled = (classWorkflowState.studentStatusHandledByDay[dayKey] || []).includes(data.id);
-            const status = handled ? (classWorkflowState.studentStatusByClass[classInfo.id]?.[data.id] || '') : '';
-            return { classInfo, dayKey, handled: Boolean(status), status };
-        }
-
-        function getStudentDisplayStatus(data = student) {
-            const live = getStudentLiveStatusContext(data);
-            return live.handled && rollcallStatuses.includes(live.status) ? live.status : (data?.studentStatus || '未设置');
-        }
-
-        function renderStudentStatusDetail() {
-            const academicStatuses = ['新生注册','在读','休学','退学','毕业'];
-            const live = getStudentLiveStatusContext(student);
-            const displayedStatus = getStudentDisplayStatus(student);
-            studentStatusDetailTitle.textContent = '学生状态';
-            studentStatusDetailRoot.innerHTML = `<div class="student-status-detail-stack">
-                <section class="student-status-profile" aria-label="${escapeHtml(student.name)}当前学生状态">
-                    <span class="student-avatar ${student.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(student)}</span>
-                    <span class="student-status-profile-copy"><strong>${escapeHtml(student.name)}</strong><span>${escapeHtml(student.className || '待分班')}</span></span>
-                    <em class="student-status-current">${escapeHtml(displayedStatus)}</em>
-                </section>
-                <section class="student-status-panel" aria-label="调整学籍状态">
-                    <div class="student-status-panel-head"><span><small>长期状态</small><strong>学籍状态</strong></span><em>${escapeHtml(student.studentStatus || '未设置')}</em></div>
-                    <p class="student-status-note">用于新生注册、在读、休学、退学和毕业等长期学籍变化。</p>
-                    <div class="student-academic-options">${academicStatuses.map(status => `<button type="button" class="student-status-option${student.studentStatus === status ? ' active' : ''}" data-action="set-student-academic-status" data-student-academic-status="${status}" aria-pressed="${student.studentStatus === status ? 'true' : 'false'}">${status}</button>`).join('')}</div>
-                </section>
-                <section class="student-status-panel" aria-label="调整今日在校状态">
-                    <div class="student-status-panel-head"><span><small>今日状态 · ${escapeHtml(formatLocalDate())}</small><strong>在校动态</strong></span><em>${live.handled ? escapeHtml(live.status) : '未调整'}</em></div>
-                    <p class="student-status-note">${live.handled ? `学生详情当前展示“${escapeHtml(live.status)}”，今日状态会优先于学籍状态。` : `当前没有选择今日状态，学生详情保持展示“${escapeHtml(student.studentStatus || '未设置')}”。`}</p>
-                    <div class="student-live-options">${rollcallStatuses.map(status => `<button type="button" class="student-status-option${live.handled && live.status === status ? ' active' : ''}" data-action="set-student-live-status" data-student-live-status="${status}" aria-pressed="${live.handled && live.status === status ? 'true' : 'false'}">${status}</button>`).join('')}</div>
-                    ${live.handled ? '<button type="button" class="student-live-clear" data-action="clear-student-live-status">恢复显示学籍状态</button>' : ''}
-                </section>
-            </div>`;
-        }
-
-        function openStudentStatusDetail() {
-            if (state.editMode) return showToast('请先保存或取消档案编辑');
-            renderStudentStatusDetail();
-            setView('student-status-detail');
-            studentStatusDetailScroll.scrollTop = 0;
-            focusAfterViewChange(studentStatusDetailBackButton);
-        }
-
-        function setStudentAcademicStatus(nextStatus) {
-            const allowed = ['新生注册','在读','休学','退学','毕业'];
-            if (!allowed.includes(nextStatus) || student.studentStatus === nextStatus) return;
-            student.studentStatus = nextStatus;
-            student.statusChangedAt = formatLocalDate();
-            student.updatedAt = new Date().toLocaleString('zh-CN', { hour12: false }).replaceAll('/', '-');
-            renderStudentStatusDetail();
-            renderHero();
-            renderStudentList();
-            renderClassInfo();
-            showToast(`学籍状态已更新为${nextStatus}`);
-        }
-
-        function setStudentLiveStatus(nextStatus = '') {
-            const live = getStudentLiveStatusContext(student);
-            if (!live.classInfo) return showToast('该学生尚未关联行政班，无法设置今日状态');
-            const dayKey = `${live.classInfo.id}-${formatLocalDate()}`;
-            const statusMap = getStudentStatusMap(live.classInfo);
-            if (nextStatus && rollcallStatuses.includes(nextStatus)) {
-                statusMap[student.id] = nextStatus;
-                markStudentStatusHandled(student.id, live.classInfo);
-                student.currentAttendance = nextStatus;
-            } else {
-                delete statusMap[student.id];
-                classWorkflowState.studentStatusHandledByDay[dayKey] = (classWorkflowState.studentStatusHandledByDay[dayKey] || []).filter(id => id !== student.id);
-            }
-            student.updatedAt = new Date().toLocaleString('zh-CN', { hour12: false }).replaceAll('/', '-');
-            renderStudentStatusDetail();
-            renderHero();
-            renderClassOverview();
-            renderClassInfo();
-            showToast(nextStatus ? `今日状态已更新为${nextStatus}` : '已恢复显示学籍状态');
-        }
-
         function renderHero() {
             const data = currentData();
             const classLabel = data.className || '待分班';
             const detailStudentId = data.id || student.id;
             const following = state.followedStudentIds.includes(detailStudentId);
-            const displayedStatus = getStudentDisplayStatus(data);
+            const academicStatus = data.studentStatus || '未设置';
             detailTitle.textContent = data.name || '学生详情';
             heroRoot.innerHTML = `
                 <section class="hero glass" aria-label="学生概览">
@@ -8328,7 +9774,7 @@
                         </div>
                     </div>
                     <div class="hero-facts">
-                        <button type="button" class="hero-fact hero-status-fact" data-action="open-student-status" aria-label="当前学生状态${escapeHtml(displayedStatus)}，进入学生状态页面"><span>学生状态</span><span class="hero-status-line"><strong class="hero-status-value ${statusTone(displayedStatus)}">${escapeHtml(displayedStatus)}</strong><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></span></button>
+                        <button type="button" class="hero-fact hero-status-fact" data-action="open-student-school-tab" aria-label="当前学籍状态${escapeHtml(academicStatus)}，查看学籍信息"><span>学籍状态</span><span class="hero-status-line"><strong class="hero-status-value ${statusTone(academicStatus)}">${escapeHtml(academicStatus)}</strong><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></span></button>
                         <div class="hero-fact"><span>学生学号</span><strong>${escapeHtml(data.studentNo)}</strong></div>
                         <div class="hero-fact"><span>最近更新</span><strong>${escapeHtml(data.updatedAt)}</strong></div>
                     </div>
@@ -8515,9 +9961,9 @@
         }
 
         function renderEditFooter() {
+            document.getElementById('studentEditDock')?.remove();
             if (!state.editMode) return;
-            const currentCard = panelRoot.querySelector('.panel-stack > .section-card:last-child');
-            currentCard?.insertAdjacentHTML('beforeend', `<div class="edit-inline-actions" aria-label="学生档案编辑操作"><button type="button" class="footer-button cancel" data-action="cancel-edit">取消编辑</button><button type="button" class="footer-button save" data-action="save-edit">保存学生档案</button></div>`);
+            detailView.insertAdjacentHTML('beforeend', `<div class="edit-inline-actions" id="studentEditDock" aria-label="学生档案编辑操作"><button type="button" class="footer-button cancel" data-action="cancel-edit">取消编辑</button><button type="button" class="footer-button save" data-action="save-edit">保存学生档案</button></div>`);
         }
 
         const attendanceCourseSchedule = [
@@ -8809,7 +10255,7 @@
                 focusAfterViewChange(() => attendanceRoot.querySelector(`[data-attendance-date="${editedDate}"]`) || (trigger?.isConnected ? trigger : attendanceBackButton));
             } else {
                 setView('detail');
-                focusAfterViewChange(() => heroRoot.querySelector('[data-action="open-student-status"]') || editButton);
+                focusAfterViewChange(() => heroRoot.querySelector('[data-action="open-student-school-tab"]') || editButton);
             }
             if (discardedChanges) showToast('未保存的修改已取消');
         }
@@ -9370,9 +10816,20 @@
             return schoolClasses.filter(item => !query || [item.name, item.teacher, item.major, item.code].some(value => String(value).toLowerCase().includes(query)));
         }
 
-        function getCompactClassName(value, maxLength = 9) {
+        function getCompactClassName(value, maxLength = 10) {
             const characters = Array.from(String(value || ''));
             return characters.length > maxLength ? `${characters.slice(0, maxLength).join('')}…` : characters.join('');
+        }
+
+        function updateClassListStickyState() {
+            const tableHead = classDirectory.querySelector('.class-table-head');
+            const searchTools = classListScroll.querySelector('.class-list-tools');
+            if (!tableHead || !searchTools) return;
+            const scrollStyle = getComputedStyle(classListScroll);
+            const stickyTop = classListScroll.getBoundingClientRect().top + (parseFloat(scrollStyle.paddingTop) || 0);
+            const searchRect = searchTools.getBoundingClientRect();
+            const searchStuck = searchRect.top <= stickyTop + 1;
+            tableHead.classList.toggle('is-stuck', searchStuck && tableHead.getBoundingClientRect().top <= searchRect.bottom + 1);
         }
 
         function renderClassDirectory() {
@@ -9387,13 +10844,14 @@
                 const pending = getClassPendingCounts(item).total;
                 return `<button type="button" class="class-row${pending ? ' has-pending' : ''}" data-class-id="${escapeHtml(item.id)}" aria-label="第${index + 1}个班级，${escapeHtml(getClassDisplayName(item))}，班主任${escapeHtml(item.teacher)}，总人数${item.total}人，男生${item.male}人，女生${item.female}人${pending ? `，有${pending}项待处理` : ''}">
                     <span class="class-index" aria-hidden="true">${String(index + 1).padStart(2,'0')}</span>
-                    <span class="class-table-class"><span class="class-table-name-line" title="${escapeHtml(getClassDisplayName(item))}"><strong class="class-name-short">${escapeHtml(getCompactClassName(getClassDisplayName(item)))}</strong><strong class="class-teacher-full">（${escapeHtml(item.teacher)}）</strong></span></span>
+                    <span class="class-table-class"><span class="class-table-name-line" title="${escapeHtml(getClassDisplayName(item))}（${escapeHtml(item.teacher)}）"><strong class="class-name-short">${escapeHtml(getClassDisplayName(item))}（${escapeHtml(item.teacher)}）</strong></span></span>
                     <span class="class-table-count total">${item.total}</span>
                     <span class="class-table-count male">${item.male}</span>
                     <span class="class-table-count female">${item.female}</span>
                 </button>`;
             }).join('');
             classDirectory.innerHTML = `<section class="class-table" aria-label="全校班级紧凑表格"><div class="class-table-head" aria-hidden="true"><span>序号</span><span>班级（班主任）</span><span>总人数</span><span>男</span><span>女</span></div>${rows}</section>`;
+            requestAnimationFrame(updateClassListStickyState);
         }
 
         function openClassList() {
@@ -9403,6 +10861,7 @@
             renderClassDirectory();
             setView('class-list');
             classListScroll.scrollTop = 0;
+            requestAnimationFrame(updateClassListStickyState);
             focusAfterViewChange(classListBackButton);
         }
 
@@ -9485,12 +10944,21 @@
 
         function renderStudentLiveSummary(classInfo = getSelectedClass()) {
             const counts = getStudentStatusCounts(classInfo);
-            return `<section class="student-live-summary" aria-label="学生实时状态汇总">
-                <div class="student-live-head"><span><span>实时状态 · ${escapeHtml(formatLocalDate())}</span><strong>学生当前状态</strong></span><button type="button" class="student-live-manage" data-open-live-status data-status-filter="all">管理状态</button></div>
-                <div class="student-live-metrics">
-                    <button type="button" class="student-live-metric school" data-open-live-status data-status-filter="在校"><strong>${counts['在校']}</strong><span>在校</span></button>
-                    <button type="button" class="student-live-metric leave" data-open-live-status data-status-filter="请假"><strong>${counts['请假']}</strong><span>请假</span></button>
-                    <button type="button" class="student-live-metric meal" data-open-live-status data-status-filter="就餐"><strong>${counts['就餐']}</strong><span>就餐</span></button>
+            return `<section class="student-roster-board" aria-label="${escapeHtml(getClassDisplayName(classInfo))}学生人数与实时状态">
+                <div class="student-roster-board-head">
+                    <span class="student-roster-board-title"><span>班级学生看板</span><strong>${escapeHtml(getClassDisplayName(classInfo))}</strong></span>
+                    <button type="button" class="student-live-manage" data-open-live-status data-status-filter="all">管理状态</button>
+                </div>
+                <div class="student-roster-demographics" aria-label="班级人数">
+                    <span class="student-roster-demographic"><strong>${classInfo.total}</strong><span>全班</span></span>
+                    <span class="student-roster-demographic"><strong>${classInfo.male}</strong><span>男生</span></span>
+                    <span class="student-roster-demographic"><strong>${classInfo.female}</strong><span>女生</span></span>
+                </div>
+                <div class="student-roster-statuses" aria-label="${escapeHtml(formatLocalDate())}学生实时状态">
+                    <span>学生状态</span>
+                    <button type="button" class="student-roster-status" data-open-live-status data-status-filter="在校"><strong>${counts['在校']}</strong><span>在校</span></button>
+                    <button type="button" class="student-roster-status" data-open-live-status data-status-filter="请假"><strong>${counts['请假']}</strong><span>请假</span></button>
+                    <button type="button" class="student-roster-status" data-open-live-status data-status-filter="就餐"><strong>${counts['就餐']}</strong><span>就餐</span></button>
                 </div>
             </section>`;
         }
@@ -9511,7 +10979,6 @@
                     return `<button type="button" class="class-student-row${item.authenticated ? '' : ' has-pending'}" data-student-id="${escapeHtml(item.id)}" data-roster-search="${escapeHtml(item.name.toLowerCase())}" aria-label="${escapeHtml(item.name)}，今日状态${statusLabel}，查看学生详情">
                         <span class="student-avatar ${item.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(item)}</span>
                         <span class="class-student-copy"><span class="class-student-name">${escapeHtml(item.name)}</span></span>
-                        <span class="class-student-live-state ${studentStatusTone(status)}">${statusLabel}</span>
                         ${item.authenticated ? '' : pendingBadgeMarkup(1)}
                     </button>`;
                 }).join('')}<div class="roster-empty" id="classRosterEmpty" hidden>没有找到完全匹配的本班学生</div></div>`;
@@ -9592,7 +11059,7 @@
                     const tone = filter.value === '在校' ? 'school' : (filter.value === '请假' ? 'leave' : (filter.value === '就餐' ? 'meal' : filter.value));
                     return `<button type="button" class="status-filter-chip filter-${tone}${state.rollcallFilter === filter.value ? ' active' : ''}" data-action="set-rollcall-filter" data-rollcall-filter="${filter.value}" aria-pressed="${state.rollcallFilter === filter.value ? 'true' : 'false'}">${filter.label}</button>`;
                 }).join('')}</div>
-            </section><div class="class-section-head"><h2 id="rollcallCount">学生名单（${getFilteredRollcallRoster().length}）</h2></div><div class="live-status-list" id="liveStatusList">${renderRollcallListMarkup()}</div>`;
+            </section><section class="status-roster-surface" aria-label="学生状态名单"><div class="class-section-head"><h2 id="rollcallCount">学生名单（${getFilteredRollcallRoster().length}）</h2></div><div class="live-status-list" id="liveStatusList">${renderRollcallListMarkup()}</div></section>`;
         }
 
         function updateRollcallList() {
@@ -9678,27 +11145,25 @@
             const scopedNames = new Set(getScopedDormRecords().map(item => item.name));
             const classScoped = state.classModuleOrigin === 'class' && state.classModule === 'dorm';
             const occupiedCount = room.beds.filter(bed => bed.occupied).length;
-            const groups = getDormBunkGroups(room.beds);
             const renderBed = bed => {
-                const placement = getBedPlacement(bed.number, room.beds.length);
+                const bedName = getDormBedName(bed);
                 const isCurrentBed = Boolean(record && record.roomId === room.id && Number(record.bedNumber) === bed.number);
                 const selected = Number(context?.bedNumber) === bed.number;
                 const foreignStudent = classScoped && bed.occupied && !scopedNames.has(bed.studentName);
                 const disabled = Boolean((context && bed.occupied && !isCurrentBed) || foreignStudent);
                 const stateText = bed.occupied ? '已住' : '空床';
-                const studentText = bed.occupied ? (bed.studentName || '已住学生') : '待安排';
+                const studentText = bed.occupied ? (bed.studentName || '已住学生') : '暂未入住';
                 const actionAttrs = context
                     ? ` data-action="select-dorm-bed" data-bed-number="${bed.number}"`
                     : (bed.occupied ? ` data-action="open-occupied-bed-actions" data-room-id="${room.id}" data-bed-number="${bed.number}"` : ` data-action="open-vacant-bed-picker" data-room-id="${room.id}" data-bed-number="${bed.number}"`);
-                return `<button type="button" class="dorm-bed-option ${bed.occupied ? 'occupied' : 'vacant'}${selected ? ' active' : ''}"${actionAttrs}${disabled ? ' disabled' : ''} aria-label="${placement.unitNumber}号床，${placement.bunk}，${escapeHtml(stateText)}，${escapeHtml(studentText)}${foreignStudent ? '，非本班学生不可管理' : ''}">
-                    <span class="dorm-bed-bunk">${placement.bunk}</span><strong class="dorm-bed-student-name">${escapeHtml(studentText)}</strong><span class="dorm-bed-status"><i aria-hidden="true"></i>${escapeHtml(stateText)}</span>
+                return `<button type="button" class="dorm-bed-option dorm-bed-card ${bed.occupied ? 'occupied' : 'vacant'}${selected ? ' active' : ''}"${actionAttrs}${disabled ? ' disabled' : ''} aria-label="${escapeHtml(bedName)}，${escapeHtml(stateText)}，入住人${escapeHtml(studentText)}${foreignStudent ? '，非本班学生不可管理' : ''}">
+                    <span class="dorm-bed-card-head"><strong class="dorm-bed-name">${escapeHtml(bedName)}</strong><span class="dorm-bed-status"><i aria-hidden="true"></i>${escapeHtml(stateText)}</span></span>
+                    <span class="dorm-bed-occupant"><small>入住人</small><strong class="dorm-bed-student-name">${escapeHtml(studentText)}</strong></span>
                 </button>`;
             };
-            return `<div class="dorm-plan" aria-label="${escapeHtml(room.name)}床位分布图">
+            return `<div class="dorm-plan dorm-bed-directory" aria-label="${escapeHtml(room.name)}床位列表">
                 <div class="dorm-plan-head"><div class="dorm-plan-current"><strong>${escapeHtml(room.building ? `${room.building} · ${room.roomNo}` : room.name)}</strong><span>已住 ${occupiedCount}/${room.beds.length}</span></div><div class="dorm-plan-legend"><span><i aria-hidden="true"></i>已住</span><span><i aria-hidden="true"></i>空床</span></div></div>
-                <div class="dorm-plan-corridor">宿舍门口 · 公共走廊</div>
-                <div class="dorm-bed-grid dorm-layout-grid">${groups.map(group => `<section class="dorm-bunk-unit" aria-label="${group.unitNumber}号床位组"><div class="dorm-bunk-unit-head"><span><strong>${String(group.unitNumber).padStart(2,'0')}</strong><small>号床</small></span><em>${group.beds.filter(bed => bed.occupied).length}/${group.beds.length} 已住</em></div><div class="dorm-bunk-stack">${group.beds.map(renderBed).join('')}</div></section>`).join('')}</div>
-                <div class="dorm-plan-balcony">阳台</div>
+                <div class="dorm-bed-grid dorm-card-grid">${getDormDisplayBeds(room.beds).map(renderBed).join('')}</div>
             </div>`;
         }
 
@@ -10049,10 +11514,7 @@
 
         function handleAction(button) {
             const action = button.dataset.action;
-            if (action === 'open-student-status') openStudentStatusDetail();
-            if (action === 'set-student-academic-status') setStudentAcademicStatus(button.dataset.studentAcademicStatus);
-            if (action === 'set-student-live-status') setStudentLiveStatus(button.dataset.studentLiveStatus);
-            if (action === 'clear-student-live-status') setStudentLiveStatus('');
+            if (action === 'open-student-school-tab') switchTab('school', true);
             if (action === 'scroll-student-status-top') {
                 classModuleScroll.scrollTo({ top: 0, behavior: 'smooth' });
                 studentStatusTopButton.blur();
@@ -10349,12 +11811,6 @@
             }
         });
 
-        studentStatusDetailBackButton.addEventListener('click', () => {
-            renderAll();
-            setView('detail');
-            focusAfterViewChange(() => heroRoot.querySelector('[data-action="open-student-status"]') || backButton);
-        });
-
         attendanceBackButton.addEventListener('click', () => {
             renderAll();
             setView('detail');
@@ -10448,6 +11904,7 @@
             });
         });
 
+        classListScroll.addEventListener('scroll', updateClassListStickyState, { passive: true });
         classModuleScroll.addEventListener('scroll', updateStudentStatusTopButton, { passive: true });
 
         schoolFeatureSearch.addEventListener('input', event => {
@@ -10744,7 +12201,7 @@
         else if (previewRoute === 'discipline-setup') openSchoolModule('discipline-setup');
         else if (previewRoute === 'add-student') openStudentList();
         else if (previewRoute === 'student-detail') { openStudentList(); openStudentDetail(students[0].id); }
-        else if (previewRoute === 'student-status') { openStudentList(); openStudentDetail(students[0].id); openStudentStatusDetail(); }
+        else if (previewRoute === 'student-status') { openStudentList(); openStudentDetail(students[0].id); switchTab('school'); }
         else if (previewRoute === 'student-materials') { openStudentList(); openStudentDetail(students[0].id); switchTab('materials'); }
         else if (previewRoute === 'student-attendance') { openStudentList(); openStudentDetail(students[0].id); openStudentAttendance(); }
         else if (previewRoute === 'student-attendance-edit') { openStudentList(); openStudentDetail(students[0].id); openStudentAttendance(); openStudentAttendanceStatusPicker(attendanceBackButton, formatLocalDate()); toggleAttendanceEditorMode(); }
