@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#EFF6FF">
-    <title>掌上校园 · 首页去图标与入口层级优化 7.53</title>
+    <title>掌上校园 · 联系人状态反馈与宿舍统计优化 7.56</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -6634,6 +6634,1245 @@
             font-size: 8px;
             font-weight: 900;
         }
+
+        /* 7.54：学生状态多选、班级看板吸顶、首页四列与宿舍快速定位。 */
+        .phone-copy-button,
+        .contact-phone-line .phone-copy-button,
+        .call-phone-line .phone-copy-button,
+        .parent-option-actions .phone-copy-button,
+        .account-username-line .phone-copy-button,
+        .guardian-copy-action {
+            width: 26px;
+            min-width: 26px;
+            height: 26px;
+            min-height: 26px;
+            display: inline-grid;
+            place-items: center;
+            flex: 0 0 26px;
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+            color: var(--brand);
+            background: transparent;
+            box-shadow: none;
+        }
+        .phone-copy-button svg,
+        .guardian-copy-action svg {
+            width: 15px;
+            height: 15px;
+        }
+        .phone-copy-button:active,
+        .guardian-copy-action:active {
+            transform: scale(.88);
+            background: transparent;
+        }
+        .phone-copy-button.copy-flash svg,
+        .guardian-copy-action.copy-flash svg {
+            animation: copy-icon-flash .52s cubic-bezier(.2,.8,.2,1);
+        }
+        @keyframes copy-icon-flash {
+            0% { opacity: .25; transform: scale(.62); }
+            48% { opacity: 1; transform: scale(1.22); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .class-module-scroll.student-status-scroll {
+            padding-top: 8px;
+        }
+        .student-status-scroll .status-manager-hero {
+            padding: 9px 12px 8px;
+            border-radius: 16px;
+        }
+        .student-status-scroll .status-manager-head strong {
+            margin-top: 1px;
+            font-size: 13px;
+        }
+        .student-status-scroll .status-manager-head > span > span {
+            font-size: 8px;
+        }
+        .student-status-scroll .status-manager-head em {
+            padding: 4px 7px;
+            font-size: 8px;
+        }
+        .student-status-scroll .status-manager-metrics {
+            grid-template-columns: repeat(3,minmax(0,1fr));
+            gap: 0;
+            margin-top: 7px;
+            overflow: hidden;
+            border: 1px solid rgba(31,95,255,.08);
+            border-radius: 11px;
+            background: rgba(255,255,255,.52);
+        }
+        .student-status-scroll .status-manager-metric,
+        .student-status-scroll .status-manager-metric.school,
+        .student-status-scroll .status-manager-metric.leave,
+        .student-status-scroll .status-manager-metric.meal {
+            min-height: 36px;
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 4px;
+            padding: 6px 3px;
+            border: 0;
+            border-radius: 0;
+            color: #52627A;
+            background: transparent;
+            box-shadow: none;
+        }
+        .student-status-scroll .status-manager-metric + .status-manager-metric {
+            border-left: 1px solid rgba(15,23,42,.07);
+        }
+        .student-status-scroll .status-manager-metric strong {
+            font-size: 15px;
+        }
+        .student-status-scroll .status-manager-metric span {
+            margin: 0;
+            font-size: 9px;
+        }
+        .student-status-scroll .status-manager-metric.active {
+            color: var(--brand);
+            background: rgba(31,95,255,.09);
+        }
+        .student-status-scroll .status-manager-metric.meal.active {
+            color: #B45309;
+            background: rgba(245,158,11,.12);
+        }
+        .student-status-scroll .status-toolbar {
+            margin-top: 6px;
+            padding-top: 7px;
+            padding-bottom: 7px;
+        }
+        .student-status-scroll .status-toolbar .rollcall-search {
+            margin-bottom: 0;
+        }
+        .status-roster-surface {
+            padding-top: 0;
+        }
+        .status-roster-surface .status-column-head {
+            min-height: 34px;
+            display: grid;
+            grid-template-columns: minmax(0,1fr) repeat(3,34px);
+            align-items: center;
+            gap: 6px;
+            padding: 0 2px;
+            border-bottom: 1px solid var(--content-line);
+            color: var(--muted);
+            font-size: 9px;
+            font-weight: 900;
+            text-align: center;
+        }
+        .status-roster-surface .status-column-head span:first-child {
+            text-align: left;
+        }
+        .student-status-scroll .live-status-card {
+            min-height: 45px;
+            grid-template-columns: minmax(0,1fr) 114px;
+            gap: 8px;
+            padding: 5px 2px;
+        }
+        .student-status-scroll .live-status-card-head {
+            gap: 0;
+        }
+        .student-status-scroll .compact-status-name {
+            font-size: 11.5px;
+        }
+        .student-status-scroll .compact-status-dot {
+            display: none;
+        }
+        .student-status-scroll .live-status-actions {
+            grid-template-columns: repeat(3,34px);
+            gap: 6px;
+        }
+        .student-status-scroll .live-status-action,
+        .student-status-scroll .live-status-action.school,
+        .student-status-scroll .live-status-action.leave,
+        .student-status-scroll .live-status-action.meal {
+            width: 34px;
+            min-width: 34px;
+            height: 34px;
+            display: grid;
+            place-items: center;
+            padding: 0;
+            border: 0;
+            border-radius: 8px;
+            color: #94A3B8;
+            background: transparent;
+        }
+        .student-status-scroll .status-checkbox {
+            width: 21px;
+            height: 21px;
+            display: grid;
+            place-items: center;
+            border: 1.5px solid #CBD5E1;
+            border-radius: 6px;
+            background: #FFFFFF;
+            transition: border-color .16s ease, background .16s ease, transform .16s ease;
+        }
+        .student-status-scroll .status-checkbox svg {
+            width: 13px;
+            height: 13px;
+            fill: none;
+            stroke: #FFFFFF;
+            stroke-width: 2.7;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            opacity: 0;
+            transform: scale(.65);
+            transition: opacity .15s ease, transform .15s ease;
+        }
+        .student-status-scroll .live-status-action.active,
+        .student-status-scroll .live-status-action.active.school,
+        .student-status-scroll .live-status-action.active.leave,
+        .student-status-scroll .live-status-action.active.meal {
+            border: 0;
+            color: inherit;
+            background: transparent;
+            box-shadow: none;
+        }
+        .student-status-scroll .live-status-action.active .status-checkbox {
+            border-color: var(--brand);
+            background: var(--brand);
+        }
+        .student-status-scroll .live-status-action.active.meal .status-checkbox {
+            border-color: #F59E0B;
+            background: #F59E0B;
+        }
+        .student-status-scroll .live-status-action.active .status-checkbox svg {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .student-status-scroll .live-status-action:active .status-checkbox {
+            transform: scale(.86);
+        }
+
+        .class-summary-card {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            border: 1px solid rgba(255,255,255,.92);
+            background: rgba(255,255,255,.94);
+            box-shadow: 0 7px 18px rgba(31,95,255,.07);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+        .class-list-tools {
+            position: relative;
+            top: auto;
+            z-index: 2;
+        }
+        .class-table-head,
+        .class-table-head.is-stuck {
+            position: relative;
+            top: auto;
+            z-index: 2;
+            border-radius: 24px 24px 0 0;
+            box-shadow: none;
+        }
+        .class-table .class-row {
+            min-height: 48px;
+            padding-block: 5px;
+        }
+
+        .school-home-view .home-high-card {
+            padding: 10px;
+        }
+        .school-home-view .home-high-grid {
+            grid-template-columns: repeat(4,minmax(0,1fr));
+            gap: 6px;
+        }
+        .school-home-view .home-high-btn,
+        .school-home-view .home-high-btn.config {
+            min-height: 52px;
+            display: grid;
+            place-items: center;
+            padding: 7px 3px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .school-home-view .home-high-btn .home-high-copy small {
+            display: none;
+        }
+        .school-home-view .home-high-btn .home-high-copy strong,
+        .school-home-view .home-high-btn .home-high-class-name {
+            margin-top: 0;
+            font-size: 10.5px;
+            line-height: 1.25;
+            white-space: normal;
+        }
+        .school-home-view .admission-entry-grid {
+            grid-template-columns: repeat(4,minmax(0,1fr));
+            gap: 0 5px;
+        }
+        .school-home-view .admission-entry-group-title {
+            grid-column: 1 / -1;
+            min-height: 34px;
+            margin-top: 5px;
+            padding: 10px 0 3px;
+        }
+        .school-home-view .admission-entry-btn {
+            min-height: 40px;
+            justify-content: center;
+            padding: 0 2px;
+            font-size: 10.5px;
+            line-height: 1.25;
+            text-align: center;
+        }
+
+        .school-dorm-overview {
+            gap: 0;
+            padding: 8px 0;
+            overflow: hidden;
+            border: 1px solid rgba(31,95,255,.08);
+            border-radius: 16px;
+            background: rgba(255,255,255,.66);
+        }
+        .school-dorm-stat {
+            padding: 4px 5px;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+        }
+        .school-dorm-stat + .school-dorm-stat {
+            border-left: 1px solid rgba(15,23,42,.075);
+        }
+        .school-dorm-level-card {
+            grid-template-columns: minmax(0,1fr) auto;
+            gap: 10px;
+        }
+        .school-dorm-level-icon {
+            display: none;
+        }
+        .school-dorm-quick-search {
+            position: relative;
+            margin: 10px 0 12px;
+        }
+        .school-dorm-quick-search svg {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            width: 16px;
+            height: 16px;
+            transform: translateY(-50%);
+            fill: none;
+            stroke: #94A3B8;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+        }
+        .school-dorm-quick-search input {
+            width: 100%;
+            height: 40px;
+            padding: 0 12px 0 37px;
+            border: 1px solid rgba(31,95,255,.11);
+            border-radius: 11px;
+            outline: 0;
+            color: var(--ink);
+            background: rgba(255,255,255,.82);
+            font-size: 11px;
+            font-weight: 800;
+        }
+        .school-dorm-quick-search input:focus {
+            border-color: rgba(31,95,255,.32);
+            box-shadow: 0 0 0 3px rgba(31,95,255,.06);
+        }
+        .school-dorm-search-results {
+            display: grid;
+            gap: 7px;
+        }
+        .school-dorm-search-result {
+            width: 100%;
+            min-height: 50px;
+            display: grid;
+            grid-template-columns: minmax(0,1fr) auto;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 11px;
+            border: 0;
+            border-bottom: 1px solid rgba(15,23,42,.07);
+            color: inherit;
+            background: rgba(255,255,255,.62);
+            text-align: left;
+        }
+        .school-dorm-search-result strong,
+        .school-dorm-search-result small {
+            display: block;
+        }
+        .school-dorm-search-result strong {
+            color: var(--ink);
+            font-size: 13px;
+            font-weight: 950;
+        }
+        .school-dorm-search-result small,
+        .school-dorm-search-result > span:last-child {
+            margin-top: 3px;
+            color: var(--muted);
+            font-size: 9px;
+            font-weight: 820;
+        }
+        .school-dorm-search-empty {
+            padding: 18px 8px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 800;
+            text-align: center;
+        }
+
+        .dorm-bed-student-option.active strong,
+        .dorm-bed-student-option.active small {
+            color: #FFFFFF;
+        }
+        .dorm-bed-student-option.active .student-sequence {
+            border-color: rgba(255,255,255,.46);
+            color: #FFFFFF;
+            background: rgba(255,255,255,.20);
+        }
+        .dorm-bed-student-option.active > svg {
+            stroke: #FFFFFF;
+        }
+        .dorm-bed-option.dorm-bed-card.occupied,
+        .class-module-scroll .dorm-bed-option.dorm-bed-card.occupied:not(:disabled):not(.active) {
+            border-color: rgba(100,116,139,.10);
+            color: #334155;
+            background: #F8FAFC;
+            box-shadow: none;
+        }
+        .dorm-bed-option.dorm-bed-card.occupied .dorm-bed-status,
+        .class-module-scroll .dorm-bed-option.dorm-bed-card.occupied:not(:disabled):not(.active) .dorm-bed-status {
+            color: #64748B;
+        }
+        .dorm-bed-option.dorm-bed-card.occupied .dorm-bed-student-name,
+        .class-module-scroll .dorm-bed-option.dorm-bed-card.occupied:not(:disabled):not(.active) .dorm-bed-student-name {
+            color: var(--ink);
+        }
+        .dorm-plan-legend span:first-child i {
+            background: #94A3B8;
+        }
+        .dorm-plan-legend span:last-child i {
+            background: #EF4444;
+        }
+
+        /* 7.55：状态控件语义、首页图标、班级连续吸顶与宿舍统计双视图。 */
+        .student-status-scroll .live-status-action.school .status-checkbox,
+        .student-status-scroll .live-status-action.leave .status-checkbox {
+            border-radius: 50%;
+        }
+        .student-status-scroll .live-status-action.meal .status-checkbox {
+            border-radius: 6px;
+        }
+        .student-status-scroll .status-radio-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #FFFFFF;
+            opacity: 0;
+            transform: scale(.45);
+            transition: opacity .15s ease, transform .15s ease;
+        }
+        .student-status-scroll .live-status-action.active .status-radio-dot {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .status-roster-surface .status-column-head span:nth-child(2)::before,
+        .status-roster-surface .status-column-head span:nth-child(3)::before,
+        .status-roster-surface .status-column-head span:nth-child(4)::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            display: inline-block;
+            margin-right: 2px;
+            border: 1px solid #94A3B8;
+            vertical-align: -1px;
+        }
+        .status-roster-surface .status-column-head span:nth-child(2)::before,
+        .status-roster-surface .status-column-head span:nth-child(3)::before {
+            border-radius: 50%;
+        }
+        .status-roster-surface .status-column-head span:nth-child(4)::before {
+            border-radius: 2px;
+        }
+
+        .school-home-view .home-high-btn.config {
+            color: var(--brand);
+        }
+        .school-home-view .home-high-btn.config .home-add-icon {
+            width: 22px;
+            height: 22px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+        }
+        .school-home-view .home-high-btn:not(.class-shortcut):not(.config) .home-high-copy strong {
+            overflow: visible;
+            text-overflow: clip;
+            white-space: nowrap;
+        }
+        .school-home-view .home-high-btn > .feature-pending-dot,
+        .school-home-view .home-high-btn > .feature-pending-dot.dot-only {
+            top: -7px;
+            right: -7px;
+        }
+        .school-home-view .admission-entry-btn > .feature-pending-dot,
+        .school-home-view .admission-entry-btn > .feature-pending-dot.dot-only {
+            top: -5px;
+            right: -5px;
+        }
+        .school-home-view .home-high-btn.manage-mode::after {
+            content: "";
+            top: -6px;
+            right: -6px;
+            width: 20px;
+            height: 20px;
+            padding: 0;
+            border: 1.5px solid #FFFFFF;
+            border-radius: 50%;
+            color: #FFFFFF;
+            background-color: var(--danger);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round'%3E%3Cline x1='17' y1='7' x2='7' y2='17'/%3E%3Cline x1='7' y1='7' x2='17' y2='17'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 9px 9px;
+            box-shadow: 0 4px 8px rgba(239,68,68,.25);
+            font-size: 0;
+        }
+        .school-home-view .admission-entry-btn.manage-mode::after {
+            content: "";
+            top: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            padding: 0;
+            transform: none;
+            border: 1.5px solid #FFFFFF;
+            border-radius: 50%;
+            color: #FFFFFF;
+            background-color: var(--success);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round'%3E%3Cline x1='12' y1='5' x2='12' y2='19'/%3E%3Cline x1='5' y1='12' x2='19' y2='12'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 10px 10px;
+            box-shadow: 0 4px 8px rgba(16,185,129,.25);
+            font-size: 0;
+        }
+        .school-home-view .home-high-btn.manage-mode > .feature-pending-dot,
+        .school-home-view .admission-entry-btn.manage-mode > .feature-pending-dot {
+            display: none;
+        }
+
+        .class-list-scroll {
+            --class-summary-sticky-height: 52px;
+            --class-search-sticky-height: 56px;
+        }
+        .class-summary-card {
+            position: sticky;
+            top: 0;
+            z-index: 42;
+        }
+        .class-list-tools {
+            position: sticky;
+            top: var(--class-summary-sticky-height);
+            z-index: 40;
+            min-height: var(--class-search-sticky-height);
+            background: linear-gradient(135deg, rgba(239,246,255,.98), rgba(223,231,255,.97));
+        }
+        .class-table-head,
+        .class-table-head.is-stuck {
+            position: sticky;
+            top: calc(var(--class-summary-sticky-height) + var(--class-search-sticky-height));
+            z-index: 38;
+            background: #FFFFFF;
+        }
+        .class-table-head.is-stuck {
+            border-radius: 0;
+            box-shadow: 0 7px 16px rgba(31,95,255,.055);
+        }
+
+        .school-dorm-room-grid {
+            grid-template-columns: repeat(3,minmax(0,1fr));
+            gap: 6px;
+        }
+        .school-dorm-room-grid .school-room-card {
+            min-height: 46px;
+            padding: 7px 5px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .school-dorm-room-grid .school-room-card strong {
+            font-size: 11px;
+        }
+        .school-dorm-room-grid .school-room-card span {
+            margin-top: 3px;
+            font-size: 10px;
+        }
+        .dorm-bed-grid.dorm-card-grid {
+            gap: 6px;
+        }
+        .dorm-bed-option.dorm-bed-card {
+            min-height: 72px;
+            gap: 6px;
+            padding: 9px;
+            border-radius: 12px;
+        }
+        #classModuleView.school-dorm-room-mode .class-module-scroll {
+            padding-bottom: 0;
+        }
+        #classModuleView.school-dorm-room-mode #classModuleRoot {
+            min-height: calc(100% + 1px);
+            padding-bottom: 36px;
+        }
+
+        .dorm-stats-shell {
+            min-height: 100%;
+            color: var(--ink);
+        }
+        .dorm-stats-switch {
+            position: sticky;
+            top: 92px;
+            z-index: 36;
+            display: grid;
+            grid-template-columns: repeat(2,minmax(0,1fr));
+            gap: 4px;
+            margin: -16px -20px 12px;
+            padding: 8px 20px;
+            border-bottom: 1px solid rgba(15,23,42,.07);
+            background: rgba(255,255,255,.96);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+        .dorm-stats-tab {
+            min-height: 36px;
+            padding: 0 10px;
+            border: 0;
+            border-radius: 10px;
+            color: #64748B;
+            background: #F1F5F9;
+            font-size: 12px;
+            font-weight: 900;
+        }
+        .dorm-stats-tab.active {
+            color: #FFFFFF;
+            background: var(--brand);
+        }
+        .dorm-stats-note {
+            margin: 0 0 10px;
+            color: #64748B;
+            font-size: 11px;
+            font-weight: 750;
+            line-height: 1.5;
+        }
+        .dorm-stats-table-wrap {
+            margin-inline: -20px;
+        }
+        .dorm-stats-table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+            background: #FFFFFF;
+            font-variant-numeric: tabular-nums;
+        }
+        .dorm-stats-table th {
+            position: sticky;
+            top: 144px;
+            z-index: 32;
+            height: 38px;
+            padding: 6px 4px;
+            border-top: 1px solid rgba(15,23,42,.07);
+            border-bottom: 1px solid rgba(15,23,42,.09);
+            color: #64748B;
+            background: rgba(248,250,252,.98);
+            font-size: 11px;
+            font-weight: 900;
+            line-height: 1.2;
+            text-align: center;
+        }
+        .dorm-stats-table th small {
+            font-size: 10px;
+            font-weight: 850;
+        }
+        .dorm-stats-table td {
+            padding: 10px 5px;
+            border-bottom: 1px solid rgba(15,23,42,.07);
+            color: #334155;
+            font-size: 11px;
+            font-weight: 800;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .dorm-building-table col:nth-child(1) { width: 25%; }
+        .dorm-building-table col:nth-child(2) { width: 40%; }
+        .dorm-building-table col:nth-child(3) { width: 35%; }
+        .dorm-building-name {
+            color: #111827 !important;
+            font-size: 12px !important;
+            font-weight: 950 !important;
+            line-height: 1.3;
+        }
+        .dorm-metric-cluster {
+            display: grid;
+            align-items: start;
+            gap: 2px;
+        }
+        .dorm-metric-cluster.rooms { grid-template-columns: repeat(4,minmax(0,1fr)); }
+        .dorm-metric-cluster.beds { grid-template-columns: repeat(3,minmax(0,1fr)); }
+        .dorm-metric-cluster span {
+            min-width: 0;
+            display: block;
+        }
+        .dorm-metric-cluster strong,
+        .dorm-metric-cluster small {
+            display: block;
+        }
+        .dorm-metric-cluster strong {
+            color: #111827;
+            font-size: 11px;
+            font-weight: 950;
+        }
+        .dorm-metric-cluster small {
+            margin-top: 3px;
+            color: #94A3B8;
+            font-size: 10px;
+            font-weight: 850;
+        }
+        .dorm-building-total td {
+            color: #1747C8;
+            background: #EFF6FF;
+            font-weight: 950;
+        }
+        .dorm-class-table col:nth-child(1) { width: 40%; }
+        .dorm-class-table col:nth-child(2),
+        .dorm-class-table col:nth-child(3),
+        .dorm-class-table col:nth-child(4) { width: 20%; }
+        .dorm-class-name {
+            padding-left: 12px !important;
+            color: #111827 !important;
+            font-size: 11px !important;
+            font-weight: 950 !important;
+            line-height: 1.35;
+            text-align: left !important;
+        }
+        .dorm-gender-count strong,
+        .dorm-gender-count small {
+            display: block;
+        }
+        .dorm-gender-count strong {
+            color: #334155;
+            font-size: 11px;
+            font-weight: 950;
+        }
+        .dorm-gender-count strong .male { color: #2563EB; }
+        .dorm-gender-count strong .female { color: #DB2777; }
+        .dorm-gender-count strong i {
+            margin-inline: 3px;
+            color: #CBD5E1;
+            font-style: normal;
+        }
+        .dorm-gender-count small {
+            margin-top: 3px;
+            color: #94A3B8;
+            font-size: 10px;
+            font-weight: 850;
+        }
+        .dorm-class-assignments td {
+            padding: 7px 12px 11px;
+            background: #FBFCFE;
+            text-align: left;
+        }
+        .dorm-assignment-label {
+            display: block;
+            margin-bottom: 6px;
+            color: #64748B;
+            font-size: 10px;
+            font-weight: 900;
+        }
+        .dorm-assignment-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px 6px;
+        }
+        .dorm-assignment {
+            display: inline-flex;
+            align-items: center;
+            min-height: 24px;
+            padding: 4px 7px;
+            border: 1px solid rgba(31,95,255,.09);
+            border-radius: 8px;
+            color: #334155;
+            background: #FFFFFF;
+            font-size: 10px;
+            font-weight: 850;
+            line-height: 1.25;
+        }
+        .dorm-assignment-empty {
+            color: #94A3B8;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        /* 7.56：联系人紧凑行、首页徽标归位与宿舍统计信息层级重构。 */
+        .school-home-view .home-high-card {
+            overflow: visible;
+            padding: 10px;
+        }
+        .school-home-view .home-high-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+        }
+        .school-home-view .home-high-btn,
+        .school-home-view .home-high-btn.config {
+            min-width: 0;
+            min-height: 56px;
+            padding: 8px 20px 8px 8px;
+            overflow: visible;
+            border-radius: 12px;
+        }
+        .school-home-view .home-high-btn.config {
+            padding-right: 8px;
+        }
+        .school-home-view .home-high-btn .home-high-copy strong,
+        .school-home-view .home-high-btn .home-high-class-name {
+            max-width: 100%;
+            font-size: 11.5px;
+            line-height: 1.3;
+            overflow-wrap: anywhere;
+        }
+        .school-home-view .home-high-btn > .feature-pending-dot,
+        .school-home-view .home-high-btn > .feature-pending-dot.dot-only {
+            top: 5px;
+            right: 5px;
+        }
+
+        .contact-row {
+            min-height: 48px;
+            grid-template-columns: 26px minmax(0, 1fr) 34px;
+            gap: 9px;
+            padding: 6px 0;
+        }
+        .contact-sequence {
+            font-size: 11px;
+        }
+        .contact-name-line {
+            display: block;
+            min-width: 0;
+        }
+        .contact-name {
+            max-width: 100%;
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+            font-size: 13.5px;
+            line-height: 1.35;
+        }
+        .contact-detail-inline {
+            min-width: 0;
+            overflow: hidden;
+            color: #64748B;
+            font-size: 11px;
+            font-weight: 750;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .contact-meta {
+            display: none;
+        }
+        .contact-call {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+        }
+
+        #classModuleView.dorm-stats-mode #classModuleRoot {
+            padding-top: 16px;
+        }
+        #classModuleView.dorm-stats-mode .topbar {
+            grid-template-columns: 44px minmax(0, 1fr) 44px;
+        }
+        #classModuleView.dorm-stats-mode .nav-button {
+            width: 32px;
+            height: 32px;
+            border: 0;
+            background: transparent;
+        }
+        #classModuleView.dorm-stats-mode .nav-button svg {
+            width: 24px;
+            height: 24px;
+        }
+        .dorm-stats-shell {
+            min-height: 100%;
+            color: var(--ink);
+        }
+        .dorm-stats-overview {
+            padding: 2px 0 14px;
+        }
+        .dorm-stats-overview-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        .dorm-stats-overview-head span {
+            color: #334155;
+            font-size: 13px;
+            font-weight: 900;
+        }
+        .dorm-stats-overview-head em {
+            color: #64748B;
+            font-size: 11px;
+            font-style: normal;
+            font-weight: 700;
+        }
+        .dorm-stats-primary {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            align-items: end;
+            gap: 12px;
+            padding-bottom: 13px;
+            border-bottom: 1px solid rgba(15,23,42,.07);
+        }
+        .dorm-stats-primary-value strong {
+            display: block;
+            color: #111827;
+            font-size: 30px;
+            font-weight: 950;
+            line-height: 1;
+            letter-spacing: -.04em;
+            font-variant-numeric: tabular-nums;
+        }
+        .dorm-stats-primary-value span {
+            display: block;
+            margin-top: 6px;
+            color: #64748B;
+            font-size: 11px;
+            font-weight: 800;
+        }
+        .dorm-stats-primary-copy {
+            min-width: 0;
+            padding-bottom: 1px;
+            text-align: right;
+        }
+        .dorm-stats-primary-copy strong {
+            display: block;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 900;
+            font-variant-numeric: tabular-nums;
+        }
+        .dorm-stats-primary-copy span {
+            display: block;
+            margin-top: 5px;
+            color: #64748B;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .dorm-stats-kpis {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            margin-top: 12px;
+        }
+        .dorm-stats-kpi {
+            min-width: 0;
+            padding: 0 12px;
+            border-left: 1px solid rgba(15,23,42,.07);
+        }
+        .dorm-stats-kpi:first-child {
+            padding-left: 0;
+            border-left: 0;
+        }
+        .dorm-stats-kpi:last-child {
+            padding-right: 0;
+        }
+        .dorm-stats-kpi strong {
+            display: block;
+            color: #111827;
+            font-size: 17px;
+            font-weight: 950;
+            font-variant-numeric: tabular-nums;
+        }
+        .dorm-stats-kpi span {
+            display: block;
+            margin-top: 4px;
+            color: #64748B;
+            font-size: 11px;
+            font-weight: 750;
+        }
+        .dorm-stats-switch {
+            position: sticky;
+            top: 92px;
+            z-index: 36;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 4px;
+            margin: 0 -20px;
+            padding: 8px 20px;
+            border-top: 1px solid rgba(15,23,42,.06);
+            border-bottom: 1px solid rgba(15,23,42,.07);
+            background: rgba(255,255,255,.98);
+            box-shadow: 0 6px 14px rgba(15,23,42,.025);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+        .dorm-stats-tab {
+            min-height: 36px;
+            padding: 0 10px;
+            border: 0;
+            border-radius: 10px;
+            color: #64748B;
+            background: #F1F5F9;
+            font-size: 12px;
+            font-weight: 900;
+        }
+        .dorm-stats-tab.active {
+            color: #FFFFFF;
+            background: var(--brand);
+        }
+        .dorm-stats-context {
+            margin: 0;
+            padding: 11px 0 10px;
+            color: #64748B;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.5;
+        }
+        .dorm-stats-list-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            min-height: 34px;
+            margin: 0 -20px;
+            padding: 0 20px;
+            border-top: 1px solid rgba(15,23,42,.06);
+            border-bottom: 1px solid rgba(15,23,42,.07);
+            color: #64748B;
+            background: #F8FAFC;
+            font-size: 11px;
+            font-weight: 850;
+        }
+        .dorm-building-list,
+        .dorm-class-list {
+            margin: 0 -20px;
+        }
+        .dorm-building-row-v2 {
+            display: grid;
+            grid-template-columns: 82px minmax(0, 1fr);
+            gap: 12px;
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(15,23,42,.07);
+            background: #FFFFFF;
+        }
+        .dorm-building-identity {
+            min-width: 0;
+            padding-top: 1px;
+        }
+        .dorm-building-identity strong {
+            display: block;
+            color: #111827;
+            font-size: 14px;
+            font-weight: 950;
+            line-height: 1.35;
+        }
+        .dorm-building-identity span {
+            display: block;
+            margin-top: 5px;
+            color: #64748B;
+            font-size: 11px;
+            font-weight: 750;
+            line-height: 1.35;
+        }
+        .dorm-building-detail {
+            min-width: 0;
+        }
+        .dorm-building-usage {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .dorm-building-usage strong {
+            color: #334155;
+            font-size: 13px;
+            font-weight: 900;
+            font-variant-numeric: tabular-nums;
+        }
+        .dorm-building-usage strong small {
+            color: #94A3B8;
+            font-size: 11px;
+            font-weight: 750;
+        }
+        .dorm-building-rate {
+            color: #1747C8;
+            font-size: 12px;
+            font-weight: 900;
+            font-variant-numeric: tabular-nums;
+        }
+        .dorm-occupancy-track {
+            height: 5px;
+            margin-top: 7px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #E8EDF5;
+        }
+        .dorm-occupancy-track span {
+            height: 100%;
+            display: block;
+            border-radius: inherit;
+            background: #6B8EFF;
+        }
+        .dorm-building-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px 10px;
+            margin-top: 8px;
+            color: #64748B;
+            font-size: 11px;
+            font-weight: 750;
+        }
+        .dorm-building-meta span:last-child {
+            color: #B45309;
+        }
+        .dorm-class-item {
+            border-bottom: 1px solid rgba(15,23,42,.07);
+            background: #FFFFFF;
+        }
+        .dorm-class-summary-button {
+            width: 100%;
+            min-height: 48px;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 20px 8px;
+            border: 0;
+            color: inherit;
+            background: transparent;
+            text-align: left;
+        }
+        .dorm-class-summary-button:disabled {
+            opacity: 1;
+            cursor: default;
+        }
+        .dorm-class-title {
+            min-width: 0;
+        }
+        .dorm-class-title strong {
+            display: block;
+            overflow: hidden;
+            color: #111827;
+            font-size: 13px;
+            font-weight: 950;
+            line-height: 1.35;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .dorm-class-title small {
+            display: block;
+            margin-top: 3px;
+            color: #64748B;
+            font-size: 11px;
+            font-weight: 750;
+        }
+        .dorm-class-room-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #64748B;
+            font-size: 11px;
+            font-weight: 850;
+            white-space: nowrap;
+        }
+        .dorm-class-room-count svg {
+            width: 14px;
+            height: 14px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: transform .18s ease;
+        }
+        .dorm-class-summary-button[aria-expanded="true"] .dorm-class-room-count {
+            color: var(--brand);
+        }
+        .dorm-class-summary-button[aria-expanded="true"] .dorm-class-room-count svg {
+            transform: rotate(90deg);
+        }
+        .dorm-class-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            padding: 0 20px 12px;
+        }
+        .dorm-class-metric {
+            min-width: 0;
+            padding: 0 10px;
+            border-left: 1px solid rgba(15,23,42,.07);
+        }
+        .dorm-class-metric:first-child {
+            padding-left: 0;
+            border-left: 0;
+        }
+        .dorm-class-metric:last-child {
+            padding-right: 0;
+        }
+        .dorm-class-metric span {
+            display: block;
+            color: #64748B;
+            font-size: 11px;
+            font-weight: 750;
+        }
+        .dorm-class-metric strong {
+            display: block;
+            margin-top: 4px;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 950;
+            font-variant-numeric: tabular-nums;
+        }
+        .dorm-class-metric .male {
+            color: #2563EB;
+        }
+        .dorm-class-metric .female {
+            color: #DB2777;
+        }
+        .dorm-class-metric i {
+            margin: 0 4px;
+            color: #CBD5E1;
+            font-style: normal;
+        }
+        .dorm-class-assignments-v2 {
+            padding: 11px 20px 13px;
+            border-top: 1px solid rgba(15,23,42,.06);
+            background: #F8FAFC;
+        }
+        .dorm-class-assignments-v2 > span {
+            display: block;
+            margin-bottom: 7px;
+            color: #64748B;
+            font-size: 11px;
+            font-weight: 850;
+        }
+        .dorm-assignment-list-v2 {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .dorm-assignment-v2 {
+            max-width: 100%;
+            min-height: 26px;
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            border: 1px solid rgba(31,95,255,.10);
+            border-radius: 8px;
+            color: #334155;
+            background: #FFFFFF;
+            font-size: 11px;
+            font-weight: 800;
+            line-height: 1.35;
+        }
+        .dorm-assignment-empty-v2 {
+            color: #94A3B8;
+            font-size: 11px;
+            font-weight: 750;
+        }
     </style>
 </head>
 <body>
@@ -6947,7 +8186,7 @@
                 <div class="call-person" id="callSingleRoot">
                     <span id="callPersonRole">确认联系</span>
                     <strong id="callSheetTitle"><span id="callPersonName">联系人</span></strong>
-                    <div class="call-phone-line"><em id="callPersonPhone">138 0000 0000</em><button type="button" class="phone-copy-button" id="callPhoneCopyButton" data-action="copy" data-copy="13800000000" aria-label="复制电话号码"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="11" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path></svg>复制</button></div>
+                    <div class="call-phone-line"><em id="callPersonPhone">138 0000 0000</em><button type="button" class="phone-copy-button" id="callPhoneCopyButton" data-action="copy" data-copy="13800000000" aria-label="复制电话号码"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="11" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path></svg></button></div>
                 </div>
                 <a class="call-confirm" id="callConfirmLink" href="tel:13800000000"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.11 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.72c.12.9.35 1.78.68 2.62a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.46-1.24a2 2 0 0 1 2.11-.45c.84.33 1.72.56 2.62.68A2 2 0 0 1 22 16.92z"></path></svg>拨打电话</a>
                 <div class="guardian-call-root" id="guardianCallRoot" hidden></div>
@@ -7271,6 +8510,7 @@
             rollcallSessionDrafts: {},
             studentStatusByClass: {},
             studentStatusHandledByDay: {},
+            studentStatusMealByDay: {},
             checkinTasks: [
                 { id: 'return-20260724', type: 'return', title: '暑期实训返校点到', window: '7月24日 14:00—18:00', status: '进行中', createdBy: '学工处 · 陈老师', checkedIds: [] },
                 { id: 'return-20260718', type: 'return', title: '周末返校点到', window: '7月18日 16:00—19:00', status: '已完成', createdBy: '学工处 · 李老师', checkedIds: [] },
@@ -7300,19 +8540,19 @@
         const dormInventory = {
             '女': [
                 { id: 'F401', building: 'F栋', roomNo: '401', name: '401宿舍', beds: makeDormBeds(['叶清欢','许安宁','周以宁','赵思妍','陈语桐','何嘉怡','彭心悦','余静姝']) },
-                { id: 'F402', building: 'F栋', roomNo: '402', name: '402宿舍', beds: makeDormBeds(['梁诗语','林知夏','唐若溪','']) },
+                { id: 'F402', building: 'F栋', roomNo: '402', name: '402宿舍', beds: makeDormBeds(['梁诗语','林知夏','唐若溪','','','','','']) },
                 { id: 'F403', building: 'G栋', roomNo: '403', name: '403宿舍', beds: makeDormBeds(['苏晚晴','宋予希','', '', '罗书瑶','', '江婉宁','韩雨薇']) },
-                { id: 'F404', building: 'G栋', roomNo: '404', name: '404宿舍', beds: makeDormBeds(['顾星遥','林书妍','许依诺','','','']) }
+                { id: 'F404', building: 'G栋', roomNo: '404', name: '404宿舍', beds: makeDormBeds(['顾星遥','林书妍','许依诺','','','','','']) }
             ],
             '男': [
                 { id: 'M301', building: 'A栋', roomNo: '301', name: '301宿舍', beds: makeDormBeds(['陈柏安','谢承宇','周景行','沈亦辰','林予安','江叙白','高亦凡','唐一航']) },
-                { id: 'M302', building: 'A栋', roomNo: '302', name: '302宿舍', beds: makeDormBeds(['陆星野','顾怀川','许嘉木','']) },
+                { id: 'M302', building: 'A栋', roomNo: '302', name: '302宿舍', beds: makeDormBeds(['陆星野','顾怀川','许嘉木','','','','','']) },
                 { id: 'M303', building: 'B栋', roomNo: '303', name: '303宿舍', beds: makeDormBeds(['', '', '程屿','', '', '宋知远','叶修远','梁慕辰']) },
-                { id: 'M304', building: 'B栋', roomNo: '304', name: '304宿舍', beds: makeDormBeds(['秦朗','韩旭','','','']) }
+                { id: 'M304', building: 'B栋', roomNo: '304', name: '304宿舍', beds: makeDormBeds(['秦朗','韩旭','','','','','','']) }
             ]
         };
         const prototypeDormSurnames = ['陈','林','张','李','王','周','吴','郑','赵','钱','孙','许','徐','顾','沈','叶','宋','梁','何','高','罗','彭','韩','冯','邓','曹','魏','杜','陶','袁','夏','程'];
-        const prototypeDormGivenNames = ['子轩','梓涵','宇辰','诗涵','浩然','雨桐','嘉诚','欣妍','奕辰','若曦','思远','可欣','景行','书瑶','明哲','语柔','星河','安然','嘉树','清妍','沐阳','知意','云开','佳宁','修远','安歌','景澄','依诺','承宇','雅琪','亦辰','梦瑶'];
+        const prototypeDormGivenNames = ['子轩','梓涵','宇辰','诗涵','浩然','雨桐','嘉诚','欣妍','奕辰','若曦','思远','可欣','景行','书瑶','明哲','语柔','星河','安然','嘉树','清妍','沐阳','知意','云开','佳宁','修远','安歌','景澄','依诺','承宇','雅琪','亦辰','梦瑶','嘉禾','清越','向晨','知远','亦航','沐辰','景尧','星野','柏舟','书言','予安','时雨','乐川','望舒','云舒','昭宁','怀瑾','允禾','闻溪','念初','亦宁','子衿','清和','映雪','言蹊','南乔','明朗','初晴','舒窈','嘉言','思齐','庭安','青禾','砚舟','星澜','若川','景湛','砚秋','舒然','安澜'];
         const usedDormStudentNames = new Set(Object.values(dormInventory).flat().flatMap(room => room.beds.map(bed => bed.studentName).filter(Boolean)));
         let prototypeDormNameCursor = 0;
         function nextPrototypeDormStudentName() {
@@ -7326,18 +8566,32 @@
             usedDormStudentNames.add(candidate);
             return candidate;
         }
-        const prototypeDormBuildings = { '男': ['A栋','B栋'], '女': ['F栋','G栋'] };
+        const prototypeDormBuildings = {
+            '男': [
+                { name: 'A栋', code: 'A' },
+                { name: 'B栋', code: 'B' },
+                { name: 'E栋', code: 'E' },
+                { name: '9号达畅楼', code: 'DC9' }
+            ],
+            '女': [
+                { name: 'F栋', code: 'F' },
+                { name: 'G栋', code: 'G' },
+                { name: 'H栋', code: 'H' },
+                { name: '旭泰宿舍', code: 'XT' }
+            ]
+        };
         Object.entries(prototypeDormBuildings).forEach(([gender, buildings], genderIndex) => {
-            buildings.forEach((building, buildingIndex) => {
-                const buildingCode = building.replace('栋','');
+            buildings.forEach((buildingInfo, buildingIndex) => {
+                const building = buildingInfo.name;
                 for (let floor = 1; floor <= 6; floor += 1) {
-                    for (let roomIndex = 1; roomIndex <= 4; roomIndex += 1) {
+                    for (let roomIndex = 1; roomIndex <= 6; roomIndex += 1) {
                         const roomNo = `${floor}0${roomIndex}`;
                         if (dormInventory[gender].some(room => room.building === building && room.roomNo === roomNo)) continue;
-                        const occupiedCount = 5 + ((genderIndex + buildingIndex + floor + roomIndex) % 4);
+                        const patternSeed = genderIndex * 37 + buildingIndex * 19 + floor * 7 + roomIndex;
+                        const occupiedCount = patternSeed % 11 === 0 ? 0 : (patternSeed % 4 === 0 ? 8 : 4 + (patternSeed % 4));
                         const names = Array.from({ length: 8 }, (_, bedIndex) => bedIndex < occupiedCount ? nextPrototypeDormStudentName() : '');
                         dormInventory[gender].push({
-                            id: `PROTO-${buildingCode}-${roomNo}`,
+                            id: `PROTO-${buildingInfo.code}-${roomNo}`,
                             building,
                             roomNo,
                             name: `${roomNo}宿舍`,
@@ -7346,6 +8600,50 @@
                     }
                 }
             });
+        });
+
+        const dormStatsBuildingOrder = ['A栋','B栋','E栋','F栋','G栋','H栋','旭泰宿舍','9号达畅楼'];
+        const dormStatsMajors = ['平面','软件','电商','计应','艺术','动漫','计算机'];
+        const dormStatsMaleBuildings = ['A栋','B栋','E栋','9号达畅楼'];
+        const dormStatsFemaleBuildings = ['F栋','G栋','H栋','旭泰宿舍'];
+        function makeDormStatsAssignments(gradeIndex, majorIndex, gender, stayCount) {
+            if (!stayCount) return [];
+            const buildings = gender === '男' ? dormStatsMaleBuildings : dormStatsFemaleBuildings;
+            const building = buildings[(gradeIndex + majorIndex) % buildings.length];
+            const roomCount = Math.ceil(stayCount / 8);
+            return Array.from({ length: roomCount }, (_, roomIndex) => {
+                const floor = 2 + ((gradeIndex + majorIndex + roomIndex) % 4);
+                const roomNumber = 1 + ((majorIndex * 2 + roomIndex) % 6);
+                const roomNo = `${floor}0${roomNumber}`;
+                const room = dormInventory[gender].find(item => item.building === building && item.roomNo === roomNo);
+                const capacity = room?.beds.length || 8;
+                const actual = room ? room.beds.filter(bed => bed.occupied).length : Math.min(8, Math.max(1, stayCount - roomIndex * 8));
+                return `${building}${roomNo} ${gender}（${capacity}/${actual}）`;
+            });
+        }
+        const dormClassDetailData = [24,25,26].flatMap((grade, gradeIndex) => dormStatsMajors.map((major, majorIndex) => {
+            const stayMale = 8 + ((gradeIndex * 3 + majorIndex * 2) % 9);
+            const stayFemale = 6 + ((gradeIndex * 4 + majorIndex * 3) % 11);
+            const commuteMale = 2 + ((gradeIndex + majorIndex) % 5);
+            const commuteFemale = 2 + ((gradeIndex * 2 + majorIndex) % 5);
+            const unknownMale = (gradeIndex + majorIndex) % 3;
+            const unknownFemale = (gradeIndex * 2 + majorIndex + 1) % 3;
+            return {
+                className: `${grade}级${major}1班`,
+                stay: { male: stayMale, female: stayFemale },
+                commute: { male: commuteMale, female: commuteFemale },
+                unknown: { male: unknownMale, female: unknownFemale },
+                assignments: [
+                    ...makeDormStatsAssignments(gradeIndex, majorIndex, '男', stayMale),
+                    ...makeDormStatsAssignments(gradeIndex, majorIndex, '女', stayFemale)
+                ]
+            };
+        })).concat({
+            className: '26级未报到人员',
+            stay: { male: 0, female: 0 },
+            commute: { male: 0, female: 0 },
+            unknown: { male: 18, female: 12 },
+            assignments: []
         });
 
         const STATUS_POLICY = { allowTeacherLeaveEdit: true };
@@ -7367,11 +8665,11 @@
         const schoolDirectory = {
             '招生管理': ['招生管理'],
             '教学管理': ['关注学生', '全校班级', '课表编排', '课堂巡检', '成绩归档', '教师排班'],
-            '校园服务': ['全校宿舍', '违纪管理', '请假审批', '安全巡检', '家校通知']
+            '校园服务': ['全校宿舍', '宿舍统计', '违纪管理', '请假审批', '安全巡检', '家校通知']
         };
         const schoolFeatureAliases = {
             '招生管理': 'zsgl zhaoshengguanli', '关注学生': 'gzxs guanzhuxuesheng xsgl student', '全校班级': 'qxbj quanxiaobanji class', '课表编排': 'kbbp kebiao',
-            '课堂巡检': 'ktxj ketang', '成绩归档': 'cjgd chengji', '教师排班': 'jspb jiaoshi', '全校宿舍': 'qxss quanxiaosushe ssgl sushe',
+            '课堂巡检': 'ktxj ketang', '成绩归档': 'cjgd chengji', '教师排班': 'jspb jiaoshi', '全校宿舍': 'qxss quanxiaosushe ssgl sushe', '宿舍统计': 'sstj sushitongji dorm statistics',
             '违纪管理': 'wjgl weijiguanli discipline', '请假审批': 'qjsp qingjia', '安全巡检': 'aqxj anquan', '家校通知': 'jxtz jiaxiao'
         };
         let schoolHighFeatures = ['招生管理', '全校班级', '关注学生'];
@@ -7428,8 +8726,12 @@
             schoolDormSearch: '',
             schoolDormExpandedBuildings: [],
             schoolDormExpandedFloors: [],
+            dormStatsTab: 'building',
+            dormStatsExpandedClasses: [],
             rollcallSearch: '',
             rollcallFilter: 'all',
+            rollcallPrimaryFilter: 'all',
+            rollcallMealFilter: false,
             statusDayKey: '',
             rollcallExpandedId: '',
             rollcallWeek: getAcademicWeekNumber(),
@@ -7617,7 +8919,7 @@
         function phoneCopyButton(phone, label = '电话号码') {
             const raw = String(phone || '').replace(/\D/g, '');
             if (!raw) return '';
-            return `<button type="button" class="phone-copy-button" data-action="copy" data-copy="${escapeHtml(raw)}" aria-label="复制${escapeHtml(label)}"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="11" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path></svg>复制</button>`;
+            return `<button type="button" class="phone-copy-button" data-action="copy" data-copy="${escapeHtml(raw)}" aria-label="复制${escapeHtml(label)}"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="11" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path></svg></button>`;
         }
 
         function phoneDisplayMarkup(phone, label = '电话号码') {
@@ -7626,7 +8928,26 @@
             return `<span class="phone-value-text">${escapeHtml(formatPhone(raw))}</span>${phoneCopyButton(raw, label)}`;
         }
 
-        async function copyPhoneNumber(value) {
+        function flashCopyFeedback(trigger) {
+            if (!trigger) return;
+            const svg = trigger.querySelector('svg');
+            if (!svg) return;
+            const originalMarkup = svg.dataset.copyOriginal || svg.innerHTML;
+            svg.dataset.copyOriginal = originalMarkup;
+            const token = `${Date.now()}-${Math.random()}`;
+            trigger.dataset.copyFeedbackToken = token;
+            svg.innerHTML = '<polyline points="5 12 10 17 19 7"></polyline>';
+            trigger.classList.remove('copy-flash');
+            void trigger.offsetWidth;
+            trigger.classList.add('copy-flash');
+            window.setTimeout(() => {
+                if (!trigger.isConnected || trigger.dataset.copyFeedbackToken !== token) return;
+                svg.innerHTML = originalMarkup;
+                trigger.classList.remove('copy-flash');
+            }, 560);
+        }
+
+        async function copyPhoneNumber(value, trigger) {
             const text = String(value || '').replace(/\D/g, '');
             if (!text) return showToast('暂无可复制的号码');
             let copied = false;
@@ -7653,7 +8974,7 @@
                     }
                 }
                 if (!copied) throw new Error('copy failed');
-                showToast('电话号码已复制');
+                flashCopyFeedback(trigger);
             } catch (error) {
                 showToast('复制失败，请手动复制');
             }
@@ -7673,15 +8994,15 @@
             const featureEntries = schoolHighFeatures.map(label => {
                 const pendingCount = getSchoolFeaturePendingCount(label);
                 const accessibleLabel = schoolManageMode ? `从高频功能移除${label}` : `${label}${pendingCount ? `，有${pendingCount}项待处理内容` : ''}`;
-                return `<button type="button" class="home-high-btn${schoolManageMode ? ' manage-mode' : ''}" data-school-feature="${escapeHtml(label)}" data-feature-source="high" aria-label="${escapeHtml(accessibleLabel)}"><span class="home-high-copy"><small>高频入口</small><strong>${escapeHtml(label)}</strong></span>${pendingCount ? pendingDotMarkup(pendingCount) : ''}</button>`;
+                return `<button type="button" class="home-high-btn${schoolManageMode ? ' manage-mode' : ''}" data-school-feature="${escapeHtml(label)}" data-feature-source="high" aria-label="${escapeHtml(accessibleLabel)}"><span class="home-high-copy"><strong>${escapeHtml(label)}</strong></span>${pendingCount ? pendingDotMarkup(pendingCount) : ''}</button>`;
             }).join('');
             const classEntries = schoolHighClasses.map(classId => schoolClasses.find(item => item.id === classId)).filter(Boolean).map(classInfo => {
                 const pendingCount = getClassPendingCounts(classInfo).total;
                 const accessibleLabel = schoolManageMode ? `从首页移除${getClassDisplayName(classInfo)}` : `打开${getClassDisplayName(classInfo)}${pendingCount ? `，有${pendingCount}项待处理` : ''}`;
-                return `<button type="button" class="home-high-btn class-shortcut${schoolManageMode ? ' manage-mode' : ''}" data-school-class-shortcut="${escapeHtml(classInfo.id)}" aria-label="${escapeHtml(accessibleLabel)}"><span class="home-high-copy"><small>常用班级</small><strong class="home-high-class-name">${escapeHtml(getClassDisplayName(classInfo))}</strong></span>${pendingCount ? pendingDotMarkup(pendingCount) : ''}</button>`;
+                return `<button type="button" class="home-high-btn class-shortcut${schoolManageMode ? ' manage-mode' : ''}" data-school-class-shortcut="${escapeHtml(classInfo.id)}" aria-label="${escapeHtml(accessibleLabel)}"><span class="home-high-copy"><strong class="home-high-class-name">${escapeHtml(getClassDisplayName(classInfo))}</strong></span>${pendingCount ? pendingDotMarkup(pendingCount) : ''}</button>`;
             }).join('');
             highFreqGrid.innerHTML = featureEntries + classEntries +
-                `<button type="button" class="home-high-btn config" data-action="school-add-function" aria-label="添加高频功能入口"><span class="home-high-copy"><small>自定义首页</small><strong>添加入口</strong></span></button>`;
+                `<button type="button" class="home-high-btn config" data-action="school-add-function" aria-label="添加高频功能入口"><svg class="home-add-icon" aria-hidden="true" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>`;
 
             const renderDirectoryButtons = labels => labels.map(label => {
                     const alreadyAdded = schoolHighFeatures.includes(label);
@@ -7825,7 +9146,7 @@
             homeView.className = `app-view school-home-view${nextView === 'home' ? ' active' : ' behind'}`;
             classListView.className = `app-view${nextView === 'class-list' ? ' active' : (inClassFlow ? ' behind' : '')}`;
             classDetailView.className = `app-view${nextView === 'class-detail' ? ' active' : (classChildViews.includes(nextView) || (/detail|attendance/.test(nextView) && state.studentDetailOrigin === 'class-detail') ? ' behind' : '')}`;
-            classModuleView.className = `app-view${state.classModule === 'rollcall' ? ' student-status-mode' : ''}${nextView === 'class-module' ? ' active' : (moduleChildViews.includes(nextView) ? ' behind' : '')}`;
+            classModuleView.className = `app-view${state.classModule === 'rollcall' ? ' student-status-mode' : ''}${state.classModule === 'school-dorm' && state.schoolDormLevel === 'rooms' ? ' school-dorm-room-mode' : ''}${state.classModule === 'school-dorm-stats' ? ' dorm-stats-mode' : ''}${nextView === 'class-module' ? ' active' : (moduleChildViews.includes(nextView) ? ' behind' : '')}`;
             leaveDetailView.className = `app-view${nextView === 'leave-detail' ? ' active' : ''}`;
             studentLogHistoryView.className = `app-view${nextView === 'student-log-history' ? ' active' : (nextView === 'log-detail' && state.logDetailOrigin === 'student-log-history' ? ' behind' : '')}`;
             logDetailView.className = `app-view${nextView === 'log-detail' ? ' active' : ''}`;
@@ -8240,11 +9561,10 @@
             const detail = kind === 'cadre'
                 ? item.role
                 : `${item.role}${item.subject ? ` · ${item.subject}` : ''}`;
-            const displayPhone = formatPhone(item.phone);
             return `<div class="contact-row">
                 <span class="contact-sequence" aria-hidden="true">${String(index + 1).padStart(2,'0')}</span>
-                <span class="contact-copy"><span class="contact-name-line"><span class="contact-name">${escapeHtml(item.name)}<span class="contact-detail-inline">（${escapeHtml(detail)}）</span></span></span><span class="contact-meta"><span class="contact-phone-line"><span>${escapeHtml(displayPhone)}</span>${phoneCopyButton(item.phone, `${item.name}的电话号码`)}</span></span></span>
-                <button type="button" class="contact-call" data-call-name="${escapeHtml(item.name)}" data-call-role="${escapeHtml(item.role)}" data-call-phone="${escapeHtml(item.phone)}" aria-label="拨打${escapeHtml(item.name)}的电话"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.11 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.72c.12.9.35 1.78.68 2.62a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.46-1.24a2 2 0 0 1 2.11-.45c.84.33 1.72.56 2.62.68A2 2 0 0 1 22 16.92z"></path></svg></button>
+                <span class="contact-copy"><span class="contact-name-line"><span class="contact-name">${escapeHtml(item.name)}<span class="contact-detail-inline">（${escapeHtml(detail)}）</span></span></span></span>
+                <button type="button" class="contact-call" data-call-name="${escapeHtml(item.name)}" data-call-role="${escapeHtml(item.role)}" data-call-phone="${escapeHtml(item.phone)}" aria-label="查看${escapeHtml(item.name)}的电话"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.11 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.72c.12.9.35 1.78.68 2.62a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.46-1.24a2 2 0 0 1 2.11-.45c.84.33 1.72.56 2.62.68A2 2 0 0 1 22 16.92z"></path></svg></button>
             </div>`;
         }
 
@@ -8978,6 +10298,12 @@
             return Object.values(dormInventory).flat();
         }
 
+        function formatDormRoomName(room) {
+            if (!room) return '';
+            if (room.building && room.roomNo) return `${room.building}${room.roomNo}`;
+            return String(room.name || room.roomNo || '未命名宿舍');
+        }
+
         function getDormRoom(roomId) {
             return getAllDormRooms().find(room => room.id === roomId) || null;
         }
@@ -9267,8 +10593,7 @@
 
         function formatDormBedLabel(room, bed) {
             if (!room || !bed) return '';
-            const roomLabel = room.building ? `${room.building} ${room.roomNo}` : room.name;
-            return `${roomLabel} · ${getDormBedName(bed)}`;
+            return `${formatDormRoomName(room)} · ${getDormBedName(bed)}`;
         }
 
         function getDormPickerRooms(record) {
@@ -10823,13 +12148,11 @@
 
         function updateClassListStickyState() {
             const tableHead = classDirectory.querySelector('.class-table-head');
-            const searchTools = classListScroll.querySelector('.class-list-tools');
-            if (!tableHead || !searchTools) return;
-            const scrollStyle = getComputedStyle(classListScroll);
-            const stickyTop = classListScroll.getBoundingClientRect().top + (parseFloat(scrollStyle.paddingTop) || 0);
-            const searchRect = searchTools.getBoundingClientRect();
-            const searchStuck = searchRect.top <= stickyTop + 1;
-            tableHead.classList.toggle('is-stuck', searchStuck && tableHead.getBoundingClientRect().top <= searchRect.bottom + 1);
+            if (!tableHead) return;
+            const scrollRect = classListScroll.getBoundingClientRect();
+            const stickyOffset = parseFloat(getComputedStyle(tableHead).top) || 0;
+            const tableStuck = tableHead.getBoundingClientRect().top <= scrollRect.top + stickyOffset + 1;
+            tableHead.classList.toggle('is-stuck', tableStuck);
         }
 
         function renderClassDirectory() {
@@ -10911,9 +12234,21 @@
             return new Set(classWorkflowState.studentStatusHandledByDay[dayKey]);
         }
 
+        function getStudentMealSet(classInfo = getSelectedClass()) {
+            const dayKey = `${classInfo.id}-${formatLocalDate()}`;
+            if (!classWorkflowState.studentStatusMealByDay[dayKey]) classWorkflowState.studentStatusMealByDay[dayKey] = [];
+            return new Set(classWorkflowState.studentStatusMealByDay[dayKey]);
+        }
+
+        function saveStudentMealSet(mealSet, classInfo = getSelectedClass()) {
+            const dayKey = `${classInfo.id}-${formatLocalDate()}`;
+            classWorkflowState.studentStatusMealByDay[dayKey] = [...mealSet];
+        }
+
         function initializeStudentStatusDay() {
             getStudentStatusMap();
             getStudentStatusHandledSet();
+            getStudentMealSet();
         }
 
         function markStudentStatusHandled(studentId, classInfo = getSelectedClass()) {
@@ -10927,11 +12262,13 @@
             const roster = ensureClassRoster(classInfo);
             const statusMap = getStudentStatusMap(classInfo);
             const handled = getStudentStatusHandledSet(classInfo);
+            const mealSet = getStudentMealSet(classInfo);
             return roster.reduce((counts, item) => {
                 const isHandled = handled.has(item.id);
-                const status = isHandled ? (statusMap[item.id] || '') : '';
-                if (rollcallStatuses.includes(status)) counts[status] += 1;
-                if (isHandled && status) counts.handled += 1;
+                const primaryStatus = isHandled && ['在校','请假'].includes(statusMap[item.id]) ? statusMap[item.id] : '';
+                if (primaryStatus) counts[primaryStatus] += 1;
+                if (mealSet.has(item.id)) counts['就餐'] += 1;
+                if (isHandled && primaryStatus) counts.handled += 1;
                 else counts.unhandled += 1;
                 return counts;
             }, { '在校': 0, '请假': 0, '就餐': 0, handled: 0, unhandled: 0, total: roster.length });
@@ -10968,14 +12305,15 @@
             const roster = ensureClassRoster(classInfo);
             const statusMap = getStudentStatusMap(classInfo);
             const handled = getStudentStatusHandledSet(classInfo);
+            const mealSet = getStudentMealSet(classInfo);
             const filteredRoster = state.classStudentFilter === 'auth' ? roster.filter(item => !item.authenticated) : roster;
             classInfoPanel.innerHTML = `${renderStudentLiveSummary(classInfo)}
                 <div class="class-section-head" id="classStudentSection"><h2 id="classRosterTitle">${state.classStudentFilter === 'auth' ? '未认证学生' : '学生列表'}（${filteredRoster.length}）</h2></div>
                 ${state.classStudentFilter === 'auth' ? '<div class="class-filter-notice"><span>当前仅显示未完成身份认证的学生</span><button type="button" data-action="clear-class-student-filter">查看全部</button></div>' : ''}
                 <div class="class-roster-search">${rosterSearchMarkup({ id: 'classRosterSearch', value: state.classStudentSearch, placeholder: '搜索本班学生姓名', clearAction: 'clear-class-roster-search', label: '搜索本班学生姓名' })}</div>
                 <div class="class-student-list">${filteredRoster.map(item => {
-                    const status = handled.has(item.id) && rollcallStatuses.includes(statusMap[item.id]) ? statusMap[item.id] : '';
-                    const statusLabel = status || '未设置';
+                    const status = handled.has(item.id) && ['在校','请假'].includes(statusMap[item.id]) ? statusMap[item.id] : '';
+                    const statusLabel = [status, mealSet.has(item.id) ? '就餐' : ''].filter(Boolean).join('、') || '未设置';
                     return `<button type="button" class="class-student-row${item.authenticated ? '' : ' has-pending'}" data-student-id="${escapeHtml(item.id)}" data-roster-search="${escapeHtml(item.name.toLowerCase())}" aria-label="${escapeHtml(item.name)}，今日状态${statusLabel}，查看学生详情">
                         <span class="student-avatar ${item.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(item)}</span>
                         <span class="class-student-copy"><span class="class-student-name">${escapeHtml(item.name)}</span></span>
@@ -11007,16 +12345,15 @@
             const roster = ensureClassRoster(getSelectedClass());
             const statusMap = getStudentStatusMap();
             const handled = getStudentStatusHandledSet();
+            const mealSet = getStudentMealSet();
             const query = state.rollcallSearch.trim().toLowerCase();
             return roster.filter(item => {
-                const isHandled = handled.has(item.id) && rollcallStatuses.includes(statusMap[item.id]);
-                const status = isHandled ? statusMap[item.id] : '';
+                const isHandled = handled.has(item.id) && ['在校','请假'].includes(statusMap[item.id]);
+                const primaryStatus = isHandled ? statusMap[item.id] : '';
                 const matchesSearch = !query || String(item.name || '').toLowerCase().includes(query);
-                const matchesFilter = state.rollcallFilter === 'all'
-                    || state.rollcallFilter === status
-                    || (state.rollcallFilter === 'handled' && isHandled)
-                    || (state.rollcallFilter === 'unhandled' && !isHandled);
-                return matchesSearch && matchesFilter;
+                const matchesPrimary = state.rollcallPrimaryFilter === 'all' || state.rollcallPrimaryFilter === primaryStatus;
+                const matchesMeal = !state.rollcallMealFilter || mealSet.has(item.id);
+                return matchesSearch && matchesPrimary && matchesMeal;
             });
         }
 
@@ -11024,10 +12361,10 @@
             const counts = getStudentStatusCounts();
             return `<section class="status-manager-hero" id="statusManagerHero" aria-label="学生实时状态统计">
                 <div class="status-manager-head"><span><span>实时状态管理</span><strong>${escapeHtml(getClassDisplayName(getSelectedClass()))}</strong></span><em>${counts.handled}/${counts.total} 已处理</em></div>
-                <div class="status-manager-metrics">
-                    <div class="status-manager-metric school"><strong>${counts['在校']}</strong><span>在校</span></div>
-                    <div class="status-manager-metric leave"><strong>${counts['请假']}</strong><span>请假</span></div>
-                    <div class="status-manager-metric meal"><strong>${counts['就餐']}</strong><span>就餐</span></div>
+                <div class="status-manager-metrics" aria-label="点击看板筛选学生">
+                    <button type="button" class="status-manager-metric school${state.rollcallPrimaryFilter === '在校' ? ' active' : ''}" data-action="set-live-status-filter" data-live-filter="在校" aria-pressed="${state.rollcallPrimaryFilter === '在校' ? 'true' : 'false'}"><strong>${counts['在校']}</strong><span>在校</span></button>
+                    <button type="button" class="status-manager-metric leave${state.rollcallPrimaryFilter === '请假' ? ' active' : ''}" data-action="set-live-status-filter" data-live-filter="请假" aria-pressed="${state.rollcallPrimaryFilter === '请假' ? 'true' : 'false'}"><strong>${counts['请假']}</strong><span>请假</span></button>
+                    <button type="button" class="status-manager-metric meal${state.rollcallMealFilter ? ' active' : ''}" data-action="set-live-status-filter" data-live-filter="就餐" aria-pressed="${state.rollcallMealFilter ? 'true' : 'false'}"><strong>${counts['就餐']}</strong><span>就餐</span></button>
                 </div>
             </section>`;
         }
@@ -11038,28 +12375,32 @@
             const sequenceById = new Map(fullRoster.map((item, index) => [item.id, index + 1]));
             const statusMap = getStudentStatusMap();
             const handled = getStudentStatusHandledSet();
+            const mealSet = getStudentMealSet();
             if (!roster.length) return '<div class="todo-empty">没有符合当前搜索或筛选条件的学生</div>';
             return roster.map(item => {
-                const isHandled = handled.has(item.id) && rollcallStatuses.includes(statusMap[item.id]);
-                const status = isHandled ? statusMap[item.id] : '';
+                const isHandled = handled.has(item.id) && ['在校','请假'].includes(statusMap[item.id]);
+                const primaryStatus = isHandled ? statusMap[item.id] : '';
+                const hasMeal = mealSet.has(item.id);
                 const sequence = sequenceById.get(item.id) || 0;
-                return `<article class="live-status-card status-${studentStatusTone(status)}${isHandled ? ' is-handled' : ''}" data-live-status-id="${escapeHtml(item.id)}" aria-label="${String(sequence).padStart(2,'0')}号${escapeHtml(item.name)}，${isHandled ? `当前${escapeHtml(status)}` : '状态未处理'}">
-                    <div class="live-status-card-head"><strong class="compact-status-name">${String(sequence).padStart(2,'0')} · ${escapeHtml(item.name)}</strong><span class="compact-status-dot" aria-hidden="true"></span></div>
-                    <div class="live-status-actions" aria-label="设置${escapeHtml(item.name)}当前状态">${rollcallStatuses.map(option => `<button type="button" class="live-status-action ${studentStatusTone(option)}${isHandled && status === option ? ' active' : ''}" data-workflow="rollcall" data-workflow-id="${escapeHtml(item.id)}" data-workflow-value="${option}" aria-pressed="${isHandled && status === option ? 'true' : 'false'}"><span>${option}</span></button>`).join('')}</div>
+                const statusLabel = [primaryStatus, hasMeal ? '就餐' : ''].filter(Boolean).join('、') || '状态未处理';
+                return `<article class="live-status-card status-${studentStatusTone(primaryStatus)}${isHandled ? ' is-handled' : ''}" data-live-status-id="${escapeHtml(item.id)}" aria-label="${String(sequence).padStart(2,'0')}号${escapeHtml(item.name)}，${escapeHtml(statusLabel)}">
+                    <div class="live-status-card-head"><strong class="compact-status-name">${String(sequence).padStart(2,'0')} · ${escapeHtml(item.name)}</strong></div>
+                    <div class="live-status-actions" aria-label="设置${escapeHtml(item.name)}当前状态">${rollcallStatuses.map(option => {
+                        const active = option === '就餐' ? hasMeal : primaryStatus === option;
+                        const indicator = option === '就餐'
+                            ? '<svg viewBox="0 0 24 24"><polyline points="5 12 10 17 19 7"></polyline></svg>'
+                            : '<i class="status-radio-dot"></i>';
+                        return `<button type="button" class="live-status-action ${studentStatusTone(option)}${option === '就餐' ? ' meal' : ''}${active ? ' active' : ''}" data-workflow="rollcall" data-workflow-id="${escapeHtml(item.id)}" data-workflow-value="${option}" aria-label="${active ? '取消' : '选择'}${escapeHtml(item.name)}${option}" aria-pressed="${active ? 'true' : 'false'}"><span class="status-checkbox" aria-hidden="true">${indicator}</span></button>`;
+                    }).join('')}</div>
                 </article>`;
             }).join('');
         }
 
         function renderRollcallModule() {
             initializeStudentStatusDay();
-            const filters = [{ value: 'all', label: '全部' }, { value: 'unhandled', label: '未处理' }, { value: 'handled', label: '已处理' }, ...rollcallStatuses.map(value => ({ value, label: value }))];
-            return `${renderStatusManagerHero()}<section class="status-toolbar" aria-label="学生状态搜索与筛选">
+            return `${renderStatusManagerHero()}<section class="status-toolbar" aria-label="搜索学生状态名单">
                 <div class="rollcall-search"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="rollcallSearch" type="search" value="${escapeHtml(state.rollcallSearch)}" placeholder="搜索本班学生姓名" autocomplete="off" aria-label="搜索学生姓名"></div>
-                <div class="status-filter-row">${filters.map(filter => {
-                    const tone = filter.value === '在校' ? 'school' : (filter.value === '请假' ? 'leave' : (filter.value === '就餐' ? 'meal' : filter.value));
-                    return `<button type="button" class="status-filter-chip filter-${tone}${state.rollcallFilter === filter.value ? ' active' : ''}" data-action="set-rollcall-filter" data-rollcall-filter="${filter.value}" aria-pressed="${state.rollcallFilter === filter.value ? 'true' : 'false'}">${filter.label}</button>`;
-                }).join('')}</div>
-            </section><section class="status-roster-surface" aria-label="学生状态名单"><div class="class-section-head"><h2 id="rollcallCount">学生名单（${getFilteredRollcallRoster().length}）</h2></div><div class="live-status-list" id="liveStatusList">${renderRollcallListMarkup()}</div></section>`;
+            </section><section class="status-roster-surface" aria-label="学生状态名单"><div class="status-column-head"><span id="rollcallCount">学生（${getFilteredRollcallRoster().length}）</span><span>在校</span><span>请假</span><span>就餐</span></div><div class="live-status-list" id="liveStatusList">${renderRollcallListMarkup()}</div></section>`;
         }
 
         function updateRollcallList() {
@@ -11067,8 +12408,17 @@
             const count = document.getElementById('rollcallCount');
             const hero = document.getElementById('statusManagerHero');
             if (list) list.innerHTML = renderRollcallListMarkup();
-            if (count) count.textContent = `学生名单（${getFilteredRollcallRoster().length}）`;
+            if (count) count.textContent = `学生（${getFilteredRollcallRoster().length}）`;
             if (hero) hero.outerHTML = renderStatusManagerHero();
+        }
+
+        function toggleLiveStatusFilter(filter) {
+            if (filter === '就餐') {
+                state.rollcallMealFilter = !state.rollcallMealFilter;
+            } else if (['在校','请假'].includes(filter)) {
+                state.rollcallPrimaryFilter = state.rollcallPrimaryFilter === filter ? 'all' : filter;
+            }
+            updateRollcallList();
         }
 
         function renderCheckinModule(kind) {
@@ -11162,7 +12512,7 @@
                 </button>`;
             };
             return `<div class="dorm-plan dorm-bed-directory" aria-label="${escapeHtml(room.name)}床位列表">
-                <div class="dorm-plan-head"><div class="dorm-plan-current"><strong>${escapeHtml(room.building ? `${room.building} · ${room.roomNo}` : room.name)}</strong><span>已住 ${occupiedCount}/${room.beds.length}</span></div><div class="dorm-plan-legend"><span><i aria-hidden="true"></i>已住</span><span><i aria-hidden="true"></i>空床</span></div></div>
+                <div class="dorm-plan-head"><div class="dorm-plan-current"><strong>${escapeHtml(formatDormRoomName(room))}</strong><span>已住 ${occupiedCount}/${room.beds.length}</span></div><div class="dorm-plan-legend"><span><i aria-hidden="true"></i>已住</span><span><i aria-hidden="true"></i>空床</span></div></div>
                 <div class="dorm-bed-grid dorm-card-grid">${getDormDisplayBeds(room.beds).map(renderBed).join('')}</div>
             </div>`;
         }
@@ -11179,7 +12529,7 @@
             const unassigned = getUnassignedDormStudents(selectedGender);
             return `<div class="dorm-module-shell"><section class="dorm-room-directory" aria-label="本班学生涉及宿舍"><div class="dorm-room-directory-head"><strong>本班学生宿舍</strong><span>${visibleRooms.length} 间 · 床位数量自适应</span></div><div class="dorm-room-list">${visibleRooms.map(room => {
                 const occupied = room.beds.filter(bed => bed.occupied).length;
-                return `<button type="button" class="dorm-room-chip${room.id === state.dormRoomId ? ' active' : ''}" data-action="select-dorm-overview-room" data-room-id="${room.id}" aria-pressed="${room.id === state.dormRoomId ? 'true' : 'false'}"><strong>${escapeHtml(room.building ? `${room.building} · ${room.roomNo}` : room.name)}</strong><span class="dorm-occupancy">已住 <b>${occupied}</b>/${room.beds.length}</span></button>`;
+                return `<button type="button" class="dorm-room-chip${room.id === state.dormRoomId ? ' active' : ''}" data-action="select-dorm-overview-room" data-room-id="${room.id}" aria-pressed="${room.id === state.dormRoomId ? 'true' : 'false'}"><strong>${escapeHtml(formatDormRoomName(room))}</strong><span class="dorm-occupancy">已住 <b>${occupied}</b>/${room.beds.length}</span></button>`;
             }).join('')}</div><div class="dorm-room-preview">${renderDormPlan(selectedRoom)}</div></section><div class="class-section-head dorm-unassigned-head"><h2>本班未分配学生（${unassigned.length}）</h2></div><div class="dorm-unassigned-list">${unassigned.length ? unassigned.map(item => `<article class="dorm-unassigned-card"><span class="student-avatar ${item.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(item)}</span><span class="dorm-unassigned-copy"><strong>${escapeHtml(item.name)}</strong></span><button type="button" class="dorm-student-action" data-action="open-dorm-picker" data-dorm-id="${item.id}" data-preferred-room-id="${selectedRoom?.id || ''}">安排</button></article>`).join('') : '<div class="dorm-unassigned-empty"><strong>当前暂无未分配学生</strong><span>本班对应学生均已完成床位安排</span></div>'}</div></div>`;
         }
 
@@ -11208,34 +12558,49 @@
         function renderSchoolDormModule() {
             ensureDormMasterRecords();
             const allRooms = getAllDormRooms();
-            const totalBeds = allRooms.reduce((sum, room) => sum + room.beds.length, 0);
-            const occupied = allRooms.reduce((sum, room) => sum + room.beds.filter(bed => bed.occupied).length, 0);
             const buildingGroups = [...allRooms.reduce((map, room) => {
                 const building = room.building || '其他楼栋';
                 if (!map.has(building)) map.set(building, []);
                 map.get(building).push(room);
                 return map;
-            }, new Map()).entries()].sort((left, right) => left[0].localeCompare(right[0], 'zh-CN', { numeric: true }));
+            }, new Map()).entries()].sort((left, right) => {
+                const leftIndex = dormStatsBuildingOrder.indexOf(left[0]);
+                const rightIndex = dormStatsBuildingOrder.indexOf(right[0]);
+                if (leftIndex >= 0 && rightIndex >= 0) return leftIndex - rightIndex;
+                if (leftIndex >= 0) return -1;
+                if (rightIndex >= 0) return 1;
+                return left[0].localeCompare(right[0], 'zh-CN', { numeric: true });
+            });
 
-            const overview = `<div class="school-dorm-overview"><div class="school-dorm-stat"><strong>${allRooms.length}</strong><span>宿舍</span></div><div class="school-dorm-stat"><strong>${occupied}</strong><span>已住床位</span></div><div class="school-dorm-stat"><strong>${totalBeds - occupied}</strong><span>空余床位</span></div></div>`;
-            const buildingIcon = '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"></path><path d="M16 9h2a2 2 0 0 1 2 2v10M8 7h4M8 11h4M8 15h4M3 21h18"></path></svg>';
-            const floorIcon = '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 19h5v-4h5v-4h6"></path><path d="M4 5h16v14H4z"></path></svg>';
             const arrow = '<svg class="school-dorm-level-arrow" aria-hidden="true" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>';
             const level = ['buildings','floors','rooms'].includes(state.schoolDormLevel) ? state.schoolDormLevel : 'buildings';
             state.schoolDormLevel = level;
 
             if (level === 'buildings') {
+                const quickQuery = state.schoolDormSearch.trim().toLowerCase();
+                const quickSearch = `<div class="school-dorm-quick-search"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="schoolDormSearch" type="search" value="${escapeHtml(state.schoolDormSearch)}" placeholder="输入宿舍号，如 401" autocomplete="off" aria-label="快速搜索所有楼栋的宿舍"></div>`;
+                if (quickQuery) {
+                    const matchedRooms = allRooms
+                        .filter(room => `${room.building || ''} ${room.roomNo || ''} ${room.name || ''}`.toLowerCase().includes(quickQuery))
+                        .sort((left, right) => `${left.roomNo}-${left.building}`.localeCompare(`${right.roomNo}-${right.building}`, 'zh-CN', { numeric: true }));
+                    const results = matchedRooms.length ? matchedRooms.map(room => {
+                        const used = room.beds.filter(bed => bed.occupied).length;
+                        const floorNumber = getDormFloorNumber(room) || '其他';
+                        const gender = getDormRoomGender(room.id);
+                        return `<button type="button" class="school-dorm-search-result" data-action="open-school-dorm-search-room" data-school-dorm-building="${escapeHtml(room.building || '其他楼栋')}" data-school-dorm-floor="${escapeHtml(floorNumber)}" data-room-id="${escapeHtml(room.id)}"><span><strong>${escapeHtml(formatDormRoomName(room))}</strong><small>${floorNumber === '其他' ? '其他楼层' : `${escapeHtml(floorNumber)}层`} · ${escapeHtml(gender)}（${room.beds.length}/${used}）</small></span><span>空床 ${room.beds.length - used}</span></button>`;
+                    }).join('') : '<div class="school-dorm-search-empty">没有找到匹配的宿舍号</div>';
+                    return `<div class="school-dorm-level level-buildings">${quickSearch}<div class="school-dorm-level-head"><span><span>快速定位</span><strong>匹配宿舍</strong></span><small>${matchedRooms.length} 间</small></div><div class="school-dorm-search-results">${results}</div></div>`;
+                }
                 const cards = buildingGroups.map(([building, buildingRooms]) => {
                     const beds = buildingRooms.reduce((sum, room) => sum + room.beds.length, 0);
                     const used = buildingRooms.reduce((sum, room) => sum + room.beds.filter(bed => bed.occupied).length, 0);
                     const floors = new Set(buildingRooms.map(getDormFloorNumber).filter(Boolean));
                     return `<button type="button" class="school-dorm-level-card" data-action="open-school-dorm-building" data-school-dorm-building="${escapeHtml(building)}" aria-label="${escapeHtml(building)}，${floors.size}个楼层，${buildingRooms.length}间宿舍，已住${used}/${beds}">
-                        <span class="school-dorm-level-icon">${buildingIcon}</span>
                         <span class="school-dorm-level-copy"><strong>${escapeHtml(building)}</strong><small>${floors.size} 个楼层 · ${buildingRooms.length} 间宿舍</small></span>
                         <span class="school-dorm-level-side">已住 ${used}/${beds}${arrow}</span>
                     </button>`;
                 }).join('');
-                return `<div class="school-dorm-level level-buildings">${overview}<div class="school-dorm-level-head"><span><span>第 1 级</span><strong>选择楼栋</strong></span><small>共 ${buildingGroups.length} 栋</small></div><div class="school-dorm-level-list">${cards}</div></div>`;
+                return `<div class="school-dorm-level level-buildings">${quickSearch}<div class="school-dorm-level-head"><span><span>第 1 级</span><strong>选择楼栋</strong></span><small>共 ${buildingGroups.length} 栋</small></div><div class="school-dorm-level-list">${cards}</div></div>`;
             }
 
             const selectedBuildingGroup = buildingGroups.find(([building]) => building === state.schoolDormBuilding);
@@ -11251,7 +12616,14 @@
                 if (!map.has(floorNumber)) map.set(floorNumber, []);
                 map.get(floorNumber).push(room);
                 return map;
-            }, new Map()).entries()].sort((left, right) => String(left[0]).localeCompare(String(right[0]), 'zh-CN', { numeric: true }));
+            }, new Map()).entries()].sort((left, right) => {
+                const leftNumber = Number(left[0]);
+                const rightNumber = Number(right[0]);
+                if (Number.isFinite(leftNumber) && Number.isFinite(rightNumber)) return rightNumber - leftNumber;
+                if (Number.isFinite(leftNumber)) return 1;
+                if (Number.isFinite(rightNumber)) return -1;
+                return String(left[0]).localeCompare(String(right[0]), 'zh-CN', { numeric: true });
+            });
 
             if (level === 'floors') {
                 const cards = floorGroups.map(([floorNumber, floorRooms]) => {
@@ -11259,7 +12631,6 @@
                     const used = floorRooms.reduce((sum, room) => sum + room.beds.filter(bed => bed.occupied).length, 0);
                     const floorLabel = floorNumber === '其他' ? '其他楼层' : `${floorNumber}层`;
                     return `<button type="button" class="school-dorm-level-card" data-action="open-school-dorm-floor" data-school-dorm-floor="${escapeHtml(floorNumber)}" aria-label="${escapeHtml(state.schoolDormBuilding)}${escapeHtml(floorLabel)}，${floorRooms.length}间宿舍，已住${used}/${beds}">
-                        <span class="school-dorm-level-icon">${floorIcon}</span>
                         <span class="school-dorm-level-copy"><strong>${escapeHtml(floorLabel)}</strong><small>${floorRooms.length} 间宿舍 · ${beds} 个床位</small></span>
                         <span class="school-dorm-level-side">已住 ${used}/${beds}${arrow}</span>
                     </button>`;
@@ -11278,9 +12649,149 @@
             state.dormRoomId = selectedRoom?.id || '';
             const roomCards = floorRooms.map(room => {
                 const used = room.beds.filter(bed => bed.occupied).length;
-                return `<button type="button" class="school-room-card${room.id === state.dormRoomId ? ' active' : ''}" data-action="select-dorm-overview-room" data-room-id="${escapeHtml(room.id)}" aria-pressed="${room.id === state.dormRoomId ? 'true' : 'false'}"><strong>${escapeHtml(room.roomNo)}室</strong><span>已住 ${used}/${room.beds.length}</span></button>`;
+                const gender = getDormRoomGender(room.id);
+                return `<button type="button" class="school-room-card${room.id === state.dormRoomId ? ' active' : ''}" data-action="select-dorm-overview-room" data-room-id="${escapeHtml(room.id)}" aria-pressed="${room.id === state.dormRoomId ? 'true' : 'false'}" aria-label="${escapeHtml(formatDormRoomName(room))}，${escapeHtml(gender)}生宿舍，额定${room.beds.length}床，实际入住${used}人"><strong>${escapeHtml(formatDormRoomName(room))}</strong><span>${escapeHtml(gender)}（${room.beds.length}/${used}）</span></button>`;
             }).join('');
             return `<div class="school-dorm-level level-rooms"><div class="school-dorm-level-head"><span><span>第 3 级 · ${escapeHtml(state.schoolDormBuilding)}</span><strong>选择具体房间</strong></span><small>${state.schoolDormFloor === '其他' ? '其他楼层' : `${escapeHtml(state.schoolDormFloor)} 层`} · ${floorRooms.length} 间</small></div><div class="school-dorm-room-grid">${roomCards}</div><div class="school-dorm-room-preview">${renderDormPlan(selectedRoom)}</div></div>`;
+        }
+
+        function getDormBuildingSummaryData() {
+            const roomGroups = getAllDormRooms().reduce((map, room) => {
+                if (!map.has(room.building)) map.set(room.building, []);
+                map.get(room.building).push(room);
+                return map;
+            }, new Map());
+            return dormStatsBuildingOrder.map(building => {
+                const rooms = roomGroups.get(building) || [];
+                const fullRooms = rooms.filter(room => room.beds.every(bed => bed.occupied)).length;
+                const emptyRooms = rooms.filter(room => room.beds.every(bed => !bed.occupied)).length;
+                const totalBeds = rooms.reduce((sum, room) => sum + room.beds.length, 0);
+                const occupiedBeds = rooms.reduce((sum, room) => sum + room.beds.filter(bed => bed.occupied).length, 0);
+                return {
+                    building,
+                    totalRooms: rooms.length,
+                    fullRooms,
+                    emptyRooms,
+                    partialRooms: Math.max(0, rooms.length - fullRooms - emptyRooms),
+                    totalBeds,
+                    occupiedBeds,
+                    emptyBeds: totalBeds - occupiedBeds
+                };
+            });
+        }
+
+        function renderDormMetricCluster(values, labels, tone) {
+            return `<span class="dorm-metric-cluster ${tone}">${values.map((value, index) => `<span><strong>${value}</strong><small>${labels[index]}</small></span>`).join('')}</span>`;
+        }
+
+        function getDormBuildingTotals(rows = getDormBuildingSummaryData()) {
+            return rows.reduce((sum, item) => ({
+                totalRooms: sum.totalRooms + item.totalRooms,
+                fullRooms: sum.fullRooms + item.fullRooms,
+                emptyRooms: sum.emptyRooms + item.emptyRooms,
+                partialRooms: sum.partialRooms + item.partialRooms,
+                totalBeds: sum.totalBeds + item.totalBeds,
+                occupiedBeds: sum.occupiedBeds + item.occupiedBeds,
+                emptyBeds: sum.emptyBeds + item.emptyBeds
+            }), { totalRooms: 0, fullRooms: 0, emptyRooms: 0, partialRooms: 0, totalBeds: 0, occupiedBeds: 0, emptyBeds: 0 });
+        }
+
+        function getDormClassSummaryData() {
+            return dormClassDetailData.reduce((sum, item) => {
+                sum.stayMale += item.stay.male;
+                sum.stayFemale += item.stay.female;
+                sum.commuteMale += item.commute.male;
+                sum.commuteFemale += item.commute.female;
+                sum.unknownMale += item.unknown.male;
+                sum.unknownFemale += item.unknown.female;
+                return sum;
+            }, {
+                stayMale: 0,
+                stayFemale: 0,
+                commuteMale: 0,
+                commuteFemale: 0,
+                unknownMale: 0,
+                unknownFemale: 0
+            });
+        }
+
+        function renderDormBuildingSummaryTable() {
+            const rows = getDormBuildingSummaryData();
+            const rowMarkup = rows.map(item => {
+                const rate = item.totalBeds ? Math.round(item.occupiedBeds / item.totalBeds * 100) : 0;
+                return `<article class="dorm-building-row-v2">
+                    <div class="dorm-building-identity"><strong>${escapeHtml(item.building)}</strong><span>${item.totalRooms} 间 · ${item.totalBeds} 床</span></div>
+                    <div class="dorm-building-detail">
+                        <div class="dorm-building-usage"><strong>已住 ${item.occupiedBeds}<small> / ${item.totalBeds}</small></strong><span class="dorm-building-rate">${rate}%</span></div>
+                        <div class="dorm-occupancy-track" aria-hidden="true"><span style="width:${rate}%"></span></div>
+                        <div class="dorm-building-meta"><span>满房 ${item.fullRooms}</span><span>未满 ${item.partialRooms}</span><span>空房 ${item.emptyRooms}</span><span>空床 ${item.emptyBeds}</span></div>
+                    </div>
+                </article>`;
+            }).join('');
+            return `<section aria-label="全校宿舍楼栋汇总"><div class="dorm-stats-list-head"><span>楼栋与规模</span><span>床位入住情况</span></div><div class="dorm-building-list">${rowMarkup}</div></section>`;
+        }
+
+        function renderDormGenderCount(group) {
+            return `<span class="dorm-gender-count"><strong><span class="male">${group.male}</span><i>/</i><span class="female">${group.female}</span></strong><small>男 / 女</small></span>`;
+        }
+
+        function renderDormClassDetailTable() {
+            const expandedClasses = new Set(state.dormStatsExpandedClasses || []);
+            const rows = dormClassDetailData.map(item => {
+                const hasAssignments = item.assignments.length > 0;
+                const expanded = hasAssignments && expandedClasses.has(item.className);
+                const total = item.stay.male + item.stay.female + item.commute.male + item.commute.female + item.unknown.male + item.unknown.female;
+                const assignmentMarkup = expanded
+                    ? `<div class="dorm-class-assignments-v2"><span>已分配宿舍（额定床位 / 实际入住）</span><div class="dorm-assignment-list-v2">${item.assignments.map(label => `<span class="dorm-assignment-v2">${escapeHtml(label)}</span>`).join('')}</div></div>`
+                    : '';
+                const roomLabel = hasAssignments
+                    ? `<span class="dorm-class-room-count">${item.assignments.length} 间宿舍<svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></span>`
+                    : '<span class="dorm-class-room-count">暂未分配</span>';
+                return `<article class="dorm-class-item">
+                    <button type="button" class="dorm-class-summary-button" ${hasAssignments ? `data-action="toggle-dorm-stats-class" data-dorm-class-name="${escapeHtml(item.className)}" aria-expanded="${expanded ? 'true' : 'false'}"` : 'disabled aria-disabled="true"'}>
+                        <span class="dorm-class-title"><strong>${escapeHtml(item.className)}</strong><small>共 ${total} 人</small></span>
+                        ${roomLabel}
+                    </button>
+                    <div class="dorm-class-metrics" aria-label="${escapeHtml(item.className)}住宿构成，人数顺序为男生和女生">
+                        <span class="dorm-class-metric"><span>住宿</span><strong><b class="male">${item.stay.male}</b><i>/</i><b class="female">${item.stay.female}</b></strong></span>
+                        <span class="dorm-class-metric"><span>走读</span><strong><b class="male">${item.commute.male}</b><i>/</i><b class="female">${item.commute.female}</b></strong></span>
+                        <span class="dorm-class-metric"><span>待确认</span><strong><b class="male">${item.unknown.male}</b><i>/</i><b class="female">${item.unknown.female}</b></strong></span>
+                    </div>
+                    ${assignmentMarkup}
+                </article>`;
+            }).join('');
+            return `<section aria-label="全校班级住宿明细"><div class="dorm-stats-list-head"><span>班级与人数</span><span>男 / 女</span></div><div class="dorm-class-list">${rows}</div></section>`;
+        }
+
+        function renderDormStatsModule() {
+            state.dormStatsTab = state.dormStatsTab === 'class' ? 'class' : 'building';
+            const buildingActive = state.dormStatsTab === 'building';
+            const body = buildingActive ? renderDormBuildingSummaryTable() : renderDormClassDetailTable();
+            const buildingRows = getDormBuildingSummaryData();
+            const buildingTotals = getDormBuildingTotals(buildingRows);
+            const classTotals = getDormClassSummaryData();
+            const stayTotal = classTotals.stayMale + classTotals.stayFemale;
+            const commuteTotal = classTotals.commuteMale + classTotals.commuteFemale;
+            const unknownTotal = classTotals.unknownMale + classTotals.unknownFemale;
+            const occupancyRate = buildingTotals.totalBeds ? (buildingTotals.occupiedBeds / buildingTotals.totalBeds * 100).toFixed(1) : '0.0';
+            const overview = buildingActive
+                ? `<section class="dorm-stats-overview" aria-label="全校床位使用概览">
+                    <div class="dorm-stats-overview-head"><span>全校床位使用</span><em>数据更新至今日</em></div>
+                    <div class="dorm-stats-primary"><div class="dorm-stats-primary-value"><strong>${occupancyRate}%</strong><span>床位入住率</span></div><div class="dorm-stats-primary-copy"><strong>${buildingTotals.occupiedBeds} / ${buildingTotals.totalBeds} 床</strong><span>当前剩余 ${buildingTotals.emptyBeds} 个空床</span></div></div>
+                    <div class="dorm-stats-kpis"><span class="dorm-stats-kpi"><strong>${buildingTotals.totalRooms}</strong><span>宿舍总数</span></span><span class="dorm-stats-kpi"><strong>${buildingTotals.fullRooms}</strong><span>满房</span></span><span class="dorm-stats-kpi"><strong>${buildingTotals.partialRooms}</strong><span>未满房</span></span></div>
+                </section>`
+                : `<section class="dorm-stats-overview" aria-label="班级住宿概览">
+                    <div class="dorm-stats-overview-head"><span>班级住宿构成</span><em>覆盖 ${dormClassDetailData.length} 个班级</em></div>
+                    <div class="dorm-stats-primary"><div class="dorm-stats-primary-value"><strong>${stayTotal}</strong><span>住宿学生</span></div><div class="dorm-stats-primary-copy"><strong>男 ${classTotals.stayMale} · 女 ${classTotals.stayFemale}</strong><span>房间分配可按班级展开</span></div></div>
+                    <div class="dorm-stats-kpis"><span class="dorm-stats-kpi"><strong>${dormClassDetailData.length}</strong><span>班级</span></span><span class="dorm-stats-kpi"><strong>${commuteTotal}</strong><span>走读学生</span></span><span class="dorm-stats-kpi"><strong>${unknownTotal}</strong><span>待确认</span></span></div>
+                </section>`;
+            const note = buildingActive
+                ? '单间额定 8 床；按楼栋查看入住率与空余资源，“未满房”指已有学生入住但仍有空床。'
+                : '人数按男 / 女展示；点击班级可展开已分配的宿舍房间。';
+            return `<section class="dorm-stats-shell">${overview}<nav class="dorm-stats-switch" aria-label="宿舍统计视图" role="tablist">
+                <button type="button" class="dorm-stats-tab${buildingActive ? ' active' : ''}" data-action="set-dorm-stats-tab" data-dorm-stats-tab="building" role="tab" aria-selected="${buildingActive ? 'true' : 'false'}">楼栋汇总</button>
+                <button type="button" class="dorm-stats-tab${buildingActive ? '' : ' active'}" data-action="set-dorm-stats-tab" data-dorm-stats-tab="class" role="tab" aria-selected="${buildingActive ? 'false' : 'true'}">班级明细</button>
+            </nav><p class="dorm-stats-context">${escapeHtml(note)}</p>${body}</section>`;
         }
 
         function renderDisciplineSetupModule() {
@@ -11330,7 +12841,7 @@
         }
 
         function renderClassModule() {
-            const titles = { leave: '学生假条', rollcall: '学生状态', discipline: '学生违纪', logs: '班级日志', dorm: '宿舍设置', 'checkin-return': '返校点到任务', 'checkin-home': '回家点到任务', 'school-dorm': '全校宿舍', 'discipline-setup': '违纪管理' };
+            const titles = { leave: '学生假条', rollcall: '学生状态', discipline: '学生违纪', logs: '班级日志', dorm: '宿舍设置', 'checkin-return': '返校点到任务', 'checkin-home': '回家点到任务', 'school-dorm': '全校宿舍', 'school-dorm-stats': '宿舍统计', 'discipline-setup': '违纪管理' };
             classModuleTitle.textContent = titles[state.classModule] || '班级业务';
             classModuleView.setAttribute('aria-label', state.classModuleOrigin === 'school' ? '学校管理业务' : '班级业务');
             classModuleBackButton.setAttribute('aria-label', state.classModuleOrigin === 'school' ? '返回学校管理' : '返回班级管理');
@@ -11342,8 +12853,11 @@
             if (state.classModule === 'checkin-return') classModuleRoot.innerHTML = renderCheckinModule('return');
             if (state.classModule === 'checkin-home') classModuleRoot.innerHTML = renderCheckinModule('home');
             if (state.classModule === 'school-dorm') classModuleRoot.innerHTML = renderSchoolDormModule();
+            if (state.classModule === 'school-dorm-stats') classModuleRoot.innerHTML = renderDormStatsModule();
             if (state.classModule === 'discipline-setup') classModuleRoot.innerHTML = renderDisciplineSetupModule();
             if (state.classModule === 'school-dorm') updateSchoolDormNavigation();
+            classModuleView.classList.toggle('school-dorm-room-mode', state.classModule === 'school-dorm' && state.schoolDormLevel === 'rooms');
+            classModuleView.classList.toggle('dorm-stats-mode', state.classModule === 'school-dorm-stats');
             if (state.classModule === 'logs') updateLogRosterSearchResults();
             const discipline = state.classModuleOrigin === 'class' && state.classModule === 'discipline';
             classModuleFloatingAction.hidden = !discipline;
@@ -11363,7 +12877,9 @@
             }
             if (module === 'rollcall') {
                 state.rollcallSearch = '';
-                state.rollcallFilter = ['all','unhandled','handled',...rollcallStatuses].includes(initialRollcallFilter) ? initialRollcallFilter : 'all';
+                state.rollcallFilter = 'all';
+                state.rollcallPrimaryFilter = ['在校','请假'].includes(initialRollcallFilter) ? initialRollcallFilter : 'all';
+                state.rollcallMealFilter = initialRollcallFilter === '就餐';
                 initializeStudentStatusDay();
             }
             if (module === 'discipline') {
@@ -11396,6 +12912,11 @@
                 state.schoolDormSearch = '';
                 state.schoolDormExpandedBuildings = [];
                 state.schoolDormExpandedFloors = [];
+                ensureDormMasterRecords();
+            }
+            if (module === 'school-dorm-stats') {
+                state.dormStatsTab = 'building';
+                state.dormStatsExpandedClasses = [];
                 ensureDormMasterRecords();
             }
             if (module === 'discipline-setup') state.disciplineSetupTab = 'items';
@@ -11433,59 +12954,29 @@
                 const nextStatus = rollcallStatuses.includes(button.dataset.workflowValue) ? button.dataset.workflowValue : '在校';
                 if (nextStatus === '请假' && !STATUS_POLICY.allowTeacherLeaveEdit) return showToast('请假状态当前由正式审批流程更新');
                 const savedScrollTop = classModuleScroll.scrollTop;
-                getStudentStatusMap()[id] = nextStatus;
-                markStudentStatusHandled(id);
-                renderClassInfo();
-                showToast(`学生状态已更新为${nextStatus}`);
-                const hero = document.getElementById('statusManagerHero');
-                if (hero) hero.outerHTML = renderStatusManagerHero();
-                if (state.rollcallFilter === 'unhandled') {
-                    const card = button.closest('.live-status-card');
-                    const list = document.getElementById('liveStatusList');
-                    const cardIndex = card && list ? Array.from(list.children).indexOf(card) : -1;
-                    if (!card || !list) {
-                        updateRollcallList();
-                        classModuleScroll.scrollTop = savedScrollTop;
-                        return;
+                const statusMap = getStudentStatusMap();
+                const mealSet = getStudentMealSet();
+                const studentItem = ensureClassRoster(getSelectedClass()).find(item => item.id === id);
+                const studentName = studentItem?.name || '该学生';
+                let feedback = '';
+                if (nextStatus === '就餐') {
+                    if (mealSet.has(id)) {
+                        mealSet.delete(id);
+                        feedback = `${studentName}已取消就餐`;
+                    } else {
+                        mealSet.add(id);
+                        if (!['在校','请假'].includes(statusMap[id])) statusMap[id] = '在校';
+                        markStudentStatusHandled(id);
+                        feedback = `${studentName}已勾选就餐`;
                     }
-                    card.classList.remove('status-unset','status-school','status-leave','status-meal');
-                    card.classList.add(`status-${studentStatusTone(nextStatus)}`,'is-handled','is-confirming');
-                    card.querySelectorAll('.live-status-action').forEach(action => {
-                        const active = action === button;
-                        action.classList.toggle('active', active);
-                        action.setAttribute('aria-pressed', active ? 'true' : 'false');
-                        action.disabled = true;
-                    });
-                    const currentStatus = card.querySelector('.live-status-copy small');
-                    if (currentStatus) currentStatus.textContent = `已更新为 · ${nextStatus}`;
-                    const handledChip = card.querySelector('.handled-chip');
-                    if (handledChip) {
-                        handledChip.textContent = '已处理';
-                        handledChip.classList.add('done');
-                    }
-                    const transitionToken = `${id}-${Date.now()}`;
-                    card.dataset.transitionToken = transitionToken;
-                    window.setTimeout(() => {
-                        if (!card.isConnected || card.dataset.transitionToken !== transitionToken) return;
-                        card.classList.add('is-exiting');
-                        let finished = false;
-                        const finishExit = () => {
-                            if (finished) return;
-                            finished = true;
-                            if (!card.isConnected || card.dataset.transitionToken !== transitionToken) return;
-                            updateRollcallList();
-                            classModuleScroll.scrollTop = savedScrollTop;
-                            requestAnimationFrame(() => {
-                                const remainingCards = classModuleRoot.querySelectorAll('.live-status-card');
-                                const focusIndex = Math.max(0, Math.min(cardIndex, remainingCards.length - 1));
-                                remainingCards[focusIndex]?.querySelector('.live-status-action')?.focus({ preventScroll: true });
-                            });
-                        };
-                        card.addEventListener('animationend', finishExit, { once: true });
-                        window.setTimeout(finishExit, 320);
-                    }, 220);
-                    return;
+                    saveStudentMealSet(mealSet);
+                } else {
+                    statusMap[id] = nextStatus;
+                    markStudentStatusHandled(id);
+                    feedback = `${studentName}已设为${nextStatus}`;
                 }
+                renderClassInfo();
+                showToast(feedback);
                 updateRollcallList();
                 classModuleScroll.scrollTop = savedScrollTop;
                 requestAnimationFrame(() => classModuleRoot.querySelector(`[data-workflow="rollcall"][data-workflow-id="${id}"][data-workflow-value="${nextStatus}"]`)?.focus({ preventScroll: true }));
@@ -11504,6 +12995,7 @@
             if (label === '关注学生') { openStudentList(); return; }
             if (label === '全校班级') { openClassList(); return; }
             if (label === '全校宿舍') { openSchoolModule('school-dorm'); return; }
+            if (label === '宿舍统计') { openSchoolModule('school-dorm-stats'); return; }
             if (label === '违纪管理') { openSchoolModule('discipline-setup'); return; }
             if (label === '招生管理') { showToast('招生管理业务内容已移除，入口按原版保留'); return; }
             showToast(`${label}入口已保留`);
@@ -11519,12 +13011,13 @@
                 classModuleScroll.scrollTo({ top: 0, behavior: 'smooth' });
                 studentStatusTopButton.blur();
             }
+            if (action === 'set-live-status-filter') toggleLiveStatusFilter(button.dataset.liveFilter);
             if (action === 'set-student-directory-mode') setStudentDirectoryMode(button.dataset.studentMode);
             if (action === 'submit-exact-student-search') submitExactStudentSearch();
             if (action === 'toggle-follow-student') toggleFollowedStudent(button.dataset.followId);
             if (action === 'call-student') openCallSheet(button);
             if (action === 'call-guardian') openParentPicker(button);
-            if (action === 'copy') copyPhoneNumber(button.dataset.copy);
+            if (action === 'copy') copyPhoneNumber(button.dataset.copy, button);
             if (action === 'add-health') addHealthDialog();
             if (action === 'add-grade') addGradeDialog();
             if (action === 'reset-password') resetPassword();
@@ -11651,6 +13144,16 @@
                     showToast(task.checkedIds.includes(studentId) ? '已完成点到' : '已撤销点到');
                 }
             }
+            if (action === 'open-school-dorm-search-room') {
+                state.schoolDormBuilding = button.dataset.schoolDormBuilding || 'all';
+                state.schoolDormFloor = button.dataset.schoolDormFloor || '';
+                state.dormRoomId = button.dataset.roomId || '';
+                state.schoolDormLevel = 'rooms';
+                state.schoolDormSearch = '';
+                renderClassModule();
+                classModuleScroll.scrollTop = 0;
+                requestAnimationFrame(() => classModuleRoot.querySelector(`[data-room-id="${state.dormRoomId}"]`)?.focus({ preventScroll: true }));
+            }
             if (action === 'open-school-dorm-building') {
                 state.schoolDormBuilding = button.dataset.schoolDormBuilding || 'all';
                 state.schoolDormFloor = '';
@@ -11693,6 +13196,23 @@
                 state.schoolDormExpandedFloors = [...expandedFloors];
                 renderClassModule();
                 requestAnimationFrame(() => Array.from(classModuleRoot.querySelectorAll('[data-floor-key]')).find(item => item.dataset.floorKey === floorKey)?.focus({ preventScroll: true }));
+            }
+            if (action === 'set-dorm-stats-tab') {
+                state.dormStatsTab = button.dataset.dormStatsTab === 'class' ? 'class' : 'building';
+                renderClassModule();
+                classModuleScroll.scrollTop = 0;
+                requestAnimationFrame(() => classModuleRoot.querySelector(`[data-dorm-stats-tab="${state.dormStatsTab}"]`)?.focus({ preventScroll: true }));
+            }
+            if (action === 'toggle-dorm-stats-class') {
+                const className = button.dataset.dormClassName || '';
+                const expandedClasses = new Set(state.dormStatsExpandedClasses || []);
+                const savedScrollTop = classModuleScroll.scrollTop;
+                if (expandedClasses.has(className)) expandedClasses.delete(className);
+                else expandedClasses.add(className);
+                state.dormStatsExpandedClasses = [...expandedClasses];
+                renderClassModule();
+                classModuleScroll.scrollTop = savedScrollTop;
+                requestAnimationFrame(() => Array.from(classModuleRoot.querySelectorAll('[data-dorm-class-name]')).find(item => item.dataset.dormClassName === className)?.focus({ preventScroll: true }));
             }
             if (action === 'set-discipline-setup-tab') {
                 state.disciplineSetupTab = button.dataset.disciplineTab === 'rules' ? 'rules' : 'items';
@@ -11890,9 +13410,12 @@
             }
             if (state.classModuleOrigin === 'school') {
                 const returnModule = state.classModule;
+                const returnFeature = returnModule === 'school-dorm'
+                    ? '全校宿舍'
+                    : (returnModule === 'school-dorm-stats' ? '宿舍统计' : '违纪管理');
                 renderSchoolHome();
                 setView('home');
-                focusAfterViewChange(() => Array.from(document.querySelectorAll('[data-school-feature]')).find(button => button.dataset.schoolFeature === (returnModule === 'school-dorm' ? '全校宿舍' : '违纪管理')) || schoolFeatureSearch);
+                focusAfterViewChange(() => Array.from(document.querySelectorAll('[data-school-feature]')).find(button => button.dataset.schoolFeature === returnFeature) || schoolFeatureSearch);
                 return;
             }
             renderClassOverview();
@@ -12198,6 +13721,8 @@
         else if (previewRoute === 'students') openStudentList();
         else if (previewRoute === 'student-following') { openStudentList(); setStudentDirectoryMode('following'); }
         else if (previewRoute === 'school-dorm') openSchoolModule('school-dorm');
+        else if (previewRoute === 'dorm-stats') openSchoolModule('school-dorm-stats');
+        else if (previewRoute === 'dorm-stats-class') { openSchoolModule('school-dorm-stats'); state.dormStatsTab = 'class'; renderClassModule(); }
         else if (previewRoute === 'discipline-setup') openSchoolModule('discipline-setup');
         else if (previewRoute === 'add-student') openStudentList();
         else if (previewRoute === 'student-detail') { openStudentList(); openStudentDetail(students[0].id); }
