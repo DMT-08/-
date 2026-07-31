@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#EFF6FF">
-    <title>掌上校园 · 学生详情与实时点名优化 7.62</title>
+    <title>掌上校园 · 班级违纪与班级考核开放 7.64</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -9566,6 +9566,1041 @@
             backdrop-filter: blur(18px);
             -webkit-backdrop-filter: blur(18px);
         }
+
+        /* 7.63：假条时间反馈、详情状态层级、点名看板与即时待办统一。 */
+        .class-module-scroll.leave-module-scroll {
+            inset: 92px 0 0;
+            padding: 0 20px 36px;
+        }
+        .leave-module-scroll .leave-toolbar {
+            top: 0;
+            margin-top: 0;
+            padding-top: 9px;
+            background: rgba(244,247,252,.97);
+        }
+        .leave-module-scroll .leave-toolbar-row {
+            display: block;
+        }
+        .leave-scroll-time {
+            position: absolute;
+            z-index: 49;
+            top: 202px;
+            right: 20px;
+            min-height: 28px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 10px;
+            border: 1px solid rgba(255,255,255,.30);
+            border-radius: 9px;
+            color: #FFFFFF;
+            background: rgba(30,41,59,.88);
+            box-shadow: 0 7px 16px rgba(15,23,42,.14);
+            font-size: 9px;
+            font-weight: 850;
+            font-variant-numeric: tabular-nums;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateY(-5px);
+            transition: opacity .22s ease, transform .22s ease, visibility .22s;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .leave-scroll-time.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .leave-scroll-time svg {
+            width: 13px;
+            height: 13px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .grade-list-heading span {
+            display: none;
+        }
+        .grade-add-action {
+            min-width: 94px;
+            height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 0 12px;
+            border: 1px solid rgba(255,255,255,.74);
+            border-radius: 11px;
+            color: #FFFFFF;
+            background: #1F5FFF;
+            box-shadow: 0 7px 15px rgba(31,95,255,.18);
+            font-size: 11px;
+            font-weight: 900;
+            transition: transform .16s ease, background .16s ease, box-shadow .16s ease;
+        }
+        .grade-add-action:active {
+            transform: scale(.95);
+            background: #174CD6;
+            box-shadow: 0 4px 10px rgba(31,95,255,.14);
+        }
+        .grade-add-action svg {
+            width: 15px;
+            height: 15px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.4;
+            stroke-linecap: round;
+        }
+
+        .student-roster-demographic.male strong {
+            color: #2563EB;
+        }
+        .student-roster-demographic.female strong {
+            color: #EF4444;
+        }
+
+        .class-dashboard-head .class-dashboard-room {
+            max-width: 152px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 2px;
+        }
+        .class-dashboard-room > span {
+            flex: 0 0 auto;
+            color: var(--muted);
+            font-size: 9px;
+            font-weight: 850;
+        }
+        .class-dashboard-room > strong {
+            min-width: 0;
+            overflow: hidden;
+            color: var(--body);
+            font-size: 10.5px;
+            font-weight: 900;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .student-status-scroll .status-manager-metric,
+        .student-status-scroll .status-manager-metric.school,
+        .student-status-scroll .status-manager-metric.leave,
+        .student-status-scroll .status-manager-metric.meal {
+            min-height: 44px;
+            align-items: center;
+            cursor: pointer;
+            transition: color .16s ease, background .16s ease, box-shadow .16s ease, transform .16s ease;
+        }
+        .student-status-scroll .status-manager-metric.school {
+            color: #047857;
+            background: rgba(16,185,129,.075);
+        }
+        .student-status-scroll .status-manager-metric.leave {
+            color: #B45309;
+            background: rgba(245,158,11,.085);
+        }
+        .student-status-scroll .status-manager-metric.meal {
+            color: #2563EB;
+            background: rgba(59,130,246,.075);
+        }
+        .student-status-scroll .status-manager-metric:active {
+            transform: scale(.96);
+            filter: saturate(1.08);
+        }
+        .student-status-scroll .status-manager-metric.active {
+            box-shadow: inset 0 0 0 2px currentColor;
+        }
+
+        .dialog-actions {
+            border-top: 0 !important;
+            background: #FFFFFF !important;
+            box-shadow: none !important;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+        .dialog-actions .dialog-button {
+            box-shadow: none;
+        }
+
+        .material-missing-card.needs-action,
+        .material-thumb-card.needs-action {
+            position: relative;
+            overflow: visible;
+        }
+        .material-missing-card.needs-action::after,
+        .material-thumb-card.needs-action::after {
+            content: "";
+            position: absolute;
+            z-index: 5;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            border: 1.5px solid #FFFFFF;
+            border-radius: 50%;
+            background: var(--danger);
+            box-shadow: 0 2px 7px rgba(239,68,68,.30);
+            pointer-events: none;
+        }
+
+        .student-state-overview {
+            overflow: hidden;
+            margin-bottom: 12px;
+            border: 1px solid rgba(15,23,42,.065);
+            border-radius: 18px;
+            background: #FFFFFF;
+        }
+        .student-state-row {
+            min-height: 58px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 0 16px;
+        }
+        .student-state-row + .student-state-row {
+            border-top: 1px solid rgba(15,23,42,.065);
+        }
+        .student-state-row > span {
+            color: #64748B;
+            font-size: 11px;
+            font-weight: 850;
+        }
+        .student-state-value {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 950;
+        }
+        .student-state-value::before {
+            content: "";
+            width: 7px;
+            height: 7px;
+            flex: 0 0 7px;
+            border-radius: 50%;
+            background: currentColor;
+            box-shadow: 0 0 0 3px rgba(100,116,139,.08);
+        }
+        .student-state-value.school,
+        .student-state-value.success { color: #047857; }
+        .student-state-value.leave,
+        .student-state-value.warning { color: #B45309; }
+        .student-state-value.meal,
+        .student-state-value.info { color: #2563EB; }
+        .student-state-value.danger { color: #B91C1C; }
+
+        /* 7.64：班级违纪、纯扣分考核与学生状态轻量化。 */
+        .grade-add-action,
+        .grade-add-action:hover,
+        .grade-add-action:focus-visible {
+            min-width: 60px;
+            height: 36px;
+            padding: 0 2px;
+            border: 0;
+            border-radius: 8px;
+            color: var(--brand);
+            background: transparent;
+            box-shadow: none;
+            font-size: 12px;
+            font-weight: 900;
+        }
+        .grade-add-action:active {
+            color: #1747C8;
+            background: rgba(31,95,255,.06);
+            box-shadow: none;
+            transform: scale(.96);
+        }
+
+        .student-portrait-tag,
+        .student-portrait-tag.tone-1,
+        .student-portrait-tag.tone-2,
+        .student-portrait-tag.tone-3,
+        .student-portrait-tag.tone-4,
+        .student-portrait-tag.tone-5,
+        .student-portrait-tag.tone-6,
+        .student-portrait-tag.empty {
+            border: 1px solid rgba(100,116,139,.14);
+            color: #475569;
+            background: #F8FAFC;
+            box-shadow: none;
+        }
+        .student-portrait-tag.portrait-alert-warning {
+            border-color: rgba(245,158,11,.22);
+            color: #92400E;
+            background: #FFF7E6;
+        }
+        .student-portrait-tag.portrait-alert-danger {
+            border-color: rgba(239,68,68,.20);
+            color: #991B1B;
+            background: #FFF1F2;
+        }
+
+        .student-status-scroll .status-manager-metric,
+        .student-status-scroll .status-manager-metric.school,
+        .student-status-scroll .status-manager-metric.leave,
+        .student-status-scroll .status-manager-metric.meal {
+            border-color: rgba(100,116,139,.09);
+            color: #52627A;
+            background: rgba(248,250,252,.86);
+            box-shadow: none;
+        }
+        .student-status-scroll .status-manager-metric strong,
+        .student-status-scroll .status-manager-metric span,
+        .student-status-scroll .status-manager-metric.school strong,
+        .student-status-scroll .status-manager-metric.school span,
+        .student-status-scroll .status-manager-metric.leave strong,
+        .student-status-scroll .status-manager-metric.leave span,
+        .student-status-scroll .status-manager-metric.meal strong,
+        .student-status-scroll .status-manager-metric.meal span {
+            color: inherit;
+        }
+        .student-status-scroll .status-manager-metric.active,
+        .student-status-scroll .status-manager-metric.school.active,
+        .student-status-scroll .status-manager-metric.leave.active,
+        .student-status-scroll .status-manager-metric.meal.active {
+            color: var(--brand);
+            background: rgba(31,95,255,.08);
+            box-shadow: inset 0 0 0 1px rgba(31,95,255,.24);
+        }
+
+        .class-module-scroll.class-record-scroll {
+            padding: 104px 0 0;
+        }
+        .class-module-scroll.class-record-scroll.content-surface-passed {
+            background: #FFFFFF;
+        }
+        .class-record-surface {
+            min-height: calc(100% - 8px);
+            padding: 14px 20px 40px;
+            border-radius: 24px 24px 0 0;
+            background: #FFFFFF;
+            box-shadow: 0 -1px 0 rgba(255,255,255,.96);
+        }
+        .class-record-context {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding: 0 2px;
+        }
+        .class-record-context > span {
+            min-width: 0;
+        }
+        .class-record-context strong,
+        .class-record-context small {
+            display: block;
+        }
+        .class-record-context strong {
+            overflow: hidden;
+            color: var(--ink);
+            font-size: 15px;
+            font-weight: 900;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .class-record-context small {
+            margin-top: 3px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 650;
+        }
+        .class-record-context > em {
+            flex: 0 0 auto;
+            color: #B91C1C;
+            font-size: 12px;
+            font-style: normal;
+            font-weight: 900;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .class-discipline-tabs {
+            display: grid;
+            grid-template-columns: repeat(2,minmax(0,1fr));
+            gap: 4px;
+            padding: 4px;
+            border: 1px solid rgba(100,116,139,.10);
+            border-radius: 12px;
+            background: #F1F5F9;
+        }
+        .class-discipline-tab {
+            min-height: 36px;
+            padding: 0 8px;
+            border: 0;
+            border-radius: 9px;
+            color: #64748B;
+            background: transparent;
+            font-size: 12px;
+            font-weight: 850;
+        }
+        .class-discipline-tab.active {
+            color: var(--brand);
+            background: #FFFFFF;
+            box-shadow: 0 2px 7px rgba(15,23,42,.08);
+        }
+        .class-discipline-tab b {
+            margin-left: 3px;
+            color: inherit;
+            font-size: 11px;
+            font-weight: 900;
+        }
+        .class-record-list {
+            margin-top: 12px;
+            border-top: 1px solid rgba(15,23,42,.07);
+        }
+        .class-record-row {
+            width: 100%;
+            min-height: 92px;
+            display: grid;
+            grid-template-columns: minmax(0,1fr) auto;
+            gap: 10px;
+            align-items: center;
+            padding: 14px 2px;
+            border: 0;
+            border-bottom: 1px solid rgba(15,23,42,.07);
+            color: inherit;
+            background: transparent;
+            text-align: left;
+        }
+        .class-record-row:active {
+            background: rgba(31,95,255,.035);
+            transform: scale(.99);
+        }
+        .class-record-copy {
+            min-width: 0;
+        }
+        .class-record-copy > strong {
+            display: -webkit-box;
+            overflow: hidden;
+            color: var(--ink);
+            font-size: 14px;
+            font-weight: 900;
+            line-height: 1.42;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+        }
+        .class-record-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px 10px;
+            margin-top: 7px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 650;
+            line-height: 1.35;
+        }
+        .class-record-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .class-record-meta span + span::before {
+            content: "";
+            width: 3px;
+            height: 3px;
+            margin-right: 2px;
+            border-radius: 50%;
+            background: #CBD5E1;
+        }
+        .class-record-side {
+            min-width: 50px;
+            display: grid;
+            justify-items: end;
+            gap: 9px;
+        }
+        .class-record-points {
+            color: #B91C1C;
+            font-size: 17px;
+            font-weight: 950;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+        .class-record-points small {
+            margin-left: 2px;
+            font-size: 10px;
+            font-weight: 850;
+        }
+        .class-record-arrow {
+            width: 24px;
+            height: 24px;
+            display: grid;
+            place-items: center;
+            color: #94A3B8;
+        }
+        .class-record-arrow svg {
+            width: 16px;
+            height: 16px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .class-record-empty {
+            padding: 44px 12px;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .assessment-week-list {
+            margin-top: 2px;
+            border-top: 1px solid rgba(15,23,42,.07);
+        }
+        .assessment-week-row {
+            width: 100%;
+            display: block;
+            padding: 14px 2px 15px;
+            border: 0;
+            border-bottom: 1px solid rgba(15,23,42,.07);
+            color: inherit;
+            background: transparent;
+            text-align: left;
+        }
+        .assessment-week-row:active {
+            background: rgba(31,95,255,.035);
+            transform: scale(.99);
+        }
+        .assessment-week-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .assessment-week-title {
+            display: flex;
+            align-items: baseline;
+            gap: 9px;
+        }
+        .assessment-week-title strong {
+            color: var(--ink);
+            font-size: 15px;
+            font-weight: 950;
+        }
+        .assessment-week-title span {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 750;
+        }
+        .assessment-week-rank {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #475569;
+            font-size: 11px;
+            font-weight: 750;
+        }
+        .assessment-week-rank b {
+            color: var(--ink);
+            font-size: 14px;
+            font-weight: 950;
+            font-variant-numeric: tabular-nums;
+        }
+        .assessment-week-rank svg {
+            width: 15px;
+            height: 15px;
+            fill: none;
+            stroke: #94A3B8;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .assessment-week-metrics {
+            display: grid;
+            grid-template-columns: repeat(3,minmax(0,1fr));
+            margin-top: 11px;
+            overflow: hidden;
+            border: 1px solid rgba(100,116,139,.10);
+            border-radius: 10px;
+            background: #F8FAFC;
+        }
+        .assessment-week-metric {
+            min-width: 0;
+            padding: 8px 5px;
+            text-align: center;
+        }
+        .assessment-week-metric + .assessment-week-metric {
+            border-left: 1px solid rgba(100,116,139,.10);
+        }
+        .assessment-week-metric strong,
+        .assessment-week-metric span {
+            display: block;
+        }
+        .assessment-week-metric strong {
+            color: #334155;
+            font-size: 14px;
+            font-weight: 950;
+            font-variant-numeric: tabular-nums;
+        }
+        .assessment-week-metric span {
+            margin-top: 3px;
+            overflow: hidden;
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 700;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .assessment-week-metric.pending strong {
+            color: #B45309;
+        }
+
+        .assessment-toolbar {
+            position: relative;
+            z-index: 1;
+            margin: 0 -20px 4px;
+            padding: 0 20px 12px;
+            border-bottom: 1px solid rgba(15,23,42,.06);
+            background: rgba(255,255,255,.96);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+        .assessment-filter-select {
+            position: relative;
+        }
+        .assessment-filter-select select {
+            width: 100%;
+            height: 40px;
+            padding: 0 38px 0 12px;
+            border: 1px solid rgba(100,116,139,.15);
+            border-radius: 11px;
+            outline: none;
+            color: #334155;
+            background: #F8FAFC;
+            font-size: 12px;
+            font-weight: 800;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+        .assessment-filter-select svg {
+            position: absolute;
+            top: 50%;
+            right: 13px;
+            width: 15px;
+            height: 15px;
+            pointer-events: none;
+            fill: none;
+            stroke: #64748B;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transform: translateY(-50%);
+        }
+        .assessment-search-row {
+            display: grid;
+            grid-template-columns: minmax(0,1fr) 62px;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .assessment-search {
+            position: relative;
+        }
+        .assessment-search svg {
+            position: absolute;
+            top: 50%;
+            left: 12px;
+            width: 15px;
+            height: 15px;
+            pointer-events: none;
+            fill: none;
+            stroke: #94A3B8;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            transform: translateY(-50%);
+        }
+        .assessment-search input {
+            width: 100%;
+            height: 40px;
+            padding: 0 11px 0 36px;
+            border: 1px solid rgba(100,116,139,.15);
+            border-radius: 11px;
+            outline: none;
+            color: var(--ink);
+            background: #F8FAFC;
+            font-size: 12px;
+            font-weight: 750;
+        }
+        .assessment-search input:focus,
+        .assessment-filter-select select:focus {
+            border-color: rgba(31,95,255,.32);
+            box-shadow: 0 0 0 3px rgba(31,95,255,.07);
+        }
+        .assessment-search-confirm {
+            height: 40px;
+            border: 0;
+            border-radius: 11px;
+            color: #FFFFFF;
+            background: var(--brand);
+            box-shadow: 0 6px 12px rgba(31,95,255,.15);
+            font-size: 12px;
+            font-weight: 900;
+        }
+        .assessment-result-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 2px 8px;
+        }
+        .assessment-result-head strong {
+            color: var(--ink);
+            font-size: 14px;
+            font-weight: 900;
+        }
+        .assessment-result-head span {
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 700;
+        }
+        .class-record-status {
+            padding: 4px 7px;
+            border-radius: 7px;
+            color: #B45309;
+            background: #FFF7E6;
+            font-size: 10px;
+            font-weight: 850;
+            white-space: nowrap;
+        }
+        .class-record-status.processed {
+            color: #047857;
+            background: #ECFDF5;
+        }
+
+        #disciplineDetailView.class-discipline-mode {
+            background: linear-gradient(135deg, #EFF6FF 0%, #DFE7FF 100%);
+        }
+        #disciplineDetailView.class-discipline-mode .workflow-page-scroll {
+            padding: 104px 0 0;
+        }
+        .class-discipline-detail {
+            min-height: calc(100% - 8px);
+            padding: 18px 20px 42px;
+            border-radius: 24px 24px 0 0;
+            background: #FFFFFF;
+            box-shadow: 0 -1px 0 rgba(255,255,255,.96);
+        }
+        .class-discipline-detail-hero {
+            padding-bottom: 17px;
+            border-bottom: 1px solid rgba(15,23,42,.07);
+        }
+        .class-discipline-detail-kicker {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .class-discipline-detail-kicker span {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 750;
+        }
+        .class-discipline-detail-kicker strong {
+            color: #B91C1C;
+            font-size: 18px;
+            font-weight: 950;
+            font-variant-numeric: tabular-nums;
+        }
+        .class-discipline-detail-hero h2 {
+            margin: 8px 0 0;
+            color: var(--ink);
+            font-size: 18px;
+            font-weight: 950;
+            line-height: 1.42;
+        }
+        .class-discipline-detail-hero p {
+            margin: 7px 0 0;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .class-discipline-section {
+            padding: 18px 0 2px;
+        }
+        .class-discipline-section + .class-discipline-section {
+            margin-top: 8px;
+            border-top: 1px solid rgba(15,23,42,.07);
+        }
+        .class-discipline-section h3 {
+            margin: 0 0 8px;
+            color: var(--ink);
+            font-size: 15px;
+            font-weight: 900;
+        }
+        .class-discipline-fields {
+            border-top: 1px solid rgba(15,23,42,.06);
+        }
+        .class-discipline-field {
+            min-height: 48px;
+            display: grid;
+            grid-template-columns: 88px minmax(0,1fr);
+            gap: 14px;
+            align-items: start;
+            padding: 13px 0;
+            border-bottom: 1px solid rgba(15,23,42,.06);
+        }
+        .class-discipline-field > span {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .class-discipline-field > strong {
+            min-width: 0;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 850;
+            line-height: 1.55;
+            text-align: right;
+            word-break: break-word;
+        }
+        .class-discipline-field > strong.pending-value {
+            color: #B45309;
+        }
+        .class-discipline-field > strong.deduction-value {
+            color: #B91C1C;
+            font-size: 14px;
+            font-weight: 950;
+        }
+        .class-discipline-photo {
+            position: relative;
+            height: 156px;
+            margin-top: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(100,116,139,.10);
+            border-radius: 14px;
+            background: #F1F5F9;
+        }
+        .class-discipline-photo-label {
+            margin-top: 14px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .class-discipline-photo svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .class-discipline-photo span {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            padding: 5px 8px;
+            border-radius: 7px;
+            color: #475569;
+            background: rgba(255,255,255,.86);
+            font-size: 10px;
+            font-weight: 800;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .attendance-scroll.student-live-only {
+            padding: 104px 0 0;
+        }
+        .attendance-scroll.student-live-only.content-surface-passed {
+            background: #FFFFFF;
+        }
+        .student-live-status-surface {
+            min-height: calc(100% - 8px);
+            padding: 18px 20px 40px;
+            border-radius: 24px 24px 0 0;
+            background: #FFFFFF;
+            box-shadow: 0 -1px 0 rgba(255,255,255,.96);
+        }
+        .student-live-person {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(15,23,42,.07);
+        }
+        .student-live-person-avatar {
+            width: 42px;
+            height: 42px;
+            flex: 0 0 42px;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            border: 1px solid rgba(100,116,139,.10);
+            border-radius: 50%;
+            color: #5B6B85;
+            background: #F1F5F9;
+        }
+        .student-live-person-avatar img,
+        .student-live-person-avatar svg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .student-live-person-copy {
+            min-width: 0;
+        }
+        .student-live-person-copy strong,
+        .student-live-person-copy span {
+            display: block;
+        }
+        .student-live-person-copy strong {
+            color: var(--ink);
+            font-size: 15px;
+            font-weight: 950;
+        }
+        .student-live-person-copy span {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .student-live-section {
+            padding: 20px 0 2px;
+        }
+        .student-live-section + .student-live-section {
+            margin-top: 14px;
+            border-top: 1px solid rgba(15,23,42,.07);
+        }
+        .student-live-section-head {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 11px;
+        }
+        .student-live-section-head strong,
+        .student-live-section-head span {
+            display: block;
+        }
+        .student-live-section-head strong {
+            color: var(--ink);
+            font-size: 15px;
+            font-weight: 900;
+        }
+        .student-live-section-head span {
+            margin-top: 3px;
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 650;
+        }
+        .student-live-summary {
+            color: #475569;
+            font-size: 11px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+        .student-live-actions {
+            display: grid;
+            grid-template-columns: repeat(3,minmax(0,1fr));
+            gap: 8px;
+        }
+        .student-live-action {
+            min-height: 52px;
+            display: grid;
+            place-items: center;
+            gap: 4px;
+            padding: 7px 4px;
+            border: 1px solid rgba(100,116,139,.12);
+            border-radius: 12px;
+            color: #52627A;
+            background: #F8FAFC;
+            font-size: 12px;
+            font-weight: 900;
+        }
+        .student-live-action::before {
+            content: "";
+            width: 7px;
+            height: 7px;
+            border: 2px solid #CBD5E1;
+            border-radius: 50%;
+            background: transparent;
+        }
+        .student-live-action.active {
+            color: var(--brand);
+            border-color: rgba(31,95,255,.25);
+            background: rgba(31,95,255,.07);
+            box-shadow: inset 0 0 0 1px rgba(31,95,255,.08);
+        }
+        .student-live-action.active::before {
+            border-color: currentColor;
+            background: currentColor;
+            box-shadow: inset 0 0 0 2px #FFFFFF;
+        }
+        .student-live-action[data-realtime-status="请假"].active {
+            color: #B45309;
+            border-color: rgba(245,158,11,.24);
+            background: #FFF7E6;
+        }
+        .student-live-action[data-realtime-status="就餐"].active {
+            color: #2563EB;
+            border-color: rgba(59,130,246,.22);
+            background: #EFF6FF;
+        }
+        .student-live-action[data-realtime-status="就餐"]::before {
+            border-radius: 3px;
+        }
+        .student-academic-control {
+            display: grid;
+            grid-template-columns: minmax(0,1fr) 92px;
+            gap: 9px;
+        }
+        .student-academic-select {
+            position: relative;
+        }
+        .student-academic-select select {
+            width: 100%;
+            height: 42px;
+            padding: 0 38px 0 12px;
+            border: 1px solid rgba(100,116,139,.15);
+            border-radius: 11px;
+            outline: none;
+            color: #334155;
+            background: #F8FAFC;
+            font-size: 12px;
+            font-weight: 800;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+        .student-academic-select svg {
+            position: absolute;
+            top: 50%;
+            right: 13px;
+            width: 15px;
+            height: 15px;
+            pointer-events: none;
+            fill: none;
+            stroke: #64748B;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transform: translateY(-50%);
+        }
+        .student-academic-confirm {
+            height: 42px;
+            border: 0;
+            border-radius: 11px;
+            color: #FFFFFF;
+            background: var(--brand);
+            box-shadow: 0 6px 12px rgba(31,95,255,.14);
+            font-size: 11px;
+            font-weight: 900;
+        }
+        .student-academic-confirm:disabled {
+            color: #94A3B8;
+            background: #EEF2F7;
+            box-shadow: none;
+        }
+        .student-academic-note {
+            margin: 9px 2px 0;
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 650;
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body>
@@ -9654,6 +10689,10 @@
             <main class="class-module-scroll" id="classModuleScroll">
                 <div id="classModuleRoot"></div>
             </main>
+            <output class="leave-scroll-time" id="leaveScrollTime" aria-live="polite" aria-hidden="true">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"></circle><path d="M12 7v5l3 2"></path></svg>
+                <span></span>
+            </output>
             <button type="button" class="module-floating-add" id="classModuleFloatingAction" data-action="add-discipline" hidden>
                 <svg aria-hidden="true" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 <span>添加记录</span>
@@ -9825,12 +10864,12 @@
             </main>
         </section>
 
-        <section class="app-view" id="attendanceView" aria-label="学生考勤记录">
-            <header class="topbar" aria-label="学生考勤记录导航">
+        <section class="app-view" id="attendanceView" aria-label="学生状态">
+            <header class="topbar" aria-label="学生状态导航">
                 <button type="button" class="nav-button" id="attendanceBackButton" aria-label="返回学生详情">
                     <svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
                 </button>
-                <h1 class="nav-title">考勤记录</h1>
+                <h1 class="nav-title" id="attendanceTitle">学生状态</h1>
                 <div aria-hidden="true"></div>
             </header>
             <main class="attendance-scroll" id="attendanceScroll">
@@ -9953,7 +10992,7 @@
             wechat: 'LZX_240301',
             qq: '',
             familyEconomy: '普通家庭',
-            parentsSeparated: '否',
+            parentsSeparated: '婚姻存续',
             learningStyle: '视觉 + 实操型',
             personality: '细致稳重',
             emotion: '稳定',
@@ -10551,6 +11590,7 @@
         const classModuleRoot = document.getElementById('classModuleRoot');
         const classModuleFloatingAction = document.getElementById('classModuleFloatingAction');
         const studentStatusTopButton = document.getElementById('studentStatusTopButton');
+        const leaveScrollTime = document.getElementById('leaveScrollTime');
         const callLayer = document.getElementById('callLayer');
         const studentSearch = document.getElementById('studentSearch');
         const studentSearchButton = document.getElementById('studentSearchButton');
@@ -10869,7 +11909,7 @@
             logDetailView.className = `app-view${nextView === 'log-detail' ? ' active' : ''}`;
             rollcallHistoryView.className = `app-view${nextView === 'rollcall-history' ? ' active' : (nextView === 'rollcall-record' ? ' behind' : '')}`;
             rollcallRecordView.className = `app-view${nextView === 'rollcall-record' ? ' active' : ''}`;
-            disciplineDetailView.className = `app-view${nextView === 'discipline-detail' ? ' active' : ''}`;
+            disciplineDetailView.className = `app-view${state.classDisciplineDetailOrigin ? ' class-discipline-mode' : ''}${nextView === 'discipline-detail' ? ' active' : ''}`;
             disciplineAddView.className = `app-view${nextView === 'discipline-add' ? ' active' : ''}`;
             listView.className = `app-view${nextView === 'list' ? ' active' : (['detail','grade-detail','attendance','attendance-edit','add'].includes(nextView) && state.studentDetailOrigin !== 'class-detail' ? ' behind' : '')}`;
             if (addView) addView.className = `app-view${nextView === 'add' ? ' active' : ''}`;
@@ -11031,6 +12071,7 @@
 
         function getModulePendingCount(module, classInfo = getSelectedClass()) {
             const counts = getClassPendingCounts(classInfo);
+            if (module === 'class-discipline') return classDisciplineSeed.filter(item => item.status === 'pending').length;
             return ({ leave: counts.leave, dorm: counts.dorm, discipline: counts.discipline, logs: counts.logs })[module] || 0;
         }
 
@@ -11049,12 +12090,12 @@
 
         function pendingDotMarkup(count = 1) {
             const normalized = Math.max(1, Number(count) || 1);
-            return `<span class="feature-pending-dot${normalized === 1 ? ' dot-only' : ''}" aria-hidden="true">${normalized === 1 ? '' : normalized}</span>`;
+            return `<span class="feature-pending-dot" aria-hidden="true">${normalized}</span>`;
         }
 
         function pendingBadgeMarkup(count = 1) {
             const normalized = Math.max(1, Number(count) || 1);
-            return `<span class="pending-count-badge${normalized === 1 ? ' dot-only' : ''}" aria-hidden="true">${normalized === 1 ? '' : normalized}</span>`;
+            return `<span class="pending-count-badge" aria-hidden="true">${normalized}</span>`;
         }
 
         function setPendingBadge(element, count) {
@@ -11069,7 +12110,7 @@
             const managementTab = document.querySelector('[data-class-tab="management"]');
             managementTab?.classList.toggle('has-pending', pending);
             setPendingBadge(managementTab, pendingCount);
-            if (managementTab) managementTab.setAttribute('aria-label', `班级管理${pending ? '，有待处理内容' : ''}`);
+            if (managementTab) managementTab.setAttribute('aria-label', `班级管理${pending ? `，有${pendingCount}项待处理内容` : ''}`);
         }
 
         function renderClassSchoolSummary() {
@@ -11213,7 +12254,7 @@
             '教学与成长': ['班级作业','班级报修','班级日志','学生评语','学生特长班','期末成绩'],
             '班级配置': ['宿舍设置','行为设置','班级座位设置','班级就业','班级指标','班干部设置','特长班请假']
         };
-        const classCoreModules = { '学生假条': 'leave', '实时点名': 'rollcall', '返校点到': 'checkin-return', '回家点到': 'checkin-home', '学生违纪': 'discipline', '班级日志': 'logs', '宿舍设置': 'dorm' };
+        const classCoreModules = { '学生假条': 'leave', '实时点名': 'rollcall', '返校点到': 'checkin-return', '回家点到': 'checkin-home', '班级违纪': 'class-discipline', '班级考核': 'class-assessment', '学生违纪': 'discipline', '班级日志': 'logs', '宿舍设置': 'dorm' };
 
         function renderClassManagement() {
             updateClassTabPendingState();
@@ -11393,16 +12434,11 @@
 
         function getFilteredLeaveRecords() {
             const query = state.leaveSearch.trim().toLowerCase();
-            const range = getLeaveFilterRange();
             return classWorkflowState.leave.filter(item => {
                 const matchesQuery = !query || [item.name,item.reason,item.description,item.period,item.status].some(value => String(value || '').toLowerCase().includes(query));
                 const matchesStatus = state.leaveStatusFilter === 'all' || item.status === state.leaveStatusFilter;
-                if (!matchesQuery || !matchesStatus) return false;
-                if (!range) return true;
-                const start = parseLocalDateValue(item.startDate);
-                const end = parseLocalDateValue(item.endDate || item.startDate);
-                return Boolean(start && end && end >= range.start && start <= range.end);
-            });
+                return matchesQuery && matchesStatus;
+            }).sort((a, b) => String(b.submittedAt || '').localeCompare(String(a.submittedAt || '')));
         }
 
         function leaveEvidenceMarkup(item, index = 0) {
@@ -11412,20 +12448,22 @@
         }
 
         function renderLeaveCards(records) {
-            if (!records.length) return '<div class="leave-empty-result">没有找到匹配的请假申请<br>可调整关键词或时间范围</div>';
+            if (!records.length) return '<div class="leave-empty-result">没有找到匹配的请假申请<br>可调整关键词或审批状态</div>';
             return records.map((item, index) => {
                 const statusClass = item.status === '已驳回' ? ' rejected' : (item.status === '待审批' ? '' : ' done');
-                return `<article class="module-card leave-card" role="button" tabindex="0" data-action="open-leave-detail" data-leave-id="${escapeHtml(item.id)}" aria-label="查看${escapeHtml(item.name)}的请假详情"><div class="leave-card-main"><div><div class="module-card-head"><div><div class="module-card-name">${escapeHtml(item.name)} · ${escapeHtml(item.reason)}</div><div class="module-card-sub">${escapeHtml(item.period)}</div></div><span class="module-status${statusClass}">${escapeHtml(item.status)}</span></div><p class="leave-application-text">${escapeHtml(item.description || item.reason)}</p></div><button type="button" class="leave-thumb-button" data-action="preview-leave-image" data-leave-id="${escapeHtml(item.id)}" aria-label="放大${escapeHtml(item.evidenceLabel || '请假凭证')}">${leaveEvidenceMarkup(item, index)}</button></div>${item.rejectReason ? `<div class="module-reject-reason"><strong>驳回原因</strong><span>${escapeHtml(item.rejectReason)}</span></div>` : ''}${item.status === '待审批' ? `<div class="module-card-actions"><button type="button" class="module-action danger" data-workflow="leave" data-workflow-id="${item.id}" data-workflow-value="已驳回">驳回</button><button type="button" class="module-action primary" data-workflow="leave" data-workflow-id="${item.id}" data-workflow-value="已通过">通过</button></div>${pendingBadgeMarkup(1)}` : ''}</article>`;
+                const submittedTime = formatLeaveApplicationTime(item.submittedAt);
+                return `<article class="module-card leave-card" role="button" tabindex="0" data-action="open-leave-detail" data-leave-id="${escapeHtml(item.id)}" data-leave-time="${escapeHtml(submittedTime)}" aria-label="查看${escapeHtml(item.name)}的请假详情，提交于${escapeHtml(submittedTime)}"><div class="leave-card-main"><div><div class="module-card-head"><div><div class="module-card-name">${escapeHtml(item.name)} · ${escapeHtml(item.reason)}</div><div class="module-card-sub">${escapeHtml(item.period)}</div></div><span class="module-status${statusClass}">${escapeHtml(item.status)}</span></div><p class="leave-application-text">${escapeHtml(item.description || item.reason)}</p></div><button type="button" class="leave-thumb-button" data-action="preview-leave-image" data-leave-id="${escapeHtml(item.id)}" aria-label="放大${escapeHtml(item.evidenceLabel || '请假凭证')}">${leaveEvidenceMarkup(item, index)}</button></div>${item.rejectReason ? `<div class="module-reject-reason"><strong>驳回原因</strong><span>${escapeHtml(item.rejectReason)}</span></div>` : ''}${item.status === '待审批' ? `<div class="module-card-actions"><button type="button" class="module-action danger" data-workflow="leave" data-workflow-id="${item.id}" data-workflow-value="已驳回">驳回</button><button type="button" class="module-action primary" data-workflow="leave" data-workflow-id="${item.id}" data-workflow-value="已通过">通过</button></div>${pendingBadgeMarkup(1)}` : ''}</article>`;
             }).join('');
         }
 
         function renderLeaveModule() {
             const records = getFilteredLeaveRecords();
             const statusOptions = [{ value: 'all', label: '全部' }, { value: '已通过', label: '已通过' }, { value: '已驳回', label: '已驳回' }];
-            return `<section class="leave-toolbar" aria-label="请假申请搜索与筛选"><div class="leave-toolbar-row"><button type="button" class="leave-time-trigger" id="leaveTimeTrigger" data-action="open-leave-time-filter" aria-haspopup="dialog" aria-controls="pickerLayer" aria-expanded="false"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M8 3v4M16 3v4M3 10h18"></path></svg><span>${escapeHtml(getLeaveTimeFilterLabel())}</span><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div class="leave-search"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="leaveSearch" type="search" value="${escapeHtml(state.leaveSearch)}" placeholder="搜索姓名 / 原因 / 状态" autocomplete="off" aria-label="搜索请假申请"><button type="button" class="leave-search-clear${state.leaveSearch ? ' visible' : ''}" data-action="clear-leave-search" aria-label="清空请假搜索"><svg aria-hidden="true" viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg></button></div></div><div class="leave-status-filters" aria-label="按审批状态筛选">${statusOptions.map(option => `<button type="button" class="leave-status-chip${state.leaveStatusFilter === option.value ? ' active' : ''}" data-action="set-leave-status-filter" data-leave-status="${option.value}" aria-pressed="${state.leaveStatusFilter === option.value ? 'true' : 'false'}">${option.label}</button>`).join('')}</div></section><div class="class-section-head"><h2 id="leaveResultTitle">请假申请（${records.length}）</h2></div><div class="module-list" id="leaveList">${renderLeaveCards(records)}</div>`;
+            return `<section class="leave-toolbar" aria-label="请假申请搜索与状态筛选"><div class="leave-toolbar-row"><div class="leave-search"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="leaveSearch" type="search" value="${escapeHtml(state.leaveSearch)}" placeholder="搜索姓名 / 原因 / 状态" autocomplete="off" aria-label="搜索请假申请"><button type="button" class="leave-search-clear${state.leaveSearch ? ' visible' : ''}" data-action="clear-leave-search" aria-label="清空请假搜索"><svg aria-hidden="true" viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg></button></div></div><div class="leave-status-filters" aria-label="按审批状态筛选">${statusOptions.map(option => `<button type="button" class="leave-status-chip${state.leaveStatusFilter === option.value ? ' active' : ''}" data-action="set-leave-status-filter" data-leave-status="${option.value}" aria-pressed="${state.leaveStatusFilter === option.value ? 'true' : 'false'}">${option.label}</button>`).join('')}</div></section><div class="class-section-head"><h2 id="leaveResultTitle">请假申请（${records.length}）</h2></div><div class="module-list" id="leaveList">${renderLeaveCards(records)}</div>`;
         }
 
         function updateLeaveList() {
+            hideLeaveScrollTime();
             const records = getFilteredLeaveRecords();
             const title = document.getElementById('leaveResultTitle');
             const list = document.getElementById('leaveList');
@@ -11767,6 +12805,7 @@
         function openDisciplineDetail(recordId) {
             const item = classWorkflowState.discipline.find(record => record.id === recordId);
             if (!item) return;
+            state.classDisciplineDetailOrigin = '';
             state.selectedDisciplineId = item.id;
             renderDisciplineDetailPage();
             setView('discipline-detail');
@@ -12091,7 +13130,7 @@
             state.classModuleReturnTab = returnTab;
             if (module === 'leave') {
                 state.leaveSearch = '';
-                state.leaveTimeFilter = 'week';
+                state.leaveTimeFilter = 'all';
                 state.leaveStatusFilter = 'all';
             }
             if (module === 'rollcall') {
@@ -12129,21 +13168,15 @@
             if (!item) return;
             openDialog({
                 title: `驳回${item.name}的假条？`,
-                desc: '驳回原因会同步给学生，请填写清晰、可执行的说明。',
-                body: '<div class="dialog-field"><label for="leaveRejectReason">驳回原因<span class="required-star" aria-hidden="true">*</span></label><textarea id="leaveRejectReason" required maxlength="200" placeholder="例如：请假时段与凭证不一致，请核实后重新提交"></textarea></div>',
+                body: '<div class="dialog-field"><label for="leaveRejectReason">驳回说明（选填）</label><textarea id="leaveRejectReason" maxlength="200" placeholder="可补充需要学生核实或重新提交的内容"></textarea></div>',
                 confirmLabel: '确认驳回',
                 danger: true,
                 onConfirm: () => {
                     const reason = document.getElementById('leaveRejectReason');
-                    if (!reason.value.trim()) {
-                        reason.focus();
-                        showToast('请填写驳回原因');
-                        return false;
-                    }
                     item.status = '已驳回';
                     item.rejectReason = reason.value.trim();
                     refreshClassWorkflowViews();
-                    showToast('假条已驳回并记录原因');
+                    showToast(reason.value.trim() ? '假条已驳回并记录说明' : '假条已驳回');
                 }
             });
             state.dialogReturnFocus = trigger;
@@ -12891,12 +13924,24 @@
             };
         }
 
+        function getStudentRealtimeStatus(data = currentData()) {
+            const classInfo = schoolClasses.find(item => item.name === data.className);
+            if (!classInfo) return normalizeAttendanceStatus(data.currentAttendance || '在校');
+            const mealSet = getStudentMealSet(classInfo);
+            if (mealSet.has(data.id)) return '就餐';
+            const handled = getStudentStatusHandledSet(classInfo);
+            const status = getStudentStatusMap(classInfo)[data.id];
+            if (handled.has(data.id) && ['在校','请假'].includes(status)) return status;
+            return normalizeAttendanceStatus(data.currentAttendance || '在校');
+        }
+
         function renderHero() {
             const data = currentData();
             const classLabel = data.className || '待分班';
             const detailStudentId = data.id || student.id;
             const following = state.followedStudentIds.includes(detailStudentId);
             const academicStatus = data.studentStatus || '未设置';
+            const realtimeStatus = getStudentRealtimeStatus(data);
             const residence = getStudentResidenceProfile(data);
             const residenceModeControl = state.editMode
                 ? `<button type="button" class="hero-residence-item hero-residence-edit" id="heroResidenceMode" data-action="open-select-picker" data-picker-path="residenceMode" data-picker-label="选择在校情况" data-picker-options='["住校","走读"]' aria-haspopup="dialog" aria-controls="pickerLayer" aria-expanded="false"><span>在校情况</span><strong>${escapeHtml(residence.residenceMode)}</strong></button>`
@@ -12925,7 +13970,7 @@
                         ${stayTypeControl}
                     </div>
                     <div class="hero-facts">
-                        <button type="button" class="hero-fact hero-status-fact" data-action="open-student-archive-tab" aria-label="当前学籍状态${escapeHtml(academicStatus)}，查看档案信息"><span>学籍状态</span><span class="hero-status-line"><strong class="hero-status-value ${statusTone(academicStatus)}">${escapeHtml(academicStatus)}</strong><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></span></button>
+                        <button type="button" class="hero-fact hero-status-fact" data-action="open-student-attendance" aria-label="当前实时状态${escapeHtml(realtimeStatus)}，查看学生状态详情"><span>实时状态</span><span class="hero-status-line"><strong class="hero-status-value ${statusTone(realtimeStatus)}">${escapeHtml(realtimeStatus)}</strong><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></span></button>
                         <div class="hero-fact"><span>学生学号</span><strong>${escapeHtml(data.studentNo)}</strong></div>
                         <div class="hero-fact"><span>最近更新</span><strong>${escapeHtml(data.updatedAt)}</strong></div>
                     </div>
@@ -13054,7 +14099,7 @@
                 ${renderControl('监护人身份证号码','family.0.idNumber')}
                 ${renderControl('监护人电话','family.0.phone',{type:'tel'})}
             </div>`;
-            const familyContext = `<div class="info-list">${renderControl('父母情况','parentsSeparated',{type:'select',choices:['否','是']})}</div>`;
+            const familyContext = `<div class="info-list">${renderControl('父母婚姻状况','parentsSeparated',{type:'select',choices:['婚姻存续','已离异','情况不详'],display:value => value === '是' ? '已离异' : (value === '否' ? '婚姻存续' : value)})}</div>`;
             return `<div class="panel-stack">${card('联系方式','',contact)}${card('监护人','',guardian)}${card('家庭情况','',familyContext)}</div>`;
         }
 
@@ -13120,8 +14165,8 @@
             }).join('');
             return `<div class="grade-view">
                 <div class="grade-view-toolbar">
-                    <div class="grade-list-heading"><strong>最近成绩</strong><span>按日期展示最近 ${Math.min(4, allRecords.length)} 条</span></div>
-                    <button type="button" class="grade-add-action" data-action="add-grade">录入成绩</button>
+                    <div class="grade-list-heading"><strong>最近成绩</strong></div>
+                    <button type="button" class="grade-add-action" data-action="add-grade" aria-label="录入成绩"><span>＋ 录入</span></button>
                 </div>
                 <section class="grade-history-table" role="table" aria-label="学生最近四次成绩">
                     <div class="grade-history-head" role="row">
@@ -13207,14 +14252,14 @@
         function renderMaterials() {
             const data = currentData();
             const materials = getMaterialSlots(data).map((slot, index) => {
-                if (!slot.item) return `<div class="material-missing-card"><span>${escapeHtml(slot.name)}</span><button type="button" class="material-upload-button pending-leaf-action" data-action="material-upload" data-material-name="${escapeHtml(slot.name)}" aria-label="补传${escapeHtml(slot.name)}">补传${pendingBadgeMarkup(1)}</button></div>`;
+                if (!slot.item) return `<div class="material-missing-card needs-action"><span>${escapeHtml(slot.name)}</span><button type="button" class="material-upload-button" data-action="material-upload" data-material-name="${escapeHtml(slot.name)}" aria-label="补传${escapeHtml(slot.name)}">补传</button></div>`;
                 const rejected = /不通过/.test(slot.item.status || '');
                 return `<article class="material-thumb-card${rejected ? ' needs-action' : ''}">
                     <button type="button" class="material-thumb-open" data-action="material-preview" data-index="${data.attachments.indexOf(slot.item)}" aria-label="查看${escapeHtml(slot.name)}图片">
                         <span class="material-thumb-visual">${materialPreviewMarkup(slot.item, index)}</span>
                         <span class="material-thumb-caption"><strong>${escapeHtml(slot.name)}</strong><small>${escapeHtml(slot.item.status || '已上传')}</small></span>
                     </button>
-                    ${rejected ? `<button type="button" class="material-reupload-button pending-leaf-action" data-action="material-upload" data-material-name="${escapeHtml(slot.name)}" aria-label="重新上传${escapeHtml(slot.name)}">重新上传${pendingBadgeMarkup(1)}</button>` : ''}
+                    ${rejected ? `<button type="button" class="material-reupload-button" data-action="material-upload" data-material-name="${escapeHtml(slot.name)}" aria-label="重新上传${escapeHtml(slot.name)}">重新上传</button>` : ''}
                 </article>`;
             }).join('');
             return `<div class="panel-stack">${card('证件与材料','',`<div class="material-gallery">${materials}</div>`)}</div>`;
@@ -13222,11 +14267,9 @@
 
         function updateStudentDetailPendingState() {
             const tab = document.getElementById('tab-materials');
-            const pendingCount = getMaterialSlots().filter(slot => requiredMaterialNames.includes(slot.name) && (!slot.item || /不通过/.test(slot.item.status || ''))).length;
-            const pending = pendingCount > 0;
-            tab.classList.toggle('has-pending', pending);
-            setPendingBadge(tab, pendingCount);
-            tab.setAttribute('aria-label', `材料${pending ? `，有${pendingCount}项待补传内容` : ''}`);
+            tab.classList.remove('has-pending');
+            setPendingBadge(tab, 0);
+            tab.setAttribute('aria-label', '材料');
         }
 
         function renderPanel() {
@@ -13378,6 +14421,8 @@
             const records = getAttendanceRecords();
             const filtered = getFilteredAttendanceRecords();
             const data = currentData();
+            const realtimeStatus = getStudentRealtimeStatus(data);
+            const academicStatus = data.studentStatus || '未设置';
             const statusCounts = status => records.filter(record => record.status === status).length;
             const grouped = new Map();
             filtered.forEach(record => {
@@ -13393,7 +14438,7 @@
             const allStatusesActive = state.attendanceStatusFilter === 'all';
             const statusOptions = rollcallStatuses.map(status => ({ value: status, tone: studentStatusTone(status) }));
             const customLabel = state.attendancePeriodFilter === 'custom' ? getAttendancePeriodLabel('custom') : '自选时间';
-            attendanceRoot.innerHTML = `<section class="attendance-dashboard" aria-label="考勤数据看板"><div class="attendance-dashboard-head"><div class="attendance-dashboard-person"><span class="attendance-dashboard-avatar${data.gender === '男' ? ' male' : ''}">${studentAvatarMarkup(data)}</span><strong>${escapeHtml(data.name)}</strong></div><span>累计 ${records.length} 条</span></div><div class="attendance-metrics"><div class="attendance-metric school"><strong>${statusCounts('在校')}</strong><span>在校</span></div><div class="attendance-metric leave"><strong>${statusCounts('请假')}</strong><span>请假</span></div><div class="attendance-metric meal"><strong>${statusCounts('就餐')}</strong><span>就餐</span></div></div></section><section class="attendance-tools" aria-label="考勤筛选"><div class="attendance-filter-section"><span class="attendance-filter-label">时间范围</span><div class="attendance-filter-group attendance-time-actions" aria-label="按时间筛选"><button type="button" class="attendance-filter-chip${state.attendancePeriodFilter === 'all' ? ' active' : ''}" data-action="set-attendance-period-all" aria-pressed="${state.attendancePeriodFilter === 'all' ? 'true' : 'false'}">全部时间</button><button type="button" class="attendance-filter-chip attendance-custom-trigger${state.attendancePeriodFilter === 'custom' ? ' active' : ''}" data-action="open-attendance-time-filter" aria-haspopup="dialog" aria-controls="pickerLayer" aria-expanded="false" aria-pressed="${state.attendancePeriodFilter === 'custom' ? 'true' : 'false'}"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M8 3v4M16 3v4M3 10h18"></path></svg><span>${escapeHtml(customLabel)}</span></button></div></div><div class="attendance-filter-section"><span class="attendance-filter-label">考勤状态</span><div class="attendance-filter-group attendance-status-options" aria-label="按考勤状态筛选">${statusOptions.map(option => { const active = allStatusesActive || state.attendanceStatusFilter === option.value; return `<button type="button" class="attendance-filter-chip status-${option.tone}${active ? ' active' : ''}" data-action="set-attendance-filter" data-attendance-filter-kind="status" data-attendance-filter-value="${option.value}" aria-pressed="${active ? 'true' : 'false'}">${option.value}</button>`; }).join('')}</div></div></section><div class="attendance-result-head"><h2>考勤明细</h2><span>${escapeHtml(getAttendancePeriodLabel())} · ${grouped.size} 天</span></div>${tableRows ? `<div class="attendance-day-table-wrap"><table class="attendance-day-table"><colgroup><col><col><col><col><col></colgroup><thead><tr><th>日期</th><th>在校</th><th>请假</th><th>就餐</th><th>查看</th></tr></thead><tbody>${tableRows}</tbody></table></div>` : '<div class="attendance-history-empty">没有符合筛选条件的考勤记录</div>'}`;
+            attendanceRoot.innerHTML = `<section class="student-state-overview" aria-label="${escapeHtml(data.name)}的学生状态"><div class="student-state-row"><span>实时状态</span><strong class="student-state-value ${studentStatusTone(realtimeStatus)}">${escapeHtml(realtimeStatus)}</strong></div><div class="student-state-row"><span>学籍状态</span><strong class="student-state-value ${statusTone(academicStatus)}">${escapeHtml(academicStatus)}</strong></div></section><section class="attendance-dashboard" aria-label="考勤数据看板"><div class="attendance-dashboard-head"><div class="attendance-dashboard-person"><span class="attendance-dashboard-avatar${data.gender === '男' ? ' male' : ''}">${studentAvatarMarkup(data)}</span><strong>${escapeHtml(data.name)}</strong></div><span>累计 ${records.length} 条</span></div><div class="attendance-metrics"><div class="attendance-metric school"><strong>${statusCounts('在校')}</strong><span>在校</span></div><div class="attendance-metric leave"><strong>${statusCounts('请假')}</strong><span>请假</span></div><div class="attendance-metric meal"><strong>${statusCounts('就餐')}</strong><span>就餐</span></div></div></section><section class="attendance-tools" aria-label="考勤筛选"><div class="attendance-filter-section"><span class="attendance-filter-label">时间范围</span><div class="attendance-filter-group attendance-time-actions" aria-label="按时间筛选"><button type="button" class="attendance-filter-chip${state.attendancePeriodFilter === 'all' ? ' active' : ''}" data-action="set-attendance-period-all" aria-pressed="${state.attendancePeriodFilter === 'all' ? 'true' : 'false'}">全部时间</button><button type="button" class="attendance-filter-chip attendance-custom-trigger${state.attendancePeriodFilter === 'custom' ? ' active' : ''}" data-action="open-attendance-time-filter" aria-haspopup="dialog" aria-controls="pickerLayer" aria-expanded="false" aria-pressed="${state.attendancePeriodFilter === 'custom' ? 'true' : 'false'}"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M8 3v4M16 3v4M3 10h18"></path></svg><span>${escapeHtml(customLabel)}</span></button></div></div><div class="attendance-filter-section"><span class="attendance-filter-label">考勤状态</span><div class="attendance-filter-group attendance-status-options" aria-label="按考勤状态筛选">${statusOptions.map(option => { const active = allStatusesActive || state.attendanceStatusFilter === option.value; return `<button type="button" class="attendance-filter-chip status-${option.tone}${active ? ' active' : ''}" data-action="set-attendance-filter" data-attendance-filter-kind="status" data-attendance-filter-value="${option.value}" aria-pressed="${active ? 'true' : 'false'}">${option.value}</button>`; }).join('')}</div></div></section><div class="attendance-result-head"><h2>考勤明细</h2><span>${escapeHtml(getAttendancePeriodLabel())} · ${grouped.size} 天</span></div>${tableRows ? `<div class="attendance-day-table-wrap"><table class="attendance-day-table"><colgroup><col><col><col><col><col></colgroup><thead><tr><th>日期</th><th>在校</th><th>请假</th><th>就餐</th><th>查看</th></tr></thead><tbody>${tableRows}</tbody></table></div>` : '<div class="attendance-history-empty">没有符合筛选条件的考勤记录</div>'}`;
         }
 
         function renderAttendanceEditor() {
@@ -13531,7 +14576,7 @@
                 focusAfterViewChange(() => attendanceRoot.querySelector(`[data-attendance-date="${editedDate}"]`) || (trigger?.isConnected ? trigger : attendanceBackButton));
             } else {
                 setView('detail');
-                focusAfterViewChange(() => heroRoot.querySelector('[data-action="open-student-archive-tab"]') || editButton);
+                focusAfterViewChange(() => heroRoot.querySelector('[data-action="open-student-attendance"]') || editButton);
             }
             if (discardedChanges) showToast('未保存的修改已取消');
         }
@@ -13613,7 +14658,7 @@
             ['suspensionStatus','休学状态'], ['workStudyStatus','勤工俭学'], ['registeredGrade','注册年级'], ['registeredClass','注册班级'],
             ['registeredTerm','注册学期'], ['classPlan','班级培养计划'], ['personalPlans','个人培养计划'], ['address','现居地址'],
             ['email','电子邮箱'], ['wechat','微信号'], ['qq','QQ号'], ['emergencyName','紧急联系人'], ['emergencyPhone','紧急电话'],
-            ['familyEconomy','家庭经济'], ['parentsSeparated','父母情况'], ['learningStyle','学习风格'], ['personality','个性特征'],
+            ['familyEconomy','家庭经济'], ['parentsSeparated','父母婚姻状况'], ['learningStyle','学习风格'], ['personality','个性特征'],
             ['emotion','情绪状态'], ['hobbies','兴趣爱好'], ['skills','擅长技能'], ['family','监护人'],
             ['healthStatus','健康状况'], ['height','身高'], ['weight','体重'], ['bloodType','血型'], ['leftVision','左眼视力'],
             ['rightVision','右眼视力'], ['allergies','过敏信息'], ['medicalHistory','既往病史'],
@@ -14155,7 +15200,7 @@
             const scoreEvaluation = getClassScoreEvaluation(classInfo.yesterdayScore);
             updateClassTabPendingState();
             classOverviewPanel.innerHTML = `<section class="class-dashboard" aria-label="班级数据看板">
-                <div class="class-dashboard-head"><span class="class-dashboard-plan-line">培养方案：<b>${escapeHtml(classInfo.plan)}</b></span><span class="class-dashboard-room">教室 · ${escapeHtml(classInfo.room)}</span></div>
+                <div class="class-dashboard-head"><span class="class-dashboard-plan-line">培养方案：<b>${escapeHtml(classInfo.plan)}</b></span><span class="class-dashboard-room"><span>教室：</span><strong>${escapeHtml(classInfo.room)}</strong></span></div>
                 <div class="class-dashboard-primary">
                     <div class="class-dashboard-focus score-${scoreEvaluation.tone}"><span class="class-dashboard-focus-label">昨日班级均分</span><div class="class-dashboard-focus-value"><strong>${classInfo.yesterdayScore}</strong><small>分</small></div></div>
                     <div class="class-dashboard-rank"><span>综合排名</span><div><strong>${classInfo.rank}</strong><small>/ ${classInfo.rankTotal}</small></div><em><span>较上周</span><b>↑ ${classInfo.rankShift}</b></em></div>
@@ -14239,8 +15284,8 @@
                 </div>
                 <div class="student-roster-demographics" aria-label="班级人数">
                     <span class="student-roster-demographic"><strong>${classInfo.total}</strong><span>全班</span></span>
-                    <span class="student-roster-demographic"><strong>${classInfo.male}</strong><span>男生</span></span>
-                    <span class="student-roster-demographic"><strong>${classInfo.female}</strong><span>女生</span></span>
+                    <span class="student-roster-demographic male"><strong>${classInfo.male}</strong><span>男生</span></span>
+                    <span class="student-roster-demographic female"><strong>${classInfo.female}</strong><span>女生</span></span>
                 </div>
                 <div class="student-roster-statuses" aria-label="${escapeHtml(formatLocalDate())}学生实时状态">
                     <button type="button" class="student-roster-status" data-open-live-status data-status-filter="在校"><strong>${counts['在校']}</strong><span>在校</span></button>
@@ -14778,6 +15823,41 @@
             showToast('违纪记录已按预设违纪项保存');
         }
 
+        let leaveScrollTimeHideTimer = 0;
+
+        function hideLeaveScrollTime() {
+            window.clearTimeout(leaveScrollTimeHideTimer);
+            leaveScrollTime?.classList.remove('visible');
+            leaveScrollTime?.setAttribute('aria-hidden', 'true');
+        }
+
+        function updateLeaveScrollTime() {
+            if (!leaveScrollTime || state.view !== 'class-module' || state.classModule !== 'leave' || classModuleScroll.scrollTop < 6) {
+                hideLeaveScrollTime();
+                return;
+            }
+            const cards = Array.from(classModuleRoot.querySelectorAll('.leave-card[data-leave-time]'));
+            if (!cards.length) {
+                hideLeaveScrollTime();
+                return;
+            }
+            const scrollerTop = classModuleScroll.getBoundingClientRect().top;
+            const toolbarHeight = classModuleRoot.querySelector('.leave-toolbar')?.offsetHeight || 0;
+            const threshold = scrollerTop + toolbarHeight + 18;
+            let currentCard = cards[0];
+            cards.forEach(card => {
+                if (card.getBoundingClientRect().top <= threshold) currentCard = card;
+            });
+            const label = currentCard.dataset.leaveTime || '';
+            const labelNode = leaveScrollTime.querySelector('span');
+            if (labelNode) labelNode.textContent = `提交于 ${label}`;
+            leaveScrollTime.setAttribute('aria-label', `当前假条提交于${label}`);
+            leaveScrollTime.setAttribute('aria-hidden', 'false');
+            leaveScrollTime.classList.add('visible');
+            window.clearTimeout(leaveScrollTimeHideTimer);
+            leaveScrollTimeHideTimer = window.setTimeout(hideLeaveScrollTime, 1800);
+        }
+
         function updateStudentStatusTopButton() {
             if (!studentStatusTopButton) return;
             const visible = state.view === 'class-module' && state.classModule === 'rollcall' && classModuleScroll.scrollTop > 260;
@@ -14786,14 +15866,23 @@
             studentStatusTopButton.tabIndex = visible ? 0 : -1;
         }
 
+        function handleClassModuleScroll() {
+            updateStudentStatusTopButton();
+            updateLeaveScrollTime();
+        }
+
         function renderClassModule() {
-            const titles = { leave: '学生假条', rollcall: '实时点名', discipline: '学生违纪', logs: '班级日志', dorm: '宿舍设置', 'checkin-return': '返校点到任务', 'checkin-home': '回家点到任务', 'school-dorm': '全校宿舍', 'school-dorm-stats': '宿舍统计', 'discipline-setup': '违纪管理' };
-            classModuleTitle.textContent = titles[state.classModule] || '班级业务';
+            const titles = { leave: '学生假条', rollcall: '实时点名', discipline: '学生违纪', 'class-discipline': '班级违纪', 'class-assessment': '班级考核', logs: '班级日志', dorm: '宿舍设置', 'checkin-return': '返校点到任务', 'checkin-home': '回家点到任务', 'school-dorm': '全校宿舍', 'school-dorm-stats': '宿舍统计', 'discipline-setup': '违纪管理' };
+            classModuleTitle.textContent = state.classModule === 'class-assessment' && state.classAssessmentWeek
+                ? `第 ${state.classAssessmentWeek} 周考核`
+                : (titles[state.classModule] || '班级业务');
             classModuleView.setAttribute('aria-label', state.classModuleOrigin === 'school' ? '学校管理业务' : '班级业务');
             classModuleBackButton.setAttribute('aria-label', state.classModuleOrigin === 'school' ? '返回学校管理' : '返回班级管理');
             if (state.classModule === 'leave') classModuleRoot.innerHTML = renderLeaveModule();
             if (state.classModule === 'rollcall') classModuleRoot.innerHTML = renderRollcallModule();
             if (state.classModule === 'discipline') classModuleRoot.innerHTML = renderDisciplineModule();
+            if (state.classModule === 'class-discipline') classModuleRoot.innerHTML = renderClassDisciplineModule();
+            if (state.classModule === 'class-assessment') classModuleRoot.innerHTML = renderClassAssessmentModule();
             if (state.classModule === 'logs') classModuleRoot.innerHTML = renderLogsModule();
             if (state.classModule === 'dorm') classModuleRoot.innerHTML = renderDormModule();
             if (state.classModule === 'checkin-return') classModuleRoot.innerHTML = renderCheckinModule('return');
@@ -14809,6 +15898,10 @@
             classModuleFloatingAction.hidden = !discipline;
             classModuleScroll.classList.toggle('has-floating-action', discipline);
             classModuleScroll.classList.toggle('student-status-scroll', state.classModule === 'rollcall');
+            classModuleScroll.classList.toggle('leave-module-scroll', state.classModule === 'leave');
+            classModuleScroll.classList.toggle('class-record-scroll', ['class-discipline','class-assessment'].includes(state.classModule));
+            classModuleBackButton.setAttribute('aria-label', state.classModule === 'class-assessment' && state.classAssessmentWeek ? '返回班级考核列表' : (state.classModuleOrigin === 'school' ? '返回学校管理' : '返回班级管理'));
+            hideLeaveScrollTime();
             updateStudentStatusTopButton();
         }
 
@@ -14818,7 +15911,7 @@
             state.classModuleReturnTab = returnTab;
             if (module === 'leave') {
                 state.leaveSearch = '';
-                state.leaveTimeFilter = 'week';
+                state.leaveTimeFilter = 'all';
                 state.leaveStatusFilter = 'all';
             }
             if (module === 'rollcall') {
@@ -14831,6 +15924,17 @@
             if (module === 'discipline') {
                 state.disciplineSearch = '';
                 state.disciplineTimeFilter = 'week';
+            }
+            if (module === 'class-discipline') {
+                state.classDisciplineTab = 'pending';
+                state.classAssessmentWeek = 0;
+            }
+            if (module === 'class-assessment') {
+                state.classAssessmentWeek = 0;
+                state.classAssessmentCategory = 'all';
+                state.classAssessmentQuery = '';
+                state.classAssessmentDraftCategory = 'all';
+                state.classAssessmentDraftQuery = '';
             }
             if (module === 'logs') {
                 state.logsPendingExpanded = false;
@@ -15311,7 +16415,7 @@
         attendanceBackButton.addEventListener('click', () => {
             renderAll();
             setView('detail');
-            focusAfterViewChange(document.getElementById('studentAttendanceHistory'));
+            focusAfterViewChange(() => heroRoot.querySelector('[data-action="open-student-attendance"]') || editButton);
         });
 
         attendanceEditorBackButton.addEventListener('click', closeAttendanceEditorPage);
@@ -15339,6 +16443,16 @@
         });
 
         disciplineDetailBackButton.addEventListener('click', () => {
+            if (state.classDisciplineDetailOrigin) {
+                const recordId = state.selectedClassDisciplineId;
+                const returnOrigin = state.classDisciplineDetailOrigin;
+                state.classDisciplineDetailOrigin = '';
+                renderClassModule();
+                setView('class-module');
+                focusAfterViewChange(() => classModuleRoot.querySelector(`[data-class-discipline-id="${recordId}"]`) || classModuleBackButton);
+                if (returnOrigin === 'class-assessment') classModuleScroll.scrollTop = state.classAssessmentScrollTop || 0;
+                return;
+            }
             renderClassModule();
             setView('class-module');
             focusAfterViewChange(() => classModuleRoot.querySelector(`[data-discipline-id="${state.selectedDisciplineId}"]`) || classModuleBackButton);
@@ -15370,6 +16484,18 @@
         });
 
         classModuleBackButton.addEventListener('click', () => {
+            if (state.classModule === 'class-assessment' && state.classAssessmentWeek) {
+                const returnWeek = state.classAssessmentWeek;
+                state.classAssessmentWeek = 0;
+                state.classAssessmentCategory = 'all';
+                state.classAssessmentQuery = '';
+                state.classAssessmentDraftCategory = 'all';
+                state.classAssessmentDraftQuery = '';
+                renderClassModule();
+                classModuleScroll.scrollTop = 0;
+                focusAfterViewChange(() => classModuleRoot.querySelector(`[data-assessment-week="${returnWeek}"]`) || classModuleBackButton);
+                return;
+            }
             if (state.classModuleOrigin === 'school' && state.classModule === 'school-dorm' && state.schoolDormLevel !== 'buildings') {
                 state.schoolDormLevel = state.schoolDormLevel === 'rooms' ? 'floors' : 'buildings';
                 if (state.schoolDormLevel === 'buildings') {
@@ -15405,7 +16531,7 @@
         });
 
         classListScroll.addEventListener('scroll', updateClassListStickyState, { passive: true });
-        classModuleScroll.addEventListener('scroll', updateStudentStatusTopButton, { passive: true });
+        classModuleScroll.addEventListener('scroll', handleClassModuleScroll, { passive: true });
 
         schoolFeatureSearch.addEventListener('input', event => {
             schoolFeatureQuery = event.target.value;
@@ -15735,6 +16861,584 @@
             scroller.addEventListener('scroll', () => syncContentSurfaceBackground(scroller), { passive: true });
         });
 
+        state.classDisciplineTab = 'pending';
+        state.classAssessmentWeek = 0;
+        state.classAssessmentCategory = 'all';
+        state.classAssessmentQuery = '';
+        state.classAssessmentDraftCategory = 'all';
+        state.classAssessmentDraftQuery = '';
+        state.classAssessmentScrollTop = 0;
+        state.classDisciplineDetailOrigin = '';
+        state.selectedClassDisciplineId = '';
+        state.pendingAcademicStatus = '';
+
+        const classDisciplineSeed = [
+            {
+                id: 'class-discipline-6401',
+                week: 10,
+                category: '课堂纪律',
+                location: '教学楼 A203',
+                item: '课堂使用手机',
+                points: 2,
+                date: '2026-07-30',
+                clock: '10:18',
+                recorder: '赵明远',
+                type: '课堂违纪',
+                description: '第二节护理基础课中发现学生使用手机，经当堂提醒后已收起，按班级考核规则登记。',
+                status: 'pending',
+                photoLabel: '课堂现场记录'
+            },
+            {
+                id: 'class-discipline-6402',
+                week: 10,
+                category: '校园秩序',
+                location: '东区操场',
+                item: '集合迟到',
+                points: 1,
+                date: '2026-07-29',
+                clock: '07:42',
+                recorder: '陈老师',
+                type: '行为规范',
+                description: '晨会集合结束后仍有学生进入队列，现场已完成点名并登记迟到情况。',
+                status: 'processed',
+                handler: '周静怡',
+                handledAt: '2026-07-29 11:05',
+                multiplier: 1,
+                finalPoints: 1,
+                photoLabel: '晨会队列现场'
+            },
+            {
+                id: 'class-discipline-6403',
+                week: 9,
+                category: '宿舍纪律',
+                location: '2 号宿舍楼 301',
+                item: '违规使用大功率电器',
+                points: 5,
+                date: '2026-07-24',
+                clock: '21:16',
+                recorder: '宿管王老师',
+                type: '宿舍违纪',
+                description: '晚间巡查发现宿舍内使用大功率电器，现场已断电并暂存相关物品。',
+                status: 'processed',
+                handler: '周静怡',
+                handledAt: '2026-07-25 09:20',
+                multiplier: 1.5,
+                finalPoints: 7.5,
+                photoLabel: '宿舍巡查凭证'
+            },
+            {
+                id: 'class-discipline-6404',
+                week: 9,
+                category: '校园秩序',
+                location: '北门广场',
+                item: '升旗队列迟到',
+                points: 2,
+                date: '2026-07-22',
+                clock: '07:36',
+                recorder: '李老师',
+                type: '行为规范',
+                description: '升旗仪式整队完成后进入班级队列，值周教师完成现场登记。',
+                status: 'pending',
+                photoLabel: '升旗队列记录'
+            },
+            {
+                id: 'class-discipline-6405',
+                week: 8,
+                category: '卫生管理',
+                location: '教学楼 B 区',
+                item: '教室卫生检查不合格',
+                points: 3,
+                date: '2026-07-17',
+                clock: '16:35',
+                recorder: '学生会纪检部',
+                type: '卫生检查',
+                description: '放学后卫生检查发现地面与公共台面未按要求清理，检查结果判定不合格。',
+                status: 'pending',
+                photoLabel: '卫生检查现场'
+            },
+            {
+                id: 'class-discipline-6406',
+                week: 7,
+                category: '校园秩序',
+                location: '食堂西门',
+                item: '排队秩序不规范',
+                points: 1,
+                date: '2026-07-10',
+                clock: '12:08',
+                recorder: '值周教师',
+                type: '行为规范',
+                description: '午餐高峰时段出现插队情况，经现场提醒后恢复秩序。',
+                status: 'processed',
+                handler: '周静怡',
+                handledAt: '2026-07-10 17:10',
+                multiplier: 1,
+                finalPoints: 1,
+                photoLabel: '食堂秩序记录'
+            },
+            {
+                id: 'class-discipline-6407',
+                week: 6,
+                category: '课堂纪律',
+                location: '实训楼 204',
+                item: '实训课未按要求穿戴',
+                points: 2,
+                date: '2026-07-03',
+                clock: '14:22',
+                recorder: '韩雨',
+                type: '课堂违纪',
+                description: '护理实训开始后仍未按要求穿戴实训服，现场补充穿戴后继续课程。',
+                status: 'processed',
+                handler: '周静怡',
+                handledAt: '2026-07-03 18:20',
+                multiplier: 1,
+                finalPoints: 2,
+                photoLabel: '实训课堂记录'
+            },
+            {
+                id: 'class-discipline-6408',
+                week: 5,
+                category: '宿舍纪律',
+                location: '2 号宿舍楼 302',
+                item: '晚归宿舍',
+                points: 3,
+                date: '2026-06-26',
+                clock: '22:18',
+                recorder: '宿管刘老师',
+                type: '宿舍违纪',
+                description: '超过宿舍规定归寝时间后返回，宿管完成身份核验与晚归登记。',
+                status: 'pending',
+                photoLabel: '晚归登记凭证'
+            },
+            {
+                id: 'class-discipline-6409',
+                week: 4,
+                category: '校园秩序',
+                location: '图书馆二层',
+                item: '公共区域喧哗',
+                points: 1,
+                date: '2026-06-18',
+                clock: '15:42',
+                recorder: '图书馆管理员',
+                type: '行为规范',
+                description: '自习区域交谈音量过大影响其他学生，经管理员提醒后停止。',
+                status: 'processed',
+                handler: '周静怡',
+                handledAt: '2026-06-19 09:00',
+                multiplier: 1,
+                finalPoints: 1,
+                photoLabel: '图书馆巡查记录'
+            },
+            {
+                id: 'class-discipline-6410',
+                week: 3,
+                category: '卫生管理',
+                location: '教学楼 A203',
+                item: '值日未完成',
+                points: 2,
+                date: '2026-06-11',
+                clock: '17:06',
+                recorder: '生活部干事',
+                type: '卫生检查',
+                description: '当日值日结束后黑板与垃圾桶区域未完成清理，复查时仍未达标。',
+                status: 'processed',
+                handler: '周静怡',
+                handledAt: '2026-06-12 08:30',
+                multiplier: 1,
+                finalPoints: 2,
+                photoLabel: '值日复查记录'
+            },
+            {
+                id: 'class-discipline-6411',
+                week: 2,
+                category: '课堂纪律',
+                location: '教学楼 A203',
+                item: '自习课纪律松散',
+                points: 2,
+                date: '2026-06-04',
+                clock: '19:28',
+                recorder: '值班教师',
+                type: '课堂违纪',
+                description: '晚自习期间多次出现随意走动与交谈，值班教师完成现场提醒。',
+                status: 'processed',
+                handler: '周静怡',
+                handledAt: '2026-06-05 10:15',
+                multiplier: 1,
+                finalPoints: 2,
+                photoLabel: '晚自习巡查记录'
+            },
+            {
+                id: 'class-discipline-6412',
+                week: 1,
+                category: '宿舍纪律',
+                location: '2 号宿舍楼 301',
+                item: '内务整理不合格',
+                points: 2,
+                date: '2026-05-28',
+                clock: '08:12',
+                recorder: '宿管王老师',
+                type: '宿舍违纪',
+                description: '早间内务检查中床铺与公共物品摆放未达到检查标准。',
+                status: 'processed',
+                handler: '周静怡',
+                handledAt: '2026-05-28 16:40',
+                multiplier: 1,
+                finalPoints: 2,
+                photoLabel: '宿舍内务检查'
+            }
+        ];
+
+        const classAssessmentRankByWeek = { 10: 3, 9: 5, 8: 6, 7: 4, 6: 5, 5: 7, 4: 6, 3: 4, 2: 5, 1: 8 };
+        const classAssessmentCategories = ['课堂纪律','宿舍纪律','校园秩序','卫生管理'];
+
+        function getClassDisciplineRecord(recordId) {
+            return classDisciplineSeed.find(item => item.id === recordId);
+        }
+
+        function getClassRecordClassName() {
+            return getClassDisplayName(getSelectedClass());
+        }
+
+        function formatClassDisciplineTime(item) {
+            return `${item.date} ${item.clock}`;
+        }
+
+        function getClassDisciplineDeduction(item) {
+            return item.status === 'processed' ? Number(item.finalPoints ?? item.points) : Number(item.points);
+        }
+
+        function classDisciplineRowMarkup(item, origin = 'class-discipline', showStatus = false) {
+            const deduction = getClassDisciplineDeduction(item);
+            const statusMarkup = showStatus
+                ? `<span class="class-record-status${item.status === 'processed' ? ' processed' : ''}">${item.status === 'processed' ? '已处理' : '未处理'}</span>`
+                : `<span class="class-record-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></span>`;
+            return `<button type="button" class="class-record-row" data-action="open-class-discipline-detail" data-class-discipline-id="${escapeHtml(item.id)}" data-class-discipline-origin="${escapeHtml(origin)}" aria-label="查看${escapeHtml(item.location)}${escapeHtml(item.item)}违纪详情，扣${deduction}分">
+                <span class="class-record-copy">
+                    <strong>${escapeHtml(item.location)} · ${escapeHtml(item.item)}</strong>
+                    <span class="class-record-meta"><span>${escapeHtml(formatClassDisciplineTime(item))}</span><span>班级 ${escapeHtml(getClassRecordClassName())}</span><span>记录人 ${escapeHtml(item.recorder)}</span></span>
+                </span>
+                <span class="class-record-side"><strong class="class-record-points">-${deduction}<small>分</small></strong>${statusMarkup}</span>
+            </button>`;
+        }
+
+        function renderClassDisciplineModule() {
+            const pending = classDisciplineSeed.filter(item => item.status === 'pending');
+            const processed = classDisciplineSeed.filter(item => item.status === 'processed');
+            const records = state.classDisciplineTab === 'processed' ? processed : pending;
+            return `<section class="class-record-surface" aria-label="${escapeHtml(getClassRecordClassName())}班级违纪">
+                <div class="class-record-context"><span><strong>${escapeHtml(getClassRecordClassName())}</strong><small>只读查看本班违纪记录</small></span><em>${records.length} 条</em></div>
+                <nav class="class-discipline-tabs" role="tablist" aria-label="班级违纪处理状态">
+                    <button type="button" class="class-discipline-tab${state.classDisciplineTab === 'pending' ? ' active' : ''}" role="tab" aria-selected="${state.classDisciplineTab === 'pending' ? 'true' : 'false'}" data-action="set-class-discipline-tab" data-class-discipline-tab="pending">我班未处理 <b>${pending.length}</b></button>
+                    <button type="button" class="class-discipline-tab${state.classDisciplineTab === 'processed' ? ' active' : ''}" role="tab" aria-selected="${state.classDisciplineTab === 'processed' ? 'true' : 'false'}" data-action="set-class-discipline-tab" data-class-discipline-tab="processed">我班已处理 <b>${processed.length}</b></button>
+                </nav>
+                <div class="class-record-list">${records.length ? records.map(item => classDisciplineRowMarkup(item)).join('') : '<div class="class-record-empty">当前标签页暂无违纪记录</div>'}</div>
+            </section>`;
+        }
+
+        function getClassAssessmentWeekSummary(week) {
+            const records = classDisciplineSeed.filter(item => item.week === week);
+            const processedDeduction = records.filter(item => item.status === 'processed').reduce((sum, item) => sum + getClassDisciplineDeduction(item), 0);
+            const pendingDeduction = records.filter(item => item.status === 'pending').reduce((sum, item) => sum + Number(item.points), 0);
+            return {
+                week,
+                rank: classAssessmentRankByWeek[week],
+                records,
+                totalDeduction: processedDeduction + pendingDeduction,
+                processedDeduction,
+                pendingDeduction
+            };
+        }
+
+        function assessmentMetricMarkup(value, label, extraClass = '') {
+            return `<span class="assessment-week-metric${extraClass ? ` ${extraClass}` : ''}"><strong>${value}</strong><span>${label}</span></span>`;
+        }
+
+        function renderClassAssessmentList() {
+            const weeks = Array.from({ length: 10 }, (_, index) => getClassAssessmentWeekSummary(10 - index));
+            const total = weeks.reduce((sum, item) => sum + item.totalDeduction, 0);
+            return `<section class="class-record-surface" aria-label="${escapeHtml(getClassRecordClassName())}班级考核周列表">
+                <div class="class-record-context"><span><strong>${escapeHtml(getClassRecordClassName())}</strong><small>2026 春季学期 · 仅展示违纪扣分</small></span><em>累计 -${total}</em></div>
+                <div class="assessment-week-list">${weeks.map(item => `<button type="button" class="assessment-week-row" data-action="open-class-assessment-week" data-assessment-week="${item.week}" aria-label="查看第${item.week}周考核，班级第${item.rank}名，累计扣${item.totalDeduction}分">
+                    <span class="assessment-week-head">
+                        <span class="assessment-week-title"><strong>第 ${item.week} 周</strong><span>2026 春季学期</span></span>
+                        <span class="assessment-week-rank">班级名次 <b>${item.rank}</b><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></span>
+                    </span>
+                    <span class="assessment-week-metrics">
+                        ${assessmentMetricMarkup(`-${item.totalDeduction}`, '累计扣分')}
+                        ${assessmentMetricMarkup(`-${item.processedDeduction}`, '已处理扣分')}
+                        ${assessmentMetricMarkup(`-${item.pendingDeduction}`, '待处理扣分', 'pending')}
+                    </span>
+                </button>`).join('')}</div>
+            </section>`;
+        }
+
+        function getFilteredClassAssessmentRecords() {
+            const query = String(state.classAssessmentQuery || '').trim().toLowerCase();
+            return classDisciplineSeed.filter(item => {
+                const matchesWeek = item.week === state.classAssessmentWeek;
+                const matchesCategory = state.classAssessmentCategory === 'all' || item.category === state.classAssessmentCategory;
+                const matchesQuery = !query || [item.location, item.item, item.type, item.description].some(value => String(value || '').toLowerCase().includes(query));
+                return matchesWeek && matchesCategory && matchesQuery;
+            });
+        }
+
+        function renderClassAssessmentWeek() {
+            const summary = getClassAssessmentWeekSummary(state.classAssessmentWeek);
+            const records = getFilteredClassAssessmentRecords();
+            const categoryOptions = [`<option value="all"${state.classAssessmentDraftCategory === 'all' ? ' selected' : ''}>全部违纪类别</option>`, ...classAssessmentCategories.map(item => `<option value="${escapeHtml(item)}"${state.classAssessmentDraftCategory === item ? ' selected' : ''}>${escapeHtml(item)}</option>`)].join('');
+            return `<section class="class-record-surface" aria-label="第${state.classAssessmentWeek}周违纪扣分明细">
+                <section class="assessment-toolbar" aria-label="违纪筛选与搜索">
+                    <div class="assessment-filter-select"><select id="classAssessmentCategory" aria-label="选择违纪类别">${categoryOptions}</select><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
+                    <div class="assessment-search-row">
+                        <div class="assessment-search"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="classAssessmentSearch" type="search" value="${escapeHtml(state.classAssessmentDraftQuery)}" placeholder="搜索违纪名称" autocomplete="off" aria-label="搜索违纪名称"></div>
+                        <button type="button" class="assessment-search-confirm" data-action="apply-class-assessment-filter">确定</button>
+                    </div>
+                </section>
+                <div class="assessment-result-head"><strong>违纪条目（${records.length}）</strong><span>本周累计扣分 ${summary.totalDeduction}</span></div>
+                <div class="class-record-list">${records.length ? records.map(item => classDisciplineRowMarkup(item, 'class-assessment', true)).join('') : '<div class="class-record-empty">没有符合当前条件的违纪记录<br>可调整类别或违纪名称</div>'}</div>
+            </section>`;
+        }
+
+        function renderClassAssessmentModule() {
+            return state.classAssessmentWeek ? renderClassAssessmentWeek() : renderClassAssessmentList();
+        }
+
+        function classDisciplinePhotoMarkup(item) {
+            const graphicId = `class-evidence-${slug(item.id)}`;
+            return `<div class="class-discipline-photo" aria-label="${escapeHtml(item.photoLabel)}">
+                <svg role="img" aria-label="${escapeHtml(item.location)}违纪照片示意" viewBox="0 0 335 156" preserveAspectRatio="xMidYMid slice">
+                    <defs><linearGradient id="${graphicId}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#E8EEF6"/><stop offset="1" stop-color="#CBD5E1"/></linearGradient></defs>
+                    <rect width="335" height="156" fill="url(#${graphicId})"/>
+                    <rect x="20" y="18" width="295" height="112" rx="12" fill="#F8FAFC" opacity=".78"/>
+                    <path d="M38 112V42h94v70M151 112V56h146v56" fill="none" stroke="#64748B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity=".58"/>
+                    <path d="M54 58h62M54 76h62M170 75h108M170 93h72" fill="none" stroke="#94A3B8" stroke-width="4" stroke-linecap="round" opacity=".62"/>
+                    <circle cx="272" cy="40" r="10" fill="#F59E0B" opacity=".62"/>
+                    <path d="M20 137h295" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" opacity=".78"/>
+                </svg>
+                <span>${escapeHtml(item.photoLabel)}</span>
+            </div>`;
+        }
+
+        function classDisciplineFieldMarkup(label, value, className = '') {
+            return `<div class="class-discipline-field"><span>${escapeHtml(label)}</span><strong${className ? ` class="${className}"` : ''}>${escapeHtml(String(value))}</strong></div>`;
+        }
+
+        function renderClassDisciplineDetailPage() {
+            const item = getClassDisciplineRecord(state.selectedClassDisciplineId);
+            if (!item) return;
+            const processed = item.status === 'processed';
+            const finalDeduction = processed ? getClassDisciplineDeduction(item) : '—';
+            disciplineDetailRoot.innerHTML = `<article class="class-discipline-detail">
+                <header class="class-discipline-detail-hero">
+                    <div class="class-discipline-detail-kicker"><span>${processed ? '已完成班级处理' : '等待班级处理'}</span><strong>-${item.points} 分</strong></div>
+                    <h2>${escapeHtml(item.location)} · ${escapeHtml(item.item)}</h2>
+                    <p>${escapeHtml(formatClassDisciplineTime(item))} · ${escapeHtml(getClassRecordClassName())}</p>
+                </header>
+                <section class="class-discipline-section" aria-label="基础明细">
+                    <h3>基础明细</h3>
+                    <div class="class-discipline-fields">
+                        ${classDisciplineFieldMarkup('违纪时间', formatClassDisciplineTime(item))}
+                        ${classDisciplineFieldMarkup('违纪类型', item.type)}
+                        ${classDisciplineFieldMarkup('违纪项', item.item)}
+                        ${classDisciplineFieldMarkup('违纪描述', item.description)}
+                        ${classDisciplineFieldMarkup('记录人', item.recorder)}
+                    </div>
+                    <div class="class-discipline-photo-label">违纪照片</div>
+                    ${classDisciplinePhotoMarkup(item)}
+                </section>
+                <section class="class-discipline-section" aria-label="违纪事件处理信息">
+                    <h3>违纪事件处理信息</h3>
+                    <div class="class-discipline-fields">
+                        ${classDisciplineFieldMarkup('处理人', processed ? item.handler : '待处理', processed ? '' : 'pending-value')}
+                        ${classDisciplineFieldMarkup('处理时间', processed ? item.handledAt : '—', processed ? '' : 'pending-value')}
+                    </div>
+                </section>
+                <section class="class-discipline-section" aria-label="违纪班级处理结果">
+                    <h3>违纪班级处理结果</h3>
+                    <div class="class-discipline-fields">
+                        ${classDisciplineFieldMarkup('违纪班级', getClassRecordClassName())}
+                        ${classDisciplineFieldMarkup('倍数', processed ? `${item.multiplier} 倍` : '—', processed ? '' : 'pending-value')}
+                        ${classDisciplineFieldMarkup('最终扣分', processed ? `-${finalDeduction} 分` : '待处理', processed ? 'deduction-value' : 'pending-value')}
+                    </div>
+                </section>
+            </article>`;
+        }
+
+        function openClassDisciplineDetail(recordId, origin = 'class-discipline') {
+            const item = getClassDisciplineRecord(recordId);
+            if (!item) return;
+            state.selectedClassDisciplineId = item.id;
+            state.classDisciplineDetailOrigin = origin;
+            state.classAssessmentScrollTop = classModuleScroll.scrollTop;
+            disciplineDetailBackButton.setAttribute('aria-label', origin === 'class-assessment' ? `返回第${state.classAssessmentWeek}周考核` : '返回班级违纪');
+            renderClassDisciplineDetailPage();
+            setView('discipline-detail');
+            disciplineDetailScroll.scrollTop = 0;
+            focusAfterViewChange(disciplineDetailBackButton);
+        }
+
+        function getPortraitAlertClass(path, value) {
+            const normalized = String(value || '').trim();
+            if (path === 'familyEconomy' && normalized === '困难') return ' portrait-alert-warning';
+            if (path === 'emotion' && normalized === '偶有焦虑') return ' portrait-alert-warning';
+            if (path === 'emotion' && ['近期低落','需要关注'].includes(normalized)) return ' portrait-alert-danger';
+            return '';
+        }
+
+        function renderStudentPortrait(data = currentData()) {
+            const tags = studentPortraitFields.map((field, index) => {
+                const value = String(getPath(data, field.path) || '').trim();
+                return `<button type="button" class="student-portrait-tag tone-${index + 1}${value ? '' : ' empty'}${getPortraitAlertClass(field.path, value)}" data-action="edit-student-portrait-field" data-portrait-path="${escapeHtml(field.path)}" aria-label="编辑${escapeHtml(field.label)}，当前${escapeHtml(value || '未填写')}"><span>${escapeHtml(field.label)}</span><strong>${escapeHtml(value || '未填写')}</strong></button>`;
+            }).join('');
+            return `<section class="student-portrait-panel" aria-label="学生画像标签">
+                <div class="student-portrait-head"><span><strong>学生画像</strong></span><button type="button" data-action="open-student-portrait-editor">编辑画像<svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></button></div>
+                <div class="student-portrait-tags">${tags}</div>
+            </section>`;
+        }
+
+        function getCurrentStudentClassInfo(data = currentData()) {
+            return schoolClasses.find(item => item.name === data.className) || getSelectedClass();
+        }
+
+        function getCurrentStudentLiveState(data = currentData()) {
+            const classInfo = getCurrentStudentClassInfo(data);
+            const handled = getStudentStatusHandledSet(classInfo);
+            const statusMap = getStudentStatusMap(classInfo);
+            const primary = handled.has(data.id) && ['在校','请假'].includes(statusMap[data.id])
+                ? statusMap[data.id]
+                : (normalizeAttendanceStatus(data.currentAttendance || '在校') === '请假' ? '请假' : '在校');
+            return { classInfo, primary, meal: getStudentMealSet(classInfo).has(data.id) };
+        }
+
+        function renderAttendancePage() {
+            const data = currentData();
+            const live = getCurrentStudentLiveState(data);
+            const academicStatuses = ['新生注册','在读','休学','退学','毕业'];
+            if (!academicStatuses.includes(state.pendingAcademicStatus)) state.pendingAcademicStatus = academicStatuses.includes(data.studentStatus) ? data.studentStatus : '在读';
+            const combinedStatus = [live.primary, live.meal ? '就餐' : ''].filter(Boolean).join(' · ');
+            const title = document.getElementById('attendanceTitle');
+            if (title) title.textContent = `${data.name}的状态`;
+            attendanceView.setAttribute('aria-label', `${data.name}的状态`);
+            attendanceScroll.classList.add('student-live-only');
+            attendanceRoot.innerHTML = `<section class="student-live-status-surface" aria-label="${escapeHtml(data.name)}的状态">
+                <div class="student-live-person">
+                    <span class="student-live-person-avatar">${studentAvatarMarkup(data)}</span>
+                    <span class="student-live-person-copy"><strong>${escapeHtml(data.name)}</strong><span>${escapeHtml(data.className || '待分班')} · ${escapeHtml(data.studentNo || '')}</span></span>
+                </div>
+                <section class="student-live-section" aria-label="调整实时状态">
+                    <div class="student-live-section-head"><span><strong>实时状态</strong><span>点击后立即生效</span></span><em class="student-live-summary">${escapeHtml(combinedStatus)}</em></div>
+                    <div class="student-live-actions">
+                        <button type="button" class="student-live-action${live.primary === '在校' ? ' active' : ''}" data-action="set-student-realtime-status" data-realtime-status="在校" aria-pressed="${live.primary === '在校' ? 'true' : 'false'}">在校</button>
+                        <button type="button" class="student-live-action${live.primary === '请假' ? ' active' : ''}" data-action="set-student-realtime-status" data-realtime-status="请假" aria-pressed="${live.primary === '请假' ? 'true' : 'false'}">请假</button>
+                        <button type="button" class="student-live-action${live.meal ? ' active' : ''}" data-action="set-student-realtime-status" data-realtime-status="就餐" aria-pressed="${live.meal ? 'true' : 'false'}">就餐</button>
+                    </div>
+                </section>
+                <section class="student-live-section" aria-label="调整学籍状态">
+                    <div class="student-live-section-head"><span><strong>学籍状态</strong><span>重要信息需确认后生效</span></span></div>
+                    <div class="student-academic-control">
+                        <label class="student-academic-select"><span class="sr-only">选择学籍状态</span><select id="studentAcademicStatusSelect">${academicStatuses.map(item => `<option value="${item}"${state.pendingAcademicStatus === item ? ' selected' : ''}>${item}</option>`).join('')}</select><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></label>
+                        <button type="button" class="student-academic-confirm" data-action="confirm-student-academic-status"${state.pendingAcademicStatus === data.studentStatus ? ' disabled' : ''}>确认修改</button>
+                    </div>
+                    <p class="student-academic-note">当前学籍状态：${escapeHtml(data.studentStatus || '未设置')}。修改不会影响上方实时状态。</p>
+                </section>
+            </section>`;
+        }
+
+        function openStudentAttendance() {
+            const academicStatuses = ['新生注册','在读','休学','退学','毕业'];
+            state.pendingAcademicStatus = academicStatuses.includes(currentData().studentStatus) ? currentData().studentStatus : '在读';
+            renderAttendancePage();
+            setView('attendance');
+            attendanceScroll.scrollTop = 0;
+            focusAfterViewChange(attendanceBackButton);
+        }
+
+        function setStudentRealtimeStatus(status) {
+            if (!rollcallStatuses.includes(status)) return;
+            const data = currentData();
+            const classInfo = getCurrentStudentClassInfo(data);
+            const statusMap = getStudentStatusMap(classInfo);
+            const mealSet = getStudentMealSet(classInfo);
+            let feedback = '';
+            if (status === '就餐') {
+                if (mealSet.has(data.id)) {
+                    mealSet.delete(data.id);
+                    feedback = `${data.name}已取消就餐`;
+                } else {
+                    mealSet.add(data.id);
+                    if (!['在校','请假'].includes(statusMap[data.id])) statusMap[data.id] = '在校';
+                    markStudentStatusHandled(data.id, classInfo);
+                    feedback = `${data.name}已勾选就餐`;
+                }
+                saveStudentMealSet(mealSet, classInfo);
+            } else {
+                statusMap[data.id] = status;
+                data.currentAttendance = status;
+                markStudentStatusHandled(data.id, classInfo);
+                feedback = `${data.name}已设为${status}`;
+            }
+            renderAttendancePage();
+            renderAll();
+            requestAnimationFrame(() => attendanceRoot.querySelector(`[data-realtime-status="${status}"]`)?.focus({ preventScroll: true }));
+            showToast(feedback);
+        }
+
+        function confirmStudentAcademicStatus() {
+            const data = currentData();
+            if (!state.pendingAcademicStatus || state.pendingAcademicStatus === data.studentStatus) return;
+            data.studentStatus = state.pendingAcademicStatus;
+            data.updatedAt = new Date().toLocaleString('zh-CN', { hour12: false }).replaceAll('/', '-');
+            renderAttendancePage();
+            renderAll();
+            showToast(`${data.name}的学籍状态已改为${data.studentStatus}`);
+        }
+
+        appDevice.addEventListener('click', event => {
+            const button = event.target.closest('[data-action]');
+            if (!button) return;
+            const action = button.dataset.action;
+            if (action === 'set-class-discipline-tab') {
+                state.classDisciplineTab = button.dataset.classDisciplineTab === 'processed' ? 'processed' : 'pending';
+                renderClassModule();
+                classModuleScroll.scrollTop = 0;
+                requestAnimationFrame(() => classModuleRoot.querySelector(`[data-class-discipline-tab="${state.classDisciplineTab}"]`)?.focus());
+            }
+            if (action === 'open-class-assessment-week') {
+                state.classAssessmentWeek = Number(button.dataset.assessmentWeek) || 10;
+                state.classAssessmentCategory = 'all';
+                state.classAssessmentQuery = '';
+                state.classAssessmentDraftCategory = 'all';
+                state.classAssessmentDraftQuery = '';
+                renderClassModule();
+                classModuleScroll.scrollTop = 0;
+                focusAfterViewChange(classModuleBackButton);
+            }
+            if (action === 'apply-class-assessment-filter') {
+                state.classAssessmentDraftCategory = document.getElementById('classAssessmentCategory')?.value || 'all';
+                state.classAssessmentDraftQuery = document.getElementById('classAssessmentSearch')?.value.trim() || '';
+                state.classAssessmentCategory = state.classAssessmentDraftCategory;
+                state.classAssessmentQuery = state.classAssessmentDraftQuery;
+                renderClassModule();
+                requestAnimationFrame(() => document.getElementById('classAssessmentSearch')?.focus());
+            }
+            if (action === 'open-class-discipline-detail') openClassDisciplineDetail(button.dataset.classDisciplineId, button.dataset.classDisciplineOrigin || 'class-discipline');
+            if (action === 'set-student-realtime-status') setStudentRealtimeStatus(button.dataset.realtimeStatus);
+            if (action === 'confirm-student-academic-status') confirmStudentAcademicStatus();
+        });
+
+        appDevice.addEventListener('change', event => {
+            if (event.target.id !== 'studentAcademicStatusSelect') return;
+            state.pendingAcademicStatus = event.target.value;
+            const confirm = attendanceRoot.querySelector('[data-action="confirm-student-academic-status"]');
+            if (confirm) confirm.disabled = state.pendingAcademicStatus === currentData().studentStatus;
+        });
+
+        appDevice.addEventListener('keydown', event => {
+            if (event.key !== 'Enter' || event.target.id !== 'classAssessmentSearch') return;
+            event.preventDefault();
+            const confirm = classModuleRoot.querySelector('[data-action="apply-class-assessment-filter"]');
+            if (confirm) confirm.click();
+        });
+
         initializeClassFilter();
         renderSchoolHome();
         renderClassDirectory();
@@ -15747,6 +17451,12 @@
         else if (previewRoute === 'class-overview') openClassDetail('CLS2403');
         else if (previewRoute === 'class-management') { openClassDetail('CLS2403'); switchClassTab('management'); }
         else if (previewRoute === 'class-info') { openClassDetail('CLS2403'); switchClassTab('info'); }
+        else if (previewRoute === 'class-discipline') { openClassDetail('CLS2403'); openClassModule('class-discipline'); }
+        else if (previewRoute === 'class-discipline-processed') { openClassDetail('CLS2403'); openClassModule('class-discipline'); state.classDisciplineTab = 'processed'; renderClassModule(); }
+        else if (previewRoute === 'class-discipline-detail') { openClassDetail('CLS2403'); openClassModule('class-discipline'); openClassDisciplineDetail('class-discipline-6401', 'class-discipline'); }
+        else if (previewRoute === 'class-assessment') { openClassDetail('CLS2403'); openClassModule('class-assessment'); }
+        else if (previewRoute === 'class-assessment-week') { openClassDetail('CLS2403'); openClassModule('class-assessment'); state.classAssessmentWeek = 10; renderClassModule(); }
+        else if (previewRoute === 'class-assessment-detail') { openClassDetail('CLS2403'); openClassModule('class-assessment'); state.classAssessmentWeek = 10; renderClassModule(); openClassDisciplineDetail('class-discipline-6402', 'class-assessment'); }
         else if (previewRoute === 'students') openStudentList();
         else if (previewRoute === 'student-following') { openStudentList(); setStudentDirectoryMode('following'); }
         else if (previewRoute === 'school-dorm') openSchoolModule('school-dorm');
@@ -15755,12 +17465,12 @@
         else if (previewRoute === 'discipline-setup') openSchoolModule('discipline-setup');
         else if (previewRoute === 'add-student') openStudentList();
         else if (previewRoute === 'student-detail') { openStudentList(); openStudentDetail(students[0].id); }
-        else if (previewRoute === 'student-status') { openStudentList(); openStudentDetail(students[0].id); switchTab('archive'); }
+        else if (previewRoute === 'student-status') { openStudentList(); openStudentDetail(students[0].id); openStudentAttendance(); }
         else if (previewRoute === 'student-grades') { openStudentList(); openStudentDetail(students[0].id); switchTab('grades'); }
         else if (previewRoute === 'student-grade-detail') { openStudentList(); openStudentDetail(students[0].id); switchTab('grades'); openGradeDetail(2); }
         else if (previewRoute === 'student-materials') { openStudentList(); openStudentDetail(students[0].id); switchTab('materials'); }
         else if (previewRoute === 'student-attendance') { openStudentList(); openStudentDetail(students[0].id); openStudentAttendance(); }
-        else if (previewRoute === 'student-attendance-edit') { openStudentList(); openStudentDetail(students[0].id); openStudentAttendance(); openStudentAttendanceStatusPicker(attendanceBackButton, formatLocalDate()); toggleAttendanceEditorMode(); }
+        else if (previewRoute === 'student-attendance-edit') { openStudentList(); openStudentDetail(students[0].id); openStudentAttendance(); }
         else if (previewRoute === 'student-edit') { openStudentList(); openStudentDetail(students[0].id); enterEdit(); switchTab('archive'); }
         else if (previewRoute === 'student-edit-phone') { openStudentList(); openStudentDetail(students[0].id); enterEdit(); switchTab('family'); }
         else if (previewRoute === 'leave-detail') { openClassDetail('CLS2403'); openClassModule('leave'); openLeaveDetail('leave-1'); }
@@ -15769,7 +17479,7 @@
         else if (previewRoute === 'rollcall-history' || previewRoute === 'rollcall-record') { openClassDetail('CLS2403'); openClassModule('rollcall'); }
         else if (previewRoute === 'discipline-detail') { openClassDetail('CLS2403'); openClassModule('discipline'); openDisciplineDetail('discipline-1'); }
         else if (previewRoute === 'discipline-add') { openClassDetail('CLS2403'); openClassModule('discipline'); openDisciplineAddPage(); }
-        else if (previewRoute === 'leave-filter') { openClassDetail('CLS2403'); openClassModule('leave'); openLeaveTimeFilter(document.getElementById('leaveTimeTrigger')); }
+        else if (previewRoute === 'leave-filter') { openClassDetail('CLS2403'); openClassModule('leave'); classModuleScroll.scrollTop = 160; updateLeaveScrollTime(); }
         else if (previewRoute === 'dorm-occupied') { openClassDetail('CLS2403'); openClassModule('dorm'); const occupiedBed = classModuleRoot.querySelector('[data-action="open-occupied-bed-actions"]'); if (occupiedBed) openOccupiedBedActions(occupiedBed); }
         else if (['leave','rollcall','discipline','logs','dorm'].includes(previewRoute)) { openClassDetail('CLS2403'); openClassModule(previewRoute); }
         else setView('home');
