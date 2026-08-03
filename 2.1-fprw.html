@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#EFF6FF">
-    <title>掌上校园 · 移除高频标题重复底线 7.79</title>
+    <title>掌上校园 · 班级信息姓名职位同级显示 7.83</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -2142,7 +2142,7 @@
         .class-summary-inline .class-summary-stat strong { font-size: 13px; }
         .class-summary-inline .class-summary-stat span { font-size: 8.5px; }
 
-        /* 班级概览：均分分段着色、排名变化置顶、考勤分母统一。 */
+        /* 班级信息：均分分段着色、排名变化置顶、考勤分母统一。 */
         .class-dashboard-focus { transition: border-color .2s ease, background .2s ease; }
         .class-dashboard-focus.score-excellent { border-color: rgba(16,185,129,.18); background: linear-gradient(145deg,rgba(16,185,129,.14),rgba(255,255,255,.76)); }
         .class-dashboard-focus.score-good { border-color: rgba(31,95,255,.18); background: linear-gradient(145deg,rgba(31,95,255,.14),rgba(255,255,255,.76)); }
@@ -7476,12 +7476,13 @@
             font-size: 13.5px;
             line-height: 1.35;
         }
+        /* 7.83：班级信息内姓名与职位使用相同的文字层级。 */
         .contact-detail-inline {
             min-width: 0;
             overflow: hidden;
-            color: #64748B;
-            font-size: 11px;
-            font-weight: 750;
+            color: inherit;
+            font: inherit;
+            font-weight: inherit;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
@@ -11843,6 +11844,58 @@
         .class-discipline-list-row .class-record-side {
             gap: 0;
         }
+
+        /* 7.81：首页与管理页的高频区、普通入口统一为三列，并放大入口文字。 */
+        :root {
+            --type-section-title-size: 17px;
+            --type-feature-size: 15px;
+            --type-assist-size: 14px;
+        }
+        .quick-grid,
+        .school-home-view .home-high-grid,
+        .class-detail-scroll.management-mode .class-high-grid,
+        .school-home-view .admission-entry-grid,
+        .class-detail-scroll.management-mode .management-grid,
+        .class-detail-scroll.management-mode .management-group:first-child .management-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-auto-rows: minmax(44px, auto);
+        }
+        .school-home-view .quick-section-title,
+        .school-home-view .admission-entry-group-title,
+        .class-detail-scroll.management-mode .quick-section-title,
+        .class-detail-scroll.management-mode .management-group-title {
+            font-size: 17px;
+            line-height: 24px;
+        }
+        .quick-manage-button,
+        .school-home-view .manage-btn.quick-manage-button {
+            font-size: 14px;
+        }
+        .quick-entry,
+        .school-home-view .home-high-btn.quick-entry,
+        .school-home-view .home-high-btn.config.quick-entry,
+        .school-home-view .home-high-btn.class-shortcut.quick-entry,
+        .school-home-view .admission-entry-btn,
+        .class-detail-scroll.management-mode .management-entry,
+        .class-detail-scroll.management-mode .management-entry.core,
+        .class-detail-scroll.management-mode .management-entry.disabled,
+        .class-detail-scroll.management-mode .management-entry:disabled {
+            min-height: 44px;
+            font-size: 15px;
+            line-height: 22px;
+        }
+        .school-home-view .quick-entry-copy,
+        .school-home-view .admission-entry-btn > span:not(.feature-pending-dot),
+        .class-detail-scroll.management-mode .quick-entry-copy,
+        .class-detail-scroll.management-mode .management-entry-label {
+            padding: 11px 8px;
+            font-size: 15px;
+            line-height: 22px;
+        }
+        .school-home-view .home-high-grid,
+        .class-detail-scroll.management-mode .class-high-grid {
+            column-gap: 4px;
+        }
     </style>
 </head>
 <body>
@@ -11906,14 +11959,14 @@
             </header>
             <nav class="class-detail-tabs" aria-label="班级详情分区">
                 <div class="class-tab-shell" role="tablist">
-                    <button type="button" class="class-tab active" role="tab" aria-selected="true" data-class-tab="overview">班级概览</button>
+                    <button type="button" class="class-tab active" role="tab" aria-selected="true" data-class-tab="overview">班级信息</button>
                     <button type="button" class="class-tab" role="tab" aria-selected="false" data-class-tab="management">班级管理</button>
                     <button type="button" class="class-tab" role="tab" aria-selected="false" data-class-tab="info">学生信息</button>
                 </div>
             </nav>
             <main class="class-detail-scroll" id="classDetailScroll">
                 <div class="class-detail-surface">
-                    <section class="class-tab-panel active" id="classOverviewPanel" aria-label="班级概览"></section>
+                    <section class="class-tab-panel active" id="classOverviewPanel" aria-label="班级信息"></section>
                     <section class="class-tab-panel" id="classManagementPanel" aria-label="班级管理"></section>
                     <section class="class-tab-panel" id="classInfoPanel" aria-label="学生信息"></section>
                 </div>
@@ -16996,9 +17049,8 @@
                 const cards = buildingGroups.map(([building, buildingRooms]) => {
                     const beds = buildingRooms.reduce((sum, room) => sum + room.beds.length, 0);
                     const used = buildingRooms.reduce((sum, room) => sum + room.beds.filter(bed => bed.occupied).length, 0);
-                    const floors = new Set(buildingRooms.map(getDormFloorNumber).filter(Boolean));
-                    return `<button type="button" class="school-dorm-level-card" data-action="open-school-dorm-building" data-school-dorm-building="${escapeHtml(building)}" aria-label="${escapeHtml(building)}，${floors.size}个楼层，${buildingRooms.length}间宿舍，已住${used}/${beds}">
-                        <span class="school-dorm-level-copy"><strong>${escapeHtml(building)}</strong><small>${floors.size} 个楼层</small></span>
+                    return `<button type="button" class="school-dorm-level-card" data-action="open-school-dorm-building" data-school-dorm-building="${escapeHtml(building)}" aria-label="${escapeHtml(building)}，${buildingRooms.length}间宿舍，已住${used}/${beds}">
+                        <span class="school-dorm-level-copy"><strong>${escapeHtml(building)}</strong></span>
                         <span class="school-dorm-level-side">已住 ${used}/${beds}${arrow}</span>
                     </button>`;
                 }).join('');
@@ -18106,7 +18158,7 @@
             const quickEntry = event.target.closest('.quick-entry[data-quick-token]');
             if (quickEntry && event.altKey && ['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key) && isQuickManageContext(quickEntry.dataset.quickContext)) {
                 event.preventDefault();
-                const columns = 4;
+                const columns = 3;
                 const offset = event.key === 'ArrowLeft' ? -1 : (event.key === 'ArrowRight' ? 1 : (event.key === 'ArrowUp' ? -columns : columns));
                 moveQuickItem(quickEntry.dataset.quickContext, quickEntry.dataset.quickToken, offset);
                 showToast('高频入口排序已更新');
