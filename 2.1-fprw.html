@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#EFF6FF">
-    <title>掌上校园 · 全校班级固定标题与内容面裁切 7.73</title>
+    <title>掌上校园 · 移除高频标题重复底线 7.79</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -45,7 +45,7 @@
             place-items: center;
             background: #E8F0FF;
             color: var(--body);
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
         }
         button, input, select, textarea { font: inherit; }
         button { -webkit-tap-highlight-color: transparent; }
@@ -8866,6 +8866,13 @@
             display: grid;
             gap: 12px;
         }
+        #detailView #panelRoot.grade-panel-flat {
+            margin-inline: 0;
+            padding-inline: 0;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+        }
         .grade-view-toolbar {
             display: grid;
             grid-template-columns: minmax(0,1fr) auto;
@@ -10697,6 +10704,1145 @@
         #classListView .class-directory {
             overflow: visible;
         }
+
+        /* 7.75：统一全局文字层级，提高真机阅读清晰度；不改变页面结构与四列功能布局。 */
+        :root {
+            --text-title: #172033;
+            --text-primary: #1F2A44;
+            --text-secondary: #667085;
+            --text-disabled: #B0B8C5;
+            --type-page-title-size: 20px;
+            --type-section-title-size: 16px;
+            --type-feature-size: 14px;
+            --type-assist-size: 13px;
+            --type-caption-size: 12px;
+            --type-badge-size: 10px;
+            --ink: var(--text-title);
+            --body: var(--text-primary);
+            --muted: var(--text-secondary);
+        }
+
+        body {
+            color: var(--text-primary);
+            line-height: 1.4;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+
+        /* 页面主标题 */
+        .nav-title,
+        .school-home-view .nav-title,
+        .home-heading h1 {
+            color: var(--text-title);
+            font-size: var(--type-page-title-size);
+            font-weight: 600;
+            line-height: 1.3;
+            letter-spacing: 0;
+        }
+
+        /* 一级分区标题 */
+        .section-title,
+        .school-home-view .section-title,
+        .school-home-view .admission-entry-group-title,
+        .management-group-title,
+        .class-detail-scroll.management-mode .management-group-title,
+        .class-info-heading,
+        .grade-list-heading,
+        .leave-detail-section-title,
+        .dorm-class-title {
+            color: var(--text-title);
+            font-size: var(--type-section-title-size);
+            font-weight: 600;
+            line-height: 1.4;
+            letter-spacing: 0;
+        }
+
+        /* 首页高频功能：四列不变，文字与点击高度按真机可读性统一。 */
+        .school-home-view .home-high-btn,
+        .school-home-view .home-high-btn.config,
+        .school-home-view .home-high-btn.class-shortcut {
+            min-height: 56px;
+            padding: 9px 7px;
+            color: var(--text-primary);
+            font-size: var(--type-feature-size);
+            font-weight: 600;
+            line-height: 1.35;
+        }
+        .school-home-view .home-high-btn .home-high-copy strong,
+        .school-home-view .home-high-btn .home-high-class-name,
+        .school-home-view .home-high-btn:not(.class-shortcut):not(.config) .home-high-copy strong {
+            max-width: 100%;
+            display: -webkit-box;
+            overflow: hidden;
+            color: inherit;
+            font-size: var(--type-feature-size);
+            font-weight: 600;
+            line-height: 1.35;
+            text-overflow: clip;
+            white-space: normal;
+            word-break: normal;
+            overflow-wrap: anywhere;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+        }
+        .school-home-view .home-high-btn.config {
+            color: var(--brand);
+        }
+
+        /* 首页功能目录：保持四列、少框与纯文字方向。 */
+        .school-home-view .admission-entry-btn {
+            min-height: 56px;
+            padding: 8px 5px;
+            color: var(--text-primary);
+            font-size: var(--type-feature-size);
+            font-weight: 500;
+            line-height: 1.35;
+        }
+        .school-home-view .admission-entry-btn > span:not(.feature-pending-dot) {
+            max-width: 100%;
+            display: -webkit-box;
+            overflow: hidden;
+            text-overflow: clip;
+            white-space: normal;
+            word-break: normal;
+            overflow-wrap: anywhere;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+        }
+
+        /* 其他页面同级功能入口沿用同一套字号、字重和颜色。 */
+        .management-entry,
+        .class-detail-scroll.management-mode .management-entry,
+        .class-detail-scroll.management-mode .management-entry.core,
+        .class-detail-scroll.management-mode .management-entry.disabled,
+        .class-detail-scroll.management-mode .management-entry:disabled,
+        .feature-row-copy strong,
+        .student-entry-copy strong {
+            min-height: 52px;
+            color: var(--text-primary);
+            font-size: var(--type-feature-size);
+            font-weight: 500;
+            line-height: 1.35;
+        }
+        .class-detail-scroll.management-mode .management-entry,
+        .class-detail-scroll.management-mode .management-entry.core,
+        .class-detail-scroll.management-mode .management-entry.disabled,
+        .class-detail-scroll.management-mode .management-entry:disabled {
+            min-height: 56px;
+        }
+
+        /* 搜索框 */
+        input[type="search"],
+        .school-home-view .search-input-pill,
+        .student-search input,
+        .class-search input {
+            color: #253047;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.35;
+        }
+        input[type="search"]::placeholder,
+        .school-home-view .search-input-pill::placeholder,
+        .student-search input::placeholder,
+        .class-search input::placeholder {
+            color: #8A94A6;
+            font-size: 14px;
+            font-weight: 400;
+            opacity: 1;
+        }
+        .school-home-view .search-icon-pill,
+        .student-search > svg,
+        .class-search > svg {
+            top: 50%;
+            color: #8A94A6;
+            stroke: currentColor;
+        }
+
+        /* 顶部管理、编辑与查看类辅助操作 */
+        .manage-btn,
+        .school-home-view .manage-btn,
+        .nav-action,
+        .soft-action {
+            color: var(--brand);
+            font-size: var(--type-assist-size);
+            font-weight: 500;
+            line-height: 1.35;
+        }
+
+        /* 底部导航 */
+        .school-home-view .tab-item {
+            color: var(--text-secondary);
+        }
+        .school-home-view .tab-label {
+            font-size: 13px;
+            font-weight: 500;
+            line-height: 1.2;
+            letter-spacing: 0;
+        }
+        .school-home-view .tab-item.active .tab-label {
+            font-weight: 600;
+        }
+
+        /* 数量角标：数字居中，并让首页角标避开入口文字。 */
+        .pending-count-badge,
+        .feature-pending-dot {
+            min-width: 20px;
+            height: 20px;
+            padding: 0 4px;
+            font-size: var(--type-badge-size);
+            font-weight: 600;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+        #homeView .home-high-btn > .feature-pending-dot,
+        #homeView .home-high-btn > .feature-pending-dot.dot-only,
+        #homeView .admission-entry-btn > .feature-pending-dot,
+        #homeView .admission-entry-btn > .feature-pending-dot.dot-only {
+            top: -4px;
+            right: 2px;
+        }
+        #homeView .home-high-btn > .feature-pending-dot:not(.dot-only),
+        #homeView .admission-entry-btn > .feature-pending-dot:not(.dot-only) {
+            min-width: 20px;
+            height: 20px;
+            padding: 0 4px;
+        }
+        #homeView .home-high-btn:has(> .feature-pending-dot),
+        #homeView .admission-entry-btn:has(> .feature-pending-dot) {
+            padding-top: 15px;
+            padding-bottom: 3px;
+        }
+        .class-detail-scroll.management-mode .management-entry > .pending-count-badge {
+            top: -4px;
+            right: 2px;
+        }
+        .class-detail-scroll.management-mode .management-entry:has(> .pending-count-badge) {
+            padding-top: 15px;
+            padding-bottom: 3px;
+        }
+
+        /* 次要说明与字段文字 */
+        .section-note,
+        .subcard-meta,
+        .module-card-sub,
+        .material-meta,
+        .dialog-desc,
+        .record-note,
+        .feature-row-copy span,
+        .student-entry-copy span,
+        .class-row-meta,
+        .contact-meta {
+            color: var(--text-secondary);
+            font-size: var(--type-caption-size);
+            font-weight: 400;
+            line-height: 1.4;
+        }
+        .info-label {
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+        .info-value {
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        /* 禁用状态统一对比；不改动原有禁用逻辑。 */
+        button:disabled,
+        [aria-disabled="true"],
+        .disabled,
+        .school-home-view .admission-entry-btn.added-disabled,
+        .class-detail-scroll.management-mode .management-entry.disabled,
+        .class-detail-scroll.management-mode .management-entry:disabled {
+            color: var(--text-disabled);
+        }
+        .school-home-view .admission-entry-btn.added-disabled {
+            opacity: 1;
+        }
+
+        /* 7.76：学校首页与班级管理入口统一网格、文字和角标基线。 */
+        .device {
+            width: 375px;
+            max-width: 100vw;
+        }
+        .school-home-view .main-content {
+            padding-right: 16px;
+            padding-left: 16px;
+        }
+        .school-home-view .school-search-sticky {
+            margin-right: -16px;
+            margin-left: -16px;
+            padding-right: 16px;
+            padding-left: 16px;
+        }
+
+        .school-home-view .section-title,
+        .school-home-view .admission-entry-group-title,
+        .class-detail-scroll.management-mode .management-group-title {
+            color: #172033;
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.4;
+            letter-spacing: 0;
+        }
+
+        /* 高频功能固定四列，添加入口与业务入口使用完全相同的网格轨道。 */
+        .school-home-view .home-high-grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-auto-flow: row;
+            align-items: stretch;
+            gap: 4px 6px;
+        }
+        .school-home-view .home-high-btn,
+        .school-home-view .home-high-btn.config,
+        .school-home-view .home-high-btn.class-shortcut {
+            position: relative;
+            width: 100%;
+            min-width: 0;
+            min-height: 56px;
+            display: grid;
+            place-items: center;
+            padding: 8px 4px;
+            border: 0;
+            border-radius: 8px;
+            color: #1F2A44;
+            background: transparent;
+            box-shadow: none;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.4;
+            letter-spacing: 0;
+            text-align: center;
+        }
+        .school-home-view .home-high-btn .home-high-copy {
+            width: 100%;
+            min-width: 0;
+            display: grid;
+            place-items: center;
+        }
+        .school-home-view .home-high-btn .home-high-copy strong,
+        .school-home-view .home-high-btn .home-high-class-name,
+        .school-home-view .home-high-btn:not(.class-shortcut):not(.config) .home-high-copy strong {
+            max-width: 100%;
+            display: -webkit-box;
+            overflow: hidden;
+            color: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.4;
+            letter-spacing: 0;
+            text-overflow: clip;
+            text-wrap: balance;
+            white-space: normal;
+            word-break: auto-phrase;
+            overflow-wrap: normal;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+        }
+        .school-home-view .home-high-btn.config {
+            color: var(--brand);
+        }
+
+        /* 普通功能目录固定三列；不足三项时按文档流从左向右自然落位。 */
+        .school-home-view .admission-entry-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-auto-flow: row;
+            align-items: stretch;
+            column-gap: 0;
+            row-gap: 4px;
+        }
+        .school-home-view .admission-entry-btn {
+            position: relative;
+            width: 100%;
+            min-width: 0;
+            min-height: 56px;
+            display: grid;
+            place-items: center;
+            padding: 8px 6px;
+            border: 0;
+            border-radius: 8px;
+            color: #1F2A44;
+            background: transparent;
+            box-shadow: none;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.4;
+            letter-spacing: 0;
+            text-align: center;
+        }
+        .school-home-view .admission-entry-btn > span:not(.feature-pending-dot) {
+            max-width: 100%;
+            display: -webkit-box;
+            overflow: hidden;
+            text-overflow: clip;
+            text-wrap: balance;
+            white-space: normal;
+            word-break: auto-phrase;
+            overflow-wrap: normal;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+        }
+
+        /* 班级管理：首组高频班务四列，其余功能分区三列。 */
+        .class-detail-scroll.management-mode {
+            padding-right: 16px;
+            padding-bottom: max(34px, calc(24px + env(safe-area-inset-bottom, 0px)));
+            padding-left: 16px;
+        }
+        .class-detail-scroll.management-mode .management-group + .management-group {
+            margin-top: 22px;
+            padding-top: 0;
+        }
+        .class-detail-scroll.management-mode .management-group-title {
+            min-height: 0;
+            margin: 0 0 10px;
+            padding: 0;
+        }
+        .class-detail-scroll.management-mode .management-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-auto-flow: row;
+            align-items: stretch;
+            gap: 4px 0;
+        }
+        .class-detail-scroll.management-mode .management-group:first-child .management-grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            column-gap: 6px;
+        }
+        .class-detail-scroll.management-mode .management-entry,
+        .class-detail-scroll.management-mode .management-entry.core,
+        .class-detail-scroll.management-mode .management-entry.disabled,
+        .class-detail-scroll.management-mode .management-entry:disabled {
+            position: relative;
+            width: 100%;
+            min-width: 0;
+            min-height: 56px;
+            display: grid;
+            place-items: center;
+            padding: 8px 6px;
+            border: 0;
+            border-radius: 8px;
+            color: #1F2A44;
+            background: transparent;
+            box-shadow: none;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.4;
+            letter-spacing: 0;
+            text-align: center;
+        }
+        .class-detail-scroll.management-mode .management-entry-label {
+            max-width: 100%;
+            display: -webkit-box;
+            overflow: hidden;
+            text-overflow: clip;
+            text-wrap: balance;
+            white-space: normal;
+            word-break: auto-phrase;
+            overflow-wrap: normal;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+        }
+        .class-detail-scroll.management-mode .management-entry.disabled,
+        .class-detail-scroll.management-mode .management-entry:disabled {
+            color: #B0B8C5;
+            opacity: 1;
+        }
+
+        /* 角标只依附于所属入口，不进入网格计算，也不再改变带角标项的内边距。 */
+        #homeView .home-high-btn > .feature-pending-dot,
+        #homeView .home-high-btn > .feature-pending-dot.dot-only,
+        #homeView .admission-entry-btn > .feature-pending-dot,
+        #homeView .admission-entry-btn > .feature-pending-dot.dot-only,
+        .class-detail-scroll.management-mode .management-entry > .pending-count-badge {
+            position: absolute;
+            top: -4px;
+            right: 0;
+            z-index: 6;
+            min-width: 20px;
+            height: 20px;
+            display: grid;
+            place-items: center;
+            padding: 0 4px;
+            line-height: 1;
+            pointer-events: none;
+        }
+        #homeView .home-high-btn:has(> .feature-pending-dot),
+        #homeView .admission-entry-btn:has(> .feature-pending-dot),
+        .class-detail-scroll.management-mode .management-entry:has(> .pending-count-badge) {
+            padding-top: 8px;
+            padding-bottom: 8px;
+        }
+
+        /* 7.77：学校与班级入口共用紧凑文字网格，高频区共用添加、删除与排序状态。 */
+        .school-home-view .section-title,
+        .school-home-view .admission-entry-group-title,
+        .class-detail-scroll.management-mode .management-group-title,
+        .class-detail-scroll.management-mode .quick-section-title {
+            color: #172033;
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 22px;
+            letter-spacing: 0;
+        }
+
+        .quick-section-header,
+        .school-home-view .section-header.quick-section-header {
+            min-height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin: 8px 0 4px;
+            padding: 0;
+        }
+        .quick-manage-button,
+        .school-home-view .manage-btn.quick-manage-button {
+            min-width: 42px;
+            min-height: 28px;
+            padding: 0 2px;
+            border: 0;
+            border-radius: 8px;
+            color: var(--brand);
+            background: transparent;
+            box-shadow: none;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 20px;
+        }
+
+        .quick-grid,
+        .school-home-view .home-high-grid,
+        .class-detail-scroll.management-mode .class-high-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-auto-flow: row;
+            grid-auto-rows: minmax(36px, auto);
+            align-items: stretch;
+            gap: 0 2px;
+        }
+        .quick-entry,
+        .school-home-view .home-high-btn.quick-entry,
+        .school-home-view .home-high-btn.config.quick-entry,
+        .school-home-view .home-high-btn.class-shortcut.quick-entry,
+        .class-detail-scroll.management-mode .management-entry.class-high-entry {
+            position: relative;
+            width: 100%;
+            min-width: 0;
+            min-height: 36px;
+            display: grid;
+            place-items: center;
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+            color: #1F2A44;
+            background: transparent;
+            box-shadow: none;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 20px;
+            letter-spacing: 0;
+            text-align: center;
+        }
+        .quick-entry-copy {
+            position: relative;
+            z-index: 1;
+            width: auto;
+            max-width: 100%;
+            min-width: 0;
+            display: -webkit-box;
+            overflow: hidden;
+            padding: 8px 4px;
+            border-radius: 8px;
+            color: inherit;
+            background: transparent;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 20px;
+            letter-spacing: 0;
+            text-align: center;
+            text-overflow: clip;
+            text-wrap: balance;
+            white-space: normal;
+            word-break: auto-phrase;
+            overflow-wrap: normal;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+        }
+        .quick-entry.config {
+            color: var(--brand);
+        }
+        .quick-entry.config .quick-entry-copy {
+            display: grid;
+            place-items: center;
+        }
+        .quick-entry.config .home-add-icon {
+            width: 18px;
+            height: 18px;
+            stroke-width: 2.3;
+        }
+
+        .quick-entry:active,
+        .quick-entry:focus-visible,
+        .school-home-view .home-high-btn.quick-entry:active,
+        .class-detail-scroll.management-mode .management-entry.class-high-entry:active {
+            color: var(--brand);
+            background: transparent;
+            box-shadow: none;
+            transform: scale(.98);
+        }
+        .quick-entry:active .quick-entry-copy,
+        .quick-entry:focus-visible .quick-entry-copy,
+        .quick-entry.is-sorting .quick-entry-copy {
+            background: rgba(31, 95, 255, .08);
+        }
+        .quick-entry.manage-mode {
+            touch-action: none;
+            animation: high-manage-wiggle .3s ease-in-out infinite;
+        }
+        .quick-entry.manage-mode:nth-child(2n) {
+            animation-delay: -.16s;
+        }
+        .quick-entry.manage-mode::after {
+            content: '×';
+            position: absolute;
+            top: -3px;
+            right: 1px;
+            z-index: 8;
+            width: 17px;
+            height: 17px;
+            display: grid;
+            place-items: center;
+            border: 1.5px solid #FFFFFF;
+            border-radius: 50%;
+            color: #FFFFFF;
+            background: var(--danger);
+            background-image: none;
+            box-shadow: 0 2px 6px rgba(239, 68, 68, .22);
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1;
+            pointer-events: none;
+        }
+        .quick-entry.config::after {
+            display: none;
+        }
+        .school-home-view .home-high-btn.quick-entry.manage-mode::after,
+        .class-detail-scroll.management-mode .class-high-entry.quick-entry.manage-mode::after {
+            content: '×';
+            width: 17px;
+            height: 17px;
+            border: 1.5px solid #FFFFFF;
+            color: #FFFFFF;
+            background-color: var(--danger);
+            background-image: none;
+            box-shadow: 0 2px 6px rgba(239, 68, 68, .22);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* 学校管理首页：普通目录三列，单行入口维持 36px。 */
+        .school-home-view .main-content {
+            padding-right: 16px;
+            padding-left: 16px;
+        }
+        .school-home-view .school-search-sticky {
+            margin-right: -16px;
+            margin-left: -16px;
+            padding-right: 16px;
+            padding-left: 16px;
+        }
+        .school-home-view .home-high-card {
+            margin: 0 0 10px;
+            padding: 0 !important;
+            overflow: visible;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+        .school-home-view .admission-entry-card {
+            margin: 0 0 16px !important;
+            padding: 0 0 10px;
+            overflow: visible;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+        .school-home-view .admission-entry-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-auto-flow: row;
+            grid-auto-rows: minmax(36px, auto);
+            align-items: stretch;
+            column-gap: 2px;
+            row-gap: 0;
+        }
+        .school-home-view .admission-entry-group-title {
+            min-height: 0;
+            display: block;
+            margin: 0;
+            padding: 12px 0 4px;
+        }
+        .school-home-view .admission-entry-group-title:first-child {
+            padding-top: 0;
+        }
+        .school-home-view .admission-entry-group-title::after {
+            display: none;
+        }
+        .school-home-view .admission-entry-btn {
+            position: relative;
+            width: 100%;
+            min-width: 0;
+            min-height: 36px;
+            display: grid;
+            place-items: center;
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+            color: #1F2A44;
+            background: transparent;
+            box-shadow: none;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 20px;
+            letter-spacing: 0;
+            text-align: center;
+        }
+        .school-home-view .admission-entry-btn > span:not(.feature-pending-dot) {
+            width: auto;
+            max-width: 100%;
+            min-width: 0;
+            display: -webkit-box;
+            overflow: hidden;
+            padding: 8px 10px;
+            border-radius: 8px;
+            color: inherit;
+            background: transparent;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 20px;
+            letter-spacing: 0;
+            text-overflow: clip;
+            text-wrap: balance;
+            white-space: normal;
+            word-break: auto-phrase;
+            overflow-wrap: normal;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+        }
+        .school-home-view .admission-entry-btn:active,
+        .school-home-view .admission-entry-btn:focus-visible {
+            color: var(--brand);
+            background: transparent;
+            box-shadow: none;
+            transform: scale(.98);
+        }
+        .school-home-view .admission-entry-btn:active > span:not(.feature-pending-dot),
+        .school-home-view .admission-entry-btn:focus-visible > span:not(.feature-pending-dot) {
+            background: rgba(31, 95, 255, .08);
+        }
+        .school-home-view .admission-entry-btn.manage-mode,
+        .class-detail-scroll.management-mode .management-entry.manage-mode {
+            animation: high-manage-wiggle .3s ease-in-out infinite;
+        }
+        .school-home-view .admission-entry-btn.manage-mode::after,
+        .class-detail-scroll.management-mode .management-grid .management-entry.manage-mode::after {
+            content: '+';
+            position: absolute;
+            top: -2px;
+            right: 4px;
+            z-index: 8;
+            width: 17px;
+            height: 17px;
+            display: grid;
+            place-items: center;
+            border: 1.5px solid #FFFFFF;
+            border-radius: 50%;
+            color: #FFFFFF;
+            background: var(--success);
+            background-image: none;
+            box-shadow: 0 2px 6px rgba(16, 185, 129, .20);
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1;
+            pointer-events: none;
+        }
+        .school-home-view .admission-entry-btn.added-disabled,
+        .class-detail-scroll.management-mode .management-entry.added-disabled {
+            color: var(--text-disabled);
+            background: transparent;
+            opacity: 1;
+        }
+        .school-home-view .admission-entry-btn.added-disabled::after,
+        .class-detail-scroll.management-mode .management-entry.added-disabled::after {
+            display: none;
+        }
+
+        /* 班级管理：高频班务四列，其余五个分区统一三列。 */
+        .class-detail-scroll.management-mode {
+            padding-right: 16px;
+            padding-bottom: max(34px, calc(24px + env(safe-area-inset-bottom, 0px)));
+            padding-left: 16px;
+        }
+        .class-detail-scroll.management-mode .management-directory {
+            padding: 8px 0 14px;
+            overflow: visible;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+        .class-detail-scroll.management-mode .management-high-section {
+            margin: 0 0 10px;
+        }
+        .class-detail-scroll.management-mode .management-high-section .quick-section-header {
+            margin-top: 0;
+        }
+        .class-detail-scroll.management-mode .management-group,
+        .class-detail-scroll.management-mode .management-group + .management-group {
+            margin: 0;
+            padding: 0;
+        }
+        .class-detail-scroll.management-mode .management-group + .management-group {
+            margin-top: 12px;
+        }
+        .class-detail-scroll.management-mode .management-group-title {
+            min-height: 0;
+            margin: 0 0 4px;
+            padding: 0;
+        }
+        .class-detail-scroll.management-mode .management-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-auto-flow: row;
+            grid-auto-rows: minmax(36px, auto);
+            align-items: stretch;
+            gap: 0 2px;
+        }
+        .class-detail-scroll.management-mode .management-entry,
+        .class-detail-scroll.management-mode .management-entry.core,
+        .class-detail-scroll.management-mode .management-entry.disabled,
+        .class-detail-scroll.management-mode .management-entry:disabled {
+            position: relative;
+            width: 100%;
+            min-width: 0;
+            min-height: 36px;
+            display: grid;
+            place-items: center;
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+            color: #1F2A44;
+            background: transparent;
+            box-shadow: none;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 20px;
+            letter-spacing: 0;
+            text-align: center;
+        }
+        .class-detail-scroll.management-mode .management-entry-label {
+            width: auto;
+            max-width: 100%;
+            min-width: 0;
+            display: -webkit-box;
+            overflow: hidden;
+            padding: 8px 10px;
+            border-radius: 8px;
+            color: inherit;
+            background: transparent;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 20px;
+            letter-spacing: 0;
+            text-overflow: clip;
+            text-wrap: balance;
+            white-space: normal;
+            word-break: auto-phrase;
+            overflow-wrap: normal;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+        }
+        .class-detail-scroll.management-mode .management-entry:active,
+        .class-detail-scroll.management-mode .management-entry:focus-visible {
+            color: var(--brand);
+            background: transparent;
+            box-shadow: none;
+            transform: scale(.98);
+        }
+        .class-detail-scroll.management-mode .management-entry:active .management-entry-label,
+        .class-detail-scroll.management-mode .management-entry:focus-visible .management-entry-label {
+            background: rgba(31, 95, 255, .08);
+        }
+        .class-detail-scroll.management-mode .management-entry.disabled,
+        .class-detail-scroll.management-mode .management-entry:disabled {
+            color: var(--text-disabled);
+            opacity: 1;
+        }
+        .class-detail-scroll.management-mode .class-high-entry .quick-entry-copy {
+            padding-right: 4px;
+            padding-left: 4px;
+            font-weight: 500;
+        }
+
+        /* 数字角标依附所属入口并脱离网格流，不改变入口内边距或列宽。 */
+        #homeView .quick-entry > .feature-pending-dot,
+        #homeView .admission-entry-btn > .feature-pending-dot,
+        .class-detail-scroll.management-mode .management-entry > .pending-count-badge {
+            position: absolute;
+            top: -1px;
+            right: 1px;
+            z-index: 7;
+            width: auto;
+            min-width: 16px;
+            height: 16px;
+            display: grid;
+            place-items: center;
+            padding: 0 4px;
+            border-radius: 8px;
+            font-size: 9px;
+            font-weight: 600;
+            line-height: 1;
+            pointer-events: none;
+        }
+        #homeView .quick-entry.manage-mode > .feature-pending-dot,
+        .class-detail-scroll.management-mode .class-high-entry.manage-mode > .pending-count-badge {
+            display: none;
+        }
+        #homeView .home-high-btn:has(> .feature-pending-dot),
+        #homeView .admission-entry-btn:has(> .feature-pending-dot),
+        .class-detail-scroll.management-mode .management-entry:has(> .pending-count-badge) {
+            padding: 0;
+        }
+
+        /* 7.78：学校首页与班级管理页共用同一标题、延伸线和字体规范。 */
+        html,
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+        }
+        button,
+        a,
+        span,
+        div {
+            font-family: inherit !important;
+        }
+        .school-home-view .nav-title,
+        #classDetailView .nav-title {
+            font-size: 20px;
+            font-weight: 600;
+            line-height: 26px;
+            letter-spacing: 0;
+        }
+
+        .school-home-view .quick-section-title,
+        .school-home-view .admission-entry-group-title,
+        .class-detail-scroll.management-mode .quick-section-title,
+        .class-detail-scroll.management-mode .management-group-title {
+            min-width: 0;
+            display: flex;
+            flex: 1 1 auto;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+            padding: 0;
+            color: var(--text-title);
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 22px;
+            letter-spacing: 0;
+        }
+        .school-home-view .quick-section-title::after,
+        .school-home-view .admission-entry-group-title::after,
+        .class-detail-scroll.management-mode .quick-section-title::after,
+        .class-detail-scroll.management-mode .management-group-title::after {
+            content: '';
+            min-width: 18px;
+            height: 1px;
+            display: block;
+            flex: 1 1 auto;
+            border-radius: 999px;
+            background: linear-gradient(90deg, rgba(100,116,139,.24), rgba(100,116,139,.04));
+        }
+        .school-home-view .section-header.quick-section-header,
+        .class-detail-scroll.management-mode .quick-section-header {
+            min-height: 28px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0 4px;
+            padding: 0;
+        }
+        .school-home-view .section-header.quick-section-header {
+            border-bottom: 0;
+        }
+        .class-detail-scroll.management-mode .management-high-section .quick-section-header {
+            margin-top: 0;
+        }
+        .quick-manage-button,
+        .school-home-view .manage-btn.quick-manage-button {
+            min-width: 42px;
+            min-height: 28px;
+            flex: 0 0 42px;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            border: 0;
+            color: var(--brand);
+            background: transparent;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 20px;
+            letter-spacing: 0;
+            animation: none !important;
+            transform: none !important;
+        }
+        .school-home-view .admission-entry-group-title,
+        .class-detail-scroll.management-mode .management-group-title {
+            min-height: 28px;
+            margin-bottom: 4px;
+        }
+        .school-home-view .admission-entry-group-title:not(:first-child) {
+            padding-top: 12px;
+        }
+
+        .school-home-view .quick-entry,
+        .school-home-view .quick-entry-copy,
+        .school-home-view .admission-entry-btn,
+        .school-home-view .admission-entry-btn > span:not(.feature-pending-dot),
+        .class-detail-scroll.management-mode .class-high-entry,
+        .class-detail-scroll.management-mode .quick-entry-copy,
+        .class-detail-scroll.management-mode .management-entry,
+        .class-detail-scroll.management-mode .management-entry-label {
+            font-family: inherit !important;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 20px;
+            letter-spacing: 0;
+            animation: none !important;
+            transform: none !important;
+        }
+        .school-home-view .quick-entry-copy,
+        .school-home-view .admission-entry-btn > span:not(.feature-pending-dot),
+        .class-detail-scroll.management-mode .quick-entry-copy,
+        .class-detail-scroll.management-mode .management-entry-label {
+            transform: none;
+        }
+        .school-home-view .admission-entry-btn.added-disabled,
+        .class-detail-scroll.management-mode .management-entry.disabled,
+        .class-detail-scroll.management-mode .management-entry:disabled,
+        .class-detail-scroll.management-mode .management-entry.added-disabled {
+            font-weight: 500;
+        }
+
+        /* 宿舍设置：本班未分配学生以三列整块可点入口呈现。 */
+        .class-module-scroll .dorm-unassigned-list {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 6px;
+            padding: 0;
+        }
+        .class-module-scroll .dorm-unassigned-card {
+            width: 100%;
+            min-width: 0;
+            min-height: 54px;
+            display: grid;
+            grid-template-columns: 28px minmax(0, 1fr);
+            align-items: center;
+            gap: 6px;
+            padding: 7px 6px;
+            border: 0;
+            border-radius: 10px;
+            color: var(--text-primary);
+            background: rgba(31,95,255,.045);
+            box-shadow: none;
+            text-align: left;
+        }
+        .class-module-scroll .dorm-unassigned-card .student-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 9px;
+            font-size: 11px;
+        }
+        .class-module-scroll .dorm-unassigned-copy {
+            min-width: 0;
+            display: block;
+        }
+        .class-module-scroll .dorm-unassigned-copy strong {
+            display: block;
+            overflow: hidden;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 500;
+            line-height: 18px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .class-module-scroll .dorm-unassigned-copy small {
+            display: block;
+            margin-top: 1px;
+            color: var(--brand);
+            font-size: 11px;
+            font-weight: 500;
+            line-height: 14px;
+        }
+        .class-module-scroll .dorm-unassigned-card:active {
+            color: var(--brand);
+            background: rgba(31,95,255,.10);
+            transform: scale(.98);
+        }
+        .class-module-scroll .dorm-unassigned-empty {
+            grid-column: 1 / -1;
+        }
+
+        /* 班级违纪列表只保留地址、分数和违纪简要，其余字段进入详情。 */
+        #classModuleView .class-module-scroll.class-record-scroll #classModuleRoot {
+            margin-inline: 0;
+            padding-inline: 0;
+        }
+        .class-discipline-list-row {
+            min-height: 68px;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+        .class-discipline-list-row .class-record-copy {
+            min-width: 0;
+            display: grid;
+            gap: 3px;
+        }
+        .class-discipline-list-row .class-record-location {
+            display: block;
+            overflow: hidden;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 18px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .class-discipline-list-row .class-record-summary {
+            display: -webkit-box;
+            overflow: hidden;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 20px;
+            text-overflow: clip;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+        }
+        .class-discipline-list-row .class-record-side {
+            gap: 0;
+        }
     </style>
 </head>
 <body>
@@ -10712,8 +11858,8 @@
                                 <input id="school-feature-search" type="search" class="search-input-pill" placeholder="全局搜索功能/拼音首字母" autocomplete="off" aria-label="搜索学校功能">
                             </div>
                         </div>
-                        <div class="section-header"><div class="section-title">高频功能</div><button type="button" class="manage-btn" id="manage-btn-text">管理</button></div>
-                        <div class="glass-card home-high-card"><div class="home-high-grid" id="high-freq-grid"></div></div>
+                        <div class="section-header quick-section-header"><div class="section-title quick-section-title">高频功能</div><button type="button" class="manage-btn quick-manage-button" id="manage-btn-text">管理</button></div>
+                        <div class="glass-card home-high-card"><div class="home-high-grid quick-grid" id="high-freq-grid" data-quick-grid="school"></div></div>
                         <div class="glass-card admission-entry-card home-directory-card" style="margin-bottom:16px;"><div class="admission-entry-grid" id="dir-grid"></div></div>
                     </div>
                 </div>
@@ -11503,10 +12649,67 @@
             '课堂巡检': 'ktxj ketang', '成绩归档': 'cjgd chengji', '教师排班': 'jspb jiaoshi', '全校宿舍': 'qxss quanxiaosushe ssgl sushe', '宿舍统计': 'sstj sushitongji dorm statistics',
             '违纪管理': 'wjgl weijiguanli discipline', '请假审批': 'qjsp qingjia', '安全巡检': 'aqxj anquan', '家校通知': 'jxtz jiaxiao'
         };
-        let schoolHighFeatures = ['招生管理', '全校班级', '关注学生'];
-        let schoolHighClasses = [];
+        const SCHOOL_HIGH_CONFIG_KEY = 'pocket-campus-school-high-frequency-v1';
+
+        function readStoredHighConfig(key, fallback) {
+            try {
+                const value = JSON.parse(localStorage.getItem(key) || 'null');
+                return value && typeof value === 'object' ? value : fallback;
+            } catch (error) {
+                return fallback;
+            }
+        }
+
+        function writeStoredHighConfig(key, value) {
+            try {
+                localStorage.setItem(key, JSON.stringify(value));
+            } catch (error) {}
+        }
+
+        const storedSchoolHighConfig = readStoredHighConfig(SCHOOL_HIGH_CONFIG_KEY, {});
+        let schoolHighFeatures = Array.isArray(storedSchoolHighConfig.features) ? [...storedSchoolHighConfig.features] : ['招生管理', '全校班级', '关注学生'];
+        let schoolHighClasses = Array.isArray(storedSchoolHighConfig.classes) ? [...storedSchoolHighConfig.classes] : [];
+        let schoolHighOrder = Array.isArray(storedSchoolHighConfig.order)
+            ? [...storedSchoolHighConfig.order]
+            : [...schoolHighFeatures.map(label => `feature:${label}`), ...schoolHighClasses.map(classId => `class:${classId}`)];
         let schoolManageMode = false;
         let schoolFeatureQuery = '';
+
+        function normalizeSchoolHighConfig() {
+            const featureLabels = new Set(Object.values(schoolDirectory).flat());
+            const classIds = new Set(schoolClasses.map(item => item.id));
+            const normalizedFeatures = [...new Set(schoolHighFeatures)].filter(label => featureLabels.has(label));
+            const normalizedClasses = [...new Set(schoolHighClasses)].filter(classId => classIds.has(classId));
+            const validTokens = new Set([
+                ...normalizedFeatures.map(label => `feature:${label}`),
+                ...normalizedClasses.map(classId => `class:${classId}`)
+            ]);
+            const normalizedOrder = [];
+            schoolHighOrder.forEach(value => {
+                const raw = String(value || '');
+                const token = raw.startsWith('feature:') || raw.startsWith('class:')
+                    ? raw
+                    : (featureLabels.has(raw) ? `feature:${raw}` : (classIds.has(raw) ? `class:${raw}` : ''));
+                if (token && validTokens.has(token) && !normalizedOrder.includes(token)) normalizedOrder.push(token);
+            });
+            validTokens.forEach(token => {
+                if (!normalizedOrder.includes(token)) normalizedOrder.push(token);
+            });
+            schoolHighOrder = normalizedOrder;
+            schoolHighFeatures = normalizedOrder.filter(token => token.startsWith('feature:')).map(token => token.slice(8));
+            schoolHighClasses = normalizedOrder.filter(token => token.startsWith('class:')).map(token => token.slice(6));
+        }
+
+        function persistSchoolHighConfig() {
+            normalizeSchoolHighConfig();
+            writeStoredHighConfig(SCHOOL_HIGH_CONFIG_KEY, {
+                features: schoolHighFeatures,
+                classes: schoolHighClasses,
+                order: schoolHighOrder
+            });
+        }
+
+        normalizeSchoolHighConfig();
 
         const state = {
             view: 'home',
@@ -11824,19 +13027,41 @@
             return normalizeFeatureText(`${label} ${schoolFeatureAliases[label] || ''}`).includes(query);
         }
 
+        function quickEntryMarkup({ context, token, label, manageMode, ariaLabel, attributes = '', className = '', pending = 0 }) {
+            const baseClass = context === 'school' ? 'home-high-btn' : 'management-entry class-high-entry';
+            const badge = pending ? (context === 'school' ? pendingDotMarkup(pending) : pendingBadgeMarkup(pending)) : '';
+            return `<button type="button" class="${baseClass} quick-entry${className ? ` ${className}` : ''}${manageMode ? ' manage-mode' : ''}" data-quick-context="${escapeHtml(context)}" data-quick-token="${escapeHtml(token)}" aria-label="${escapeHtml(ariaLabel)}"${manageMode ? ' aria-roledescription="可排序入口" aria-keyshortcuts="Alt+ArrowLeft Alt+ArrowRight"' : ''} ${attributes}><span class="quick-entry-copy">${escapeHtml(label)}</span>${badge}</button>`;
+        }
+
+        function quickAddEntryMarkup(context, action, ariaLabel) {
+            const baseClass = context === 'school' ? 'home-high-btn' : 'management-entry class-high-entry';
+            return `<button type="button" class="${baseClass} quick-entry config" data-quick-context="${escapeHtml(context)}" data-action="${escapeHtml(action)}" aria-label="${escapeHtml(ariaLabel)}"><span class="quick-entry-copy"><svg class="home-add-icon" aria-hidden="true" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></span></button>`;
+        }
+
         function renderSchoolHome() {
-            const featureEntries = schoolHighFeatures.map(label => {
-                const pendingCount = getSchoolFeaturePendingCount(label);
-                const accessibleLabel = schoolManageMode ? `从高频功能移除${label}` : `${label}${pendingCount ? `，有${pendingCount}项待处理内容` : ''}`;
-                return `<button type="button" class="home-high-btn${schoolManageMode ? ' manage-mode' : ''}" data-school-feature="${escapeHtml(label)}" data-feature-source="high" aria-label="${escapeHtml(accessibleLabel)}"><span class="home-high-copy"><strong>${escapeHtml(label)}</strong></span>${pendingCount ? pendingDotMarkup(pendingCount) : ''}</button>`;
-            }).join('');
-            const classEntries = schoolHighClasses.map(classId => schoolClasses.find(item => item.id === classId)).filter(Boolean).map(classInfo => {
+            normalizeSchoolHighConfig();
+            const highEntries = schoolHighOrder.map(token => {
+                if (token.startsWith('feature:')) {
+                    const label = token.slice(8);
+                    const pendingCount = getSchoolFeaturePendingCount(label);
+                    const accessibleLabel = schoolManageMode ? `从高频功能移除${label}` : `${label}${pendingCount ? `，有${pendingCount}项待处理内容` : ''}`;
+                    return quickEntryMarkup({
+                        context: 'school', token, label, manageMode: schoolManageMode, ariaLabel: accessibleLabel, pending: pendingCount,
+                        attributes: `data-school-feature="${escapeHtml(label)}" data-feature-source="high"`
+                    });
+                }
+                const classId = token.slice(6);
+                const classInfo = schoolClasses.find(item => item.id === classId);
+                if (!classInfo) return '';
+                const label = getClassDisplayName(classInfo);
                 const pendingCount = getClassPendingCounts(classInfo).total;
-                const accessibleLabel = schoolManageMode ? `从首页移除${getClassDisplayName(classInfo)}` : `打开${getClassDisplayName(classInfo)}${pendingCount ? `，有${pendingCount}项待处理` : ''}`;
-                return `<button type="button" class="home-high-btn class-shortcut${schoolManageMode ? ' manage-mode' : ''}" data-school-class-shortcut="${escapeHtml(classInfo.id)}" aria-label="${escapeHtml(accessibleLabel)}"><span class="home-high-copy"><strong class="home-high-class-name">${escapeHtml(getClassDisplayName(classInfo))}</strong></span>${pendingCount ? pendingDotMarkup(pendingCount) : ''}</button>`;
+                const accessibleLabel = schoolManageMode ? `从首页移除${label}` : `打开${label}${pendingCount ? `，有${pendingCount}项待处理` : ''}`;
+                return quickEntryMarkup({
+                    context: 'school', token, label, manageMode: schoolManageMode, ariaLabel: accessibleLabel, pending: pendingCount, className: 'class-shortcut',
+                    attributes: `data-school-class-shortcut="${escapeHtml(classInfo.id)}"`
+                });
             }).join('');
-            highFreqGrid.innerHTML = featureEntries + classEntries +
-                `<button type="button" class="home-high-btn config" data-action="school-add-function" aria-label="添加高频功能入口"><svg class="home-add-icon" aria-hidden="true" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>`;
+            highFreqGrid.innerHTML = highEntries;
 
             const renderDirectoryButtons = labels => labels.map(label => {
                     const alreadyAdded = schoolHighFeatures.includes(label);
@@ -11868,9 +13093,8 @@
             const label = button.dataset.schoolFeature;
             const source = button.dataset.featureSource;
             if (schoolManageMode) {
-                if (source === 'high') schoolHighFeatures = schoolHighFeatures.filter(item => item !== label);
-                else if (!schoolHighFeatures.includes(label)) schoolHighFeatures.push(label);
-                renderSchoolHome();
+                if (source === 'high') removeQuickItem('school', `feature:${label}`);
+                else addQuickItem('school', `feature:${label}`);
                 return;
             }
             if (label === '关注学生') { openStudentList(); return; }
@@ -11884,8 +13108,7 @@
             const classInfo = schoolClasses.find(item => item.id === classId);
             if (!classInfo) return;
             if (schoolManageMode) {
-                schoolHighClasses = schoolHighClasses.filter(id => id !== classId);
-                renderSchoolHome();
+                removeQuickItem('school', `class:${classId}`);
                 showToast(`已从首页移除${getClassDisplayName(classInfo)}`);
                 return;
             }
@@ -11936,7 +13159,7 @@
         function addSchoolClassShortcut(classId) {
             const classInfo = schoolClasses.find(item => item.id === classId);
             if (!classInfo) return;
-            if (!schoolHighClasses.includes(classId)) schoolHighClasses.push(classId);
+            addQuickItem('school', `class:${classId}`, false);
             closePicker(false);
             renderSchoolHome();
             showToast(`已添加${getClassDisplayName(classInfo)}`);
@@ -12325,25 +13548,161 @@
         }
 
         const classManagementGroups = {
-            '高频班务': ['实时点名','学生日志','学生假条','班级课表课堂','班级奖励','班级违纪','班级考核','学生奖励','学生违纪','学生考核排名'],
-            '学工点到任务': ['返校点到','回家点到','返校统计','回家统计'],
-            '教学与成长': ['班级作业','班级报修','班级日志','学生评语','学生特长班','期末成绩'],
-            '班级配置': ['宿舍设置','行为设置','班级座位设置','班级就业','班级指标','班干部设置','特长班请假']
+            '日常班务': ['实时点名','学生假条','班级课表课堂','学生日志','班级日志','班级报修'],
+            '奖惩考核': ['班级奖励','学生奖励','班级违纪','学生违纪','班级考核','学生考核排名'],
+            '返校与回家': ['返校点到','回家点到','返校统计','回家统计'],
+            '教学与成长': ['班级作业','学生评语','期末成绩','学生特长班','特长班请假','班级就业'],
+            '班级设置': ['宿舍设置','行为设置','班级座位设置','班级指标','班干部设置']
+        };
+        const classManagementDisplayLabels = {
+            '学生假条': '学生请假',
+            '班级课表课堂': '班级课表',
+            '学生考核排名': '考核排名',
+            '班级座位设置': '座位设置',
+            '宿舍设置': '宿舍安排',
+            '行为设置': '行为规则'
         };
         const classCoreModules = { '学生假条': 'leave', '实时点名': 'rollcall', '返校点到': 'checkin-return', '回家点到': 'checkin-home', '班级违纪': 'class-discipline', '班级考核': 'class-assessment', '学生违纪': 'discipline', '班级日志': 'logs', '宿舍设置': 'dorm' };
+        const CLASS_HIGH_CONFIG_KEY = 'pocket-campus-class-high-frequency-v1';
+        const defaultClassHighFeatures = ['实时点名','学生假条','班级违纪','班级课表课堂'];
+        const storedClassHighConfig = readStoredHighConfig(CLASS_HIGH_CONFIG_KEY, {});
+        let classHighFeatureConfig = Array.isArray(storedClassHighConfig) ? {} : storedClassHighConfig;
+        let classManageMode = false;
+
+        function getClassManagementLabels() {
+            return [...new Set(Object.values(classManagementGroups).flat())];
+        }
+
+        function normalizeClassManagementLabel(value) {
+            const label = String(value || '');
+            if (getClassManagementLabels().includes(label)) return label;
+            return Object.keys(classManagementDisplayLabels).find(key => classManagementDisplayLabels[key] === label) || '';
+        }
+
+        function getClassHighFeatures(classId = state.selectedClassId) {
+            const hasStoredConfig = Object.prototype.hasOwnProperty.call(classHighFeatureConfig, classId);
+            const source = hasStoredConfig && Array.isArray(classHighFeatureConfig[classId])
+                ? classHighFeatureConfig[classId]
+                : defaultClassHighFeatures;
+            return [...new Set(source.map(normalizeClassManagementLabel).filter(Boolean))];
+        }
+
+        function setClassHighFeatures(labels, classId = state.selectedClassId) {
+            classHighFeatureConfig[classId] = [...new Set(labels.map(normalizeClassManagementLabel).filter(Boolean))];
+            writeStoredHighConfig(CLASS_HIGH_CONFIG_KEY, classHighFeatureConfig);
+        }
+
+        function getQuickOrder(context) {
+            return context === 'school' ? [...schoolHighOrder] : getClassHighFeatures();
+        }
+
+        function setQuickOrder(context, tokens, shouldRender = true) {
+            if (context === 'school') {
+                const featureLabels = new Set(Object.values(schoolDirectory).flat());
+                const classIds = new Set(schoolClasses.map(item => item.id));
+                const normalized = [...new Set(tokens.map(value => String(value || '')))].filter(token => {
+                    if (token.startsWith('feature:')) return featureLabels.has(token.slice(8));
+                    if (token.startsWith('class:')) return classIds.has(token.slice(6));
+                    return false;
+                });
+                schoolHighOrder = normalized;
+                schoolHighFeatures = normalized.filter(token => token.startsWith('feature:')).map(token => token.slice(8));
+                schoolHighClasses = normalized.filter(token => token.startsWith('class:')).map(token => token.slice(6));
+                persistSchoolHighConfig();
+            } else {
+                setClassHighFeatures(tokens);
+            }
+            if (shouldRender) {
+                if (context === 'school') renderSchoolHome();
+                else renderClassManagement();
+            }
+        }
+
+        function addQuickItem(context, token, shouldRender = true) {
+            const order = getQuickOrder(context);
+            if (!order.includes(token)) order.push(token);
+            setQuickOrder(context, order, shouldRender);
+        }
+
+        function removeQuickItem(context, token) {
+            setQuickOrder(context, getQuickOrder(context).filter(item => item !== token));
+        }
+
+        function moveQuickItem(context, token, offset) {
+            const order = getQuickOrder(context);
+            const currentIndex = order.indexOf(token);
+            if (currentIndex < 0) return;
+            const nextIndex = Math.max(0, Math.min(order.length - 1, currentIndex + offset));
+            if (nextIndex === currentIndex) return;
+            order.splice(currentIndex, 1);
+            order.splice(nextIndex, 0, token);
+            setQuickOrder(context, order);
+        }
+
+        function toggleClassManageMode() {
+            classManageMode = !classManageMode;
+            renderClassManagement();
+        }
+
+        function startClassFunctionAdd() {
+            classManageMode = true;
+            renderClassManagement();
+            showToast('请从下方分类中选择要添加的班务');
+        }
+
+        function addClassQuickFeature(label) {
+            const normalized = normalizeClassManagementLabel(label);
+            if (!normalized) return;
+            addQuickItem('class', normalized);
+        }
+
+        function handleClassQuickFeature(button) {
+            const label = normalizeClassManagementLabel(button.dataset.classQuickFeature);
+            if (!label) return;
+            if (classManageMode) {
+                removeQuickItem('class', label);
+                return;
+            }
+            const module = classCoreModules[label];
+            if (module) {
+                openClassModule(module, state.classTab || 'management');
+                return;
+            }
+            showToast(`${classManagementDisplayLabels[label] || label}入口已保留`);
+        }
 
         function renderClassManagement() {
             updateClassTabPendingState();
+            const highLabels = getClassHighFeatures();
+            const highMarkup = highLabels.map(label => {
+                const module = classCoreModules[label];
+                const pending = module ? getModulePendingCount(module) : 0;
+                const displayLabel = classManagementDisplayLabels[label] || label;
+                return quickEntryMarkup({
+                    context: 'class', token: label, label: displayLabel, manageMode: classManageMode, pending,
+                    ariaLabel: classManageMode ? `从高频班务移除${displayLabel}` : `${displayLabel}${pending ? `，${pending}项待处理` : ''}`,
+                    attributes: `data-class-quick-feature="${escapeHtml(label)}"`
+                });
+            }).join('');
             classManagementPanel.innerHTML = `
                 <section class="management-directory" aria-label="班级管理入口">
+                <section class="management-high-section" aria-label="高频班务">
+                    <div class="quick-section-header"><div class="quick-section-title">高频班务</div><button type="button" class="quick-manage-button" data-action="toggle-class-quick-manage">${classManageMode ? '完成' : '管理'}</button></div>
+                    <div class="class-high-grid quick-grid" data-quick-grid="class">${highMarkup}</div>
+                </section>
                 ${Object.entries(classManagementGroups).map(([group, labels]) => `
                     <section class="management-group"><div class="management-group-title">${escapeHtml(group)}</div><div class="management-grid">
                         ${labels.map(label => {
                             const module = classCoreModules[label];
                             const pending = module ? getModulePendingCount(module) : 0;
+                            const displayLabel = classManagementDisplayLabels[label] || label;
+                            const alreadyAdded = highLabels.includes(label);
+                            if (classManageMode) {
+                                return `<button type="button" class="management-entry${alreadyAdded ? ' added-disabled' : ' manage-mode'}" data-action="class-add-quick" data-class-quick-add="${escapeHtml(label)}" aria-label="${escapeHtml(alreadyAdded ? `${displayLabel}已在高频班务中` : `添加${displayLabel}到高频班务`)}"${alreadyAdded ? ' disabled aria-disabled="true"' : ''}><span class="management-entry-label">${escapeHtml(displayLabel)}</span></button>`;
+                            }
                             return module
-                                ? `<button type="button" class="management-entry${pending ? ' has-pending' : ''}" data-class-module="${module}" aria-label="${escapeHtml(label)}${pending ? `，${pending}项待处理` : ''}">${escapeHtml(label)}${pending ? pendingBadgeMarkup(pending) : ''}</button>`
-                                : `<button type="button" class="management-entry disabled" disabled aria-label="${escapeHtml(label)}，暂未开放">${escapeHtml(label)}</button>`;
+                                ? `<button type="button" class="management-entry${pending ? ' has-pending' : ''}" data-class-module="${module}" aria-label="${escapeHtml(displayLabel)}${pending ? `，${pending}项待处理` : ''}"><span class="management-entry-label">${escapeHtml(displayLabel)}</span>${pending ? pendingBadgeMarkup(pending) : ''}</button>`
+                                : `<button type="button" class="management-entry disabled" disabled aria-label="${escapeHtml(displayLabel)}，暂未开放"><span class="management-entry-label">${escapeHtml(displayLabel)}</span></button>`;
                         }).join('')}
                     </div></section>`).join('')}</section>`;
         }
@@ -13170,7 +14529,7 @@
             state.dormRoomId = selectedRoom?.id || '';
             const selectedGender = getDormRoomGender(selectedRoom?.id);
             const unassigned = getUnassignedDormStudents(selectedGender);
-            const markup = `<div class="dorm-module-shell"><section class="dorm-room-directory" aria-label="本班所有宿舍"><div class="dorm-room-directory-head"><strong>本班宿舍</strong><span>${rooms.length} 间 · 点击切换床位图</span></div><div class="dorm-room-list">${rooms.map(room => { const occupied = room.beds.filter(bed => bed.occupied).length; return `<button type="button" class="dorm-room-chip${room.id === state.dormRoomId ? ' active' : ''}" data-action="select-dorm-overview-room" data-room-id="${room.id}" aria-pressed="${room.id === state.dormRoomId ? 'true' : 'false'}"><strong>${escapeHtml(room.building ? `${room.building} · ${room.roomNo}` : room.name)}</strong><span class="dorm-occupancy">已住 <b>${occupied}</b>/${room.beds.length}</span></button>`; }).join('')}</div><div class="dorm-room-preview">${renderDormPlan(selectedRoom)}</div></section><div class="class-section-head dorm-unassigned-head"><h2>未分配宿舍学生（${unassigned.length}）</h2></div><div class="dorm-unassigned-list">${unassigned.length ? unassigned.map(item => `<article class="dorm-unassigned-card"><span class="student-avatar ${item.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(item)}</span><span class="dorm-unassigned-copy"><strong>${escapeHtml(item.name)}</strong></span><button type="button" class="dorm-student-action pending-leaf-action" data-action="open-dorm-picker" data-dorm-id="${item.id}" data-preferred-room-id="${selectedRoom.id}">安排${pendingBadgeMarkup(1)}</button></article>`).join('') : '<div class="dorm-unassigned-empty"><strong>当前暂无未分配学生</strong><span>该宿舍对应学生均已完成床位安排</span></div>'}</div></div>`;
+            const markup = `<div class="dorm-module-shell"><section class="dorm-room-directory" aria-label="本班所有宿舍"><div class="dorm-room-directory-head"><strong>本班宿舍</strong><span>${rooms.length} 间 · 点击切换床位图</span></div><div class="dorm-room-list">${rooms.map(room => { const occupied = room.beds.filter(bed => bed.occupied).length; return `<button type="button" class="dorm-room-chip${room.id === state.dormRoomId ? ' active' : ''}" data-action="select-dorm-overview-room" data-room-id="${room.id}" aria-pressed="${room.id === state.dormRoomId ? 'true' : 'false'}"><strong>${escapeHtml(room.building ? `${room.building} · ${room.roomNo}` : room.name)}</strong><span class="dorm-occupancy">已住 <b>${occupied}</b>/${room.beds.length}</span></button>`; }).join('')}</div><div class="dorm-room-preview">${renderDormPlan(selectedRoom)}</div></section><div class="class-section-head dorm-unassigned-head"><h2>未分配宿舍学生（${unassigned.length}）</h2></div><div class="dorm-unassigned-list">${unassigned.length ? unassigned.map(item => `<button type="button" class="dorm-unassigned-card pending-leaf-action" data-action="open-dorm-picker" data-dorm-id="${item.id}" data-preferred-room-id="${selectedRoom.id}" aria-label="为${escapeHtml(item.name)}安排宿舍"><span class="student-avatar ${item.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(item)}</span><span class="dorm-unassigned-copy"><strong>${escapeHtml(item.name)}</strong><small>安排</small></span>${pendingBadgeMarkup(1)}</button>`).join('') : '<div class="dorm-unassigned-empty"><strong>当前暂无未分配学生</strong><span>该宿舍对应学生均已完成床位安排</span></div>'}</div></div>`;
             state.dormTransitionDirection = '';
             return markup;
         }
@@ -14300,6 +15659,7 @@
 
         function renderPanel() {
             const renderers = { grades: renderGrades, family: renderFamily, archive: renderArchive, materials: renderMaterials };
+            panelRoot.classList.toggle('grade-panel-flat', state.activeTab === 'grades');
             panelRoot.innerHTML = renderers[state.activeTab]();
             renderEditFooter();
             updateStudentDetailPendingState();
@@ -15079,13 +16439,27 @@
             const selected = students.find(item => item.id === studentId);
             if (!selected) return;
             const following = state.followedStudentIds.includes(studentId);
-            state.followedStudentIds = following
-                ? state.followedStudentIds.filter(id => id !== studentId)
-                : [...state.followedStudentIds, studentId];
-            persistFollowedStudentIds();
-            renderStudentList();
-            if (state.view === 'detail' && student.id === studentId) renderHero();
-            showToast(following ? `已取消关注${selected.name}` : `已关注${selected.name}`);
+            const applyFollowState = () => {
+                state.followedStudentIds = following
+                    ? state.followedStudentIds.filter(id => id !== studentId)
+                    : [...state.followedStudentIds, studentId];
+                persistFollowedStudentIds();
+                renderStudentList();
+                if (state.view === 'detail' && student.id === studentId) renderHero();
+                showToast(following ? `已取消关注${selected.name}` : `已关注${selected.name}`);
+            };
+            if (!following) {
+                applyFollowState();
+                return;
+            }
+            openDialog({
+                title: `确认取消关注${selected.name}？`,
+                desc: '取消后，该学生将从关注学生列表中移除。',
+                confirmLabel: '确认取消关注',
+                cancelLabel: '继续关注',
+                danger: true,
+                onConfirm: applyFollowState
+            });
         }
 
         function getFilteredStudents() {
@@ -15558,7 +16932,7 @@
             return `<div class="dorm-module-shell"><section class="dorm-room-directory" aria-label="本班学生涉及宿舍"><div class="dorm-room-directory-head"><strong>本班学生宿舍</strong><span>${visibleRooms.length} 间 · 床位数量自适应</span></div><div class="dorm-room-list">${visibleRooms.map(room => {
                 const occupied = room.beds.filter(bed => bed.occupied).length;
                 return `<button type="button" class="dorm-room-chip${room.id === state.dormRoomId ? ' active' : ''}" data-action="select-dorm-overview-room" data-room-id="${room.id}" aria-pressed="${room.id === state.dormRoomId ? 'true' : 'false'}"><strong>${escapeHtml(formatDormRoomName(room))}</strong><span class="dorm-occupancy">已住 <b>${occupied}</b>/${room.beds.length}</span></button>`;
-            }).join('')}</div><div class="dorm-room-preview">${renderDormPlan(selectedRoom)}</div></section><div class="class-section-head dorm-unassigned-head"><h2>本班未分配学生（${unassigned.length}）</h2></div><div class="dorm-unassigned-list">${unassigned.length ? unassigned.map(item => `<article class="dorm-unassigned-card"><span class="student-avatar ${item.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(item)}</span><span class="dorm-unassigned-copy"><strong>${escapeHtml(item.name)}</strong></span><button type="button" class="dorm-student-action" data-action="open-dorm-picker" data-dorm-id="${item.id}" data-preferred-room-id="${selectedRoom?.id || ''}">安排</button></article>`).join('') : '<div class="dorm-unassigned-empty"><strong>当前暂无未分配学生</strong><span>本班对应学生均已完成床位安排</span></div>'}</div></div>`;
+            }).join('')}</div><div class="dorm-room-preview">${renderDormPlan(selectedRoom)}</div></section><div class="class-section-head dorm-unassigned-head"><h2>本班未分配学生（${unassigned.length}）</h2></div><div class="dorm-unassigned-list">${unassigned.length ? unassigned.map(item => `<button type="button" class="dorm-unassigned-card" data-action="open-dorm-picker" data-dorm-id="${item.id}" data-preferred-room-id="${selectedRoom?.id || ''}" aria-label="为${escapeHtml(item.name)}安排宿舍"><span class="student-avatar ${item.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(item)}</span><span class="dorm-unassigned-copy"><strong>${escapeHtml(item.name)}</strong><small>安排</small></span></button>`).join('') : '<div class="dorm-unassigned-empty"><strong>当前暂无未分配学生</strong><span>本班对应学生均已完成床位安排</span></div>'}</div></div>`;
         }
 
         function getDormFloorNumber(room) {
@@ -16063,9 +17437,8 @@
             const label = button.dataset.schoolFeature;
             const source = button.dataset.featureSource;
             if (schoolManageMode) {
-                if (source === 'high') schoolHighFeatures = schoolHighFeatures.filter(item => item !== label);
-                else if (!schoolHighFeatures.includes(label)) schoolHighFeatures.push(label);
-                renderSchoolHome();
+                if (source === 'high') removeQuickItem('school', `feature:${label}`);
+                else addQuickItem('school', `feature:${label}`);
                 return;
             }
             if (label === '关注学生') { openStudentList(); return; }
@@ -16126,6 +17499,9 @@
             if (action === 'school-add-function') startSchoolFunctionAdd();
             if (action === 'school-add-class') openSchoolClassAddPicker();
             if (action === 'add-school-class-shortcut') addSchoolClassShortcut(button.dataset.schoolShortcutAdd);
+            if (action === 'toggle-class-quick-manage') toggleClassManageMode();
+            if (action === 'class-add-function') startClassFunctionAdd();
+            if (action === 'class-add-quick') addClassQuickFeature(button.dataset.classQuickAdd);
             if (action === 'open-leave-detail') openLeaveDetail(button.dataset.leaveId);
             if (action === 'preview-leave-image') previewLeaveImage(button.dataset.leaveId);
             if (action === 'clear-class-roster-search') {
@@ -16602,6 +17978,81 @@
         });
 
         const appDevice = document.getElementById('device');
+        let quickSortGesture = null;
+        let quickSortSuppressUntil = 0;
+
+        function isQuickManageContext(context) {
+            return context === 'school' ? schoolManageMode : classManageMode;
+        }
+
+        function finishQuickSort(pointerId, commit = true) {
+            const gesture = quickSortGesture;
+            if (!gesture || gesture.pointerId !== pointerId) return;
+            window.clearTimeout(gesture.timer);
+            const wasActive = gesture.active;
+            gesture.item.classList.remove('is-sorting');
+            try {
+                if (gesture.item.hasPointerCapture(pointerId)) gesture.item.releasePointerCapture(pointerId);
+            } catch (error) {}
+            quickSortGesture = null;
+            if (!wasActive || !commit) return;
+            const order = Array.from(gesture.grid.querySelectorAll('.quick-entry[data-quick-token]')).map(item => item.dataset.quickToken);
+            quickSortSuppressUntil = Date.now() + 450;
+            setQuickOrder(gesture.context, order);
+            showToast('高频入口排序已更新');
+        }
+
+        appDevice.addEventListener('pointerdown', event => {
+            const item = event.target.closest?.('.quick-entry[data-quick-token]');
+            if (!item || event.button !== 0) return;
+            const context = item.dataset.quickContext;
+            if (!isQuickManageContext(context)) return;
+            const grid = item.closest('[data-quick-grid]');
+            if (!grid) return;
+            const gesture = {
+                pointerId: event.pointerId,
+                item,
+                grid,
+                context,
+                startX: event.clientX,
+                startY: event.clientY,
+                active: false,
+                timer: 0
+            };
+            gesture.timer = window.setTimeout(() => {
+                if (quickSortGesture !== gesture) return;
+                gesture.active = true;
+                item.classList.add('is-sorting');
+                try { item.setPointerCapture(event.pointerId); } catch (error) {}
+                navigator.vibrate?.(18);
+            }, 280);
+            quickSortGesture = gesture;
+        }, true);
+
+        appDevice.addEventListener('pointermove', event => {
+            const gesture = quickSortGesture;
+            if (!gesture || gesture.pointerId !== event.pointerId) return;
+            const distance = Math.hypot(event.clientX - gesture.startX, event.clientY - gesture.startY);
+            if (!gesture.active) {
+                if (distance > 8) {
+                    window.clearTimeout(gesture.timer);
+                    quickSortGesture = null;
+                }
+                return;
+            }
+            event.preventDefault();
+            const over = document.elementFromPoint(event.clientX, event.clientY)?.closest?.('.quick-entry[data-quick-token]');
+            if (!over || over === gesture.item || over.closest('[data-quick-grid]') !== gesture.grid) return;
+            const items = Array.from(gesture.grid.querySelectorAll('.quick-entry[data-quick-token]'));
+            const currentIndex = items.indexOf(gesture.item);
+            const overIndex = items.indexOf(over);
+            if (currentIndex < overIndex) gesture.grid.insertBefore(gesture.item, over.nextSibling);
+            else gesture.grid.insertBefore(gesture.item, over);
+        }, { passive: false, capture: true });
+
+        appDevice.addEventListener('pointerup', event => finishQuickSort(event.pointerId, true), true);
+        appDevice.addEventListener('pointercancel', event => finishQuickSort(event.pointerId, true), true);
+
         function resetDeviceHorizontalOffset() {
             if (appDevice.scrollLeft !== 0) appDevice.scrollLeft = 0;
         }
@@ -16610,6 +18061,10 @@
         appDevice.addEventListener('click', event => {
             resetDeviceHorizontalOffset();
             requestAnimationFrame(resetDeviceHorizontalOffset);
+            if (Date.now() < quickSortSuppressUntil) {
+                event.preventDefault();
+                return;
+            }
             const schoolTab = event.target.closest('[data-school-tab]');
             if (schoolTab) { switchSchoolTab(schoolTab.dataset.schoolTab, schoolTab); return; }
             const classTab = event.target.closest('[data-class-tab]');
@@ -16624,6 +18079,8 @@
             if (route?.dataset.route === 'students') { openStudentList(); return; }
             const classRow = event.target.closest('[data-class-id]');
             if (classRow) { openClassDetail(classRow.dataset.classId); return; }
+            const classQuickFeature = event.target.closest('[data-class-quick-feature]');
+            if (classQuickFeature) { handleClassQuickFeature(classQuickFeature); return; }
             const liveStatusShortcut = event.target.closest('[data-open-live-status]');
             if (liveStatusShortcut) {
                 const metric = event.target.closest('[data-live-status-filter]');
@@ -16646,6 +18103,15 @@
         });
 
         appDevice.addEventListener('keydown', event => {
+            const quickEntry = event.target.closest('.quick-entry[data-quick-token]');
+            if (quickEntry && event.altKey && ['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key) && isQuickManageContext(quickEntry.dataset.quickContext)) {
+                event.preventDefault();
+                const columns = 4;
+                const offset = event.key === 'ArrowLeft' ? -1 : (event.key === 'ArrowRight' ? 1 : (event.key === 'ArrowUp' ? -columns : columns));
+                moveQuickItem(quickEntry.dataset.quickContext, quickEntry.dataset.quickToken, offset);
+                showToast('高频入口排序已更新');
+                return;
+            }
             const leaveCard = event.target.closest('.leave-card[data-action="open-leave-detail"]');
             const logCard = event.target.closest('.log-card[data-action="open-log-detail"]');
             const card = leaveCard || logCard;
@@ -17127,6 +18593,15 @@
 
         function classDisciplineRowMarkup(item, origin = 'class-discipline', showStatus = false) {
             const deduction = getClassDisciplineDeduction(item);
+            if (origin === 'class-discipline') {
+                return `<button type="button" class="class-record-row class-discipline-list-row" data-action="open-class-discipline-detail" data-class-discipline-id="${escapeHtml(item.id)}" data-class-discipline-origin="class-discipline" aria-label="查看${escapeHtml(item.location)}${escapeHtml(item.item)}违纪详情，扣${deduction}分">
+                    <span class="class-record-copy">
+                        <span class="class-record-location">${escapeHtml(item.location)}</span>
+                        <strong class="class-record-summary">${escapeHtml(item.item)}</strong>
+                    </span>
+                    <span class="class-record-side"><strong class="class-record-points">-${deduction}<small>分</small></strong></span>
+                </button>`;
+            }
             const statusMarkup = showStatus
                 ? `<span class="class-record-status${item.status === 'processed' ? ' processed' : ''}">${item.status === 'processed' ? '已处理' : '未处理'}</span>`
                 : `<span class="class-record-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></span>`;
