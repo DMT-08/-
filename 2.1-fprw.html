@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#EFF6FF">
-    <title>掌上校园 · 高频角标与目录统一 7.71</title>
+    <title>掌上校园 · 全校班级固定标题与内容面裁切 7.73</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -10673,6 +10673,29 @@
         .school-home-view .admission-entry-btn > .feature-pending-dot.dot-only {
             top: -5px;
             right: -5px;
+        }
+
+        /* 7.73：固定全校班级标题，由标题下方的大圆角内容面统一裁切滚动内容。 */
+        #classListView > .topbar {
+            position: absolute;
+            inset: 0 0 auto;
+            z-index: 50;
+        }
+        #classListView .class-list-scroll {
+            inset: 92px 0 0;
+            padding: 12px 0 34px;
+            overflow-x: hidden;
+            overflow-y: auto;
+            border-radius: 24px 24px 0 0;
+            background: linear-gradient(135deg, rgba(239,246,255,.98), rgba(223,231,255,.96));
+            clip-path: inset(0 round 24px 24px 0 0);
+            isolation: isolate;
+        }
+        #classListView .class-list-scroll.content-surface-passed {
+            background: #FFFFFF;
+        }
+        #classListView .class-directory {
+            overflow: visible;
         }
     </style>
 </head>
