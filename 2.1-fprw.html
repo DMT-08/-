@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#EFF6FF">
-    <title>掌上校园 · 班级信息姓名职位同级显示 7.83</title>
+    <title>掌上校园 · 宿舍空房与空床数量补充 7.88</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -11896,6 +11896,237 @@
         .class-detail-scroll.management-mode .class-high-grid {
             column-gap: 4px;
         }
+
+        /* 7.84：学校管理与班级管理弱化分组层级，突出功能入口。 */
+        .school-home-view .quick-entry,
+        .school-home-view .quick-entry-copy,
+        .school-home-view .admission-entry-btn,
+        .school-home-view .admission-entry-btn > span:not(.feature-pending-dot),
+        .class-detail-scroll.management-mode .class-high-entry,
+        .class-detail-scroll.management-mode .quick-entry-copy,
+        .class-detail-scroll.management-mode .management-entry,
+        .class-detail-scroll.management-mode .management-entry.core,
+        .class-detail-scroll.management-mode .management-entry.disabled,
+        .class-detail-scroll.management-mode .management-entry:disabled,
+        .class-detail-scroll.management-mode .management-entry-label {
+            font-size: 15px;
+            font-weight: 500;
+            line-height: 22px;
+        }
+
+        .school-home-view .quick-section-title,
+        .school-home-view .admission-entry-group-title,
+        .class-detail-scroll.management-mode .quick-section-title,
+        .class-detail-scroll.management-mode .management-group-title {
+            min-height: 24px;
+            gap: 8px;
+            color: #64748B;
+            font-size: 13px;
+            font-weight: 500;
+            line-height: 18px;
+        }
+        .school-home-view .quick-section-title::after,
+        .school-home-view .admission-entry-group-title::after,
+        .class-detail-scroll.management-mode .quick-section-title::after,
+        .class-detail-scroll.management-mode .management-group-title::after {
+            min-width: 16px;
+            background: linear-gradient(90deg, rgba(100,116,139,.10), rgba(100,116,139,.01));
+        }
+        .school-home-view .section-header.quick-section-header,
+        .class-detail-scroll.management-mode .quick-section-header {
+            min-height: 26px;
+            gap: 16px;
+        }
+        .school-home-view .admission-entry-group-title,
+        .class-detail-scroll.management-mode .management-group-title {
+            margin-bottom: 2px;
+        }
+        .school-home-view .admission-entry-group-title:not(:first-child) {
+            padding-top: 10px;
+        }
+        .quick-manage-button,
+        .school-home-view .manage-btn.quick-manage-button {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* 7.85：用几何 SVG 代替字体字形，消除 × / ＋ 的基线偏移。 */
+        .quick-entry.manage-mode::after,
+        .school-home-view .home-high-btn.quick-entry.manage-mode::after,
+        .class-detail-scroll.management-mode .class-high-entry.quick-entry.manage-mode::after {
+            content: '';
+            background-color: var(--danger);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M5 5l6 6M11 5l-6 6' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: 50% 50%;
+            background-size: 10px 10px;
+            font-size: 0;
+            line-height: 0;
+        }
+        .school-home-view .admission-entry-btn.manage-mode::after,
+        .class-detail-scroll.management-mode .management-grid .management-entry.manage-mode::after {
+            content: '';
+            background-color: var(--success);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M8 4.5v7M4.5 8h7' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: 50% 50%;
+            background-size: 10px 10px;
+            font-size: 0;
+            line-height: 0;
+        }
+
+        /* 7.86：全校宿舍改为男女分组与连续列表，空房信息跟随名称展示。 */
+        .school-dorm-building-groups {
+            display: grid;
+            gap: 18px;
+        }
+        .school-dorm-group {
+            min-width: 0;
+        }
+        .school-dorm-group-title {
+            min-height: 22px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin: 0 2px 5px;
+            color: #64748B;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 18px;
+        }
+        .school-dorm-group-title i {
+            min-width: 16px;
+            height: 1px;
+            flex: 1 1 auto;
+            background: linear-gradient(90deg, rgba(100,116,139,.18), rgba(100,116,139,.02));
+        }
+        .school-dorm-group-title small {
+            flex: 0 0 auto;
+            color: #94A3B8;
+            font: inherit;
+            font-size: 11px;
+        }
+        .school-dorm-section-title {
+            min-height: 22px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin: 1px 2px 5px;
+            color: #64748B;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 18px;
+        }
+        .school-dorm-section-title i {
+            min-width: 16px;
+            height: 1px;
+            flex: 1 1 auto;
+            background: linear-gradient(90deg, rgba(100,116,139,.18), rgba(100,116,139,.02));
+        }
+        .school-dorm-section-title small {
+            flex: 0 0 auto;
+            color: #94A3B8;
+            font: inherit;
+            font-size: 11px;
+        }
+        .school-dorm-level-list {
+            gap: 0;
+        }
+        .school-dorm-level-card {
+            min-height: 52px;
+            grid-template-columns: minmax(0, 1fr) 20px;
+            gap: 8px;
+            padding: 0 2px;
+            border: 0;
+            border-bottom: 1px solid rgba(15,23,42,.06);
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+        .school-dorm-level-card:last-child {
+            border-bottom: 0;
+        }
+        .school-dorm-level-card:active {
+            background: rgba(31,95,255,.05);
+        }
+        .school-dorm-level-copy strong {
+            color: #334155;
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 20px;
+        }
+        .school-dorm-level-side {
+            width: 20px;
+            justify-content: center;
+            color: #94A3B8;
+            font-size: 0;
+        }
+        .school-dorm-level-side .school-dorm-level-arrow {
+            width: 16px;
+            height: 16px;
+        }
+        .school-dorm-search-result {
+            grid-template-columns: minmax(0, 1fr) 20px;
+        }
+        .school-dorm-search-result > span:last-child {
+            width: 20px;
+            display: grid;
+            place-items: center;
+            margin-top: 0;
+            color: #94A3B8;
+            font-size: 0;
+        }
+        .school-dorm-search-result > span:last-child .school-dorm-level-arrow {
+            width: 16px;
+            height: 16px;
+        }
+        .school-dorm-room-grid .school-room-card strong {
+            color: #334155;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .school-room-card .school-room-meta,
+        .school-room-card .school-room-meta.male,
+        .school-room-card .school-room-meta.female {
+            color: #64748B;
+            background: rgba(100,116,139,.07);
+        }
+        .school-room-meta i {
+            display: none;
+        }
+
+        /* 7.87：为高频管理态建立独立触控安全带，并精简宿舍三级页状态表达。 */
+        .quick-manage-button,
+        .school-home-view .manage-btn.quick-manage-button {
+            min-width: 48px;
+            min-height: 32px;
+            padding: 0 8px;
+            border-radius: 10px;
+        }
+        .school-home-view.quick-manage-active .section-header.quick-section-header,
+        .class-detail-scroll.management-mode .management-high-section.quick-manage-active .quick-section-header {
+            margin-bottom: 16px;
+        }
+        .school-home-view.quick-manage-active .home-high-card,
+        .class-detail-scroll.management-mode .management-high-section.quick-manage-active {
+            margin-bottom: 22px;
+        }
+        .school-home-view.quick-manage-active .quick-manage-button,
+        .class-detail-scroll.management-mode .management-high-section.quick-manage-active .quick-manage-button {
+            background: rgba(31,95,255,.08);
+        }
+        #classModuleView.school-dorm-room-mode .dorm-bed-option.dorm-bed-card.occupied .dorm-bed-status,
+        #classModuleView.school-dorm-room-mode .class-module-scroll .dorm-bed-option.dorm-bed-card.occupied:not(:disabled):not(.active) .dorm-bed-status,
+        #classModuleView.school-dorm-room-mode .dorm-plan-legend span:first-child {
+            color: var(--success);
+        }
+        #classModuleView.school-dorm-room-mode .dorm-plan-legend span:first-child i {
+            background: var(--success);
+        }
+        #classModuleView.school-dorm-room-mode .school-dorm-room-grid .school-room-card {
+            display: grid;
+            place-items: center;
+        }
     </style>
 </head>
 <body>
@@ -12648,7 +12879,7 @@
                 const room = dormInventory[gender].find(item => item.building === building && item.roomNo === roomNo);
                 const capacity = room?.beds.length || 8;
                 const actual = room ? room.beds.filter(bed => bed.occupied).length : Math.min(8, Math.max(1, stayCount - roomIndex * 8));
-                return `${building}${roomNo} ${gender}（${capacity}/${actual}）`;
+                return `${building}${roomNo} ${gender}（空 ${Math.max(0, capacity - actual)} 床）`;
             });
         }
         const dormClassDetailData = [24,25,26].flatMap((grade, gradeIndex) => dormStatsMajors.map((major, majorIndex) => {
@@ -12702,7 +12933,7 @@
             '课堂巡检': 'ktxj ketang', '成绩归档': 'cjgd chengji', '教师排班': 'jspb jiaoshi', '全校宿舍': 'qxss quanxiaosushe ssgl sushe', '宿舍统计': 'sstj sushitongji dorm statistics',
             '违纪管理': 'wjgl weijiguanli discipline', '请假审批': 'qjsp qingjia', '安全巡检': 'aqxj anquan', '家校通知': 'jxtz jiaxiao'
         };
-        const SCHOOL_HIGH_CONFIG_KEY = 'pocket-campus-school-high-frequency-v1';
+        const SCHOOL_HIGH_CONFIG_KEY = 'pocket-campus-school-high-frequency-v2';
 
         function readStoredHighConfig(key, fallback) {
             try {
@@ -12720,7 +12951,7 @@
         }
 
         const storedSchoolHighConfig = readStoredHighConfig(SCHOOL_HIGH_CONFIG_KEY, {});
-        let schoolHighFeatures = Array.isArray(storedSchoolHighConfig.features) ? [...storedSchoolHighConfig.features] : ['招生管理', '全校班级', '关注学生'];
+        let schoolHighFeatures = Array.isArray(storedSchoolHighConfig.features) ? [...storedSchoolHighConfig.features] : ['全校班级', '全校宿舍', '关注学生'];
         let schoolHighClasses = Array.isArray(storedSchoolHighConfig.classes) ? [...storedSchoolHighConfig.classes] : [];
         let schoolHighOrder = Array.isArray(storedSchoolHighConfig.order)
             ? [...storedSchoolHighConfig.order]
@@ -13093,6 +13324,7 @@
 
         function renderSchoolHome() {
             normalizeSchoolHighConfig();
+            homeView.classList.toggle('quick-manage-active', schoolManageMode);
             const highEntries = schoolHighOrder.map(token => {
                 if (token.startsWith('feature:')) {
                     const label = token.slice(8);
@@ -13616,8 +13848,8 @@
             '行为设置': '行为规则'
         };
         const classCoreModules = { '学生假条': 'leave', '实时点名': 'rollcall', '返校点到': 'checkin-return', '回家点到': 'checkin-home', '班级违纪': 'class-discipline', '班级考核': 'class-assessment', '学生违纪': 'discipline', '班级日志': 'logs', '宿舍设置': 'dorm' };
-        const CLASS_HIGH_CONFIG_KEY = 'pocket-campus-class-high-frequency-v1';
-        const defaultClassHighFeatures = ['实时点名','学生假条','班级违纪','班级课表课堂'];
+        const CLASS_HIGH_CONFIG_KEY = 'pocket-campus-class-high-frequency-v2';
+        const defaultClassHighFeatures = ['实时点名','学生假条','班级违纪'];
         const storedClassHighConfig = readStoredHighConfig(CLASS_HIGH_CONFIG_KEY, {});
         let classHighFeatureConfig = Array.isArray(storedClassHighConfig) ? {} : storedClassHighConfig;
         let classManageMode = false;
@@ -13739,7 +13971,7 @@
             }).join('');
             classManagementPanel.innerHTML = `
                 <section class="management-directory" aria-label="班级管理入口">
-                <section class="management-high-section" aria-label="高频班务">
+                <section class="management-high-section${classManageMode ? ' quick-manage-active' : ''}" aria-label="高频班务">
                     <div class="quick-section-header"><div class="quick-section-title">高频班务</div><button type="button" class="quick-manage-button" data-action="toggle-class-quick-manage">${classManageMode ? '完成' : '管理'}</button></div>
                     <div class="class-high-grid quick-grid" data-quick-grid="class">${highMarkup}</div>
                 </section>
@@ -14582,7 +14814,7 @@
             state.dormRoomId = selectedRoom?.id || '';
             const selectedGender = getDormRoomGender(selectedRoom?.id);
             const unassigned = getUnassignedDormStudents(selectedGender);
-            const markup = `<div class="dorm-module-shell"><section class="dorm-room-directory" aria-label="本班所有宿舍"><div class="dorm-room-directory-head"><strong>本班宿舍</strong><span>${rooms.length} 间 · 点击切换床位图</span></div><div class="dorm-room-list">${rooms.map(room => { const occupied = room.beds.filter(bed => bed.occupied).length; return `<button type="button" class="dorm-room-chip${room.id === state.dormRoomId ? ' active' : ''}" data-action="select-dorm-overview-room" data-room-id="${room.id}" aria-pressed="${room.id === state.dormRoomId ? 'true' : 'false'}"><strong>${escapeHtml(room.building ? `${room.building} · ${room.roomNo}` : room.name)}</strong><span class="dorm-occupancy">已住 <b>${occupied}</b>/${room.beds.length}</span></button>`; }).join('')}</div><div class="dorm-room-preview">${renderDormPlan(selectedRoom)}</div></section><div class="class-section-head dorm-unassigned-head"><h2>未分配宿舍学生（${unassigned.length}）</h2></div><div class="dorm-unassigned-list">${unassigned.length ? unassigned.map(item => `<button type="button" class="dorm-unassigned-card pending-leaf-action" data-action="open-dorm-picker" data-dorm-id="${item.id}" data-preferred-room-id="${selectedRoom.id}" aria-label="为${escapeHtml(item.name)}安排宿舍"><span class="student-avatar ${item.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(item)}</span><span class="dorm-unassigned-copy"><strong>${escapeHtml(item.name)}</strong><small>安排</small></span>${pendingBadgeMarkup(1)}</button>`).join('') : '<div class="dorm-unassigned-empty"><strong>当前暂无未分配学生</strong><span>该宿舍对应学生均已完成床位安排</span></div>'}</div></div>`;
+            const markup = `<div class="dorm-module-shell"><section class="dorm-room-directory" aria-label="本班所有宿舍"><div class="dorm-room-directory-head"><strong>本班宿舍</strong><span>${rooms.length} 间 · 点击切换床位图</span></div><div class="dorm-room-list">${rooms.map(room => { const occupied = room.beds.filter(bed => bed.occupied).length; return `<button type="button" class="dorm-room-chip${room.id === state.dormRoomId ? ' active' : ''}" data-action="select-dorm-overview-room" data-room-id="${room.id}" aria-pressed="${room.id === state.dormRoomId ? 'true' : 'false'}"><strong>${escapeHtml(room.building ? `${room.building} · ${room.roomNo}` : room.name)}</strong><span class="dorm-occupancy">空 <b>${room.beds.length - occupied}</b> 床</span></button>`; }).join('')}</div><div class="dorm-room-preview">${renderDormPlan(selectedRoom)}</div></section><div class="class-section-head dorm-unassigned-head"><h2>未分配宿舍学生（${unassigned.length}）</h2></div><div class="dorm-unassigned-list">${unassigned.length ? unassigned.map(item => `<button type="button" class="dorm-unassigned-card pending-leaf-action" data-action="open-dorm-picker" data-dorm-id="${item.id}" data-preferred-room-id="${selectedRoom.id}" aria-label="为${escapeHtml(item.name)}安排宿舍"><span class="student-avatar ${item.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(item)}</span><span class="dorm-unassigned-copy"><strong>${escapeHtml(item.name)}</strong><small>安排</small></span>${pendingBadgeMarkup(1)}</button>`).join('') : '<div class="dorm-unassigned-empty"><strong>当前暂无未分配学生</strong><span>该宿舍对应学生均已完成床位安排</span></div>'}</div></div>`;
             state.dormTransitionDirection = '';
             return markup;
         }
@@ -16967,7 +17199,7 @@
                 </button>`;
             };
             return `<div class="dorm-plan dorm-bed-directory" aria-label="${escapeHtml(room.name)}床位列表">
-                <div class="dorm-plan-head"><div class="dorm-plan-current"><strong>${escapeHtml(formatDormRoomName(room))}</strong><span>已住 ${occupiedCount}/${room.beds.length}</span></div><div class="dorm-plan-legend"><span><i aria-hidden="true"></i>已住</span><span><i aria-hidden="true"></i>空床</span></div></div>
+                <div class="dorm-plan-head"><div class="dorm-plan-current"><strong>${escapeHtml(formatDormRoomName(room))}</strong><span>空 ${room.beds.length - occupiedCount} 床</span></div><div class="dorm-plan-legend"><span><i aria-hidden="true"></i>已住</span><span><i aria-hidden="true"></i>空床</span></div></div>
                 <div class="dorm-bed-grid dorm-card-grid">${getDormDisplayBeds(room.beds).map(renderBed).join('')}</div>
             </div>`;
         }
@@ -16984,7 +17216,7 @@
             const unassigned = getUnassignedDormStudents(selectedGender);
             return `<div class="dorm-module-shell"><section class="dorm-room-directory" aria-label="本班学生涉及宿舍"><div class="dorm-room-directory-head"><strong>本班学生宿舍</strong><span>${visibleRooms.length} 间 · 床位数量自适应</span></div><div class="dorm-room-list">${visibleRooms.map(room => {
                 const occupied = room.beds.filter(bed => bed.occupied).length;
-                return `<button type="button" class="dorm-room-chip${room.id === state.dormRoomId ? ' active' : ''}" data-action="select-dorm-overview-room" data-room-id="${room.id}" aria-pressed="${room.id === state.dormRoomId ? 'true' : 'false'}"><strong>${escapeHtml(formatDormRoomName(room))}</strong><span class="dorm-occupancy">已住 <b>${occupied}</b>/${room.beds.length}</span></button>`;
+                return `<button type="button" class="dorm-room-chip${room.id === state.dormRoomId ? ' active' : ''}" data-action="select-dorm-overview-room" data-room-id="${room.id}" aria-pressed="${room.id === state.dormRoomId ? 'true' : 'false'}"><strong>${escapeHtml(formatDormRoomName(room))}</strong><span class="dorm-occupancy">空 <b>${room.beds.length - occupied}</b> 床</span></button>`;
             }).join('')}</div><div class="dorm-room-preview">${renderDormPlan(selectedRoom)}</div></section><div class="class-section-head dorm-unassigned-head"><h2>本班未分配学生（${unassigned.length}）</h2></div><div class="dorm-unassigned-list">${unassigned.length ? unassigned.map(item => `<button type="button" class="dorm-unassigned-card" data-action="open-dorm-picker" data-dorm-id="${item.id}" data-preferred-room-id="${selectedRoom?.id || ''}" aria-label="为${escapeHtml(item.name)}安排宿舍"><span class="student-avatar ${item.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(item)}</span><span class="dorm-unassigned-copy"><strong>${escapeHtml(item.name)}</strong><small>安排</small></span></button>`).join('') : '<div class="dorm-unassigned-empty"><strong>当前暂无未分配学生</strong><span>本班对应学生均已完成床位安排</span></div>'}</div></div>`;
         }
 
@@ -16998,11 +17230,22 @@
             return `${room?.building || '其他楼栋'}::${getDormFloorNumber(room) || '其他'}`;
         }
 
+        function getDormEmptyRoomCount(rooms = []) {
+            return rooms.filter(room => room.beds.length && room.beds.every(bed => !bed.occupied)).length;
+        }
+
+        function getDormEmptyBedCount(rooms = []) {
+            return rooms.reduce((sum, room) => sum + room.beds.filter(bed => !bed.occupied).length, 0);
+        }
+
         function updateSchoolDormNavigation() {
             if (state.classModule !== 'school-dorm') return;
             const level = state.schoolDormLevel || 'buildings';
+            const selectedBuildingRoom = getAllDormRooms().find(room => room.building === state.schoolDormBuilding);
+            const selectedBuildingGender = getDormRoomGender(selectedBuildingRoom?.id);
+            const selectedDormType = selectedBuildingGender === '男' ? '男寝' : (selectedBuildingGender === '女' ? '女寝' : '宿舍');
             if (level === 'floors') classModuleTitle.textContent = `${state.schoolDormBuilding || '宿舍楼'} · 选择楼层`;
-            else if (level === 'rooms') classModuleTitle.textContent = `${state.schoolDormBuilding || '宿舍楼'} · ${state.schoolDormFloor === '其他' ? '其他楼层' : `${state.schoolDormFloor}层`}`;
+            else if (level === 'rooms') classModuleTitle.textContent = `${state.schoolDormBuilding || '宿舍楼'}（${selectedDormType}）`;
             else classModuleTitle.textContent = '全校宿舍';
             const backLabel = level === 'rooms'
                 ? '返回楼层选择'
@@ -17042,19 +17285,35 @@
                         const used = room.beds.filter(bed => bed.occupied).length;
                         const floorNumber = getDormFloorNumber(room) || '其他';
                         const gender = getDormRoomGender(room.id);
-                        return `<button type="button" class="school-dorm-search-result" data-action="open-school-dorm-search-room" data-school-dorm-building="${escapeHtml(room.building || '其他楼栋')}" data-school-dorm-floor="${escapeHtml(floorNumber)}" data-room-id="${escapeHtml(room.id)}"><span><strong>${escapeHtml(formatDormRoomName(room))}</strong><small>${floorNumber === '其他' ? '其他楼层' : `${escapeHtml(floorNumber)}层`} · ${escapeHtml(gender)}寝 · 空 ${room.beds.length - used}床</small></span><span>已住 ${used}/${room.beds.length}</span></button>`;
+                        const emptyBeds = room.beds.length - used;
+                        return `<button type="button" class="school-dorm-search-result" data-action="open-school-dorm-search-room" data-school-dorm-building="${escapeHtml(room.building || '其他楼栋')}" data-school-dorm-floor="${escapeHtml(floorNumber)}" data-room-id="${escapeHtml(room.id)}" aria-label="${escapeHtml(formatDormRoomName(room))}，空${emptyBeds}床"><span><strong>${escapeHtml(formatDormRoomName(room))}（空 ${emptyBeds} 床）</strong><small>${floorNumber === '其他' ? '其他楼层' : `${escapeHtml(floorNumber)}层`} · ${escapeHtml(gender)}生宿舍</small></span><span>${arrow}</span></button>`;
                     }).join('') : '<div class="school-dorm-search-empty">没有找到匹配的宿舍号</div>';
-                    return `<div class="school-dorm-level level-buildings">${quickSearch}<div class="school-dorm-level-head"><span><span>快速定位</span><strong>匹配宿舍</strong></span><small>${matchedRooms.length} 间</small></div><div class="school-dorm-search-results">${results}</div></div>`;
+                    return `<div class="school-dorm-level level-buildings">${quickSearch}<div class="school-dorm-section-title"><span>搜索结果</span><i aria-hidden="true"></i><small>${matchedRooms.length} 间</small></div><div class="school-dorm-search-results">${results}</div></div>`;
                 }
-                const cards = buildingGroups.map(([building, buildingRooms]) => {
-                    const beds = buildingRooms.reduce((sum, room) => sum + room.beds.length, 0);
-                    const used = buildingRooms.reduce((sum, room) => sum + room.beds.filter(bed => bed.occupied).length, 0);
-                    return `<button type="button" class="school-dorm-level-card" data-action="open-school-dorm-building" data-school-dorm-building="${escapeHtml(building)}" aria-label="${escapeHtml(building)}，${buildingRooms.length}间宿舍，已住${used}/${beds}">
-                        <span class="school-dorm-level-copy"><strong>${escapeHtml(building)}</strong></span>
-                        <span class="school-dorm-level-side">已住 ${used}/${beds}${arrow}</span>
+                const groupedBuildings = { '男': [], '女': [], '其他': [] };
+                buildingGroups.forEach(group => {
+                    const counts = group[1].reduce((sum, room) => {
+                        const gender = getDormRoomGender(room.id);
+                        if (gender === '男' || gender === '女') sum[gender] += 1;
+                        return sum;
+                    }, { '男': 0, '女': 0 });
+                    const gender = counts['男'] || counts['女'] ? (counts['男'] >= counts['女'] ? '男' : '女') : '其他';
+                    groupedBuildings[gender].push(group);
+                });
+                const renderBuildingCard = ([building, buildingRooms]) => {
+                    const emptyRooms = getDormEmptyRoomCount(buildingRooms);
+                    const emptyBeds = getDormEmptyBedCount(buildingRooms);
+                    return `<button type="button" class="school-dorm-level-card" data-action="open-school-dorm-building" data-school-dorm-building="${escapeHtml(building)}" aria-label="${escapeHtml(building)}，空房${emptyRooms}间，空床${emptyBeds}个">
+                        <span class="school-dorm-level-copy"><strong>${escapeHtml(building)}（空房 ${emptyRooms} 间，空床 ${emptyBeds} 个）</strong></span>
+                        <span class="school-dorm-level-side">${arrow}</span>
                     </button>`;
-                }).join('');
-                return `<div class="school-dorm-level level-buildings">${quickSearch}<div class="school-dorm-level-head"><span><span>第 1 级</span><strong>选择楼栋</strong></span><small>共 ${buildingGroups.length} 栋</small></div><div class="school-dorm-level-list">${cards}</div></div>`;
+                };
+                const groupMarkup = [
+                    ['男', '男生宿舍'],
+                    ['女', '女生宿舍'],
+                    ['其他', '其他宿舍']
+                ].filter(([gender]) => groupedBuildings[gender].length).map(([gender, label]) => `<section class="school-dorm-group" aria-label="${label}"><div class="school-dorm-group-title"><span>${label}</span><i aria-hidden="true"></i></div><div class="school-dorm-level-list">${groupedBuildings[gender].map(renderBuildingCard).join('')}</div></section>`).join('');
+                return `<div class="school-dorm-level level-buildings">${quickSearch}<div class="school-dorm-building-groups">${groupMarkup}</div></div>`;
             }
 
             const selectedBuildingGroup = buildingGroups.find(([building]) => building === state.schoolDormBuilding);
@@ -17081,15 +17340,15 @@
 
             if (level === 'floors') {
                 const cards = floorGroups.map(([floorNumber, floorRooms]) => {
-                    const beds = floorRooms.reduce((sum, room) => sum + room.beds.length, 0);
-                    const used = floorRooms.reduce((sum, room) => sum + room.beds.filter(bed => bed.occupied).length, 0);
                     const floorLabel = floorNumber === '其他' ? '其他楼层' : `${floorNumber}层`;
-                    return `<button type="button" class="school-dorm-level-card" data-action="open-school-dorm-floor" data-school-dorm-floor="${escapeHtml(floorNumber)}" aria-label="${escapeHtml(state.schoolDormBuilding)}${escapeHtml(floorLabel)}，${floorRooms.length}间宿舍，已住${used}/${beds}">
-                        <span class="school-dorm-level-copy"><strong>${escapeHtml(floorLabel)}</strong></span>
-                        <span class="school-dorm-level-side">已住 ${used}/${beds}${arrow}</span>
+                    const emptyRooms = getDormEmptyRoomCount(floorRooms);
+                    const emptyBeds = getDormEmptyBedCount(floorRooms);
+                    return `<button type="button" class="school-dorm-level-card" data-action="open-school-dorm-floor" data-school-dorm-floor="${escapeHtml(floorNumber)}" aria-label="${escapeHtml(state.schoolDormBuilding)}${escapeHtml(floorLabel)}，空房${emptyRooms}间，空床${emptyBeds}个">
+                        <span class="school-dorm-level-copy"><strong>${escapeHtml(floorLabel)}（空房 ${emptyRooms} 间，空床 ${emptyBeds} 个）</strong></span>
+                        <span class="school-dorm-level-side">${arrow}</span>
                     </button>`;
                 }).join('');
-                return `<div class="school-dorm-level level-floors"><div class="school-dorm-level-head"><span><span>第 2 级 · ${escapeHtml(state.schoolDormBuilding)}</span><strong>选择楼层</strong></span><small>共 ${floorGroups.length} 层</small></div><div class="school-dorm-level-list">${cards}</div></div>`;
+                return `<div class="school-dorm-level level-floors"><div class="school-dorm-section-title"><span>楼层</span><i aria-hidden="true"></i><small>${floorGroups.length} 层</small></div><div class="school-dorm-level-list">${cards}</div></div>`;
             }
 
             const selectedFloorGroup = floorGroups.find(([floorNumber]) => String(floorNumber) === String(state.schoolDormFloor));
@@ -17105,9 +17364,10 @@
                 const used = room.beds.filter(bed => bed.occupied).length;
                 const gender = getDormRoomGender(room.id);
                 const emptyBeds = room.beds.length - used;
-                return `<button type="button" class="school-room-card${room.id === state.dormRoomId ? ' active' : ''}" data-action="select-dorm-overview-room" data-room-id="${escapeHtml(room.id)}" aria-pressed="${room.id === state.dormRoomId ? 'true' : 'false'}" aria-label="${escapeHtml(formatDormRoomName(room))}，${escapeHtml(gender)}寝，空${emptyBeds}床"><strong>${escapeHtml(formatDormRoomName(room))}</strong><span class="school-room-meta ${gender === '男' ? 'male' : 'female'}"><i aria-hidden="true"></i>${escapeHtml(gender)}寝 · 空 ${emptyBeds}床</span></button>`;
+                const roomLabel = String(room.roomNo || room.name || '未命名房间');
+                return `<button type="button" class="school-room-card${room.id === state.dormRoomId ? ' active' : ''}" data-action="select-dorm-overview-room" data-room-id="${escapeHtml(room.id)}" aria-pressed="${room.id === state.dormRoomId ? 'true' : 'false'}" aria-label="${escapeHtml(roomLabel)}，${escapeHtml(gender)}生宿舍，空${emptyBeds}床"><strong>${escapeHtml(roomLabel)}（空 ${emptyBeds} 床）</strong></button>`;
             }).join('');
-            return `<div class="school-dorm-level level-rooms"><div class="school-dorm-level-head"><span><span>第 3 级 · ${escapeHtml(state.schoolDormBuilding)}</span><strong>选择具体房间</strong></span><small>${state.schoolDormFloor === '其他' ? '其他楼层' : `${escapeHtml(state.schoolDormFloor)} 层`} · ${floorRooms.length} 间</small></div><div class="school-dorm-room-grid">${roomCards}</div><div class="school-dorm-room-preview">${renderDormPlan(selectedRoom)}</div></div>`;
+            return `<div class="school-dorm-level level-rooms"><div class="school-dorm-section-title"><span>房间</span><i aria-hidden="true"></i><small>${floorRooms.length} 间</small></div><div class="school-dorm-room-grid">${roomCards}</div><div class="school-dorm-room-preview">${renderDormPlan(selectedRoom)}</div></div>`;
         }
 
         function getDormBuildingSummaryData() {
@@ -17178,7 +17438,7 @@
                 return `<tr>
                     <th scope="row">${escapeHtml(item.building)}</th>
                     <td>${item.totalRooms}</td>
-                    <td><strong>${item.occupiedBeds}</strong><span>/ ${item.totalBeds}</span></td>
+                    <td>${item.emptyRooms}</td>
                     <td>${item.emptyBeds}</td>
                     <td><span class="dorm-table-rate">${rate}%</span></td>
                 </tr>`;
@@ -17188,9 +17448,9 @@
                 <div class="dorm-table-scroll">
                     <table class="dorm-stats-table dorm-building-table">
                         <caption><span>楼栋床位汇总</span><em>更新至今日</em></caption>
-                        <thead><tr><th scope="col">楼栋</th><th scope="col">房间</th><th scope="col">已住/床位</th><th scope="col">空床</th><th scope="col">入住率</th></tr></thead>
+                        <thead><tr><th scope="col">楼栋</th><th scope="col">房间</th><th scope="col">空房</th><th scope="col">空床</th><th scope="col">入住率</th></tr></thead>
                         <tbody>${rowMarkup}</tbody>
-                        <tfoot><tr><th scope="row">合计</th><td>${totals.totalRooms}</td><td><strong>${totals.occupiedBeds}</strong><span>/ ${totals.totalBeds}</span></td><td>${totals.emptyBeds}</td><td><span class="dorm-table-rate total">${totalRate}%</span></td></tr></tfoot>
+                        <tfoot><tr><th scope="row">合计</th><td>${totals.totalRooms}</td><td>${totals.emptyRooms}</td><td>${totals.emptyBeds}</td><td><span class="dorm-table-rate total">${totalRate}%</span></td></tr></tfoot>
                     </table>
                 </div>
             </section>`;
