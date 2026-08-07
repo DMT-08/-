@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#EFF6FF">
-    <title>掌上校园 · 历史残留与依赖精简 7.97</title>
+    <title>掌上校园 · 搜索清除与课表中文输入修复 7.106</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
             --brand: #1F5FFF;
@@ -1734,35 +1735,42 @@
         .pending-leaf-action > .pending-count-badge { top: -5px; right: -5px; }
         .module-card-actions .pending-leaf-action > .pending-count-badge { top: -4px; right: -4px; }
 
-        .guardian-call-root { margin: 0 2px 4px; }
+        .guardian-call-root {
+            max-height: min(52vh, 360px);
+            margin: 0 2px 4px;
+            overflow-x: hidden;
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+        .guardian-call-root::-webkit-scrollbar { display: none; }
         .call-sheet [hidden] { display: none !important; }
-        .guardian-call-list { display: grid; gap: 8px; }
+        .guardian-call-list { display: grid; border-top: 1px solid rgba(15,23,42,.06); }
         .guardian-call-card {
             min-width: 0;
             display: grid;
-            grid-template-columns: 32px minmax(0,1fr) 78px;
+            grid-template-columns: minmax(0,1fr) 62px;
             align-items: center;
-            gap: 10px;
-            padding: 11px 12px;
-            border: 1px solid rgba(255,255,255,.94);
-            border-radius: 16px;
-            background: rgba(255,255,255,.78);
-            box-shadow: 0 7px 18px rgba(31,95,255,.05);
+            gap: 7px;
+            min-height: 48px;
+            padding: 6px 2px;
+            border: 0;
+            border-bottom: 1px solid rgba(15,23,42,.06);
+            background: transparent;
         }
-        .guardian-call-index { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 10px; color: var(--brand); background: rgba(31,95,255,.10); font-size: 10px; font-weight: 950; }
-        .guardian-call-copy { min-width: 0; }
-        .guardian-call-copy > span { display: block; color: var(--muted); font-size: 9px; font-weight: 800; }
-        .guardian-call-copy strong { display: block; margin-top: 2px; overflow: hidden; color: var(--ink); font-size: 13px; font-weight: 950; text-overflow: ellipsis; white-space: nowrap; }
-        .guardian-call-copy em { display: block; margin-top: 3px; color: var(--body); font-size: 10px; font-style: normal; font-weight: 850; font-variant-numeric: tabular-nums; }
-        .guardian-call-actions { display: grid; grid-template-columns: 34px 38px; gap: 6px; }
+        .guardian-call-copy { min-width: 0; display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 7px; }
+        .guardian-call-copy strong { min-width: 0; display: flex; align-items: baseline; gap: 4px; overflow: hidden; color: var(--ink); font-size: 12px; font-weight: 900; white-space: nowrap; }
+        .guardian-call-copy strong b { flex: 0 0 auto; color: var(--muted); font-size: 10px; font-weight: 750; }
+        .guardian-call-copy strong span { overflow: hidden; text-overflow: ellipsis; }
+        .guardian-call-copy em { color: var(--body); font-size: 10px; font-style: normal; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .guardian-call-actions { display: grid; grid-template-columns: 26px 32px; align-items: center; gap: 4px; }
         .guardian-copy-action,
-        .guardian-dial-action { height: 34px; display: grid; place-items: center; border-radius: 10px; }
+        .guardian-dial-action { height: 32px; display: grid; place-items: center; border-radius: 10px; }
         .guardian-copy-action { border: 1px solid rgba(31,95,255,.13); color: var(--brand); background: rgba(31,95,255,.08); }
         .guardian-dial-action { color: #fff; background: var(--brand); box-shadow: 0 6px 14px rgba(31,95,255,.18); }
         .guardian-copy-action:active,
         .guardian-dial-action:active { transform: scale(.94); }
         .guardian-copy-action svg,
-        .guardian-dial-action svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; }
+        .guardian-dial-action svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; }
 
         .material-thumb-open { width: 100%; display: block; padding: 0; border: 0; color: inherit; background: transparent; text-align: left; }
         .material-thumb-open:active { transform: scale(.98); }
@@ -2364,7 +2372,7 @@
             min-height: 36px;
             display: grid;
             padding: 0 8px;
-            border-bottom: 1px solid rgba(15,23,42,.07);
+            border-bottom: 1px solid transparent;
             color: var(--muted);
             background: rgba(239,246,255,.72);
             font-size: 9px;
@@ -8382,29 +8390,42 @@
             border-radius: 24px 24px 0 0;
             background: #FFFFFF;
         }
-        .student-add-toolbar { position: sticky; top: -1px; z-index: 18; padding-bottom: 10px; background: #FFFFFF; }
-        .student-add-result-head { display: flex; align-items: center; justify-content: space-between; min-height: 40px; border-bottom: 1px solid rgba(15,23,42,.07); }
-        .student-add-result-head strong { color: var(--ink); font-size: 14px; font-weight: 900; }
-        .student-add-result-head span { color: var(--muted); font-size: 11px; font-weight: 750; }
-        .unassigned-student-list { display: grid; }
+        .student-add-toolbar { position: sticky; top: -1px; z-index: 18; padding-bottom: 8px; background: #FFFFFF; }
+        .student-add-result-head { display: flex; align-items: center; justify-content: space-between; min-height: 42px; border-bottom: 1px solid rgba(15,23,42,.07); }
+        .student-add-result-count { color: var(--muted); font-size: 11px; font-weight: 750; font-variant-numeric: tabular-nums; }
+        .student-add-toggle-all { min-width: 74px; height: 32px; padding: 0 10px; border: 1px solid rgba(31,95,255,.14); border-radius: 10px; color: var(--brand); background: rgba(31,95,255,.07); font-size: 11px; font-weight: 900; }
+        .student-add-toggle-all.active { color: #1747C8; border-color: rgba(31,95,255,.22); background: rgba(31,95,255,.11); }
+        .student-add-toggle-all:disabled { color: #94A3B8; border-color: rgba(100,116,139,.10); background: #F8FAFC; }
+        .unassigned-student-list { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 8px 4px; padding: 12px 0 18px; }
         .unassigned-student-row {
+            position: relative;
             width: 100%;
-            min-height: 62px;
-            display: grid;
-            grid-template-columns: 40px minmax(0,1fr) auto;
+            min-width: 0;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 10px;
-            padding: 10px 2px;
+            justify-content: flex-start;
+            gap: 7px;
+            padding: 4px 1px 3px;
             border: 0;
-            border-bottom: 1px solid rgba(15,23,42,.065);
             color: inherit;
             background: transparent;
-            text-align: left;
+            text-align: center;
         }
-        .unassigned-student-row:active { background: #F4F7FC; transform: scale(.98); }
-        .unassigned-student-copy strong { display: block; color: var(--ink); font-size: 14px; font-weight: 850; }
-        .unassigned-student-copy span { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; font-weight: 650; }
-        .unassigned-add-label { min-width: 52px; height: 30px; display: grid; place-items: center; border-radius: 9px; color: var(--brand); background: rgba(31,95,255,.08); font-size: 11px; font-weight: 900; }
+        .unassigned-student-row:active { background: rgba(31,95,255,.045); transform: scale(.97); }
+        .unassigned-student-row .student-avatar { width: 44px; height: 44px; flex: 0 0 44px; transition: box-shadow .18s ease, transform .18s ease; }
+        .unassigned-student-name { width: 100%; overflow: hidden; color: var(--ink); font-size: 12px; font-weight: 850; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
+        .unassigned-student-check { position: absolute; top: 1px; right: 7px; width: 17px; height: 17px; display: grid; place-items: center; border: 2px solid #FFFFFF; border-radius: 50%; color: #FFFFFF; background: var(--brand); box-shadow: 0 3px 8px rgba(31,95,255,.22); opacity: 0; transform: scale(.62); transition: opacity .16s ease, transform .16s ease; }
+        .unassigned-student-check svg { width: 10px; height: 10px; fill: none; stroke: currentColor; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round; }
+        .unassigned-student-row.selected .student-avatar { box-shadow: 0 0 0 2px #FFFFFF,0 0 0 4px rgba(31,95,255,.42); transform: translateY(-1px); }
+        .unassigned-student-row.selected .unassigned-student-name { color: var(--brand); font-weight: 900; }
+        .unassigned-student-row.selected .unassigned-student-check { opacity: 1; transform: scale(1); }
+        .unassigned-student-list > .roster-empty { grid-column: 1 / -1; padding-block: 34px; }
+        .class-module-scroll.has-student-add-action { padding-bottom: 112px; }
+        .module-floating-add.student-add-confirm { left: 20px; right: 20px; bottom: 22px; width: auto; min-width: 0; height: 44px; border-radius: 12px; transform: none; }
+        .module-floating-add.student-add-confirm:active { transform: scale(.98); }
+        .module-floating-add.student-add-confirm:disabled { color: #FFFFFF; border-color: rgba(203,213,225,.95); background: #CBD5E1; box-shadow: none; }
 
         .repair-tabs,
         .student-discipline-tabs {
@@ -9120,6 +9141,912 @@
         .gap-3 { gap: 0.75rem; }
         .col-span-2 { grid-column: span 2 / span 2; }
 
+        /* 7.98：班级学生搜索回归内容流，未知性别统一使用灰色头像。 */
+        #classInfoPanel .class-roster-search {
+            position: static;
+            margin: 0;
+            padding: 0 0 10px;
+            background: transparent;
+            box-shadow: none;
+        }
+        #classInfoPanel .class-roster-search .roster-search {
+            position: relative;
+            margin: 0;
+            border-bottom: 1px solid rgba(15,23,42,.07);
+            background: transparent;
+            box-shadow: none;
+        }
+        #classInfoPanel .class-roster-search .roster-search > svg { display: none; }
+        #classInfoPanel .class-roster-search .roster-search input {
+            height: 56px;
+            padding: 0 42px 0 2px;
+            border: 0;
+            border-radius: 0;
+            color: var(--ink);
+            background: transparent;
+            box-shadow: none;
+            font-size: 14px;
+            font-weight: 650;
+        }
+        #classInfoPanel .class-roster-search .roster-search input::placeholder {
+            color: #94A3B8;
+            opacity: 1;
+        }
+        #classInfoPanel .class-roster-search .roster-search input:focus {
+            border: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+        #classInfoPanel .class-roster-search .roster-search:focus-within {
+            border-bottom-color: rgba(31,95,255,.28);
+        }
+        #classInfoPanel .class-roster-search .roster-search-clear {
+            top: 12px;
+            right: 0;
+            color: #64748B;
+            background: transparent;
+        }
+        #classInfoPanel .class-roster-search .roster-search-clear:active {
+            color: var(--brand);
+            background: rgba(31,95,255,.07);
+            transform: scale(.95);
+        }
+        .student-avatar.unknown,
+        .log-student-avatar.unknown,
+        .discipline-avatar.unknown,
+        .leave-detail-avatar.unknown,
+        .hero-avatar.unknown {
+            color: #64748B;
+            background: #F1F5F9;
+        }
+
+        /* 7.99：五列学生头像显式遵守 hidden，搜索结果不再被 display:flex 覆盖。 */
+        #classInfoPanel .class-student-row[hidden] {
+            display: none !important;
+        }
+
+        /* 7.100：压缩学生列表标题与搜索输入之间的垂直间距。 */
+        #classInfoPanel #classStudentSection {
+            margin-bottom: 0;
+        }
+        #classInfoPanel .class-roster-search {
+            padding-bottom: 6px;
+        }
+        #classInfoPanel .class-roster-search .roster-search input {
+            height: 40px;
+        }
+        #classInfoPanel .class-roster-search .roster-search-clear {
+            top: 4px;
+        }
+
+        /* 7.102：补齐未选班级学生空态，并开放可筛选的全周班级课表。 */
+        .student-add-surface {
+            min-height: 0;
+            margin-inline: 0;
+            padding: 0;
+            border-radius: 0;
+            background: transparent;
+        }
+        .student-add-empty {
+            min-height: 390px;
+            display: grid;
+            place-items: center;
+            padding: 42px 20px 72px;
+            text-align: center;
+        }
+        .student-add-empty-mark {
+            width: 72px;
+            height: 72px;
+            display: grid;
+            place-items: center;
+            margin: 0 auto 18px;
+            border-radius: 22px;
+            color: #64748B;
+            background: #F1F5F9;
+        }
+        .student-add-empty-mark svg {
+            width: 34px;
+            height: 34px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.1;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .student-add-empty strong {
+            display: block;
+            color: var(--ink);
+            font-size: 16px;
+            font-weight: 800;
+            line-height: 24px;
+        }
+        .student-add-empty span {
+            display: block;
+            max-width: 230px;
+            margin: 7px auto 0;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 500;
+            line-height: 20px;
+        }
+        .unassigned-student-list > .student-add-empty { grid-column: 1 / -1; width: 100%; }
+        #classModuleView.student-add-mode #classModuleRoot {
+            min-height: 0;
+            padding-bottom: 18px;
+            border-radius: 24px;
+            box-shadow: 0 -1px 0 rgba(255,255,255,.96);
+        }
+
+        .class-schedule-surface {
+            --schedule-line: rgba(71,85,105,.12);
+            min-height: calc(100% - 18px);
+            margin-inline: -4px;
+            padding: 0 0 26px;
+        }
+        .class-schedule-tools {
+            display: grid;
+            gap: 12px;
+            padding: 0 4px 14px;
+        }
+        .class-schedule-search {
+            position: relative;
+        }
+        .class-schedule-search > svg {
+            position: absolute;
+            top: 50%;
+            left: 13px;
+            width: 17px;
+            height: 17px;
+            fill: none;
+            stroke: #64748B;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+        .class-schedule-search input {
+            width: 100%;
+            height: 40px;
+            padding: 0 42px 0 40px;
+            border: 1px solid rgba(100,116,139,.12);
+            border-radius: 12px;
+            outline: 0;
+            color: var(--ink);
+            background: #F8FAFC;
+            font-size: 14px;
+            font-weight: 600;
+            transition: border-color .18s ease, background .18s ease, box-shadow .18s ease;
+        }
+        .class-schedule-search input::placeholder { color: #94A3B8; }
+        .class-schedule-search input:focus {
+            border-color: rgba(31,95,255,.30);
+            background: #FFFFFF;
+            box-shadow: 0 0 0 3px rgba(31,95,255,.07);
+        }
+        .class-schedule-clear {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 32px;
+            height: 32px;
+            display: grid;
+            place-items: center;
+            border: 0;
+            border-radius: 9px;
+            color: #64748B;
+            background: transparent;
+        }
+        .class-schedule-clear[hidden] { display: none; }
+        .class-schedule-clear svg {
+            width: 15px;
+            height: 15px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.3;
+            stroke-linecap: round;
+        }
+        .class-schedule-clear:active { color: var(--brand); background: rgba(31,95,255,.07); transform: scale(.95); }
+        .class-schedule-days {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 4px;
+        }
+        .class-schedule-day {
+            position: relative;
+            min-width: 0;
+        }
+        .class-schedule-day input {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .class-schedule-day span {
+            height: 32px;
+            display: grid;
+            place-items: center;
+            border: 1px solid rgba(100,116,139,.10);
+            border-radius: 9px;
+            color: #64748B;
+            background: #F8FAFC;
+            font-size: 11px;
+            font-weight: 700;
+            transition: color .16s ease, border-color .16s ease, background .16s ease, transform .16s ease;
+        }
+        .class-schedule-day input:checked + span {
+            border-color: var(--brand);
+            color: #FFFFFF;
+            background: var(--brand);
+        }
+        .class-schedule-day input:focus-visible + span { box-shadow: 0 0 0 3px rgba(31,95,255,.15); }
+        .class-schedule-day:active span { transform: scale(.95); }
+        .class-schedule-day input:disabled + span { opacity: .62; }
+        .class-schedule-result {
+            min-height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 0 5px 8px;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .class-schedule-result strong { color: var(--ink); font-weight: 800; }
+        .class-schedule-result .has-result { color: var(--brand); }
+        .class-schedule-table-shell {
+            overflow: hidden;
+            border: 1px solid var(--schedule-line);
+            border-radius: 14px;
+            background: #FFFFFF;
+        }
+        .class-schedule-table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+            color: var(--body);
+        }
+        .class-schedule-table th,
+        .class-schedule-table td {
+            overflow: hidden;
+            border-right: 1px solid var(--schedule-line);
+            border-bottom: 1px solid var(--schedule-line);
+            text-align: center;
+            vertical-align: middle;
+        }
+        .class-schedule-table tr > :last-child { border-right: 0; }
+        .class-schedule-table tbody tr:last-child > * { border-bottom: 0; }
+        .class-schedule-table thead th {
+            height: 34px;
+            color: #475569;
+            background: #F8FAFC;
+            font-size: 10px;
+            font-weight: 800;
+            line-height: 14px;
+        }
+        .class-schedule-table thead th:first-child {
+            width: 36px;
+            color: #94A3B8;
+        }
+        .class-schedule-table tbody th {
+            width: 36px;
+            height: 49px;
+            color: #64748B;
+            background: #FBFCFE;
+            font-size: 10px;
+            font-weight: 800;
+            line-height: 14px;
+        }
+        .class-schedule-table td {
+            height: 49px;
+            padding: 3px 2px;
+            background: #FFFFFF;
+        }
+        .schedule-course {
+            min-height: 38px;
+            display: grid;
+            place-items: center;
+            padding: 2px;
+            border-radius: 7px;
+            color: #334155;
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 13px;
+            word-break: auto-phrase;
+            overflow-wrap: break-word;
+            transition: opacity .16s ease, color .16s ease, background .16s ease;
+        }
+        .schedule-course.empty { color: transparent; }
+        .class-schedule-table.searching .schedule-course:not(.matched):not(.empty) { opacity: .20; }
+        .class-schedule-table.searching .schedule-course.matched {
+            color: #1747C8;
+            background: rgba(31,95,255,.10);
+        }
+        .schedule-hidden-day { display: none; }
+        .class-schedule-no-result {
+            padding: 14px 4px 0;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        /* 7.103：未选学生、家校联系与独立课表二版。 */
+        #classModuleView.student-add-mode:not(.student-status-mode) #classModuleRoot {
+            min-height: 0;
+            margin-inline: 0;
+            padding: 0 0 18px;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+        #classModuleView.student-add-mode .class-module-scroll.content-surface-passed {
+            background: transparent;
+        }
+        #classModuleView.student-add-mode .student-add-toolbar {
+            background: linear-gradient(135deg, rgba(239,246,255,.97), rgba(223,231,255,.95));
+        }
+        .unassigned-student-list {
+            gap: 11px 4px;
+        }
+        .unassigned-student-row {
+            min-height: 78px;
+        }
+        .unassigned-student-avatar-line {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        .unassigned-student-row .student-avatar {
+            width: 40px;
+            height: 40px;
+            flex-basis: 40px;
+        }
+        .unassigned-student-check {
+            position: static;
+            width: 17px;
+            height: 17px;
+            flex: 0 0 17px;
+            border: 1.5px solid #B9C4D3;
+            border-radius: 5px;
+            color: transparent;
+            background: rgba(255,255,255,.72);
+            box-shadow: none;
+            opacity: 1;
+            transform: none;
+        }
+        .unassigned-student-row.selected .unassigned-student-check {
+            border-color: var(--brand);
+            color: #FFFFFF;
+            background: var(--brand);
+            box-shadow: 0 3px 8px rgba(31,95,255,.18);
+            opacity: 1;
+            transform: none;
+        }
+
+        .guardian-call-card {
+            grid-template-columns: minmax(0,1fr) auto;
+            gap: 12px;
+            min-height: 62px;
+            padding: 8px 2px;
+        }
+        .guardian-call-copy {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 5px;
+        }
+        .guardian-call-copy strong {
+            width: 100%;
+        }
+        .guardian-call-copy em {
+            color: #475569;
+            font-size: 11px;
+            font-weight: 750;
+            letter-spacing: .02em;
+        }
+        .guardian-call-actions {
+            grid-template-columns: 36px 36px;
+            gap: 10px;
+        }
+        .guardian-copy-action,
+        .guardian-dial-action {
+            width: 36px;
+            height: 36px;
+            border-radius: 11px;
+        }
+        .guardian-copy-action {
+            border-color: rgba(100,116,139,.14);
+            color: #475569;
+            background: #F1F5F9;
+        }
+
+        #classModuleView.schedule-v2-mode {
+            background: #EEF3F9;
+        }
+        #classModuleView.schedule-v2-mode .topbar {
+            grid-template-columns: 44px minmax(0,1fr) 44px;
+            background: linear-gradient(180deg, rgba(238,243,249,.99), rgba(238,243,249,.88));
+        }
+        #classModuleView.schedule-v2-mode .nav-title {
+            color: #111827;
+            font-size: 22px;
+            font-weight: 850;
+            letter-spacing: -.02em;
+        }
+        #classModuleView.schedule-v2-mode .class-module-scroll {
+            padding-inline: 14px;
+            background: #EEF3F9;
+        }
+        #classModuleView.schedule-v2-mode .class-module-scroll.content-surface-passed {
+            background: #EEF3F9;
+        }
+        #classModuleView.schedule-v2-mode #classModuleRoot {
+            min-height: 0;
+            margin-inline: 0;
+            padding: 0 0 28px;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+        .schedule-v2-surface {
+            --schedule-v2-row: 88px;
+            --schedule-v2-head: 42px;
+            min-width: 0;
+        }
+        .schedule-v2-card {
+            min-width: 0;
+            padding: 9px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,.92);
+            border-radius: 22px;
+            background: #FFFFFF;
+            box-shadow: 0 12px 30px rgba(50,72,110,.10);
+        }
+        .schedule-v2-grid {
+            min-width: 0;
+            display: grid;
+            grid-template-columns: 42px minmax(0,1fr);
+        }
+        .schedule-v2-period-rail {
+            position: relative;
+            z-index: 3;
+            background: #FFFFFF;
+            box-shadow: 8px 0 15px -15px rgba(15,23,42,.35);
+        }
+        .schedule-v2-corner,
+        .schedule-v2-period {
+            display: grid;
+            place-items: center;
+            border-bottom: 1px solid rgba(100,116,139,.07);
+            color: #7B8798;
+            font-size: 10px;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .schedule-v2-corner { height: var(--schedule-v2-head); }
+        .schedule-v2-period { height: var(--schedule-v2-row); }
+        .schedule-v2-period:last-child { border-bottom: 0; }
+        .schedule-v2-days-scroll {
+            min-width: 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: none;
+            overscroll-behavior-x: contain;
+            scroll-snap-type: x proximity;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+        .schedule-v2-days-scroll::-webkit-scrollbar { display: none; }
+        .schedule-v2-days-grid {
+            width: 233.333333%;
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0,1fr));
+            grid-template-rows: var(--schedule-v2-head) repeat(9, var(--schedule-v2-row));
+        }
+        .schedule-v2-day-header {
+            display: grid;
+            place-items: center;
+            border-bottom: 1px solid rgba(100,116,139,.07);
+            color: #475569;
+            background: #FFFFFF;
+            font-size: 11px;
+            font-weight: 800;
+            scroll-snap-align: start;
+        }
+        .schedule-v2-day-header.active { color: var(--brand); }
+        .schedule-v2-cell {
+            min-width: 0;
+            height: var(--schedule-v2-row);
+            padding: 4px;
+            border-bottom: 1px solid rgba(100,116,139,.07);
+            background: #FFFFFF;
+        }
+        .schedule-v2-cell:nth-last-child(-n + 7) { border-bottom: 0; }
+        .schedule-v2-course {
+            height: 100%;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 8px 7px;
+            overflow: hidden;
+            border-radius: 12px;
+            color: #334155;
+            transition: opacity .17s ease, box-shadow .17s ease, transform .17s ease;
+        }
+        .schedule-v2-course.tone-blue { background: #EDF4FF; }
+        .schedule-v2-course.tone-green { background: #EDF8F4; }
+        .schedule-v2-course.tone-orange { background: #FFF5E8; }
+        .schedule-v2-course.tone-slate { background: #F2F5F8; }
+        .schedule-v2-course strong,
+        .schedule-v2-course span,
+        .schedule-v2-course small {
+            display: block;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .schedule-v2-course strong {
+            color: #1F2937;
+            font-size: 13px;
+            font-weight: 850;
+            line-height: 18px;
+        }
+        .schedule-v2-course > span {
+            margin-top: 4px;
+            color: #536175;
+            font-size: 10px;
+            font-weight: 650;
+            line-height: 14px;
+        }
+        .schedule-v2-course small {
+            margin-top: 4px;
+            color: #8A97A8;
+            font-size: 9px;
+            font-weight: 550;
+            line-height: 12px;
+        }
+        .schedule-v2-course.is-muted { opacity: .18; }
+        .schedule-v2-course.is-match {
+            box-shadow: inset 0 0 0 1.5px rgba(31,95,255,.34), 0 5px 12px rgba(31,95,255,.08);
+        }
+        .schedule-v2-empty-cell {
+            height: 100%;
+            border-radius: 12px;
+            background: linear-gradient(180deg, rgba(248,250,252,.62), rgba(248,250,252,.16));
+        }
+        .schedule-v2-no-result {
+            margin: 12px 0 0;
+            color: #64748B;
+            font-size: 12px;
+            font-weight: 650;
+            text-align: center;
+        }
+
+        /* 7.104：双版课表统一课程分类配色；二版去除筛选与大外框，直接横向拖动。 */
+        .schedule-course.tone-blue,
+        .schedule-v2-course.tone-blue { background: #EAF3FF; }
+        .schedule-course.tone-green,
+        .schedule-v2-course.tone-green { background: #EAF7F0; }
+        .schedule-course.tone-orange,
+        .schedule-v2-course.tone-orange { background: #FFF2E3; }
+        .schedule-course.tone-slate,
+        .schedule-v2-course.tone-slate { background: #F1F4F7; }
+
+        #classModuleView.schedule-v2-mode .class-module-scroll {
+            padding-inline: 0;
+            background: #F7F9FC;
+        }
+        #classModuleView.schedule-v2-mode .class-module-scroll.content-surface-passed {
+            background: #F7F9FC;
+        }
+        #classModuleView.schedule-v2-mode #classModuleRoot {
+            padding-bottom: 18px;
+        }
+        .schedule-v2-surface {
+            --schedule-v2-row: 60px;
+            --schedule-v2-head: 38px;
+            width: 100%;
+        }
+        .schedule-v2-card {
+            padding: 0;
+            overflow: hidden;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+        .schedule-v2-grid {
+            grid-template-columns: 34px minmax(0,1fr);
+        }
+        .schedule-v2-period-rail {
+            background: #F7F9FC;
+            box-shadow: 7px 0 14px -14px rgba(15,23,42,.5);
+        }
+        .schedule-v2-corner,
+        .schedule-v2-period {
+            border-color: rgba(71,85,105,.11);
+            color: #728096;
+            background: #F7F9FC;
+            font-size: 10px;
+        }
+        .schedule-v2-days-scroll {
+            cursor: grab;
+            touch-action: pan-x pan-y;
+            scroll-snap-type: x proximity;
+        }
+        .schedule-v2-days-scroll:active { cursor: grabbing; }
+        .schedule-v2-days-grid {
+            width: 218.75%;
+            grid-template-rows: var(--schedule-v2-head) repeat(9, var(--schedule-v2-row));
+        }
+        .schedule-v2-day-header {
+            border-right: 1px solid rgba(71,85,105,.08);
+            border-bottom-color: rgba(71,85,105,.12);
+            color: #475569;
+            background: #F7F9FC;
+            font-size: 11px;
+        }
+        .schedule-v2-cell {
+            padding: 3px;
+            border-right: 1px solid rgba(71,85,105,.08);
+            border-bottom-color: rgba(71,85,105,.10);
+            background: rgba(255,255,255,.45);
+        }
+        .schedule-v2-course {
+            justify-content: center;
+            padding: 6px;
+            border-radius: 8px;
+        }
+        .schedule-v2-course strong {
+            display: -webkit-box;
+            overflow: hidden;
+            color: #253246;
+            font-size: 12px;
+            font-weight: 850;
+            line-height: 16px;
+            white-space: normal;
+            overflow-wrap: break-word;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+        }
+        .schedule-v2-course > span {
+            margin-top: 2px;
+            color: #64748B;
+            font-size: 10px;
+            font-weight: 650;
+            line-height: 13px;
+        }
+        .schedule-v2-course small { display: none; }
+        .schedule-v2-empty-cell {
+            border-radius: 0;
+            background: transparent;
+        }
+
+        /* 7.105：双版课表共用紧贴标题栏的满高内容面、单一搜索与纵向换行规则。 */
+        #classModuleView.schedule-v1-mode,
+        #classModuleView.schedule-v2-mode {
+            background: linear-gradient(135deg, #EFF6FF 0%, #DFE7FF 100%);
+        }
+        #classModuleView.schedule-v1-mode .topbar,
+        #classModuleView.schedule-v2-mode .topbar {
+            grid-template-columns: 48px minmax(0,1fr) 60px;
+            background: linear-gradient(180deg, rgba(239,246,255,.98), rgba(239,246,255,.78));
+        }
+        #classModuleView.schedule-v1-mode .nav-title,
+        #classModuleView.schedule-v2-mode .nav-title {
+            color: var(--ink);
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: .02em;
+        }
+        #classModuleView.schedule-v1-mode .class-module-scroll,
+        #classModuleView.schedule-v2-mode .class-module-scroll {
+            inset: 104px 0 0;
+            padding: 0;
+            background: transparent;
+        }
+        #classModuleView.schedule-v1-mode .class-module-scroll.content-surface-passed,
+        #classModuleView.schedule-v2-mode .class-module-scroll.content-surface-passed {
+            background: transparent;
+        }
+        #classModuleView.schedule-v1-mode #classModuleRoot,
+        #classModuleView.schedule-v2-mode #classModuleRoot {
+            width: 100%;
+            height: 100%;
+            min-height: 100%;
+            display: flex;
+            margin: 0;
+            padding: 14px 16px 16px;
+            overflow: hidden;
+            border-radius: 24px 24px 0 0;
+            background: #FFFFFF;
+            box-shadow: 0 -1px 0 rgba(255,255,255,.96);
+        }
+        .class-schedule-surface,
+        .schedule-v2-surface {
+            width: 100%;
+            min-width: 0;
+            min-height: 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            padding: 0;
+        }
+        .class-schedule-tools {
+            display: block;
+            flex: 0 0 auto;
+            padding: 0 0 10px;
+        }
+        .class-schedule-days,
+        .class-schedule-result {
+            display: none;
+        }
+        .class-schedule-search input {
+            height: 40px;
+            background: #F6F8FB;
+        }
+        .class-schedule-table-shell {
+            min-height: 0;
+            flex: 1;
+            overflow: hidden;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+        }
+        .class-schedule-table {
+            height: 100%;
+        }
+        .class-schedule-table thead {
+            height: 34px;
+        }
+        .class-schedule-table tbody {
+            height: calc(100% - 34px);
+        }
+        .class-schedule-table tbody tr {
+            height: 11.111111%;
+        }
+        .class-schedule-table thead th,
+        .class-schedule-table tbody th,
+        .class-schedule-table td {
+            height: auto;
+        }
+        .class-schedule-table thead th:first-child,
+        .class-schedule-table tbody th {
+            width: 34px;
+        }
+        .class-schedule-table td {
+            padding: 3px 2px;
+        }
+        .schedule-course {
+            width: 100%;
+            height: 100%;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3px 2px;
+            overflow: hidden;
+        }
+        .schedule-course strong,
+        .schedule-course > span {
+            width: 100%;
+            min-width: 0;
+            display: -webkit-box;
+            overflow: hidden;
+            text-align: center;
+            white-space: normal;
+            overflow-wrap: break-word;
+            -webkit-box-orient: vertical;
+        }
+        .schedule-course strong {
+            color: #253246;
+            font-size: 10px;
+            font-weight: 800;
+            line-height: 13px;
+            -webkit-line-clamp: 2;
+        }
+        .schedule-course > span {
+            margin-top: 2px;
+            color: #64748B;
+            font-size: 9px;
+            font-weight: 650;
+            line-height: 12px;
+            -webkit-line-clamp: 1;
+        }
+        .schedule-course.empty {
+            color: transparent;
+            background: transparent;
+        }
+        .class-schedule-table.searching .schedule-course.matched {
+            opacity: 1;
+            box-shadow: inset 0 0 0 1.5px rgba(31,95,255,.30);
+        }
+        .schedule-v2-surface {
+            gap: 10px;
+        }
+        .schedule-v2-card {
+            min-height: 0;
+            flex: 1;
+        }
+        .schedule-v2-grid,
+        .schedule-v2-days-scroll,
+        .schedule-v2-days-grid {
+            height: 100%;
+        }
+        .schedule-v2-grid {
+            grid-template-columns: 34px minmax(0,1fr);
+        }
+        .schedule-v2-period-rail,
+        .schedule-v2-days-grid {
+            display: grid;
+            grid-template-rows: 34px repeat(9, minmax(0,1fr));
+        }
+        .schedule-v2-period-rail {
+            background: #FFFFFF;
+        }
+        .schedule-v2-corner,
+        .schedule-v2-period,
+        .schedule-v2-cell {
+            height: auto;
+        }
+        .schedule-v2-days-grid {
+            width: 168%;
+        }
+        .schedule-v2-day-header,
+        .schedule-v2-cell {
+            background: #FFFFFF;
+        }
+        .schedule-v2-course {
+            padding: 5px 4px;
+        }
+        .schedule-v2-course strong,
+        .schedule-v2-course > span {
+            display: -webkit-box;
+            overflow: hidden;
+            white-space: normal;
+            overflow-wrap: break-word;
+            -webkit-box-orient: vertical;
+        }
+        .schedule-v2-course strong {
+            font-size: 11px;
+            line-height: 14px;
+            -webkit-line-clamp: 2;
+        }
+        .schedule-v2-course > span {
+            margin-top: 2px;
+            font-size: 9px;
+            line-height: 12px;
+            -webkit-line-clamp: 1;
+        }
+        .schedule-v2-surface.searching .schedule-v2-course:not(.is-match) {
+            opacity: .20;
+        }
+        .schedule-v2-surface.searching .schedule-v2-course.is-match {
+            opacity: 1;
+            box-shadow: inset 0 0 0 1.5px rgba(31,95,255,.30);
+        }
+
+        /* 7.106：统一保留搜索框原生清除按钮，移除重复的前置蓝色清除按钮。 */
+        .class-search-clear,
+        .student-search-clear,
+        .roster-search-clear,
+        .leave-search-clear,
+        .student-log-search-clear,
+        .class-schedule-clear {
+            display: none !important;
+        }
+
     </style>
 </head>
 <body>
@@ -9526,7 +10453,7 @@
                 { subject: '语文', score: '86', rank: '12', rankTotal: '46', examType: '入学摸底', date: '2026-09-08' },
                 { subject: '数学', score: '89', rank: '9', rankTotal: '46', examType: '入学摸底', date: '2026-09-08' },
                 { subject: '英语', score: '84', rank: '15', rankTotal: '46', examType: '入学摸底', date: '2026-09-08' },
-                { subject: '护理基础', score: '92', rank: '5', rankTotal: '46', examType: '入学摸底', date: '2026-09-08' }
+                { subject: 'Java', score: '92', rank: '5', rankTotal: '46', examType: '入学摸底', date: '2026-09-08' }
             ],
             attachments: [
                 { name: '身份证正面', status: '审核通过', updatedAt: '2026-06-18', note: '人像面清晰' },
@@ -9538,18 +10465,18 @@
             avatarUrl: '',
             currentAttendance: '在校',
             attendanceRecords: [
-                { date: shiftedDateValue(0), time: '08:03', status: '在校', course: '护理礼仪', period: '第 1 节', recordedBy: '周老师' },
+                { date: shiftedDateValue(0), time: '08:03', status: '在校', course: 'Java', period: '第 1 节', recordedBy: '周老师' },
                 { date: shiftedDateValue(0), time: '08:57', status: '在校', course: '语文', period: '第 2 节', recordedBy: '周老师' },
-                { date: shiftedDateValue(0), time: '10:07', status: '在校', course: '护理基础实训', period: '第 3 节', recordedBy: '陈老师' },
-                { date: shiftedDateValue(0), time: '10:56', status: '在校', course: '护理基础', period: '第 4 节', recordedBy: '陈老师' },
+                { date: shiftedDateValue(0), time: '10:07', status: '在校', course: '走进人工智能', period: '第 3 节', recordedBy: '陈老师' },
+                { date: shiftedDateValue(0), time: '10:56', status: '在校', course: 'C语言', period: '第 4 节', recordedBy: '陈老师' },
                 { date: shiftedDateValue(0), time: '14:02', status: '就餐', course: '数学', period: '第 5 节', recordedBy: '李老师' },
                 { date: shiftedDateValue(0), time: '14:57', status: '就餐', course: '英语', period: '第 6 节', recordedBy: '李老师' },
-                { date: shiftedDateValue(0), time: '15:51', status: '请假', course: '班会', period: '第 7 节', recordedBy: '王老师' },
-                { date: shiftedDateValue(0), time: '19:02', status: '在校', course: '晚自习', period: '晚间点名', recordedBy: '王老师' },
-                { date: shiftedDateValue(-3), time: '08:06', status: '在校', course: '护理礼仪', period: '第 1 节', recordedBy: '周老师' },
+                { date: shiftedDateValue(0), time: '15:51', status: '请假', course: '周会', period: '第 7 节', recordedBy: '王老师' },
+                { date: shiftedDateValue(0), time: '19:02', status: '在校', course: '店铺运营', period: '晚间点名', recordedBy: '王老师' },
+                { date: shiftedDateValue(-3), time: '08:06', status: '在校', course: 'Java', period: '第 1 节', recordedBy: '周老师' },
                 { date: shiftedDateValue(-3), time: '09:01', status: '在校', course: '语文', period: '第 2 节', recordedBy: '周老师' },
-                { date: shiftedDateValue(-8), time: '10:01', status: '在校', course: '护理基础实训', period: '第 3 节', recordedBy: '陈老师' },
-                { date: shiftedDateValue(-24), time: '19:06', status: '请假', course: '晚自习', period: '晚间点名', recordedBy: '王老师' },
+                { date: shiftedDateValue(-8), time: '10:01', status: '在校', course: '走进人工智能', period: '第 3 节', recordedBy: '陈老师' },
+                { date: shiftedDateValue(-24), time: '19:06', status: '请假', course: '店铺运营', period: '晚间点名', recordedBy: '王老师' },
                 { date: shiftedDateValue(-50), time: '09:08', status: '在校', course: '数学', period: '第 5 节', recordedBy: '李老师' }
             ],
             account: { username: '13825163201', enabled: true, lastLogin: '2026-07-09 20:16' },
@@ -9576,6 +10503,7 @@
         function createStudent(overrides) {
             const data = clone(student);
             Object.assign(data, overrides);
+            data.gender = normalizeStudentGender(data.gender);
             data.account = { ...data.account, username: data.phoneRaw || data.studentNo };
             data.registeredClass = data.className;
             data.classPlan = `${data.major}专业人才培养方案（2026版）`;
@@ -9646,7 +10574,10 @@
                 family: [{ relation: '母亲', name: '谢文静', idNumber: '440308198508019927', education: '高中', job: '个体经营', phone: '135 8013 9927', phoneRaw: '13580139927', guardian: true }]
             })
         ];
-        students.forEach(enforceSinglePrimaryGuardian);
+        students.forEach(item => {
+            item.gender = normalizeStudentGender(item.gender);
+            enforceSinglePrimaryGuardian(item);
+        });
 
         const classBlueprints = [
             { major: '计算机应用', room: 'D栋 406 室', plan: '职教高考', maleRatio: .72 },
@@ -9732,13 +10663,13 @@
                 { id: 'leave-4', name: '叶清欢', reason: '门诊复查', description: '申请下午离校前往门诊复查，并由监护人负责接送。', period: '上周五 13:00—17:30', submittedAt: `${shiftedDateValue(-4)} 21:05`, startDate: shiftedDateValue(-3), endDate: shiftedDateValue(-3), status: '已驳回', evidenceLabel: '门诊病历', rejectReason: '请假时段与门诊凭证不一致，请核实后重新提交。' }
             ],
             discipline: [
-                { id: 'discipline-1', name: '陈柏安', itemId: 'discipline-item-1', event: '晚自习迟到', date: shiftedDateValue(0), clock: '19:06', details: '晚自习开始后 6 分钟到达教室。学生说明因归还实训器材耽误，已完成口头提醒并要求补登记器材交接时间。', photoCount: 2, submittedBy: '王老师', status: 'pending' },
-                { id: 'discipline-2', name: '徐明哲', itemId: 'discipline-item-2', event: '课堂使用手机', date: shiftedDateValue(-1), clock: '10:24', details: '护理基础课期间未经允许使用手机，任课教师现场暂存并完成第一次课堂纪律提醒。', photoCount: 1, submittedBy: '王老师', status: 'processed' },
+                { id: 'discipline-1', name: '陈柏安', itemId: 'discipline-item-1', event: '晚课迟到', date: shiftedDateValue(0), clock: '19:06', details: '晚课开始后 6 分钟到达教室。学生说明因归还实训器材耽误，已完成口头提醒并要求补登记器材交接时间。', photoCount: 2, submittedBy: '王老师', status: 'pending' },
+                { id: 'discipline-2', name: '徐明哲', itemId: 'discipline-item-2', event: '课堂使用手机', date: shiftedDateValue(-1), clock: '10:24', details: 'C语言课期间未经允许使用手机，任课教师现场暂存并完成第一次课堂纪律提醒。', photoCount: 1, submittedBy: '王老师', status: 'processed' },
                 { id: 'discipline-3', name: '谢承宇', itemId: 'discipline-item-3', event: '宿舍熄灯后喧哗', date: shiftedDateValue(-8), clock: '22:38', details: '熄灯后与同寝同学持续交谈，影响其他学生休息。宿管现场制止并完成情况记录。', photoCount: 2, submittedBy: '宿管王老师', status: 'pending' }
             ],
             logs: [
-                { id: 'log-1', date: shiftedDateValue(-1), name: '林知夏', title: '护理实训周记', summary: '完成无菌操作练习与复盘。', content: '本周完成了无菌操作的分组练习，重点复盘了洗手、铺无菌盘和物品传递三个步骤。第一次练习时容易忽略操作顺序，经过同伴提醒后已经能够独立完成。下周计划继续练习速度与动作稳定性。', status: '待批阅', review: '' },
-                { id: 'log-1-history', date: shiftedDateValue(-8), name: '林知夏', title: '基础护理学习记录', summary: '记录生命体征测量练习。', content: '完成了体温、脉搏和呼吸测量练习，并整理了容易出错的读数步骤。', status: '已批阅', review: '记录完整，下次可补充异常数据判断。' },
+                { id: 'log-1', date: shiftedDateValue(-1), name: '林知夏', title: '走进人工智能周记', summary: '完成课堂实践与复盘。', content: '本周完成了走进人工智能的分组实践，重点复盘了信息整理、任务拆解和成果表达三个步骤。第一次练习时容易忽略操作顺序，经过同伴提醒后已经能够独立完成。下周计划继续练习速度与准确度。', status: '待批阅', review: '' },
+                { id: 'log-1-history', date: shiftedDateValue(-8), name: '林知夏', title: 'C语言学习记录', summary: '记录课堂编程练习。', content: '完成了基础语句和条件判断练习，并整理了容易出错的代码步骤。', status: '已批阅', review: '记录完整，下次可补充运行结果分析。' },
                 { id: 'log-2', date: shiftedDateValue(-2), name: '叶清欢', title: '本周成长记录', summary: '调整了技能练习计划。', content: '根据本周课堂反馈，我把每天的技能练习拆分为基础动作、限时练习和错项复盘三部分，并记录每次练习中出现的问题。新的安排更容易坚持，也能更快发现薄弱环节。', status: '待批阅', review: '' },
                 { id: 'log-2-history', date: shiftedDateValue(-9), name: '叶清欢', title: '阶段计划复盘', summary: '回顾上周学习计划完成情况。', content: '上周计划中的晨读和技能复习基本完成，周末错题整理进度稍慢，已经重新安排时间。', status: '已批阅', review: '计划清晰，注意给错题复盘保留固定时段。' },
                 { id: 'log-3', date: shiftedDateValue(-3), name: '顾怀川', title: '班级服务日志', summary: '协助整理实训器材。', content: '周三实训结束后协助生活委员清点器材，并按照标签重新整理储物柜。发现两套器材缺少记录卡，已经反馈给实训老师并完成补充。', status: '待批阅', review: '' },
@@ -9763,10 +10694,10 @@
                 { id: 'home-20260712', type: 'home', title: '周末离校点到', window: '7月12日 12:00—18:00', status: '已完成', createdBy: '学工处 · 李老师', checkedIds: [] }
             ],
             rollcallHistory: [
-                { id: 'rollcall-history-1', date: shiftedDateValue(-1), week: getAcademicWeekNumber(new Date(Date.now() - 86400000)), course: '护理基础实训', period: '第 3 节', exceptions: [{ name: '顾怀川', status: '就餐' }, { name: '叶清欢', status: '请假' }] },
+                { id: 'rollcall-history-1', date: shiftedDateValue(-1), week: getAcademicWeekNumber(new Date(Date.now() - 86400000)), course: '走进人工智能', period: '第 3 节', exceptions: [{ name: '顾怀川', status: '就餐' }, { name: '叶清欢', status: '请假' }] },
                 { id: 'rollcall-history-2', date: shiftedDateValue(-2), week: getAcademicWeekNumber(new Date(Date.now() - 172800000)), course: '语文', period: '第 2 节', exceptions: [{ name: '陈柏安', status: '请假' }, { name: '林知夏', status: '就餐' }] },
-                { id: 'rollcall-history-3', date: shiftedDateValue(-3), week: getAcademicWeekNumber(new Date(Date.now() - 259200000)), course: '护理礼仪', period: '第 1 节', exceptions: [] },
-                { id: 'rollcall-history-4', date: shiftedDateValue(-7), week: getAcademicWeekNumber(new Date(Date.now() - 604800000)), course: '班会', period: '第 7 节', exceptions: [{ name: '周景行', status: '请假' }] }
+                { id: 'rollcall-history-3', date: shiftedDateValue(-3), week: getAcademicWeekNumber(new Date(Date.now() - 259200000)), course: 'Java', period: '第 1 节', exceptions: [] },
+                { id: 'rollcall-history-4', date: shiftedDateValue(-7), week: getAcademicWeekNumber(new Date(Date.now() - 604800000)), course: '周会', period: '第 7 节', exceptions: [{ name: '周景行', status: '请假' }] }
             ]
         };
 
@@ -10011,6 +10942,9 @@
             classStudentFilter: 'all',
             classStudentSearch: '',
             classStudentAddSearch: '',
+            classStudentAddSelectedIds: [],
+            classScheduleSearch: '',
+            classScheduleSelectedDays: ['0','1','2','3','4','5','6'],
             classModule: null,
             classModuleOrigin: 'class',
             classModuleReturnTab: 'management',
@@ -10208,8 +11142,10 @@
         function escapeHtml(value) {
             return String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]);
         }
-        function rosterSearchMarkup({ id, value = '', placeholder = '搜索学生姓名', clearAction, label = '搜索班级学生' }) {
-            return `<div class="roster-search"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="${escapeHtml(id)}" type="search" value="${escapeHtml(value)}" placeholder="${escapeHtml(placeholder)}" autocomplete="off" aria-label="${escapeHtml(label)}"><button type="button" class="roster-search-clear${value ? ' visible' : ''}" data-action="${escapeHtml(clearAction)}" aria-label="清空学生搜索"><svg aria-hidden="true" viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg></button></div>`;
+        function rosterSearchMarkup({ id, value = '', placeholder = '搜索学生姓名', clearAction, label = '搜索班级学生', controls = '', describedBy = '' }) {
+            const controlsAttribute = controls ? ` aria-controls="${escapeHtml(controls)}"` : '';
+            const describedByAttribute = describedBy ? ` aria-describedby="${escapeHtml(describedBy)}"` : '';
+            return `<div class="roster-search"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="${escapeHtml(id)}" type="search" value="${escapeHtml(value)}" placeholder="${escapeHtml(placeholder)}" autocomplete="off" enterkeyhint="search" spellcheck="false" aria-label="${escapeHtml(label)}"${controlsAttribute}${describedByAttribute}><button type="button" class="roster-search-clear${value ? ' visible' : ''}" data-action="${escapeHtml(clearAction)}" aria-label="清空学生搜索"><svg aria-hidden="true" viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg></button></div>`;
         }
         function slug(value) { return String(value).replace(/[^a-zA-Z0-9_-]/g, '-'); }
         function getPath(source, path) {
@@ -10468,7 +11404,7 @@
             homeView.className = `app-view school-home-view${nextView === 'home' ? ' active' : ' behind'}`;
             classListView.className = `app-view${nextView === 'class-list' ? ' active' : (inClassFlow ? ' behind' : '')}`;
             classDetailView.className = `app-view${nextView === 'class-detail' ? ' active' : (classChildViews.includes(nextView) || (/detail|attendance/.test(nextView) && state.studentDetailOrigin === 'class-detail') ? ' behind' : '')}`;
-            classModuleView.className = `app-view${state.classModule === 'rollcall' ? ' student-status-mode' : ''}${state.classModule === 'school-dorm' && state.schoolDormLevel === 'rooms' ? ' school-dorm-room-mode' : ''}${state.classModule === 'school-dorm-stats' ? ' dorm-stats-mode' : ''}${nextView === 'class-module' ? ' active' : (moduleChildViews.includes(nextView) ? ' behind' : '')}`;
+            classModuleView.className = `app-view${state.classModule === 'rollcall' ? ' student-status-mode' : ''}${state.classModule === 'student-add' ? ' student-add-mode' : ''}${state.classModule === 'class-schedule' ? ' schedule-v1-mode' : ''}${state.classModule === 'class-schedule-v2' ? ' schedule-v2-mode' : ''}${state.classModule === 'school-dorm' && state.schoolDormLevel === 'rooms' ? ' school-dorm-room-mode' : ''}${state.classModule === 'school-dorm-stats' ? ' dorm-stats-mode' : ''}${nextView === 'class-module' ? ' active' : (moduleChildViews.includes(nextView) ? ' behind' : '')}`;
             leaveDetailView.className = `app-view${nextView === 'leave-detail' ? ' active' : ''}`;
             studentLogHistoryView.className = `app-view${nextView === 'student-log-history' ? ' active' : (nextView === 'log-detail' && state.logDetailOrigin === 'student-log-history' ? ' behind' : '')}`;
             logDetailView.className = `app-view${nextView === 'log-detail' ? ' active' : ''}`;
@@ -10509,10 +11445,20 @@
             return String(classInfo?.name || '班级详情').replace(/\s+班$/, '班');
         }
 
+        function normalizeStudentGender(gender) {
+            return gender === '男' || gender === '女' ? gender : '未知';
+        }
+
+        function studentGenderClass(gender) {
+            const normalizedGender = normalizeStudentGender(gender);
+            return normalizedGender === '男' ? 'male' : (normalizedGender === '女' ? 'female' : 'unknown');
+        }
+
         function classAvatarSvg(gender) {
-            return gender === '男'
-                ? '<svg aria-hidden="true" viewBox="0 0 32 32"><circle cx="16" cy="11" r="5.2"></circle><path d="M7.5 27c.8-5.4 3.7-8.1 8.5-8.1s7.7 2.7 8.5 8.1"></path><path d="M11.2 7.8c1.1-2.1 3-3.1 5.8-3.1 2.3 0 4 1 5 2.8"></path></svg>'
-                : '<svg aria-hidden="true" viewBox="0 0 32 32"><circle cx="16" cy="11.2" r="5"></circle><path d="M7.7 27c.8-5.3 3.6-8 8.3-8 4.7 0 7.5 2.7 8.3 8"></path><path d="M10.2 12.8c-.6-5.5 1.4-8.2 5.8-8.2 4.5 0 6.5 2.7 5.8 8.2"></path><path d="M10.8 9.7c1.8.2 3.8-.8 5-2.4 1.3 1.8 3.2 2.8 5.4 2.7"></path></svg>';
+            const normalizedGender = normalizeStudentGender(gender);
+            if (normalizedGender === '男') return '<svg aria-hidden="true" viewBox="0 0 32 32"><circle cx="16" cy="11" r="5.2"></circle><path d="M7.5 27c.8-5.4 3.7-8.1 8.5-8.1s7.7 2.7 8.5 8.1"></path><path d="M11.2 7.8c1.1-2.1 3-3.1 5.8-3.1 2.3 0 4 1 5 2.8"></path></svg>';
+            if (normalizedGender === '女') return '<svg aria-hidden="true" viewBox="0 0 32 32"><circle cx="16" cy="11.2" r="5"></circle><path d="M7.7 27c.8-5.3 3.6-8 8.3-8 4.7 0 7.5 2.7 8.3 8"></path><path d="M10.2 12.8c-.6-5.5 1.4-8.2 5.8-8.2 4.5 0 6.5 2.7 5.8 8.2"></path><path d="M10.8 9.7c1.8.2 3.8-.8 5-2.4 1.3 1.8 3.2 2.8 5.4 2.7"></path></svg>';
+            return '<svg aria-hidden="true" viewBox="0 0 32 32"><circle cx="16" cy="11" r="5"></circle><path d="M7.5 27c.8-5.4 3.6-8.1 8.5-8.1s7.7 2.7 8.5 8.1"></path></svg>';
         }
 
         function makeRosterName(gender, index, classInfo) {
@@ -10585,7 +11531,7 @@
                 return;
             }
             const pendingNames = new Set(classWorkflowState.logs.filter(item => item.status === '待批阅').map(item => item.name));
-            const titles = ['本周成长记录','护理技能练习复盘','学习计划完成情况','班级生活周记','课堂收获与反思'];
+            const titles = ['本周成长记录','课堂技能练习复盘','学习计划完成情况','班级生活周记','课堂收获与反思'];
             const summaries = ['复盘了本周学习任务与完成情况。','记录技能练习中的进步和待改进项。','整理课堂重点并制定下周计划。','记录本周班级生活与个人感受。','总结课堂收获与课后练习情况。'];
             roster.forEach((studentItem, index) => {
                 if (pendingCount >= targetCount || pendingNames.has(studentItem.name)) return;
@@ -10685,7 +11631,7 @@
         
 
         const classManagementGroups = {
-            '日常班务': ['实时点名','学生假条','班级课表课堂','学生日志','班级日志','班级报修'],
+            '日常班务': ['实时点名','学生假条','班级课表课堂','班级课表二版','学生日志','班级日志','班级报修'],
             '奖惩考核': ['班级奖励','学生奖励','班级违纪','学生违纪','班级考核','学生考核排名'],
             '返校与回家': ['返校点到','回家点到','返校统计','回家统计'],
             '教学与成长': ['班级作业','学生评语','期末成绩','学生特长班','特长班请假','班级就业'],
@@ -10694,12 +11640,82 @@
         const classManagementDisplayLabels = {
             '学生假条': '学生请假',
             '班级课表课堂': '班级课表',
+            '班级课表二版': '课表二版',
             '学生考核排名': '考核排名',
             '班级座位设置': '座位设置',
             '宿舍设置': '宿舍管理',
             '行为设置': '行为规则'
         };
-        const classCoreModules = { '学生假条': 'leave', '实时点名': 'rollcall', '返校点到': 'checkin-return', '回家点到': 'checkin-home', '返校统计': 'return-stats', '回家统计': 'home-stats', '班级报修': 'class-repair', '班级违纪': 'class-discipline', '班级考核': 'class-assessment', '学生考核排名': 'student-ranking', '学生违纪': 'discipline', '班级日志': 'logs', '学生评语': 'student-comments', '宿舍设置': 'dorm' };
+        const classCoreModules = { '学生假条': 'leave', '实时点名': 'rollcall', '班级课表课堂': 'class-schedule', '班级课表二版': 'class-schedule-v2', '返校点到': 'checkin-return', '回家点到': 'checkin-home', '返校统计': 'return-stats', '回家统计': 'home-stats', '班级报修': 'class-repair', '班级违纪': 'class-discipline', '班级考核': 'class-assessment', '学生考核排名': 'student-ranking', '学生违纪': 'discipline', '班级日志': 'logs', '学生评语': 'student-comments', '宿舍设置': 'dorm' };
+        const classScheduleDays = [
+            { id: '0', label: '周日', short: '周日' },
+            { id: '1', label: '周一', short: '周一' },
+            { id: '2', label: '周二', short: '周二' },
+            { id: '3', label: '周三', short: '周三' },
+            { id: '4', label: '周四', short: '周四' },
+            { id: '5', label: '周五', short: '周五' },
+            { id: '6', label: '周六', short: '周六' }
+        ];
+        const classSchedulePeriods = [
+            { id: 'am-1', label: '上1' }, { id: 'am-2', label: '上2' },
+            { id: 'am-3', label: '上3' }, { id: 'am-4', label: '上4' },
+            { id: 'pm-1', label: '下1' }, { id: 'pm-2', label: '下2' },
+            { id: 'pm-3', label: '下3' }, { id: 'eve-1', label: '晚1' },
+            { id: 'eve-2', label: '晚2' }
+        ];
+        const globalSubjectCatalog = [
+            '语文', '数学', '英语', '历史', '思政',
+            '淘宝美工设计', 'Java', 'C语言', 'VI设计', '走进人工智能',
+            '家居设计基础', '店铺运营', '直播电商教程', '图形图像处理',
+            '彩铅', '矢量绘图', '商品拍摄与后期处理', '电商海报合成',
+            '体育', '音乐', '美术实践', '心理', '周会'
+        ];
+        const classScheduleSeed = {
+            'am-1': ['', '语文', '数学', '英语', 'Java', '思政', ''],
+            'am-2': ['', '语文', '数学', '英语', 'Java', '体育', ''],
+            'am-3': ['', '淘宝美工设计', 'C语言', '走进人工智能', 'VI设计', '数学', '店铺运营'],
+            'am-4': ['', '淘宝美工设计', 'C语言', '走进人工智能', 'VI设计', '数学', '店铺运营'],
+            'pm-1': ['', '英语', '图形图像处理', '体育', '直播电商教程', 'C语言', ''],
+            'pm-2': ['', '英语', '矢量绘图', '心理', '家居设计基础', '商品拍摄与后期处理', ''],
+            'pm-3': ['', '周会', '历史', '思政', '语文', '美术实践', ''],
+            'eve-1': ['', '店铺运营', '彩铅', 'Java', '电商海报合成', '', ''],
+            'eve-2': ['', '店铺运营', '彩铅', 'Java', '电商海报合成', '', '']
+        };
+        const classScheduleToneMap = {
+            blue: ['语文', '数学', '英语', '历史', '思政'],
+            green: ['淘宝美工设计', 'Java', 'C语言', 'VI设计', '走进人工智能', '家居设计基础', '店铺运营', '直播电商教程', '图形图像处理', '彩铅', '矢量绘图', '商品拍摄与后期处理', '电商海报合成'],
+            orange: ['体育', '音乐', '美术实践', '心理']
+        };
+        function getClassScheduleTone(course) {
+            const name = String(course || '');
+            return Object.entries(classScheduleToneMap).find(([, courses]) => courses.includes(name))?.[0] || 'slate';
+        }
+        const classScheduleV2Days = ['1','2','3','4','5','6','0'].map(id => classScheduleDays.find(day => day.id === id));
+        const classScheduleV2Meta = {
+            '语文': { teacher: '吴雪宁' },
+            '数学': { teacher: '蒋浩然' },
+            '英语': { teacher: '赵思雅' },
+            '思政': { teacher: '何嘉文' },
+            '体育': { teacher: '张远' },
+            '音乐': { teacher: '沈乙清' },
+            '美术实践': { teacher: '陶雨薇' },
+            '心理': { teacher: '徐仕鲲' },
+            '历史': { teacher: '钟琪' },
+            '淘宝美工设计': { teacher: '周晓娜' },
+            'Java': { teacher: '唐进华' },
+            'C语言': { teacher: '许佳敏' },
+            'VI设计': { teacher: '杨宇宸' },
+            '走进人工智能': { teacher: '龙海燕' },
+            '家居设计基础': { teacher: '陶雨薇' },
+            '店铺运营': { teacher: '何可可' },
+            '直播电商教程': { teacher: '马文文' },
+            '图形图像处理': { teacher: '向晓薇' },
+            '彩铅': { teacher: '凌嘉诚' },
+            '矢量绘图': { teacher: '宾艳红' },
+            '商品拍摄与后期处理': { teacher: '向晓薇' },
+            '电商海报合成': { teacher: '周晓娜' },
+            '周会': { teacher: '班主任' }
+        };
         const CLASS_HIGH_CONFIG_KEY = 'pocket-campus-class-high-frequency-v2';
         const defaultClassHighFeatures = ['实时点名','学生假条','班级违纪'];
         const storedClassHighConfig = readStoredHighConfig(CLASS_HIGH_CONFIG_KEY, {});
@@ -10843,19 +11859,19 @@
         function getClassTeachers(classInfo) {
             const teacherGender = /静怡|敏慧|许雯|思琪|雅琴|小雨|晓琳|诗雨|安然/.test(classInfo.teacher) ? '女' : '男';
             const headTeacherSubjects = {
-                '计算机应用': '计算机基础',
-                '电子商务': '电子商务基础',
-                '护理': '护理基础',
-                '新能源汽车': '汽车构造',
-                '幼儿保育': '幼儿卫生学',
-                '数字媒体技术': '数字媒体技术'
+                '计算机应用': 'Java',
+                '电子商务': '淘宝美工设计',
+                '护理': '心理',
+                '新能源汽车': '走进人工智能',
+                '幼儿保育': '音乐',
+                '数字媒体技术': '图形图像处理'
             };
             return [
-                { name: classInfo.teacher, gender: teacherGender, role: '班主任', subject: headTeacherSubjects[classInfo.major] || `${classInfo.major}专业课`, phone: classInfo.teacherPhone, tone: '' },
-                { name: '韩雨', gender: '女', role: '指导员', subject: '学生发展指导', phone: '13970581246', tone: 'advisor' },
+                { name: classInfo.teacher, gender: teacherGender, role: '班主任', subject: headTeacherSubjects[classInfo.major] || '语文', phone: classInfo.teacherPhone, tone: '' },
+                { name: '韩雨', gender: '女', role: '指导员', subject: '思政', phone: '13970581246', tone: 'advisor' },
                 { name: '吴雪宁', gender: '女', role: '任课教师', subject: '语文', phone: '13628471059', tone: '' },
                 { name: '蒋浩然', gender: '男', role: '任课教师', subject: '数学', phone: '13765092841', tone: '' },
-                { name: '陆清荷', gender: '女', role: '任课教师', subject: `${classInfo.major}专业课`, phone: '13580621479', tone: '' }
+                { name: '陆清荷', gender: '女', role: '任课教师', subject: headTeacherSubjects[classInfo.major] || '英语', phone: '13580621479', tone: '' }
             ];
         }
 
@@ -11176,7 +12192,7 @@
         }
 
         function getClassRosterStudentByName(name) {
-            return ensureClassRoster(getSelectedClass()).find(item => item.name === name) || { name, gender: maleNames.includes(name) ? '男' : '女', avatarUrl: '' };
+            return ensureClassRoster(getSelectedClass()).find(item => item.name === name) || { name, gender: maleNames.includes(name) ? '男' : (femaleNames.includes(name) ? '女' : '未知'), avatarUrl: '' };
         }
 
         function disciplineEvidenceMarkup(item, index = 0) {
@@ -11217,7 +12233,7 @@
             const item = classWorkflowState.discipline.find(record => record.id === state.selectedDisciplineId);
             if (!item) return;
             const rosterStudent = getClassRosterStudentByName(item.name);
-            disciplineDetailRoot.innerHTML = `<article class="discipline-detail-page"><section class="discipline-detail-hero"><div class="discipline-detail-person"><span class="discipline-avatar ${rosterStudent.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(rosterStudent)}</span><span class="discipline-detail-person-copy"><span>违纪学生</span><strong>${escapeHtml(item.name)}</strong></span></div><div class="discipline-detail-event"><strong>${escapeHtml(item.event)}</strong><span>${escapeHtml(formatWorkflowDate(item.date))} · ${escapeHtml(item.clock || '未记录时间')}</span></div></section><section class="discipline-detail-section"><h2>情况说明</h2><p>${escapeHtml(item.details || item.event)}</p></section><section class="discipline-detail-section"><h2>现场图片</h2>${renderDisciplinePhotoGrid(item)}</section></article>`;
+            disciplineDetailRoot.innerHTML = `<article class="discipline-detail-page"><section class="discipline-detail-hero"><div class="discipline-detail-person"><span class="discipline-avatar ${studentGenderClass(rosterStudent.gender)}">${studentAvatarMarkup(rosterStudent)}</span><span class="discipline-detail-person-copy"><span>违纪学生</span><strong>${escapeHtml(item.name)}</strong></span></div><div class="discipline-detail-event"><strong>${escapeHtml(item.event)}</strong><span>${escapeHtml(formatWorkflowDate(item.date))} · ${escapeHtml(item.clock || '未记录时间')}</span></div></section><section class="discipline-detail-section"><h2>情况说明</h2><p>${escapeHtml(item.details || item.event)}</p></section><section class="discipline-detail-section"><h2>现场图片</h2>${renderDisciplinePhotoGrid(item)}</section></article>`;
         }
 
         function openDisciplineDetail(recordId) {
@@ -11294,7 +12310,7 @@
                     ${rosterSearchMarkup({ id: 'logRosterSearch', value: state.logRosterSearch, placeholder: '搜索班级学生姓名', clearAction: 'clear-log-roster-search', label: '搜索班级日志学生' })}
                     <div class="log-student-grid">${roster.map(item => {
                     const studentPending = records.filter(record => record.name === item.name && record.status === '待批阅').length;
-                    return `<button type="button" class="log-student-option" data-action="open-student-log-history" data-log-student-id="${escapeHtml(item.id)}" data-roster-search="${escapeHtml(item.name.toLowerCase())}" aria-label="查看${escapeHtml(item.name)}的过往日志${studentPending ? `，${studentPending}篇待批阅` : ''}"><span class="log-student-avatar-wrap"><span class="log-student-avatar ${item.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(item)}</span>${studentPending ? pendingBadgeMarkup(studentPending) : ''}</span><strong>${escapeHtml(item.name)}</strong></button>`;
+                    return `<button type="button" class="log-student-option" data-action="open-student-log-history" data-log-student-id="${escapeHtml(item.id)}" data-roster-search="${escapeHtml(item.name.toLowerCase())}" aria-label="查看${escapeHtml(item.name)}的过往日志${studentPending ? `，${studentPending}篇待批阅` : ''}"><span class="log-student-avatar-wrap"><span class="log-student-avatar ${studentGenderClass(item.gender)}">${studentAvatarMarkup(item)}</span>${studentPending ? pendingBadgeMarkup(studentPending) : ''}</span><strong>${escapeHtml(item.name)}</strong></button>`;
                 }).join('')}<div class="roster-empty" id="logRosterEmpty" hidden>没有找到匹配的学生<br>请尝试其他姓名关键词</div></div></section>`;
         }
 
@@ -11368,7 +12384,7 @@
             studentLogHistoryTitle.textContent = `${rosterStudent.name}的日志`;
             studentLogHistoryRoot.innerHTML = `
                 <section class="student-log-page-head">
-                    <span class="log-student-avatar ${rosterStudent.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(rosterStudent)}</span>
+                    <span class="log-student-avatar ${studentGenderClass(rosterStudent.gender)}">${studentAvatarMarkup(rosterStudent)}</span>
                     <span class="student-log-page-head-copy"><strong>${escapeHtml(rosterStudent.name)}</strong><span>${records.length ? `共 ${records.length} 篇日志` : '暂未提交日志'}</span></span>
                 </section>
                 <section class="student-log-filter" aria-label="日志搜索与时间筛选">
@@ -11536,7 +12552,7 @@
             leaveDetailRoot.innerHTML = `
                 <article class="leave-detail-page">
                     <section class="leave-detail-hero">
-                        <span class="leave-detail-avatar ${rosterStudent.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(rosterStudent)}</span>
+                        <span class="leave-detail-avatar ${studentGenderClass(rosterStudent.gender)}">${studentAvatarMarkup(rosterStudent)}</span>
                         <div class="leave-detail-hero-copy"><span>${escapeHtml(item.name)}的请假申请</span><h2>${escapeHtml(item.reason)}</h2><p>申请时间 · ${escapeHtml(formatLeaveApplicationTime(item.submittedAt))}</p></div>
                     </section>
                     <section class="leave-detail-section">
@@ -11935,23 +12951,47 @@
             document.getElementById('callCancelButton').focus({ preventScroll: true });
         }
 
-        function openGuardianCallSheet(button) {
-            const parents = (currentData().family || []).filter(item => item.phoneRaw || item.phone);
-            if (!parents.length) return showToast('该学生暂未添加监护人电话');
+        function getStudentClassForContact(data = currentData()) {
+            const classValues = [data.className, data.registeredClass].map(value => String(value || ''));
+            const classNames = classValues.map(value => value.replace(/\s+/g, '')).filter(Boolean);
+            const exactMatch = schoolClasses.find(item => classNames.includes(String(item.name || '').replace(/\s+/g, '')));
+            if (exactMatch) return exactMatch;
+            const classCode = classValues.map(value => value.match(/\d{4}/)?.[0]).find(Boolean);
+            return schoolClasses.find(item => item.code === classCode) || null;
+        }
+
+        function getHomeSchoolContacts(data = currentData()) {
+            const guardians = (data.family || []).map(item => ({
+                role: item.relation || '监护人',
+                name: item.name || '未填写姓名',
+                phone: String(item.phoneRaw || item.phone || '').replace(/\D/g, '')
+            }));
+            const classInfo = getStudentClassForContact(data);
+            const schoolContacts = classInfo
+                ? getClassTeachers(classInfo)
+                    .filter(item => ['班主任','指导员'].includes(item.role))
+                    .map(item => ({ role: item.role, name: item.name, phone: String(item.phone || '').replace(/\D/g, '') }))
+                : [];
+            return [...guardians, ...schoolContacts].filter(item => item.phone);
+        }
+
+        function openHomeSchoolCallSheet(button) {
+            const data = currentData();
+            const contacts = getHomeSchoolContacts(data);
+            if (!contacts.length) return showToast('该学生暂无可联系人员');
             state.callReturnFocus = button;
-            document.getElementById('callPersonRole').textContent = '联系监护人';
-            document.getElementById('callPersonName').textContent = '选择联系人';
+            document.getElementById('callPersonRole').textContent = '家校联系';
+            document.getElementById('callPersonName').textContent = `${data.name || '学生'}的联系人`;
             document.querySelector('#callSingleRoot .call-phone-line').hidden = true;
             document.getElementById('callConfirmLink').hidden = true;
             guardianCallRoot.hidden = false;
-            guardianCallRoot.innerHTML = `<div class="guardian-call-list">${parents.map((item, index) => {
-                const phone = String(item.phoneRaw || item.phone || '').replace(/\D/g,'');
+            guardianCallRoot.innerHTML = `<div class="guardian-call-list">${contacts.map(item => {
+                const phone = item.phone;
                 return `<article class="guardian-call-card">
-                    <span class="guardian-call-index" aria-hidden="true">${String(index + 1).padStart(2,'0')}</span>
-                    <span class="guardian-call-copy"><span>${escapeHtml(item.relation || '监护人')}</span><strong>${escapeHtml(item.name || '未填写姓名')}</strong><em>${escapeHtml(formatPhone(phone))}</em></span>
+                    <span class="guardian-call-copy"><strong><b>${escapeHtml(item.role)}</b><span>${escapeHtml(item.name)}</span></strong><em>${escapeHtml(formatPhone(phone))}</em></span>
                     <span class="guardian-call-actions">
-                        <button type="button" class="guardian-copy-action" data-action="copy" data-copy="${escapeHtml(phone)}" aria-label="复制${escapeHtml(item.name || '监护人')}的手机号"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="11" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path></svg></button>
-                        <a class="guardian-dial-action" href="tel:${escapeHtml(phone)}" data-guardian-dial data-guardian-name="${escapeHtml(item.name || '监护人')}" data-guardian-phone="${escapeHtml(phone)}" aria-label="拨打${escapeHtml(item.name || '监护人')}的电话"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.11 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.72c.12.9.35 1.78.68 2.62a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.46-1.24a2 2 0 0 1 2.11-.45c.84.33 1.72.56 2.62.68A2 2 0 0 1 22 16.92z"></path></svg></a>
+                        <button type="button" class="guardian-copy-action" data-action="copy" data-copy="${escapeHtml(phone)}" aria-label="复制${escapeHtml(item.name)}的手机号"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="11" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path></svg></button>
+                        <a class="guardian-dial-action" href="tel:${escapeHtml(phone)}" data-contact-dial data-contact-name="${escapeHtml(item.name)}" data-contact-phone="${escapeHtml(phone)}" aria-label="拨打${escapeHtml(item.role)}${escapeHtml(item.name)}的电话"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.11 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.72c.12.9.35 1.78.68 2.62a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.46-1.24a2 2 0 0 1 2.11-.45c.84.33 1.72.56 2.62.68A2 2 0 0 1 22 16.92z"></path></svg></a>
                     </span>
                 </article>`;
             }).join('')}</div>`;
@@ -11985,10 +13025,6 @@
             scrollArea.scrollTop = 0;
             setView('detail');
             focusAfterViewChange(backButton);
-        }
-
-        function openParentPicker(button) {
-            openGuardianCallSheet(button);
         }
 
         function calculateAge(birthDate, now = new Date()) {
@@ -12143,7 +13179,7 @@
             heroRoot.innerHTML = `
                 <section class="hero glass" aria-label="学生概览">
                     <div class="hero-profile">
-                        <div class="hero-avatar ${data.gender === '女' ? 'female' : ''}">${studentAvatarMarkup(data)}</div>
+                        <div class="hero-avatar ${studentGenderClass(data.gender)}">${studentAvatarMarkup(data)}</div>
                         <div class="min-w-0">
                             <div class="student-hero-heading">
                                 <h2 class="hero-name">${escapeHtml(data.name)}</h2>
@@ -12164,7 +13200,7 @@
                     </div>
                     <div class="quick-actions">
                         <button type="button" class="quick-button primary" data-action="call-student" data-call-name="${escapeHtml(data.name)}" data-call-role="学生电话" data-call-phone="${escapeHtml(data.phone)}">${icon('phone')}<span>拨打学生</span></button>
-                        <button type="button" class="quick-button" data-action="call-guardian">${icon('guardian')}<span>联系监护人</span></button>
+                        <button type="button" class="quick-button" data-action="call-home-school">${icon('guardian')}<span>家校联系</span></button>
                     </div>
                 </section>
                 ${renderStudentPortrait(data)}`;
@@ -12172,7 +13208,8 @@
 
         function renderControl(label, path, options = {}) {
             const data = currentData();
-            const value = getPath(data, path);
+            const rawValue = getPath(data, path);
+            const value = path === 'gender' ? normalizeStudentGender(rawValue) : rawValue;
             const multiline = options.type === 'textarea' ? ' multiline' : '';
             const id = `edit-${slug(path)}`;
             if (!state.editMode || options.readonly) {
@@ -12215,7 +13252,7 @@
         function renderArchive() {
             const profile = `<div class="info-list">
                 ${state.editMode ? renderControl('学生姓名', 'name') : ''}
-                ${renderControl('性别', 'gender', { type: 'select', choices: ['男','女'] })}
+                ${renderControl('性别', 'gender', { type: 'select', choices: ['男','女','未知'] })}
                 ${renderControl('出生日期', 'birthDate', { type: 'date' })}${renderControl('年龄', 'age', { readonly: true })}
                 ${state.editMode ? renderControl('学生学号', 'studentNo') : ''}
                 ${renderControl('就读方式', 'educationMode', { type: 'select', choices: ['全日制','校企协同'] })}
@@ -12365,14 +13402,14 @@
         }
 
         const attendanceCourseSchedule = [
-            { course: '护理礼仪', period: '第 1 节', start: '08:00', end: '08:45' },
+            { course: 'Java', period: '第 1 节', start: '08:00', end: '08:45' },
             { course: '语文', period: '第 2 节', start: '08:55', end: '09:40' },
-            { course: '护理基础实训', period: '第 3 节', start: '10:00', end: '10:45' },
-            { course: '护理基础', period: '第 4 节', start: '10:55', end: '11:40' },
+            { course: '走进人工智能', period: '第 3 节', start: '10:00', end: '10:45' },
+            { course: 'C语言', period: '第 4 节', start: '10:55', end: '11:40' },
             { course: '数学', period: '第 5 节', start: '14:00', end: '14:45' },
             { course: '英语', period: '第 6 节', start: '14:55', end: '15:40' },
-            { course: '班会', period: '第 7 节', start: '15:50', end: '16:35' },
-            { course: '晚自习', period: '晚间点名', start: '19:00', end: '19:40' }
+            { course: '周会', period: '第 7 节', start: '15:50', end: '16:35' },
+            { course: '店铺运营', period: '晚间点名', start: '19:00', end: '19:40' }
         ];
 
         function formatLocalDate(date = new Date()) {
@@ -12476,7 +13513,7 @@
             const groups = [
                 { title: '上午', indices: [0,1,2,3], meta: '4 节课' },
                 { title: '下午', indices: [4,5,6], meta: '3 节课' },
-                { title: '晚自习', indices: [7], meta: '晚间点名' }
+                { title: '店铺运营', indices: [7], meta: '晚间点名' }
             ];
             const groupMarkup = groups.map(group => `<section class="attendance-lesson-group"><div class="attendance-lesson-group-head"><h2>${group.title}</h2><span>${group.meta}</span></div><div class="attendance-lesson-list">${group.indices.map(index => {
                 const lesson = context.lessons[index];
@@ -12613,6 +13650,7 @@
 
         function enterEdit() {
             state.draft = clone(student);
+            state.draft.gender = normalizeStudentGender(state.draft.gender);
             if (!Array.isArray(state.draft.family) || !state.draft.family.length) {
                 state.draft.family = [{ relation: '监护人', name: '', idNumber: '', phone: '', phoneRaw: '', guardian: true }];
             }
@@ -12705,6 +13743,7 @@
                 confirmLabel: '确认保存',
                 cancelLabel: '继续编辑',
                 onConfirm: () => {
+                    state.draft.gender = normalizeStudentGender(state.draft.gender);
                     enforceSinglePrimaryGuardian(state.draft);
                     state.draft.phoneRaw = String(state.draft.phone || '').replace(/\D/g, '');
                     state.draft.phone = formatPhone(state.draft.phoneRaw);
@@ -12924,10 +13963,11 @@
         
 
         function addGradeDialog() {
+            const subjectOptions = globalSubjectCatalog.map(subject => `<option value="${escapeHtml(subject)}">${escapeHtml(subject)}</option>`).join('');
             openDialog({
                 title: '新增成绩',
                 desc: '填写后将按考试日期归入成绩记录。',
-                body: `<div class="grid grid-cols-2 gap-3"><div class="dialog-field col-span-2"><label for="gradeType">考试名称<span class="required-star" aria-hidden="true">*</span></label><input id="gradeType" type="text" required maxlength="30" placeholder="例如：期中考试"></div><div class="dialog-field"><label for="gradeSubject">科目名称<span class="required-star" aria-hidden="true">*</span></label><input id="gradeSubject" required placeholder="例如：英语"></div><div class="dialog-field"><label for="gradeScore">成绩<span class="required-star" aria-hidden="true">*</span></label><input id="gradeScore" type="number" inputmode="decimal" required min="0" max="150" placeholder="例如：92"></div><div class="dialog-field"><label for="gradeRank">班级排名<span class="required-star" aria-hidden="true">*</span></label><input id="gradeRank" type="number" inputmode="numeric" required min="1" max="46" placeholder="例如：12"></div><div class="dialog-field"><label for="gradeDate">考试日期<span class="required-star" aria-hidden="true">*</span></label><input id="gradeDate" type="date" required value="${formatLocalDate()}"></div></div>`,
+                body: `<div class="grid grid-cols-2 gap-3"><div class="dialog-field col-span-2"><label for="gradeType">考试名称<span class="required-star" aria-hidden="true">*</span></label><input id="gradeType" type="text" required maxlength="30" placeholder="例如：期中考试"></div><div class="dialog-field"><label for="gradeSubject">科目名称<span class="required-star" aria-hidden="true">*</span></label><select id="gradeSubject" required><option value="">请选择</option>${subjectOptions}</select></div><div class="dialog-field"><label for="gradeScore">成绩<span class="required-star" aria-hidden="true">*</span></label><input id="gradeScore" type="number" inputmode="decimal" required min="0" max="150" placeholder="例如：92"></div><div class="dialog-field"><label for="gradeRank">班级排名<span class="required-star" aria-hidden="true">*</span></label><input id="gradeRank" type="number" inputmode="numeric" required min="1" max="46" placeholder="例如：12"></div><div class="dialog-field"><label for="gradeDate">考试日期<span class="required-star" aria-hidden="true">*</span></label><input id="gradeDate" type="date" required value="${formatLocalDate()}"></div></div>`,
                 confirmLabel: '保存成绩',
                 onConfirm: () => {
                     const subject = document.getElementById('gradeSubject');
@@ -12936,7 +13976,8 @@
                     const examType = document.getElementById('gradeType');
                     const date = document.getElementById('gradeDate');
                     if (!subject.value.trim() || !score.value || !rank.value || !examType.value.trim() || !date.value) { (!examType.value.trim() ? examType : (!subject.value.trim() ? subject : (!score.value ? score : (!rank.value ? rank : date)))).focus(); showToast('请填写所有必填项'); return false; }
-                    currentData().grades.unshift({ subject: subject.value.trim(), score: score.value, rank: rank.value, rankTotal: '46', examType: examType.value.trim(), date: date.value });
+                    if (!globalSubjectCatalog.includes(subject.value)) { subject.focus(); showToast('请选择科目'); return false; }
+                    currentData().grades.unshift({ subject: subject.value, score: score.value, rank: rank.value, rankTotal: '46', examType: examType.value.trim(), date: date.value });
                     renderPanel(); showToast(state.editMode ? '成绩记录已加入草稿' : '成绩记录已新增');
                 }
             });
@@ -13057,7 +14098,7 @@
                 const following = state.followedStudentIds.includes(item.id);
                 return `<article class="student-result-card">
                     <button type="button" class="student-result-main" data-student-id="${escapeHtml(item.id)}" aria-label="第${index + 1}位，${escapeHtml(item.name)}，${escapeHtml(item.className)}，查看学生档案">
-                        <span class="student-avatar student-result-avatar ${item.gender === '男' ? 'male' : 'female'}" aria-hidden="true">${studentAvatarMarkup(item)}</span>
+                        <span class="student-avatar student-result-avatar ${studentGenderClass(item.gender)}" aria-hidden="true">${studentAvatarMarkup(item)}</span>
                         <span class="student-result-copy"><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.className)}</span></span>
                     </button>
                     <button type="button" class="student-follow-button${following ? ' following' : ''}" data-action="toggle-follow-student" data-follow-id="${escapeHtml(item.id)}" aria-pressed="${following ? 'true' : 'false'}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m12 3 2.8 5.6 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2-4.5-4.4 6.2-.9Z"></path></svg><span>${following ? '已关注' : '关注'}</span></button>
@@ -13275,18 +14316,18 @@
             const mealSet = getStudentMealSet(classInfo);
             const filteredRoster = state.classStudentFilter === 'auth' ? roster.filter(item => !item.authenticated) : roster;
             classInfoPanel.innerHTML = `${renderStudentLiveSummary(classInfo)}
-                <div class="class-section-head" id="classStudentSection"><h2 id="classRosterTitle">${state.classStudentFilter === 'auth' ? '未认证学生' : '学生列表'}（${filteredRoster.length}）</h2><button type="button" class="class-section-action" data-class-module="student-add" aria-label="添加未分配学生"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>添加</button></div>
+                <div class="class-section-head" id="classStudentSection"><h2 id="classRosterTitle">${state.classStudentFilter === 'auth' ? '未认证学生' : '学生列表'}（${filteredRoster.length}）</h2><button type="button" class="class-section-action" data-class-module="student-add" aria-label="添加未选班级学生"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>添加</button></div>
                 ${state.classStudentFilter === 'auth' ? '<div class="class-filter-notice"><span>当前仅显示未完成身份认证的学生</span><button type="button" data-action="clear-class-student-filter">查看全部</button></div>' : ''}
-                <div class="class-roster-search">${rosterSearchMarkup({ id: 'classRosterSearch', value: state.classStudentSearch, placeholder: '搜索本班学生姓名', clearAction: 'clear-class-roster-search', label: '搜索本班学生姓名' })}</div>
-                <div class="class-student-list">${filteredRoster.map(item => {
+                <div class="class-roster-search" role="search">${rosterSearchMarkup({ id: 'classRosterSearch', value: state.classStudentSearch, placeholder: '搜索本班学生姓名', clearAction: 'clear-class-roster-search', label: '搜索本班学生姓名', controls: 'classStudentList', describedBy: 'classRosterResultStatus' })}<span class="sr-only" id="classRosterResultStatus" role="status" aria-live="polite"></span></div>
+                <div class="class-student-list" id="classStudentList">${filteredRoster.map(item => {
                     const status = handled.has(item.id) && ['在校','请假'].includes(statusMap[item.id]) ? statusMap[item.id] : '';
                     const statusLabel = [status, mealSet.has(item.id) ? '就餐' : ''].filter(Boolean).join('、') || '未设置';
                     return `<button type="button" class="class-student-row${item.authenticated ? '' : ' has-pending'}" data-student-id="${escapeHtml(item.id)}" data-roster-search="${escapeHtml(item.name.toLowerCase())}" aria-label="${escapeHtml(item.name)}，今日状态${statusLabel}，查看学生详情">
-                        <span class="student-avatar ${item.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(item)}</span>
+                        <span class="student-avatar ${studentGenderClass(item.gender)}">${studentAvatarMarkup(item)}</span>
                         <span class="class-student-copy"><span class="class-student-name">${escapeHtml(item.name)}</span></span>
                         ${item.authenticated ? '' : pendingBadgeMarkup(1)}
                     </button>`;
-                }).join('')}<div class="roster-empty" id="classRosterEmpty" hidden>没有找到完全匹配的本班学生</div></div>`;
+                }).join('')}<div class="roster-empty" id="classRosterEmpty" role="status" hidden>没有找到匹配的本班学生</div></div>`;
             updateClassRosterSearchResults();
         }
 
@@ -13306,6 +14347,8 @@
             if (clear) clear.classList.toggle('visible', Boolean(state.classStudentSearch));
             const empty = document.getElementById('classRosterEmpty');
             if (empty) empty.hidden = visible > 0;
+            const resultStatus = document.getElementById('classRosterResultStatus');
+            if (resultStatus) resultStatus.textContent = query ? `找到 ${visible} 名学生，共 ${rows.length} 名` : `共 ${rows.length} 名学生`;
         }
 
         function getFilteredRollcallRoster() {
@@ -13788,7 +14831,7 @@
             pickerBody.removeAttribute('aria-label');
             pickerBody.innerHTML = `<div class="discipline-student-picker-list">${roster.map(item => {
                 const selected = state.disciplineStudentIds.includes(item.id);
-                return `<button type="button" class="discipline-student-picker-row${selected ? ' selected' : ''}" data-action="toggle-discipline-student" data-discipline-student-id="${escapeHtml(item.id)}" aria-pressed="${selected ? 'true' : 'false'}"><span class="student-avatar ${item.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(item)}</span><strong>${escapeHtml(item.name)}</strong><span class="discipline-student-picker-check"><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="5 12 10 17 19 7"></polyline></svg></span></button>`;
+                return `<button type="button" class="discipline-student-picker-row${selected ? ' selected' : ''}" data-action="toggle-discipline-student" data-discipline-student-id="${escapeHtml(item.id)}" aria-pressed="${selected ? 'true' : 'false'}"><span class="student-avatar ${studentGenderClass(item.gender)}">${studentAvatarMarkup(item)}</span><strong>${escapeHtml(item.name)}</strong><span class="discipline-student-picker-check"><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="5 12 10 17 19 7"></polyline></svg></span></button>`;
             }).join('')}</div><button type="button" class="picker-done-button" data-action="finish-discipline-students">完成（${state.disciplineStudentIds.length}）</button>`;
         }
 
@@ -13842,32 +14885,164 @@
             showToast(`已为 ${records.length} 名学生保存违纪记录`);
         }
 
+        function renderClassScheduleModule() {
+            const query = String(state.classScheduleSearch || '').trim().toLowerCase();
+            const headerCells = classScheduleDays.map(day => `<th scope="col" data-schedule-column="${day.id}">${escapeHtml(day.short)}</th>`).join('');
+            const bodyRows = classSchedulePeriods.map(period => {
+                const courses = classScheduleSeed[period.id] || [];
+                const cells = classScheduleDays.map((day, dayIndex) => {
+                    const course = String(courses[dayIndex] || '');
+                    const teacher = course ? (classScheduleV2Meta[course]?.teacher || '任课教师') : '';
+                    const matched = Boolean(query && `${course} ${teacher}`.toLowerCase().includes(query));
+                    const tone = course ? getClassScheduleTone(course) : '';
+                    const aria = course ? `${day.label}${period.label}，${course}，${teacher}` : `${day.label}${period.label}无课程`;
+                    return `<td data-schedule-column="${day.id}"><span class="schedule-course${course ? ` tone-${tone}` : ' empty'}${matched ? ' matched' : ''}" aria-label="${escapeHtml(aria)}">${course ? `<strong>${escapeHtml(course)}</strong><span>${escapeHtml(teacher)}</span>` : '—'}</span></td>`;
+                }).join('');
+                return `<tr><th scope="row">${escapeHtml(period.label)}</th>${cells}</tr>`;
+            }).join('');
+            return `<section class="class-schedule-surface" aria-label="班级课程表">
+                <div class="class-schedule-tools">
+                    <div class="class-schedule-search">
+                        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+                        <label class="sr-only" for="classScheduleSearch">搜索课程或老师</label>
+                        <input id="classScheduleSearch" type="search" value="${escapeHtml(state.classScheduleSearch)}" placeholder="搜索课程或老师" autocomplete="off">
+                        <button type="button" class="class-schedule-clear" data-action="clear-class-schedule-search" aria-label="清空课程搜索"${query ? '' : ' hidden'}><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+                    </div>
+                </div>
+                <div class="class-schedule-table-shell">
+                    <table class="class-schedule-table${query ? ' searching' : ''}">
+                        <caption class="sr-only">周日至周六班级课程表</caption>
+                        <thead><tr><th scope="col">节次</th>${headerCells}</tr></thead>
+                        <tbody>${bodyRows}</tbody>
+                    </table>
+                </div>
+            </section>`;
+        }
+
+        function getClassScheduleV2Course(periodId, dayId) {
+            const dayIndex = classScheduleDays.findIndex(day => day.id === String(dayId));
+            const course = String(classScheduleSeed[periodId]?.[dayIndex] || '');
+            if (!course) return null;
+            const meta = classScheduleV2Meta[course] || { teacher: '任课教师' };
+            return { course, teacher: meta.teacher, tone: getClassScheduleTone(course) };
+        }
+
+        function renderClassScheduleV2Module() {
+            const query = String(state.classScheduleSearch || '').trim().toLowerCase();
+            const dayHeaders = classScheduleV2Days.map(day => `<div class="schedule-v2-day-header">${escapeHtml(day.short)}</div>`).join('');
+            const cells = classSchedulePeriods.map(period => classScheduleV2Days.map(day => {
+                const course = getClassScheduleV2Course(period.id, day.id);
+                if (!course) return `<div class="schedule-v2-cell" data-schedule-v2-cell="${day.id}-${period.id}"><div class="schedule-v2-empty-cell" aria-label="${escapeHtml(`${day.label}${period.label}无课程`)}"></div></div>`;
+                const aria = `${day.label}${period.label}，${course.course}，${course.teacher}`;
+                const matched = Boolean(query && `${course.course} ${course.teacher}`.toLowerCase().includes(query));
+                return `<div class="schedule-v2-cell" data-schedule-v2-cell="${day.id}-${period.id}"><article class="schedule-v2-course tone-${escapeHtml(course.tone)}${matched ? ' is-match' : ''}" aria-label="${escapeHtml(aria)}"><strong>${escapeHtml(course.course)}</strong><span>${escapeHtml(course.teacher)}</span></article></div>`;
+            }).join('')).join('');
+            return `<section class="schedule-v2-surface${query ? ' searching' : ''}" aria-label="课表二版">
+                <div class="class-schedule-search">
+                    <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+                    <label class="sr-only" for="classScheduleSearch">搜索课程或老师</label>
+                    <input id="classScheduleSearch" type="search" value="${escapeHtml(state.classScheduleSearch)}" placeholder="搜索课程或老师" autocomplete="off">
+                    <button type="button" class="class-schedule-clear" data-action="clear-class-schedule-search" aria-label="清空课程搜索"${query ? '' : ' hidden'}><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+                </div>
+                <article class="schedule-v2-card" aria-label="可横向滑动的全周课程表">
+                    <div class="schedule-v2-grid">
+                        <div class="schedule-v2-period-rail"><div class="schedule-v2-corner">节次</div>${classSchedulePeriods.map(period => `<div class="schedule-v2-period">${escapeHtml(period.label)}</div>`).join('')}</div>
+                        <div class="schedule-v2-days-scroll" id="classScheduleV2Scroller" aria-label="星期课程区域，可左右拖动查看全周">
+                            <div class="schedule-v2-days-grid">${dayHeaders}${cells}</div>
+                        </div>
+                    </div>
+                </article>
+            </section>`;
+        }
+
+        function updateClassScheduleSearchResults(value) {
+            const query = String(value || '').trim().toLowerCase();
+            state.classScheduleSearch = String(value || '');
+
+            const table = classModuleRoot.querySelector('.class-schedule-table');
+            if (table) {
+                table.classList.toggle('searching', Boolean(query));
+                table.querySelectorAll('.schedule-course:not(.empty)').forEach(course => {
+                    const searchableText = String(course.getAttribute('aria-label') || course.textContent || '').toLowerCase();
+                    course.classList.toggle('matched', Boolean(query && searchableText.includes(query)));
+                });
+            }
+
+            const surface = classModuleRoot.querySelector('.schedule-v2-surface');
+            if (surface) {
+                surface.classList.toggle('searching', Boolean(query));
+                surface.querySelectorAll('.schedule-v2-course').forEach(course => {
+                    const searchableText = String(course.getAttribute('aria-label') || course.textContent || '').toLowerCase();
+                    course.classList.toggle('is-match', Boolean(query && searchableText.includes(query)));
+                });
+            }
+        }
+
         function getFilteredUnassignedStudents() {
             const query = String(state.classStudentAddSearch || '').trim().toLowerCase();
-            return unassignedStudentPool.filter(item => !item.assignedClassId && (!query || [item.name,item.studentNo,item.major].some(value => String(value || '').toLowerCase().includes(query))));
+            return unassignedStudentPool.filter(item => !item.assignedClassId && (!query || String(item.name || '').toLowerCase().includes(query)));
+        }
+
+        function getStudentAddSelectedSet() {
+            const availableIds = new Set(unassignedStudentPool.filter(item => !item.assignedClassId).map(item => item.id));
+            const selected = new Set((state.classStudentAddSelectedIds || []).filter(id => availableIds.has(id)));
+            state.classStudentAddSelectedIds = [...selected];
+            return selected;
         }
 
         function renderStudentAddModule() {
             const records = getFilteredUnassignedStudents();
             const total = unassignedStudentPool.filter(item => !item.assignedClassId).length;
-            return `<section class="student-add-surface" aria-label="添加未分配学生">
-                <div class="student-add-toolbar">${rosterSearchMarkup({ id: 'classStudentAddSearch', value: state.classStudentAddSearch, placeholder: '搜索姓名 / 学号 / 专业', clearAction: 'clear-student-add-search', label: '搜索未分配学生' })}</div>
-                <div class="student-add-result-head"><strong>未分配学生</strong><span>${records.length}${records.length !== total ? ` / ${total}` : ''} 人</span></div>
-                <div class="unassigned-student-list">${records.length ? records.map(item => `<button type="button" class="unassigned-student-row" data-action="assign-student-to-class" data-unassigned-student-id="${escapeHtml(item.id)}" aria-label="将${escapeHtml(item.name)}添加到${escapeHtml(getClassDisplayName(getSelectedClass()))}"><span class="student-avatar ${item.gender === '男' ? 'male' : 'female'}">${studentAvatarMarkup(item)}</span><span class="unassigned-student-copy"><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.studentNo)} · ${escapeHtml(item.major)}</span></span><span class="unassigned-add-label">添加</span></button>`).join('') : '<div class="roster-empty">没有找到匹配的未分配学生</div>'}</div>
+            const selected = getStudentAddSelectedSet();
+            const allVisibleSelected = Boolean(records.length) && records.every(item => selected.has(item.id));
+            if (!total) return `<section class="student-add-surface" aria-label="添加未选班级学生"><div class="student-add-empty"><div><span class="student-add-empty-mark"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"></path><circle cx="9.5" cy="7" r="4"></circle><path d="m17 8 2 2 4-4"></path></svg></span><strong>暂无未选班级学生</strong><span>当前可添加学生均已完成班级分配</span></div></div></section>`;
+            return `<section class="student-add-surface" aria-label="添加未选班级学生">
+                <div class="student-add-toolbar">${rosterSearchMarkup({ id: 'classStudentAddSearch', value: state.classStudentAddSearch, placeholder: '搜索学生姓名', clearAction: 'clear-student-add-search', label: '搜索未选班级学生' })}</div>
+                <div class="student-add-result-head"><span class="student-add-result-count">${records.length}${records.length !== total ? ` / ${total}` : ''} 人</span><button type="button" class="student-add-toggle-all${allVisibleSelected ? ' active' : ''}" data-action="toggle-select-all-unassigned" aria-pressed="${allVisibleSelected ? 'true' : 'false'}"${records.length ? '' : ' disabled'}>${allVisibleSelected ? '取消全选' : '全选'}</button></div>
+                <div class="unassigned-student-list">${records.length ? records.map(item => {
+                    const isSelected = selected.has(item.id);
+                    return `<button type="button" class="unassigned-student-row${isSelected ? ' selected' : ''}" data-action="toggle-unassigned-student" data-unassigned-student-id="${escapeHtml(item.id)}" aria-pressed="${isSelected ? 'true' : 'false'}" aria-label="${isSelected ? '取消选择' : '选择'}${escapeHtml(item.name)}"><span class="unassigned-student-avatar-line"><span class="student-avatar ${studentGenderClass(item.gender)}">${studentAvatarMarkup(item)}</span><span class="unassigned-student-check" aria-hidden="true"><svg viewBox="0 0 24 24"><polyline points="5 12 10 17 19 7"></polyline></svg></span></span><span class="unassigned-student-name">${escapeHtml(item.name)}</span></button>`;
+                }).join('') : '<div class="student-add-empty"><div><span class="student-add-empty-mark"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path><path d="M8.5 11h5"></path></svg></span><strong>未找到学生</strong><span>换个姓名关键词试试</span></div></div>'}</div>
             </section>`;
         }
 
-        function assignStudentToClass(studentId) {
+        function toggleUnassignedStudent(studentId) {
             const candidate = unassignedStudentPool.find(item => item.id === studentId && !item.assignedClassId);
-            const classInfo = getSelectedClass();
-            if (!candidate || !classInfo) return;
-            const studentItem = createStudent({
+            if (!candidate) return;
+            const selected = getStudentAddSelectedSet();
+            if (selected.has(studentId)) selected.delete(studentId);
+            else selected.add(studentId);
+            state.classStudentAddSelectedIds = [...selected];
+            renderClassModule();
+            requestAnimationFrame(() => classModuleRoot.querySelector(`[data-unassigned-student-id="${studentId}"]`)?.focus({ preventScroll: true }));
+        }
+
+        function toggleSelectAllUnassigned() {
+            const records = getFilteredUnassignedStudents();
+            if (!records.length) return;
+            const selected = getStudentAddSelectedSet();
+            const allVisibleSelected = records.every(item => selected.has(item.id));
+            records.forEach(item => {
+                if (allVisibleSelected) selected.delete(item.id);
+                else selected.add(item.id);
+            });
+            state.classStudentAddSelectedIds = [...selected];
+            renderClassModule();
+            requestAnimationFrame(() => classModuleRoot.querySelector('[data-action="toggle-select-all-unassigned"]')?.focus({ preventScroll: true }));
+        }
+
+        function createStudentFromUnassigned(candidate, classInfo) {
+            return createStudent({
                 id: `STU${candidate.studentNo}`,
                 name: candidate.name,
                 gender: candidate.gender,
                 studentNo: candidate.studentNo,
                 phoneRaw: candidate.phoneRaw,
                 phone: formatPhone(candidate.phoneRaw),
+                guardianName: '',
+                guardianPhone: '',
+                guardianPhoneRaw: '',
+                family: [],
                 major: classInfo.major,
                 className: classInfo.name,
                 registeredGrade: candidate.registeredGrade,
@@ -13880,14 +15055,42 @@
                 logPending: false,
                 updatedAt: new Date().toLocaleString('zh-CN', { hour12: false }).replaceAll('/', '-')
             });
-            candidate.assignedClassId = classInfo.id;
-            students.push(studentItem);
-            ensureClassRoster(classInfo).push(studentItem);
-            classInfo.total += 1;
-            if (candidate.gender === '男') classInfo.male += 1;
-            else classInfo.female += 1;
+        }
+
+        function addSelectedStudentsToClass(studentIds) {
+            const classInfo = getSelectedClass();
+            if (!classInfo) return false;
+            const selectedIds = new Set(studentIds || []);
+            const candidates = unassignedStudentPool.filter(item => selectedIds.has(item.id) && !item.assignedClassId);
+            if (!candidates.length) return false;
+            const roster = ensureClassRoster(classInfo);
+            candidates.forEach(candidate => {
+                const studentItem = createStudentFromUnassigned(candidate, classInfo);
+                candidate.assignedClassId = classInfo.id;
+                students.push(studentItem);
+                roster.push(studentItem);
+                classInfo.total += 1;
+                if (studentItem.gender === '男') classInfo.male += 1;
+                else if (studentItem.gender === '女') classInfo.female += 1;
+            });
+            state.classStudentAddSelectedIds = [];
             renderClassModule();
-            showToast(`${candidate.name}已添加到${getClassDisplayName(classInfo)}`);
+            showToast(`已将 ${candidates.length} 名学生添加到${getClassDisplayName(classInfo)}`);
+            return true;
+        }
+
+        function requestAddSelectedStudents() {
+            const selected = getStudentAddSelectedSet();
+            const candidates = unassignedStudentPool.filter(item => selected.has(item.id) && !item.assignedClassId);
+            const classInfo = getSelectedClass();
+            if (!candidates.length || !classInfo) return showToast('请先选择学生');
+            openDialog({
+                title: `确认添加 ${candidates.length} 名学生？`,
+                desc: `将添加到${getClassDisplayName(classInfo)}。`,
+                confirmLabel: '确认添加',
+                cancelLabel: '返回选择',
+                onConfirm: () => addSelectedStudentsToClass(candidates.map(item => item.id))
+            });
         }
 
         function renderRepairModule() {
@@ -13951,7 +15154,7 @@
         }
 
         function renderClassModule() {
-            const titles = { leave: '学生请假', rollcall: '实时点名', discipline: '学生违纪', 'class-discipline': '班级违纪', 'class-assessment': '班级考核', 'student-ranking': '考核排名', 'return-stats': '返校统计', 'home-stats': '回家统计', 'student-comments': '学生评语', 'class-repair': '班级报修', 'student-add': '添加学生', logs: '班级日志', dorm: '宿舍管理', 'checkin-return': '返校点到任务', 'checkin-home': '回家点到任务', 'school-dorm': '全校宿舍', 'school-dorm-stats': '宿舍统计', 'discipline-setup': '违纪管理' };
+            const titles = { leave: '学生请假', rollcall: '实时点名', 'class-schedule': '班级课表', 'class-schedule-v2': '课表二版', discipline: '学生违纪', 'class-discipline': '班级违纪', 'class-assessment': '班级考核', 'student-ranking': '考核排名', 'return-stats': '返校统计', 'home-stats': '回家统计', 'student-comments': '学生评语', 'class-repair': '班级报修', 'student-add': '添加未选班级学生', logs: '班级日志', dorm: '宿舍管理', 'checkin-return': '返校点到任务', 'checkin-home': '回家点到任务', 'school-dorm': '全校宿舍', 'school-dorm-stats': '宿舍统计', 'discipline-setup': '违纪管理' };
             classModuleTitle.textContent = getV791ClassModuleTitle(titles);
             classModuleView.setAttribute('aria-label', state.classModuleOrigin === 'school' ? '学校管理业务' : '班级业务');
             classModuleBackButton.setAttribute('aria-label', state.classModuleOrigin === 'school' ? '返回学校管理' : '返回班级管理');
@@ -13966,6 +15169,8 @@
             if (state.classModule === 'student-comments') classModuleRoot.innerHTML = renderStudentCommentsModule();
             if (state.classModule === 'class-repair') classModuleRoot.innerHTML = renderRepairModule();
             if (state.classModule === 'student-add') classModuleRoot.innerHTML = renderStudentAddModule();
+            if (state.classModule === 'class-schedule') classModuleRoot.innerHTML = renderClassScheduleModule();
+            if (state.classModule === 'class-schedule-v2') classModuleRoot.innerHTML = renderClassScheduleV2Module();
             if (state.classModule === 'logs') classModuleRoot.innerHTML = renderLogsModule();
             if (state.classModule === 'dorm') classModuleRoot.innerHTML = renderDormModule();
             if (state.classModule === 'checkin-return') classModuleRoot.innerHTML = renderCheckinModule('return');
@@ -13976,13 +15181,31 @@
             if (state.classModule === 'school-dorm') updateSchoolDormNavigation();
             classModuleView.classList.toggle('school-dorm-room-mode', state.classModule === 'school-dorm' && state.schoolDormLevel === 'rooms');
             classModuleView.classList.toggle('dorm-stats-mode', state.classModule === 'school-dorm-stats');
+            classModuleView.classList.toggle('student-add-mode', state.classModule === 'student-add');
+            classModuleView.classList.toggle('schedule-v1-mode', state.classModule === 'class-schedule');
+            classModuleView.classList.toggle('schedule-v2-mode', state.classModule === 'class-schedule-v2');
             if (state.classModule === 'logs') updateLogRosterSearchResults();
             classModuleFloatingAction.hidden = true;
-            classModuleScroll.classList.remove('has-floating-action');
+            classModuleFloatingAction.disabled = false;
+            classModuleFloatingAction.classList.remove('student-add-confirm');
+            classModuleFloatingAction.dataset.action = 'add-discipline';
+            classModuleFloatingAction.removeAttribute('aria-label');
+            classModuleFloatingAction.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg><span>添加记录</span>';
+            classModuleScroll.classList.remove('has-floating-action','has-student-add-action');
             classModuleScroll.classList.toggle('student-status-scroll', state.classModule === 'rollcall');
             classModuleScroll.classList.toggle('leave-module-scroll', state.classModule === 'leave');
             classModuleScroll.classList.toggle('class-record-scroll', ['class-discipline','class-assessment','student-ranking','return-stats','home-stats','student-comments','dorm'].includes(state.classModule));
             classModuleScroll.classList.toggle('v791-data-scroll', ['student-ranking','return-stats','home-stats','student-comments','dorm'].includes(state.classModule));
+            if (state.classModule === 'student-add') {
+                const selectedCount = getStudentAddSelectedSet().size;
+                classModuleFloatingAction.hidden = false;
+                classModuleFloatingAction.disabled = selectedCount === 0;
+                classModuleFloatingAction.classList.add('student-add-confirm');
+                classModuleFloatingAction.dataset.action = 'request-add-selected-students';
+                classModuleFloatingAction.setAttribute('aria-label', selectedCount ? `添加已选的${selectedCount}名学生` : '请先选择学生');
+                classModuleFloatingAction.innerHTML = `<span>添加（${selectedCount}）</span>`;
+                classModuleScroll.classList.add('has-student-add-action');
+            }
             classModuleBackButton.setAttribute('aria-label', getV791ClassModuleBackLabel());
             hideLeaveScrollTime();
             updateStudentStatusTopButton();
@@ -14011,7 +15234,14 @@
                 state.disciplineListFilter = 'mine';
             }
             if (module === 'class-repair') state.repairStatusFilter = '待处理';
-            if (module === 'student-add') state.classStudentAddSearch = '';
+            if (module === 'student-add') {
+                state.classStudentAddSearch = '';
+                state.classStudentAddSelectedIds = [];
+            }
+            if (module === 'class-schedule' || module === 'class-schedule-v2') {
+                state.classScheduleSearch = '';
+                state.classScheduleSelectedDays = classScheduleDays.map(item => item.id);
+            }
             if (module === 'class-discipline') {
                 state.classDisciplineTab = 'pending';
                 state.classAssessmentWeek = 0;
@@ -14166,7 +15396,7 @@
             if (action === 'submit-exact-student-search') submitExactStudentSearch();
             if (action === 'toggle-follow-student') toggleFollowedStudent(button.dataset.followId);
             if (action === 'call-student') openCallSheet(button);
-            if (action === 'call-guardian') openParentPicker(button);
+            if (action === 'call-home-school') openHomeSchoolCallSheet(button);
             if (action === 'copy') copyPhoneNumber(button.dataset.copy, button);
             if (action === 'open-student-portrait-editor') openStudentPortraitEditor(button);
             if (action === 'edit-student-portrait-field') editStudentPortraitField(button.dataset.portraitPath);
@@ -14215,7 +15445,14 @@
                 renderClassModule();
                 requestAnimationFrame(() => document.getElementById('classStudentAddSearch')?.focus());
             }
-            if (action === 'assign-student-to-class') assignStudentToClass(button.dataset.unassignedStudentId);
+            if (action === 'clear-class-schedule-search') {
+                state.classScheduleSearch = '';
+                renderClassModule();
+                requestAnimationFrame(() => document.getElementById('classScheduleSearch')?.focus());
+            }
+            if (action === 'toggle-unassigned-student') toggleUnassignedStudent(button.dataset.unassignedStudentId);
+            if (action === 'toggle-select-all-unassigned') toggleSelectAllUnassigned();
+            if (action === 'request-add-selected-students') requestAddSelectedStudents();
             if (action === 'clear-log-roster-search') {
                 state.logRosterSearch = '';
                 const input = document.getElementById('logRosterSearch');
@@ -14796,6 +16033,20 @@
         });
 
         appDevice.addEventListener('keydown', event => {
+            if (event.target.id === 'classRosterSearch') {
+                if (event.key === 'Escape' && state.classStudentSearch) {
+                    event.preventDefault();
+                    state.classStudentSearch = '';
+                    event.target.value = '';
+                    updateClassRosterSearchResults();
+                    return;
+                }
+                if (event.key === 'Enter' && !event.isComposing) {
+                    event.preventDefault();
+                    event.target.blur();
+                    return;
+                }
+            }
             const quickEntry = event.target.closest('.quick-entry[data-quick-token]');
             if (quickEntry && event.altKey && ['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key) && isQuickManageContext(quickEntry.dataset.quickContext)) {
                 event.preventDefault();
@@ -14839,6 +16090,11 @@
                         input.setSelectionRange(input.value.length, input.value.length);
                     }
                 });
+                return;
+            }
+            if (event.target.id === 'classScheduleSearch') {
+                state.classScheduleSearch = event.target.value;
+                if (!event.isComposing) updateClassScheduleSearchResults(event.target.value);
                 return;
             }
             if (event.target.id === 'classRosterSearch') {
@@ -14969,9 +16225,9 @@
             setTimeout(closeCallSheet, 160);
         });
         callLayer.addEventListener('click', event => {
-            const dial = event.target.closest('[data-guardian-dial]');
+            const dial = event.target.closest('[data-contact-dial]');
             if (dial) {
-                showToast(`正在调用系统拨号 ${formatPhone(dial.dataset.guardianPhone)}`);
+                showToast(`正在拨打${dial.dataset.contactName || '联系人'} ${formatPhone(dial.dataset.contactPhone)}`);
                 setTimeout(closeCallSheet, 160);
                 return;
             }
@@ -15177,7 +16433,7 @@
                 clock: '14:22',
                 recorder: '韩雨',
                 type: '课堂违纪',
-                description: '护理实训开始后仍未按要求穿戴实训服，现场补充穿戴后继续课程。',
+                description: '商品拍摄与后期处理开始后仍未按要求准备实训用品，现场补充后继续课程。',
                 status: 'processed',
                 handler: '周静怡',
                 handledAt: '2026-07-03 18:20',
@@ -15249,13 +16505,13 @@
                 clock: '19:28',
                 recorder: '值班教师',
                 type: '课堂违纪',
-                description: '晚自习期间多次出现随意走动与交谈，值班教师完成现场提醒。',
+                description: '晚间巡查期间多次出现随意走动与交谈，值班教师完成现场提醒。',
                 status: 'processed',
                 handler: '周静怡',
                 handledAt: '2026-06-05 10:15',
                 multiplier: 1,
                 finalPoints: 2,
-                photoLabel: '晚自习巡查记录'
+                photoLabel: '晚间巡查记录'
             },
             {
                 id: 'class-discipline-6412',
@@ -16175,6 +17431,22 @@
         });
 
         appDevice.addEventListener('change', event => {
+            const scheduleDay = event.target.closest('[data-schedule-day]');
+            if (scheduleDay) {
+                const dayId = String(scheduleDay.dataset.scheduleDay || '');
+                const selected = new Set((state.classScheduleSelectedDays || []).map(String));
+                if (scheduleDay.checked) selected.add(dayId);
+                else selected.delete(dayId);
+                if (!selected.size) {
+                    scheduleDay.checked = true;
+                    showToast('至少保留一天课表');
+                    return;
+                }
+                state.classScheduleSelectedDays = classScheduleDays.filter(day => selected.has(day.id)).map(day => day.id);
+                renderClassModule();
+                requestAnimationFrame(() => classModuleRoot.querySelector(`[data-schedule-day="${dayId}"]`)?.focus({ preventScroll: true }));
+                return;
+            }
             if (event.target.id !== 'studentAcademicStatusSelect') return;
             state.pendingAcademicStatus = event.target.value;
             const confirm = attendanceRoot.querySelector('[data-action="confirm-student-academic-status"]');
@@ -16217,6 +17489,8 @@
         else if (previewRoute === 'class-management') { openClassDetail('CLS2403'); switchClassTab('management'); }
         else if (previewRoute === 'class-info') { openClassDetail('CLS2403'); switchClassTab('info'); }
         else if (previewRoute === 'student-add') { openClassDetail('CLS2403'); switchClassTab('info'); openClassModule('student-add', 'info'); }
+        else if (previewRoute === 'class-schedule') { openClassDetail('CLS2403'); openClassModule('class-schedule'); }
+        else if (previewRoute === 'class-schedule-v2') { openClassDetail('CLS2403'); openClassModule('class-schedule-v2'); }
         else if (previewRoute === 'class-repair') { openClassDetail('CLS2403'); openClassModule('class-repair'); }
         else if (previewRoute === 'class-repair-processing') { openClassDetail('CLS2403'); openClassModule('class-repair'); state.repairStatusFilter = '处理中'; renderClassModule(); }
         else if (previewRoute === 'class-discipline') { openClassDetail('CLS2403'); openClassModule('class-discipline'); }
@@ -16241,6 +17515,7 @@
         else if (previewRoute === 'discipline-setup') openSchoolModule('discipline-setup');
         else if (previewRoute === 'add-student') openStudentList();
         else if (previewRoute === 'student-detail') { openStudentList(); openStudentDetail(students[0].id); }
+        else if (previewRoute === 'student-home-school') { openStudentList(); openStudentDetail(students[0].id); openHomeSchoolCallSheet(); }
         else if (previewRoute === 'student-status') { openStudentList(); openStudentDetail(students[0].id); openStudentAttendance(); }
         else if (previewRoute === 'student-grades') { openStudentList(); openStudentDetail(students[0].id); switchTab('grades'); }
         else if (previewRoute === 'student-materials') { openStudentList(); openStudentDetail(students[0].id); switchTab('materials'); }
