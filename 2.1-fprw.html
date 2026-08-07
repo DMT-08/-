@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#EFF6FF">
-    <title>掌上校园 · 搜索清除与课表中文输入修复 7.106</title>
+    <title>掌上校园 · 班干部宿舍高频与保修信息优化 7.110</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
@@ -10037,14 +10037,686 @@
             box-shadow: inset 0 0 0 1.5px rgba(31,95,255,.30);
         }
 
-        /* 7.106：统一保留搜索框原生清除按钮，移除重复的前置蓝色清除按钮。 */
-        .class-search-clear,
-        .student-search-clear,
-        .roster-search-clear,
-        .leave-search-clear,
-        .student-log-search-clear,
-        .class-schedule-clear {
-            display: none !important;
+        /* 7.107：保留最右侧灰色清除按钮，隐藏靠左的 WebKit 系统蓝色按钮。 */
+        .class-search input::-webkit-search-cancel-button,
+        .student-search input::-webkit-search-cancel-button,
+        .roster-search input::-webkit-search-cancel-button,
+        .leave-search input::-webkit-search-cancel-button,
+        .student-log-search input::-webkit-search-cancel-button,
+        .class-schedule-search input::-webkit-search-cancel-button {
+            display: none;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+        .class-search input::-ms-clear,
+        .student-search input::-ms-clear,
+        .roster-search input::-ms-clear,
+        .leave-search input::-ms-clear,
+        .student-log-search input::-ms-clear,
+        .class-schedule-search input::-ms-clear {
+            display: none;
+        }
+
+        /* 双版课表紧贴内容面四边；固定纵向画布，避免 iOS 聚焦搜索时产生顶部橡皮筋空白。 */
+        #classModuleView.schedule-v1-mode .class-module-scroll,
+        #classModuleView.schedule-v2-mode .class-module-scroll {
+            inset: 100px 0 0;
+            overflow: hidden;
+            overscroll-behavior: none;
+            -webkit-overflow-scrolling: auto;
+        }
+        body.schedule-keyboard-safe {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+        #classModuleView.schedule-v1-mode #classModuleRoot,
+        #classModuleView.schedule-v2-mode #classModuleRoot {
+            padding: 0;
+            border-radius: 0;
+        }
+        #classModuleView.schedule-v1-mode .class-schedule-tools,
+        #classModuleView.schedule-v2-mode .schedule-v2-surface {
+            gap: 0;
+            padding: 0;
+        }
+        #classModuleView.schedule-v1-mode .class-schedule-search input,
+        #classModuleView.schedule-v2-mode .class-schedule-search input {
+            border-radius: 0;
+        }
+        #classModuleView.schedule-v1-mode .class-schedule-search input:focus,
+        #classModuleView.schedule-v2-mode .class-schedule-search input:focus {
+            box-shadow: inset 0 0 0 2px rgba(31,95,255,.16);
+        }
+
+        /* 一版使用明确网格行高，规避 iPadOS Safari 的 table 百分比高度顶部留白。 */
+        #classModuleView.schedule-v1-mode .class-schedule-table {
+            display: grid;
+            grid-template-rows: 34px minmax(0,1fr);
+            height: 100%;
+            overflow: hidden;
+        }
+        #classModuleView.schedule-v1-mode .class-schedule-table thead,
+        #classModuleView.schedule-v1-mode .class-schedule-table tbody {
+            min-width: 0;
+            min-height: 0;
+            display: grid;
+            height: auto;
+        }
+        #classModuleView.schedule-v1-mode .class-schedule-table thead {
+            grid-template-rows: minmax(0,1fr);
+        }
+        #classModuleView.schedule-v1-mode .class-schedule-table tbody {
+            grid-template-rows: repeat(9,minmax(0,1fr));
+        }
+        #classModuleView.schedule-v1-mode .class-schedule-table tr {
+            min-width: 0;
+            min-height: 0;
+            display: grid;
+            grid-template-columns: 34px repeat(7,minmax(0,1fr));
+            height: auto;
+        }
+        #classModuleView.schedule-v1-mode .class-schedule-table th,
+        #classModuleView.schedule-v1-mode .class-schedule-table td {
+            min-width: 0;
+            min-height: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 二版文字轻量放大一级。 */
+        #classModuleView.schedule-v2-mode .schedule-v2-course strong {
+            font-size: 12px;
+            line-height: 15px;
+        }
+        #classModuleView.schedule-v2-mode .schedule-v2-course > span {
+            font-size: 10px;
+            line-height: 13px;
+        }
+
+        /* 7.108：成绩联想、点名时间、圆角课表搜索、全屏凭证与头像选框。 */
+        .grade-combobox {
+            position: relative;
+        }
+        .grade-combobox input {
+            padding-right: 46px;
+        }
+        .grade-combobox-picker {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 36px;
+            height: 36px;
+            display: grid;
+            place-items: center;
+            border: 0;
+            border-radius: 9px;
+            color: var(--brand);
+            background: rgba(31,95,255,.08);
+            transition: transform .16s ease, background .16s ease;
+        }
+        .grade-combobox-picker:active {
+            transform: scale(.94);
+            background: rgba(31,95,255,.14);
+        }
+        .grade-combobox-picker svg {
+            width: 17px;
+            height: 17px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        #classModuleView.schedule-v1-mode .class-schedule-search,
+        #classModuleView.schedule-v2-mode .class-schedule-search {
+            margin: 0 16px 8px;
+        }
+        #classModuleView.schedule-v1-mode .class-schedule-search input,
+        #classModuleView.schedule-v2-mode .class-schedule-search input {
+            border-radius: 12px;
+        }
+        #classModuleView.schedule-v1-mode .class-schedule-search input:focus,
+        #classModuleView.schedule-v2-mode .class-schedule-search input:focus {
+            box-shadow: 0 0 0 3px rgba(31,95,255,.07);
+        }
+        .leave-detail-actions {
+            border-top: 0;
+        }
+        .leave-evidence-preview {
+            position: absolute;
+            inset: 0;
+            z-index: 190;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            background: #05070B;
+            cursor: zoom-out;
+            touch-action: manipulation;
+        }
+        .leave-evidence-preview[hidden] {
+            display: none;
+        }
+        .leave-evidence-preview-surface {
+            width: 100%;
+            height: 100%;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+        }
+        .leave-evidence-preview-surface > svg,
+        .leave-evidence-preview-surface > img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: contain;
+        }
+        .unassigned-student-avatar-line {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            display: block;
+        }
+        .unassigned-student-check {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            z-index: 2;
+            border-color: #B9C4D3;
+            border-radius: 5px;
+            color: transparent;
+            background: rgba(255,255,255,.96);
+            box-shadow: 0 2px 7px rgba(15,23,42,.12);
+        }
+        .unassigned-student-row.selected .unassigned-student-check {
+            border-color: var(--brand);
+            border-radius: 5px;
+            box-shadow: 0 3px 8px rgba(31,95,255,.24);
+        }
+        .student-status-scroll .status-manager-head em {
+            color: var(--muted);
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* 7.109：违纪列表提级、报修全字段台账与考核表格对齐修复。 */
+        .class-discipline-list-row {
+            min-height: 76px;
+            padding-block: 10px;
+        }
+        .class-discipline-list-row .class-record-copy {
+            gap: 4px;
+        }
+        .class-discipline-list-title {
+            font-size: 18px;
+            line-height: 1.32;
+            letter-spacing: -.15px;
+        }
+        .class-discipline-list-title b {
+            margin-left: 3px;
+            color: #B91C1C;
+            font-size: 14px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+        .class-discipline-list-fields {
+            grid-template-columns: minmax(0,1.25fr) minmax(0,.75fr);
+            gap: 4px 10px;
+        }
+        .class-discipline-list-field {
+            grid-template-columns: auto minmax(0,1fr);
+            align-items: baseline;
+            gap: 5px;
+        }
+        .class-discipline-list-field span {
+            font-size: 10px;
+        }
+        .class-discipline-list-field strong {
+            font-size: 12px;
+        }
+        .class-discipline-primary {
+            padding-top: 12px;
+        }
+        .class-discipline-description p.is-empty {
+            color: #94A3B8;
+            font-weight: 700;
+        }
+
+        .repair-list {
+            border-top: 1px solid rgba(15,23,42,.07);
+        }
+        .repair-row {
+            padding: 16px 2px 18px;
+        }
+        .repair-row-head strong {
+            font-size: 18px;
+            line-height: 1.32;
+            letter-spacing: -.15px;
+        }
+        .repair-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2,minmax(0,1fr));
+            gap: 12px 14px;
+            margin-top: 13px;
+        }
+        .repair-detail-field {
+            min-width: 0;
+            display: grid;
+            align-content: start;
+            gap: 3px;
+        }
+        .repair-detail-field.wide {
+            grid-column: 1 / -1;
+        }
+        .repair-detail-field > span,
+        .repair-photo-field > span {
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 750;
+            line-height: 1.3;
+        }
+        .repair-detail-field > strong {
+            min-width: 0;
+            overflow-wrap: anywhere;
+            color: var(--body);
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.5;
+        }
+        .repair-detail-field.description > strong {
+            font-size: 13px;
+            font-weight: 650;
+            line-height: 1.65;
+        }
+        .repair-detail-field > strong.pending {
+            color: #B45309;
+        }
+        .repair-detail-field > strong.accepted {
+            color: #047857;
+        }
+        .repair-photo-field {
+            grid-column: 1 / -1;
+            min-width: 0;
+        }
+        .repair-photo-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 7px;
+        }
+        .repair-photo-thumb {
+            width: 58px;
+            height: 58px;
+            flex: 0 0 58px;
+            padding: 0;
+            overflow: hidden;
+            border: 1px solid rgba(100,116,139,.14);
+            border-radius: 10px;
+            background: #EEF2F7;
+            box-shadow: none;
+            touch-action: manipulation;
+        }
+        .repair-photo-thumb:active {
+            transform: scale(.95);
+        }
+        .repair-photo-thumb svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .repair-photo-empty {
+            color: #94A3B8;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .v791-table-head.v791-assessment-grid,
+        button.v791-table-row.v791-assessment-grid {
+            box-sizing: border-box;
+            grid-template-columns: 58px 54px minmax(0,1fr) 66px;
+            column-gap: 0;
+            margin: 0;
+            padding-inline: 0;
+            text-align: center;
+        }
+        button.v791-table-row.v791-assessment-grid {
+            appearance: none;
+            font-family: inherit;
+        }
+        .v791-assessment-grid > * {
+            width: 100%;
+            padding-inline: 2px;
+            text-align: center;
+            justify-self: stretch;
+        }
+        .v791-table-head.v791-assessment-grid > span {
+            white-space: nowrap;
+        }
+
+        /* 7.110：固定高频班务，开放班干部设置，并压缩宿舍与保修信息层级。 */
+        .class-high-fixed-count {
+            flex: 0 0 auto;
+            color: #94A3B8;
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 20px;
+        }
+
+        .class-cadre-surface {
+            min-height: calc(100% + 1px);
+            padding-bottom: 40px;
+        }
+        .class-cadre-summary {
+            display: grid;
+            grid-template-columns: repeat(3,minmax(0,1fr));
+            margin: 0 0 8px;
+            padding: 0 0 14px;
+            border-bottom: 1px solid rgba(15,23,42,.065);
+        }
+        .class-cadre-summary span {
+            min-width: 0;
+            display: grid;
+            gap: 4px;
+            padding: 0 12px;
+            border-right: 1px solid rgba(15,23,42,.06);
+            color: #64748B;
+            font-size: 11px;
+            font-weight: 650;
+            text-align: center;
+        }
+        .class-cadre-summary span:first-child { padding-left: 0; }
+        .class-cadre-summary span:last-child { padding-right: 0; border-right: 0; }
+        .class-cadre-summary strong {
+            color: #111827;
+            font-size: 18px;
+            font-weight: 850;
+            font-variant-numeric: tabular-nums;
+            line-height: 1;
+        }
+        .class-cadre-summary .assigned strong { color: #1F5FFF; }
+
+        .class-cadre-toolbar {
+            position: sticky;
+            top: -16px;
+            z-index: 18;
+            margin: 0 -20px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,.96);
+            box-shadow: 0 1px 0 rgba(15,23,42,.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        .class-cadre-search { position: relative; }
+        .class-cadre-search > svg {
+            position: absolute;
+            top: 50%;
+            left: 12px;
+            width: 17px;
+            height: 17px;
+            transform: translateY(-50%);
+            fill: none;
+            stroke: #94A3B8;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            pointer-events: none;
+        }
+        .class-cadre-search input {
+            width: 100%;
+            height: 40px;
+            padding: 0 40px;
+            border: 1px solid rgba(100,116,139,.12);
+            border-radius: 11px;
+            outline: 0;
+            color: #111827;
+            background: #F8FAFC;
+            font-size: 13px;
+            font-weight: 650;
+        }
+        .class-cadre-search input:focus {
+            border-color: rgba(31,95,255,.30);
+            background: #FFFFFF;
+            box-shadow: 0 0 0 3px rgba(31,95,255,.07);
+        }
+        .class-cadre-search-clear {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 32px;
+            height: 32px;
+            display: none;
+            place-items: center;
+            padding: 0;
+            border: 0;
+            border-radius: 9px;
+            color: #64748B;
+            background: #EEF2F7;
+        }
+        .class-cadre-search-clear.visible { display: grid; }
+        .class-cadre-search-clear svg {
+            width: 14px;
+            height: 14px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.4;
+            stroke-linecap: round;
+        }
+        .class-cadre-result {
+            min-height: 24px;
+            display: flex;
+            align-items: flex-end;
+            padding: 7px 2px 3px;
+            color: #64748B;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .class-cadre-list { border-top: 1px solid rgba(15,23,42,.065); }
+        .class-cadre-row {
+            min-height: 62px;
+            display: grid;
+            grid-template-columns: minmax(0,1fr) 126px;
+            align-items: center;
+            gap: 12px;
+            padding: 9px 2px;
+            border-bottom: 1px solid rgba(15,23,42,.06);
+        }
+        .class-cadre-row[hidden] { display: none; }
+        .class-cadre-student {
+            min-width: 0;
+            display: grid;
+            gap: 3px;
+        }
+        .class-cadre-student strong {
+            overflow: hidden;
+            color: #111827;
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.3;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .class-cadre-student span {
+            color: #64748B;
+            font-size: 10px;
+            font-weight: 650;
+            font-variant-numeric: tabular-nums;
+        }
+        .class-cadre-select-wrap { position: relative; min-width: 0; }
+        .class-cadre-select-wrap::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            width: 6px;
+            height: 6px;
+            margin-top: -5px;
+            border-right: 1.8px solid currentColor;
+            border-bottom: 1.8px solid currentColor;
+            color: #64748B;
+            transform: rotate(45deg);
+            pointer-events: none;
+        }
+        .class-cadre-role-select {
+            width: 100%;
+            height: 36px;
+            display: block;
+            padding: 0 28px 0 10px;
+            border: 1px solid rgba(100,116,139,.14);
+            border-radius: 10px;
+            outline: 0;
+            appearance: none;
+            -webkit-appearance: none;
+            color: #64748B;
+            background: #F8FAFC;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: normal;
+            text-align: left;
+        }
+        .class-cadre-role-select.has-role {
+            border-color: rgba(31,95,255,.18);
+            color: #1747C8;
+            background: rgba(31,95,255,.07);
+        }
+        .class-cadre-role-select:focus {
+            border-color: rgba(31,95,255,.34);
+            box-shadow: 0 0 0 3px rgba(31,95,255,.07);
+        }
+        .class-cadre-empty {
+            padding: 36px 0;
+            color: #94A3B8;
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        /* 本班宿舍表头跟随内容滚动，并移除序号列。 */
+        .v791-table-head.v791-dorm-grid {
+            position: static;
+            top: auto;
+            z-index: auto;
+            grid-template-columns: 76px 66px 36px minmax(0,1fr);
+            box-shadow: none;
+        }
+        button.v791-table-row.v791-dorm-grid {
+            grid-template-columns: 76px 66px 36px minmax(0,1fr);
+        }
+        .v791-dorm-occupancy strong { font-variant-numeric: tabular-nums; }
+        .v791-bed-head,
+        .v791-bed-row {
+            grid-template-columns: 78px minmax(0,1fr) 76px;
+        }
+        .v791-bed-row > strong:first-child {
+            font-size: 11px;
+            line-height: 1.35;
+        }
+
+        /* iOS 下使用固定高度与自绘箭头，避免当前违纪筛选项上下错位。 */
+        .v791-record-filter { grid-template-columns: minmax(0,1fr); align-items: stretch; margin-top: 10px; }
+        .v791-record-filter select {
+            height: 38px;
+            min-height: 38px;
+            display: block;
+            padding-top: 0;
+            padding-bottom: 0;
+            appearance: none;
+            -webkit-appearance: none;
+            line-height: normal;
+            background-image: linear-gradient(45deg,transparent 50%,#64748B 50%),linear-gradient(135deg,#64748B 50%,transparent 50%);
+            background-position: calc(100% - 15px) 15px,calc(100% - 10px) 15px;
+            background-repeat: no-repeat;
+            background-size: 5px 5px,5px 5px;
+        }
+
+        /* 班级保修默认只展示可扫读摘要，展开后再承载完整字段与图片。 */
+        .repair-list { border-top: 1px solid rgba(15,23,42,.07); }
+        details.repair-row {
+            margin: 0;
+            padding: 0;
+            border-bottom: 1px solid rgba(15,23,42,.07);
+        }
+        .repair-row-summary {
+            position: relative;
+            display: grid;
+            grid-template-columns: minmax(0,1fr) auto;
+            gap: 7px 10px;
+            padding: 13px 25px 13px 2px;
+            list-style: none;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .repair-row-summary::-webkit-details-marker { display: none; }
+        .repair-row-summary::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            right: 5px;
+            width: 7px;
+            height: 7px;
+            border-right: 2px solid #94A3B8;
+            border-bottom: 2px solid #94A3B8;
+            transform: rotate(45deg);
+            transition: transform .2s ease,top .2s ease;
+        }
+        details.repair-row[open] .repair-row-summary::after {
+            top: 24px;
+            transform: rotate(225deg);
+        }
+        .repair-row-title {
+            min-width: 0;
+            display: grid;
+            gap: 4px;
+        }
+        .repair-row-title strong {
+            overflow: hidden;
+            color: #111827;
+            font-size: 15px;
+            font-weight: 850;
+            line-height: 1.35;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .repair-row-title span {
+            overflow: hidden;
+            color: #64748B;
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 1.4;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .repair-row-brief {
+            grid-column: 1 / -1;
+            display: -webkit-box;
+            overflow: hidden;
+            margin: 0;
+            color: #475569;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1.55;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 1;
+        }
+        .repair-row-detail {
+            padding: 0 2px 16px;
+            border-top: 1px dashed rgba(100,116,139,.14);
+        }
+        .repair-row-detail .repair-detail-grid {
+            margin-top: 12px;
+        }
+        @media (max-width: 374px) {
+            .v791-table-head.v791-dorm-grid,
+            button.v791-table-row.v791-dorm-grid {
+                grid-template-columns: 72px 62px 34px minmax(0,1fr);
+            }
+            .class-cadre-row { grid-template-columns: minmax(0,1fr) 120px; }
+        }
+
+        @supports (height: 100dvh) {
+            body.schedule-keyboard-safe { height: 100dvh; }
+            .device { max-height: 100dvh; }
         }
 
     </style>
@@ -10290,8 +10962,8 @@
                     <span class="sr-only" id="tabHint">可使用方向键、Home 和 End 键切换分区</span>
                     <button type="button" class="tab-button" id="tab-grades" role="tab" aria-selected="true" aria-controls="panelRoot" tabindex="0" data-tab="grades">成绩</button>
                     <button type="button" class="tab-button" id="tab-family" role="tab" aria-selected="false" aria-controls="panelRoot" tabindex="-1" data-tab="family">家校</button>
-                    <button type="button" class="tab-button" id="tab-archive" role="tab" aria-selected="false" aria-controls="panelRoot" tabindex="-1" data-tab="archive">档案</button>
-                    <button type="button" class="tab-button" id="tab-materials" role="tab" aria-selected="false" aria-controls="panelRoot" tabindex="-1" data-tab="materials">材料</button>
+                    <button type="button" class="tab-button" id="tab-archive" role="tab" aria-selected="false" aria-controls="panelRoot" tabindex="-1" data-tab="archive">资料</button>
+                    <button type="button" class="tab-button" id="tab-materials" role="tab" aria-selected="false" aria-controls="panelRoot" tabindex="-1" data-tab="materials">档案</button>
                 </div>
                 <section id="panelRoot" role="tabpanel" aria-labelledby="tab-grades"></section>
             </main>
@@ -10321,6 +10993,10 @@
             <main class="attendance-edit-scroll" id="attendanceEditorScroll">
                 <div id="attendanceEditorRoot"></div>
             </main>
+        </section>
+
+        <section class="leave-evidence-preview" id="leaveEvidencePreview" role="dialog" aria-modal="true" aria-label="请假申请凭证全屏预览，点击任意区域退出" tabindex="-1" hidden>
+            <div class="leave-evidence-preview-surface" id="leaveEvidencePreviewSurface"></div>
         </section>
 
         <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
@@ -10456,11 +11132,12 @@
                 { subject: 'Java', score: '92', rank: '5', rankTotal: '46', examType: '入学摸底', date: '2026-09-08' }
             ],
             attachments: [
-                { name: '身份证正面', status: '审核通过', updatedAt: '2026-06-18', note: '人像面清晰' },
-                { name: '身份证反面', status: '审核通过', updatedAt: '2026-06-18', note: '国徽面清晰' },
-                { name: '报考协议', status: '审核通过', updatedAt: '2026-06-18', note: '签字页完整' },
-                { name: '户口本主页与本人页', status: '审核不通过', updatedAt: '2026-07-05', note: '缺少完整户主页' },
-                { name: '体检报告', status: '已上传', updatedAt: '2026-04-18', note: '等待校医室复核' }
+                { name: '身份证正面照片', updatedAt: '2026-06-18' },
+                { name: '身份证反面照片', updatedAt: '2026-06-18' },
+                { name: '报考协议正面', updatedAt: '2026-06-18' },
+                { name: '报考协议背面', updatedAt: '2026-06-18' },
+                { name: '户口本户主页', updatedAt: '2026-07-05' },
+                { name: '户口本本人页', updatedAt: '2026-07-05' }
             ],
             avatarUrl: '',
             currentAttendance: '在校',
@@ -10481,7 +11158,7 @@
             ],
             account: { username: '13825163201', enabled: true, lastLogin: '2026-07-09 20:16' },
             updatedAt: '2026-07-10 09:42',
-            nextAction: '补传完整户口本主页，并确认视力复查结果'
+            nextAction: '补充户口本本人页，并确认视力复查结果'
         };
 
         function enforceSinglePrimaryGuardian(data) {
@@ -10536,7 +11213,7 @@
                 id: 'STU2026240412', name: '陈柏安', gender: '男', studentNo: '2026240412', phone: '136 2662 6621', phoneRaw: '13626626621',
                 major: '新能源汽车运用与维修', className: '新能源汽车 2404 班', registeredGrade: '2026 级', studentStatus: '新生注册',
                 guardianName: '陈慧玲', guardianPhone: '138 7261 6508', guardianPhoneRaw: '13872616508', updatedAt: '2026-07-08 09:54',
-                nextAction: '实训课前复核运动限制，并催办户口本材料审核结果',
+                nextAction: '实训课前复核运动限制，并确认户口本材料已补齐',
                 family: [
                     { relation: '母亲', name: '陈慧玲', idNumber: '440305198202166528', education: '大专', job: '行政专员', phone: '138 7261 6508', phoneRaw: '13872616508', guardian: true },
                     { relation: '父亲', name: '陈志强', idNumber: '440305197812026512', education: '高中', job: '设备维修', phone: '135 4418 2096', phoneRaw: '13544182096', guardian: false }
@@ -10570,7 +11247,7 @@
                 id: 'STU2026240611', name: '谢承宇', gender: '男', studentNo: '2026240611', phone: '132 5068 1934', phoneRaw: '13250681934',
                 major: '新能源汽车运用与维修', className: '新能源汽车 2406 班', studentStatus: '退学',
                 guardianName: '谢文静', guardianPhone: '135 8013 9927', guardianPhoneRaw: '13580139927', updatedAt: '2026-07-10 10:20',
-                nextAction: '补充体检报告，并完成学生账号首次登录确认',
+                nextAction: '补充报考协议背面，并完成学生账号首次登录确认',
                 family: [{ relation: '母亲', name: '谢文静', idNumber: '440308198508019927', education: '高中', job: '个体经营', phone: '135 8013 9927', phoneRaw: '13580139927', guardian: true }]
             })
         ];
@@ -10687,6 +11364,7 @@
             studentStatusByClass: {},
             studentStatusHandledByDay: {},
             studentStatusMealByDay: {},
+            studentStatusUpdatedAtByDay: { [`CLS2403-${formatLocalDate()}`]: `${formatLocalDate()} 07:42` },
             checkinTasks: [
                 { id: 'return-20260724', type: 'return', title: '暑期实训返校点到', window: '7月24日 14:00—18:00', status: '进行中', createdBy: '学工处 · 陈老师', checkedIds: [] },
                 { id: 'return-20260718', type: 'return', title: '周末返校点到', window: '7月18日 16:00—19:00', status: '已完成', createdBy: '学工处 · 李老师', checkedIds: [] },
@@ -10711,10 +11389,72 @@
         ];
 
         const classRepairRecords = [
-            { id: 'repair-1', title: '教室空调无法制冷', location: '教学楼 A203', submittedAt: '今天 08:16', submitter: '周静怡', status: '待处理', description: '空调已开启但持续吹送常温风，教室温度较高。' },
-            { id: 'repair-2', title: '后门门锁松动', location: '教学楼 A203', submittedAt: '昨天 17:42', submitter: '赵明远', status: '待处理', description: '后门锁舌无法稳定回弹，需要检修固定。' },
-            { id: 'repair-3', title: '多媒体投影画面闪烁', location: '教学楼 A203', submittedAt: '08月03日 10:25', submitter: '韩雨', status: '处理中', description: '设备处已完成现场检查，等待更换视频连接线。' },
-            { id: 'repair-4', title: '走廊饮水机漏水', location: 'A区二层走廊', submittedAt: '07月30日 15:08', submitter: '陈老师', status: '已处理', description: '密封圈已更换，复测后未继续漏水。' }
+            {
+                id: 'repair-1',
+                title: '宿舍空调无法制冷',
+                type: '宿舍设施故障',
+                location: '旭泰 306 室',
+                submittedAt: '今天 08:16',
+                submitter: '周静怡',
+                phone: '138 6204 1026',
+                status: '待处理',
+                description: '空调已开启但持续吹送常温风，室内温度较高。',
+                handledAt: '未处理',
+                handler: '未安排',
+                acceptance: '待验收',
+                photos: [
+                    { label: '空调出风口', kind: 'air-conditioner', tone: '#8FB5D8' },
+                    { label: '室内温度记录', kind: 'temperature', tone: '#D9A77B' }
+                ]
+            },
+            {
+                id: 'repair-2',
+                title: '教室后门门锁松动',
+                type: '门窗设施故障',
+                location: '教学楼 A203',
+                submittedAt: '昨天 17:42',
+                submitter: '赵明远',
+                phone: '136 6204 3158',
+                status: '待处理',
+                description: '后门锁舌无法稳定回弹，需要检修固定。',
+                handledAt: '未处理',
+                handler: '未安排',
+                acceptance: '待验收',
+                photos: [{ label: '门锁松动位置', kind: 'door-lock', tone: '#A89580' }]
+            },
+            {
+                id: 'repair-3',
+                title: '多媒体投影画面闪烁',
+                type: '多媒体设备故障',
+                location: '教学楼 A203',
+                submittedAt: '08月03日 10:25',
+                submitter: '韩雨',
+                phone: '159 6204 2671',
+                status: '处理中',
+                description: '设备处已完成现场检查，等待更换视频连接线。',
+                handledAt: '08月03日 14:36',
+                handler: '设备处 · 王海',
+                acceptance: '待验收',
+                photos: [
+                    { label: '投影闪烁画面', kind: 'projector', tone: '#7D92B8' },
+                    { label: '视频连接线', kind: 'cable', tone: '#738276' }
+                ]
+            },
+            {
+                id: 'repair-4',
+                title: '走廊饮水机漏水',
+                type: '公共设施故障',
+                location: 'A 区二层走廊',
+                submittedAt: '07月30日 15:08',
+                submitter: '陈老师',
+                phone: '137 6204 0883',
+                status: '已处理',
+                description: '饮水机底部持续渗水，已关闭进水阀并放置防滑提示。',
+                handledAt: '07月30日 16:22',
+                handler: '后勤处 · 刘师傅',
+                acceptance: '已验收',
+                photos: [{ label: '漏水处理现场', kind: 'water-leak', tone: '#79AFC1' }]
+            }
         ];
 
         const schoolDormBedNameTemplates = {
@@ -10943,6 +11683,7 @@
             classStudentSearch: '',
             classStudentAddSearch: '',
             classStudentAddSelectedIds: [],
+            classCadreSearch: '',
             classScheduleSearch: '',
             classScheduleSelectedDays: ['0','1','2','3','4','5','6'],
             classModule: null,
@@ -11019,7 +11760,6 @@
             dormViolationDraft: [],
             dormViolationPhotoName: '',
             dormViolationFilter: '全部违纪',
-            dormViolationDraftFilter: '全部违纪',
             homeReturnFeature: '关注学生',
             detailReturnStudentId: null,
             editMode: false,
@@ -11043,6 +11783,9 @@
         const leaveDetailActions = document.getElementById('leaveDetailActions');
         const leaveDetailRejectButton = document.getElementById('leaveDetailRejectButton');
         const leaveDetailApproveButton = document.getElementById('leaveDetailApproveButton');
+        const leaveEvidencePreview = document.getElementById('leaveEvidencePreview');
+        const leaveEvidencePreviewSurface = document.getElementById('leaveEvidencePreviewSurface');
+        let leaveEvidenceReturnFocus = null;
         const logDetailView = document.getElementById('logDetailView');
         const logDetailBackButton = document.getElementById('logDetailBackButton');
         const logDetailScroll = document.getElementById('logDetailScroll');
@@ -11398,6 +12141,8 @@
 
         function setView(nextView) {
             state.view = nextView;
+            const isScheduleView = nextView === 'class-module' && ['class-schedule','class-schedule-v2'].includes(state.classModule);
+            document.body.classList.toggle('schedule-keyboard-safe', isScheduleView);
             const classChildViews = ['class-module','leave-detail','student-log-history','log-detail','rollcall-history','rollcall-record','discipline-detail','discipline-add'];
             const moduleChildViews = ['leave-detail','student-log-history','log-detail','rollcall-history','rollcall-record','discipline-detail','discipline-add'];
             const inClassFlow = nextView === 'class-detail' || classChildViews.includes(nextView) || (/detail|attendance/.test(nextView) && state.studentDetailOrigin === 'class-detail');
@@ -11641,12 +12386,13 @@
             '学生假条': '学生请假',
             '班级课表课堂': '班级课表',
             '班级课表二版': '课表二版',
+            '班级报修': '班级保修',
             '学生考核排名': '考核排名',
             '班级座位设置': '座位设置',
             '宿舍设置': '宿舍管理',
             '行为设置': '行为规则'
         };
-        const classCoreModules = { '学生假条': 'leave', '实时点名': 'rollcall', '班级课表课堂': 'class-schedule', '班级课表二版': 'class-schedule-v2', '返校点到': 'checkin-return', '回家点到': 'checkin-home', '返校统计': 'return-stats', '回家统计': 'home-stats', '班级报修': 'class-repair', '班级违纪': 'class-discipline', '班级考核': 'class-assessment', '学生考核排名': 'student-ranking', '学生违纪': 'discipline', '班级日志': 'logs', '学生评语': 'student-comments', '宿舍设置': 'dorm' };
+        const classCoreModules = { '学生假条': 'leave', '实时点名': 'rollcall', '班级课表课堂': 'class-schedule', '班级课表二版': 'class-schedule-v2', '返校点到': 'checkin-return', '回家点到': 'checkin-home', '返校统计': 'return-stats', '回家统计': 'home-stats', '班级报修': 'class-repair', '班级违纪': 'class-discipline', '班级考核': 'class-assessment', '学生考核排名': 'student-ranking', '学生违纪': 'discipline', '班级日志': 'logs', '学生评语': 'student-comments', '宿舍设置': 'dorm', '班干部设置': 'class-cadres' };
         const classScheduleDays = [
             { id: '0', label: '周日', short: '周日' },
             { id: '1', label: '周一', short: '周一' },
@@ -11670,6 +12416,7 @@
             '彩铅', '矢量绘图', '商品拍摄与后期处理', '电商海报合成',
             '体育', '音乐', '美术实践', '心理', '周会'
         ];
+        const gradeExamCatalog = ['中考成绩', '入学摸底', '单元测验', '月度测验', '期中考试', '技能考核', '期末考试', '补考'];
         const classScheduleSeed = {
             'am-1': ['', '语文', '数学', '英语', 'Java', '思政', ''],
             'am-2': ['', '语文', '数学', '英语', 'Java', '体育', ''],
@@ -11717,7 +12464,7 @@
             '周会': { teacher: '班主任' }
         };
         const CLASS_HIGH_CONFIG_KEY = 'pocket-campus-class-high-frequency-v2';
-        const defaultClassHighFeatures = ['实时点名','学生假条','班级违纪'];
+        const defaultClassHighFeatures = ['实时点名','班级课表课堂','班级课表二版','班级报修','班级违纪','学生违纪','班级考核','学生考核排名','宿舍设置','班干部设置'];
         const storedClassHighConfig = readStoredHighConfig(CLASS_HIGH_CONFIG_KEY, {});
         let classHighFeatureConfig = Array.isArray(storedClassHighConfig) ? {} : storedClassHighConfig;
         let classManageMode = false;
@@ -11733,11 +12480,7 @@
         }
 
         function getClassHighFeatures(classId = state.selectedClassId) {
-            const hasStoredConfig = Object.prototype.hasOwnProperty.call(classHighFeatureConfig, classId);
-            const source = hasStoredConfig && Array.isArray(classHighFeatureConfig[classId])
-                ? classHighFeatureConfig[classId]
-                : defaultClassHighFeatures;
-            return [...new Set(source.map(normalizeClassManagementLabel).filter(Boolean))];
+            return [...defaultClassHighFeatures];
         }
 
         function setClassHighFeatures(labels, classId = state.selectedClassId) {
@@ -11793,7 +12536,7 @@
         }
 
         function toggleClassManageMode() {
-            classManageMode = !classManageMode;
+            classManageMode = false;
             renderClassManagement();
         }
 
@@ -11835,8 +12578,8 @@
             }).join('');
             classManagementPanel.innerHTML = `
                 <section class="management-directory" aria-label="班级管理入口">
-                <section class="management-high-section${classManageMode ? ' quick-manage-active' : ''}" aria-label="高频班务">
-                    <div class="quick-section-header"><div class="quick-section-title">高频班务</div><button type="button" class="quick-manage-button" data-action="toggle-class-quick-manage">${classManageMode ? '完成' : '管理'}</button></div>
+                <section class="management-high-section" aria-label="高频班务">
+                    <div class="quick-section-header"><div class="quick-section-title">高频班务</div><span class="class-high-fixed-count">${highLabels.length} 项</span></div>
                     <div class="class-high-grid quick-grid" data-quick-grid="class">${highMarkup}</div>
                 </section>
                 ${Object.entries(classManagementGroups).map(([group, labels]) => `
@@ -11881,23 +12624,104 @@
             { name: '林知夏', role: '学习委员', phone: '13760941852' },
             { name: '周景行', role: '体育委员', phone: '13528604719' },
             { name: '叶清欢', role: '副班长', phone: '13960428157' },
-            { name: '陈柏安', role: '班长', phone: '13682504179' },
+            { name: '徐明哲', role: '班长', phone: '13561208477' },
             { name: '沈亦辰', role: '宿舍长 · 男生 301', phone: '13850617429' },
             { name: '许安宁', role: '宿舍长 · 女生 402', phone: '13724096815' },
             { name: '林予安', role: '宿舍长 · 男生 302', phone: '13570824691' },
             { name: '周以宁', role: '宿舍长 · 女生 403', phone: '13928640517' }
         ];
 
-        const cadreRoleOrder = ['班长','副班长','团支书','学习委员','纪律委员','生活委员','体育委员','文艺委员','宣传委员','宿舍长'];
+        const cadreRoleOrder = ['文艺委员','宿舍长','劳动委员','副班长','生活委员','纪律委员','学习委员','体育委员','班长'];
+        const CLASS_CADRE_CONFIG_KEY = 'pocket-campus-class-cadres-v1';
+        const storedClassCadreAssignments = readStoredHighConfig(CLASS_CADRE_CONFIG_KEY, {});
+        let classCadreAssignments = Array.isArray(storedClassCadreAssignments) ? {} : storedClassCadreAssignments;
+
+        function getClassCadreAssignments(classInfo = getSelectedClass()) {
+            if (!classInfo) return {};
+            const saved = classCadreAssignments[classInfo.id];
+            if (saved && typeof saved === 'object' && !Array.isArray(saved)) return saved;
+            const roster = ensureClassRoster(classInfo);
+            const seeded = {};
+            classCadres.forEach(item => {
+                const studentItem = roster.find(student => student.name === item.name);
+                const role = cadreRoleOrder.find(option => item.role.startsWith(option));
+                if (studentItem && role) seeded[studentItem.id] = role;
+            });
+            classCadreAssignments[classInfo.id] = seeded;
+            writeStoredHighConfig(CLASS_CADRE_CONFIG_KEY, classCadreAssignments);
+            return seeded;
+        }
+
+        function setClassCadreRole(studentId, role) {
+            const classInfo = getSelectedClass();
+            if (!classInfo || !studentId) return;
+            const assignments = getClassCadreAssignments(classInfo);
+            if (cadreRoleOrder.includes(role)) assignments[studentId] = role;
+            else delete assignments[studentId];
+            classCadreAssignments[classInfo.id] = assignments;
+            writeStoredHighConfig(CLASS_CADRE_CONFIG_KEY, classCadreAssignments);
+        }
 
         function getSortedClassCadres() {
-            return [...classCadres].sort((a, b) => {
-                const rank = item => {
-                    const index = cadreRoleOrder.findIndex(role => item.role.startsWith(role));
-                    return index < 0 ? cadreRoleOrder.length : index;
-                };
-                return rank(a) - rank(b) || a.name.localeCompare(b.name, 'zh-CN');
+            const classInfo = getSelectedClass();
+            if (!classInfo) return [];
+            const assignments = getClassCadreAssignments(classInfo);
+            return ensureClassRoster(classInfo)
+                .filter(item => cadreRoleOrder.includes(assignments[item.id]))
+                .map(item => ({ name: item.name, role: assignments[item.id], phone: item.phoneRaw || item.phone || '' }))
+                .sort((a, b) => cadreRoleOrder.indexOf(a.role) - cadreRoleOrder.indexOf(b.role) || a.name.localeCompare(b.name, 'zh-CN'));
+        }
+
+        function updateClassCadreSummary() {
+            const roster = ensureClassRoster(getSelectedClass());
+            const assignments = getClassCadreAssignments();
+            const assignedCount = roster.filter(item => cadreRoleOrder.includes(assignments[item.id])).length;
+            const assignedNode = document.getElementById('classCadreAssignedCount');
+            const unassignedNode = document.getElementById('classCadreUnassignedCount');
+            if (assignedNode) assignedNode.textContent = assignedCount;
+            if (unassignedNode) unassignedNode.textContent = Math.max(0, roster.length - assignedCount);
+        }
+
+        function updateClassCadreSearchResults() {
+            const query = String(state.classCadreSearch || '').trim().toLowerCase();
+            const rows = Array.from(classModuleRoot.querySelectorAll('.class-cadre-row'));
+            let visibleCount = 0;
+            rows.forEach(row => {
+                const visible = !query || String(row.dataset.cadreSearch || '').toLowerCase().includes(query);
+                row.hidden = !visible;
+                if (visible) visibleCount += 1;
             });
+            const result = document.getElementById('classCadreResult');
+            const empty = document.getElementById('classCadreEmpty');
+            const clear = classModuleRoot.querySelector('[data-action="clear-class-cadre-search"]');
+            if (result) result.textContent = query ? `找到 ${visibleCount} 名学生` : `学生名单 · ${visibleCount} 人`;
+            if (empty) empty.hidden = visibleCount > 0;
+            if (clear) clear.classList.toggle('visible', Boolean(query));
+        }
+
+        function renderClassCadreModule() {
+            const classInfo = getSelectedClass();
+            const roster = ensureClassRoster(classInfo);
+            const assignments = getClassCadreAssignments(classInfo);
+            const assignedCount = roster.filter(item => cadreRoleOrder.includes(assignments[item.id])).length;
+            const roleOptions = studentItem => `<option value="">未设置</option>${cadreRoleOrder.map(role => `<option value="${escapeHtml(role)}"${assignments[studentItem.id] === role ? ' selected' : ''}>${escapeHtml(role)}</option>`).join('')}`;
+            return `<section class="class-cadre-surface" aria-label="${escapeHtml(getClassDisplayName(classInfo))}班干部设置">
+                <div class="class-cadre-summary" aria-label="班干部设置统计">
+                    <span><strong>${roster.length}</strong>全班学生</span>
+                    <span class="assigned"><strong id="classCadreAssignedCount">${assignedCount}</strong>已设置</span>
+                    <span><strong id="classCadreUnassignedCount">${roster.length - assignedCount}</strong>未设置</span>
+                </div>
+                <div class="class-cadre-toolbar">
+                    <div class="class-cadre-search" role="search"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="classCadreSearch" type="search" value="${escapeHtml(state.classCadreSearch)}" placeholder="搜索姓名 / 学号" autocomplete="off" aria-label="搜索本班学生"><button type="button" class="class-cadre-search-clear${state.classCadreSearch ? ' visible' : ''}" data-action="clear-class-cadre-search" aria-label="清空班干部学生搜索"><svg aria-hidden="true" viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg></button></div>
+                    <div class="class-cadre-result" id="classCadreResult" role="status" aria-live="polite">学生名单 · ${roster.length} 人</div>
+                </div>
+                <div class="class-cadre-list">${roster.map(studentItem => {
+                    const role = assignments[studentItem.id] || '';
+                    const searchText = `${studentItem.name} ${studentItem.studentNo || ''}`;
+                    return `<div class="class-cadre-row" data-cadre-search="${escapeHtml(searchText)}"><span class="class-cadre-student"><strong>${escapeHtml(studentItem.name)}</strong><span>${escapeHtml(studentItem.studentNo || '暂无学号')}</span></span><span class="class-cadre-select-wrap"><select class="class-cadre-role-select${role ? ' has-role' : ''}" data-cadre-student-id="${escapeHtml(studentItem.id)}" aria-label="设置${escapeHtml(studentItem.name)}的班干部职务">${roleOptions(studentItem)}</select></span></div>`;
+                }).join('')}</div>
+                <div class="class-cadre-empty" id="classCadreEmpty" hidden>没有找到匹配的学生</div>
+            </section>`;
         }
 
         function contactRow(item, kind = 'teacher', index = 0) {
@@ -12557,7 +13381,6 @@
                     </section>
                     <section class="leave-detail-section">
                         <div class="leave-detail-section-title">申请信息</div>
-                        <div class="leave-detail-info-row"><span>申请人</span><strong>${escapeHtml(item.name)}</strong></div>
                         <div class="leave-detail-info-row"><span>请假时段</span><strong>${escapeHtml(item.period)}</strong></div>
                         <div class="leave-detail-info-row"><span>请假原因</span><strong>${escapeHtml(item.reason)}</strong></div>
                         <div class="leave-detail-info-row"><span>申请说明</span><strong>${escapeHtml(item.description || item.reason)}</strong></div>
@@ -12582,13 +13405,32 @@
         function previewLeaveImage(leaveId) {
             const item = classWorkflowState.leave.find(record => record.id === leaveId);
             if (!item) return;
-            openDialog({
-                title: item.evidenceLabel || '请假凭证',
-                desc: `${item.name} · ${item.reason}`,
-                body: `<div class="image-preview-large">${leaveEvidenceMarkup(item)}</div>`,
-                confirmLabel: '关闭',
-                cancelLabel: '返回'
-            });
+            leaveEvidenceReturnFocus = document.activeElement;
+            leaveEvidencePreviewSurface.innerHTML = leaveEvidenceMarkup(item);
+            leaveEvidencePreview.setAttribute('aria-label', `${item.evidenceLabel || '请假凭证'}全屏预览，点击任意区域退出`);
+            leaveEvidencePreview.hidden = false;
+            requestAnimationFrame(() => leaveEvidencePreview.focus({ preventScroll: true }));
+        }
+
+        function closeLeaveImagePreview() {
+            if (leaveEvidencePreview.hidden) return;
+            leaveEvidencePreview.hidden = true;
+            leaveEvidencePreviewSurface.innerHTML = '';
+            const returnFocus = leaveEvidenceReturnFocus;
+            leaveEvidenceReturnFocus = null;
+            if (returnFocus?.isConnected) returnFocus.focus({ preventScroll: true });
+        }
+
+        function previewRepairImage(repairId, photoIndex) {
+            const item = classRepairRecords.find(record => record.id === repairId);
+            const index = Number(photoIndex);
+            const photo = item?.photos?.[index];
+            if (!item || !photo) return;
+            leaveEvidenceReturnFocus = document.activeElement;
+            leaveEvidencePreviewSurface.innerHTML = repairPhotoArtwork(item, photo, index);
+            leaveEvidencePreview.setAttribute('aria-label', `${photo.label || `${item.title}附图`}全屏预览，再次点击退出`);
+            leaveEvidencePreview.hidden = false;
+            requestAnimationFrame(() => leaveEvidencePreview.focus({ preventScroll: true }));
         }
 
         function openLogDetail(logId) {
@@ -13278,7 +14120,7 @@
                 ${renderControl('班级培养计划','classPlan',{type:'textarea'})}
                 ${renderControl('个人培养计划','personalPlans',{type:'textarea',display:value => Array.isArray(value) ? value.join('、') : value})}
             </div>`;
-            return `<div class="panel-stack archive-panel">${card('基础档案','',profile)}${card('学籍培养','',school)}</div>`;
+            return `<div class="panel-stack archive-panel">${card('基础资料','',profile)}${card('学籍培养','',school)}</div>`;
         }
 
         function renderFamily() {
@@ -13342,7 +14184,7 @@
             </div>`;
         }
 
-        const requiredMaterialNames = ['身份证正面', '身份证反面', '报考协议', '户口本主页与本人页', '体检报告', '近期证件照'];
+        const requiredMaterialNames = ['身份证正面照片', '身份证反面照片', '报考协议正面', '报考协议背面', '户口本户主页', '户口本本人页'];
 
         function getMaterialSlots(data = currentData()) {
             const attachments = Array.isArray(data.attachments) ? data.attachments : [];
@@ -13357,10 +14199,10 @@
             const name = String(item.name || '材料');
             if (/身份证正面/.test(name)) return `<svg aria-hidden="true" viewBox="0 0 160 116"><rect width="160" height="116" fill="#E6F0FF"/><rect x="16" y="18" width="128" height="80" rx="8" fill="#fff" stroke="#B8D3FF"/><circle cx="49" cy="53" r="17" fill="#D7E5F8"/><path d="M29 84c3-17 10-25 20-25s17 8 20 25" fill="#A9C4E8"/><rect x="78" y="36" width="47" height="5" rx="2.5" fill="#AFC7E8"/><rect x="78" y="49" width="39" height="4" rx="2" fill="#D0DDF0"/><rect x="78" y="61" width="45" height="4" rx="2" fill="#D0DDF0"/><rect x="78" y="73" width="32" height="4" rx="2" fill="#D0DDF0"/><text x="80" y="92" fill="#64748B" font-size="7" text-anchor="middle">居民身份证 · 人像面</text></svg>`;
             if (/身份证反面/.test(name)) return `<svg aria-hidden="true" viewBox="0 0 160 116"><rect width="160" height="116" fill="#E6F0FF"/><rect x="16" y="18" width="128" height="80" rx="8" fill="#fff" stroke="#B8D3FF"/><circle cx="80" cy="51" r="20" fill="none" stroke="#EF4444" stroke-width="2.4" opacity=".75"/><path d="M62 51h36M80 33v36" stroke="#EF4444" stroke-width="1.5" opacity=".75"/><rect x="48" y="78" width="64" height="4" rx="2" fill="#D0DDF0"/><text x="80" y="92" fill="#64748B" font-size="7" text-anchor="middle">居民身份证 · 国徽面</text></svg>`;
-            if (/报考协议|协议/.test(name)) return `<svg aria-hidden="true" viewBox="0 0 160 116"><rect width="160" height="116" fill="#EDF4FF"/><rect x="28" y="9" width="104" height="98" rx="5" fill="#fff" stroke="#C6D7EE"/><rect x="48" y="22" width="64" height="7" rx="3.5" fill="#5B8EE7"/><rect x="42" y="40" width="77" height="4" rx="2" fill="#D8E2EF"/><rect x="42" y="51" width="68" height="4" rx="2" fill="#D8E2EF"/><rect x="42" y="62" width="76" height="4" rx="2" fill="#D8E2EF"/><rect x="42" y="73" width="51" height="4" rx="2" fill="#D8E2EF"/><path d="M44 89c14-10 23 7 39-2 9-5 14-2 20 2" fill="none" stroke="#1F5FFF" stroke-width="2" stroke-linecap="round"/><circle cx="112" cy="85" r="13" fill="none" stroke="#EF4444" stroke-width="2.5" opacity=".78"/></svg>`;
-            if (/户口本/.test(name)) return `<svg aria-hidden="true" viewBox="0 0 160 116"><defs><linearGradient id="book-${index}" x1="0" x2="1"><stop stop-color="#7F1D1D"/><stop offset="1" stop-color="#DC2626"/></linearGradient></defs><rect width="160" height="116" fill="#F9E7E7"/><g transform="translate(22 14) rotate(-5 42 43)"><rect width="83" height="88" rx="7" fill="url(#book-${index})"/><circle cx="42" cy="35" r="12" fill="none" stroke="#FCD34D" stroke-width="2"/><path d="M31 35h22M42 24v22" stroke="#FCD34D" stroke-width="1.4"/><rect x="22" y="57" width="40" height="5" rx="2.5" fill="#FCD34D" opacity=".9"/><rect x="27" y="69" width="30" height="3" rx="1.5" fill="#FDE68A" opacity=".8"/></g><g transform="translate(82 25) rotate(6 31 38)"><rect width="62" height="77" rx="5" fill="#fff" stroke="#E8B4B4"/><rect x="10" y="12" width="42" height="5" rx="2.5" fill="#E7A4A4"/><rect x="10" y="28" width="42" height="3" rx="1.5" fill="#E5E7EB"/><rect x="10" y="38" width="34" height="3" rx="1.5" fill="#E5E7EB"/><rect x="10" y="48" width="40" height="3" rx="1.5" fill="#E5E7EB"/><rect x="10" y="58" width="27" height="3" rx="1.5" fill="#E5E7EB"/></g></svg>`;
-            if (/体检|报告/.test(name)) return `<svg aria-hidden="true" viewBox="0 0 160 116"><rect width="160" height="116" fill="#E9F8F2"/><rect x="31" y="8" width="98" height="100" rx="5" fill="#fff" stroke="#BFE6D7"/><circle cx="80" cy="29" r="14" fill="#D8F3E8"/><path d="M80 21v16M72 29h16" stroke="#10B981" stroke-width="4" stroke-linecap="round"/><rect x="46" y="52" width="68" height="4" rx="2" fill="#D6E7E1"/><rect x="46" y="63" width="54" height="4" rx="2" fill="#D6E7E1"/><path d="M46 86h12l5-10 8 19 7-14 6 5h30" fill="none" stroke="#EF4444" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-            if (/证件照|照片/.test(name)) return `<svg aria-hidden="true" viewBox="0 0 160 116"><rect width="160" height="116" fill="#E5EEFF"/><rect x="48" y="8" width="64" height="100" rx="5" fill="#D8E7FF" stroke="#B7CDEE"/><circle cx="80" cy="43" r="17" fill="#F5D8C8"/><path d="M63 43c0-18 7-27 18-27 13 0 19 10 16 27-8-2-15-8-18-14-4 8-9 12-16 14Z" fill="#334155"/><path d="M54 103c2-26 11-39 26-39s24 13 26 39" fill="#8BAEE5"/><path d="m71 65 9 12 9-12" fill="#fff"/></svg>`;
+            if (/报考协议正面/.test(name)) return `<svg aria-hidden="true" viewBox="0 0 160 116"><rect width="160" height="116" fill="#EDF4FF"/><rect x="28" y="9" width="104" height="98" rx="5" fill="#fff" stroke="#C6D7EE"/><rect x="48" y="22" width="64" height="7" rx="3.5" fill="#5B8EE7"/><rect x="42" y="40" width="77" height="4" rx="2" fill="#D8E2EF"/><rect x="42" y="51" width="68" height="4" rx="2" fill="#D8E2EF"/><rect x="42" y="62" width="76" height="4" rx="2" fill="#D8E2EF"/><rect x="42" y="73" width="51" height="4" rx="2" fill="#D8E2EF"/><circle cx="112" cy="85" r="13" fill="none" stroke="#EF4444" stroke-width="2.5" opacity=".78"/></svg>`;
+            if (/报考协议背面/.test(name)) return `<svg aria-hidden="true" viewBox="0 0 160 116"><rect width="160" height="116" fill="#EEF4FC"/><rect x="28" y="9" width="104" height="98" rx="5" fill="#fff" stroke="#C6D7EE"/><rect x="41" y="23" width="78" height="4" rx="2" fill="#AFC3DE"/><rect x="41" y="35" width="72" height="3" rx="1.5" fill="#D8E2EF"/><rect x="41" y="45" width="78" height="3" rx="1.5" fill="#D8E2EF"/><rect x="41" y="55" width="64" height="3" rx="1.5" fill="#D8E2EF"/><path d="M42 82c13-9 23 8 39-2 9-5 15-1 21 3" fill="none" stroke="#1F5FFF" stroke-width="2.2" stroke-linecap="round"/><path d="M106 74c7 2 12 8 11 16" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round"/></svg>`;
+            if (/户口本户主页/.test(name)) return `<svg aria-hidden="true" viewBox="0 0 160 116"><rect width="160" height="116" fill="#F9E7E7"/><rect x="25" y="10" width="110" height="96" rx="6" fill="#FFFDFD" stroke="#E8B4B4"/><rect x="38" y="22" width="84" height="8" rx="3" fill="#C24141"/><path d="M38 43h84M38 59h84M38 75h84M65 35v56M96 35v56" stroke="#E5C7C7" stroke-width="2"/><rect x="43" y="47" width="17" height="4" rx="2" fill="#D9A7A7"/><rect x="70" y="63" width="20" height="4" rx="2" fill="#D9A7A7"/></svg>`;
+            if (/户口本本人页/.test(name)) return `<svg aria-hidden="true" viewBox="0 0 160 116"><rect width="160" height="116" fill="#F9E7E7"/><rect x="25" y="10" width="110" height="96" rx="6" fill="#FFFDFD" stroke="#E8B4B4"/><rect x="38" y="22" width="84" height="8" rx="3" fill="#C24141"/><rect x="40" y="40" width="30" height="39" rx="3" fill="#F3DADA"/><circle cx="55" cy="53" r="8" fill="#D7B9B9"/><path d="M44 76c2-11 6-16 11-16s9 5 11 16" fill="#C99898"/><path d="M80 43h39M80 54h32M80 65h39M40 90h79" stroke="#DFC5C5" stroke-width="3" stroke-linecap="round"/></svg>`;
             return `<svg aria-hidden="true" viewBox="0 0 160 116"><rect width="160" height="116" fill="#EEF4FF"/><rect x="40" y="9" width="80" height="98" rx="6" fill="#fff" stroke="#C7D7ED"/><path d="M96 9v24h24" fill="#E2EBF8"/><rect x="54" y="48" width="52" height="5" rx="2.5" fill="#B5C9E5"/><rect x="54" y="62" width="43" height="4" rx="2" fill="#D6E0ED"/><rect x="54" y="74" width="50" height="4" rx="2" fill="#D6E0ED"/></svg>`;
         }
 
@@ -13368,23 +14210,21 @@
             const data = currentData();
             const materials = getMaterialSlots(data).map((slot, index) => {
                 if (!slot.item) return `<div class="material-missing-card needs-action"><span>${escapeHtml(slot.name)}</span><button type="button" class="material-upload-button" data-action="material-upload" data-material-name="${escapeHtml(slot.name)}" aria-label="补传${escapeHtml(slot.name)}">补传</button></div>`;
-                const rejected = /不通过/.test(slot.item.status || '');
-                return `<article class="material-thumb-card${rejected ? ' needs-action' : ''}">
+                return `<article class="material-thumb-card">
                     <button type="button" class="material-thumb-open" data-action="material-preview" data-index="${data.attachments.indexOf(slot.item)}" aria-label="查看${escapeHtml(slot.name)}图片">
                         <span class="material-thumb-visual">${materialPreviewMarkup(slot.item, index)}</span>
-                        <span class="material-thumb-caption"><strong>${escapeHtml(slot.name)}</strong><small>${escapeHtml(slot.item.status || '已上传')}</small></span>
+                        <span class="material-thumb-caption"><strong>${escapeHtml(slot.name)}</strong></span>
                     </button>
-                    ${rejected ? `<button type="button" class="material-reupload-button" data-action="material-upload" data-material-name="${escapeHtml(slot.name)}" aria-label="重新上传${escapeHtml(slot.name)}">重新上传</button>` : ''}
                 </article>`;
             }).join('');
-            return `<div class="panel-stack">${card('证件与材料','',`<div class="material-gallery">${materials}</div>`)}</div>`;
+            return `<div class="panel-stack">${card('证件档案','',`<div class="material-gallery">${materials}</div>`)}</div>`;
         }
 
         function updateStudentDetailPendingState() {
             const tab = document.getElementById('tab-materials');
             tab.classList.remove('has-pending');
             setPendingBadge(tab, 0);
-            tab.setAttribute('aria-label', '材料');
+            tab.setAttribute('aria-label', '档案');
         }
 
         function renderPanel() {
@@ -13963,11 +14803,14 @@
         
 
         function addGradeDialog() {
-            const subjectOptions = globalSubjectCatalog.map(subject => `<option value="${escapeHtml(subject)}">${escapeHtml(subject)}</option>`).join('');
+            const examCatalog = [...new Set([...(currentData().grades || []).map(item => item.examType).filter(Boolean), ...gradeExamCatalog])];
+            const examOptions = examCatalog.map(exam => `<option value="${escapeHtml(exam)}"></option>`).join('');
+            const subjectOptions = globalSubjectCatalog.map(subject => `<option value="${escapeHtml(subject)}"></option>`).join('');
+            const examPickerOptions = escapeHtml(JSON.stringify(examCatalog));
+            const subjectPickerOptions = escapeHtml(JSON.stringify(globalSubjectCatalog));
             openDialog({
                 title: '新增成绩',
-                desc: '填写后将按考试日期归入成绩记录。',
-                body: `<div class="grid grid-cols-2 gap-3"><div class="dialog-field col-span-2"><label for="gradeType">考试名称<span class="required-star" aria-hidden="true">*</span></label><input id="gradeType" type="text" required maxlength="30" placeholder="例如：期中考试"></div><div class="dialog-field"><label for="gradeSubject">科目名称<span class="required-star" aria-hidden="true">*</span></label><select id="gradeSubject" required><option value="">请选择</option>${subjectOptions}</select></div><div class="dialog-field"><label for="gradeScore">成绩<span class="required-star" aria-hidden="true">*</span></label><input id="gradeScore" type="number" inputmode="decimal" required min="0" max="150" placeholder="例如：92"></div><div class="dialog-field"><label for="gradeRank">班级排名<span class="required-star" aria-hidden="true">*</span></label><input id="gradeRank" type="number" inputmode="numeric" required min="1" max="46" placeholder="例如：12"></div><div class="dialog-field"><label for="gradeDate">考试日期<span class="required-star" aria-hidden="true">*</span></label><input id="gradeDate" type="date" required value="${formatLocalDate()}"></div></div>`,
+                body: `<div class="grid grid-cols-2 gap-3"><div class="dialog-field col-span-2"><label for="gradeType">考试名称<span class="required-star" aria-hidden="true">*</span></label><div class="grade-combobox"><input id="gradeType" type="text" required maxlength="30" list="gradeTypeSuggestions" placeholder="输入或选择考试名称" autocomplete="off"><datalist id="gradeTypeSuggestions">${examOptions}</datalist><button type="button" class="grade-combobox-picker" data-action="open-select-picker" data-picker-target="gradeType" data-picker-label="选择考试名称" data-picker-options="${examPickerOptions}" aria-label="选择考试名称" aria-haspopup="dialog" aria-controls="pickerLayer" aria-expanded="false"><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></button></div></div><div class="dialog-field"><label for="gradeSubject">科目名称<span class="required-star" aria-hidden="true">*</span></label><div class="grade-combobox"><input id="gradeSubject" type="text" required maxlength="30" list="gradeSubjectSuggestions" placeholder="输入或选择科目" autocomplete="off"><datalist id="gradeSubjectSuggestions">${subjectOptions}</datalist><button type="button" class="grade-combobox-picker" data-action="open-select-picker" data-picker-target="gradeSubject" data-picker-label="选择科目名称" data-picker-options="${subjectPickerOptions}" aria-label="选择科目名称" aria-haspopup="dialog" aria-controls="pickerLayer" aria-expanded="false"><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></button></div></div><div class="dialog-field"><label for="gradeScore">成绩<span class="required-star" aria-hidden="true">*</span></label><input id="gradeScore" type="number" inputmode="decimal" required min="0" max="150" placeholder="例如：92"></div><div class="dialog-field"><label for="gradeRank">班级排名</label><input id="gradeRank" type="number" inputmode="numeric" min="1" max="46" placeholder="选填"></div><div class="dialog-field"><label for="gradeDate">考试日期<span class="required-star" aria-hidden="true">*</span></label><input id="gradeDate" type="date" required value="${formatLocalDate()}"></div></div>`,
                 confirmLabel: '保存成绩',
                 onConfirm: () => {
                     const subject = document.getElementById('gradeSubject');
@@ -13975,9 +14818,9 @@
                     const rank = document.getElementById('gradeRank');
                     const examType = document.getElementById('gradeType');
                     const date = document.getElementById('gradeDate');
-                    if (!subject.value.trim() || !score.value || !rank.value || !examType.value.trim() || !date.value) { (!examType.value.trim() ? examType : (!subject.value.trim() ? subject : (!score.value ? score : (!rank.value ? rank : date)))).focus(); showToast('请填写所有必填项'); return false; }
-                    if (!globalSubjectCatalog.includes(subject.value)) { subject.focus(); showToast('请选择科目'); return false; }
-                    currentData().grades.unshift({ subject: subject.value, score: score.value, rank: rank.value, rankTotal: '46', examType: examType.value.trim(), date: date.value });
+                    if (!subject.value.trim() || !score.value || !examType.value.trim() || !date.value) { (!examType.value.trim() ? examType : (!subject.value.trim() ? subject : (!score.value ? score : date))).focus(); showToast('请填写所有必填项'); return false; }
+                    if (rank.value && !rank.validity.valid) { rank.focus(); showToast('班级排名请输入 1—46'); return false; }
+                    currentData().grades.unshift({ subject: subject.value.trim(), score: score.value, rank: rank.value, rankTotal: rank.value ? '46' : '', examType: examType.value.trim(), date: date.value });
                     renderPanel(); showToast(state.editMode ? '成绩记录已加入草稿' : '成绩记录已新增');
                 }
             });
@@ -14246,6 +15089,20 @@
             classWorkflowState.studentStatusMealByDay[dayKey] = [...mealSet];
         }
 
+        function getStudentStatusUpdatedLabel(classInfo = getSelectedClass()) {
+            const raw = String(classWorkflowState.studentStatusUpdatedAtByDay[`${classInfo.id}-${formatLocalDate()}`] || '').trim();
+            if (!raw) return '上次修改 暂无';
+            const [date, time = ''] = raw.split(/\s+/);
+            const dateLabel = date === formatLocalDate() ? '今天' : date.slice(5);
+            return `上次修改 ${dateLabel}${time ? ` ${time}` : ''}`;
+        }
+
+        function markStudentStatusUpdated(classInfo = getSelectedClass()) {
+            const now = new Date();
+            const dayKey = `${classInfo.id}-${formatLocalDate(now)}`;
+            classWorkflowState.studentStatusUpdatedAtByDay[dayKey] = `${formatLocalDate(now)} ${formatLocalTime(now)}`;
+        }
+
         function initializeStudentStatusDay() {
             const classInfo = getSelectedClass();
             const roster = ensureClassRoster(classInfo);
@@ -14370,7 +15227,7 @@
         function renderStatusManagerHero() {
             const counts = getStudentStatusCounts();
             return `<section class="status-manager-hero" id="statusManagerHero" aria-label="学生实时状态统计">
-                <div class="status-manager-head"><span><strong>${escapeHtml(getClassDisplayName(getSelectedClass()))}</strong></span><em>${counts.handled}/${counts.total} 已处理</em></div>
+                <div class="status-manager-head"><span><strong>${escapeHtml(getClassDisplayName(getSelectedClass()))}</strong></span><em>${escapeHtml(getStudentStatusUpdatedLabel())}</em></div>
                 <div class="status-manager-metrics" aria-label="点击看板筛选学生">
                     <button type="button" class="status-manager-metric school${state.rollcallPrimaryFilter === '在校' ? ' active' : ''}" data-action="set-live-status-filter" data-live-filter="在校" aria-pressed="${state.rollcallPrimaryFilter === '在校' ? 'true' : 'false'}"><strong>${counts['在校']}</strong><span>在校</span></button>
                     <button type="button" class="status-manager-metric leave${state.rollcallPrimaryFilter === '请假' ? ' active' : ''}" data-action="set-live-status-filter" data-live-filter="请假" aria-pressed="${state.rollcallPrimaryFilter === '请假' ? 'true' : 'false'}"><strong>${counts['请假']}</strong><span>请假</span></button>
@@ -14896,7 +15753,7 @@
                     const matched = Boolean(query && `${course} ${teacher}`.toLowerCase().includes(query));
                     const tone = course ? getClassScheduleTone(course) : '';
                     const aria = course ? `${day.label}${period.label}，${course}，${teacher}` : `${day.label}${period.label}无课程`;
-                    return `<td data-schedule-column="${day.id}"><span class="schedule-course${course ? ` tone-${tone}` : ' empty'}${matched ? ' matched' : ''}" aria-label="${escapeHtml(aria)}">${course ? `<strong>${escapeHtml(course)}</strong><span>${escapeHtml(teacher)}</span>` : '—'}</span></td>`;
+                    return `<td data-schedule-column="${day.id}"><span class="schedule-course${course ? ` tone-${tone}` : ' empty'}${matched ? ' matched' : ''}" aria-label="${escapeHtml(aria)}">${course ? `<strong>${escapeHtml(course)}</strong><span>（${escapeHtml(teacher)}）</span>` : '—'}</span></td>`;
                 }).join('');
                 return `<tr><th scope="row">${escapeHtml(period.label)}</th>${cells}</tr>`;
             }).join('');
@@ -14905,7 +15762,7 @@
                     <div class="class-schedule-search">
                         <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
                         <label class="sr-only" for="classScheduleSearch">搜索课程或老师</label>
-                        <input id="classScheduleSearch" type="search" value="${escapeHtml(state.classScheduleSearch)}" placeholder="搜索课程或老师" autocomplete="off">
+                        <input id="classScheduleSearch" type="search" value="${escapeHtml(state.classScheduleSearch)}" placeholder="搜索课程或老师" autocomplete="off" inputmode="search" enterkeyhint="search" autocapitalize="none" autocorrect="off" spellcheck="false">
                         <button type="button" class="class-schedule-clear" data-action="clear-class-schedule-search" aria-label="清空课程搜索"${query ? '' : ' hidden'}><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
                     </div>
                 </div>
@@ -14935,13 +15792,13 @@
                 if (!course) return `<div class="schedule-v2-cell" data-schedule-v2-cell="${day.id}-${period.id}"><div class="schedule-v2-empty-cell" aria-label="${escapeHtml(`${day.label}${period.label}无课程`)}"></div></div>`;
                 const aria = `${day.label}${period.label}，${course.course}，${course.teacher}`;
                 const matched = Boolean(query && `${course.course} ${course.teacher}`.toLowerCase().includes(query));
-                return `<div class="schedule-v2-cell" data-schedule-v2-cell="${day.id}-${period.id}"><article class="schedule-v2-course tone-${escapeHtml(course.tone)}${matched ? ' is-match' : ''}" aria-label="${escapeHtml(aria)}"><strong>${escapeHtml(course.course)}</strong><span>${escapeHtml(course.teacher)}</span></article></div>`;
+                return `<div class="schedule-v2-cell" data-schedule-v2-cell="${day.id}-${period.id}"><article class="schedule-v2-course tone-${escapeHtml(course.tone)}${matched ? ' is-match' : ''}" aria-label="${escapeHtml(aria)}"><strong>${escapeHtml(course.course)}</strong><span>（${escapeHtml(course.teacher)}）</span></article></div>`;
             }).join('')).join('');
             return `<section class="schedule-v2-surface${query ? ' searching' : ''}" aria-label="课表二版">
                 <div class="class-schedule-search">
                     <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
                     <label class="sr-only" for="classScheduleSearch">搜索课程或老师</label>
-                    <input id="classScheduleSearch" type="search" value="${escapeHtml(state.classScheduleSearch)}" placeholder="搜索课程或老师" autocomplete="off">
+                    <input id="classScheduleSearch" type="search" value="${escapeHtml(state.classScheduleSearch)}" placeholder="搜索课程或老师" autocomplete="off" inputmode="search" enterkeyhint="search" autocapitalize="none" autocorrect="off" spellcheck="false">
                     <button type="button" class="class-schedule-clear" data-action="clear-class-schedule-search" aria-label="清空课程搜索"${query ? '' : ' hidden'}><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
                 </div>
                 <article class="schedule-v2-card" aria-label="可横向滑动的全周课程表">
@@ -14958,6 +15815,9 @@
         function updateClassScheduleSearchResults(value) {
             const query = String(value || '').trim().toLowerCase();
             state.classScheduleSearch = String(value || '');
+
+            const clearButton = classModuleRoot.querySelector('.class-schedule-clear');
+            if (clearButton) clearButton.hidden = !state.classScheduleSearch;
 
             const table = classModuleRoot.querySelector('.class-schedule-table');
             if (table) {
@@ -15093,15 +15953,62 @@
             });
         }
 
+        function repairPhotoArtwork(item, photo, photoIndex) {
+            const tone = photo.tone || '#8DA2B8';
+            const scenes = {
+                'air-conditioner': `<rect x="28" y="48" width="184" height="86" rx="13" fill="#F8FAFC"/><path d="M48 92h144M54 106h132M68 121h104" fill="none" stroke="#64748B" stroke-width="5" stroke-linecap="round" opacity=".72"/><path d="M74 156c0 18-14 25-14 41M120 156c0 18-14 25-14 41M166 156c0 18-14 25-14 41" fill="none" stroke="#DCE7F2" stroke-width="8" stroke-linecap="round"/>`,
+                temperature: `<rect x="52" y="37" width="136" height="220" rx="20" fill="#F8FAFC"/><circle cx="120" cy="200" r="33" fill="#EF4444" opacity=".78"/><rect x="106" y="70" width="28" height="137" rx="14" fill="#FECACA"/><rect x="113" y="116" width="14" height="93" rx="7" fill="#EF4444"/><path d="M150 89h20M150 112h14M150 135h20" stroke="#94A3B8" stroke-width="5" stroke-linecap="round"/>`,
+                'door-lock': `<rect x="44" y="22" width="152" height="276" rx="9" fill="#E8DED1"/><rect x="60" y="38" width="120" height="244" rx="5" fill="#BFA992"/><circle cx="156" cy="165" r="18" fill="#475569"/><circle cx="156" cy="165" r="7" fill="#CBD5E1"/><path d="M160 165h37" stroke="#334155" stroke-width="8" stroke-linecap="round"/><path d="M197 150v30" stroke="#334155" stroke-width="7" stroke-linecap="round"/>`,
+                projector: `<rect x="24" y="48" width="192" height="126" rx="10" fill="#F8FAFC"/><path d="M39 72h160M39 93h118M39 114h176M39 135h91" stroke="#94A3B8" stroke-width="7" stroke-linecap="round" opacity=".72"/><path d="M36 84h169M48 123h142" stroke="#1F5FFF" stroke-width="3" opacity=".7"/><rect x="76" y="210" width="88" height="36" rx="11" fill="#475569"/><circle cx="145" cy="228" r="7" fill="#60A5FA"/>`,
+                cable: `<path d="M44 68c91 0 34 94 111 94 55 0 52 75 6 92" fill="none" stroke="#263142" stroke-width="14" stroke-linecap="round"/><rect x="30" y="48" width="44" height="38" rx="8" fill="#475569"/><rect x="39" y="37" width="7" height="19" rx="3" fill="#CBD5E1"/><rect x="57" y="37" width="7" height="19" rx="3" fill="#CBD5E1"/><path d="M150 254h32v28h-32z" fill="#475569"/><path d="M157 282v15M175 282v15" stroke="#CBD5E1" stroke-width="5" stroke-linecap="round"/>`,
+                'water-leak': `<rect x="58" y="36" width="124" height="148" rx="16" fill="#F8FAFC"/><rect x="82" y="59" width="76" height="56" rx="9" fill="#CBD5E1"/><path d="M120 183v42" stroke="#64748B" stroke-width="11" stroke-linecap="round"/><path d="M120 222c-23 25-22 44 0 55 22-11 23-30 0-55Z" fill="#38BDF8" opacity=".82"/><ellipse cx="120" cy="284" rx="64" ry="13" fill="#7DD3FC" opacity=".45"/>`
+            };
+            const scene = scenes[photo.kind] || scenes['air-conditioner'];
+            return `<svg role="img" aria-label="${escapeHtml(photo.label || `${item.title}附图${photoIndex + 1}`)}" viewBox="0 0 240 320" preserveAspectRatio="xMidYMid slice">
+                <rect width="240" height="320" fill="${escapeHtml(tone)}"/>
+                <rect x="12" y="12" width="216" height="296" rx="18" fill="#FFFFFF" opacity=".14"/>
+                ${scene}
+            </svg>`;
+        }
+
+        function repairDetailFieldMarkup(label, value, options = {}) {
+            const classNames = ['repair-detail-field'];
+            if (options.wide) classNames.push('wide');
+            if (options.description) classNames.push('description');
+            return `<div class="${classNames.join(' ')}"><span>${escapeHtml(label)}</span><strong${options.valueClass ? ` class="${options.valueClass}"` : ''}>${escapeHtml(String(value || '未填写'))}</strong></div>`;
+        }
+
+        function renderRepairPhotos(item) {
+            const photos = Array.isArray(item.photos) ? item.photos : [];
+            return `<div class="repair-photo-field"><span>附图</span>${photos.length
+                ? `<div class="repair-photo-list">${photos.map((photo, index) => `<button type="button" class="repair-photo-thumb" data-action="preview-repair-image" data-repair-id="${escapeHtml(item.id)}" data-repair-photo-index="${index}" aria-label="查看${escapeHtml(photo.label || `附图${index + 1}`)}大图，再次点击退出">${repairPhotoArtwork(item, photo, index)}</button>`).join('')}</div>`
+                : '<div class="repair-photo-empty">未上传</div>'}</div>`;
+        }
+
         function renderRepairModule() {
             const statuses = ['待处理','处理中','已处理'];
             const records = classRepairRecords.filter(item => item.status === state.repairStatusFilter);
-            return `<section class="repair-surface" aria-label="班级报修记录">
-                <nav class="repair-tabs" role="tablist" aria-label="报修处理状态">${statuses.map(status => {
+            return `<section class="repair-surface" aria-label="班级保修记录">
+                <nav class="repair-tabs" role="tablist" aria-label="保修处理状态">${statuses.map(status => {
                     const count = classRepairRecords.filter(item => item.status === status).length;
                     return `<button type="button" class="repair-tab${state.repairStatusFilter === status ? ' active' : ''}" role="tab" aria-selected="${state.repairStatusFilter === status ? 'true' : 'false'}" data-action="set-repair-status" data-repair-status="${status}">${status}<b>${count}</b></button>`;
                 }).join('')}</nav>
-                <div class="repair-list">${records.length ? records.map(item => `<article class="repair-row"><div class="repair-row-head"><strong>${escapeHtml(item.title)}</strong><span class="repair-status${item.status === '处理中' ? ' processing' : (item.status === '已处理' ? ' processed' : '')}">${escapeHtml(item.status)}</span></div><p>${escapeHtml(item.description)}</p><div class="repair-row-meta"><span>${escapeHtml(item.location)}</span><span>${escapeHtml(item.submittedAt)}</span><span>${escapeHtml(item.submitter)}</span></div></article>`).join('') : '<div class="roster-empty">当前状态暂无报修记录</div>'}</div>
+                <div class="repair-list">${records.length ? records.map(item => `<details class="repair-row">
+                    <summary class="repair-row-summary" aria-label="${escapeHtml(item.title)}，${escapeHtml(item.status)}，点击查看详情">
+                        <span class="repair-row-title"><strong>${escapeHtml(item.title)}</strong><span>${escapeHtml(item.location)} · ${escapeHtml(item.submittedAt)}</span></span>
+                        <span class="repair-status${item.status === '处理中' ? ' processing' : (item.status === '已处理' ? ' processed' : '')}">${escapeHtml(item.status)}</span>
+                        <p class="repair-row-brief">${escapeHtml(item.type)} · ${escapeHtml(item.description)}</p>
+                    </summary>
+                    <div class="repair-row-detail"><div class="repair-detail-grid">
+                        ${repairDetailFieldMarkup('情况描述', item.description, { wide: true, description: true })}
+                        ${repairDetailFieldMarkup('上报人', item.submitter)}
+                        ${repairDetailFieldMarkup('联系电话', item.phone)}
+                        ${repairDetailFieldMarkup('处理时间', item.handledAt, { valueClass: item.status === '待处理' ? 'pending' : '' })}
+                        ${repairDetailFieldMarkup('处理人', item.handler, { valueClass: item.status === '待处理' ? 'pending' : '' })}
+                        ${repairDetailFieldMarkup('验收情况', item.acceptance, { wide: true, valueClass: item.acceptance === '已验收' ? 'accepted' : 'pending' })}
+                        ${renderRepairPhotos(item)}
+                    </div></div>
+                </details>`).join('') : '<div class="roster-empty">当前状态暂无保修记录</div>'}</div>
             </section>`;
         }
 
@@ -15154,7 +16061,7 @@
         }
 
         function renderClassModule() {
-            const titles = { leave: '学生请假', rollcall: '实时点名', 'class-schedule': '班级课表', 'class-schedule-v2': '课表二版', discipline: '学生违纪', 'class-discipline': '班级违纪', 'class-assessment': '班级考核', 'student-ranking': '考核排名', 'return-stats': '返校统计', 'home-stats': '回家统计', 'student-comments': '学生评语', 'class-repair': '班级报修', 'student-add': '添加未选班级学生', logs: '班级日志', dorm: '宿舍管理', 'checkin-return': '返校点到任务', 'checkin-home': '回家点到任务', 'school-dorm': '全校宿舍', 'school-dorm-stats': '宿舍统计', 'discipline-setup': '违纪管理' };
+            const titles = { leave: '学生请假', rollcall: '实时点名', 'class-schedule': '班级课表', 'class-schedule-v2': '课表二版', discipline: '学生违纪', 'class-discipline': '班级违纪', 'class-assessment': '班级考核', 'student-ranking': '考核排名', 'return-stats': '返校统计', 'home-stats': '回家统计', 'student-comments': '学生评语', 'class-repair': '班级保修', 'class-cadres': '班干部设置', 'student-add': '添加未选班级学生', logs: '班级日志', dorm: '宿舍管理', 'checkin-return': '返校点到任务', 'checkin-home': '回家点到任务', 'school-dorm': '全校宿舍', 'school-dorm-stats': '宿舍统计', 'discipline-setup': '违纪管理' };
             classModuleTitle.textContent = getV791ClassModuleTitle(titles);
             classModuleView.setAttribute('aria-label', state.classModuleOrigin === 'school' ? '学校管理业务' : '班级业务');
             classModuleBackButton.setAttribute('aria-label', state.classModuleOrigin === 'school' ? '返回学校管理' : '返回班级管理');
@@ -15168,6 +16075,7 @@
             if (state.classModule === 'home-stats') classModuleRoot.innerHTML = renderHomeStatsModule();
             if (state.classModule === 'student-comments') classModuleRoot.innerHTML = renderStudentCommentsModule();
             if (state.classModule === 'class-repair') classModuleRoot.innerHTML = renderRepairModule();
+            if (state.classModule === 'class-cadres') classModuleRoot.innerHTML = renderClassCadreModule();
             if (state.classModule === 'student-add') classModuleRoot.innerHTML = renderStudentAddModule();
             if (state.classModule === 'class-schedule') classModuleRoot.innerHTML = renderClassScheduleModule();
             if (state.classModule === 'class-schedule-v2') classModuleRoot.innerHTML = renderClassScheduleV2Module();
@@ -15234,6 +16142,7 @@
                 state.disciplineListFilter = 'mine';
             }
             if (module === 'class-repair') state.repairStatusFilter = '待处理';
+            if (module === 'class-cadres') state.classCadreSearch = '';
             if (module === 'student-add') {
                 state.classStudentAddSearch = '';
                 state.classStudentAddSelectedIds = [];
@@ -15267,7 +16176,6 @@
                 state.dormViolationDraft = [];
                 state.dormViolationPhotoName = '';
                 state.dormViolationFilter = '全部违纪';
-                state.dormViolationDraftFilter = '全部违纪';
             }
             if (module === 'logs') {
                 state.logsPendingExpanded = false;
@@ -15358,6 +16266,7 @@
                     markStudentStatusHandled(id);
                     feedback = `${studentName}已设为${nextStatus}`;
                 }
+                markStudentStatusUpdated();
                 renderClassInfo();
                 showToast(feedback);
                 updateRollcallList();
@@ -15433,6 +16342,13 @@
                 updateClassRosterSearchResults();
                 input?.focus();
             }
+            if (action === 'clear-class-cadre-search') {
+                state.classCadreSearch = '';
+                const input = document.getElementById('classCadreSearch');
+                if (input) input.value = '';
+                updateClassCadreSearchResults();
+                input?.focus();
+            }
             if (action === 'show-auth-pending') {
                 state.classStudentFilter = 'auth';
                 state.classStudentSearch = '';
@@ -15446,9 +16362,13 @@
                 requestAnimationFrame(() => document.getElementById('classStudentAddSearch')?.focus());
             }
             if (action === 'clear-class-schedule-search') {
-                state.classScheduleSearch = '';
-                renderClassModule();
-                requestAnimationFrame(() => document.getElementById('classScheduleSearch')?.focus());
+                const input = document.getElementById('classScheduleSearch');
+                if (input) input.value = '';
+                updateClassScheduleSearchResults('');
+                requestAnimationFrame(() => {
+                    input?.focus({ preventScroll: true });
+                    classModuleScroll.scrollTop = 0;
+                });
             }
             if (action === 'toggle-unassigned-student') toggleUnassignedStudent(button.dataset.unassignedStudentId);
             if (action === 'toggle-select-all-unassigned') toggleSelectAllUnassigned();
@@ -15510,6 +16430,7 @@
                 renderClassModule();
                 classModuleScroll.scrollTop = 0;
             }
+            if (action === 'preview-repair-image') previewRepairImage(button.dataset.repairId, button.dataset.repairPhotoIndex);
             if (action === 'open-dorm-picker') openDormPicker(button);
             if (action === 'open-vacant-bed-picker') openVacantBedStudentPicker(button);
             if (action === 'open-occupied-bed-actions') openOccupiedBedActions(button);
@@ -15715,6 +16636,14 @@
         attendanceEditorBackButton.addEventListener('click', closeAttendanceEditorPage);
 
         leaveDetailBackButton.addEventListener('click', closeLeaveDetailPage);
+
+        leaveEvidencePreview.addEventListener('click', closeLeaveImagePreview);
+        leaveEvidencePreview.addEventListener('keydown', event => {
+            if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                closeLeaveImagePreview();
+            }
+        });
 
         logDetailBackButton.addEventListener('click', closeLogDetailPage);
 
@@ -16033,6 +16962,21 @@
         });
 
         appDevice.addEventListener('keydown', event => {
+            if (event.target.id === 'classScheduleSearch') {
+                if (event.key === 'Escape' && state.classScheduleSearch) {
+                    event.preventDefault();
+                    event.target.value = '';
+                    updateClassScheduleSearchResults('');
+                    return;
+                }
+                if (event.key === 'Enter' && !event.isComposing && event.keyCode !== 229) {
+                    event.preventDefault();
+                    updateClassScheduleSearchResults(event.target.value);
+                    event.target.blur();
+                    requestAnimationFrame(() => { classModuleScroll.scrollTop = 0; });
+                    return;
+                }
+            }
             if (event.target.id === 'classRosterSearch') {
                 if (event.key === 'Escape' && state.classStudentSearch) {
                     event.preventDefault();
@@ -16100,6 +17044,11 @@
             if (event.target.id === 'classRosterSearch') {
                 state.classStudentSearch = event.target.value;
                 updateClassRosterSearchResults();
+                return;
+            }
+            if (event.target.id === 'classCadreSearch') {
+                state.classCadreSearch = event.target.value;
+                updateClassCadreSearchResults();
                 return;
             }
             if (event.target.id === 'classStudentAddSearch') {
@@ -16174,6 +17123,16 @@
             if (input) sanitizePhoneInput(input);
         });
 
+        appDevice.addEventListener('compositionend', event => {
+            if (event.target.id === 'classScheduleSearch') updateClassScheduleSearchResults(event.target.value);
+        });
+
+        appDevice.addEventListener('search', event => {
+            if (event.target.id !== 'classScheduleSearch') return;
+            updateClassScheduleSearchResults(event.target.value);
+            requestAnimationFrame(() => { classModuleScroll.scrollTop = 0; });
+        });
+
         materialFileInput.addEventListener('change', () => {
             const file = materialFileInput.files?.[0];
             if (!file || !state.materialSlotName) return;
@@ -16193,18 +17152,11 @@
             item.previewUrl = URL.createObjectURL(file);
             item.updatedAt = new Date().toLocaleDateString('zh-CN').replaceAll('/', '-');
             item.fileName = file.name;
-            item.status = '已上传';
-            if (name === '近期证件照') data.avatarUrl = item.previewUrl;
             state.materialSlotName = '';
             materialFileInput.value = '';
             renderPanel();
             renderHero();
-            if (name === '近期证件照') {
-                renderClassOverview();
-                if (state.classModule === 'logs') renderClassModule();
-                if (state.view === 'attendance') renderAttendancePage();
-            }
-            showToast(name === '近期证件照' ? '证件照已上传并同步更新头像' : '材料图片已补传');
+            showToast('档案照片已补传');
         });
 
         disciplineCameraInput.addEventListener('change', () => {
@@ -16329,9 +17281,9 @@
                 date: '2026-07-30',
                 clock: '10:18',
                 recorder: '宿管王老师',
-                type: '宿舍违纪',
+                type: '宿舍卫生',
                 people: '旭泰 306 室全体成员',
-                description: '旭泰 306 室垃圾未倒，早间卫生检查时垃圾桶已满且未按规定完成清理。',
+                description: '',
                 status: 'pending',
                 photoLabel: '课堂现场记录'
             },
@@ -16346,7 +17298,7 @@
                 clock: '07:42',
                 recorder: '陈老师',
                 type: '行为规范',
-                description: '晨会集合结束后仍有学生进入队列，现场已完成点名并登记迟到情况。',
+                description: '',
                 status: 'processed',
                 handler: '周静怡',
                 handledAt: '2026-07-29 11:05',
@@ -16365,7 +17317,7 @@
                 clock: '21:16',
                 recorder: '宿管王老师',
                 type: '宿舍违纪',
-                description: '晚间巡查发现宿舍内使用大功率电器，现场已断电并暂存相关物品。',
+                description: '',
                 status: 'processed',
                 handler: '周静怡',
                 handledAt: '2026-07-25 09:20',
@@ -16384,7 +17336,7 @@
                 clock: '07:36',
                 recorder: '李老师',
                 type: '行为规范',
-                description: '升旗仪式整队完成后进入班级队列，值周教师完成现场登记。',
+                description: '',
                 status: 'pending',
                 photoLabel: '升旗队列记录'
             },
@@ -16399,7 +17351,7 @@
                 clock: '16:35',
                 recorder: '学生会纪检部',
                 type: '卫生检查',
-                description: '放学后卫生检查发现地面与公共台面未按要求清理，检查结果判定不合格。',
+                description: '',
                 status: 'pending',
                 photoLabel: '卫生检查现场'
             },
@@ -16414,7 +17366,7 @@
                 clock: '12:08',
                 recorder: '值周教师',
                 type: '行为规范',
-                description: '午餐高峰时段出现插队情况，经现场提醒后恢复秩序。',
+                description: '',
                 status: 'processed',
                 handler: '周静怡',
                 handledAt: '2026-07-10 17:10',
@@ -16433,7 +17385,7 @@
                 clock: '14:22',
                 recorder: '韩雨',
                 type: '课堂违纪',
-                description: '商品拍摄与后期处理开始后仍未按要求准备实训用品，现场补充后继续课程。',
+                description: '',
                 status: 'processed',
                 handler: '周静怡',
                 handledAt: '2026-07-03 18:20',
@@ -16452,7 +17404,7 @@
                 clock: '22:18',
                 recorder: '宿管刘老师',
                 type: '宿舍违纪',
-                description: '超过宿舍规定归寝时间后返回，宿管完成身份核验与晚归登记。',
+                description: '',
                 status: 'pending',
                 photoLabel: '晚归登记凭证'
             },
@@ -16467,7 +17419,7 @@
                 clock: '15:42',
                 recorder: '图书馆管理员',
                 type: '行为规范',
-                description: '自习区域交谈音量过大影响其他学生，经管理员提醒后停止。',
+                description: '',
                 status: 'processed',
                 handler: '周静怡',
                 handledAt: '2026-06-19 09:00',
@@ -16486,7 +17438,7 @@
                 clock: '17:06',
                 recorder: '生活部干事',
                 type: '卫生检查',
-                description: '当日值日结束后黑板与垃圾桶区域未完成清理，复查时仍未达标。',
+                description: '',
                 status: 'processed',
                 handler: '周静怡',
                 handledAt: '2026-06-12 08:30',
@@ -16505,7 +17457,7 @@
                 clock: '19:28',
                 recorder: '值班教师',
                 type: '课堂违纪',
-                description: '晚间巡查期间多次出现随意走动与交谈，值班教师完成现场提醒。',
+                description: '',
                 status: 'processed',
                 handler: '周静怡',
                 handledAt: '2026-06-05 10:15',
@@ -16524,7 +17476,7 @@
                 clock: '08:12',
                 recorder: '宿管王老师',
                 type: '宿舍违纪',
-                description: '早间内务检查中床铺与公共物品摆放未达到检查标准。',
+                description: '',
                 status: 'processed',
                 handler: '周静怡',
                 handledAt: '2026-05-28 16:40',
@@ -16581,9 +17533,9 @@
                 return room ? `${room.building}${room.roomNo}室详情` : '宿舍详情';
             }
             if (state.classModule === 'dorm' && state.classDormView === 'picker') {
-                if (state.classDormPickerLevel === 'floors') return '选择楼层';
-                if (state.classDormPickerLevel === 'rooms') return '选择房间';
-                return '选择本班宿舍';
+                if (state.classDormPickerLevel === 'floors') return '添加宿舍 · 选择楼层';
+                if (state.classDormPickerLevel === 'rooms') return '添加宿舍 · 选择房间';
+                return '添加宿舍';
             }
             if (state.classModule === 'dorm') return `${className}宿舍管理`;
             return titles[state.classModule] || '班级业务';
@@ -16707,6 +17659,12 @@
                 ...otherResidents.map(item => ({ name: item[0], className: item[1], mine: false }))
             ].map((item, index) => ({ ...item, bed: index + 1 }));
             return { id, building, roomNo, capacity, residents, sourceRoomId };
+        }
+
+        function getClassDormBedLabel(bedNumber) {
+            const numericBed = Math.max(1, Number(bedNumber) || 1);
+            const bunkNumber = Math.ceil(numericBed / 2);
+            return `${bunkNumber}号床${numericBed % 2 ? '上铺' : '下铺'}`;
         }
 
         const classDormitorySeed = [
@@ -16843,7 +17801,7 @@
                 const occupied = room.beds.filter(bed => bed.occupied).length;
                 const emptyBeds = room.beds.length - occupied;
                 const selected = selectedRoomIds.has(room.id) || classDormitorySeed.some(item => item.building === room.building && item.roomNo === room.roomNo);
-                return `<button type="button" class="school-room-card${selected ? ' active' : ''}" data-action="choose-class-dorm-room" data-room-id="${escapeHtml(room.id)}" aria-pressed="${selected ? 'true' : 'false'}" aria-label="${escapeHtml(room.roomNo)}室，${selected ? '已选为本班宿舍' : `空${emptyBeds}床，选择为本班宿舍`}"><strong>${escapeHtml(room.roomNo)}室</strong><span>${selected ? '已选择' : `空 ${emptyBeds} 床`}</span></button>`;
+                return `<button type="button" class="school-room-card${selected ? ' active' : ''}" data-action="choose-class-dorm-room" data-room-id="${escapeHtml(room.id)}" aria-pressed="${selected ? 'true' : 'false'}" aria-label="${escapeHtml(room.roomNo)}室，${selected ? '已添加到本班宿舍' : `空${emptyBeds}床，添加到本班宿舍`}"><strong>${escapeHtml(room.roomNo)}室</strong><span>${selected ? '已添加' : `空 ${emptyBeds} 床`}</span></button>`;
             }).join('');
             const floorLabel = state.classDormPickerFloor === '其他' ? '其他楼层' : `${state.classDormPickerFloor}层`;
             return `<section class="v791-surface class-dorm-picker-surface" aria-label="选择${escapeHtml(state.classDormPickerBuilding)}${escapeHtml(floorLabel)}房间"><div class="school-dorm-level level-rooms"><div class="school-dorm-section-title"><span>${escapeHtml(state.classDormPickerBuilding)} · ${escapeHtml(floorLabel)}</span><i aria-hidden="true"></i><small>${rooms.length} 间</small></div><div class="school-dorm-room-grid">${roomCards}</div></div></section>`;
@@ -16852,11 +17810,11 @@
         function renderClassDormOverview() {
             const classStudentCount = classDormitorySeed.reduce((sum, room) => sum + room.residents.filter(item => item.mine).length, 0);
             return `<section class="v791-surface" aria-label="${escapeHtml(getClassRecordClassName())}住宿分配情况">
-                <header class="class-dorm-overview-head"><span class="class-dorm-overview-title"><strong>本班宿舍</strong><span>${classDormitorySeed.length} 间 · ${classStudentCount} 人</span></span><button type="button" class="class-dorm-select-button" data-action="open-class-dorm-picker"><svg aria-hidden="true" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>选择宿舍</button></header>
+                <header class="class-dorm-overview-head"><span class="class-dorm-overview-title"><strong>本班宿舍</strong><span>${classDormitorySeed.length} 间 · ${classStudentCount} 人</span></span><button type="button" class="class-dorm-select-button" data-action="open-class-dorm-picker"><svg aria-hidden="true" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>添加宿舍</button></header>
                 <div class="v791-table" role="table" aria-label="班级宿舍信息表">
-                    <div class="v791-table-head v791-dorm-grid" role="row"><span role="columnheader">序号</span><span role="columnheader">房间号</span><span role="columnheader">额定 / 实际</span><span role="columnheader">我班</span><span role="columnheader">宿舍人员</span></div>
-                    ${classDormitorySeed.map((room, index) => `<button type="button" class="v791-table-row v791-dorm-grid v791-dorm-row" data-action="open-class-dorm-room" data-class-dorm-room-id="${room.id}" role="row" aria-label="查看${room.building}${room.roomNo}室详情，额定${room.capacity}人，实际${room.residents.length}人，本班${room.residents.filter(item => item.mine).length}人">
-                        <span role="cell">${index + 1}</span><strong class="v791-dorm-room" role="cell">${room.building}<br>${room.roomNo}</strong><span class="v791-dorm-occupancy" role="cell"><strong>${room.capacity}/${room.residents.length}</strong><small>床位/入住</small></span><strong role="cell">${room.residents.filter(item => item.mine).length}</strong><span class="v791-dorm-people" role="cell">${room.residents.map(person => `<span class="v791-dorm-person${person.mine ? ' mine' : ''}">${escapeHtml(person.name)}</span>`).join('')}</span>
+                    <div class="v791-table-head v791-dorm-grid" role="row"><span role="columnheader">房间号</span><span role="columnheader">床位 / 入住</span><span role="columnheader">我班</span><span role="columnheader">宿舍人员</span></div>
+                    ${classDormitorySeed.map(room => `<button type="button" class="v791-table-row v791-dorm-grid v791-dorm-row" data-action="open-class-dorm-room" data-class-dorm-room-id="${room.id}" role="row" aria-label="查看${room.building}${room.roomNo}室详情，床位${room.capacity}个，入住${room.residents.length}人，本班${room.residents.filter(item => item.mine).length}人">
+                        <strong class="v791-dorm-room" role="cell">${room.building}<br>${room.roomNo}</strong><span class="v791-dorm-occupancy" role="cell"><strong>${room.capacity}/${room.residents.length}</strong></span><strong role="cell">${room.residents.filter(item => item.mine).length}</strong><span class="v791-dorm-people" role="cell">${room.residents.map(person => `<span class="v791-dorm-person${person.mine ? ' mine' : ''}">${escapeHtml(person.name)}</span>`).join('')}</span>
                     </button>`).join('')}
                 </div>
                 <section class="v791-name-groups" aria-label="其他住宿状态人员名单">${classDormUnallocatedGroups.map(group => `<div class="v791-name-group"><div class="v791-name-group-head"><strong>${group.label}</strong><span>${group.names.length} 人</span></div><div class="v791-name-list">${group.names.map(name => `<span>${escapeHtml(name)}</span>`).join('')}</div></div>`).join('')}</section>
@@ -16877,7 +17835,7 @@
             return `<section aria-label="宿舍违纪登记"><h2 class="v791-section-title">宿舍违纪登记</h2>
                 <div class="v791-bed-table" role="table" aria-label="${room.building}${room.roomNo}室床位学生">
                     <div class="v791-bed-head" role="row"><span role="columnheader">床位号</span><span role="columnheader">学生姓名</span><span role="columnheader">违纪项</span></div>
-                    ${room.residents.map(person => { const items = drafts.filter(item => item.scope === 'bed' && item.target === String(person.bed)); const otherClass = person.mine ? '' : getClassDormResidentClass(person); return `<div class="v791-bed-row" role="row"><strong role="cell">${person.bed} 号床</strong><span class="v791-bed-student" role="cell"><strong>${escapeHtml(person.name)}</strong>${otherClass ? `<small>${escapeHtml(otherClass)}</small>` : ''}</span><button type="button" class="v791-add-item" data-action="add-dorm-violation-item" data-dorm-bed="${person.bed}" data-dorm-student="${escapeHtml(person.name)}">+ 违纪项</button>${renderDormViolationDraftItems(items)}</div>`; }).join('')}
+                    ${room.residents.map(person => { const items = drafts.filter(item => item.scope === 'bed' && item.target === String(person.bed)); const otherClass = person.mine ? '' : getClassDormResidentClass(person); return `<div class="v791-bed-row" role="row"><strong role="cell">${getClassDormBedLabel(person.bed)}</strong><span class="v791-bed-student" role="cell"><strong>${escapeHtml(person.name)}</strong>${otherClass ? `<small>${escapeHtml(otherClass)}</small>` : ''}</span><button type="button" class="v791-add-item" data-action="add-dorm-violation-item" data-dorm-bed="${person.bed}" data-dorm-student="${escapeHtml(person.name)}">+ 违纪项</button>${renderDormViolationDraftItems(items)}</div>`; }).join('')}
                 </div>
                 <div class="v791-register-tools">
                     <button type="button" class="v791-photo-upload" data-action="trigger-dorm-violation-photo"><strong>违纪图片</strong><span>${state.dormViolationPhotoName ? escapeHtml(state.dormViolationPhotoName) : '上传图片'}</span></button>
@@ -16892,8 +17850,8 @@
         function renderClassDormRecords(room) {
             const filter = state.dormViolationFilter || '全部违纪';
             const records = dormViolationRecords.filter(item => item.roomId === room.id && (filter === '全部违纪' || item.item === filter));
-            const options = ['全部违纪', ...dormViolationNames].map(name => `<option value="${escapeHtml(name)}"${state.dormViolationDraftFilter === name ? ' selected' : ''}>${escapeHtml(name)}</option>`).join('');
-            return `<section aria-label="宿舍违纪记录"><h2 class="v791-section-title">宿舍违纪记录</h2><div class="v791-record-filter"><select id="dormViolationFilter" aria-label="选择违纪类型">${options}</select><button type="button" data-action="apply-dorm-violation-filter">确定</button></div>
+            const options = ['全部违纪', ...dormViolationNames].map(name => `<option value="${escapeHtml(name)}"${filter === name ? ' selected' : ''}>${escapeHtml(name)}</option>`).join('');
+            return `<section aria-label="宿舍违纪记录"><h2 class="v791-section-title">宿舍违纪记录</h2><div class="v791-record-filter"><select id="dormViolationFilter" aria-label="选择违纪类型">${options}</select></div>
                 <div class="v791-record-list">${records.length ? records.map(item => `<article class="v791-record-row"><div><div class="v791-record-title">${escapeHtml(item.dorm)} · ${escapeHtml(item.item)} <b>（扣${item.points}分）</b></div><div class="v791-record-meta"><span>违纪班级<strong>${escapeHtml(item.className)}</strong></span><span>记录人<strong>${escapeHtml(item.recorder)}</strong></span><span>时间<strong>${escapeHtml(item.time)}</strong></span></div></div><span class="v791-status-tag${item.status === '已处理' ? ' processed' : ''}">${item.status}</span></article>`).join('') : '<div class="v791-empty">没有符合当前条件的违纪记录</div>'}</div>
             </section>`;
         }
@@ -16912,7 +17870,7 @@
         function openDormViolationItemDialog(scope, target = '', studentName = '') {
             const firstItem = dormViolationItems[0];
             openDialog({
-                title: scope === 'room' ? '添加全宿舍违纪项' : `添加${studentName || `${target}号床`}违纪项`,
+                title: scope === 'room' ? '添加全宿舍违纪项' : `添加${studentName || getClassDormBedLabel(target)}违纪项`,
                 body: `<div class="v791-violation-form"><div><label for="dormViolationItemSelect">违纪项</label><select id="dormViolationItemSelect">${dormViolationItems.map((item, index) => `<option value="${index}">${escapeHtml(item.name)}（默认扣${item.points}分）</option>`).join('')}</select></div><div><label for="dormViolationPoints">扣分</label><input id="dormViolationPoints" type="number" min="1" max="100" inputmode="numeric" value="${firstItem.points}"></div></div>`,
                 confirmLabel: '添加',
                 onConfirm: () => {
@@ -16951,7 +17909,6 @@
             state.dormViolationPhotoName = '';
             state.classDormDetailTab = 'records';
             state.dormViolationFilter = '全部违纪';
-            state.dormViolationDraftFilter = '全部违纪';
             renderClassModule();
             classModuleScroll.scrollTop = 0;
             showToast(`已提交 ${count} 项宿舍违纪`);
@@ -16978,11 +17935,9 @@
             if (origin === 'class-discipline') {
                 return `<button type="button" class="class-record-row class-discipline-list-row" data-action="open-class-discipline-detail" data-class-discipline-id="${escapeHtml(item.id)}" data-class-discipline-origin="class-discipline" aria-label="查看${escapeHtml(item.location)}${escapeHtml(item.item)}违纪详情，扣${deduction}分">
                     <span class="class-record-copy">
-                        <span class="class-discipline-list-label">违纪标题</span>
-                        <strong class="class-discipline-list-title">${escapeHtml(`${item.location}${item.item}`)}<b>（扣${deduction}分）</b></strong>
+                        <strong class="class-discipline-list-title">${escapeHtml(`${item.location}${item.item}`)}<b>（-${deduction}分）</b></strong>
                         <span class="class-discipline-list-fields">
                             <span class="class-discipline-list-field"><span>违纪时间</span><strong>${escapeHtml(formatClassDisciplineTime(item))}</strong></span>
-                            <span class="class-discipline-list-field"><span>违纪班级</span><strong>${escapeHtml(getClassRecordClassName())}</strong></span>
                             <span class="class-discipline-list-field"><span>记录人</span><strong>${escapeHtml(item.recorder)}</strong></span>
                         </span>
                     </span>
@@ -17096,41 +18051,36 @@
             const item = getClassDisciplineRecord(state.selectedClassDisciplineId);
             if (!item) return;
             const processed = item.status === 'processed';
-            const finalDeduction = processed ? getClassDisciplineDeduction(item) : '—';
+            const description = String(item.description || '').trim();
+            const multiplier = Number(item.multiplier ?? 1);
             disciplineDetailRoot.innerHTML = `<article class="class-discipline-detail">
                 <header class="class-discipline-detail-hero">
                     <div class="class-discipline-detail-kicker"><span>${processed ? '已完成班级处理' : '等待班级处理'}</span><strong>-${item.points} 分</strong></div>
-                    <h2>${escapeHtml(`${item.location}${item.item}`)}（扣${item.points}分）</h2>
+                    <h2>${escapeHtml(`${item.location}${item.item}`)}</h2>
                     <p>${escapeHtml(formatClassDisciplineTime(item))} · ${escapeHtml(getClassRecordClassName())}</p>
                 </header>
-                <section class="class-discipline-section" aria-label="违纪基础信息">
-                    <h3>违纪基础信息</h3>
+                <section class="class-discipline-section class-discipline-primary" aria-label="违纪信息">
                     <div class="class-discipline-fields">
-                        ${classDisciplineFieldMarkup('违纪标题', `${item.location}${item.item}`)}
-                        ${classDisciplineFieldMarkup('宿舍', item.location)}
-                        ${classDisciplineFieldMarkup('时间', formatClassDisciplineTime(item))}
-                        ${classDisciplineFieldMarkup('人员', item.people || `${getClassRecordClassName()}相关学生`)}
-                        ${classDisciplineFieldMarkup('扣分', `-${item.points} 分`, 'deduction-value')}
+                        ${classDisciplineFieldMarkup('违纪位置', item.location)}
+                        ${classDisciplineFieldMarkup('违纪类型', item.type || item.category || '未填写')}
+                        ${classDisciplineFieldMarkup('违纪人员', item.people || `${getClassRecordClassName()}相关学生`)}
                         ${classDisciplineFieldMarkup('记录人', item.recorder)}
                     </div>
-                    <div class="class-discipline-description"><span>违纪描述</span><p>${escapeHtml(item.description)}</p></div>
+                    <div class="class-discipline-description"><span>违纪描述</span><p${description ? '' : ' class="is-empty"'}>${escapeHtml(description || '未填写')}</p></div>
                     <div class="class-discipline-photo-label">违纪照片</div>
                     ${classDisciplinePhotoMarkup(item)}
                 </section>
                 <section class="class-discipline-section" aria-label="违纪事件处理">
                     <h3>违纪事件处理</h3>
                     <div class="class-discipline-fields">
-                        ${classDisciplineFieldMarkup('处理状态', processed ? '已处理' : '待处理', processed ? '' : 'pending-value')}
                         ${classDisciplineFieldMarkup('处理人', processed ? item.handler : '待处理', processed ? '' : 'pending-value')}
-                        ${classDisciplineFieldMarkup('处理时间', processed ? item.handledAt : '—', processed ? '' : 'pending-value')}
+                        ${classDisciplineFieldMarkup('处理时间', processed ? item.handledAt : '未处理', processed ? '' : 'pending-value')}
                     </div>
                 </section>
-                <section class="class-discipline-section" aria-label="违纪班级处理">
-                    <h3>违纪班级处理</h3>
+                <section class="class-discipline-section" aria-label="计分处理">
+                    <h3>计分处理</h3>
                     <div class="class-discipline-fields">
-                        ${classDisciplineFieldMarkup('班级', getClassRecordClassName())}
-                        ${classDisciplineFieldMarkup('倍数', processed ? `${item.multiplier} 倍` : '—', processed ? '' : 'pending-value')}
-                        ${classDisciplineFieldMarkup('扣分', processed ? `-${finalDeduction} 分` : '待处理', processed ? 'deduction-value' : 'pending-value')}
+                        ${classDisciplineFieldMarkup('倍数', multiplier)}
                     </div>
                 </section>
             </article>`;
@@ -17285,6 +18235,7 @@
                 markStudentStatusHandled(data.id, classInfo);
                 feedback = `${data.name}已设为${status}`;
             }
+            markStudentStatusUpdated(classInfo);
             data.liveStatusUpdatedAt = new Date().toLocaleString('zh-CN', { hour12: false }).replaceAll('/', '-');
             data.liveStatusUpdatedBy = getStudentStatusOperatorFullName('', data);
             renderAttendancePage();
@@ -17371,7 +18322,7 @@
                 renderClassModule();
                 classModuleScroll.scrollTop = 0;
                 focusAfterViewChange(() => classModuleRoot.querySelector(`[data-class-dorm-room-id="${roomId}"]`) || classModuleBackButton);
-                showToast(`已选择${sourceRoom.building}${sourceRoom.roomNo}室`);
+                showToast(`已添加${sourceRoom.building}${sourceRoom.roomNo}室`);
             }
             if (action === 'open-class-dorm-room') {
                 state.classDormRoomId = button.dataset.classDormRoomId || classDormitorySeed[0].id;
@@ -17380,7 +18331,6 @@
                 state.dormViolationDraft = [];
                 state.dormViolationPhotoName = '';
                 state.dormViolationFilter = '全部违纪';
-                state.dormViolationDraftFilter = '全部违纪';
                 renderClassModule();
                 classModuleScroll.scrollTop = 0;
                 focusAfterViewChange(classModuleBackButton);
@@ -17395,12 +18345,6 @@
             if (action === 'add-dorm-whole-room-violation') openDormViolationItemDialog('room');
             if (action === 'trigger-dorm-violation-photo') document.getElementById('dormViolationPhotoInput')?.click();
             if (action === 'submit-dorm-violations') submitDormViolationDraft();
-            if (action === 'apply-dorm-violation-filter') {
-                state.dormViolationDraftFilter = document.getElementById('dormViolationFilter')?.value || '全部违纪';
-                state.dormViolationFilter = state.dormViolationDraftFilter;
-                renderClassModule();
-                requestAnimationFrame(() => document.getElementById('dormViolationFilter')?.focus({ preventScroll: true }));
-            }
             if (action === 'set-class-discipline-tab') {
                 state.classDisciplineTab = button.dataset.classDisciplineTab === 'processed' ? 'processed' : 'pending';
                 renderClassModule();
@@ -17431,6 +18375,24 @@
         });
 
         appDevice.addEventListener('change', event => {
+            if (event.target.id === 'dormViolationFilter') {
+                state.dormViolationFilter = event.target.value || '全部违纪';
+                renderClassModule();
+                requestAnimationFrame(() => document.getElementById('dormViolationFilter')?.focus({ preventScroll: true }));
+                return;
+            }
+            const cadreRoleSelect = event.target.closest('[data-cadre-student-id]');
+            if (cadreRoleSelect) {
+                const studentId = cadreRoleSelect.dataset.cadreStudentId || '';
+                const role = cadreRoleOrder.includes(cadreRoleSelect.value) ? cadreRoleSelect.value : '';
+                const studentItem = ensureClassRoster(getSelectedClass()).find(item => item.id === studentId);
+                setClassCadreRole(studentId, role);
+                cadreRoleSelect.classList.toggle('has-role', Boolean(role));
+                updateClassCadreSummary();
+                renderClassOverview();
+                showToast(role ? `${studentItem?.name || '该学生'}已设为${role}` : `${studentItem?.name || '该学生'}已取消班干部职务`);
+                return;
+            }
             const scheduleDay = event.target.closest('[data-schedule-day]');
             if (scheduleDay) {
                 const dayId = String(scheduleDay.dataset.scheduleDay || '');
@@ -17492,6 +18454,7 @@
         else if (previewRoute === 'class-schedule') { openClassDetail('CLS2403'); openClassModule('class-schedule'); }
         else if (previewRoute === 'class-schedule-v2') { openClassDetail('CLS2403'); openClassModule('class-schedule-v2'); }
         else if (previewRoute === 'class-repair') { openClassDetail('CLS2403'); openClassModule('class-repair'); }
+        else if (previewRoute === 'class-cadres') { openClassDetail('CLS2403'); openClassModule('class-cadres'); }
         else if (previewRoute === 'class-repair-processing') { openClassDetail('CLS2403'); openClassModule('class-repair'); state.repairStatusFilter = '处理中'; renderClassModule(); }
         else if (previewRoute === 'class-discipline') { openClassDetail('CLS2403'); openClassModule('class-discipline'); }
         else if (previewRoute === 'class-discipline-processed') { openClassDetail('CLS2403'); openClassModule('class-discipline'); state.classDisciplineTab = 'processed'; renderClassModule(); }
