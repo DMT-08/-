@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<!-- 版本 6.1：左侧目标进度增加时使用缓动动画 -->
+<!-- 版本 6.6：统一缩放镜头缓动并居中；节点掌握后延时平滑聚焦最新节点 -->
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#EFF6FF">
-    <title>抖学 AI 技能树 · 左侧进度缓动动画</title>
+    <title>抖学 AI 技能树 · 缩放动效与居中优化</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -34,6 +34,10 @@
             --mastered: #12B981;
             --muted: #94A3B8;
             --zoom: 1;
+            --stage-gutter-x: 0px;
+            --stage-gutter-y: 0px;
+            --stage-gutter-width: 0px;
+            --stage-gutter-height: 0px;
         }
 
         * {
@@ -75,6 +79,25 @@
             overscroll-behavior: contain;
         }
 
+        #canvas-scroll {
+            background-color: #FFFFFF;
+            background-image: radial-gradient(
+                circle,
+                #D7DEE9 calc(1.35px * var(--zoom)),
+                transparent calc(1.45px * var(--zoom))
+            );
+            background-size: calc(26px * var(--zoom)) calc(26px * var(--zoom));
+            background-attachment: local;
+            cursor: grab;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #canvas-scroll.is-mouse-panning,
+        #canvas-scroll.is-mouse-panning * {
+            cursor: grabbing !important;
+        }
+
         .no-scrollbar {
             scrollbar-width: none;
         }
@@ -91,24 +114,45 @@
             will-change: transform;
         }
 
+        .goal-group-content {
+            display: grid;
+            grid-template-rows: 1fr;
+            margin-top: 10px;
+            opacity: 1;
+            transition: grid-template-rows 260ms cubic-bezier(0.16, 1, 0.3, 1),
+                        margin-top 260ms cubic-bezier(0.16, 1, 0.3, 1),
+                        opacity 180ms ease;
+        }
+
+        .goal-group-content.is-collapsed {
+            grid-template-rows: 0fr;
+            margin-top: 0;
+            opacity: 0;
+        }
+
+        .goal-group-clip {
+            min-height: 0;
+            overflow: hidden;
+        }
+
         .stage-shell {
             position: relative;
-            width: calc(1840px * var(--zoom));
-            height: calc(1150px * var(--zoom));
-            min-width: calc(1840px * var(--zoom));
-            min-height: calc(1150px * var(--zoom));
+            width: calc(1840px * var(--zoom) + var(--stage-gutter-width));
+            height: calc(1150px * var(--zoom) + var(--stage-gutter-height));
+            min-width: calc(1840px * var(--zoom) + var(--stage-gutter-width));
+            min-height: calc(1150px * var(--zoom) + var(--stage-gutter-height));
         }
 
         .skill-stage {
             position: absolute;
-            inset: 0 auto auto 0;
+            left: var(--stage-gutter-x);
+            top: var(--stage-gutter-y);
             width: 1840px;
             height: 1150px;
             transform: scale(var(--zoom));
             transform-origin: left top;
-            background-color: #FFFFFF;
-            background-image: radial-gradient(circle, #D7DEE9 1.35px, transparent 1.45px);
-            background-size: 26px 26px;
+            background: transparent;
+            will-change: transform;
         }
 
         .skill-node {
@@ -770,6 +814,8 @@
             completedFeedbackKey: null
         };
 
+        const collapsedGoalGroups = new Set();
+
         const STAGE_WIDTH = 1840;
         const STAGE_HEIGHT = 1150;
         const STAGE_OFFSET_X = 400;
@@ -796,8 +842,19 @@
         let toastTimer;
         let stageRenderToken = 0;
         let gestureStartZoom = 1;
+        let gestureFocusX = 0;
+        let gestureFocusY = 0;
+        let gestureViewportX = 0;
+        let gestureViewportY = 0;
+        let lastTouchCentroid = null;
+        let mousePanState = null;
+        let suppressMouseClick = false;
         let cameraAnimationFrame = 0;
+        let masteryCameraTimer = 0;
         let goalProgressRenderToken = 0;
+        let canvasViewportWidth = 0;
+        let canvasViewportHeight = 0;
+        const activeTouchPointers = new Map();
         const lineAnimationFrames = new WeakMap();
         const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -924,10 +981,19 @@
             const progressAnimations = [];
             const renderToken = ++goalProgressRenderToken;
 
-            goalList.innerHTML = groups.map(group => `
-                <section>
-                    <h2 class="mb-2.5 px-1.5 text-[16px] font-extrabold text-slate-900">${group.name}（${group.goals.length}）</h2>
-                    <div class="space-y-1.5">
+            goalList.innerHTML = groups.map((group, groupIndex) => {
+                const collapsed = collapsedGoalGroups.has(group.name);
+                const contentId = `goal-group-${groupIndex}`;
+                return `
+                <section data-goal-group="${group.name}">
+                    <h2>
+                        <button type="button" data-group-toggle="${group.name}" aria-expanded="${!collapsed}" aria-controls="${contentId}" class="flex min-h-11 w-full items-center rounded-xl px-1.5 text-left text-[16px] font-extrabold text-slate-900 transition hover:bg-slate-50 active:scale-[0.98]">
+                            <span>${group.name}（${group.goals.length}）</span>
+                        </button>
+                    </h2>
+                    <div id="${contentId}" data-group-content class="goal-group-content${collapsed ? ' is-collapsed' : ''}" aria-hidden="${collapsed}" ${collapsed ? 'inert' : ''}>
+                        <div class="goal-group-clip">
+                            <div class="space-y-1.5">
                         ${group.goals.map(goal => {
                             const selected = goal.id === state.goalId;
                             const displayTitle = limitGoalTitle(goal.title);
@@ -957,10 +1023,13 @@
                                     </span>
                                 </button>
                             `;
-                        }).join('')}
+                            }).join('')}
+                            </div>
+                        </div>
                     </div>
                 </section>
-            `).join('');
+                `;
+            }).join('');
 
             if (!progressAnimations.length) return;
 
@@ -991,6 +1060,22 @@
             });
         }
 
+        function toggleGoalGroup(button) {
+            const groupName = button.dataset.groupToggle;
+            const section = button.closest('[data-goal-group]');
+            const content = section?.querySelector('[data-group-content]');
+            if (!groupName || !content) return;
+
+            const willExpand = collapsedGoalGroups.has(groupName);
+            if (willExpand) collapsedGoalGroups.delete(groupName);
+            else collapsedGoalGroups.add(groupName);
+
+            button.setAttribute('aria-expanded', String(willExpand));
+            content.classList.toggle('is-collapsed', !willExpand);
+            content.setAttribute('aria-hidden', String(!willExpand));
+            content.toggleAttribute('inert', !willExpand);
+        }
+
         function collapseDrawerForGoalSwitch() {
             state.nodeId = null;
             state.drawerOpen = false;
@@ -1013,9 +1098,14 @@
         }
 
         function cancelCameraAnimation() {
-            if (!cameraAnimationFrame) return;
-            cancelAnimationFrame(cameraAnimationFrame);
-            cameraAnimationFrame = 0;
+            if (masteryCameraTimer) {
+                clearTimeout(masteryCameraTimer);
+                masteryCameraTimer = 0;
+            }
+            if (cameraAnimationFrame) {
+                cancelAnimationFrame(cameraAnimationFrame);
+                cameraAnimationFrame = 0;
+            }
         }
 
         function animateCanvasToNode(node, token, immediate = false) {
@@ -1024,13 +1114,12 @@
 
             const startLeft = canvasScroll.scrollLeft;
             const startTop = canvasScroll.scrollTop;
-            const maxLeft = Math.max(0, canvasScroll.scrollWidth - canvasScroll.clientWidth);
-            const maxTop = Math.max(0, canvasScroll.scrollHeight - canvasScroll.clientHeight);
-            const targetLeft = Math.min(maxLeft, Math.max(0,
-                (STAGE_OFFSET_X + node.x) * state.zoom - canvasScroll.clientWidth * FOCUS_VIEWPORT_X
+            const layout = getCanvasStageLayout(state.zoom);
+            const targetLeft = Math.min(layout.maxLeft, Math.max(0,
+                layout.gutterX + (STAGE_OFFSET_X + node.x) * state.zoom - layout.viewportWidth * FOCUS_VIEWPORT_X
             ));
-            const targetTop = Math.min(maxTop, Math.max(0,
-                (STAGE_OFFSET_Y + node.y) * state.zoom - canvasScroll.clientHeight * 0.5
+            const targetTop = Math.min(layout.maxTop, Math.max(0,
+                layout.gutterY + (STAGE_OFFSET_Y + node.y) * state.zoom - layout.viewportHeight * 0.5
             ));
 
             if (immediate || reducedMotionQuery.matches) {
@@ -1089,36 +1178,68 @@
             };
         }
 
+        function syncCanvasViewportGeometry() {
+            const width = canvasScroll.clientWidth;
+            const height = canvasScroll.clientHeight;
+            if (width === canvasViewportWidth && height === canvasViewportHeight) return;
+
+            canvasViewportWidth = width;
+            canvasViewportHeight = height;
+            const rootStyle = document.documentElement.style;
+            rootStyle.setProperty('--stage-gutter-x', `${width * 0.5}px`);
+            rootStyle.setProperty('--stage-gutter-y', `${height * 0.5}px`);
+            rootStyle.setProperty('--stage-gutter-width', `${width}px`);
+            rootStyle.setProperty('--stage-gutter-height', `${height}px`);
+        }
+
+        function getCanvasStageLayout(zoom) {
+            syncCanvasViewportGeometry();
+            return {
+                viewportWidth: canvasViewportWidth,
+                viewportHeight: canvasViewportHeight,
+                gutterX: canvasViewportWidth * 0.5,
+                gutterY: canvasViewportHeight * 0.5,
+                maxLeft: Math.max(0, STAGE_WIDTH * zoom),
+                maxTop: Math.max(0, STAGE_HEIGHT * zoom)
+            };
+        }
+
+        function centeredGoalViewAtZoom(goal, zoom, bounds = goalContentBounds(goal)) {
+            const layout = getCanvasStageLayout(zoom);
+            const contentCenterX = bounds.left + bounds.width * 0.5;
+            const contentCenterY = bounds.top + bounds.height * 0.5;
+            return {
+                zoom,
+                left: Math.min(layout.maxLeft, Math.max(0, contentCenterX * zoom)),
+                top: Math.min(layout.maxTop, Math.max(0, contentCenterY * zoom))
+            };
+        }
+
         function goalFitView(goal) {
             const bounds = goalContentBounds(goal);
-            const availableWidth = Math.max(320, canvasScroll.clientWidth - 40);
-            const availableHeight = Math.max(320, canvasScroll.clientHeight - 40);
+            const layout = getCanvasStageLayout(state.zoom);
+            const availableWidth = Math.max(320, layout.viewportWidth - 40);
+            const availableHeight = Math.max(320, layout.viewportHeight - 40);
             const rawZoom = Math.min(availableWidth / bounds.width, availableHeight / bounds.height, 1);
             const zoom = Math.max(0.1, Math.floor(rawZoom * 100) / 100);
-            const contentWidth = bounds.width * zoom;
-            const contentHeight = bounds.height * zoom;
-            const maxLeft = Math.max(0, STAGE_WIDTH * zoom - canvasScroll.clientWidth);
-            const maxTop = Math.max(0, STAGE_HEIGHT * zoom - canvasScroll.clientHeight);
-            const left = Math.min(maxLeft, Math.max(0,
-                bounds.left * zoom - (canvasScroll.clientWidth - contentWidth) * 0.5
-            ));
-            const top = Math.min(maxTop, Math.max(0,
-                bounds.top * zoom - (canvasScroll.clientHeight - contentHeight) * 0.5
-            ));
-            return { zoom, left, top };
+            return centeredGoalViewAtZoom(goal, zoom, bounds);
         }
 
         function applyCanvasZoom(value) {
+            syncCanvasViewportGeometry();
             state.zoom = value;
             document.documentElement.style.setProperty('--zoom', value);
             zoomLabel.textContent = `${Math.round(value * 100)}%`;
         }
 
-        function animateCanvasToGoalFit(goal, token, immediate = false) {
-            if (!goal?.nodes?.length) return;
-            cancelCameraAnimation();
+        function easeInOutCubic(progress) {
+            return progress < 0.5
+                ? 4 * progress * progress * progress
+                : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+        }
 
-            const target = goalFitView(goal);
+        function animateCanvasToView(target, token, immediate = false) {
+            cancelCameraAnimation();
             const startZoom = state.zoom;
             const startLeft = canvasScroll.scrollLeft;
             const startTop = canvasScroll.scrollTop;
@@ -1140,9 +1261,7 @@
                 }
 
                 const rawProgress = Math.min(1, (now - startTime) / duration);
-                const progress = rawProgress < 0.5
-                    ? 4 * rawProgress * rawProgress * rawProgress
-                    : 1 - Math.pow(-2 * rawProgress + 2, 3) / 2;
+                const progress = easeInOutCubic(rawProgress);
                 applyCanvasZoom(mixNumber(startZoom, target.zoom, progress));
                 canvasScroll.scrollLeft = mixNumber(startLeft, target.left, progress);
                 canvasScroll.scrollTop = mixNumber(startTop, target.top, progress);
@@ -1159,6 +1278,11 @@
             };
 
             cameraAnimationFrame = requestAnimationFrame(tick);
+        }
+
+        function animateCanvasToGoalFit(goal, token, immediate = false) {
+            if (!goal?.nodes?.length) return;
+            animateCanvasToView(goalFitView(goal), token, immediate);
         }
 
         function pathGeometry(source, target) {
@@ -1567,6 +1691,37 @@
             });
         }
 
+        function getLatestNodeAfterMastery(goal, masteredNodeId, unlockedNodeIds) {
+            const masteredNode = goal?.nodes.find(node => node.id === masteredNodeId);
+            const unlockedNodes = unlockedNodeIds
+                .map(nodeId => goal?.nodes.find(node => node.id === nodeId))
+                .filter(Boolean);
+            const candidates = unlockedNodes.length
+                ? unlockedNodes
+                : goal?.nodes.filter(isNodeActive) || [];
+
+            if (!candidates.length) return masteredNode || null;
+            return candidates.reduce((latest, node) => {
+                if (!latest || node.x > latest.x) return node;
+                if (node.x < latest.x || !masteredNode) return latest;
+                return Math.abs(node.y - masteredNode.y) < Math.abs(latest.y - masteredNode.y)
+                    ? node
+                    : latest;
+            }, null);
+        }
+
+        function scheduleLatestNodeFocus(goalId, masteredNodeId, unlockedNodeIds) {
+            if (masteryCameraTimer) clearTimeout(masteryCameraTimer);
+            masteryCameraTimer = window.setTimeout(() => {
+                masteryCameraTimer = 0;
+                if (state.goalId !== goalId) return;
+
+                const goal = findGoalById(goalId);
+                const latestNode = getLatestNodeAfterMastery(goal, masteredNodeId, unlockedNodeIds);
+                if (latestNode) animateCanvasToNode(latestNode, stageRenderToken);
+            }, 1000);
+        }
+
         function startModeTraining(button) {
             const node = getNode();
             if (!node) return;
@@ -1625,8 +1780,12 @@
                 renderStage();
                 if (state.nodeId === nodeId && state.drawerOpen) renderDrawer();
                 requestAnimationFrame(() => {
-                    if (becameMastered) showMasteryBurst(nodeId);
-                    showUnlockFeedback(unlockedNodes.map(item => item.id));
+                    const unlockedNodeIds = unlockedNodes.map(item => item.id);
+                    if (becameMastered) {
+                        showMasteryBurst(nodeId);
+                        scheduleLatestNodeFocus(goalId, nodeId, unlockedNodeIds);
+                    }
+                    showUnlockFeedback(unlockedNodeIds);
                 });
             }
 
@@ -1714,23 +1873,165 @@
             }, 1800);
         }
 
+        function clampZoom(value) {
+            const numericValue = Number(value);
+            if (!Number.isFinite(numericValue)) return state.zoom;
+            return Math.min(4, Math.max(0.1, numericValue));
+        }
+
+        function getCanvasViewportPoint(clientX, clientY, fallbackX = canvasScroll.clientWidth / 2, fallbackY = canvasScroll.clientHeight / 2) {
+            const rect = canvasScroll.getBoundingClientRect();
+            const viewportX = Number(clientX) - rect.left;
+            const viewportY = Number(clientY) - rect.top;
+            const valid = Number.isFinite(viewportX)
+                && Number.isFinite(viewportY)
+                && viewportX >= 0
+                && viewportX <= canvasScroll.clientWidth
+                && viewportY >= 0
+                && viewportY <= canvasScroll.clientHeight;
+            return valid
+                ? { x: viewportX, y: viewportY }
+                : { x: fallbackX, y: fallbackY };
+        }
+
+        function zoomScrollTarget(zoom, viewportX, viewportY, focusX, focusY) {
+            const layout = getCanvasStageLayout(zoom);
+            return {
+                left: Math.min(layout.maxLeft, Math.max(0, layout.gutterX + focusX * zoom - viewportX)),
+                top: Math.min(layout.maxTop, Math.max(0, layout.gutterY + focusY * zoom - viewportY))
+            };
+        }
+
+        function applyZoomAtPoint(value, viewportX, viewportY, focusX, focusY) {
+            const nextZoom = clampZoom(value);
+            const target = zoomScrollTarget(nextZoom, viewportX, viewportY, focusX, focusY);
+            applyCanvasZoom(nextZoom);
+            canvasScroll.scrollLeft = target.left;
+            canvasScroll.scrollTop = target.top;
+        }
+
         function setZoom(value, clientX, clientY, closeMenu = true) {
             cancelCameraAnimation();
-            const nextZoom = Math.min(4, Math.max(0.1, Math.round(value * 100) / 100));
-            const oldZoom = state.zoom;
-            const rect = canvasScroll.getBoundingClientRect();
-            const viewportX = Number.isFinite(clientX) ? clientX - rect.left : canvasScroll.clientWidth / 2;
-            const viewportY = Number.isFinite(clientY) ? clientY - rect.top : canvasScroll.clientHeight / 2;
-            const focusX = (canvasScroll.scrollLeft + viewportX) / oldZoom;
-            const focusY = (canvasScroll.scrollTop + viewportY) / oldZoom;
+            const point = getCanvasViewportPoint(clientX, clientY);
+            const layout = getCanvasStageLayout(state.zoom);
+            const focusX = (canvasScroll.scrollLeft + point.x - layout.gutterX) / state.zoom;
+            const focusY = (canvasScroll.scrollTop + point.y - layout.gutterY) / state.zoom;
+            if (closeMenu) closeZoomMenu();
+            applyZoomAtPoint(value, point.x, point.y, focusX, focusY);
+        }
 
-            applyCanvasZoom(nextZoom);
+        function animateCanvasZoomTo(value, closeMenu = true) {
+            const targetZoom = clampZoom(value);
             if (closeMenu) closeZoomMenu();
 
-            requestAnimationFrame(() => {
-                canvasScroll.scrollLeft = Math.max(0, focusX * nextZoom - viewportX);
-                canvasScroll.scrollTop = Math.max(0, focusY * nextZoom - viewportY);
-            });
+            const goal = getGoal();
+            if (goal?.nodes?.length) {
+                animateCanvasToView(centeredGoalViewAtZoom(goal, targetZoom), stageRenderToken);
+                return;
+            }
+
+            const layout = getCanvasStageLayout(state.zoom);
+            const viewportX = layout.viewportWidth * 0.5;
+            const viewportY = layout.viewportHeight * 0.5;
+            const focusX = (canvasScroll.scrollLeft + viewportX - layout.gutterX) / state.zoom;
+            const focusY = (canvasScroll.scrollTop + viewportY - layout.gutterY) / state.zoom;
+            const target = zoomScrollTarget(targetZoom, viewportX, viewportY, focusX, focusY);
+            animateCanvasToView({ zoom: targetZoom, ...target }, stageRenderToken);
+        }
+
+        function updateTouchPointer(event) {
+            if (event.pointerType !== 'touch') return;
+            activeTouchPointers.set(event.pointerId, { clientX: event.clientX, clientY: event.clientY });
+            if (activeTouchPointers.size < 2) return;
+
+            const points = Array.from(activeTouchPointers.values());
+            lastTouchCentroid = {
+                clientX: points.reduce((sum, point) => sum + point.clientX, 0) / points.length,
+                clientY: points.reduce((sum, point) => sum + point.clientY, 0) / points.length,
+                timestamp: performance.now()
+            };
+        }
+
+        function releaseTouchPointer(event) {
+            if (event.pointerType !== 'touch') return;
+            activeTouchPointers.delete(event.pointerId);
+        }
+
+        function getGestureClientPoint(event) {
+            if (event.touches?.length >= 2) {
+                const touches = Array.from(event.touches);
+                return {
+                    clientX: touches.reduce((sum, touch) => sum + touch.clientX, 0) / touches.length,
+                    clientY: touches.reduce((sum, touch) => sum + touch.clientY, 0) / touches.length
+                };
+            }
+
+            if (activeTouchPointers.size >= 2) {
+                const points = Array.from(activeTouchPointers.values());
+                return {
+                    clientX: points.reduce((sum, point) => sum + point.clientX, 0) / points.length,
+                    clientY: points.reduce((sum, point) => sum + point.clientY, 0) / points.length
+                };
+            }
+
+            if (lastTouchCentroid && performance.now() - lastTouchCentroid.timestamp < 1000) {
+                return lastTouchCentroid;
+            }
+
+            return { clientX: event.clientX, clientY: event.clientY };
+        }
+
+        function startMousePan(event) {
+            if (event.pointerType !== 'mouse' || event.button !== 0) return;
+            suppressMouseClick = false;
+            mousePanState = {
+                pointerId: event.pointerId,
+                startX: event.clientX,
+                startY: event.clientY,
+                startLeft: canvasScroll.scrollLeft,
+                startTop: canvasScroll.scrollTop,
+                dragging: false
+            };
+        }
+
+        function moveMousePan(event) {
+            if (!mousePanState || event.pointerId !== mousePanState.pointerId) return;
+            if ((event.buttons & 1) === 0) {
+                finishMousePan(event, true);
+                return;
+            }
+
+            const deltaX = event.clientX - mousePanState.startX;
+            const deltaY = event.clientY - mousePanState.startY;
+            if (!mousePanState.dragging) {
+                if (Math.hypot(deltaX, deltaY) < 4) return;
+                mousePanState.dragging = true;
+                canvasScroll.classList.add('is-mouse-panning');
+                if (!canvasScroll.hasPointerCapture(event.pointerId)) {
+                    canvasScroll.setPointerCapture(event.pointerId);
+                }
+            }
+
+            event.preventDefault();
+            canvasScroll.scrollLeft = mousePanState.startLeft - deltaX;
+            canvasScroll.scrollTop = mousePanState.startTop - deltaY;
+        }
+
+        function finishMousePan(event, cancelled = false) {
+            if (!mousePanState || event.pointerId !== mousePanState.pointerId) return;
+            const wasDragging = mousePanState.dragging;
+            if (canvasScroll.hasPointerCapture(event.pointerId)) {
+                canvasScroll.releasePointerCapture(event.pointerId);
+            }
+            canvasScroll.classList.remove('is-mouse-panning');
+            mousePanState = null;
+
+            if (wasDragging && !cancelled) {
+                suppressMouseClick = true;
+                setTimeout(() => {
+                    suppressMouseClick = false;
+                }, 0);
+            }
         }
 
         function handleCanvasWheel(event) {
@@ -1772,7 +2073,16 @@
         }
 
         goalList.addEventListener('click', event => {
-            const button = event.target instanceof Element ? event.target.closest('.goal-button') : null;
+            const target = event.target instanceof Element ? event.target : null;
+            if (!target) return;
+
+            const groupToggle = target.closest('[data-group-toggle]');
+            if (groupToggle && goalList.contains(groupToggle)) {
+                toggleGoalGroup(groupToggle);
+                return;
+            }
+
+            const button = target.closest('.goal-button');
             if (button && goalList.contains(button)) selectGoal(button.dataset.goalId);
         });
 
@@ -1798,7 +2108,7 @@
 
         zoomOptions.addEventListener('click', event => {
             const button = event.target instanceof Element ? event.target.closest('.zoom-option') : null;
-            if (button && zoomOptions.contains(button)) setZoom(Number(button.dataset.zoom));
+            if (button && zoomOptions.contains(button)) animateCanvasZoomTo(Number(button.dataset.zoom));
         });
 
         document.getElementById('close-drawer').addEventListener('click', closeDrawer);
@@ -1806,25 +2116,77 @@
         document.getElementById('confirm-change').addEventListener('click', confirmPlanChange);
         document.getElementById('zoom-trigger').addEventListener('click', toggleZoomMenu);
         document.getElementById('fit-content').addEventListener('click', fitContent);
-        canvasScroll.addEventListener('pointerdown', cancelCameraAnimation, { passive: true });
+        canvasScroll.addEventListener('pointerdown', event => {
+            cancelCameraAnimation();
+            updateTouchPointer(event);
+            startMousePan(event);
+        }, { passive: true });
+        canvasScroll.addEventListener('pointermove', event => {
+            updateTouchPointer(event);
+            moveMousePan(event);
+        }, { passive: false });
+        canvasScroll.addEventListener('pointerup', event => {
+            releaseTouchPointer(event);
+            finishMousePan(event);
+        }, { passive: true });
+        canvasScroll.addEventListener('pointercancel', event => {
+            releaseTouchPointer(event);
+            finishMousePan(event, true);
+        }, { passive: true });
+        canvasScroll.addEventListener('click', event => {
+            if (!suppressMouseClick) return;
+            suppressMouseClick = false;
+            event.preventDefault();
+            event.stopPropagation();
+        }, true);
         canvasScroll.addEventListener('wheel', handleCanvasWheel, { passive: false });
         canvasScroll.addEventListener('gesturestart', event => {
             cancelCameraAnimation();
             gestureStartZoom = state.zoom;
+            const clientPoint = getGestureClientPoint(event);
+            const viewportPoint = getCanvasViewportPoint(clientPoint.clientX, clientPoint.clientY);
+            gestureViewportX = viewportPoint.x;
+            gestureViewportY = viewportPoint.y;
+            const layout = getCanvasStageLayout(gestureStartZoom);
+            gestureFocusX = (canvasScroll.scrollLeft + gestureViewportX - layout.gutterX) / gestureStartZoom;
+            gestureFocusY = (canvasScroll.scrollTop + gestureViewportY - layout.gutterY) / gestureStartZoom;
             event.preventDefault();
         }, { passive: false });
         canvasScroll.addEventListener('gesturechange', event => {
             event.preventDefault();
-            setZoom(gestureStartZoom * event.scale, event.clientX, event.clientY, false);
+            const clientPoint = getGestureClientPoint(event);
+            const viewportPoint = getCanvasViewportPoint(
+                clientPoint.clientX,
+                clientPoint.clientY,
+                gestureViewportX,
+                gestureViewportY
+            );
+            gestureViewportX = viewportPoint.x;
+            gestureViewportY = viewportPoint.y;
+            applyZoomAtPoint(
+                gestureStartZoom * event.scale,
+                gestureViewportX,
+                gestureViewportY,
+                gestureFocusX,
+                gestureFocusY
+            );
         }, { passive: false });
         canvasScroll.addEventListener('gestureend', event => {
             event.preventDefault();
             renderZoomOptions();
+            lastTouchCentroid = null;
         }, { passive: false });
         document.getElementById('back-button').addEventListener('click', () => {
             if (history.length > 1) history.back();
             else showToast('当前已是技能树首页');
         });
+
+        if ('ResizeObserver' in window) {
+            const canvasResizeObserver = new ResizeObserver(syncCanvasViewportGeometry);
+            canvasResizeObserver.observe(canvasScroll);
+        } else {
+            window.addEventListener('resize', syncCanvasViewportGeometry, { passive: true });
+        }
 
         groups.forEach(group => {
             group.goals.forEach(goal => {
@@ -1832,6 +2194,7 @@
             });
         });
 
+        syncCanvasViewportGeometry();
         renderGoals();
         renderStage(true);
         renderDrawer();
