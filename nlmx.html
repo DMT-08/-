@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<!-- 版本 6.6：统一缩放镜头缓动并居中；节点掌握后延时平滑聚焦最新节点 -->
+<!-- 版本 6.7：节点掌握并播放烟花后，等待 0.5 秒平滑聚焦最新节点 -->
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#EFF6FF">
-    <title>抖学 AI 技能树 · 缩放动效与居中优化</title>
+    <title>抖学 AI 技能树 · 掌握后半秒聚焦</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -1719,7 +1719,7 @@
                 const goal = findGoalById(goalId);
                 const latestNode = getLatestNodeAfterMastery(goal, masteredNodeId, unlockedNodeIds);
                 if (latestNode) animateCanvasToNode(latestNode, stageRenderToken);
-            }, 1000);
+            }, 500);
         }
 
         function startModeTraining(button) {
