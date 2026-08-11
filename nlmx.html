@@ -1,0 +1,1846 @@
+<!DOCTYPE html>
+<!-- 版本 6.1：左侧目标进度增加时使用缓动动画 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#EFF6FF">
+    <title>抖学 AI 技能树 · 左侧进度缓动动画</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#1F5FFF',
+                        ink: '#172033',
+                        mastered: '#12B981'
+                    },
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+                        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace']
+                    },
+                    boxShadow: {
+                        soft: '0 4px 20px -4px rgba(0,0,0,0.03), 0 2px 8px -2px rgba(0,0,0,0.02)'
+                    }
+                }
+            }
+        };
+    </script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            --brand: #1F5FFF;
+            --mastered: #12B981;
+            --muted: #94A3B8;
+            --zoom: 1;
+        }
+
+        * {
+            box-sizing: border-box;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        body {
+            background: linear-gradient(135deg, #EFF6FF 0%, #DFE7FF 100%);
+        }
+
+        button {
+            -webkit-appearance: none;
+        }
+
+        .app-shell {
+            width: min(1300px, 100vw);
+            height: min(813px, 100vh);
+            height: min(813px, 100dvh);
+        }
+
+        .workspace {
+            height: calc(100% - 64px);
+            grid-template-columns: 300px minmax(0, 1fr);
+        }
+
+        .native-scroll {
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+        }
+
+        .no-scrollbar {
+            scrollbar-width: none;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .goal-progress-fill {
+            width: 100%;
+            transform: scaleX(0);
+            transform-origin: left center;
+            transition: transform 880ms cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform;
+        }
+
+        .stage-shell {
+            position: relative;
+            width: calc(1840px * var(--zoom));
+            height: calc(1150px * var(--zoom));
+            min-width: calc(1840px * var(--zoom));
+            min-height: calc(1150px * var(--zoom));
+        }
+
+        .skill-stage {
+            position: absolute;
+            inset: 0 auto auto 0;
+            width: 1840px;
+            height: 1150px;
+            transform: scale(var(--zoom));
+            transform-origin: left top;
+            background-color: #FFFFFF;
+            background-image: radial-gradient(circle, #D7DEE9 1.35px, transparent 1.45px);
+            background-size: 26px 26px;
+        }
+
+        .skill-node {
+            position: absolute;
+            width: 150px;
+            transform: translate(-50%, -36px);
+            transform-origin: 50% 36px;
+            opacity: 1;
+            transition: left 800ms cubic-bezier(0.16, 1, 0.3, 1),
+                        top 800ms cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 400ms cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                        opacity 300ms ease-out;
+        }
+
+        .skill-node.is-entering,
+        .skill-node.is-leaving {
+            opacity: 0;
+            pointer-events: none;
+            transform: translate(-50%, -36px) scale(0);
+        }
+
+        .skill-node:not(.is-entering):not(.is-leaving):active {
+            transform: translate(-50%, -36px) scale(0.95);
+        }
+
+        .node-shape {
+            width: 72px;
+            height: 72px;
+            border-width: 3px;
+            border-style: solid;
+            border-radius: 20px;
+            position: relative;
+            transition: box-shadow 180ms ease,
+                        transform 180ms ease,
+                        color 520ms ease,
+                        border-color 520ms ease,
+                        background-color 520ms ease;
+        }
+
+        .node-shape i {
+            display: block;
+            line-height: 1;
+        }
+
+        [data-node-title],
+        [data-node-status] {
+            transition: color 520ms ease;
+        }
+
+        .skill-node[aria-pressed="true"] .node-shape {
+            box-shadow: 0 0 0 6px rgba(31, 95, 255, 0.11);
+        }
+
+        .node-mastered .node-shape {
+            color: #12B981;
+            border-color: #12B981;
+            background: #FFFFFF;
+            box-shadow: none;
+        }
+
+        .node-active .node-shape,
+        .node-milestone-active .node-shape {
+            color: #FFFFFF;
+            border-color: #1F5FFF;
+            background: #1F5FFF;
+            animation: pulse-glow 2s infinite;
+        }
+
+        .node-milestone-active .node-shape {
+            border-radius: 24px;
+        }
+
+        .node-locked .node-shape {
+            color: #C9D4E5;
+            border-color: #D7E0ED;
+            background: #FFFFFF;
+        }
+
+        .node-milestone-locked .node-shape {
+            color: #FFFFFF;
+            border-color: #CBD5E1;
+            background: #CBD5E1;
+        }
+
+        .node-milestone-mastered .node-shape {
+            color: #FFFFFF;
+            border-color: #12B981;
+            background: #12B981;
+            box-shadow: none;
+        }
+
+        .skill-node.node-mastered[aria-pressed="true"] .node-shape,
+        .skill-node.node-milestone-mastered[aria-pressed="true"] .node-shape {
+            box-shadow: none;
+        }
+
+        .skill-node.is-unlocking .node-shape {
+            animation: unlock-reveal 900ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .mastery-burst {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            z-index: 5;
+            width: 8px;
+            height: 8px;
+            margin: -4px 0 0 -4px;
+            border-radius: 999px;
+            pointer-events: none;
+        }
+
+        .mastery-burst::before,
+        .mastery-burst::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: #FBBF24;
+            opacity: 0;
+            transform: scale(0.08) rotate(-8deg);
+            box-shadow:
+                0 -58px #FBBF24,
+                41px -41px #60A5FA,
+                58px 0 #A78BFA,
+                41px 41px #34D399,
+                0 58px #FB7185,
+                -41px 41px #F59E0B,
+                -58px 0 #22D3EE,
+                -41px -41px #4ADE80;
+            animation: mastery-firework 820ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .mastery-burst::after {
+            width: 5px;
+            height: 5px;
+            margin: 1.5px;
+            background: #FFFFFF;
+            box-shadow:
+                0 -42px #FFFFFF,
+                30px -30px #FDE68A,
+                42px 0 #BFDBFE,
+                30px 30px #A7F3D0,
+                0 42px #FBCFE8,
+                -30px 30px #FED7AA,
+                -42px 0 #CFFAFE,
+                -30px -30px #DCFCE7;
+            animation-delay: 70ms;
+        }
+
+        .mastery-burst-ring {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(251, 191, 36, 0.78);
+            border-radius: 999px;
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.2);
+            animation: mastery-ring 680ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .line-bundle {
+            opacity: 1;
+            transition: opacity 360ms ease;
+        }
+
+        .line-bundle.is-retired {
+            opacity: 0;
+        }
+
+        .graph-line {
+            fill: none;
+            stroke-width: 5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            pointer-events: none;
+            transition: stroke 800ms ease, opacity 360ms ease;
+        }
+
+        .line-bundle.is-morphing {
+            filter: drop-shadow(0 0 6px rgba(31, 95, 255, 0.16));
+        }
+
+        .line-bundle.is-active .graph-line {
+            stroke-dasharray: 11 9;
+            animation: energy-flow 1.1s linear infinite;
+        }
+
+        @keyframes energy-flow {
+            to { stroke-dashoffset: -20; }
+        }
+
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.50); }
+            70% { box-shadow: 0 0 0 16px rgba(59, 130, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
+
+        @keyframes unlock-reveal {
+            0% { transform: scale(0.72); box-shadow: 0 0 0 0 rgba(31, 95, 255, 0); }
+            42% { transform: scale(1.09); box-shadow: 0 0 0 12px rgba(31, 95, 255, 0.14); }
+            100% { transform: scale(1); box-shadow: 0 0 0 22px rgba(31, 95, 255, 0); }
+        }
+
+        @keyframes mastery-firework {
+            0% { opacity: 0; transform: scale(0.08) rotate(-8deg); }
+            14% { opacity: 1; }
+            100% { opacity: 0; transform: scale(1.08) rotate(7deg); }
+        }
+
+        @keyframes mastery-ring {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.2); }
+            22% { opacity: 1; }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(3.15); }
+        }
+
+        .drawer {
+            transform: translateX(102%);
+            transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .drawer.is-open {
+            transform: translateX(0);
+        }
+
+        .modal-layer {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 180ms ease, visibility 180ms ease;
+        }
+
+        .modal-layer.is-open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-panel {
+            transform: translateY(16px) scale(0.97);
+            transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-layer.is-open .modal-panel {
+            transform: translateY(0) scale(1);
+        }
+
+        .zoom-menu {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: opacity 160ms ease, visibility 160ms ease, transform 160ms ease;
+        }
+
+        .zoom-menu.is-open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 1120px) {
+            .workspace {
+                grid-template-columns: 260px minmax(0, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .workspace {
+                grid-template-columns: 224px minmax(0, 1fr);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+
+        }
+    </style>
+</head>
+<body class="font-sans text-ink antialiased">
+    <div class="app-shell mx-auto flex flex-col overflow-hidden p-5">
+        <header class="mb-3 flex h-[52px] shrink-0 items-center justify-between px-0.5">
+            <div class="flex min-w-0 items-center gap-4">
+                <button id="back-button" type="button" aria-label="返回上一页" class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-slate-600 shadow-soft transition active:scale-90">
+                    <i class="ph-bold ph-caret-left text-xl" aria-hidden="true"></i>
+                </button>
+                <h1 class="truncate text-[32px] font-extrabold leading-none tracking-[-0.03em] text-slate-950">抖学 AI 技能树</h1>
+            </div>
+
+            <div class="flex min-h-11 shrink-0 items-center gap-5 rounded-2xl border border-slate-200/80 bg-white/80 px-5 shadow-soft backdrop-blur">
+                <span class="flex items-center gap-2 text-[13px] font-semibold text-slate-600"><span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>已掌握</span>
+                <span class="flex items-center gap-2 text-[13px] font-semibold text-slate-600"><span class="h-2.5 w-2.5 rounded-full bg-brand"></span>攻坚中</span>
+                <span class="flex items-center gap-2 text-[13px] font-semibold text-slate-600"><span class="h-2.5 w-2.5 rounded-full border-2 border-slate-300 bg-white"></span>待解锁</span>
+            </div>
+        </header>
+
+        <main class="workspace grid min-h-0 gap-[18px]">
+            <aside class="no-scrollbar native-scroll rounded-[24px] bg-white px-[22px] py-[22px] shadow-soft" aria-label="学习目标">
+                <div id="goal-list" class="space-y-6"></div>
+            </aside>
+
+            <section class="relative min-w-0 overflow-hidden rounded-[24px] bg-white shadow-soft" aria-label="技能树画布">
+                <div id="canvas-scroll" class="no-scrollbar native-scroll absolute inset-0">
+                    <div class="stage-shell">
+                        <div id="skill-stage" class="skill-stage" aria-live="polite"></div>
+                    </div>
+                </div>
+
+                <aside id="node-drawer" class="drawer absolute inset-y-0 right-0 z-30 flex w-[360px] max-w-[calc(100%_-_40px)] flex-col border-l border-slate-100 bg-white shadow-[-16px_0_40px_rgba(15,23,42,0.08)]" aria-label="节点训练详情" aria-hidden="true">
+                    <div class="flex items-start justify-between gap-3 px-5 pb-3 pt-5">
+                        <div class="min-w-0">
+                            <h2 id="drawer-title" class="truncate text-[24px] font-extrabold tracking-[-0.02em] text-slate-800"></h2>
+                            <div id="drawer-status" class="mt-1.5 flex items-center gap-3"></div>
+                        </div>
+                        <button id="close-drawer" type="button" aria-label="关闭节点详情" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-slate-400 transition hover:bg-slate-50 active:scale-90">
+                            <i class="ph-bold ph-x text-[24px]" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <div id="drawer-content" class="no-scrollbar native-scroll min-h-0 flex-1 px-5 pb-5 pt-1"></div>
+                </aside>
+
+                <div class="absolute bottom-5 right-5 z-20">
+                    <div id="zoom-menu" class="zoom-menu absolute bottom-[54px] right-0 w-44 overflow-hidden rounded-[20px] border border-white/90 bg-white/95 p-2 shadow-[0_14px_40px_rgba(15,23,42,0.14)] backdrop-blur" role="menu" aria-hidden="true">
+                        <div id="zoom-options" class="space-y-0.5"></div>
+                        <div class="my-1.5 h-px bg-slate-100"></div>
+                        <button id="fit-content" type="button" role="menuitem" class="flex min-h-11 w-full items-center rounded-xl px-3 text-left text-[14px] font-semibold text-slate-700 transition hover:bg-slate-50 active:scale-95">缩放以适合内容</button>
+                    </div>
+                    <button id="zoom-trigger" type="button" title="滚轮或双指捏合可自由缩放" aria-haspopup="menu" aria-expanded="false" aria-label="当前缩放比例，打开缩放菜单；滚轮或双指捏合可自由缩放" class="flex h-12 min-w-[112px] items-center justify-center gap-2 rounded-full border border-white/80 bg-white/55 px-5 text-[15px] font-extrabold text-slate-900 shadow-[0_12px_32px_rgba(30,64,175,0.12),inset_0_1px_0_rgba(255,255,255,0.95)] backdrop-blur-xl transition hover:bg-white/70 active:scale-95">
+                        <span id="zoom-label" class="font-mono">100%</span>
+                        <i class="ph-bold ph-caret-down text-sm text-slate-400" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="confirm-modal" class="modal-layer fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 p-5 backdrop-blur-[3px]" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true">
+        <div class="modal-panel w-full max-w-[390px] rounded-[24px] bg-white p-6 shadow-[0_24px_70px_rgba(15,23,42,0.20)]">
+            <h2 id="modal-title" class="text-center text-[20px] font-extrabold text-slate-900">要更改训练方案吗？</h2>
+            <p class="mt-3 text-center text-[14px] leading-6 text-slate-500">
+                <span class="block">更改训练方案不会清除当前练习进度，</span>
+                <span class="block">之后可随时切换回来继续完成训练。</span>
+            </p>
+            <div class="mt-6 grid grid-cols-2 gap-3">
+                <button id="cancel-change" type="button" class="min-h-12 rounded-[14px] bg-slate-100 px-4 text-[15px] font-bold text-slate-600 transition active:scale-95">取消</button>
+                <button id="confirm-change" type="button" class="min-h-12 rounded-[14px] bg-red-500 px-4 text-[15px] font-bold text-white transition active:scale-95">确认更改</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="pointer-events-none fixed bottom-7 left-1/2 z-[60] -translate-x-1/2 translate-y-4 rounded-full bg-slate-900/90 px-5 py-3 text-[14px] font-semibold text-white opacity-0 shadow-xl transition" role="status" aria-live="polite"></div>
+
+    <script>
+        const planOptions = [
+            {
+                id: 'ai-smart',
+                name: 'AI 智能强化',
+                description: '按薄弱点动态调整题量与练习顺序',
+                recommended: true
+            },
+            {
+                id: 'high-frequency',
+                name: '高频考点突击',
+                description: '优先攻克考试中的高频核心知识'
+            },
+            {
+                id: 'foundation',
+                name: '地毯式巩固',
+                description: '完整覆盖当前节点的全部知识点'
+            }
+        ];
+
+        const GOAL_TITLE_MAX_LENGTH = 14;
+        const MODE_NAMES = ['音记', '题库', '游戏'];
+        const GROUP_NAME_BY_TONE = {
+            active: '攻坚中',
+            idle: '未开始',
+            mastered: '已掌握'
+        };
+        const STATUS_META = {
+            mastered: { label: '已掌握', nodeClass: 'node-mastered', text: 'text-emerald-600', badge: 'bg-emerald-50 text-emerald-600', icon: 'ph-check' },
+            active: { label: '攻坚中', nodeClass: 'node-active', text: 'text-brand', badge: 'bg-blue-50 text-brand', icon: 'ph-clock' },
+            locked: { label: '待解锁', nodeClass: 'node-locked', text: 'text-slate-400', badge: 'bg-slate-100 text-slate-500', icon: 'ph-lock-simple' },
+            'milestone-locked': { label: '待解锁', nodeClass: 'node-milestone-locked', text: 'text-slate-400', badge: 'bg-slate-100 text-slate-500', icon: 'ph-star' },
+            'milestone-active': { label: '攻坚中', nodeClass: 'node-milestone-active', text: 'text-brand', badge: 'bg-blue-50 text-brand', icon: 'ph-star' },
+            'milestone-mastered': { label: '已掌握', nodeClass: 'node-milestone-mastered', text: 'text-emerald-600', badge: 'bg-emerald-50 text-emerald-600', icon: 'ph-star' }
+        };
+
+        const groups = [
+            {
+                name: '攻坚中',
+                goals: [
+                    {
+                        id: 'g1',
+                        title: '手机端 UI/UX 实战',
+                        nodes: [
+                            { id: 'n1', x: 80, y: 360, title: '视觉设计基础', status: 'mastered', progress: 100, plan: 'foundation' },
+                            { id: 'n2', x: 300, y: 190, title: '移动端布局', status: 'mastered', progress: 100, plan: 'ai-smart' },
+                            { id: 'n3', x: 300, y: 530, title: '组件状态设计', status: 'mastered', progress: 100, plan: 'foundation' },
+                            { id: 'n4', x: 540, y: 190, title: '交互原型', status: 'active', progress: 76, plan: 'ai-smart' },
+                            { id: 'n5', x: 540, y: 530, title: '动效与反馈', status: 'locked', progress: 0 },
+                            { id: 'n6', x: 800, y: 360, title: '可用性测试', status: 'locked', progress: 0 },
+                            { id: 'n7', x: 1080, y: 360, title: '完成移动端作品', status: 'milestone-locked', progress: 0 }
+                        ],
+                        links: [
+                            ['n1', 'n2'], ['n1', 'n3'],
+                            ['n2', 'n4'], ['n3', 'n5'],
+                            ['n4', 'n6'], ['n5', 'n6'],
+                            ['n6', 'n7']
+                        ]
+                    },
+                    {
+                        id: 'g2',
+                        title: '独立开发电商网站前端',
+                        nodes: [
+                            { id: 'n1', x: 60, y: 360, title: 'HTML/CSS 基础', status: 'mastered', progress: 100, plan: 'foundation' },
+                            { id: 'n2', x: 260, y: 150, title: '响应式布局', status: 'mastered', progress: 100, plan: 'ai-smart' },
+                            { id: 'n3', x: 260, y: 570, title: 'JavaScript 交互', status: 'mastered', progress: 100, plan: 'high-frequency' },
+                            { id: 'n4', x: 470, y: 150, title: '商品组件库', status: 'mastered', progress: 100, plan: 'foundation' },
+                            { id: 'n5', x: 470, y: 570, title: '购物车状态', status: 'active', progress: 66, plan: 'ai-smart' },
+                            { id: 'n6', x: 690, y: 150, title: '接口数据渲染', status: 'locked', progress: 0 },
+                            { id: 'n7', x: 690, y: 570, title: '登录与鉴权', status: 'locked', progress: 0 },
+                            { id: 'n8', x: 910, y: 250, title: '订单流程联调', status: 'locked', progress: 0 },
+                            { id: 'n9', x: 910, y: 500, title: '性能与适配', status: 'locked', progress: 0 },
+                            { id: 'n10', x: 1190, y: 375, title: '独立电商项目', status: 'milestone-locked', progress: 0 }
+                        ],
+                        links: [
+                            ['n1', 'n2'], ['n1', 'n3'],
+                            ['n2', 'n4'], ['n2', 'n5'],
+                            ['n3', 'n4'], ['n3', 'n5'],
+                            ['n4', 'n6'], ['n5', 'n7'],
+                            ['n6', 'n8'], ['n7', 'n9'],
+                            ['n8', 'n10'], ['n9', 'n10']
+                        ]
+                    },
+                    {
+                        id: 'g3',
+                        title: '职教高考全真模拟',
+                        nodes: [
+                            { id: 'n1', x: 70, y: 360, title: '基础能力评估', status: 'mastered', progress: 100, plan: 'foundation' },
+                            { id: 'n2', x: 290, y: 130, title: '语文核心考点', status: 'active', progress: 36, plan: 'ai-smart' },
+                            { id: 'n3', x: 290, y: 360, title: '数学核心考点', status: 'active', progress: 28, plan: 'high-frequency' },
+                            { id: 'n4', x: 290, y: 590, title: '英语核心考点', status: 'locked', progress: 0 },
+                            { id: 'n5', x: 540, y: 130, title: '语文专项卷', status: 'locked', progress: 0 },
+                            { id: 'n6', x: 540, y: 360, title: '数学专项卷', status: 'locked', progress: 0 },
+                            { id: 'n7', x: 540, y: 590, title: '英语专项卷', status: 'locked', progress: 0 },
+                            { id: 'n8', x: 820, y: 360, title: '综合模拟训练', status: 'locked', progress: 0 },
+                            { id: 'n9', x: 1110, y: 360, title: '完成全真模拟', status: 'milestone-locked', progress: 0 }
+                        ],
+                        links: [
+                            ['n1', 'n2'], ['n1', 'n3'], ['n1', 'n4'],
+                            ['n2', 'n5'], ['n3', 'n6'], ['n4', 'n7'],
+                            ['n5', 'n8'], ['n6', 'n8'], ['n7', 'n8'],
+                            ['n8', 'n9']
+                        ]
+                    },
+                    {
+                        id: 'g7',
+                        title: '商务英语沟通进阶',
+                        nodes: [
+                            { id: 'n1', x: 90, y: 360, title: '职场高频词汇', status: 'mastered', progress: 100, plan: 'foundation' },
+                            { id: 'n2', x: 340, y: 200, title: '邮件表达', status: 'mastered', progress: 100, plan: 'ai-smart' },
+                            { id: 'n3', x: 340, y: 520, title: '会议听说', status: 'active', progress: 52, plan: 'high-frequency' },
+                            { id: 'n4', x: 620, y: 200, title: '谈判表达', status: 'locked', progress: 0 },
+                            { id: 'n5', x: 620, y: 520, title: '场景演练', status: 'locked', progress: 0 },
+                            { id: 'n6', x: 900, y: 360, title: '完成商务沟通', status: 'milestone-locked', progress: 0 }
+                        ],
+                        links: [
+                            ['n1', 'n2'], ['n1', 'n3'],
+                            ['n2', 'n4'], ['n3', 'n5'],
+                            ['n4', 'n6'], ['n5', 'n6']
+                        ]
+                    },
+                    {
+                        id: 'g8',
+                        title: '短视频运营数据分析',
+                        nodes: [
+                            { id: 'n1', x: 70, y: 360, title: '指标体系认知', status: 'mastered', progress: 100, plan: 'foundation' },
+                            { id: 'n2', x: 280, y: 150, title: '播放数据清洗', status: 'mastered', progress: 100, plan: 'ai-smart' },
+                            { id: 'n3', x: 280, y: 570, title: '用户画像拆解', status: 'mastered', progress: 100, plan: 'foundation' },
+                            { id: 'n4', x: 500, y: 150, title: '完播率诊断', status: 'active', progress: 41, plan: 'ai-smart' },
+                            { id: 'n5', x: 500, y: 570, title: '转化漏斗分析', status: 'active', progress: 33, plan: 'high-frequency' },
+                            { id: 'n6', x: 730, y: 150, title: '内容对照实验', status: 'locked', progress: 0 },
+                            { id: 'n7', x: 730, y: 570, title: '投放效率评估', status: 'locked', progress: 0 },
+                            { id: 'n8', x: 960, y: 360, title: '运营策略复盘', status: 'locked', progress: 0 },
+                            { id: 'n9', x: 1240, y: 360, title: '完成增长报告', status: 'milestone-locked', progress: 0 }
+                        ],
+                        links: [
+                            ['n1', 'n2'], ['n1', 'n3'],
+                            ['n2', 'n4'], ['n3', 'n5'],
+                            ['n4', 'n6'], ['n4', 'n7'],
+                            ['n5', 'n6'], ['n5', 'n7'],
+                            ['n6', 'n8'], ['n7', 'n8'],
+                            ['n8', 'n9']
+                        ]
+                    }
+                ]
+            },
+            {
+                name: '未开始',
+                goals: [
+                    {
+                        id: 'g4',
+                        title: '微信小程序开发实战',
+                        nodes: [
+                            { id: 'n1', x: 80, y: 360, title: '开发环境与账号', status: 'active', progress: 0 },
+                            { id: 'n2', x: 300, y: 180, title: '页面结构与样式', status: 'locked', progress: 0 },
+                            { id: 'n3', x: 300, y: 540, title: '事件与数据绑定', status: 'locked', progress: 0 },
+                            { id: 'n4', x: 550, y: 180, title: '组件与路由', status: 'locked', progress: 0 },
+                            { id: 'n5', x: 550, y: 540, title: '接口与云能力', status: 'locked', progress: 0 },
+                            { id: 'n6', x: 820, y: 360, title: '真机调试发布', status: 'locked', progress: 0 },
+                            { id: 'n7', x: 1090, y: 360, title: '完成小程序作品', status: 'milestone-locked', progress: 0 }
+                        ],
+                        links: [
+                            ['n1', 'n2'], ['n1', 'n3'],
+                            ['n2', 'n4'], ['n3', 'n5'],
+                            ['n4', 'n6'], ['n5', 'n6'],
+                            ['n6', 'n7']
+                        ]
+                    },
+                    {
+                        id: 'g9',
+                        title: 'Python 自动化办公',
+                        nodes: [
+                            { id: 'n1', x: 70, y: 360, title: 'Python 环境', status: 'active', progress: 0 },
+                            { id: 'n2', x: 270, y: 130, title: '变量与流程', status: 'locked', progress: 0 },
+                            { id: 'n3', x: 270, y: 360, title: '函数与模块', status: 'locked', progress: 0 },
+                            { id: 'n4', x: 270, y: 590, title: '文件读写', status: 'locked', progress: 0 },
+                            { id: 'n5', x: 520, y: 180, title: '表格批处理', status: 'locked', progress: 0 },
+                            { id: 'n6', x: 520, y: 540, title: '文档自动生成', status: 'locked', progress: 0 },
+                            { id: 'n7', x: 790, y: 180, title: '邮件与定时任务', status: 'locked', progress: 0 },
+                            { id: 'n8', x: 790, y: 540, title: '异常与日志', status: 'locked', progress: 0 },
+                            { id: 'n9', x: 1080, y: 360, title: '完成自动化工具', status: 'milestone-locked', progress: 0 }
+                        ],
+                        links: [
+                            ['n1', 'n2'], ['n1', 'n3'], ['n1', 'n4'],
+                            ['n2', 'n5'], ['n3', 'n5'], ['n3', 'n6'], ['n4', 'n6'],
+                            ['n5', 'n7'], ['n6', 'n8'],
+                            ['n7', 'n9'], ['n8', 'n9']
+                        ]
+                    },
+                    {
+                        id: 'g10',
+                        title: '数据库 SQL 入门',
+                        nodes: [
+                            { id: 'n1', x: 120, y: 360, title: '数据表认知', status: 'active', progress: 0 },
+                            { id: 'n2', x: 390, y: 190, title: '查询与筛选', status: 'locked', progress: 0 },
+                            { id: 'n3', x: 390, y: 530, title: '新增与更新', status: 'locked', progress: 0 },
+                            { id: 'n4', x: 690, y: 360, title: '多表关联', status: 'locked', progress: 0 },
+                            { id: 'n5', x: 980, y: 360, title: '完成数据报告', status: 'milestone-locked', progress: 0 }
+                        ],
+                        links: [
+                            ['n1', 'n2'], ['n1', 'n3'],
+                            ['n2', 'n4'], ['n3', 'n4'],
+                            ['n4', 'n5']
+                        ]
+                    },
+                    {
+                        id: 'g12',
+                        title: 'AI 智能学习产品全流程设计开发与跨端实战',
+                        nodes: [
+                            { id: 'n1', x: 80, y: 360, title: '学习需求拆解', status: 'active', progress: 0 },
+                            { id: 'n2', x: 320, y: 170, title: '知识结构设计', status: 'locked', progress: 0 },
+                            { id: 'n3', x: 320, y: 550, title: '跨端交互规范', status: 'locked', progress: 0 },
+                            { id: 'n4', x: 590, y: 170, title: 'AI 学习策略', status: 'locked', progress: 0 },
+                            { id: 'n5', x: 590, y: 550, title: '训练反馈闭环', status: 'locked', progress: 0 },
+                            { id: 'n6', x: 870, y: 360, title: '产品联调验证', status: 'locked', progress: 0 },
+                            { id: 'n7', x: 1160, y: 360, title: '完成智能学习产品', status: 'milestone-locked', progress: 0 }
+                        ],
+                        links: [
+                            ['n1', 'n2'], ['n1', 'n3'],
+                            ['n2', 'n4'], ['n3', 'n5'],
+                            ['n4', 'n6'], ['n5', 'n6'],
+                            ['n6', 'n7']
+                        ]
+                    }
+                ]
+            },
+            {
+                name: '已掌握',
+                goals: [
+                    {
+                        id: 'g5',
+                        title: '微信云开发能力',
+                        nodes: [
+                            { id: 'n1', x: 70, y: 360, title: '云环境配置', status: 'mastered', progress: 100, plan: 'ai-smart' },
+                            { id: 'n2', x: 290, y: 160, title: '云数据库', status: 'mastered', progress: 100, plan: 'ai-smart' },
+                            { id: 'n3', x: 290, y: 560, title: '云函数', status: 'mastered', progress: 100, plan: 'foundation' },
+                            { id: 'n4', x: 520, y: 160, title: '云存储', status: 'mastered', progress: 100, plan: 'foundation' },
+                            { id: 'n5', x: 520, y: 560, title: '用户与权限', status: 'mastered', progress: 100, plan: 'ai-smart' },
+                            { id: 'n6', x: 760, y: 220, title: '性能监控', status: 'mastered', progress: 100, plan: 'high-frequency' },
+                            { id: 'n7', x: 760, y: 500, title: '发布与部署', status: 'mastered', progress: 100, plan: 'ai-smart' },
+                            { id: 'n8', x: 1040, y: 360, title: '掌握云开发', status: 'milestone-mastered', progress: 100, plan: 'ai-smart' }
+                        ],
+                        links: [
+                            ['n1', 'n2'], ['n1', 'n3'],
+                            ['n2', 'n4'], ['n3', 'n5'],
+                            ['n4', 'n6'], ['n4', 'n7'],
+                            ['n5', 'n6'], ['n5', 'n7'],
+                            ['n6', 'n8'], ['n7', 'n8']
+                        ]
+                    },
+                    {
+                        id: 'g6',
+                        title: '实用文体与公文写作',
+                        nodes: [
+                            { id: 'n1', x: 100, y: 360, title: '格式规范', status: 'mastered', progress: 100, plan: 'foundation' },
+                            { id: 'n2', x: 350, y: 170, title: '通知与通报', status: 'mastered', progress: 100, plan: 'ai-smart' },
+                            { id: 'n3', x: 350, y: 550, title: '请示与报告', status: 'mastered', progress: 100, plan: 'high-frequency' },
+                            { id: 'n4', x: 620, y: 170, title: '纪要与函件', status: 'mastered', progress: 100, plan: 'foundation' },
+                            { id: 'n5', x: 620, y: 550, title: '综合写作', status: 'mastered', progress: 100, plan: 'ai-smart' },
+                            { id: 'n6', x: 930, y: 360, title: '掌握公文写作', status: 'milestone-mastered', progress: 100, plan: 'ai-smart' }
+                        ],
+                        links: [
+                            ['n1', 'n2'], ['n1', 'n3'],
+                            ['n2', 'n4'], ['n3', 'n5'],
+                            ['n4', 'n6'], ['n5', 'n6']
+                        ]
+                    },
+                    {
+                        id: 'g11',
+                        title: '数字化办公协作',
+                        nodes: [
+                            { id: 'n1', x: 50, y: 360, title: '文档规范', status: 'mastered', progress: 100, plan: 'foundation' },
+                            { id: 'n2', x: 250, y: 130, title: '表格计算', status: 'mastered', progress: 100, plan: 'high-frequency' },
+                            { id: 'n3', x: 250, y: 360, title: '演示表达', status: 'mastered', progress: 100, plan: 'ai-smart' },
+                            { id: 'n4', x: 250, y: 590, title: '团队云盘', status: 'mastered', progress: 100, plan: 'foundation' },
+                            { id: 'n5', x: 500, y: 130, title: '数据透视分析', status: 'mastered', progress: 100, plan: 'high-frequency' },
+                            { id: 'n6', x: 500, y: 360, title: '模板与组件', status: 'mastered', progress: 100, plan: 'ai-smart' },
+                            { id: 'n7', x: 500, y: 590, title: '权限与版本', status: 'mastered', progress: 100, plan: 'foundation' },
+                            { id: 'n8', x: 760, y: 190, title: '自动化流程', status: 'mastered', progress: 100, plan: 'ai-smart' },
+                            { id: 'n9', x: 760, y: 530, title: '协作项目实战', status: 'mastered', progress: 100, plan: 'ai-smart' },
+                            { id: 'n10', x: 1060, y: 360, title: '掌握数字化协作', status: 'milestone-mastered', progress: 100, plan: 'ai-smart' }
+                        ],
+                        links: [
+                            ['n1', 'n2'], ['n1', 'n3'], ['n1', 'n4'],
+                            ['n2', 'n5'], ['n3', 'n6'], ['n4', 'n7'],
+                            ['n5', 'n8'], ['n6', 'n8'], ['n6', 'n9'], ['n7', 'n9'],
+                            ['n8', 'n10'], ['n9', 'n10']
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        const state = {
+            goalId: 'g2',
+            nodeId: null,
+            zoom: 1,
+            drawerOpen: false,
+            zoomOpen: false,
+            trainingKey: null,
+            completedFeedbackKey: null
+        };
+
+        const STAGE_WIDTH = 1840;
+        const STAGE_HEIGHT = 1150;
+        const STAGE_OFFSET_X = 400;
+        const STAGE_OFFSET_Y = 250;
+        const FOCUS_VIEWPORT_X = 0.42;
+        const NODE_HALF_SIZE = 36;
+        const LINE_NODE_GAP = 8;
+        const LINE_CAP_RADIUS = 2.5;
+        const LINE_ANCHOR_OFFSET = NODE_HALF_SIZE + LINE_NODE_GAP + LINE_CAP_RADIUS;
+
+        const goalList = document.getElementById('goal-list');
+        const skillStage = document.getElementById('skill-stage');
+        const canvasScroll = document.getElementById('canvas-scroll');
+        const drawer = document.getElementById('node-drawer');
+        const drawerTitle = document.getElementById('drawer-title');
+        const drawerStatus = document.getElementById('drawer-status');
+        const drawerContent = document.getElementById('drawer-content');
+        const modal = document.getElementById('confirm-modal');
+        const zoomMenu = document.getElementById('zoom-menu');
+        const zoomOptions = document.getElementById('zoom-options');
+        const zoomTrigger = document.getElementById('zoom-trigger');
+        const zoomLabel = document.getElementById('zoom-label');
+        const toast = document.getElementById('toast');
+        let toastTimer;
+        let stageRenderToken = 0;
+        let gestureStartZoom = 1;
+        let cameraAnimationFrame = 0;
+        let goalProgressRenderToken = 0;
+        const lineAnimationFrames = new WeakMap();
+        const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+        function findGoalById(goalId) {
+            for (const group of groups) {
+                for (const goal of group.goals) {
+                    if (goal.id === goalId) return goal;
+                }
+            }
+            return null;
+        }
+
+        function getGoal() {
+            return findGoalById(state.goalId);
+        }
+
+        function getNode() {
+            return getGoal()?.nodes.find(node => node.id === state.nodeId);
+        }
+
+        function isNodeMastered(node) {
+            return node?.status === 'mastered' || node?.status === 'milestone-mastered';
+        }
+
+        function isNodeActive(node) {
+            return node?.status === 'active' || node?.status === 'milestone-active';
+        }
+
+        function isNodeLocked(node) {
+            return node?.status === 'locked' || node?.status === 'milestone-locked';
+        }
+
+        function createEmptyModeCompletion() {
+            const completion = {};
+            for (const name of MODE_NAMES) completion[name] = false;
+            return completion;
+        }
+
+        function countCompletedModes(completion) {
+            let count = 0;
+            for (const name of MODE_NAMES) {
+                if (completion[name]) count += 1;
+            }
+            return count;
+        }
+
+        function hasMasteredPrerequisites(goal, nodeId) {
+            let hasPrerequisite = false;
+            for (const [sourceId, targetId] of goal.links) {
+                if (targetId !== nodeId) continue;
+                hasPrerequisite = true;
+                const source = goal.nodes.find(node => node.id === sourceId);
+                if (!isNodeMastered(source)) return false;
+            }
+            return hasPrerequisite;
+        }
+
+        function unlockEligibleNodes(goal) {
+            if (!goal) return [];
+
+            const unlockedNodes = [];
+            goal.nodes.forEach(node => {
+                if (!isNodeLocked(node)) return;
+                if (!hasMasteredPrerequisites(goal, node.id)) return;
+
+                node.status = node.status === 'milestone-locked' ? 'milestone-active' : 'active';
+                node.progress = 0;
+                node.modeCompletion = createEmptyModeCompletion();
+                unlockedNodes.push(node);
+            });
+
+            return unlockedNodes;
+        }
+
+        function limitGoalTitle(title) {
+            const characters = Array.from(title);
+            if (characters.length <= GOAL_TITLE_MAX_LENGTH) return title;
+            return `${characters.slice(0, GOAL_TITLE_MAX_LENGTH - 1).join('')}…`;
+        }
+
+        function getGoalStats(goal) {
+            const total = goal.nodes.length;
+            let mastered = 0;
+            let hasStarted = false;
+
+            for (const node of goal.nodes) {
+                const nodeMastered = isNodeMastered(node);
+                if (nodeMastered) mastered += 1;
+                if (nodeMastered || Number(node.progress) > 0) hasStarted = true;
+            }
+
+            const percent = total > 0 ? Math.round((mastered / total) * 100) : 0;
+            const tone = total > 0 && mastered === total
+                ? 'mastered'
+                : hasStarted ? 'active' : 'idle';
+            return { mastered, total, percent, tone };
+        }
+
+        function syncGoalGroup(goal) {
+            const targetName = GROUP_NAME_BY_TONE[getGoalStats(goal).tone];
+            const currentGroup = groups.find(group => group.goals.includes(goal));
+            const targetGroup = groups.find(group => group.name === targetName);
+            if (!currentGroup || !targetGroup || currentGroup === targetGroup) return;
+
+            currentGroup.goals.splice(currentGroup.goals.indexOf(goal), 1);
+            targetGroup.goals.push(goal);
+        }
+
+        function captureRenderedGoalProgress() {
+            const progressByGoal = new Map();
+            goalList.querySelectorAll('[data-goal-progress]').forEach(fill => {
+                const track = fill.parentElement;
+                const trackWidth = track?.getBoundingClientRect().width || 0;
+                if (!trackWidth) return;
+
+                const displayedPercent = (fill.getBoundingClientRect().width / trackWidth) * 100;
+                progressByGoal.set(fill.dataset.goalProgress, Math.max(0, Math.min(100, displayedPercent)));
+            });
+            return progressByGoal;
+        }
+
+        function renderGoals() {
+            const previousProgress = captureRenderedGoalProgress();
+            const progressAnimations = [];
+            const renderToken = ++goalProgressRenderToken;
+
+            goalList.innerHTML = groups.map(group => `
+                <section>
+                    <h2 class="mb-2.5 px-1.5 text-[16px] font-extrabold text-slate-900">${group.name}（${group.goals.length}）</h2>
+                    <div class="space-y-1.5">
+                        ${group.goals.map(goal => {
+                            const selected = goal.id === state.goalId;
+                            const displayTitle = limitGoalTitle(goal.title);
+                            const stats = getGoalStats(goal);
+                            const activeTone = stats.tone === 'mastered'
+                                ? 'bg-emerald-50/90 text-emerald-700'
+                                : stats.tone === 'active'
+                                    ? 'bg-blue-50 text-brand'
+                                    : 'bg-slate-50 text-slate-600';
+                            const fill = stats.tone === 'mastered' ? 'bg-emerald-500' : stats.tone === 'active' ? 'bg-brand' : 'bg-slate-300';
+                            const displayedPercent = previousProgress.get(goal.id);
+                            const shouldAnimateProgress = Number.isFinite(displayedPercent)
+                                && stats.percent > displayedPercent + 0.1
+                                && !reducedMotionQuery.matches;
+                            const startPercent = shouldAnimateProgress ? displayedPercent : stats.percent;
+                            if (shouldAnimateProgress) {
+                                progressAnimations.push({ goalId: goal.id, targetPercent: stats.percent });
+                            }
+                            return `
+                                <button type="button" data-goal-id="${goal.id}" aria-pressed="${selected}" aria-label="${goal.title}" title="${goal.title}" class="goal-button min-h-[72px] w-full rounded-[14px] px-4 py-3 text-left transition active:scale-[0.98] ${selected ? activeTone : 'bg-transparent text-slate-600'}">
+                                    <span class="block truncate text-[14px] font-bold">${displayTitle}</span>
+                                    <span class="mt-2 flex items-center gap-3">
+                                        <span class="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-200/80">
+                                            <span class="goal-progress-fill block h-full rounded-full ${fill}" data-goal-progress="${goal.id}" style="transform:scaleX(${startPercent / 100})"></span>
+                                        </span>
+                                        <span class="min-w-[48px] text-right font-mono text-[12px] font-bold">${stats.mastered}/${stats.total}</span>
+                                    </span>
+                                </button>
+                            `;
+                        }).join('')}
+                    </div>
+                </section>
+            `).join('');
+
+            if (!progressAnimations.length) return;
+
+            requestAnimationFrame(() => {
+                if (renderToken !== goalProgressRenderToken) return;
+                requestAnimationFrame(() => {
+                    if (renderToken !== goalProgressRenderToken) return;
+                    progressAnimations.forEach(({ goalId, targetPercent }) => {
+                        const fill = goalList.querySelector(`[data-goal-progress="${goalId}"]`);
+                        if (fill) fill.style.transform = `scaleX(${targetPercent / 100})`;
+                    });
+                });
+            });
+        }
+
+        function selectGoal(goalId) {
+            if (state.goalId === goalId) return;
+            collapseDrawerForGoalSwitch();
+            state.goalId = goalId;
+            renderGoals();
+            renderStage(false, true);
+            renderDrawer();
+            const goal = getGoal();
+            const token = stageRenderToken;
+            requestAnimationFrame(() => {
+                if (goal && getGoalStats(goal).tone === 'mastered') animateCanvasToGoalFit(goal, token);
+                else animateCanvasToNode(getGoalFocusNode(goal), token);
+            });
+        }
+
+        function collapseDrawerForGoalSwitch() {
+            state.nodeId = null;
+            state.drawerOpen = false;
+            drawer.classList.remove('is-open');
+            drawer.setAttribute('aria-hidden', 'true');
+        }
+
+        function getGoalFocusNode(goal) {
+            if (!goal?.nodes?.length) return null;
+            let mostAdvancedActiveNode = null;
+            for (const node of goal.nodes) {
+                if (!isNodeActive(node)) continue;
+                if (!mostAdvancedActiveNode || node.progress > mostAdvancedActiveNode.progress) {
+                    mostAdvancedActiveNode = node;
+                }
+            }
+            return mostAdvancedActiveNode
+                || goal.nodes.find(node => node.status === 'milestone-mastered')
+                || goal.nodes[Math.floor(goal.nodes.length / 2)];
+        }
+
+        function cancelCameraAnimation() {
+            if (!cameraAnimationFrame) return;
+            cancelAnimationFrame(cameraAnimationFrame);
+            cameraAnimationFrame = 0;
+        }
+
+        function animateCanvasToNode(node, token, immediate = false) {
+            if (!node) return;
+            cancelCameraAnimation();
+
+            const startLeft = canvasScroll.scrollLeft;
+            const startTop = canvasScroll.scrollTop;
+            const maxLeft = Math.max(0, canvasScroll.scrollWidth - canvasScroll.clientWidth);
+            const maxTop = Math.max(0, canvasScroll.scrollHeight - canvasScroll.clientHeight);
+            const targetLeft = Math.min(maxLeft, Math.max(0,
+                (STAGE_OFFSET_X + node.x) * state.zoom - canvasScroll.clientWidth * FOCUS_VIEWPORT_X
+            ));
+            const targetTop = Math.min(maxTop, Math.max(0,
+                (STAGE_OFFSET_Y + node.y) * state.zoom - canvasScroll.clientHeight * 0.5
+            ));
+
+            if (immediate || reducedMotionQuery.matches) {
+                canvasScroll.scrollLeft = targetLeft;
+                canvasScroll.scrollTop = targetTop;
+                return;
+            }
+
+            const duration = 920;
+            const startTime = performance.now();
+            const tick = now => {
+                if (token !== stageRenderToken) {
+                    cameraAnimationFrame = 0;
+                    return;
+                }
+
+                const rawProgress = Math.min(1, (now - startTime) / duration);
+                const progress = rawProgress < 0.5
+                    ? 4 * rawProgress * rawProgress * rawProgress
+                    : 1 - Math.pow(-2 * rawProgress + 2, 3) / 2;
+                canvasScroll.scrollLeft = mixNumber(startLeft, targetLeft, progress);
+                canvasScroll.scrollTop = mixNumber(startTop, targetTop, progress);
+
+                if (rawProgress < 1) {
+                    cameraAnimationFrame = requestAnimationFrame(tick);
+                } else {
+                    cameraAnimationFrame = 0;
+                }
+            };
+
+            cameraAnimationFrame = requestAnimationFrame(tick);
+        }
+
+        function goalContentBounds(goal) {
+            let minX = Infinity;
+            let maxX = -Infinity;
+            let minY = Infinity;
+            let maxY = -Infinity;
+            for (const node of goal.nodes) {
+                const x = STAGE_OFFSET_X + node.x;
+                const y = STAGE_OFFSET_Y + node.y;
+                minX = Math.min(minX, x);
+                maxX = Math.max(maxX, x);
+                minY = Math.min(minY, y);
+                maxY = Math.max(maxY, y);
+            }
+            const left = Math.max(0, minX - 100);
+            const right = Math.min(STAGE_WIDTH, maxX + 100);
+            const top = Math.max(0, minY - 64);
+            const bottom = Math.min(STAGE_HEIGHT, maxY + 104);
+            return {
+                left,
+                top,
+                width: Math.max(1, right - left),
+                height: Math.max(1, bottom - top)
+            };
+        }
+
+        function goalFitView(goal) {
+            const bounds = goalContentBounds(goal);
+            const availableWidth = Math.max(320, canvasScroll.clientWidth - 40);
+            const availableHeight = Math.max(320, canvasScroll.clientHeight - 40);
+            const rawZoom = Math.min(availableWidth / bounds.width, availableHeight / bounds.height, 1);
+            const zoom = Math.max(0.1, Math.floor(rawZoom * 100) / 100);
+            const contentWidth = bounds.width * zoom;
+            const contentHeight = bounds.height * zoom;
+            const maxLeft = Math.max(0, STAGE_WIDTH * zoom - canvasScroll.clientWidth);
+            const maxTop = Math.max(0, STAGE_HEIGHT * zoom - canvasScroll.clientHeight);
+            const left = Math.min(maxLeft, Math.max(0,
+                bounds.left * zoom - (canvasScroll.clientWidth - contentWidth) * 0.5
+            ));
+            const top = Math.min(maxTop, Math.max(0,
+                bounds.top * zoom - (canvasScroll.clientHeight - contentHeight) * 0.5
+            ));
+            return { zoom, left, top };
+        }
+
+        function applyCanvasZoom(value) {
+            state.zoom = value;
+            document.documentElement.style.setProperty('--zoom', value);
+            zoomLabel.textContent = `${Math.round(value * 100)}%`;
+        }
+
+        function animateCanvasToGoalFit(goal, token, immediate = false) {
+            if (!goal?.nodes?.length) return;
+            cancelCameraAnimation();
+
+            const target = goalFitView(goal);
+            const startZoom = state.zoom;
+            const startLeft = canvasScroll.scrollLeft;
+            const startTop = canvasScroll.scrollTop;
+
+            if (immediate || reducedMotionQuery.matches) {
+                applyCanvasZoom(target.zoom);
+                canvasScroll.scrollLeft = target.left;
+                canvasScroll.scrollTop = target.top;
+                renderZoomOptions();
+                return;
+            }
+
+            const duration = 920;
+            const startTime = performance.now();
+            const tick = now => {
+                if (token !== stageRenderToken) {
+                    cameraAnimationFrame = 0;
+                    return;
+                }
+
+                const rawProgress = Math.min(1, (now - startTime) / duration);
+                const progress = rawProgress < 0.5
+                    ? 4 * rawProgress * rawProgress * rawProgress
+                    : 1 - Math.pow(-2 * rawProgress + 2, 3) / 2;
+                applyCanvasZoom(mixNumber(startZoom, target.zoom, progress));
+                canvasScroll.scrollLeft = mixNumber(startLeft, target.left, progress);
+                canvasScroll.scrollTop = mixNumber(startTop, target.top, progress);
+
+                if (rawProgress < 1) {
+                    cameraAnimationFrame = requestAnimationFrame(tick);
+                } else {
+                    applyCanvasZoom(target.zoom);
+                    canvasScroll.scrollLeft = target.left;
+                    canvasScroll.scrollTop = target.top;
+                    cameraAnimationFrame = 0;
+                    renderZoomOptions();
+                }
+            };
+
+            cameraAnimationFrame = requestAnimationFrame(tick);
+        }
+
+        function pathGeometry(source, target) {
+            const startX = STAGE_OFFSET_X + source.x + LINE_ANCHOR_OFFSET;
+            const endX = STAGE_OFFSET_X + target.x - LINE_ANCHOR_OFFSET;
+            const startY = STAGE_OFFSET_Y + source.y;
+            const endY = STAGE_OFFSET_Y + target.y;
+            const controlX = startX + (endX - startX) * 0.5;
+            return {
+                startX,
+                startY,
+                control1X: controlX,
+                control1Y: startY,
+                control2X: controlX,
+                control2Y: endY,
+                endX,
+                endY
+            };
+        }
+
+        function geometryToPath(geometry) {
+            return `M ${geometry.startX} ${geometry.startY} C ${geometry.control1X} ${geometry.control1Y}, ${geometry.control2X} ${geometry.control2Y}, ${geometry.endX} ${geometry.endY}`;
+        }
+
+        function mixNumber(from, to, progress) {
+            return from + (to - from) * progress;
+        }
+
+        function collapsedGeometry(geometry) {
+            return {
+                startX: geometry.startX,
+                startY: geometry.startY,
+                control1X: geometry.startX,
+                control1Y: geometry.startY,
+                control2X: geometry.startX,
+                control2Y: geometry.startY,
+                endX: geometry.startX,
+                endY: geometry.startY
+            };
+        }
+
+        function applyBundleGeometry(bundle, geometry) {
+            const pathData = geometryToPath(geometry);
+            bundle.firstElementChild?.setAttribute('d', pathData);
+        }
+
+        function clearMorphVolume(bundle) {
+            bundle.firstElementChild?.style.removeProperty('stroke-width');
+        }
+
+        function setMorphVolume(bundle, stretch) {
+            bundle.firstElementChild?.style.setProperty('stroke-width', String(5 + stretch * 1.8));
+        }
+
+        function settlePath(bundle, geometry) {
+            const frame = lineAnimationFrames.get(bundle);
+            if (frame) cancelAnimationFrame(frame);
+            lineAnimationFrames.delete(bundle);
+            bundle._currentGeometry = geometry;
+            bundle._targetGeometry = geometry;
+            applyBundleGeometry(bundle, geometry);
+            clearMorphVolume(bundle);
+            bundle.classList.remove('is-morphing');
+        }
+
+        function animatePathMorph(bundle, from, to, index, token) {
+            const priorFrame = lineAnimationFrames.get(bundle);
+            if (priorFrame) cancelAnimationFrame(priorFrame);
+
+            if (reducedMotionQuery.matches) {
+                settlePath(bundle, to);
+                return;
+            }
+
+            const delay = index * 28;
+            const duration = 940;
+            const startTime = performance.now() + delay;
+            const direction = index % 2 === 0 ? 1 : -1;
+            const tension = 18 + (index % 4) * 3;
+            const origin = { ...from };
+            const current = { ...from };
+            bundle._targetGeometry = to;
+            bundle.classList.add('is-morphing');
+
+            const tick = now => {
+                if (token !== stageRenderToken || !bundle.isConnected) {
+                    lineAnimationFrames.delete(bundle);
+                    clearMorphVolume(bundle);
+                    bundle.classList.remove('is-morphing');
+                    return;
+                }
+
+                if (now < startTime) {
+                    lineAnimationFrames.set(bundle, requestAnimationFrame(tick));
+                    return;
+                }
+
+                const rawProgress = Math.min(1, (now - startTime) / duration);
+                const progress = 1 - Math.pow(1 - rawProgress, 3);
+                const stretch = Math.sin(Math.PI * rawProgress);
+                current.startX = mixNumber(origin.startX, to.startX, progress);
+                current.startY = mixNumber(origin.startY, to.startY, progress);
+                current.control1X = mixNumber(origin.control1X, to.control1X, progress) + stretch * 10;
+                current.control1Y = mixNumber(origin.control1Y, to.control1Y, progress) + stretch * tension * direction;
+                current.control2X = mixNumber(origin.control2X, to.control2X, progress) - stretch * 7;
+                current.control2Y = mixNumber(origin.control2Y, to.control2Y, progress) - stretch * tension * 0.65 * direction;
+                current.endX = mixNumber(origin.endX, to.endX, progress);
+                current.endY = mixNumber(origin.endY, to.endY, progress);
+
+                bundle._currentGeometry = current;
+                applyBundleGeometry(bundle, current);
+                setMorphVolume(bundle, stretch);
+
+                if (rawProgress < 1) {
+                    lineAnimationFrames.set(bundle, requestAnimationFrame(tick));
+                } else {
+                    settlePath(bundle, to);
+                }
+            };
+
+            lineAnimationFrames.set(bundle, requestAnimationFrame(tick));
+        }
+
+        function lineTone(target) {
+            if (isNodeMastered(target)) return { color: '#12B981', active: false };
+            if (isNodeActive(target)) return { color: '#1F5FFF', active: true };
+            return { color: '#D6DFEC', active: false };
+        }
+
+        function createLineBundle(svgLayer) {
+            const svgNamespace = 'http://www.w3.org/2000/svg';
+            const bundle = document.createElementNS(svgNamespace, 'g');
+            bundle.setAttribute('class', 'line-bundle');
+            bundle.style.opacity = '0';
+
+            const path = document.createElementNS(svgNamespace, 'path');
+            path.setAttribute('class', 'graph-line');
+            bundle.appendChild(path);
+
+            svgLayer.appendChild(bundle);
+            return bundle;
+        }
+
+        function ensureNodeParts(button) {
+            if (button._nodeParts) return button._nodeParts;
+            button.innerHTML = `
+                <span data-node-shape class="node-shape mx-auto flex items-center justify-center">
+                    <i data-node-icon aria-hidden="true"></i>
+                </span>
+                <span class="mt-3 block text-center">
+                    <span data-node-title class="block text-[15px] font-extrabold text-slate-800"></span>
+                    <span data-node-status class="mt-1 block text-[12px] font-bold"></span>
+                </span>
+            `;
+            button._nodeParts = {
+                icon: button.querySelector('[data-node-icon]'),
+                title: button.querySelector('[data-node-title]'),
+                status: button.querySelector('[data-node-status]')
+            };
+            return button._nodeParts;
+        }
+
+        function updateNodeParts(button, node, meta) {
+            const parts = ensureNodeParts(button);
+            parts.icon.className = `ph-bold ${meta.icon} text-[34px]`;
+            parts.title.textContent = node.title;
+            parts.status.className = `mt-1 block text-[12px] font-bold ${meta.text}`;
+            parts.status.textContent = `${meta.label}${isNodeActive(node) ? ` · ${node.progress}%` : ''}`;
+        }
+
+        function renderStage(isInitial = false, isGoalSwitch = false) {
+            const goal = getGoal();
+            const token = ++stageRenderToken;
+
+            if (!goal || !goal.nodes.length) {
+                skillStage.innerHTML = '';
+                return;
+            }
+
+            let svgLayer = skillStage.querySelector('svg');
+            if (!svgLayer) {
+                svgLayer = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svgLayer.setAttribute('class', 'absolute inset-0 h-full w-full');
+                svgLayer.setAttribute('viewBox', `0 0 ${STAGE_WIDTH} ${STAGE_HEIGHT}`);
+                svgLayer.setAttribute('aria-hidden', 'true');
+                skillStage.prepend(svgLayer);
+            }
+            const existingBundles = Array.from(svgLayer.querySelectorAll('.line-bundle'));
+            goal.links.forEach(([fromId, toId], index) => {
+                const source = goal.nodes.find(node => node.id === fromId);
+                const target = goal.nodes.find(node => node.id === toId);
+                const tone = lineTone(target);
+                const nextGeometry = pathGeometry(source, target);
+                let bundle = existingBundles[index];
+                const isNew = !bundle;
+
+                if (isNew) {
+                    bundle = createLineBundle(svgLayer);
+                }
+
+                bundle.classList.remove('is-retired');
+                bundle.classList.toggle('is-active', tone.active);
+                bundle.firstElementChild.setAttribute('stroke', tone.color);
+
+                if (isGoalSwitch) {
+                    const previousGeometry = bundle._currentGeometry || bundle._targetGeometry || collapsedGeometry(nextGeometry);
+                    animatePathMorph(bundle, previousGeometry, nextGeometry, index, token);
+                } else {
+                    settlePath(bundle, nextGeometry);
+                }
+
+                if (isNew) {
+                    window.setTimeout(() => {
+                        if (token === stageRenderToken && bundle.isConnected) bundle.style.opacity = '1';
+                    }, (isInitial ? index * 50 : 0) + 200);
+                } else {
+                    bundle.style.opacity = '1';
+                }
+            });
+
+            existingBundles.slice(goal.links.length).forEach(bundle => {
+                const frame = lineAnimationFrames.get(bundle);
+                if (frame) cancelAnimationFrame(frame);
+                lineAnimationFrames.delete(bundle);
+                clearMorphVolume(bundle);
+                bundle.classList.remove('is-active', 'is-morphing');
+                bundle.classList.add('is-retired');
+                bundle.style.opacity = '0';
+            });
+
+            const existingNodes = Array.from(skillStage.querySelectorAll('.skill-node'));
+            goal.nodes.forEach((node, index) => {
+                const meta = STATUS_META[node.status];
+                const selected = state.drawerOpen && node.id === state.nodeId;
+                let button = existingNodes[index];
+                const isNew = !button;
+                const shouldEnter = isNew;
+
+                if (isNew) {
+                    button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'skill-node is-entering';
+                    button.addEventListener('click', () => openNode(button.dataset.nodeId));
+                    skillStage.appendChild(button);
+                }
+
+                button.dataset.nodeId = node.id;
+                button.setAttribute('aria-pressed', String(selected));
+                button.setAttribute('aria-label', `${node.title}，${meta.label}`);
+                button.className = `skill-node ${meta.nodeClass}${shouldEnter ? ' is-entering' : ''}`;
+                button.style.left = `${STAGE_OFFSET_X + node.x}px`;
+                button.style.top = `${STAGE_OFFSET_Y + node.y}px`;
+                updateNodeParts(button, node, meta);
+
+                if (shouldEnter) {
+                    requestAnimationFrame(() => {
+                        window.setTimeout(() => {
+                            if (token === stageRenderToken && button.isConnected) button.classList.remove('is-entering');
+                        }, isInitial ? index * 50 : 60 + index * 24);
+                    });
+                }
+            });
+
+            existingNodes.slice(goal.nodes.length).forEach(button => {
+                button.classList.add('is-leaving');
+                window.setTimeout(() => {
+                    if (token === stageRenderToken && button.classList.contains('is-leaving')) button.remove();
+                }, 400);
+            });
+        }
+
+        function openNode(nodeId) {
+            state.nodeId = nodeId;
+            state.drawerOpen = true;
+            renderStage();
+            renderDrawer();
+        }
+
+        function closeDrawer() {
+            state.drawerOpen = false;
+            drawer.classList.remove('is-open');
+            drawer.setAttribute('aria-hidden', 'true');
+            renderStage();
+        }
+
+        function renderPlanSelection() {
+            return `
+                <div class="pt-0.5">
+                    <div>
+                        <h3 class="text-[17px] font-extrabold text-slate-900">选择训练方案</h3>
+                        <p class="mt-0.5 text-[13px] leading-5 text-slate-400">选择适合你的攻坚节奏，之后可随时调整</p>
+                    </div>
+                    <div class="mt-4 space-y-3">
+                        ${planOptions.map(plan => {
+                            return `
+                            <button type="button" data-plan-id="${plan.id}" class="plan-button flex min-h-[68px] w-full items-center rounded-[14px] border border-slate-200 bg-white px-4 py-2.5 text-left transition hover:border-slate-300 hover:bg-slate-50/60 active:scale-[0.98]">
+                                <span class="min-w-0 flex-1">
+                                    <span class="flex items-center gap-2">
+                                        <span class="truncate text-[15px] font-bold text-slate-900">${plan.name}</span>
+                                        ${plan.recommended ? '<span class="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500">推荐</span>' : ''}
+                                    </span>
+                                    <span class="mt-0.5 block truncate text-[12px] leading-[18px] text-slate-500">${plan.description}</span>
+                                </span>
+                            </button>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function ensureModeCompletion(node) {
+            if (!node.modeCompletion) {
+                const mastered = isNodeMastered(node);
+                node.modeCompletion = {
+                    '音记': mastered,
+                    '题库': mastered || node.progress >= 30,
+                    '游戏': mastered || node.progress >= 60
+                };
+            }
+            return node.modeCompletion;
+        }
+
+        function getModeKey(goalId, nodeId, modeName) {
+            return `${goalId}:${nodeId}:${modeName}`;
+        }
+
+        function modeCard(iconTone, name, complete, asset, assetClass, node) {
+            const key = getModeKey(state.goalId, node.id, name);
+            const justCompleted = state.completedFeedbackKey === key;
+            const statusText = complete ? '已完成' : '未完成';
+            const statusTone = complete ? 'text-emerald-500' : 'text-slate-400';
+            const cardTone = justCompleted
+                ? 'border-emerald-300 bg-emerald-50/70 ring-4 ring-emerald-100/80'
+                : 'border-slate-200/80 bg-white hover:border-blue-200';
+            return `
+                <button type="button" data-mode-name="${name}" class="mode-button flex min-h-[68px] w-full items-center gap-3 rounded-[16px] border px-3.5 py-2.5 text-left transition ${cardTone} active:scale-[0.98]">
+                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${iconTone}">
+                        <img src="${asset}" alt="" class="${assetClass} object-contain" aria-hidden="true">
+                    </span>
+                    <span class="min-w-0 flex-1">
+                        <span class="block text-[15px] font-bold text-slate-900">${name}</span>
+                        <span class="mt-0.5 block text-[12px] font-medium ${statusTone}">${statusText}</span>
+                    </span>
+                    ${complete
+                        ? '<span class="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-500"><i class="ph-bold ph-check text-sm" aria-hidden="true"></i></span>'
+                        : '<i class="ph-bold ph-caret-right text-lg text-slate-400" aria-hidden="true"></i>'}
+                </button>
+            `;
+        }
+
+        function renderPractice(node) {
+            const plan = planOptions.find(item => item.id === node.plan) || planOptions[0];
+            const complete = isNodeMastered(node);
+            const modeCompletion = ensureModeCompletion(node);
+            return `
+                <div class="mt-2 rounded-[16px] border ${complete ? 'border-emerald-200 bg-emerald-50/80' : 'border-blue-200 bg-blue-50/70'} px-3.5 py-2.5">
+                    <div class="flex min-h-11 items-center justify-between gap-3">
+                        <div class="min-w-0">
+                            <div class="text-[11px] font-bold text-slate-500">当前训练方案</div>
+                            <div class="mt-0.5 truncate text-[14px] font-bold ${complete ? 'text-emerald-700' : 'text-blue-900'}" title="${plan.description}">${plan.name} · ${plan.description}</div>
+                        </div>
+                        ${complete
+                            ? '<span class="flex shrink-0 items-center gap-1 text-[12px] font-bold text-emerald-600"><i class="ph-fill ph-trophy text-amber-500" aria-hidden="true"></i>节点已掌握</span>'
+                            : '<button id="change-plan" type="button" aria-label="更改训练方案" class="flex min-h-11 shrink-0 items-center justify-center rounded-[10px] px-0.5 transition active:scale-95"><span class="flex h-8 items-center rounded-[9px] border border-blue-200 bg-white px-2 text-[12px] font-bold text-brand">更改方案</span></button>'}
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <h3 class="mb-3 text-[15px] font-bold text-slate-400">练习模式</h3>
+                    <div class="space-y-3">
+                        ${modeCard('bg-violet-50', '音记', modeCompletion['音记'], './icon/yinji.svg', 'h-[26px] w-[26px]', node)}
+                        ${modeCard('bg-blue-50', '题库', modeCompletion['题库'], './icon/tiku.svg', 'h-[35px] w-[35px]', node)}
+                        ${modeCard('bg-orange-50', '游戏', modeCompletion['游戏'], './icon/game.svg', 'h-[30px] w-[30px]', node)}
+                    </div>
+                </div>
+            `;
+        }
+
+        function getRenderedNodeButton(nodeId) {
+            return skillStage.querySelector(`.skill-node[data-node-id="${nodeId}"]`);
+        }
+
+        function showMasteryBurst(nodeId) {
+            const button = getRenderedNodeButton(nodeId);
+            const shape = button?.querySelector('[data-node-shape]');
+            if (!shape) return;
+
+            shape.querySelector('.mastery-burst')?.remove();
+            const burst = document.createElement('span');
+            const ring = document.createElement('span');
+            burst.className = 'mastery-burst';
+            ring.className = 'mastery-burst-ring';
+            burst.setAttribute('aria-hidden', 'true');
+            ring.setAttribute('aria-hidden', 'true');
+            burst.appendChild(ring);
+            shape.appendChild(burst);
+            window.setTimeout(() => burst.remove(), 920);
+        }
+
+        function showUnlockFeedback(nodeIds) {
+            nodeIds.forEach(nodeId => {
+                const button = getRenderedNodeButton(nodeId);
+                if (!button) return;
+                button.classList.add('is-unlocking');
+                window.setTimeout(() => button.classList.remove('is-unlocking'), 940);
+            });
+        }
+
+        function startModeTraining(button) {
+            const node = getNode();
+            if (!node) return;
+
+            const modeName = button.dataset.modeName;
+            const completion = ensureModeCompletion(node);
+            if (completion[modeName]) {
+                showToast(`${modeName}训练已完成`);
+                return;
+            }
+
+            if (state.trainingKey) {
+                return;
+            }
+
+            const goalId = state.goalId;
+            const nodeId = node.id;
+            const key = getModeKey(goalId, nodeId, modeName);
+            state.trainingKey = key;
+            state.completedFeedbackKey = null;
+
+            setTimeout(() => finishModeTraining(goalId, nodeId, modeName, key), 1000);
+        }
+
+        function finishModeTraining(goalId, nodeId, modeName, key) {
+            const goal = findGoalById(goalId);
+            const node = goal?.nodes.find(item => item.id === nodeId);
+            if (!node) {
+                state.trainingKey = null;
+                return;
+            }
+
+            const completion = ensureModeCompletion(node);
+            completion[modeName] = true;
+            const completedCount = countCompletedModes(completion);
+            const calculatedProgress = Math.round((completedCount / MODE_NAMES.length) * 100);
+            node.progress = Math.max(node.progress, calculatedProgress);
+            let becameMastered = false;
+
+            if (completedCount === MODE_NAMES.length) {
+                node.progress = 100;
+                if (isNodeActive(node)) {
+                    node.status = node.status === 'milestone-active' ? 'milestone-mastered' : 'mastered';
+                    becameMastered = true;
+                }
+            }
+
+            const unlockedNodes = becameMastered ? unlockEligibleNodes(goal) : [];
+            syncGoalGroup(goal);
+
+            state.trainingKey = null;
+            state.completedFeedbackKey = key;
+
+            if (state.goalId === goalId) {
+                renderGoals();
+                renderStage();
+                if (state.nodeId === nodeId && state.drawerOpen) renderDrawer();
+                requestAnimationFrame(() => {
+                    if (becameMastered) showMasteryBurst(nodeId);
+                    showUnlockFeedback(unlockedNodes.map(item => item.id));
+                });
+            }
+
+            if (unlockedNodes.length) {
+                showToast(`节点已掌握，已自动解锁「${unlockedNodes.map(item => item.title).join('、')}」`);
+            } else if (becameMastered) {
+                showToast('节点已掌握，进度已更新');
+            } else {
+                showToast(`${modeName}训练已完成，进度已更新`);
+            }
+
+            setTimeout(() => {
+                if (state.completedFeedbackKey !== key) return;
+                state.completedFeedbackKey = null;
+                if (state.goalId === goalId && state.nodeId === nodeId && state.drawerOpen) renderDrawer();
+            }, 1200);
+        }
+
+        function renderLockedNode() {
+            return `
+                <div class="mt-2 rounded-[16px] border border-slate-200 bg-slate-50 p-4 text-center">
+                    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-[14px] bg-white text-slate-400 shadow-soft">
+                        <i class="ph-bold ph-lock-key text-xl" aria-hidden="true"></i>
+                    </div>
+                    <h3 class="mt-3 text-[16px] font-extrabold text-slate-800">先完成前置节点</h3>
+                    <p class="mt-1.5 text-[13px] leading-5 text-slate-500">前置能力掌握后，本节点会自动解锁。</p>
+                </div>
+            `;
+        }
+
+        function renderDrawer() {
+            const node = getNode();
+            if (!node || !state.drawerOpen) {
+                drawer.classList.remove('is-open');
+                drawer.setAttribute('aria-hidden', 'true');
+                return;
+            }
+
+            const meta = STATUS_META[node.status];
+            drawerTitle.textContent = node.title;
+            drawerStatus.innerHTML = `
+                <span class="rounded-md px-2.5 py-1 text-[12px] font-extrabold ${meta.badge}">${meta.label}</span>
+                <span class="font-mono text-[12px] font-bold text-slate-400">进度 ${node.progress}%</span>
+            `;
+
+            const locked = isNodeLocked(node);
+            drawerContent.innerHTML = locked ? renderLockedNode() : node.plan ? renderPractice(node) : renderPlanSelection();
+            drawer.classList.add('is-open');
+            drawer.setAttribute('aria-hidden', 'false');
+        }
+
+        function choosePlan(planId) {
+            const node = getNode();
+            node.plan = planId;
+            renderDrawer();
+            const plan = planOptions.find(item => item.id === planId);
+            showToast(`已切换为${plan.name}`);
+        }
+
+        function openModal() {
+            modal.classList.add('is-open');
+            modal.setAttribute('aria-hidden', 'false');
+        }
+
+        function closeModal() {
+            modal.classList.remove('is-open');
+            modal.setAttribute('aria-hidden', 'true');
+        }
+
+        function confirmPlanChange() {
+            const node = getNode();
+            node.plan = null;
+            closeModal();
+            renderDrawer();
+        }
+
+        function showToast(message) {
+            clearTimeout(toastTimer);
+            toast.textContent = message;
+            toast.classList.remove('translate-y-4', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            toastTimer = setTimeout(() => {
+                toast.classList.add('translate-y-4', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 1800);
+        }
+
+        function setZoom(value, clientX, clientY, closeMenu = true) {
+            cancelCameraAnimation();
+            const nextZoom = Math.min(4, Math.max(0.1, Math.round(value * 100) / 100));
+            const oldZoom = state.zoom;
+            const rect = canvasScroll.getBoundingClientRect();
+            const viewportX = Number.isFinite(clientX) ? clientX - rect.left : canvasScroll.clientWidth / 2;
+            const viewportY = Number.isFinite(clientY) ? clientY - rect.top : canvasScroll.clientHeight / 2;
+            const focusX = (canvasScroll.scrollLeft + viewportX) / oldZoom;
+            const focusY = (canvasScroll.scrollTop + viewportY) / oldZoom;
+
+            applyCanvasZoom(nextZoom);
+            if (closeMenu) closeZoomMenu();
+
+            requestAnimationFrame(() => {
+                canvasScroll.scrollLeft = Math.max(0, focusX * nextZoom - viewportX);
+                canvasScroll.scrollTop = Math.max(0, focusY * nextZoom - viewportY);
+            });
+        }
+
+        function handleCanvasWheel(event) {
+            event.preventDefault();
+            const unit = event.deltaMode === 1 ? 0.035 : event.deltaMode === 2 ? 0.45 : 0.0015;
+            const nextZoom = state.zoom * Math.exp(-event.deltaY * unit);
+            setZoom(nextZoom, event.clientX, event.clientY, false);
+        }
+
+        function fitContent() {
+            closeZoomMenu();
+            animateCanvasToGoalFit(getGoal(), stageRenderToken);
+        }
+
+        function renderZoomOptions() {
+            const values = [0.1, 0.25, 0.5, 0.75, 1, 2, 4];
+            zoomOptions.innerHTML = values.map(value => `
+                <button type="button" data-zoom="${value}" role="menuitem" class="zoom-option flex min-h-11 w-full items-center justify-between rounded-xl px-3 text-left font-mono text-[14px] font-semibold text-slate-700 transition hover:bg-slate-50 active:scale-95">
+                    ${Math.round(value * 100)}%
+                    ${value === state.zoom ? '<i class="ph-bold ph-check text-brand" aria-hidden="true"></i>' : ''}
+                </button>
+            `).join('');
+        }
+
+        function toggleZoomMenu() {
+            state.zoomOpen = !state.zoomOpen;
+            renderZoomOptions();
+            zoomMenu.classList.toggle('is-open', state.zoomOpen);
+            zoomMenu.setAttribute('aria-hidden', String(!state.zoomOpen));
+            zoomTrigger.setAttribute('aria-expanded', String(state.zoomOpen));
+        }
+
+        function closeZoomMenu() {
+            state.zoomOpen = false;
+            zoomMenu.classList.remove('is-open');
+            zoomMenu.setAttribute('aria-hidden', 'true');
+            zoomTrigger.setAttribute('aria-expanded', 'false');
+            renderZoomOptions();
+        }
+
+        goalList.addEventListener('click', event => {
+            const button = event.target instanceof Element ? event.target.closest('.goal-button') : null;
+            if (button && goalList.contains(button)) selectGoal(button.dataset.goalId);
+        });
+
+        drawerContent.addEventListener('click', event => {
+            const target = event.target instanceof Element ? event.target : null;
+            if (!target) return;
+
+            const planButton = target.closest('.plan-button');
+            if (planButton && drawerContent.contains(planButton)) {
+                choosePlan(planButton.dataset.planId);
+                return;
+            }
+
+            const modeButton = target.closest('.mode-button');
+            if (modeButton && drawerContent.contains(modeButton)) {
+                startModeTraining(modeButton);
+                return;
+            }
+
+            const changeButton = target.closest('#change-plan');
+            if (changeButton && drawerContent.contains(changeButton)) openModal();
+        });
+
+        zoomOptions.addEventListener('click', event => {
+            const button = event.target instanceof Element ? event.target.closest('.zoom-option') : null;
+            if (button && zoomOptions.contains(button)) setZoom(Number(button.dataset.zoom));
+        });
+
+        document.getElementById('close-drawer').addEventListener('click', closeDrawer);
+        document.getElementById('cancel-change').addEventListener('click', closeModal);
+        document.getElementById('confirm-change').addEventListener('click', confirmPlanChange);
+        document.getElementById('zoom-trigger').addEventListener('click', toggleZoomMenu);
+        document.getElementById('fit-content').addEventListener('click', fitContent);
+        canvasScroll.addEventListener('pointerdown', cancelCameraAnimation, { passive: true });
+        canvasScroll.addEventListener('wheel', handleCanvasWheel, { passive: false });
+        canvasScroll.addEventListener('gesturestart', event => {
+            cancelCameraAnimation();
+            gestureStartZoom = state.zoom;
+            event.preventDefault();
+        }, { passive: false });
+        canvasScroll.addEventListener('gesturechange', event => {
+            event.preventDefault();
+            setZoom(gestureStartZoom * event.scale, event.clientX, event.clientY, false);
+        }, { passive: false });
+        canvasScroll.addEventListener('gestureend', event => {
+            event.preventDefault();
+            renderZoomOptions();
+        }, { passive: false });
+        document.getElementById('back-button').addEventListener('click', () => {
+            if (history.length > 1) history.back();
+            else showToast('当前已是技能树首页');
+        });
+
+        groups.forEach(group => {
+            group.goals.forEach(goal => {
+                unlockEligibleNodes(goal);
+            });
+        });
+
+        renderGoals();
+        renderStage(true);
+        renderDrawer();
+        renderZoomOptions();
+        requestAnimationFrame(() => {
+            const goal = getGoal();
+            if (goal && getGoalStats(goal).tone === 'mastered') animateCanvasToGoalFit(goal, stageRenderToken, true);
+            else animateCanvasToNode(getGoalFocusNode(goal), stageRenderToken, true);
+        });
+    </script>
+</body>
+</html>
