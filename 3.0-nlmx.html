@@ -1,0 +1,2463 @@
+<!DOCTYPE html>
+<!-- 版本 9.1：状态语义分离与关系图例精简。能力主线、具体能力级别、星级掌握、学习权限、后台状态与当前查看分别建模；依赖关系以具体能力级别节点为准，待解锁仍可查看但学习入口禁用，同时精简关系图注释并重整状态配色。 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#EFF6FF">
+    <title>抖学 AI 能力模型 · 状态语义分离与关系图例精简</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#1F5FFF',
+                        ink: '#172033'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    },
+                    boxShadow: {
+                        soft: '0 4px 20px -4px rgba(0,0,0,0.03), 0 2px 8px -2px rgba(0,0,0,0.02)'
+                    }
+                }
+            }
+        };
+    </script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.2/dist/svg-pan-zoom.min.js"></script>
+    <style>
+        :root {
+            --brand: #1F5FFF;
+            --ink: #172033;
+        }
+
+        * {
+            box-sizing: border-box;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        body {
+            background: linear-gradient(135deg, #EFF6FF 0%, #DFE7FF 100%);
+        }
+
+        button {
+            -webkit-appearance: none;
+        }
+
+        .app-shell {
+            width: min(1300px, 100vw);
+            height: 100vh;
+            height: 100dvh;
+        }
+
+        .page-view {
+            display: none;
+        }
+
+        .page-view.is-active {
+            display: flex;
+            animation: page-enter 180ms ease-out;
+        }
+
+        .native-scroll {
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+        }
+
+        .no-scrollbar {
+            scrollbar-width: none;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .ability-card {
+            border: 1px solid #E4EAF2;
+            background: #FFFFFF;
+            box-shadow: 0 8px 24px -22px rgba(15, 23, 42, 0.32);
+            transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+        }
+
+        #ability-grid {
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .ability-card:hover {
+                transform: translateY(-2px);
+                border-color: #BFD0FF;
+                box-shadow: 0 18px 34px -27px rgba(31, 95, 255, 0.42);
+            }
+        }
+
+        .star-row {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .star-row i {
+            color: #D7DFEA;
+            font-size: 18px;
+        }
+
+        .star-row i.is-filled {
+            color: #F59E0B;
+        }
+
+        .overview-stars .star-row {
+            gap: 2px;
+        }
+
+        .overview-stars .star-row i {
+            font-size: 15px;
+        }
+
+        .star-row.is-large {
+            gap: 5px;
+        }
+
+        .star-row.is-large i {
+            font-size: 26px;
+        }
+
+        .local-graph-surface {
+            background-color: #FBFCFE;
+            background-image: radial-gradient(circle, rgba(148, 163, 184, 0.2) 1px, transparent 1.1px);
+            background-size: 26px 26px;
+        }
+
+        .learning-card {
+            border: 1px solid #E4EAF2;
+            background: #FFFFFF;
+            box-shadow: 0 8px 20px -20px rgba(15, 23, 42, 0.34);
+            transition: transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+        }
+
+        .ability-level-flow {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 44px minmax(0, 1fr);
+            align-items: stretch;
+            gap: 12px;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .learning-card:hover {
+                transform: translateY(-1px);
+                border-color: #BFD0FF;
+                box-shadow: 0 14px 26px -22px rgba(31, 95, 255, 0.5);
+            }
+        }
+
+        .topology-surface {
+            background-color: #FAFCFF;
+        }
+
+        #topology-svg {
+            width: 100%;
+            height: 100%;
+            min-width: 0;
+            min-height: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .topology-node-group {
+            cursor: pointer;
+            outline: none;
+            transition: opacity 180ms ease;
+        }
+
+        .topology-node-visual {
+            transform-box: fill-box;
+            transform-origin: center;
+            transition: transform 150ms ease;
+        }
+
+        .topology-node-group.is-learning .topology-node-visual {
+            filter: drop-shadow(0 6px 10px rgba(31, 95, 255, 0.18));
+        }
+
+        .topology-node-group:active .topology-node-visual {
+            transform: scale(0.97);
+        }
+
+        .topology-selection-ring {
+            transition: opacity 150ms ease;
+        }
+
+        .topology-node-group:focus-visible .topology-selection-ring {
+            opacity: 1;
+        }
+
+        .ability-card.status-learning {
+            border-color: #B8CBFF;
+            background: #F8FAFF;
+            box-shadow: 0 10px 28px -24px rgba(31, 95, 255, 0.62);
+        }
+
+        .ability-card.status-completed {
+            border-color: #BFE7CB;
+            background: #F3FCF6;
+            box-shadow: 0 10px 28px -24px rgba(22, 101, 52, 0.38);
+        }
+
+        .ability-card.status-locked {
+            border-color: #DDE4EC;
+            background: #F8FAFC;
+            color: #94A3B8;
+        }
+
+        .learning-card:disabled {
+            border-color: #E2E8F0;
+            background: #F8FAFC;
+            box-shadow: none;
+            color: #94A3B8;
+            cursor: not-allowed;
+        }
+
+        .learning-card:disabled img {
+            filter: grayscale(1);
+            opacity: 0.42;
+        }
+
+        .graph-surface {
+            position: relative;
+            overflow: hidden;
+            touch-action: none;
+            background-color: #FAFCFF;
+            background-image: radial-gradient(circle, rgba(148, 163, 184, 0.2) 1px, transparent 1.1px);
+            background-size: 26px 26px;
+            cursor: grab;
+        }
+
+        .graph-surface:active {
+            cursor: grabbing;
+        }
+
+        #local-graph {
+            height: 166px;
+            touch-action: manipulation;
+            cursor: default;
+            transition: height 180ms ease;
+        }
+
+        #local-graph.is-pan-enabled {
+            touch-action: none;
+            cursor: grab;
+        }
+
+        #local-graph.is-pan-enabled:active {
+            cursor: grabbing;
+        }
+
+        #local-graph-svg,
+        #topology-svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+            min-width: 0;
+            min-height: 0;
+            overflow: visible;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .graph-edge,
+        .graph-edge-underlay {
+            fill: none;
+            vector-effect: non-scaling-stroke;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .graph-node {
+            cursor: pointer;
+            outline: none;
+        }
+
+        .graph-node-visual {
+            transform-box: fill-box;
+            transform-origin: center;
+            transition: transform 150ms ease;
+        }
+
+        .graph-node:active .graph-node-visual {
+            transform: scale(0.97);
+        }
+
+        .graph-node:focus-visible .graph-focus-ring {
+            opacity: 1;
+        }
+
+        .graph-controls {
+            position: absolute;
+            z-index: 5;
+            right: 12px;
+            bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px;
+            border: 1px solid rgba(226, 232, 240, 0.94);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.92);
+            box-shadow: 0 10px 24px -18px rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(10px);
+        }
+
+        .graph-control-button {
+            display: inline-flex;
+            min-width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border-radius: 10px;
+            color: #475569;
+            font-size: 12px;
+            font-weight: 800;
+            transition: transform 150ms ease, background 150ms ease, color 150ms ease;
+        }
+
+        .graph-control-button:active {
+            transform: scale(0.9);
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .graph-control-button:hover {
+                background: #EFF6FF;
+                color: #1F5FFF;
+            }
+        }
+
+        @keyframes page-enter {
+            from {
+                opacity: 0;
+                transform: translateY(3px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 900px) {
+            #ability-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+        }
+
+        @media (max-width: 760px) {
+            #ability-grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .ability-level-flow {
+                grid-template-columns: minmax(0, 1fr);
+                gap: 8px;
+            }
+
+            .ability-flow-arrow {
+                min-height: 28px;
+                transform: rotate(90deg);
+            }
+
+        }
+
+        @media (max-width: 620px) {
+            .learning-grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body class="font-sans text-ink antialiased">
+    <div id="overview-page" class="page-view is-active app-shell mx-auto flex-col overflow-hidden p-5">
+        <header class="flex h-16 shrink-0 items-center justify-between px-1">
+            <div class="flex min-w-0 items-center gap-3">
+                <button id="overview-back-button" type="button" aria-label="返回上一页" class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] bg-white/80 text-slate-700 shadow-soft transition active:scale-90">
+                    <i class="ph-bold ph-caret-left text-[20px]" aria-hidden="true"></i>
+                </button>
+                <h1 class="min-w-0 truncate text-[32px] font-extrabold leading-none tracking-[-0.035em] text-slate-950">英语能力</h1>
+            </div>
+            <button id="overview-topology-button" type="button" class="flex min-h-11 items-center gap-2 rounded-[12px] border border-white bg-white/80 px-4 text-[13px] font-extrabold text-slate-700 shadow-soft transition active:scale-95">
+                <i class="ph-bold ph-graph text-[18px] text-brand" aria-hidden="true"></i>
+                能力关系
+            </button>
+        </header>
+
+        <main class="mt-3 flex min-h-0 flex-1 flex-col overflow-hidden rounded-[24px] bg-white shadow-soft" aria-label="英语能力列表">
+            <div class="native-scroll no-scrollbar min-h-0 flex-1 bg-slate-50/45 p-5">
+                <div id="ability-grid" class="grid gap-3" aria-live="polite"></div>
+            </div>
+        </main>
+    </div>
+
+    <div id="detail-page" class="page-view app-shell mx-auto flex-col overflow-hidden p-5">
+        <header class="flex h-16 shrink-0 items-center justify-between px-1">
+            <div class="flex min-w-0 items-center gap-3">
+                <button id="detail-back-button" type="button" aria-label="返回英语能力全景" class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] bg-white/80 text-slate-700 shadow-soft transition active:scale-90">
+                    <i class="ph-bold ph-caret-left text-[20px]" aria-hidden="true"></i>
+                </button>
+                <div class="min-w-0">
+                    <nav aria-label="面包屑">
+                        <ol class="flex items-center gap-1.5 text-[10px] font-extrabold tracking-[0.08em] text-brand">
+                            <li><button id="detail-breadcrumb-overview" type="button" class="min-h-6 rounded-[6px] px-1 transition active:scale-95">英语能力</button></li>
+                            <li aria-hidden="true"><i class="ph-bold ph-caret-right text-[9px]"></i></li>
+                            <li aria-current="page">能力详情</li>
+                        </ol>
+                    </nav>
+                    <h1 id="detail-header-title" class="mt-0.5 truncate text-[20px] font-extrabold text-slate-950"></h1>
+                </div>
+            </div>
+            <button id="detail-topology-button" type="button" class="flex min-h-11 items-center gap-2 rounded-[12px] border border-white bg-white/80 px-4 text-[13px] font-extrabold text-slate-700 shadow-soft transition active:scale-95">
+                <i class="ph-bold ph-graph text-[18px] text-brand" aria-hidden="true"></i>
+                查看全部能力关系
+            </button>
+        </header>
+
+        <main class="mt-3 flex min-h-0 flex-1 flex-col overflow-hidden rounded-[24px] bg-white shadow-soft" aria-label="能力详情：关系、水平与学习内容">
+            <div class="native-scroll no-scrollbar min-h-0 flex-1">
+                <section class="px-5 pb-3 pt-4" aria-labelledby="local-relation-title">
+                    <div class="flex items-center justify-between gap-4">
+                        <h2 id="local-relation-title" class="text-[18px] font-extrabold text-slate-950">能力关系</h2>
+                    </div>
+                    <div id="local-graph" class="graph-surface local-graph-surface relative mt-2.5 rounded-[16px] border border-slate-100" aria-live="polite">
+                        <svg id="local-graph-svg" role="navigation" aria-label="当前能力的前置能力与后续能力">
+                            <g id="local-viewport" class="svg-pan-zoom_viewport"></g>
+                        </svg>
+                        <div id="local-controls" class="graph-controls hidden" aria-label="局部关系图视图控制">
+                            <button id="local-zoom-out" type="button" class="graph-control-button" aria-label="缩小局部关系图"><i class="ph-bold ph-minus text-[16px]" aria-hidden="true"></i></button>
+                            <button id="local-zoom-in" type="button" class="graph-control-button" aria-label="放大局部关系图"><i class="ph-bold ph-plus text-[16px]" aria-hidden="true"></i></button>
+                            <button id="local-fit" type="button" class="graph-control-button px-2.5" aria-label="适应局部关系画布"><i class="ph-bold ph-arrows-out-simple text-[16px]" aria-hidden="true"></i><span>适应</span></button>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="border-t border-slate-100 px-5 py-4" aria-labelledby="ability-info-title">
+                    <h2 id="ability-info-title" class="text-[18px] font-extrabold text-slate-950">能力信息</h2>
+                    <div id="detail-summary" class="mt-3"></div>
+                </section>
+
+                <section class="border-t border-slate-100 px-5 pb-5 pt-4" aria-labelledby="learning-title">
+                    <h2 id="learning-title" class="text-[18px] font-extrabold text-slate-950">学习内容</h2>
+                    <div id="learning-grid" class="learning-grid mt-3 grid grid-cols-3 gap-3"></div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <div id="topology-page" class="page-view app-shell mx-auto flex-col overflow-hidden p-5">
+        <header class="flex h-16 shrink-0 items-center px-1">
+            <div class="flex min-w-0 items-center gap-3">
+                <button id="topology-back-button" type="button" aria-label="返回上一页" class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] bg-white/80 text-slate-700 shadow-soft transition active:scale-90">
+                    <i class="ph-bold ph-caret-left text-[20px]" aria-hidden="true"></i>
+                </button>
+                <div class="min-w-0">
+                    <nav aria-label="面包屑">
+                        <ol class="flex items-center gap-1.5 text-[10px] font-extrabold tracking-[0.08em] text-brand">
+                            <li><button id="topology-breadcrumb-overview" type="button" class="min-h-6 rounded-[6px] px-1 transition active:scale-95">英语能力</button></li>
+                            <li aria-hidden="true"><i class="ph-bold ph-caret-right text-[9px]"></i></li>
+                            <li aria-current="page">能力关系</li>
+                        </ol>
+                    </nav>
+                    <h1 class="mt-0.5 truncate text-[20px] font-extrabold text-slate-950">能力关系图</h1>
+                </div>
+            </div>
+        </header>
+
+        <main class="mt-3 flex min-h-0 flex-1 flex-col overflow-hidden rounded-[24px] bg-white shadow-soft" aria-label="英语能力关系图">
+            <div class="no-scrollbar flex h-[50px] shrink-0 items-center overflow-x-auto border-b border-slate-100 px-5">
+                <div class="flex shrink-0 items-center gap-5" aria-label="节点业务状态图例">
+                    <span class="flex items-center gap-1.5 text-[10px] font-bold text-slate-500"><span class="h-3.5 w-5 rounded-[5px] border border-[#B8CBFF] bg-[#F8FAFF]"></span>学习中</span>
+                    <span class="flex items-center gap-1.5 text-[10px] font-bold text-slate-500"><span class="h-3.5 w-5 rounded-[5px] border border-[#DDE4EC] bg-slate-50"></span>待解锁</span>
+                </div>
+            </div>
+            <div id="topology-surface" class="graph-surface topology-surface min-h-0 flex-1">
+                <svg id="topology-svg" role="group" aria-label="英语能力关系图，从左到右表示前置到后续，点击能力可查看相关前置与后续依赖">
+                    <g id="topology-viewport" class="svg-pan-zoom_viewport"></g>
+                </svg>
+                <div class="graph-controls" aria-label="完整关系图视图控制">
+                    <button id="topology-zoom-out" type="button" class="graph-control-button" aria-label="缩小完整关系图"><i class="ph-bold ph-minus text-[16px]" aria-hidden="true"></i></button>
+                    <button id="topology-zoom-in" type="button" class="graph-control-button" aria-label="放大完整关系图"><i class="ph-bold ph-plus text-[16px]" aria-hidden="true"></i></button>
+                    <button id="topology-fit" type="button" class="graph-control-button px-2.5" aria-label="适应完整关系画布"><i class="ph-bold ph-arrows-out-simple text-[16px]" aria-hidden="true"></i><span>适应画布</span></button>
+                    <button id="topology-reset-view" type="button" class="graph-control-button px-2.5" aria-label="恢复默认全图视图"><i class="ph-bold ph-arrow-counter-clockwise text-[16px]" aria-hidden="true"></i><span>默认视图</span></button>
+                </div>
+            </div>
+        </main>
+    </div>
+<script>
+        (function () {
+            'use strict';
+
+            // 能力是首页主线，只引用当前与目标能力级别；不保存星级、学习权限或视觉状态。
+            const abilitiesV9 = [
+                { id: 'vocabulary', name: '核心词汇', currentLevelNodeId: 'vocabulary-l3', targetLevelNodeId: 'vocabulary-l5' },
+                { id: 'phonics', name: '语音辨识', currentLevelNodeId: 'phonics-l2', targetLevelNodeId: 'phonics-l4' },
+                { id: 'grammar', name: '句法理解', currentLevelNodeId: 'grammar-l2', targetLevelNodeId: 'grammar-l5' },
+                { id: 'listening', name: '听力理解', currentLevelNodeId: 'listening-l2', targetLevelNodeId: 'listening-l4' },
+                { id: 'sentence', name: '句子理解', currentLevelNodeId: 'sentence-l3', targetLevelNodeId: 'sentence-l5' },
+                { id: 'reading', name: '篇章阅读', currentLevelNodeId: 'reading-l2', targetLevelNodeId: 'reading-l5' },
+                { id: 'speaking', name: '口语表达', currentLevelNodeId: 'speaking-l2', targetLevelNodeId: 'speaking-l4' },
+                { id: 'writing', name: '写作表达', currentLevelNodeId: 'writing-l1', targetLevelNodeId: 'writing-l4' },
+                { id: 'communication', name: '情境沟通', currentLevelNodeId: 'communication-l1', targetLevelNodeId: 'communication-l5' }
+            ];
+
+            // 具体能力级别节点承载级别定义与星级。studyState / canStudy 视为后台原样返回，互不推导。
+            const levelNodesV9 = [
+                { id: 'vocabulary-l3', abilityId: 'vocabulary', level: 3, definition: '1800词', description: '覆盖约 1800 个核心词汇', masteryStars: 4, studyState: 'available', canStudy: true },
+                { id: 'vocabulary-l5', abilityId: 'vocabulary', level: 5, definition: '4500词', description: '覆盖约 4500 个核心词汇' },
+                { id: 'phonics-l2', abilityId: 'phonics', level: 2, definition: '常见词发音', description: '能听清常见单词的发音', masteryStars: 3, studyState: 'available', canStudy: true },
+                { id: 'phonics-l4', abilityId: 'phonics', level: 4, definition: '弱读与连读', description: '能辨识连续语流中的弱读与连读' },
+                { id: 'grammar-l2', abilityId: 'grammar', level: 2, definition: '常见句式', description: '能看懂常见句子', masteryStars: 3, studyState: 'available', canStudy: true },
+                { id: 'grammar-l5', abilityId: 'grammar', level: 5, definition: '复杂语篇句法', description: '能理解复杂句式和语篇中的句法关系' },
+                { id: 'listening-l2', abilityId: 'listening', level: 2, definition: '关键信息', description: '能听懂表达中的关键信息', masteryStars: 2, studyState: 'available', canStudy: true },
+                { id: 'listening-l4', abilityId: 'listening', level: 4, definition: '细节与态度', description: '能听懂连续表达中的细节和态度' },
+                { id: 'sentence-l3', abilityId: 'sentence', level: 3, definition: '完整句意', description: '能准确看懂完整句子', masteryStars: 4, studyState: 'available', canStudy: true },
+                { id: 'sentence-l5', abilityId: 'sentence', level: 5, definition: '隐含句意', description: '能结合上下文准确理解隐含句意' },
+                { id: 'reading-l2', abilityId: 'reading', level: 2, definition: '段落大意', description: '能看懂一段话的大意', masteryStars: 3, studyState: 'locked', canStudy: false },
+                { id: 'reading-l5', abilityId: 'reading', level: 5, definition: '篇章观点', description: '能独立理解整篇内容、结构和观点' },
+                { id: 'speaking-l2', abilityId: 'speaking', level: 2, definition: '基本意图', description: '能说清自己的意思', masteryStars: 2, studyState: 'locked', canStudy: false },
+                { id: 'speaking-l4', abilityId: 'speaking', level: 4, definition: '连续表达', description: '能围绕熟悉话题持续、自然地表达' },
+                { id: 'writing-l1', abilityId: 'writing', level: 1, definition: '完整句子', description: '能写出完整句子', masteryStars: 3, studyState: 'locked', canStudy: false },
+                { id: 'writing-l4', abilityId: 'writing', level: 4, definition: '结构化段落', description: '能有结构地完成一段完整表达' },
+                { id: 'communication-l1', abilityId: 'communication', level: 1, definition: '常见问答', description: '能回应常见问题', masteryStars: 1, studyState: 'locked', canStudy: false },
+                { id: 'communication-l5', abilityId: 'communication', level: 5, definition: '多场景沟通', description: '能在多种真实场景中完成连贯沟通' }
+            ];
+
+            // 依赖关系的源与目标均为具体能力级别节点；L 数字不参与前后顺序判断。
+            const levelRelationshipsV9 = [
+                ['phonics-l2', 'listening-l2'],
+                ['vocabulary-l3', 'sentence-l3'],
+                ['grammar-l2', 'sentence-l3'],
+                ['vocabulary-l3', 'reading-l2'],
+                ['sentence-l3', 'reading-l2'],
+                ['phonics-l2', 'speaking-l2'],
+                ['vocabulary-l3', 'speaking-l2'],
+                ['grammar-l2', 'writing-l1'],
+                ['sentence-l3', 'writing-l1'],
+                ['listening-l2', 'communication-l1'],
+                ['reading-l2', 'communication-l1'],
+                ['speaking-l2', 'communication-l1'],
+                ['writing-l1', 'communication-l1']
+            ];
+
+            // 当前画面每条主线只展示一个具体级别，因此布局层使用 abilityId 投影，关系语义仍保留 levelNodeId。
+            const graphEdgesV9 = levelRelationshipsV9.map(function (relationship) {
+                const sourceLevelNode = levelNodeByIdV9(relationship[0]);
+                const targetLevelNode = levelNodeByIdV9(relationship[1]);
+                if (!sourceLevelNode || !targetLevelNode) throw new Error('能力级别关系引用了不存在的节点。');
+                return {
+                    id: relationship[0] + '--' + relationship[1],
+                    source: sourceLevelNode.abilityId,
+                    target: targetLevelNode.abilityId,
+                    sourceLevelNodeId: sourceLevelNode.id,
+                    targetLevelNodeId: targetLevelNode.id
+                };
+            });
+
+            const learningTypesV9 = [
+                { name: '音记', icon: 'icon/yinji.svg', iconClass: 'bg-violet-50' },
+                { name: '题库', icon: 'icon/tiku.svg', iconClass: 'bg-blue-50' },
+                { name: '游戏', icon: 'icon/game.svg', iconClass: 'bg-orange-50' }
+            ];
+
+            const stateV9 = {
+                view: 'overview',
+                previousView: 'overview',
+                // 以下选中字段只描述当前查看，不得写回 studyState、canStudy、level 或 masteryStars。
+                selectedAbilityId: 'reading',
+                topologySelectedAbilityId: null,
+                topologyLayout: null,
+                topologyFocus: null,
+                topologyTransitionToken: 0,
+                localRenderToken: 0
+            };
+
+            const pagesV9 = {
+                overview: document.getElementById('overview-page'),
+                detail: document.getElementById('detail-page'),
+                topology: document.getElementById('topology-page')
+            };
+
+            const abilityGridV9 = document.getElementById('ability-grid');
+            const localSurfaceV9 = document.getElementById('local-graph');
+            const localSvgV9 = document.getElementById('local-graph-svg');
+            const localViewportV9 = document.getElementById('local-viewport');
+            const topologySurfaceV9 = document.getElementById('topology-surface');
+            const topologySvgV9 = document.getElementById('topology-svg');
+            const topologyViewportV9 = document.getElementById('topology-viewport');
+            const reducedMotionV9 = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const abilityOrderV9 = new Map(abilitiesV9.map(function (ability, index) {
+                return [ability.id, index];
+            }));
+            let localPanZoomV9 = null;
+            let topologyPanZoomV9 = null;
+            let topologyLongEdgeRoutesV9 = null;
+            let localSceneV9 = null;
+            let localAnimationFrameV9 = null;
+            let localSwitchPendingV9 = false;
+            let localResizePendingV9 = false;
+
+            function escapeHtmlV9(value) {
+                return String(value)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;');
+            }
+
+            function abilityByIdV9(id) {
+                return abilitiesV9.find(function (ability) {
+                    return ability.id === id;
+                });
+            }
+
+            function levelNodeByIdV9(id) {
+                return levelNodesV9.find(function (levelNode) {
+                    return levelNode.id === id;
+                });
+            }
+
+            function currentLevelNodeV9(ability) {
+                return ability ? levelNodeByIdV9(ability.currentLevelNodeId) : null;
+            }
+
+            function targetLevelNodeV9(ability) {
+                return ability ? levelNodeByIdV9(ability.targetLevelNodeId) : null;
+            }
+
+            function formatLevelV9(value) {
+                const levelNumber = String(value).trim();
+                return /^[1-9]\d*$/.test(levelNumber) ? 'L' + levelNumber : 'L—';
+            }
+
+            function currentLevelLabelV9(ability) {
+                const levelNode = currentLevelNodeV9(ability);
+                return '当前 ' + formatLevelV9(levelNode ? levelNode.level : '');
+            }
+
+            function levelDescriptionV9(ability, phase) {
+                const levelNode = phase === 'target' ? targetLevelNodeV9(ability) : currentLevelNodeV9(ability);
+                return levelNode ? levelNode.description : '';
+            }
+
+            function levelNodeSummaryV9(ability, includeMastery) {
+                const levelNode = currentLevelNodeV9(ability);
+                if (!levelNode) return 'L—';
+                const mastery = includeMastery ? ' · ' + levelNode.masteryStars + '/5星' : '';
+                return formatLevelV9(levelNode.level) + ' · ' + levelNode.definition + mastery;
+            }
+
+            function starsMarkupV9(value, large) {
+                const className = large ? 'star-row is-large' : 'star-row';
+                let markup = '<span class="' + className + '" aria-label="当前级别内已掌握 ' + value + ' 星，共 5 星">';
+                for (let index = 1; index <= 5; index += 1) {
+                    markup += '<i class="' + (index <= value ? 'ph-fill ph-star is-filled' : 'ph-fill ph-star') + '" aria-hidden="true"></i>';
+                }
+                markup += '</span>';
+                return markup;
+            }
+
+            function businessStateVisualV9(ability) {
+                const levelNode = currentLevelNodeV9(ability);
+                const studyState = levelNode ? levelNode.studyState : 'available';
+                if (studyState === 'learning') {
+                    return {
+                        key: 'learning',
+                        ariaLabel: '学习中',
+                        fill: '#F8FAFF',
+                        stroke: '#B8CBFF',
+                        title: '#173E9C',
+                        meta: '#3568E8',
+                        accent: '#77A0FF',
+                        badgeClass: 'border-blue-200 bg-blue-50 text-blue-700'
+                    };
+                }
+                if (studyState === 'completed') {
+                    return {
+                        key: 'completed',
+                        ariaLabel: '已完成',
+                        fill: '#F3FCF6',
+                        stroke: '#BFE7CB',
+                        title: '#166534',
+                        meta: '#2F855A',
+                        accent: '#73C98F',
+                        badgeClass: 'border-green-200 bg-green-50 text-green-700'
+                    };
+                }
+                if (studyState === 'locked') {
+                    return {
+                        key: 'locked',
+                        ariaLabel: '待解锁',
+                        fill: '#F8FAFC',
+                        stroke: '#DDE4EC',
+                        title: '#64748B',
+                        meta: '#94A3B8',
+                        accent: '#CBD5E1',
+                        badgeClass: 'border-slate-200 bg-slate-100 text-slate-500'
+                    };
+                }
+                return {
+                    key: 'available',
+                    ariaLabel: '可学习',
+                    fill: '#FFFFFF',
+                    stroke: '#DCE4EF',
+                    title: '#172033',
+                    meta: '#64748B',
+                    accent: '#CBD5E1',
+                    badgeClass: 'border-slate-200 bg-white text-slate-600'
+                };
+            }
+
+            function statusBadgeMarkupV9(ability) {
+                const visual = businessStateVisualV9(ability);
+                return '<span class="shrink-0 rounded-[6px] border px-2 py-1 text-[10px] font-extrabold ' + visual.badgeClass + '">' + visual.ariaLabel + '</span>';
+            }
+
+            function validateDataContractV9() {
+                const allowedStudyStates = new Set(['available', 'learning', 'completed', 'locked']);
+                abilitiesV9.forEach(function (ability) {
+                    const currentLevelNode = currentLevelNodeV9(ability);
+                    const targetLevelNode = targetLevelNodeV9(ability);
+                    if (!currentLevelNode || !targetLevelNode) throw new Error(ability.name + '缺少当前或目标能力级别节点。');
+                    if (currentLevelNode.abilityId !== ability.id || targetLevelNode.abilityId !== ability.id) {
+                        throw new Error(ability.name + '的能力级别节点归属不一致。');
+                    }
+                    if (!Number.isInteger(currentLevelNode.masteryStars) || currentLevelNode.masteryStars < 0 || currentLevelNode.masteryStars > 5) {
+                        throw new Error(currentLevelNode.id + '的星级数据无效。');
+                    }
+                    if (!allowedStudyStates.has(currentLevelNode.studyState) || typeof currentLevelNode.canStudy !== 'boolean') {
+                        throw new Error(currentLevelNode.id + '缺少明确的后台状态或学习权限。');
+                    }
+                    if ((currentLevelNode.studyState === 'locked') === currentLevelNode.canStudy) {
+                        throw new Error(currentLevelNode.id + '的待解锁状态与学习权限冲突。');
+                    }
+                });
+                graphEdgesV9.forEach(function (edge) {
+                    const sourceLevelNode = levelNodeByIdV9(edge.sourceLevelNodeId);
+                    const targetLevelNode = levelNodeByIdV9(edge.targetLevelNodeId);
+                    if (!sourceLevelNode || !targetLevelNode) throw new Error(edge.id + '引用了不存在的能力级别节点。');
+                    if (abilityByIdV9(edge.source).currentLevelNodeId !== sourceLevelNode.id || abilityByIdV9(edge.target).currentLevelNodeId !== targetLevelNode.id) {
+                        throw new Error(edge.id + '未指向当前展示的具体能力级别节点。');
+                    }
+                });
+            }
+
+            function renderOverviewV9() {
+                abilityGridV9.innerHTML = abilitiesV9.map(function (ability) {
+                    const currentLevelNode = currentLevelNodeV9(ability);
+                    const targetLevelNode = targetLevelNodeV9(ability);
+                    const visual = businessStateVisualV9(ability);
+                    const currentLevel = formatLevelV9(currentLevelNode.level);
+                    const targetLevel = formatLevelV9(targetLevelNode.level);
+                    const titleClass = visual.key === 'locked'
+                        ? 'text-slate-500'
+                        : (visual.key === 'completed' ? 'text-green-800' : 'text-slate-950');
+                    const levelClass = visual.key === 'learning'
+                        ? 'text-brand'
+                        : (visual.key === 'completed'
+                            ? 'text-green-700'
+                            : (visual.key === 'locked' ? 'text-slate-400' : 'text-slate-700'));
+                    return (
+                        '<button type="button" data-ability-id="' + escapeHtmlV9(ability.id) + '" class="ability-card status-' + visual.key + ' flex min-h-[108px] w-full flex-col rounded-[16px] p-3.5 text-left active:scale-[0.98]" aria-label="查看' + escapeHtmlV9(ability.name) + '详情，当前具体能力级别 ' + currentLevel + '，' + escapeHtmlV9(currentLevelNode.definition) + '，掌握 ' + currentLevelNode.masteryStars + ' 星，' + visual.ariaLabel + '，目标 ' + targetLevel + '">' +
+                            '<div class="flex items-start justify-between gap-3">' +
+                                '<h2 class="text-[18px] font-extrabold tracking-[-0.02em] ' + titleClass + '">' + escapeHtmlV9(ability.name) + '</h2>' +
+                                '<i class="ph-bold ph-caret-right text-[15px] text-slate-300" aria-hidden="true"></i>' +
+                            '</div>' +
+                            '<div class="mt-auto flex items-center justify-between gap-3 pt-3">' +
+                                '<strong class="shrink-0 text-[14px] font-extrabold ' + levelClass + '">当前 ' + currentLevel + '</strong>' +
+                                '<span class="shrink-0 whitespace-nowrap text-[11px] font-bold text-slate-400">目标 <strong class="ml-1 text-[13px] font-extrabold text-slate-700">' + targetLevel + '</strong></span>' +
+                            '</div>' +
+                            '<div class="mt-1.5 flex min-w-0 items-center justify-between gap-2">' +
+                                '<span class="min-w-0 truncate text-[11px] font-semibold text-slate-500">' + escapeHtmlV9(currentLevelNode.definition) + '</span>' +
+                                '<span class="overview-stars shrink-0">' + starsMarkupV9(currentLevelNode.masteryStars, false) + '</span>' +
+                            '</div>' +
+                        '</button>'
+                    );
+                }).join('');
+            }
+
+            function svgElementV9(name, attributes, textContent) {
+                const element = document.createElementNS('http://www.w3.org/2000/svg', name);
+                Object.keys(attributes || {}).forEach(function (key) {
+                    element.setAttribute(key, String(attributes[key]));
+                });
+                if (typeof textContent === 'string') element.textContent = textContent;
+                return element;
+            }
+
+            function roundedV9(value) {
+                return Math.round(value * 100) / 100;
+            }
+
+            function smoothEdgePathV9(port) {
+                const distance = Math.max(36, port.end.x - port.start.x);
+                const bend = Math.max(34, distance * 0.46);
+                return [
+                    'M', roundedV9(port.start.x), roundedV9(port.start.y),
+                    'C', roundedV9(port.start.x + bend), roundedV9(port.start.y),
+                    roundedV9(port.end.x - bend), roundedV9(port.end.y),
+                    roundedV9(port.end.x), roundedV9(port.end.y)
+                ].join(' ');
+            }
+
+            function getTopologyLongEdgeRoutesV9() {
+                if (topologyLongEdgeRoutesV9) return topologyLongEdgeRoutesV9;
+                const baseLayout = computeTopologyLayoutV9(null);
+                const grouped = { top: [], bottom: [] };
+                graphEdgesV9.forEach(function (edge) {
+                    const rankSpan = baseLayout.rank.get(edge.target) - baseLayout.rank.get(edge.source);
+                    if (rankSpan <= 1) return;
+                    const source = baseLayout.positions.get(edge.source);
+                    const target = baseLayout.positions.get(edge.target);
+                    const averageY = (nodeCenterYV9(source) + nodeCenterYV9(target)) / 2;
+                    const side = averageY <= baseLayout.height / 2 ? 'top' : 'bottom';
+                    grouped[side].push({ edge: edge, averageY: averageY });
+                });
+                topologyLongEdgeRoutesV9 = new Map();
+                ['top', 'bottom'].forEach(function (side) {
+                    grouped[side]
+                        .sort(function (first, second) {
+                            return first.averageY - second.averageY
+                                || abilityOrderV9.get(first.edge.source) - abilityOrderV9.get(second.edge.source)
+                                || abilityOrderV9.get(first.edge.target) - abilityOrderV9.get(second.edge.target);
+                        })
+                        .forEach(function (item, index) {
+                            topologyLongEdgeRoutesV9.set(item.edge.id, { side: side, laneIndex: index });
+                        });
+                });
+                return topologyLongEdgeRoutesV9;
+            }
+
+            function topologyEdgePathV9(edge, port, layout) {
+                const rankSpan = layout.rank.get(edge.target) - layout.rank.get(edge.source);
+                if (rankSpan <= 1) return smoothEdgePathV9(port);
+
+                const route = getTopologyLongEdgeRoutesV9().get(edge.id);
+                const laneSpacing = 15;
+                const laneY = route && route.side === 'bottom'
+                    ? layout.height - 26 - route.laneIndex * laneSpacing
+                    : 26 + (route ? route.laneIndex : 0) * laneSpacing;
+                const distance = port.end.x - port.start.x;
+                const corridor = Math.min(36, Math.max(28, distance * 0.16));
+                const exitX = port.start.x + corridor;
+                const entryX = port.end.x - corridor;
+                const firstDirection = laneY >= port.start.y ? 1 : -1;
+                const secondDirection = port.end.y >= laneY ? 1 : -1;
+                const radius = 9;
+
+                return [
+                    'M', roundedV9(port.start.x), roundedV9(port.start.y),
+                    'L', roundedV9(exitX - radius), roundedV9(port.start.y),
+                    'Q', roundedV9(exitX), roundedV9(port.start.y), roundedV9(exitX), roundedV9(port.start.y + firstDirection * radius),
+                    'L', roundedV9(exitX), roundedV9(laneY - firstDirection * radius),
+                    'Q', roundedV9(exitX), roundedV9(laneY), roundedV9(exitX + radius), roundedV9(laneY),
+                    'L', roundedV9(entryX - radius), roundedV9(laneY),
+                    'Q', roundedV9(entryX), roundedV9(laneY), roundedV9(entryX), roundedV9(laneY + secondDirection * radius),
+                    'L', roundedV9(entryX), roundedV9(port.end.y - secondDirection * radius),
+                    'Q', roundedV9(entryX), roundedV9(port.end.y), roundedV9(entryX + radius), roundedV9(port.end.y),
+                    'L', roundedV9(port.end.x), roundedV9(port.end.y)
+                ].join(' ');
+            }
+
+            function nodeCenterYV9(position) {
+                return position.y + position.height / 2;
+            }
+
+            function portYV9(position, index, count) {
+                if (count <= 1) return nodeCenterYV9(position);
+                const padding = Math.min(13, position.height * 0.22);
+                const span = Math.max(1, position.height - padding * 2);
+                return position.y + padding + span * index / (count - 1);
+            }
+
+            function allocateEdgePortsV9(edges, positions, sortPositions) {
+                const sortingPositions = sortPositions || positions;
+                const outgoing = new Map();
+                const incoming = new Map();
+                const ports = new Map();
+
+                edges.forEach(function (edge) {
+                    if (!outgoing.has(edge.source)) outgoing.set(edge.source, []);
+                    if (!incoming.has(edge.target)) incoming.set(edge.target, []);
+                    outgoing.get(edge.source).push(edge);
+                    incoming.get(edge.target).push(edge);
+                    ports.set(edge.id, {});
+                });
+
+                function compareByNodeY(firstId, secondId) {
+                    const firstPosition = sortingPositions.get(firstId);
+                    const secondPosition = sortingPositions.get(secondId);
+                    const yDifference = nodeCenterYV9(firstPosition) - nodeCenterYV9(secondPosition);
+                    if (Math.abs(yDifference) > 0.01) return yDifference;
+                    return (abilityOrderV9.get(firstId) || 0) - (abilityOrderV9.get(secondId) || 0);
+                }
+
+                outgoing.forEach(function (items, sourceId) {
+                    items.sort(function (first, second) {
+                        return compareByNodeY(first.target, second.target);
+                    });
+                    const source = positions.get(sourceId);
+                    items.forEach(function (edge, index) {
+                        ports.get(edge.id).start = {
+                            x: source.x + source.width,
+                            y: portYV9(source, index, items.length)
+                        };
+                    });
+                });
+
+                incoming.forEach(function (items, targetId) {
+                    items.sort(function (first, second) {
+                        return compareByNodeY(first.source, second.source);
+                    });
+                    const target = positions.get(targetId);
+                    items.forEach(function (edge, index) {
+                        ports.get(edge.id).end = {
+                            x: target.x,
+                            y: portYV9(target, index, items.length)
+                        };
+                    });
+                });
+
+                return ports;
+            }
+
+            function relatedAbilitiesV9(abilityId) {
+                const incomingEdges = graphEdgesV9.filter(function (edge) { return edge.target === abilityId; });
+                const outgoingEdges = graphEdgesV9.filter(function (edge) { return edge.source === abilityId; });
+                const incoming = incomingEdges
+                    .map(function (edge) { return abilityByIdV9(edge.source); })
+                    .filter(Boolean);
+                const outgoing = outgoingEdges
+                    .map(function (edge) { return abilityByIdV9(edge.target); })
+                    .filter(Boolean);
+                return {
+                    incoming: incoming,
+                    outgoing: outgoing,
+                    incomingEdges: incomingEdges,
+                    outgoingEdges: outgoingEdges
+                };
+            }
+
+            function stackPositionsV9(items, x, nodeWidth, nodeHeight, gap, canvasHeight) {
+                const stackHeight = items.length * nodeHeight + Math.max(0, items.length - 1) * gap;
+                const top = (canvasHeight - stackHeight) / 2 + 8;
+                const positions = new Map();
+                items.forEach(function (ability, index) {
+                    positions.set(ability.id, {
+                        x: x,
+                        y: top + index * (nodeHeight + gap),
+                        width: nodeWidth,
+                        height: nodeHeight
+                    });
+                });
+                return positions;
+            }
+
+            function computeLocalLayoutV9(ability) {
+                const related = relatedAbilitiesV9(ability.id);
+                const nodeWidth = 174;
+                const nodeHeight = 46;
+                const currentWidth = 184;
+                const currentHeight = 64;
+                const gapY = 6;
+                const maxCount = abilitiesV9.reduce(function (largestCount, item) {
+                    const incomingCount = graphEdgesV9.filter(function (edge) { return edge.target === item.id; }).length;
+                    const outgoingCount = graphEdgesV9.filter(function (edge) { return edge.source === item.id; }).length;
+                    return Math.max(largestCount, incomingCount, outgoingCount);
+                }, 1);
+                const contentHeight = maxCount * nodeHeight + Math.max(0, maxCount - 1) * gapY;
+                const height = Math.max(166, contentHeight + 30);
+                const measuredWidth = localSurfaceV9.clientWidth || 0;
+                const width = Math.max(820, measuredWidth);
+                const leftX = 30;
+                const rightX = width - 30 - nodeWidth;
+                const currentX = (width - currentWidth) / 2;
+                const positions = new Map();
+
+                stackPositionsV9(related.incoming, leftX, nodeWidth, nodeHeight, gapY, height).forEach(function (position, id) {
+                    positions.set(id, position);
+                });
+                stackPositionsV9(related.outgoing, rightX, nodeWidth, nodeHeight, gapY, height).forEach(function (position, id) {
+                    positions.set(id, position);
+                });
+                positions.set(ability.id, {
+                    x: currentX,
+                    y: (height - currentHeight) / 2 + 8,
+                    width: currentWidth,
+                    height: currentHeight
+                });
+
+                const edges = related.incomingEdges.concat(related.outgoingEdges).map(function (edge) {
+                    return {
+                        id: edge.id,
+                        source: edge.source,
+                        target: edge.target,
+                        sourceLevelNodeId: edge.sourceLevelNodeId,
+                        targetLevelNodeId: edge.targetLevelNodeId
+                    };
+                });
+
+                const roles = new Map();
+                related.incoming.forEach(function (item) { roles.set(item.id, 'incoming'); });
+                roles.set(ability.id, 'current');
+                related.outgoing.forEach(function (item) { roles.set(item.id, 'outgoing'); });
+
+                return {
+                    width: width,
+                    height: height,
+                    nodeWidth: nodeWidth,
+                    nodeHeight: nodeHeight,
+                    related: related,
+                    positions: positions,
+                    edges: edges,
+                    roles: roles,
+                    abilityId: ability.id
+                };
+            }
+
+            function appendMarkerV9(defs, id, color, size) {
+                const marker = svgElementV9('marker', {
+                    id: id,
+                    viewBox: '0 0 10 10',
+                    refX: '9',
+                    refY: '5',
+                    markerWidth: size,
+                    markerHeight: size,
+                    markerUnits: 'userSpaceOnUse',
+                    orient: 'auto'
+                });
+                marker.appendChild(svgElementV9('path', {
+                    d: 'M 0 0 L 10 5 L 0 10 z',
+                    fill: color
+                }));
+                defs.appendChild(marker);
+            }
+
+            function destroyPanZoomV9(instance, viewport) {
+                if (instance && typeof instance.destroy === 'function') instance.destroy();
+                if (viewport) {
+                    viewport.removeAttribute('transform');
+                    viewport.style.removeProperty('transform');
+                }
+            }
+
+            function initialiseLocalPanZoomV9(layout, overflow, renderToken) {
+                if (renderToken !== stateV9.localRenderToken || stateV9.view !== 'detail') return;
+                const controls = document.getElementById('local-controls');
+                destroyPanZoomV9(localPanZoomV9, localViewportV9);
+                localPanZoomV9 = null;
+
+                const libraryReady = typeof window.svgPanZoom === 'function';
+                controls.classList.toggle('hidden', !overflow || !libraryReady);
+                localSurfaceV9.classList.toggle('is-pan-enabled', overflow && libraryReady);
+                if (!overflow || !libraryReady) return;
+
+                try {
+                    localPanZoomV9 = window.svgPanZoom(localSvgV9, {
+                        viewportSelector: '#local-viewport',
+                        controlIconsEnabled: false,
+                        zoomEnabled: true,
+                        panEnabled: true,
+                        mouseWheelZoomEnabled: true,
+                        dblClickZoomEnabled: false,
+                        preventMouseEventsDefault: true,
+                        minZoom: 0.62,
+                        maxZoom: 2.5,
+                        zoomScaleSensitivity: 0.22,
+                        fit: true,
+                        center: true
+                    });
+                    localPanZoomV9.resize();
+                    localPanZoomV9.fit();
+                    localPanZoomV9.center();
+                } catch (error) {
+                    console.error('局部关系图视口初始化失败：', error);
+                    controls.classList.add('hidden');
+                    localSurfaceV9.classList.remove('is-pan-enabled');
+                    localPanZoomV9 = null;
+                }
+            }
+
+            function ensureLocalSceneV9() {
+                if (localSceneV9 && localSceneV9.viewport === localViewportV9) return localSceneV9;
+                localViewportV9.replaceChildren();
+
+                const defs = svgElementV9('defs');
+                appendMarkerV9(defs, 'local-arrow-v9', '#94A3B8', '6.5');
+                const headers = svgElementV9('g', { 'aria-hidden': 'true' });
+                const incomingHeader = svgElementV9('text', {
+                    y: '16',
+                    fill: '#94A3B8',
+                    'font-family': 'inherit',
+                    'font-size': '9',
+                    'font-weight': '800',
+                    'letter-spacing': '1.1',
+                    'text-anchor': 'middle'
+                }, '前置能力');
+                const outgoingHeader = svgElementV9('text', {
+                    y: '16',
+                    fill: '#94A3B8',
+                    'font-family': 'inherit',
+                    'font-size': '9',
+                    'font-weight': '800',
+                    'letter-spacing': '1.1',
+                    'text-anchor': 'middle'
+                }, '后续能力');
+                headers.appendChild(incomingHeader);
+                headers.appendChild(outgoingHeader);
+
+                const emptyGroup = svgElementV9('g', { 'aria-hidden': 'true' });
+                const incomingEmpty = svgElementV9('text', {
+                    fill: '#CBD5E1',
+                    'font-family': 'inherit',
+                    'font-size': '10',
+                    'font-weight': '700',
+                    'text-anchor': 'middle',
+                    opacity: '0'
+                }, '暂无前置能力');
+                const outgoingEmpty = svgElementV9('text', {
+                    fill: '#CBD5E1',
+                    'font-family': 'inherit',
+                    'font-size': '10',
+                    'font-weight': '700',
+                    'text-anchor': 'middle',
+                    opacity: '0'
+                }, '暂无后续能力');
+                emptyGroup.appendChild(incomingEmpty);
+                emptyGroup.appendChild(outgoingEmpty);
+
+                const underlayGroup = svgElementV9('g', { 'aria-hidden': 'true' });
+                const edgeGroup = svgElementV9('g', { 'aria-hidden': 'true' });
+                const nodeGroup = svgElementV9('g');
+                localViewportV9.appendChild(defs);
+                localViewportV9.appendChild(headers);
+                localViewportV9.appendChild(emptyGroup);
+                localViewportV9.appendChild(underlayGroup);
+                localViewportV9.appendChild(edgeGroup);
+                localViewportV9.appendChild(nodeGroup);
+
+                localSceneV9 = {
+                    viewport: localViewportV9,
+                    incomingHeader: incomingHeader,
+                    outgoingHeader: outgoingHeader,
+                    incomingEmpty: incomingEmpty,
+                    outgoingEmpty: outgoingEmpty,
+                    underlayGroup: underlayGroup,
+                    edgeGroup: edgeGroup,
+                    nodeGroup: nodeGroup,
+                    nodes: new Map(),
+                    edges: new Map(),
+                    layout: null,
+                    abilityId: null,
+                    animating: false
+                };
+                return localSceneV9;
+            }
+
+            function ensureLocalNodeV9(ability) {
+                const scene = ensureLocalSceneV9();
+                if (scene.nodes.has(ability.id)) return scene.nodes.get(ability.id);
+
+                const group = svgElementV9('g', {
+                    class: 'graph-node',
+                    'data-local-node-id': ability.id,
+                    opacity: '0'
+                });
+                const accessibleTitle = svgElementV9('title');
+                const visual = svgElementV9('g', {
+                    class: 'graph-node-visual',
+                    'data-local-node-visual': ability.id
+                });
+                const ring = svgElementV9('rect', {
+                    class: 'graph-focus-ring',
+                    fill: 'none',
+                    stroke: '#1F5FFF'
+                });
+                const body = svgElementV9('rect', { 'data-local-node-body': ability.id });
+                const name = svgElementV9('text', {
+                    'font-family': 'inherit',
+                    'font-weight': '800',
+                    'text-anchor': 'middle'
+                }, ability.name);
+                const level = svgElementV9('text', {
+                    'font-family': 'inherit',
+                    'font-weight': '800',
+                    'text-anchor': 'middle'
+                }, currentLevelLabelV9(ability));
+                visual.appendChild(ring);
+                visual.appendChild(body);
+                visual.appendChild(name);
+                visual.appendChild(level);
+                group.appendChild(accessibleTitle);
+                group.appendChild(visual);
+                scene.nodeGroup.appendChild(group);
+
+                const entry = {
+                    id: ability.id,
+                    group: group,
+                    visual: visual,
+                    ring: ring,
+                    body: body,
+                    name: name,
+                    level: level,
+                    title: accessibleTitle
+                };
+                scene.nodes.set(ability.id, entry);
+                return entry;
+            }
+
+            function updateLocalNodeFrameV9(entry, ability, position, relation, currentFactor, opacity) {
+                const palette = businessStateVisualV9(ability);
+                const levelNode = currentLevelNodeV9(ability);
+                const factor = Math.max(0, Math.min(1, currentFactor));
+                const isCurrent = relation === 'current';
+                const visualAria = palette.ariaLabel ? '，' + palette.ariaLabel : '';
+
+                entry.group.setAttribute('transform', 'translate(' + roundedV9(position.x) + ' ' + roundedV9(position.y) + ')');
+                entry.group.setAttribute('opacity', roundedV9(opacity));
+                entry.group.setAttribute('role', isCurrent ? 'group' : 'button');
+                entry.group.setAttribute('tabindex', isCurrent ? '-1' : '0');
+                entry.group.setAttribute('aria-label', (isCurrent ? '当前查看，' : '切换到') + ability.name + '，具体能力级别 ' + levelNodeSummaryV9(ability, false) + '，掌握 ' + levelNode.masteryStars + ' 星' + visualAria);
+                entry.group.setAttribute('data-local-relation', relation);
+                if (isCurrent) {
+                    entry.group.removeAttribute('data-route-ability');
+                } else {
+                    entry.group.setAttribute('data-route-ability', ability.id);
+                }
+                entry.title.textContent = ability.name + ' · ' + levelNodeSummaryV9(ability, true) + (palette.ariaLabel ? ' · ' + palette.ariaLabel : '');
+
+                entry.ring.setAttribute('x', '-4');
+                entry.ring.setAttribute('y', '-4');
+                entry.ring.setAttribute('width', roundedV9(position.width + 8));
+                entry.ring.setAttribute('height', roundedV9(position.height + 8));
+                entry.ring.setAttribute('rx', roundedV9(15 + factor * 3));
+                entry.ring.setAttribute('stroke-width', roundedV9(1.5 + factor * 0.5));
+                entry.ring.setAttribute('opacity', roundedV9(factor));
+
+                entry.body.setAttribute('x', '0');
+                entry.body.setAttribute('y', '0');
+                entry.body.setAttribute('width', roundedV9(position.width));
+                entry.body.setAttribute('height', roundedV9(position.height));
+                entry.body.setAttribute('rx', roundedV9(12 + factor * 3));
+                entry.body.setAttribute('fill', palette.fill);
+                entry.body.setAttribute('stroke', palette.stroke);
+                entry.body.setAttribute('stroke-width', '1.25');
+
+                entry.name.setAttribute('x', roundedV9(position.width / 2));
+                entry.name.setAttribute('y', roundedV9(19 + factor * 8));
+                entry.name.setAttribute('fill', palette.title);
+                entry.name.setAttribute('font-size', roundedV9(12 + factor * 3));
+                entry.name.textContent = ability.name;
+
+                entry.level.setAttribute('x', roundedV9(position.width / 2));
+                entry.level.setAttribute('y', roundedV9(36 + factor * 11));
+                entry.level.setAttribute('fill', palette.meta);
+                entry.level.setAttribute('font-size', roundedV9(9.5 + factor));
+                entry.level.textContent = levelNodeSummaryV9(ability, true);
+            }
+
+            function ensureLocalEdgeV9(edge) {
+                const scene = ensureLocalSceneV9();
+                if (scene.edges.has(edge.id)) return scene.edges.get(edge.id);
+                const underlay = svgElementV9('path', {
+                    class: 'graph-edge-underlay',
+                    stroke: '#FFFFFF',
+                    'stroke-width': '6.5',
+                    opacity: '0',
+                    'data-local-edge-key': edge.id
+                });
+                const path = svgElementV9('path', {
+                    class: 'graph-edge',
+                    stroke: '#94A3B8',
+                    'stroke-width': '1.8',
+                    opacity: '0',
+                    'marker-end': 'url(#local-arrow-v9)',
+                    'data-local-edge-key': edge.id,
+                    'data-source-id': edge.source,
+                    'data-target-id': edge.target,
+                    'data-source-level-node-id': edge.sourceLevelNodeId,
+                    'data-target-level-node-id': edge.targetLevelNodeId
+                });
+                scene.underlayGroup.appendChild(underlay);
+                scene.edgeGroup.appendChild(path);
+                const entry = {
+                    id: edge.id,
+                    sourceId: edge.source,
+                    targetId: edge.target,
+                    underlay: underlay,
+                    path: path,
+                    geometry: null
+                };
+                scene.edges.set(edge.id, entry);
+                return entry;
+            }
+
+            function updateLocalHeadersV9(layout) {
+                const scene = ensureLocalSceneV9();
+                const leftX = 30 + layout.nodeWidth / 2;
+                const rightX = layout.width - 30 - layout.nodeWidth / 2;
+                scene.incomingHeader.setAttribute('x', leftX);
+                scene.outgoingHeader.setAttribute('x', rightX);
+                scene.incomingEmpty.setAttribute('x', leftX);
+                scene.outgoingEmpty.setAttribute('x', rightX);
+                scene.incomingEmpty.setAttribute('y', layout.height / 2 + 8);
+                scene.outgoingEmpty.setAttribute('y', layout.height / 2 + 8);
+                scene.incomingEmpty.setAttribute('opacity', layout.related.incoming.length ? '0' : '1');
+                scene.outgoingEmpty.setAttribute('opacity', layout.related.outgoing.length ? '0' : '1');
+            }
+
+            function localGeometryFromPortV9(port) {
+                const distance = Math.max(36, port.end.x - port.start.x);
+                const bend = Math.max(34, distance * 0.46);
+                return {
+                    startX: port.start.x,
+                    startY: port.start.y,
+                    control1X: port.start.x + bend,
+                    control1Y: port.start.y,
+                    control2X: port.end.x - bend,
+                    control2Y: port.end.y,
+                    endX: port.end.x,
+                    endY: port.end.y
+                };
+            }
+
+            function localGeometryToPathV9(geometry) {
+                return [
+                    'M', roundedV9(geometry.startX), roundedV9(geometry.startY),
+                    'C', roundedV9(geometry.control1X), roundedV9(geometry.control1Y),
+                    roundedV9(geometry.control2X), roundedV9(geometry.control2Y),
+                    roundedV9(geometry.endX), roundedV9(geometry.endY)
+                ].join(' ');
+            }
+
+            function collapsedLocalGeometryV9(geometry) {
+                return {
+                    startX: geometry.startX,
+                    startY: geometry.startY,
+                    control1X: geometry.startX,
+                    control1Y: geometry.startY,
+                    control2X: geometry.startX,
+                    control2Y: geometry.startY,
+                    endX: geometry.startX,
+                    endY: geometry.startY
+                };
+            }
+
+            function interpolateLocalGeometryV9(from, to, progress, edgeId) {
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const stretch = Math.sin(Math.PI * progress);
+                const direction = edgeId.split('').reduce(function (sum, character) {
+                    return sum + character.charCodeAt(0);
+                }, 0) % 2 === 0 ? 1 : -1;
+                return {
+                    startX: lerpV9(from.startX, to.startX, eased),
+                    startY: lerpV9(from.startY, to.startY, eased),
+                    control1X: lerpV9(from.control1X, to.control1X, eased) + stretch * 4,
+                    control1Y: lerpV9(from.control1Y, to.control1Y, eased) + stretch * 3.5 * direction,
+                    control2X: lerpV9(from.control2X, to.control2X, eased) - stretch * 3,
+                    control2Y: lerpV9(from.control2Y, to.control2Y, eased) - stretch * 2.2 * direction,
+                    endX: lerpV9(from.endX, to.endX, eased),
+                    endY: lerpV9(from.endY, to.endY, eased)
+                };
+            }
+
+            function interpolateLocalPositionV9(from, to, progress) {
+                return {
+                    x: lerpV9(from.x, to.x, progress),
+                    y: lerpV9(from.y, to.y, progress),
+                    width: lerpV9(from.width, to.width, progress),
+                    height: lerpV9(from.height, to.height, progress)
+                };
+            }
+
+            function shiftedLocalPositionV9(position, relation, amount) {
+                const direction = relation === 'incoming' ? -1 : (relation === 'outgoing' ? 1 : 0);
+                return {
+                    x: position.x + direction * amount,
+                    y: position.y,
+                    width: position.width,
+                    height: position.height
+                };
+            }
+
+            function clampV9(value, minimum, maximum) {
+                return Math.max(minimum, Math.min(maximum, value));
+            }
+
+            function configureLocalCanvasV9(ability, layout) {
+                const displayHeight = Math.min(232, Math.max(166, layout.height));
+                const overflow = layout.height > displayHeight + 1 || layout.width > (localSurfaceV9.clientWidth || layout.width) + 1;
+                localSurfaceV9.style.height = displayHeight + 'px';
+                localSvgV9.setAttribute('viewBox', '0 0 ' + layout.width + ' ' + layout.height);
+                localSvgV9.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+                localSvgV9.setAttribute(
+                    'aria-label',
+                    ability.name + '的能力关系，' + layout.related.incoming.length + ' 个前置能力，' + layout.related.outgoing.length + ' 个后续能力'
+                );
+                updateLocalHeadersV9(layout);
+                return overflow;
+            }
+
+            function commitLocalLayoutV9(ability, layout) {
+                const scene = ensureLocalSceneV9();
+                const visibleNodeIds = new Set(layout.positions.keys());
+                const visibleEdgeIds = new Set(layout.edges.map(function (edge) { return edge.id; }));
+
+                scene.nodes.forEach(function (entry, id) {
+                    if (!visibleNodeIds.has(id)) {
+                        entry.group.remove();
+                        scene.nodes.delete(id);
+                    }
+                });
+                scene.edges.forEach(function (entry, id) {
+                    if (!visibleEdgeIds.has(id)) {
+                        entry.path.remove();
+                        entry.underlay.remove();
+                        scene.edges.delete(id);
+                    }
+                });
+
+                layout.positions.forEach(function (position, id) {
+                    const nodeAbility = abilityByIdV9(id);
+                    const relation = layout.roles.get(id);
+                    const entry = ensureLocalNodeV9(nodeAbility);
+                    updateLocalNodeFrameV9(entry, nodeAbility, position, relation, relation === 'current' ? 1 : 0, 1);
+                });
+
+                const ports = allocateEdgePortsV9(layout.edges, layout.positions);
+                layout.edges.forEach(function (edge) {
+                    const entry = ensureLocalEdgeV9(edge);
+                    const geometry = localGeometryFromPortV9(ports.get(edge.id));
+                    const pathData = localGeometryToPathV9(geometry);
+                    entry.path.setAttribute('d', pathData);
+                    entry.path.setAttribute('opacity', '1');
+                    entry.path.setAttribute('stroke-width', '1.8');
+                    entry.underlay.setAttribute('d', pathData);
+                    entry.underlay.setAttribute('opacity', '1');
+                    entry.geometry = geometry;
+                });
+
+                scene.layout = layout;
+                scene.abilityId = ability.id;
+                scene.animating = false;
+                localViewportV9.style.removeProperty('pointer-events');
+            }
+
+            function renderLocalGraphV9(ability) {
+                if (!ability) return;
+                stateV9.localRenderToken += 1;
+                if (localAnimationFrameV9) {
+                    window.cancelAnimationFrame(localAnimationFrameV9);
+                    localAnimationFrameV9 = null;
+                }
+                destroyPanZoomV9(localPanZoomV9, localViewportV9);
+                localPanZoomV9 = null;
+                const layout = computeLocalLayoutV9(ability);
+                const overflow = configureLocalCanvasV9(ability, layout);
+                commitLocalLayoutV9(ability, layout);
+                const renderToken = stateV9.localRenderToken;
+                window.requestAnimationFrame(function () {
+                    initialiseLocalPanZoomV9(layout, overflow, renderToken);
+                });
+            }
+
+            function animateLocalGraphV9(ability) {
+                const scene = ensureLocalSceneV9();
+                if (!ability || !scene.layout || scene.abilityId === ability.id) return;
+                stateV9.localRenderToken += 1;
+                const transitionToken = stateV9.localRenderToken;
+                if (localAnimationFrameV9) window.cancelAnimationFrame(localAnimationFrameV9);
+
+                const fromLayout = scene.layout;
+                const toLayout = computeLocalLayoutV9(ability);
+                configureLocalCanvasV9(ability, toLayout);
+                const fromNodeIds = new Set(fromLayout.positions.keys());
+                const toNodeIds = new Set(toLayout.positions.keys());
+                const allNodeIds = new Set(Array.from(fromNodeIds).concat(Array.from(toNodeIds)));
+                const fromEdgeMap = new Map(fromLayout.edges.map(function (edge) { return [edge.id, edge]; }));
+                const toEdgeMap = new Map(toLayout.edges.map(function (edge) { return [edge.id, edge]; }));
+                const allEdgeIds = new Set(Array.from(fromEdgeMap.keys()).concat(Array.from(toEdgeMap.keys())));
+                const fromPorts = allocateEdgePortsV9(fromLayout.edges, fromLayout.positions);
+                const toPorts = allocateEdgePortsV9(toLayout.edges, toLayout.positions);
+                const nodeTransitions = [];
+                const edgeTransitions = [];
+
+                allNodeIds.forEach(function (id) {
+                    const nodeAbility = abilityByIdV9(id);
+                    const existed = fromNodeIds.has(id);
+                    const remains = toNodeIds.has(id);
+                    const fromRole = existed ? fromLayout.roles.get(id) : toLayout.roles.get(id);
+                    const toRole = remains ? toLayout.roles.get(id) : fromLayout.roles.get(id);
+                    const fromPosition = existed
+                        ? fromLayout.positions.get(id)
+                        : shiftedLocalPositionV9(toLayout.positions.get(id), toRole, 26);
+                    const toPosition = remains
+                        ? toLayout.positions.get(id)
+                        : shiftedLocalPositionV9(fromLayout.positions.get(id), fromRole, 26);
+                    const entry = ensureLocalNodeV9(nodeAbility);
+                    nodeTransitions.push({
+                        id: id,
+                        ability: nodeAbility,
+                        entry: entry,
+                        existed: existed,
+                        remains: remains,
+                        fromRole: fromRole,
+                        toRole: toRole,
+                        fromPosition: fromPosition,
+                        toPosition: toPosition,
+                        fromCurrent: fromRole === 'current' ? 1 : 0,
+                        toCurrent: toRole === 'current' ? 1 : 0
+                    });
+                });
+
+                allEdgeIds.forEach(function (id) {
+                    const oldEdge = fromEdgeMap.get(id);
+                    const nextEdge = toEdgeMap.get(id);
+                    const edge = nextEdge || oldEdge;
+                    const entry = ensureLocalEdgeV9(edge);
+                    const oldGeometry = oldEdge
+                        ? (entry.geometry || localGeometryFromPortV9(fromPorts.get(id)))
+                        : collapsedLocalGeometryV9(localGeometryFromPortV9(toPorts.get(id)));
+                    const nextGeometry = nextEdge
+                        ? localGeometryFromPortV9(toPorts.get(id))
+                        : collapsedLocalGeometryV9(oldGeometry);
+                    edgeTransitions.push({
+                        id: id,
+                        entry: entry,
+                        existed: Boolean(oldEdge),
+                        remains: Boolean(nextEdge),
+                        fromGeometry: oldGeometry,
+                        toGeometry: nextGeometry
+                    });
+                });
+
+                scene.animating = true;
+                localViewportV9.style.pointerEvents = 'none';
+                const startedAt = performance.now();
+                const nodeDuration = reducedMotionV9 ? 0 : 420;
+                const lineDuration = reducedMotionV9 ? 0 : 470;
+                const totalDuration = Math.max(nodeDuration, lineDuration);
+
+                function finish() {
+                    if (transitionToken !== stateV9.localRenderToken) return;
+                    nodeTransitions.forEach(function (transition) {
+                        if (!transition.remains) {
+                            transition.entry.group.remove();
+                            scene.nodes.delete(transition.id);
+                        }
+                    });
+                    edgeTransitions.forEach(function (transition) {
+                        if (!transition.remains) {
+                            transition.entry.path.remove();
+                            transition.entry.underlay.remove();
+                            scene.edges.delete(transition.id);
+                        }
+                    });
+                    commitLocalLayoutV9(ability, toLayout);
+                    localAnimationFrameV9 = null;
+                    if (localResizePendingV9 && stateV9.view === 'detail') {
+                        localResizePendingV9 = false;
+                        window.requestAnimationFrame(function () {
+                            renderLocalGraphV9(abilityByIdV9(stateV9.selectedAbilityId));
+                        });
+                    }
+                }
+
+                if (!totalDuration) {
+                    finish();
+                    return;
+                }
+
+                function tick(now) {
+                    if (transitionToken !== stateV9.localRenderToken) return;
+                    const elapsed = now - startedAt;
+                    const nodeLinear = clampV9(elapsed / nodeDuration, 0, 1);
+                    const nodeProgress = 1 - Math.pow(1 - nodeLinear, 3);
+                    const lineProgress = clampV9(elapsed / lineDuration, 0, 1);
+
+                    nodeTransitions.forEach(function (transition) {
+                        const position = interpolateLocalPositionV9(transition.fromPosition, transition.toPosition, nodeProgress);
+                        const currentFactor = lerpV9(transition.fromCurrent, transition.toCurrent, nodeProgress);
+                        let opacity = 1;
+                        if (!transition.existed) opacity = clampV9((elapsed - 110) / 220, 0, 1);
+                        if (!transition.remains) opacity = 1 - clampV9(elapsed / 220, 0, 1);
+                        updateLocalNodeFrameV9(
+                            transition.entry,
+                            transition.ability,
+                            position,
+                            transition.remains ? transition.toRole : transition.fromRole,
+                            currentFactor,
+                            opacity
+                        );
+                    });
+
+                    edgeTransitions.forEach(function (transition) {
+                        const geometry = interpolateLocalGeometryV9(
+                            transition.fromGeometry,
+                            transition.toGeometry,
+                            lineProgress,
+                            transition.id
+                        );
+                        const pathData = localGeometryToPathV9(geometry);
+                        let opacity = 1;
+                        if (!transition.existed) opacity = clampV9((elapsed - 110) / 220, 0, 1);
+                        if (!transition.remains) opacity = 1 - clampV9(elapsed / 220, 0, 1);
+                        transition.entry.path.setAttribute('d', pathData);
+                        transition.entry.path.setAttribute('opacity', roundedV9(opacity));
+                        transition.entry.path.setAttribute('stroke-width', '1.8');
+                        transition.entry.underlay.setAttribute('d', pathData);
+                        transition.entry.underlay.setAttribute('opacity', roundedV9(opacity));
+                        transition.entry.geometry = geometry;
+                    });
+
+                    if (elapsed < totalDuration) {
+                        localAnimationFrameV9 = window.requestAnimationFrame(tick);
+                    } else {
+                        finish();
+                    }
+                }
+                localAnimationFrameV9 = window.requestAnimationFrame(tick);
+            }
+
+            let topologyStructureV9 = null;
+
+            function buildTopologyStructureV9() {
+                const nodeIds = abilitiesV9.map(function (ability) { return ability.id; });
+                const incoming = new Map();
+                const outgoing = new Map();
+                const indegree = new Map();
+                const rank = new Map();
+
+                nodeIds.forEach(function (id) {
+                    incoming.set(id, []);
+                    outgoing.set(id, []);
+                    indegree.set(id, 0);
+                    rank.set(id, 0);
+                });
+                graphEdgesV9.forEach(function (edge) {
+                    outgoing.get(edge.source).push(edge.target);
+                    incoming.get(edge.target).push(edge.source);
+                    indegree.set(edge.target, indegree.get(edge.target) + 1);
+                });
+
+                const queue = nodeIds.filter(function (id) {
+                    return indegree.get(id) === 0;
+                });
+                const ordered = [];
+                while (queue.length) {
+                    queue.sort(function (first, second) {
+                        return abilityOrderV9.get(first) - abilityOrderV9.get(second);
+                    });
+                    const id = queue.shift();
+                    ordered.push(id);
+                    outgoing.get(id).forEach(function (targetId) {
+                        rank.set(targetId, Math.max(rank.get(targetId), rank.get(id) + 1));
+                        indegree.set(targetId, indegree.get(targetId) - 1);
+                        if (indegree.get(targetId) === 0) queue.push(targetId);
+                    });
+                }
+
+                if (ordered.length !== nodeIds.length) {
+                    throw new Error('能力关系存在循环，无法生成有向图。');
+                }
+
+                const maxRank = Math.max.apply(null, Array.from(rank.values()));
+                const layers = Array.from({ length: maxRank + 1 }, function () { return []; });
+                ordered.forEach(function (id) {
+                    layers[rank.get(id)].push(id);
+                });
+
+                function normalizedPosition(id) {
+                    const layer = layers[rank.get(id)];
+                    if (layer.length <= 1) return 0.5;
+                    return layer.indexOf(id) / (layer.length - 1);
+                }
+
+                function sortLayerByNeighbours(layerIndex, neighbourMap) {
+                    const layer = layers[layerIndex];
+                    const previousOrder = new Map(layer.map(function (id, index) {
+                        return [id, index];
+                    }));
+                    layer.sort(function (firstId, secondId) {
+                        function score(id) {
+                            const neighbours = neighbourMap.get(id);
+                            if (!neighbours.length) return 0.5;
+                            return neighbours.reduce(function (sum, neighbourId) {
+                                return sum + normalizedPosition(neighbourId);
+                            }, 0) / neighbours.length;
+                        }
+                        const difference = score(firstId) - score(secondId);
+                        return Math.abs(difference) > 0.0001
+                            ? difference
+                            : previousOrder.get(firstId) - previousOrder.get(secondId);
+                    });
+                }
+
+                for (let pass = 0; pass < 4; pass += 1) {
+                    for (let layerIndex = 1; layerIndex < layers.length; layerIndex += 1) {
+                        sortLayerByNeighbours(layerIndex, incoming);
+                    }
+                    for (let layerIndex = layers.length - 2; layerIndex >= 0; layerIndex -= 1) {
+                        sortLayerByNeighbours(layerIndex, outgoing);
+                    }
+                }
+
+                return {
+                    incoming: incoming,
+                    outgoing: outgoing,
+                    rank: rank,
+                    layers: layers
+                };
+            }
+
+            function collectTopologyFocusV9(selectedAbilityId) {
+                const focusedNodeIds = new Set();
+                const focusedEdgeIds = new Set();
+                const upstreamNodeIds = new Set();
+                const downstreamNodeIds = new Set();
+
+                if (!selectedAbilityId || !abilityByIdV9(selectedAbilityId)) {
+                    return {
+                        selectedId: null,
+                        focusedNodeIds: focusedNodeIds,
+                        focusedEdgeIds: focusedEdgeIds,
+                        upstreamNodeIds: upstreamNodeIds,
+                        downstreamNodeIds: downstreamNodeIds
+                    };
+                }
+
+                focusedNodeIds.add(selectedAbilityId);
+
+                function traverse(direction, relationNodeIds) {
+                    const visited = new Set([selectedAbilityId]);
+                    const stack = [selectedAbilityId];
+                    while (stack.length) {
+                        const currentId = stack.pop();
+                        graphEdgesV9.forEach(function (edge) {
+                            const matches = direction === 'incoming'
+                                ? edge.target === currentId
+                                : edge.source === currentId;
+                            if (!matches) return;
+                            const nextId = direction === 'incoming' ? edge.source : edge.target;
+                            focusedEdgeIds.add(edge.id);
+                            focusedNodeIds.add(nextId);
+                            relationNodeIds.add(nextId);
+                            if (!visited.has(nextId)) {
+                                visited.add(nextId);
+                                stack.push(nextId);
+                            }
+                        });
+                    }
+                }
+
+                traverse('incoming', upstreamNodeIds);
+                traverse('outgoing', downstreamNodeIds);
+                return {
+                    selectedId: selectedAbilityId,
+                    focusedNodeIds: focusedNodeIds,
+                    focusedEdgeIds: focusedEdgeIds,
+                    upstreamNodeIds: upstreamNodeIds,
+                    downstreamNodeIds: downstreamNodeIds
+                };
+            }
+
+            function centeredFocusedSlotsV9(layer, focus) {
+                if (!focus.selectedId) return layer.slice();
+                const focusedIds = layer.filter(function (id) {
+                    return focus.focusedNodeIds.has(id);
+                });
+                if (!focusedIds.length || focusedIds.length === layer.length) return layer.slice();
+
+                const slotIndexes = layer.map(function (_, index) { return index; });
+                const center = (layer.length - 1) / 2;
+                const focusedSlots = slotIndexes
+                    .slice()
+                    .sort(function (first, second) {
+                        const distanceDifference = Math.abs(first - center) - Math.abs(second - center);
+                        return distanceDifference || first - second;
+                    })
+                    .slice(0, focusedIds.length)
+                    .sort(function (first, second) { return first - second; });
+                const remainingSlots = slotIndexes.filter(function (index) {
+                    return focusedSlots.indexOf(index) === -1;
+                });
+                const unrelatedIds = layer.filter(function (id) {
+                    return !focus.focusedNodeIds.has(id);
+                });
+                const orderedBySlot = new Array(layer.length);
+                focusedIds.forEach(function (id, index) {
+                    orderedBySlot[focusedSlots[index]] = id;
+                });
+                unrelatedIds.forEach(function (id, index) {
+                    orderedBySlot[remainingSlots[index]] = id;
+                });
+                return orderedBySlot;
+            }
+
+            function computeTopologyLayoutV9(selectedAbilityId) {
+                if (!topologyStructureV9) topologyStructureV9 = buildTopologyStructureV9();
+                const focus = collectTopologyFocusV9(selectedAbilityId);
+                const nodeWidth = 184;
+                const nodeHeight = 76;
+                const gapX = 94;
+                const gapY = 34;
+                const paddingX = 58;
+                const graphHeight = 500;
+                const graphWidth = paddingX * 2
+                    + topologyStructureV9.layers.length * nodeWidth
+                    + Math.max(0, topologyStructureV9.layers.length - 1) * gapX;
+                const positions = new Map();
+                const visualLayers = [];
+
+                topologyStructureV9.layers.forEach(function (baseLayer, layerIndex) {
+                    const visualLayer = centeredFocusedSlotsV9(baseLayer, focus);
+                    visualLayers.push(visualLayer);
+                    const layerHeight = visualLayer.length * nodeHeight + Math.max(0, visualLayer.length - 1) * gapY;
+                    const layerTop = (graphHeight - layerHeight) / 2;
+                    visualLayer.forEach(function (id, itemIndex) {
+                        positions.set(id, {
+                            x: paddingX + layerIndex * (nodeWidth + gapX),
+                            y: layerTop + itemIndex * (nodeHeight + gapY),
+                            width: nodeWidth,
+                            height: nodeHeight
+                        });
+                    });
+                });
+
+                return {
+                    width: graphWidth,
+                    height: graphHeight,
+                    positions: positions,
+                    rank: topologyStructureV9.rank,
+                    layers: visualLayers,
+                    focus: focus
+                };
+            }
+
+            function hexToRgbV9(color) {
+                const normalized = String(color).replace('#', '');
+                return {
+                    r: parseInt(normalized.slice(0, 2), 16),
+                    g: parseInt(normalized.slice(2, 4), 16),
+                    b: parseInt(normalized.slice(4, 6), 16)
+                };
+            }
+
+            function mixColorV9(firstColor, secondColor, amount) {
+                const first = hexToRgbV9(firstColor);
+                const second = hexToRgbV9(secondColor);
+                const progress = Math.max(0, Math.min(1, amount));
+                const channel = function (firstValue, secondValue) {
+                    return Math.round(firstValue + (secondValue - firstValue) * progress)
+                        .toString(16)
+                        .padStart(2, '0');
+                };
+                return '#' + channel(first.r, second.r) + channel(first.g, second.g) + channel(first.b, second.b);
+            }
+
+            function lerpV9(first, second, amount) {
+                return first + (second - first) * amount;
+            }
+
+            function interpolateLayoutV9(fromLayout, toLayout, amount) {
+                const positions = new Map();
+                abilitiesV9.forEach(function (ability) {
+                    const from = fromLayout.positions.get(ability.id);
+                    const to = toLayout.positions.get(ability.id);
+                    positions.set(ability.id, {
+                        x: lerpV9(from.x, to.x, amount),
+                        y: lerpV9(from.y, to.y, amount),
+                        width: to.width,
+                        height: to.height
+                    });
+                });
+                return {
+                    width: toLayout.width,
+                    height: toLayout.height,
+                    positions: positions,
+                    rank: toLayout.rank,
+                    layers: toLayout.layers,
+                    focus: toLayout.focus
+                };
+            }
+
+            function interpolatePortsV9(fromPorts, toPorts, amount) {
+                const ports = new Map();
+                graphEdgesV9.forEach(function (edge) {
+                    const from = fromPorts.get(edge.id);
+                    const to = toPorts.get(edge.id);
+                    ports.set(edge.id, {
+                        start: {
+                            x: lerpV9(from.start.x, to.start.x, amount),
+                            y: lerpV9(from.start.y, to.start.y, amount)
+                        },
+                        end: {
+                            x: lerpV9(from.end.x, to.end.x, amount),
+                            y: lerpV9(from.end.y, to.end.y, amount)
+                        }
+                    });
+                });
+                return ports;
+            }
+
+            function nodeMutedV9(focus, id) {
+                return focus.selectedId && !focus.focusedNodeIds.has(id) ? 1 : 0;
+            }
+
+            function edgeVisualV9(focus, edgeId) {
+                if (!focus.selectedId) {
+                    return {
+                        color: '#B8C5D8',
+                        opacity: 0.72,
+                        width: 1.7
+                    };
+                }
+                if (focus.focusedEdgeIds.has(edgeId)) {
+                    return {
+                        color: '#1F5FFF',
+                        opacity: 0.96,
+                        width: 2.8
+                    };
+                }
+                return {
+                    color: '#CBD5E1',
+                    opacity: 0.2,
+                    width: 1.45
+                };
+            }
+
+            function blendedEdgeVisualV9(fromFocus, toFocus, edgeId, amount) {
+                const from = edgeVisualV9(fromFocus, edgeId);
+                const to = edgeVisualV9(toFocus, edgeId);
+                return {
+                    color: mixColorV9(from.color, to.color, amount),
+                    opacity: lerpV9(from.opacity, to.opacity, amount),
+                    width: lerpV9(from.width, to.width, amount)
+                };
+            }
+
+            function renderTopologyFrameV9(layout, selectedId, fromFocus, toFocus, amount, ports) {
+                topologyViewportV9.replaceChildren();
+                const svgHasViewBox = topologySvgV9.hasAttribute('viewBox');
+                if (!topologyPanZoomV9 || !svgHasViewBox) {
+                    topologySvgV9.setAttribute('viewBox', '0 0 ' + layout.width + ' ' + layout.height);
+                    topologySvgV9.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+                }
+                topologySvgV9.setAttribute(
+                    'aria-label',
+                    selectedId
+                        ? abilityByIdV9(selectedId).name + '的相关前置与后续依赖，其他能力保留并降低视觉权重'
+                        : '英语全部能力关系，从左到右表示前置到后续，点击能力后查看相关依赖'
+                );
+
+                const defs = svgElementV9('defs');
+                const edgeItems = graphEdgesV9.map(function (edge) {
+                    const visual = blendedEdgeVisualV9(fromFocus, toFocus, edge.id, amount);
+                    appendMarkerV9(defs, 'topology-arrow-v9-' + edge.id, visual.color, '7');
+                    return { edge: edge, visual: visual };
+                }).sort(function (first, second) {
+                    return first.visual.opacity - second.visual.opacity;
+                });
+                topologyViewportV9.appendChild(defs);
+
+                const underlays = svgElementV9('g', { 'aria-hidden': 'true' });
+                const edgeGroup = svgElementV9('g', { 'aria-hidden': 'true' });
+                edgeItems.forEach(function (item) {
+                    const edge = item.edge;
+                    const visual = item.visual;
+                    const pathData = topologyEdgePathV9(edge, ports.get(edge.id), layout);
+                    underlays.appendChild(svgElementV9('path', {
+                        class: 'graph-edge-underlay',
+                        d: pathData,
+                        stroke: '#FFFFFF',
+                        'stroke-width': visual.width + 5.4,
+                        opacity: Math.min(0.92, visual.opacity + 0.18)
+                    }));
+                    edgeGroup.appendChild(svgElementV9('path', {
+                        class: 'graph-edge',
+                        d: pathData,
+                        stroke: visual.color,
+                        'stroke-width': visual.width,
+                        opacity: visual.opacity,
+                        'marker-end': 'url(#topology-arrow-v9-' + edge.id + ')',
+                        'data-source-level-node-id': edge.sourceLevelNodeId,
+                        'data-target-level-node-id': edge.targetLevelNodeId
+                    }));
+                });
+                topologyViewportV9.appendChild(underlays);
+                topologyViewportV9.appendChild(edgeGroup);
+
+                const nodeGroup = svgElementV9('g');
+                abilitiesV9.forEach(function (ability) {
+                    const position = layout.positions.get(ability.id);
+                    const levelNode = currentLevelNodeV9(ability);
+                    const businessVisual = businessStateVisualV9(ability);
+                    const isSelected = ability.id === selectedId;
+                    let mutedAmount = lerpV9(
+                        nodeMutedV9(fromFocus, ability.id),
+                        nodeMutedV9(toFocus, ability.id),
+                        amount
+                    );
+                    if (isSelected) mutedAmount = 0;
+                    const nodeOpacity = lerpV9(1, 0.72, mutedAmount);
+                    const relationLabel = toFocus.upstreamNodeIds.has(ability.id)
+                        ? '，相关前置能力'
+                        : (toFocus.downstreamNodeIds.has(ability.id) ? '，相关后续能力' : '');
+                    const group = svgElementV9('g', {
+                        class: 'graph-node topology-node-group is-' + businessVisual.key,
+                        transform: 'translate(' + roundedV9(position.x) + ' ' + roundedV9(position.y) + ')',
+                        opacity: nodeOpacity,
+                        'data-topology-node-id': ability.id,
+                        'data-level-node-id': levelNode.id,
+                        role: 'button',
+                        tabindex: '0',
+                        'aria-pressed': String(isSelected),
+                        'aria-label': ability.name + '，具体能力级别 ' + formatLevelV9(levelNode.level) + '，' + levelNode.definition + '，掌握 ' + levelNode.masteryStars + ' 星，' + businessVisual.ariaLabel + (isSelected ? '，当前查看' : relationLabel) + (mutedAmount > 0.5 ? '，非当前关系链能力' : '')
+                    });
+                    group.appendChild(svgElementV9('title', {}, ability.name + ' · ' + levelNodeSummaryV9(ability, true) + ' · ' + businessVisual.ariaLabel));
+
+                    const visual = svgElementV9('g', { class: 'graph-node-visual' });
+                    visual.appendChild(svgElementV9('rect', {
+                        class: 'topology-selection-ring graph-focus-ring',
+                        x: '-4',
+                        y: '-4',
+                        width: position.width + 8,
+                        height: position.height + 8,
+                        rx: '20',
+                        fill: 'none',
+                        stroke: '#1F5FFF',
+                        'stroke-width': '2.2',
+                        opacity: isSelected ? '1' : '0'
+                    }));
+                    visual.appendChild(svgElementV9('rect', {
+                        x: '0',
+                        y: '0',
+                        width: position.width,
+                        height: position.height,
+                        rx: '16',
+                        fill: businessVisual.fill,
+                        stroke: businessVisual.stroke,
+                        'stroke-width': '1.25'
+                    }));
+                    visual.appendChild(svgElementV9('rect', {
+                        x: '0',
+                        y: '14',
+                        width: '4',
+                        height: position.height - 28,
+                        rx: '2',
+                        fill: businessVisual.accent,
+                        opacity: '0.9'
+                    }));
+                    visual.appendChild(svgElementV9('text', {
+                        x: position.width / 2,
+                        y: '25',
+                        fill: businessVisual.title,
+                        'font-family': 'inherit',
+                        'font-size': '14',
+                        'font-weight': '800',
+                        'text-anchor': 'middle'
+                    }, ability.name));
+                    visual.appendChild(svgElementV9('text', {
+                        x: position.width / 2,
+                        y: '48',
+                        fill: businessVisual.meta,
+                        'font-family': 'inherit',
+                        'font-size': '10',
+                        'font-weight': '750',
+                        'text-anchor': 'middle'
+                    }, formatLevelV9(levelNode.level) + ' · ' + levelNode.definition));
+                    visual.appendChild(svgElementV9('text', {
+                        x: position.width / 2,
+                        y: '65',
+                        fill: businessVisual.meta,
+                        'font-family': 'inherit',
+                        'font-size': '9.5',
+                        'font-weight': '750',
+                        'text-anchor': 'middle',
+                        opacity: '0.9'
+                    }, '掌握 ' + levelNode.masteryStars + '/5 星'));
+                    group.appendChild(visual);
+                    nodeGroup.appendChild(group);
+                });
+                topologyViewportV9.appendChild(nodeGroup);
+            }
+
+            function fitTopologyCanvasV9() {
+                if (!topologyPanZoomV9) return;
+                topologyPanZoomV9.resize();
+                topologyPanZoomV9.fit();
+                topologyPanZoomV9.center();
+            }
+
+            function initialiseTopologyPanZoomV9() {
+                destroyPanZoomV9(topologyPanZoomV9, topologyViewportV9);
+                topologyPanZoomV9 = null;
+                if (typeof window.svgPanZoom !== 'function') {
+                    console.error('完整关系图缩放库未加载。');
+                    return;
+                }
+                try {
+                    topologyPanZoomV9 = window.svgPanZoom(topologySvgV9, {
+                        viewportSelector: '#topology-viewport',
+                        controlIconsEnabled: false,
+                        zoomEnabled: true,
+                        panEnabled: true,
+                        mouseWheelZoomEnabled: true,
+                        dblClickZoomEnabled: false,
+                        preventMouseEventsDefault: true,
+                        minZoom: 0.45,
+                        maxZoom: 3.2,
+                        zoomScaleSensitivity: 0.2,
+                        fit: true,
+                        center: true
+                    });
+                    fitTopologyCanvasV9();
+                } catch (error) {
+                    console.error('完整关系图视口初始化失败：', error);
+                    topologyPanZoomV9 = null;
+                }
+            }
+
+            function renderTopologyInitialV9() {
+                stateV9.topologyTransitionToken += 1;
+                destroyPanZoomV9(topologyPanZoomV9, topologyViewportV9);
+                topologyPanZoomV9 = null;
+                const layout = computeTopologyLayoutV9(stateV9.topologySelectedAbilityId);
+                const focus = layout.focus;
+                const ports = allocateEdgePortsV9(graphEdgesV9, layout.positions);
+                stateV9.topologyLayout = layout;
+                stateV9.topologyFocus = focus;
+                renderTopologyFrameV9(layout, stateV9.topologySelectedAbilityId, focus, focus, 1, ports);
+                window.requestAnimationFrame(initialiseTopologyPanZoomV9);
+            }
+
+            function animateTopologySelectionV9(nextId, fitAfter) {
+                if (nextId && !abilityByIdV9(nextId)) return;
+                if (nextId === stateV9.topologySelectedAbilityId && stateV9.topologyLayout) {
+                    if (fitAfter) fitTopologyCanvasV9();
+                    return;
+                }
+
+                stateV9.topologyTransitionToken += 1;
+                const transitionToken = stateV9.topologyTransitionToken;
+                const fromLayout = stateV9.topologyLayout || computeTopologyLayoutV9(stateV9.topologySelectedAbilityId);
+                const fromFocus = stateV9.topologyFocus || fromLayout.focus;
+                const toLayout = computeTopologyLayoutV9(nextId);
+                const toFocus = toLayout.focus;
+                const fromPorts = allocateEdgePortsV9(graphEdgesV9, fromLayout.positions);
+                const toPorts = allocateEdgePortsV9(graphEdgesV9, toLayout.positions);
+                stateV9.topologySelectedAbilityId = nextId;
+
+                renderTopologyFrameV9(fromLayout, nextId, fromFocus, fromFocus, 0, fromPorts);
+
+                const delay = reducedMotionV9 ? 0 : 34;
+                const duration = reducedMotionV9 ? 0 : 220;
+                const startAt = performance.now() + delay;
+
+                function finish() {
+                    stateV9.topologyLayout = toLayout;
+                    stateV9.topologyFocus = toFocus;
+                    renderTopologyFrameV9(toLayout, nextId, toFocus, toFocus, 1, toPorts);
+                    if (fitAfter) window.requestAnimationFrame(fitTopologyCanvasV9);
+                }
+
+                if (!duration) {
+                    finish();
+                    return;
+                }
+
+                function step(now) {
+                    if (transitionToken !== stateV9.topologyTransitionToken) return;
+                    if (now < startAt) {
+                        window.requestAnimationFrame(step);
+                        return;
+                    }
+                    const linear = Math.min(1, (now - startAt) / duration);
+                    const eased = 1 - Math.pow(1 - linear, 3);
+                    const layout = interpolateLayoutV9(fromLayout, toLayout, eased);
+                    const ports = interpolatePortsV9(fromPorts, toPorts, eased);
+                    renderTopologyFrameV9(layout, nextId, fromFocus, toFocus, eased, ports);
+                    if (linear < 1) {
+                        window.requestAnimationFrame(step);
+                    } else {
+                        finish();
+                    }
+                }
+                window.requestAnimationFrame(step);
+            }
+
+            function renderDetailV9(skipLocalGraph) {
+                const ability = abilityByIdV9(stateV9.selectedAbilityId);
+                if (!ability) return;
+                const currentLevelNode = currentLevelNodeV9(ability);
+                const targetLevelNode = targetLevelNodeV9(ability);
+                const currentLevel = formatLevelV9(currentLevelNode.level);
+                const targetLevel = formatLevelV9(targetLevelNode.level);
+                const currentDescription = levelDescriptionV9(ability, 'current');
+                const targetDescription = levelDescriptionV9(ability, 'target');
+
+                document.getElementById('detail-header-title').textContent = ability.name;
+                document.getElementById('detail-summary').innerHTML =
+                    '<div class="ability-level-flow">' +
+                        '<section class="min-h-[132px] rounded-[16px] border border-slate-200 bg-white p-4" aria-label="当前具体能力级别">' +
+                            '<div class="flex items-center justify-between gap-3">' +
+                                '<p class="text-[10px] font-extrabold tracking-[0.1em] text-slate-500">当前级别</p>' +
+                                statusBadgeMarkupV9(ability) +
+                            '</div>' +
+                            '<div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">' +
+                                '<strong class="text-[28px] font-extrabold leading-none text-slate-950">' + currentLevel + '</strong>' +
+                                '<span class="rounded-[8px] border border-amber-100 bg-amber-50/70 px-2 py-1" aria-label="当前级别内星级">' + starsMarkupV9(currentLevelNode.masteryStars, false) + '</span>' +
+                            '</div>' +
+                            '<div class="mt-3 border-t border-slate-100 pt-2.5">' +
+                                '<p class="text-[9px] font-extrabold tracking-[0.08em] text-slate-400">级别定义 · ' + escapeHtmlV9(currentLevelNode.definition) + '</p>' +
+                                '<p class="mt-1 text-[12px] font-semibold leading-[1.45] text-slate-700">' + escapeHtmlV9(currentDescription) + '</p>' +
+                            '</div>' +
+                        '</section>' +
+                        '<span class="ability-flow-arrow flex min-h-[44px] items-center justify-center text-slate-300" aria-hidden="true">' +
+                            '<span class="flex h-8 w-8 items-center justify-center rounded-full border border-slate-100 bg-white shadow-soft"><i class="ph-bold ph-arrow-right text-[15px]"></i></span>' +
+                        '</span>' +
+                        '<section class="min-h-[132px] rounded-[16px] border border-slate-100 bg-slate-50/70 p-4" aria-label="目标级别与目标要求">' +
+                            '<p class="text-[10px] font-extrabold tracking-[0.1em] text-slate-500">目标级别</p>' +
+                            '<strong class="mt-2 block text-[28px] font-extrabold leading-none text-slate-700">' + targetLevel + '</strong>' +
+                            '<div class="mt-3 border-t border-slate-200 pt-2.5">' +
+                                '<p class="text-[9px] font-extrabold tracking-[0.08em] text-slate-400">级别定义 · ' + escapeHtmlV9(targetLevelNode.definition) + '</p>' +
+                                '<p class="mt-1 text-[12px] font-semibold leading-[1.45] text-slate-700">' + escapeHtmlV9(targetDescription) + '</p>' +
+                            '</div>' +
+                        '</section>' +
+                    '</div>';
+
+                document.getElementById('learning-grid').innerHTML = learningTypesV9.map(function (type) {
+                    const disabled = !currentLevelNode.canStudy;
+                    const disabledAttribute = disabled ? ' disabled aria-disabled="true"' : '';
+                    const iconClass = disabled ? 'bg-slate-100' : type.iconClass;
+                    const labelClass = disabled ? 'text-slate-400' : 'text-slate-900';
+                    return (
+                        '<button type="button" data-learning-type="' + escapeHtmlV9(type.name) + '" class="learning-card group flex min-h-[70px] w-full items-center gap-3 rounded-[14px] p-3 text-left active:scale-[0.97]" aria-label="' + (disabled ? escapeHtmlV9(ability.name) + '当前待解锁，暂不可进入' : '进入' + escapeHtmlV9(ability.name) + '的') + escapeHtmlV9(type.name) + '"' + disabledAttribute + '>' +
+                            '<span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] ' + iconClass + '"><img src="' + type.icon + '" alt="" class="h-6 w-6" aria-hidden="true"></span>' +
+                            '<span class="min-w-0 flex-1 truncate text-[13px] font-extrabold ' + labelClass + '">' + escapeHtmlV9(type.name) + '</span>' +
+                            (disabled
+                                ? '<span class="shrink-0 text-[10px] font-extrabold text-slate-400">暂不可用</span><i class="ph-bold ph-lock-key shrink-0 text-[15px] text-slate-300" aria-hidden="true"></i>'
+                                : '<i class="ph-bold ph-caret-right shrink-0 text-[16px] text-slate-300 transition-transform group-active:translate-x-0.5" aria-hidden="true"></i>') +
+                        '</button>'
+                    );
+                }).join('');
+
+                if (!skipLocalGraph) renderLocalGraphV9(ability);
+            }
+
+            function switchLocalAbilityV9(abilityId, sourceElement) {
+                const ability = abilityByIdV9(abilityId);
+                if (!ability || ability.id === stateV9.selectedAbilityId || localSwitchPendingV9) return;
+                localSwitchPendingV9 = true;
+                localViewportV9.style.pointerEvents = 'none';
+
+                const entry = localSceneV9 ? localSceneV9.nodes.get(ability.id) : null;
+                if (entry && !reducedMotionV9) {
+                    entry.ring.setAttribute('opacity', '1');
+                    if (typeof entry.visual.animate === 'function') {
+                        entry.visual.animate(
+                            [
+                                { transform: 'scale(1)', filter: 'drop-shadow(0 0 0 rgba(31,95,255,0))' },
+                                { transform: 'scale(0.97)', filter: 'drop-shadow(0 5px 8px rgba(31,95,255,0.2))' },
+                                { transform: 'scale(1)', filter: 'drop-shadow(0 0 0 rgba(31,95,255,0))' }
+                            ],
+                            { duration: 170, easing: 'ease-out' }
+                        );
+                    }
+                }
+
+                const beginTransition = function () {
+                    localSwitchPendingV9 = false;
+                    stateV9.selectedAbilityId = ability.id;
+                    renderDetailV9(true);
+                    animateLocalGraphV9(ability);
+                    if (sourceElement && typeof sourceElement.blur === 'function') sourceElement.blur();
+                };
+                if (reducedMotionV9) {
+                    beginTransition();
+                } else {
+                    window.setTimeout(beginTransition, 55);
+                }
+            }
+
+            function showPageV9(name) {
+                Object.keys(pagesV9).forEach(function (pageName) {
+                    pagesV9[pageName].classList.toggle('is-active', pageName === name);
+                });
+                stateV9.view = name;
+            }
+
+            function openDetailV9(abilityId) {
+                if (!abilityByIdV9(abilityId)) return;
+                stateV9.selectedAbilityId = abilityId;
+                showPageV9('detail');
+                renderDetailV9(false);
+            }
+
+            function openTopologyV9() {
+                const sourceView = stateV9.view;
+                stateV9.previousView = sourceView === 'topology' ? 'overview' : sourceView;
+                stateV9.topologySelectedAbilityId = sourceView === 'detail' ? stateV9.selectedAbilityId : null;
+                stateV9.topologyLayout = null;
+                stateV9.topologyFocus = null;
+                showPageV9('topology');
+                window.requestAnimationFrame(renderTopologyInitialV9);
+            }
+
+            abilityGridV9.addEventListener('click', function (event) {
+                const target = event.target instanceof Element ? event.target.closest('[data-ability-id]') : null;
+                if (target) openDetailV9(target.dataset.abilityId);
+            });
+
+            localSvgV9.addEventListener('click', function (event) {
+                const target = event.target instanceof Element ? event.target.closest('[data-route-ability]') : null;
+                if (!target || !abilityByIdV9(target.dataset.routeAbility)) return;
+                switchLocalAbilityV9(target.dataset.routeAbility, target);
+            });
+
+            topologySvgV9.addEventListener('click', function (event) {
+                const target = event.target instanceof Element ? event.target.closest('[data-topology-node-id]') : null;
+                if (!target || !abilityByIdV9(target.dataset.topologyNodeId)) return;
+                animateTopologySelectionV9(target.dataset.topologyNodeId, false);
+            });
+
+            function handleGraphKeyboardV9(event, selector, handler) {
+                if (event.key !== 'Enter' && event.key !== ' ') return;
+                const target = event.target instanceof Element ? event.target.closest(selector) : null;
+                if (!target) return;
+                event.preventDefault();
+                handler(target);
+            }
+
+            localSvgV9.addEventListener('keydown', function (event) {
+                handleGraphKeyboardV9(event, '[data-route-ability]', function (target) {
+                    switchLocalAbilityV9(target.dataset.routeAbility, target);
+                });
+            });
+
+            topologySvgV9.addEventListener('keydown', function (event) {
+                handleGraphKeyboardV9(event, '[data-topology-node-id]', function (target) {
+                    animateTopologySelectionV9(target.dataset.topologyNodeId, false);
+                });
+            });
+
+            document.getElementById('overview-back-button').addEventListener('click', function () {
+                window.history.back();
+            });
+            document.getElementById('overview-topology-button').addEventListener('click', openTopologyV9);
+            document.getElementById('detail-back-button').addEventListener('click', function () {
+                showPageV9('overview');
+            });
+            document.getElementById('detail-breadcrumb-overview').addEventListener('click', function () {
+                showPageV9('overview');
+            });
+            document.getElementById('detail-topology-button').addEventListener('click', openTopologyV9);
+            document.getElementById('topology-back-button').addEventListener('click', function () {
+                stateV9.topologyTransitionToken += 1;
+                showPageV9(stateV9.previousView);
+                if (stateV9.previousView === 'detail') {
+                    window.requestAnimationFrame(function () {
+                        renderDetailV9(false);
+                    });
+                }
+            });
+            document.getElementById('topology-breadcrumb-overview').addEventListener('click', function () {
+                stateV9.topologyTransitionToken += 1;
+                showPageV9('overview');
+            });
+
+            document.getElementById('local-zoom-out').addEventListener('click', function () {
+                if (localPanZoomV9) localPanZoomV9.zoomOut();
+            });
+            document.getElementById('local-zoom-in').addEventListener('click', function () {
+                if (localPanZoomV9) localPanZoomV9.zoomIn();
+            });
+            document.getElementById('local-fit').addEventListener('click', function () {
+                if (!localPanZoomV9) return;
+                localPanZoomV9.resize();
+                localPanZoomV9.fit();
+                localPanZoomV9.center();
+            });
+
+            document.getElementById('topology-zoom-out').addEventListener('click', function () {
+                if (topologyPanZoomV9) topologyPanZoomV9.zoomOut();
+            });
+            document.getElementById('topology-zoom-in').addEventListener('click', function () {
+                if (topologyPanZoomV9) topologyPanZoomV9.zoomIn();
+            });
+            document.getElementById('topology-fit').addEventListener('click', fitTopologyCanvasV9);
+            document.getElementById('topology-reset-view').addEventListener('click', function () {
+                if (!stateV9.topologySelectedAbilityId) {
+                    fitTopologyCanvasV9();
+                    return;
+                }
+                animateTopologySelectionV9(null, true);
+            });
+
+            if (typeof ResizeObserver !== 'undefined') {
+                let resizeTimer = null;
+                const layoutResizeObserver = new ResizeObserver(function () {
+                    window.clearTimeout(resizeTimer);
+                    resizeTimer = window.setTimeout(function () {
+                        if (stateV9.view === 'detail') {
+                            if (localSceneV9 && localSceneV9.animating) {
+                                localResizePendingV9 = true;
+                            } else {
+                                renderLocalGraphV9(abilityByIdV9(stateV9.selectedAbilityId));
+                            }
+                        }
+                        if (stateV9.view === 'topology') {
+                            if (topologyPanZoomV9) topologyPanZoomV9.resize();
+                            if (stateV9.topologyLayout && stateV9.topologyFocus) {
+                                const ports = allocateEdgePortsV9(graphEdgesV9, stateV9.topologyLayout.positions);
+                                renderTopologyFrameV9(
+                                    stateV9.topologyLayout,
+                                    stateV9.topologySelectedAbilityId,
+                                    stateV9.topologyFocus,
+                                    stateV9.topologyFocus,
+                                    1,
+                                    ports
+                                );
+                            }
+                        }
+                    }, 90);
+                });
+                layoutResizeObserver.observe(document.getElementById('detail-page'));
+                layoutResizeObserver.observe(topologySurfaceV9);
+            }
+
+            validateDataContractV9();
+            renderOverviewV9();
+            renderDetailV9(false);
+        }());
+    </script>
+</body>
+</html>
