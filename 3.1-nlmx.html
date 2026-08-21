@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<!-- 版本 11.9：完成星级与教师确认提醒。继承 11.8 的关系色彩语义；已完成节点展示差异化 3/4/5 星，并在详情页提供一键提醒老师评星与确认下一节点。 -->
+<!-- 版本 12.0：详情节点历史返回。继承 11.9 的完成星级与教师确认提醒；详情内所有节点切换按访问顺序记录，左上角返回键优先返回上一节点，历史耗尽后再返回能力总览。 -->
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#EFF6FF">
-    <title>抖学 AI 能力模型 11.9 · 完成星级与教师确认提醒</title>
+    <title>抖学 AI 能力模型 12.0 · 详情节点历史返回</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -1596,6 +1596,7 @@
                 previousView: 'overview',
                 selectedAbilityId: 'vocabulary',
                 selectedLevelNodeId: 'vocabulary-l3',
+                detailNodeHistory: [],
                 topologySelectedNodeId: null,
                 topologyHintShown: false
             };
@@ -1907,6 +1908,40 @@
                 return levelNodeByIdV10(stateV10.selectedLevelNodeId);
             }
 
+            function updateDetailBackButtonV10() {
+                const button = document.getElementById('detail-back-button');
+                if (!button) return;
+                const previousNodeId = stateV10.detailNodeHistory[stateV10.detailNodeHistory.length - 1];
+                const previousNode = levelNodeByIdV10(previousNodeId);
+                if (!previousNode) {
+                    button.setAttribute('aria-label', '返回英语能力');
+                    return;
+                }
+                const previousAbility = abilityForNodeV10(previousNode);
+                button.setAttribute('aria-label', '返回上一节点，' + previousAbility.name + ' ' + formatLevelV10(previousNode.level));
+            }
+
+            function clearDetailNodeHistoryV10() {
+                stateV10.detailNodeHistory.length = 0;
+                updateDetailBackButtonV10();
+            }
+
+            function recordCurrentDetailNodeV10() {
+                const currentNode = selectedNodeV10();
+                if (!currentNode) return;
+                const lastNodeId = stateV10.detailNodeHistory[stateV10.detailNodeHistory.length - 1];
+                if (lastNodeId !== currentNode.id) stateV10.detailNodeHistory.push(currentNode.id);
+                updateDetailBackButtonV10();
+            }
+
+            function takePreviousDetailNodeV10() {
+                while (stateV10.detailNodeHistory.length) {
+                    const previousNode = levelNodeByIdV10(stateV10.detailNodeHistory.pop());
+                    if (previousNode) return previousNode;
+                }
+                return null;
+            }
+
             function relationStateMarkupV10(node) {
                 let markup = '';
                 if (node.role === 'completed') {
@@ -2061,6 +2096,7 @@
                 renderDependenciesV10(node);
                 renderLearningV10(ability, node);
                 renderTeacherReviewV10(ability, node);
+                updateDetailBackButtonV10();
             }
 
             function revealSelectedDetailNodeV10(smooth) {
@@ -2175,12 +2211,14 @@
                     const detailScroller = document.querySelector('#detail-page .native-scroll');
                     if (detailScroller) detailScroller.scrollTop = 0;
                 }
+                updateDetailBackButtonV10();
             }
 
-            function animateDetailSelectionV10(ability, node, resetScroll) {
+            function animateDetailSelectionV10(ability, node, resetScroll, recordHistory) {
                 if (!ability || !node) return;
                 const abilityChanged = ability.id !== stateV10.selectedAbilityId;
                 if (!abilityChanged && node.id === stateV10.selectedLevelNodeId) return;
+                if (recordHistory !== false) recordCurrentDetailNodeV10();
                 const reducedMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
                 const direction = detailSwitchDirectionV10(ability, node);
                 resetDetailSwitchMotionV10();
@@ -2228,6 +2266,7 @@
 
             function showPageV10(name) {
                 if (name !== 'detail') resetDetailSwitchMotionV10();
+                if (name === 'overview') clearDetailNodeHistoryV10();
                 Object.keys(pagesV10).forEach(function (pageName) {
                     pagesV10[pageName].classList.toggle('is-active', pageName === name);
                 });
@@ -2247,9 +2286,10 @@
                 const node = requested && requested.abilityId === ability.id ? requested : levelNodeByIdV10(ability.currentLevelNodeId);
                 if (!node) return;
                 if (stateV10.view === 'detail') {
-                    animateDetailSelectionV10(ability, node, true);
+                    animateDetailSelectionV10(ability, node, true, true);
                     return;
                 }
+                clearDetailNodeHistoryV10();
                 stateV10.selectedAbilityId = ability.id;
                 stateV10.selectedLevelNodeId = node.id;
                 showPageV10('detail');
@@ -2263,7 +2303,18 @@
                 const node = levelNodeByIdV10(levelNodeId);
                 if (!node || node.abilityId !== stateV10.selectedAbilityId) return;
                 const ability = abilityByIdV10(node.abilityId);
-                animateDetailSelectionV10(ability, node, false);
+                animateDetailSelectionV10(ability, node, false, true);
+            }
+
+            function navigateBackFromDetailV10() {
+                const previousNode = takePreviousDetailNodeV10();
+                if (!previousNode) {
+                    showPageV10('overview');
+                    return;
+                }
+                const previousAbility = abilityForNodeV10(previousNode);
+                const abilityChanged = previousAbility.id !== stateV10.selectedAbilityId;
+                animateDetailSelectionV10(previousAbility, previousNode, abilityChanged, false);
             }
 
             function showToastV10(message) {
@@ -3159,9 +3210,7 @@
                 window.history.back();
             });
             document.getElementById('overview-topology-button').addEventListener('click', openTopologyV10);
-            document.getElementById('detail-back-button').addEventListener('click', function () {
-                showPageV10('overview');
-            });
+            document.getElementById('detail-back-button').addEventListener('click', navigateBackFromDetailV10);
             document.getElementById('detail-breadcrumb-overview').addEventListener('click', function () {
                 showPageV10('overview');
             });
