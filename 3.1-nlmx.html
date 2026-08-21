@@ -1,0 +1,3209 @@
+<!DOCTYPE html>
+<!-- 版本 11.9：完成星级与教师确认提醒。继承 11.8 的关系色彩语义；已完成节点展示差异化 3/4/5 星，并在详情页提供一键提醒老师评星与确认下一节点。 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#EFF6FF">
+    <title>抖学 AI 能力模型 11.9 · 完成星级与教师确认提醒</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#1F5FFF',
+                        ink: '#172033'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    },
+                    boxShadow: {
+                        soft: '0 4px 20px -4px rgba(0,0,0,0.03), 0 2px 8px -2px rgba(0,0,0,0.02)'
+                    }
+                }
+            }
+        };
+    </script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.2/dist/svg-pan-zoom.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <style>
+        :root {
+            --brand: #1F5FFF;
+            --ink: #172033;
+            --soft-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.03), 0 2px 8px -2px rgba(0, 0, 0, 0.02);
+            --type-page-title: 32px;
+            --type-section-title: 20px;
+            --type-card-title: 17px;
+            --type-body: 14px;
+            --type-meta: 12px;
+            --type-label: 11px;
+        }
+
+        * {
+            box-sizing: border-box;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        body {
+            background: linear-gradient(135deg, #EFF6FF 0%, #DFE7FF 100%);
+        }
+
+        button {
+            -webkit-appearance: none;
+        }
+
+        button:focus-visible,
+        [role="button"]:focus-visible {
+            outline: 3px solid rgba(31, 95, 255, 0.25);
+            outline-offset: 2px;
+        }
+
+        .app-shell {
+            width: min(1300px, 100vw);
+            height: 100vh;
+            height: 100dvh;
+        }
+
+        .page-view {
+            display: none;
+        }
+
+        .page-view.is-active {
+            display: flex;
+            animation: page-enter 180ms ease-out;
+        }
+
+        .native-scroll {
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            touch-action: pan-y;
+        }
+
+        .horizontal-scroll {
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-x: contain;
+            touch-action: pan-x;
+            scrollbar-width: none;
+        }
+
+        .horizontal-scroll::-webkit-scrollbar,
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            scrollbar-width: none;
+        }
+
+        .ability-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .ability-row {
+            border: 1px solid #E4EAF2;
+            background: #FFFFFF;
+            box-shadow: 0 8px 24px -22px rgba(15, 23, 42, 0.32);
+            transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+        }
+
+        .ability-row-track {
+            min-width: max-content;
+        }
+
+        .ability-name-card {
+            display: flex;
+            width: 176px;
+            height: 78px;
+            flex-direction: row;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 8px;
+            border: 1px solid #C9D8FF;
+            border-radius: 14px;
+            background: #F4F7FF;
+            padding: 0 15px;
+            color: #173E9C;
+            text-align: left;
+        }
+
+        .mainline-list {
+            min-width: max-content;
+        }
+
+        .overview-mainline .mainline-node {
+            width: 112px;
+            min-width: 112px;
+            height: 78px;
+            padding: 9px 10px;
+        }
+
+        .overview-mainline .mainline-connector {
+            width: 24px;
+            height: 78px;
+            flex-basis: 24px;
+        }
+
+        .overview-mainline .node-caption {
+            max-width: 90px;
+            margin-top: 3px;
+            font-size: 10px;
+        }
+
+        .node-current-badge {
+            position: absolute;
+            right: 7px;
+            top: 6px;
+            border: 1px solid #F4CF79;
+            border-radius: 6px;
+            background: #FFF4CF;
+            padding: 2px 5px;
+            color: #8A4B08;
+            font-size: 10px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .node-lock-badge {
+            position: absolute;
+            left: 8px;
+            top: 7px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748B;
+            font-size: 12px;
+            line-height: 1;
+        }
+
+        .mainline-node.role-current .node-lock-badge {
+            color: #9A5B13;
+        }
+
+        .mainline-node.role-target .node-lock-badge {
+            color: #1746B2;
+        }
+
+        .mainline-node {
+            position: relative;
+            display: flex;
+            min-width: 66px;
+            height: 68px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #DCE4EF;
+            border-radius: 12px;
+            background: #FFFFFF;
+            color: #475569;
+            transition: transform 150ms ease, border-color 150ms ease, background-color 150ms ease, box-shadow 150ms ease;
+        }
+
+        .mainline-node:active {
+            transform: scale(0.95);
+        }
+
+        .mainline-node.role-completed {
+            border-color: #BFE7CB;
+            background: #F3FCF6;
+            color: #166534;
+        }
+
+        .mainline-node.role-current {
+            border-color: #F0C36A;
+            background: #FFFBEB;
+            color: #92400E;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.07);
+        }
+
+        .mainline-node.role-current.state-locked {
+            border-color: #E5B453;
+            border-style: dashed;
+            background: #FFFBEB;
+            color: #92400E;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.05);
+        }
+
+        .mainline-node.role-upcoming {
+            border-color: #D2DAE6;
+            background: #FFFFFF;
+            color: #64748B;
+        }
+
+        .mainline-node.role-upcoming.state-locked {
+            border-style: dashed;
+        }
+
+        .mainline-node.role-target {
+            border-color: #6F98FF;
+            border-style: dashed;
+            background: #EDF3FF;
+            color: #1746B2;
+        }
+
+        .mainline-node::after {
+            position: absolute;
+            inset: -3px;
+            border: 1.5px solid rgba(31, 95, 255, 0.68);
+            border-radius: 14px;
+            content: "";
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.97);
+            transition: opacity 180ms linear, transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .mainline-node.is-selected::after {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .node-level {
+            font-size: 15px;
+            font-weight: 900;
+            letter-spacing: -0.03em;
+        }
+
+        .node-caption {
+            margin-top: 1px;
+            max-width: 60px;
+            overflow: hidden;
+            color: currentColor;
+            font-size: 9px;
+            font-weight: 800;
+            line-height: 1.15;
+            opacity: 0.78;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .mini-stars {
+            display: flex;
+            height: 11px;
+            align-items: center;
+            gap: 1px;
+            margin-top: 3px;
+        }
+
+        .mini-stars i {
+            color: #D7DFEA;
+            font-size: 9px;
+        }
+
+        .mini-stars i.is-filled {
+            color: #F59E0B;
+        }
+
+        .role-completed .mini-stars i.is-filled {
+            color: #35A760;
+        }
+
+        .mainline-connector {
+            position: relative;
+            display: flex;
+            width: 25px;
+            height: 68px;
+            flex: 0 0 25px;
+            align-items: center;
+            justify-content: center;
+            color: #CBD5E1;
+        }
+
+        .mainline-connector::before {
+            width: 100%;
+            height: 2px;
+            border-radius: 999px;
+            background: currentColor;
+            content: "";
+        }
+
+        .mainline-connector i {
+            position: absolute;
+            right: -3px;
+            padding: 1px 0;
+            background: #FFFFFF;
+            font-size: 11px;
+        }
+
+        .mainline-connector.is-passed {
+            color: #86C99D;
+        }
+
+        .mainline-connector.is-current {
+            color: #7DA1FF;
+        }
+
+        .mainline-connector.is-target {
+            color: #CBD5E1;
+        }
+
+        .detail-mainline .mainline-node {
+            min-width: 126px;
+            height: 88px;
+            border-radius: 14px;
+            padding: 9px 10px;
+        }
+
+        .detail-mainline .mainline-connector {
+            width: 42px;
+            height: 88px;
+            flex-basis: 42px;
+        }
+
+        .detail-mainline .node-level {
+            font-size: 18px;
+        }
+
+        .detail-mainline .node-caption {
+            max-width: 108px;
+            margin-top: 3px;
+            font-size: 10px;
+        }
+
+        .detail-mainline .mini-stars {
+            margin-top: 5px;
+        }
+
+        .detail-mainline .mini-stars i {
+            font-size: 11px;
+        }
+
+        .dependency-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 30px minmax(148px, 0.58fr) 30px minmax(0, 1fr);
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dependency-column {
+            min-height: 126px;
+            border: 1px solid #E1E9F5;
+            border-radius: 16px;
+            background: #FFFFFF;
+            padding: 13px;
+        }
+
+        .dependency-column.is-empty {
+            border-color: transparent;
+            background: transparent;
+            padding-inline: 7px;
+        }
+
+        .dependency-arrow {
+            position: relative;
+            display: flex;
+            min-height: 44px;
+            align-items: center;
+            justify-content: center;
+            color: #5274C9;
+        }
+
+        .dependency-arrow::before {
+            position: absolute;
+            right: 3px;
+            left: 3px;
+            height: 2px;
+            border-radius: 999px;
+            background: #B8C8EB;
+            content: "";
+        }
+
+        .dependency-arrow i {
+            position: relative;
+            right: -8px;
+            z-index: 1;
+            background: #FFFFFF;
+            padding-left: 2px;
+        }
+
+        .dependency-chip {
+            display: flex;
+            width: 100%;
+            min-height: 44px;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            border: 1px solid #E2E8F0;
+            border-radius: 10px;
+            background: #FFFFFF;
+            padding: 8px 10px;
+            color: #475569;
+            text-align: left;
+            transition: transform 150ms ease, border-color 150ms ease, background-color 150ms ease;
+        }
+
+        .dependency-chip.role-completed {
+            border-color: #CBEBD5;
+            background: #F7FCF8;
+        }
+
+        .dependency-chip.role-current {
+            border-color: #F4D58D;
+            background: #FFFCF3;
+        }
+
+        .dependency-chip.role-target {
+            border-color: #6F98FF;
+            border-style: dashed;
+            background: #EDF3FF;
+        }
+
+        .dependency-relation-kind,
+        .dependency-node-state {
+            display: inline-flex;
+            min-height: 20px;
+            align-items: center;
+            gap: 4px;
+            border-radius: 6px;
+            padding: 0 6px;
+            font-size: 10px;
+            font-weight: 850;
+            line-height: 1;
+        }
+
+        .dependency-relation-kind.is-mainline {
+            border: 1px solid #CAD8E8;
+            background: #F3F7FB;
+            color: #526B85;
+        }
+
+        .dependency-relation-kind.is-crossline {
+            border: 1px solid #DDD3EA;
+            background: #F8F5FB;
+            color: #6B5D7D;
+        }
+
+        .dependency-node-state.is-completed {
+            border: 1px solid #BFE7CB;
+            background: #F3FCF6;
+            color: #166534;
+        }
+
+        .dependency-node-state.is-current {
+            border: 1px solid #F4CF79;
+            background: #FFF4CF;
+            color: #8A4B08;
+        }
+
+        .dependency-node-state.is-target {
+            border: 1px dashed #5D8AFF;
+            background: #EDF3FF;
+            color: #1746B2;
+        }
+
+        .dependency-node-state.is-locked {
+            border: 1px solid #CBD5E1;
+            background: #FFFFFF;
+            color: #526174;
+        }
+
+        .dependency-chip:active {
+            transform: scale(0.97);
+        }
+
+        .dependency-focus {
+            display: flex;
+            min-height: 108px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #1F5FFF;
+            border-radius: 14px;
+            background: #F7F9FF;
+            padding: 12px;
+            text-align: center;
+            box-shadow: 0 0 0 4px rgba(31, 95, 255, 0.07);
+        }
+
+        .dependency-focus-label {
+            display: inline-flex;
+            min-height: 22px;
+            align-items: center;
+            gap: 4px;
+            border: 1px solid #BFD0FF;
+            border-radius: 6px;
+            background: #EAF0FF;
+            padding: 0 7px;
+            color: #1F5FFF;
+            font-size: 10px;
+            font-weight: 900;
+        }
+
+        .dependency-empty {
+            display: flex;
+            min-height: 46px;
+            align-items: center;
+            gap: 7px;
+            border-top: 1px solid #E9EEF5;
+            padding: 10px 2px 2px;
+            color: #94A3B8;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .learning-card {
+            border: 1px solid #E4EAF2;
+            background: #FFFFFF;
+            box-shadow: 0 8px 20px -20px rgba(15, 23, 42, 0.34);
+            transition: transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+        }
+
+        .learning-card:active:not(:disabled) {
+            transform: scale(0.97);
+        }
+
+        .learning-card:disabled {
+            cursor: not-allowed;
+            border-color: #E2E8F0;
+            background: #F8FAFC;
+            box-shadow: none;
+        }
+
+        .topology-surface {
+            position: relative;
+            min-height: 0;
+            overflow: hidden;
+            background-color: #FAFCFF;
+            background-image: radial-gradient(circle, rgba(148, 163, 184, 0.2) 1px, transparent 1.1px);
+            background-size: 26px 26px;
+            touch-action: none;
+        }
+
+        #topology-svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .graph-controls {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .graph-control-button {
+            display: flex;
+            min-width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            border-radius: 10px;
+            color: #475569;
+            font-size: 11px;
+            font-weight: 800;
+            transition: transform 150ms ease, background-color 150ms ease, color 150ms ease;
+        }
+
+        .graph-control-button[hidden] {
+            display: none;
+        }
+
+        .graph-control-button:active {
+            transform: scale(0.9);
+            background: #EFF6FF;
+            color: #1F5FFF;
+        }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: max(24px, env(safe-area-inset-bottom));
+            z-index: 50;
+            display: flex;
+            min-height: 44px;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #DCE4EF;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.96);
+            padding: 10px 14px;
+            color: #334155;
+            font-size: var(--type-meta);
+            font-weight: 800;
+            box-shadow: 0 16px 36px -20px rgba(15, 23, 42, 0.42);
+            opacity: 0;
+            pointer-events: none;
+            transform: translate(-50%, 12px);
+            transition: opacity 180ms ease, transform 180ms ease;
+        }
+
+        .toast.is-visible {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+
+        .topology-hint {
+            position: absolute;
+            left: 50%;
+            top: 14px;
+            z-index: 4;
+            display: flex;
+            min-height: 40px;
+            align-items: center;
+            border: 1px solid rgba(191, 208, 255, 0.9);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.96);
+            padding: 8px 13px;
+            color: #2852B8;
+            font-size: 11px;
+            font-weight: 800;
+            box-shadow: var(--soft-shadow);
+            opacity: 0;
+            pointer-events: none;
+            transform: translate(-50%, -6px);
+            transition: opacity 180ms ease, transform 180ms ease;
+        }
+
+        .topology-hint.is-visible {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+
+        .topology-hint.is-warning {
+            border-color: #F7D7A6;
+            background: rgba(255, 251, 235, 0.97);
+            color: #9A5B13;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .ability-row:hover {
+                border-color: #BFD0FF;
+                box-shadow: 0 18px 34px -27px rgba(31, 95, 255, 0.42);
+                transform: translateY(-2px);
+            }
+
+            .mainline-node:hover {
+                border-color: #7DA1FF;
+                box-shadow: 0 8px 18px -14px rgba(31, 95, 255, 0.48);
+                transform: translateY(-1px);
+            }
+
+            .dependency-chip:hover {
+                border-color: #BFD0FF;
+                background: #F8FAFF;
+            }
+
+            .learning-card:hover:not(:disabled) {
+                border-color: #BFD0FF;
+                box-shadow: 0 14px 26px -22px rgba(31, 95, 255, 0.5);
+                transform: translateY(-1px);
+            }
+
+            .graph-control-button:hover {
+                background: #EFF6FF;
+                color: #1F5FFF;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .app-shell {
+                padding: 12px;
+            }
+
+            .ability-name-card {
+                width: 164px;
+            }
+
+            .dependency-layout {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .dependency-arrow {
+                min-height: 20px;
+                transform: rotate(90deg);
+            }
+
+            .learning-grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        @keyframes page-enter {
+            from {
+                opacity: 0;
+                transform: translateY(4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 10.2：统一无衬线排版与更明确的原生点击语义 */
+        body,
+        button,
+        .node-level,
+        #topology-svg text {
+            font-family: Inter, system-ui, sans-serif !important;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .page-title {
+            font-size: var(--type-page-title);
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -0.035em;
+        }
+
+        .section-title {
+            font-size: var(--type-section-title);
+            font-weight: 800;
+            line-height: 1.25;
+        }
+
+        .card-title {
+            font-size: var(--type-card-title);
+            font-weight: 800;
+            line-height: 1.25;
+        }
+
+        .meta-text {
+            font-size: var(--type-meta);
+        }
+
+        .label-text {
+            font-size: var(--type-label);
+        }
+
+        button:not(:disabled),
+        [role="button"] {
+            cursor: pointer;
+        }
+
+        .overview-surface {
+            border-radius: 24px;
+            background: #FFFFFF;
+            box-shadow: var(--soft-shadow);
+        }
+
+        .topology-context {
+            display: flex;
+            min-width: 0;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .topology-mode-badge {
+            display: inline-flex;
+            min-height: 26px;
+            flex: 0 0 auto;
+            align-items: center;
+            border: 1px solid #DCE3EC;
+            border-radius: 6px;
+            background: #F8FAFC;
+            padding: 0 8px;
+            color: #475569;
+            font-size: var(--type-label);
+            font-weight: 850;
+            letter-spacing: 0.04em;
+        }
+
+        .topology-mode-badge.is-focus {
+            border-color: #BFD0FF;
+            background: #EAF0FF;
+            color: #1F5FFF;
+        }
+
+        .topology-context-copy {
+            overflow: hidden;
+            color: #64748B;
+            font-size: var(--type-meta);
+            font-weight: 750;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .overview-scroll {
+            background: #FFFFFF;
+        }
+
+        .overview-surface {
+            position: relative;
+            isolation: isolate;
+        }
+
+        .ability-list {
+            gap: 0;
+        }
+
+        .ability-row {
+            position: relative;
+            border: 0;
+            border-bottom: 1px solid #F1F5F9;
+            border-radius: 0 !important;
+            background: transparent;
+            box-shadow: none;
+            cursor: pointer;
+            transform: none;
+            transition: background-color 150ms ease;
+        }
+
+        .ability-row:last-child {
+            border-bottom: 0;
+        }
+
+        .ability-row-scroll {
+            padding: 7px 52px 7px 6px;
+            scroll-padding-inline: 6px 52px;
+        }
+
+        .ability-row-entry {
+            position: absolute;
+            right: 0;
+            top: 0;
+            z-index: 3;
+            display: flex;
+            width: 52px;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            border: 0;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.9) 52%, #FFFFFF 100%);
+            color: #5274C9;
+            opacity: 0;
+            pointer-events: none;
+            visibility: hidden;
+            transition: opacity 150ms ease, visibility 150ms ease;
+        }
+
+        .ability-row-entry.is-visible {
+            opacity: 1;
+            pointer-events: auto;
+            visibility: visible;
+        }
+
+        .ability-row-entry i {
+            font-size: 15px;
+            transition: color 150ms ease, transform 150ms ease;
+        }
+
+        .ability-row:active {
+            background: #F8FAFF;
+        }
+
+        .ability-row:active .ability-row-entry i {
+            color: #7DA1FF;
+            transform: translateX(1px) scale(0.9);
+        }
+
+        .overview-scroll-cue {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 6;
+            display: flex;
+            height: 46px;
+            align-items: flex-end;
+            justify-content: center;
+            background: linear-gradient(180deg, rgba(239, 246, 255, 0) 0%, rgba(223, 231, 255, 0.72) 100%);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(8px);
+            transition: opacity 180ms ease, transform 180ms ease;
+        }
+
+        .overview-scroll-cue.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .overview-scroll-cue.is-visible.is-soft {
+            opacity: 0.38;
+        }
+
+        .ability-name-card {
+            width: 142px;
+            height: 66px;
+            align-items: center;
+            border: 0;
+            border-radius: 12px;
+            background: transparent;
+            padding: 0 9px;
+            color: #173E9C;
+            cursor: default;
+        }
+
+        .ability-sequence {
+            flex: 0 0 auto;
+            color: #94A3B8;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            line-height: 1;
+        }
+
+        .overview-mainline .mainline-node {
+            width: 146px;
+            min-width: 146px;
+            height: 66px;
+            border-radius: 12px;
+            padding: 7px 9px;
+        }
+
+        .overview-mainline .mainline-connector {
+            width: 19px;
+            height: 66px;
+            flex-basis: 19px;
+            opacity: 0.66;
+        }
+
+        .mainline-label-gap {
+            width: 10px;
+            height: 66px;
+            flex: 0 0 10px;
+        }
+
+        .detail-motion-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 40;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .detail-switch-ghost {
+            position: absolute;
+            overflow: hidden;
+            pointer-events: none;
+            transform-origin: 50% 50%;
+            will-change: transform, opacity;
+        }
+
+        .detail-switch-ghost > * {
+            width: 100% !important;
+            height: 100% !important;
+            margin: 0 !important;
+        }
+
+        .overview-mainline .node-level {
+            font-size: var(--type-card-title);
+            line-height: 1;
+            letter-spacing: -0.055em;
+        }
+
+        .overview-mainline .node-caption {
+            max-width: 124px;
+            margin-top: 3px;
+            font-size: var(--type-meta);
+            opacity: 0.84;
+        }
+
+        .mainline-node.role-upcoming {
+            border-color: #D2DAE6;
+            background: #FFFFFF;
+            color: #64748B;
+        }
+
+        .node-level-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .target-marker {
+            display: none;
+            font-size: 11px;
+        }
+
+        .mainline-connector::before {
+            height: 1px;
+        }
+
+        .mainline-connector i {
+            right: -2px;
+            background: transparent;
+            font-size: 9px;
+            opacity: 0.62;
+        }
+
+        .target-theme-c .mainline-node.role-target {
+            border-color: #6F98FF;
+            border-style: dashed;
+            background: #EDF3FF;
+            color: #1746B2;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.72);
+        }
+
+        .target-theme-c .mainline-node.role-target .target-marker {
+            display: inline-block;
+        }
+
+        .target-theme-c .mainline-connector.is-target {
+            color: #6F98FF;
+        }
+
+        .topology-legend {
+            position: relative;
+            z-index: 7;
+            display: flex;
+            width: 100%;
+            min-height: 38px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 7px 12px;
+            border-bottom: 1px solid #EDF2F8;
+            background: #FBFDFF;
+            padding: 7px 20px;
+            color: #526174;
+            font-size: 10px;
+            font-weight: 800;
+            pointer-events: none;
+        }
+
+        .topology-legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+
+        .legend-swatch {
+            width: 14px;
+            height: 14px;
+            flex: 0 0 auto;
+            border-radius: 4px;
+            background: #FFFFFF;
+        }
+
+        .legend-swatch.is-focus {
+            border: 2px solid #1F5FFF;
+            box-shadow: 0 0 0 2px rgba(31, 95, 255, 0.08);
+        }
+
+        .legend-swatch.is-completed {
+            border: 1px solid #8FD3A7;
+            background: #F3FCF6;
+        }
+
+        .legend-swatch.is-current {
+            border: 1px solid #F0C36A;
+            background: #FFFBEB;
+        }
+
+        .legend-swatch.is-target {
+            border: 1px dashed #5D8AFF;
+            background: #EDF3FF;
+        }
+
+        .legend-opacity {
+            width: 18px;
+            height: 3px;
+            border-radius: 999px;
+            background: #1F5FFF;
+            opacity: 0.24;
+        }
+
+        .topology-lock-icon {
+            display: flex;
+            width: 20px;
+            height: 20px;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #CBD5E1;
+            border-radius: 6px;
+            background: #FFFFFF;
+            color: #526174;
+            font-size: 12px;
+            line-height: 1;
+        }
+
+        .detail-mainline {
+            padding: 5px 3px 7px;
+        }
+
+        .detail-mainline .mainline-node {
+            min-width: 160px;
+            height: 106px;
+            border-radius: 16px;
+            padding: 12px 14px;
+        }
+
+        .detail-mainline .mainline-connector {
+            width: 34px;
+            height: 106px;
+            flex-basis: 34px;
+            opacity: 0.7;
+        }
+
+        .detail-mainline .node-level {
+            font-size: var(--type-card-title);
+            line-height: 1;
+        }
+
+        .detail-mainline .node-caption {
+            max-width: 132px;
+            margin-top: 6px;
+            font-size: var(--type-meta);
+            opacity: 0.86;
+        }
+
+        .detail-mainline .mini-stars {
+            margin-top: 7px;
+        }
+
+        .detail-mainline .mini-stars i {
+            font-size: 12px;
+        }
+
+        .detail-mainline .node-current-badge {
+            right: 9px;
+            top: 9px;
+        }
+
+        .dependency-chip {
+            min-height: 50px;
+            padding: 9px 11px;
+        }
+
+        .dependency-chip-caret {
+            flex: 0 0 auto;
+            color: #94A3B8;
+            font-size: 15px;
+        }
+
+        .dependency-focus {
+            min-height: 112px;
+        }
+
+        .learning-card {
+            min-height: 72px;
+        }
+
+        .topology-stage-node {
+            cursor: pointer;
+        }
+
+        .topology-stage-visual {
+            transition: opacity 160ms ease, transform 150ms ease;
+            transform-box: fill-box;
+            transform-origin: center;
+        }
+
+        .topology-stage-node:active .topology-stage-visual {
+            transform: scale(0.95);
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .ability-row:hover {
+                border-color: rgba(255, 255, 255, 0.72);
+                background: rgba(255, 255, 255, 0.26);
+                box-shadow: none;
+                transform: none;
+            }
+
+            .ability-row:hover .ability-row-entry i {
+                color: #7DA1FF;
+                transform: translateX(1px);
+            }
+
+        }
+
+        @media (max-width: 760px) {
+            .topology-context-copy {
+                display: none;
+            }
+
+            .ability-name-card {
+                width: 136px;
+            }
+
+            .overview-mainline .mainline-node {
+                width: 138px;
+                min-width: 138px;
+            }
+
+            .detail-mainline .mainline-node {
+                min-width: 148px;
+            }
+        }
+    </style>
+</head>
+<body class="font-sans text-ink antialiased">
+    <div id="overview-page" class="page-view is-active app-shell mx-auto flex-col overflow-hidden p-5">
+        <header class="flex h-16 shrink-0 items-center justify-between px-1">
+            <div class="flex min-w-0 items-center gap-3">
+                <button id="overview-back-button" type="button" aria-label="返回上一页" class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] bg-white/80 text-slate-700 shadow-soft transition active:scale-90">
+                    <i class="ph-bold ph-caret-left text-[20px]" aria-hidden="true"></i>
+                </button>
+                <div class="min-w-0">
+                    <h1 class="page-title truncate text-slate-950">英语能力</h1>
+                    <p id="overview-meta" class="meta-text mt-1 font-semibold text-slate-400">10 条主线 · 50 个能力阶段</p>
+                </div>
+            </div>
+            <button id="overview-topology-button" type="button" class="flex min-h-11 items-center gap-2 rounded-[12px] border border-white bg-white/80 px-4 text-[13px] font-extrabold text-slate-700 shadow-soft transition active:scale-95">
+                <i class="ph-bold ph-graph text-[18px] text-brand" aria-hidden="true"></i>
+                阶段关系图
+            </button>
+        </header>
+
+        <main class="overview-surface mt-3 flex min-h-0 flex-1 flex-col overflow-hidden" aria-label="英语能力主线列表">
+            <div id="overview-scroll" class="overview-scroll native-scroll no-scrollbar min-h-0 flex-1 px-1 pb-2 pt-2">
+                <div id="ability-grid" class="ability-list" aria-live="polite"></div>
+            </div>
+            <div id="overview-scroll-cue" class="overview-scroll-cue" aria-hidden="true"></div>
+        </main>
+    </div>
+
+    <div id="detail-page" class="page-view app-shell mx-auto flex-col overflow-hidden p-5">
+        <header class="flex h-16 shrink-0 items-center justify-between px-1">
+            <div class="flex min-w-0 items-center gap-3">
+                <button id="detail-back-button" type="button" aria-label="返回英语能力" class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] bg-white/80 text-slate-700 shadow-soft transition active:scale-90">
+                    <i class="ph-bold ph-caret-left text-[20px]" aria-hidden="true"></i>
+                </button>
+                <div class="min-w-0">
+                    <nav aria-label="面包屑">
+                        <ol class="label-text flex items-center gap-1.5 font-extrabold tracking-[0.08em] text-brand">
+                            <li><button id="detail-breadcrumb-overview" type="button" class="min-h-6 rounded-[6px] px-1 transition active:scale-95">英语能力</button></li>
+                            <li aria-hidden="true"><i class="ph-bold ph-caret-right text-[10px]"></i></li>
+                            <li aria-current="page">能力详情</li>
+                        </ol>
+                    </nav>
+                    <h1 id="detail-header-title" class="page-title mt-0.5 truncate text-slate-950"></h1>
+                </div>
+            </div>
+            <button id="detail-topology-button" type="button" class="flex min-h-11 items-center gap-2 rounded-[12px] border border-white bg-white/80 px-4 text-[13px] font-extrabold text-slate-700 shadow-soft transition active:scale-95">
+                <i class="ph-bold ph-graph text-[18px] text-brand" aria-hidden="true"></i>
+                查看阶段关系
+            </button>
+        </header>
+
+        <main class="mt-3 flex min-h-0 flex-1 flex-col overflow-hidden rounded-[24px] bg-white shadow-soft" aria-label="能力详情">
+            <div class="native-scroll no-scrollbar min-h-0 flex-1">
+                <section class="px-5 pb-5 pt-5" aria-labelledby="detail-mainline-title">
+                    <h2 id="detail-mainline-title" class="section-title text-slate-950">主线阶段</h2>
+                    <div id="detail-mainline" class="detail-mainline horizontal-scroll mt-3 pb-1" aria-live="polite"></div>
+                </section>
+
+                <section class="border-y border-blue-100/70 bg-blue-50/30 px-5 py-5" aria-labelledby="dependency-title">
+                    <h2 id="dependency-title" class="section-title text-slate-950">阶段依赖关系</h2>
+                    <div id="dependency-view" class="mt-3" aria-live="polite"></div>
+                </section>
+
+                <section class="px-5 pb-5 pt-5" aria-labelledby="learning-title">
+                    <div class="flex items-end justify-between gap-4">
+                        <h2 id="learning-title" class="section-title text-slate-950">学习内容</h2>
+                        <span id="learning-status" class="shrink-0 rounded-[6px] border px-2 py-1 text-[11px] font-extrabold"></span>
+                    </div>
+                    <div id="learning-grid" class="learning-grid mt-3 grid grid-cols-3 gap-3"></div>
+                    <div id="teacher-review" aria-live="polite" aria-atomic="true" hidden></div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <div id="topology-page" class="page-view app-shell mx-auto flex-col overflow-hidden p-5">
+        <header class="flex h-16 shrink-0 items-center px-1">
+            <div class="flex min-w-0 items-center gap-3">
+                <button id="topology-back-button" type="button" aria-label="返回上一页" class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] bg-white/80 text-slate-700 shadow-soft transition active:scale-90">
+                    <i class="ph-bold ph-caret-left text-[20px]" aria-hidden="true"></i>
+                </button>
+                <div class="min-w-0">
+                    <nav aria-label="面包屑">
+                        <ol class="label-text flex items-center gap-1.5 font-extrabold tracking-[0.08em] text-brand">
+                            <li><button id="topology-breadcrumb-overview" type="button" class="min-h-6 rounded-[6px] px-1 transition active:scale-95">英语能力</button></li>
+                            <li aria-hidden="true"><i class="ph-bold ph-caret-right text-[10px]"></i></li>
+                            <li aria-current="page">关系图</li>
+                        </ol>
+                    </nav>
+                    <h1 class="page-title mt-0.5 truncate text-slate-950">阶段依赖关系</h1>
+                </div>
+            </div>
+        </header>
+
+        <main class="mt-3 flex min-h-0 flex-1 flex-col overflow-hidden rounded-[24px] bg-white shadow-soft" aria-label="阶段依赖关系图">
+            <div class="relative z-[8] flex min-h-[54px] shrink-0 items-center justify-between gap-4 border-b border-slate-100 px-5">
+                <div class="topology-context" role="status" aria-live="polite" aria-atomic="true">
+                    <span id="topology-mode-badge" class="topology-mode-badge">全图</span>
+                    <p id="topology-context-label" class="topology-context-copy">可点击任一节点切换查看其直接前置与后续关系</p>
+                </div>
+                <div class="graph-controls shrink-0" aria-label="关系图视图控制">
+                    <button id="topology-zoom-out" type="button" class="graph-control-button" aria-label="缩小关系图"><i class="ph-bold ph-minus text-[16px]" aria-hidden="true"></i></button>
+                    <button id="topology-zoom-in" type="button" class="graph-control-button" aria-label="放大关系图"><i class="ph-bold ph-plus text-[16px]" aria-hidden="true"></i></button>
+                    <button id="topology-fit" type="button" class="graph-control-button px-2.5" aria-label="适应画布"><i class="ph-bold ph-arrows-out-simple text-[16px]" aria-hidden="true"></i><span>适应</span></button>
+                    <button id="topology-reset" type="button" class="graph-control-button px-2.5" aria-label="取消节点聚焦并恢复全图" hidden><i class="ph-bold ph-arrow-counter-clockwise text-[16px]" aria-hidden="true"></i><span>全图</span></button>
+                </div>
+            </div>
+            <div class="topology-legend" aria-label="关系图图例">
+                <span class="topology-legend-item"><span class="legend-swatch is-focus" aria-hidden="true"></span>查看焦点</span>
+                <span class="topology-legend-item"><span class="legend-swatch is-completed" aria-hidden="true"></span>已完成</span>
+                <span class="topology-legend-item"><span class="legend-swatch is-current" aria-hidden="true"></span>当前阶段</span>
+                <span class="topology-legend-item"><span class="legend-swatch is-target" aria-hidden="true"></span>目标</span>
+                <span class="topology-legend-item"><i class="ph-bold ph-lock-key" aria-hidden="true"></i>未解锁</span>
+                <span class="topology-legend-item"><span class="legend-opacity" aria-hidden="true"></span>非直接关联</span>
+                <span class="topology-legend-item"><i class="ph-bold ph-arrow-right text-[13px] text-brand" aria-hidden="true"></i>箭头指向后续</span>
+            </div>
+            <div id="topology-surface" class="topology-surface min-h-0 flex-1">
+                <svg id="topology-svg" viewBox="0 0 2770 1106" preserveAspectRatio="xMidYMid meet" role="group" aria-label="全部能力主线与阶段；主线内仅连接相邻阶段；跨主线关联默认隐藏；点按阶段查看本主线相邻阶段与全部一层直接跨主线关系">
+                    <g id="topology-viewport" class="svg-pan-zoom_viewport"></g>
+                </svg>
+                <div id="topology-hint" class="topology-hint" role="status" aria-live="polite">可点击任一节点查看直接关系</div>
+            </div>
+        </main>
+    </div>
+
+    <div id="detail-motion-layer" class="detail-motion-layer" aria-hidden="true"></div>
+
+    <div id="action-toast" class="toast" role="status" aria-live="polite">
+        <i class="ph-bold ph-check-circle text-[17px] text-brand" aria-hidden="true"></i>
+        <span id="action-toast-text"></span>
+    </div>
+
+    <script>
+        (function () {
+            'use strict';
+
+            const abilitiesV10 = [
+                {
+                    id: 'vocabulary',
+                    name: '核心词汇',
+                    currentLevelNodeId: 'vocabulary-l3',
+                    targetLevelNodeId: 'vocabulary-l9',
+                    topologyOrder: 0,
+                    levels: [
+                        { id: 'vocabulary-l1', level: 1, definition: '600词', description: '掌握约 600 个高频基础词汇', masteryStars: 5, role: 'completed', studyState: 'completed', canStudy: true },
+                        { id: 'vocabulary-l2', level: 2, definition: '1200词', description: '掌握约 1200 个常用核心词汇', masteryStars: 3, role: 'completed', studyState: 'completed', canStudy: true },
+                        { id: 'vocabulary-l3', level: 3, definition: '1800词', description: '覆盖约 1800 个核心词汇', masteryStars: 4, role: 'current', studyState: 'available', canStudy: true },
+                        { id: 'vocabulary-l4', level: 4, definition: '2500词', description: '覆盖约 2500 个高频进阶词汇', masteryStars: 0, role: 'upcoming', studyState: 'locked', canStudy: false },
+                        { id: 'vocabulary-l5', level: 5, definition: '3500词', description: '覆盖约 3500 个通用核心词汇', masteryStars: 0, role: 'upcoming', studyState: 'locked', canStudy: false },
+                        { id: 'vocabulary-l6', level: 6, definition: '4500词', description: '覆盖约 4500 个常用学术词汇', masteryStars: 0, role: 'upcoming', studyState: 'locked', canStudy: false },
+                        { id: 'vocabulary-l7', level: 7, definition: '6000词', description: '覆盖约 6000 个中高阶词汇', masteryStars: 0, role: 'upcoming', studyState: 'locked', canStudy: false },
+                        { id: 'vocabulary-l8', level: 8, definition: '8000词', description: '覆盖约 8000 个高阶阅读词汇', masteryStars: 0, role: 'upcoming', studyState: 'locked', canStudy: false },
+                        { id: 'vocabulary-l9', level: 9, definition: '10000词', description: '达到教师设定的 10000 词目标', masteryStars: 0, role: 'target', studyState: 'locked', canStudy: false },
+                        { id: 'vocabulary-l10', level: 10, definition: '12000词', description: '覆盖约 12000 个广泛阅读词汇', masteryStars: 0, role: 'upcoming', studyState: 'locked', canStudy: false },
+                        { id: 'vocabulary-l11', level: 11, definition: '14000词', description: '覆盖约 14000 个专业拓展词汇', masteryStars: 0, role: 'upcoming', studyState: 'locked', canStudy: false },
+                        { id: 'vocabulary-l12', level: 12, definition: '16000词', description: '覆盖约 16000 个高阶表达词汇', masteryStars: 0, role: 'upcoming', studyState: 'locked', canStudy: false },
+                        { id: 'vocabulary-l13', level: 13, definition: '18000词', description: '覆盖约 18000 个深度应用词汇', masteryStars: 0, role: 'upcoming', studyState: 'locked', canStudy: false }
+                    ]
+                },
+                {
+                    id: 'phonics',
+                    name: '语音辨识',
+                    currentLevelNodeId: 'phonics-l2',
+                    targetLevelNodeId: 'phonics-l3',
+                    topologyOrder: 1,
+                    levels: [
+                        { id: 'phonics-l1', level: 1, definition: '字母音素', description: '能辨识基础字母与常见音素', masteryStars: 4, role: 'completed', studyState: 'completed', canStudy: true },
+                        { id: 'phonics-l2', level: 2, definition: '常见词发音', description: '能听清常见单词的发音', masteryStars: 3, role: 'current', studyState: 'available', canStudy: true },
+                        { id: 'phonics-l3', level: 3, definition: '自然语流', description: '能辨识重音、连读与真实语速下的语音变化', masteryStars: 0, role: 'target', studyState: 'locked', canStudy: false }
+                    ]
+                },
+                {
+                    id: 'grammar',
+                    name: '句法理解',
+                    currentLevelNodeId: 'grammar-l2',
+                    targetLevelNodeId: 'grammar-l5',
+                    topologyOrder: 2,
+                    levels: [
+                        { id: 'grammar-l1', level: 1, definition: '基础词序', description: '能识别基础句子结构与常见词序', masteryStars: 3, role: 'completed', studyState: 'completed', canStudy: true },
+                        { id: 'grammar-l2', level: 2, definition: '常见句式', description: '能看懂常见句子', masteryStars: 3, role: 'current', studyState: 'available', canStudy: true },
+                        { id: 'grammar-l3', level: 3, definition: '时态结构', description: '能理解常见时态与语态结构', masteryStars: 0, role: 'upcoming', studyState: 'locked', canStudy: false },
+                        { id: 'grammar-l4', level: 4, definition: '复合句式', description: '能拆解复合句中的层级结构', masteryStars: 0, role: 'upcoming', studyState: 'locked', canStudy: false },
+                        { id: 'grammar-l5', level: 5, definition: '复杂语篇句法', description: '能理解复杂句式和语篇中的句法关系', masteryStars: 0, role: 'target', studyState: 'locked', canStudy: false }
+                    ]
+                },
+                {
+                    id: 'listening',
+                    name: '听力理解',
+                    currentLevelNodeId: 'listening-l2',
+                    targetLevelNodeId: 'listening-l5',
+                    topologyOrder: 2,
+                    levels: [
+                        { id: 'listening-l1', level: 1, definition: '词音匹配', description: '能将高频词汇与语音准确匹配', masteryStars: 4, role: 'completed', studyState: 'completed', canStudy: true },
+                        { id: 'listening-l2', level: 2, definition: '关键信息', description: '能听懂表达中的关键信息', masteryStars: 2, role: 'current', studyState: 'available', canStudy: true },
+                        { id: 'listening-l3', level: 3, definition: '连续表达', description: '能跟随连续语句理解主要内容', masteryStars: 0, role: 'upcoming', studyState: 'locked', canStudy: false },
+                        { id: 'listening-l4', level: 4, definition: '细节与态度', description: '能听懂连续表达中的细节和态度', masteryStars: 0, role: 'upcoming', studyState: 'locked', canStudy: false },
+                        { id: 'listening-l5', level: 5, definition: '深层理解', description: '能结合语境理解隐含意图与复杂信息', masteryStars: 0, role: 'target', studyState: 'locked', canStudy: false }
+                    ]
+                },
+                {
+                    id: 'sentence',
+                    name: '句子理解',
+                    currentLevelNodeId: 'sentence-l3',
+                    targetLevelNodeId: 'sentence-l5',
+                    topologyOrder: 1,
+                    levels: [
+                        { id: 'sentence-l1', level: 1, definition: '句子成分', description: '能识别句子中的基础成分', masteryStars: 5, role: 'completed', studyState: 'completed', canStudy: true },
+                        { id: 'sentence-l2', level: 2, definition: '简单句意', description: '能准确理解常见简单句的意思', masteryStars: 4, role: 'completed', studyState: 'completed', canStudy: true },
+                        { id: 'sentence-l3', level: 3, definition: '完整句意', description: '能准确看懂完整句子', masteryStars: 4, role: 'current', studyState: 'available', canStudy: true },
+                        { id: 'sentence-l4', level: 4, definition: '长句信息', description: '能提取长句中的主要与补充信息', masteryStars: 0, role: 'upcoming', studyState: 'locked', canStudy: false },
+                        { id: 'sentence-l5', level: 5, definition: '隐含句意', description: '能结合上下文准确理解隐含句意', masteryStars: 0, role: 'target', studyState: 'locked', canStudy: false }
+                    ]
+                },
+                {
+                    id: 'reading',
+                    name: '篇章阅读',
+                    currentLevelNodeId: 'reading-l2',
+                    targetLevelNodeId: 'reading-l5',
+                    topologyOrder: 0,
+                    levels: [
+                        { id: 'reading-l1', level: 1, definition: '句段衔接', description: '能理解相邻句子之间的基本衔接', masteryStars: 3, role: 'completed', studyState: 'completed', canStudy: true },
+                        { id: 'reading-l2', level: 2, definition: '段落大意', description: '能看懂一段话的大意', masteryStars: 3, role: 'current', studyState: 'locked', canStudy: false },
+                        { id: 'reading-l3', level: 3, definition: '多段信息', description: '能整合多段文本中的关键信息', masteryStars: 0, role: 'upcoming', studyState: 'locked', canStudy: false },
+                        { id: 'reading-l4', level: 4, definition: '结构推理', description: '能理解篇章结构并完成基础推理', masteryStars: 0, role: 'upcoming', studyState: 'locked', canStudy: false },
+                        { id: 'reading-l5', level: 5, definition: '篇章观点', description: '能独立理解整篇内容、结构和观点', masteryStars: 0, role: 'target', studyState: 'locked', canStudy: false }
+                    ]
+                },
+                {
+                    id: 'speaking',
+                    name: '口语表达',
+                    currentLevelNodeId: 'speaking-l2',
+                    targetLevelNodeId: 'speaking-l3',
+                    topologyOrder: 0,
+                    levels: [
+                        { id: 'speaking-l1', level: 1, definition: '单句回应', description: '能用简单句完成基础回应', masteryStars: 4, role: 'completed', studyState: 'completed', canStudy: true },
+                        { id: 'speaking-l2', level: 2, definition: '基本意图', description: '能说清自己的意思', masteryStars: 2, role: 'current', studyState: 'locked', canStudy: false },
+                        { id: 'speaking-l3', level: 3, definition: '连续表达', description: '能围绕熟悉话题持续、自然地表达', masteryStars: 0, role: 'target', studyState: 'locked', canStudy: false }
+                    ]
+                },
+                {
+                    id: 'writing',
+                    name: '写作表达',
+                    currentLevelNodeId: 'writing-l1',
+                    targetLevelNodeId: 'writing-l3',
+                    topologyOrder: 1,
+                    levels: [
+                        { id: 'writing-l1', level: 1, definition: '完整句子', description: '能写出完整句子', masteryStars: 3, role: 'current', studyState: 'locked', canStudy: false },
+                        { id: 'writing-l2', level: 2, definition: '句间连接', description: '能用常见连接方式组织多个句子', masteryStars: 0, role: 'upcoming', studyState: 'locked', canStudy: false },
+                        { id: 'writing-l3', level: 3, definition: '结构化段落', description: '能围绕中心完成结构清晰的段落表达', masteryStars: 0, role: 'target', studyState: 'locked', canStudy: false }
+                    ]
+                },
+                {
+                    id: 'communication',
+                    name: '情境沟通',
+                    currentLevelNodeId: 'communication-l1',
+                    targetLevelNodeId: 'communication-l3',
+                    topologyOrder: 0,
+                    levels: [
+                        { id: 'communication-l1', level: 1, definition: '常见问答', description: '能回应常见问题', masteryStars: 1, role: 'current', studyState: 'locked', canStudy: false },
+                        { id: 'communication-l2', level: 2, definition: '信息交换', description: '能在熟悉场景中交换基础信息', masteryStars: 0, role: 'upcoming', studyState: 'locked', canStudy: false },
+                        { id: 'communication-l3', level: 3, definition: '任务协作', description: '能在真实场景中交换信息并完成基础协作', masteryStars: 0, role: 'target', studyState: 'locked', canStudy: false }
+                    ]
+                },
+                {
+                    id: 'pragmatics',
+                    name: '语用策略',
+                    currentLevelNodeId: 'pragmatics-l1',
+                    targetLevelNodeId: 'pragmatics-l5',
+                    topologyOrder: 0,
+                    levels: [
+                        { id: 'pragmatics-l1', level: 1, definition: '场景识别', description: '能识别常见交流场景与基本意图', masteryStars: 1, role: 'current', studyState: 'locked', canStudy: false },
+                        { id: 'pragmatics-l2', level: 2, definition: '得体回应', description: '能根据对象和场景选择得体回应', masteryStars: 0, role: 'upcoming', studyState: 'locked', canStudy: false },
+                        { id: 'pragmatics-l3', level: 3, definition: '语气切换', description: '能根据沟通目的调整语气与表达方式', masteryStars: 0, role: 'upcoming', studyState: 'locked', canStudy: false },
+                        { id: 'pragmatics-l4', level: 4, definition: '含义判断', description: '能结合语境判断言外之意与表达分寸', masteryStars: 0, role: 'upcoming', studyState: 'locked', canStudy: false },
+                        { id: 'pragmatics-l5', level: 5, definition: '灵活运用', description: '能在复杂真实场景中灵活、得体地表达', masteryStars: 0, role: 'target', studyState: 'locked', canStudy: false }
+                    ]
+                }
+            ];
+
+            const levelNodesV10 = [];
+            abilitiesV10.forEach(function (ability) {
+                ability.levels.forEach(function (node) {
+                    node.abilityId = ability.id;
+                    levelNodesV10.push(node);
+                });
+            });
+
+            // 后台关系保持真实 source → target；若后台判定循环非法，可在对应关系返回 reviewState: 'invalid-cycle'。
+            const levelRelationshipsV10 = [
+                { source: 'phonics-l2', target: 'listening-l2' },
+                { source: 'vocabulary-l3', target: 'sentence-l3' },
+                { source: 'grammar-l2', target: 'sentence-l3' },
+                { source: 'vocabulary-l3', target: 'reading-l2' },
+                { source: 'sentence-l3', target: 'reading-l2' },
+                { source: 'phonics-l2', target: 'speaking-l2' },
+                { source: 'vocabulary-l3', target: 'speaking-l2' },
+                { source: 'grammar-l2', target: 'writing-l1' },
+                { source: 'sentence-l3', target: 'writing-l1' },
+                { source: 'listening-l2', target: 'communication-l1' },
+                { source: 'reading-l2', target: 'communication-l1' },
+                { source: 'speaking-l2', target: 'communication-l1' },
+                { source: 'writing-l1', target: 'communication-l1' }
+            ];
+
+            const learningTypesV10 = [
+                { name: '音记', icon: 'icon/yinji.svg', iconClass: 'bg-violet-50', iconSizeClass: 'h-6 w-6' },
+                { name: '题库', icon: 'icon/tiku.svg', iconClass: 'bg-blue-50', iconSizeClass: 'h-[30px] w-[30px]' },
+                { name: '游戏', icon: 'icon/game.svg', iconClass: 'bg-orange-50', iconSizeClass: 'h-8 w-8' }
+            ];
+
+            const topologyMaxStageCountV10 = abilitiesV10.reduce(function (maximum, ability) {
+                return Math.max(maximum, ability.levels.length);
+            }, 1);
+            const topologyStageStepV10 = 194;
+            const topologyViewWidthV10 = Math.max(1300, 240 + (topologyMaxStageCountV10 - 1) * topologyStageStepV10 + 150 + 42);
+            const topologyLayoutV10 = {
+                viewWidth: topologyViewWidthV10,
+                viewHeight: 1106,
+                laneX: 12,
+                laneRightX: topologyViewWidthV10 - 12,
+                labelX: 20,
+                labelWidth: 132,
+                stageStartX: 240,
+                stageWidth: 150,
+                stageHeight: 82,
+                stageStepX: topologyStageStepV10,
+                rowStartY: 8,
+                rowPitch: 112
+            };
+
+            const topologyAbilityOrderV10 = [
+                'phonics',
+                'vocabulary',
+                'grammar',
+                'listening',
+                'sentence',
+                'speaking',
+                'reading',
+                'writing',
+                'communication',
+                'pragmatics'
+            ];
+
+            const stateV10 = {
+                view: 'overview',
+                previousView: 'overview',
+                selectedAbilityId: 'vocabulary',
+                selectedLevelNodeId: 'vocabulary-l3',
+                topologySelectedNodeId: null,
+                topologyHintShown: false
+            };
+
+            const pagesV10 = {
+                overview: document.getElementById('overview-page'),
+                detail: document.getElementById('detail-page'),
+                topology: document.getElementById('topology-page')
+            };
+
+            const abilityGridV10 = document.getElementById('ability-grid');
+            const overviewScrollV10 = document.getElementById('overview-scroll');
+            const overviewScrollCueV10 = document.getElementById('overview-scroll-cue');
+            const detailMotionLayerV10 = document.getElementById('detail-motion-layer');
+            const topologySvgV10 = document.getElementById('topology-svg');
+            const topologyViewportV10 = document.getElementById('topology-viewport');
+            const topologyModeBadgeV10 = document.getElementById('topology-mode-badge');
+            const topologyContextLabelV10 = document.getElementById('topology-context-label');
+            const topologyResetButtonV10 = document.getElementById('topology-reset');
+            let topologyPanZoomV10 = null;
+            let toastTimerV10 = null;
+            let topologyHintTimerV10 = null;
+            let detailSwitchTimelineV10 = null;
+            let detailSwitchSequenceV10 = 0;
+            let detailSwitchGhostsV10 = [];
+            const teacherReminderKeysV10 = new Set();
+
+            topologySvgV10.setAttribute('viewBox', '0 0 ' + topologyLayoutV10.viewWidth + ' ' + topologyLayoutV10.viewHeight);
+
+            function escapeHtmlV10(value) {
+                return String(value)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
+            function abilityByIdV10(id) {
+                return abilitiesV10.find(function (ability) {
+                    return ability.id === id;
+                }) || null;
+            }
+
+            function levelNodeByIdV10(id) {
+                return levelNodesV10.find(function (node) {
+                    return node.id === id;
+                }) || null;
+            }
+
+            function abilityForNodeV10(node) {
+                return node ? abilityByIdV10(node.abilityId) : null;
+            }
+
+            function currentNodeV10(ability) {
+                return ability ? levelNodeByIdV10(ability.currentLevelNodeId) : null;
+            }
+
+            function targetNodeV10(ability) {
+                return ability ? levelNodeByIdV10(ability.targetLevelNodeId) : null;
+            }
+
+            function formatLevelV10(level) {
+                return 'L' + String(level);
+            }
+
+            function roleLabelV10(node) {
+                if (node.role === 'completed') return '已完成';
+                if (node.role === 'current') return node.studyState === 'locked' ? '当前阶段，未解锁' : '当前阶段';
+                if (node.role === 'target') return node.studyState === 'locked' ? '目标，未解锁' : '目标';
+                return node.studyState === 'locked' ? '未解锁' : '未到达';
+            }
+
+            function overviewRoleLabelV10(node) {
+                if (node.role === 'completed') return '已完成';
+                if (node.role === 'current') return '当前阶段';
+                if (node.role === 'target') return '目标';
+                return node.studyState === 'locked' ? '未解锁' : '后续';
+            }
+
+            function stateBadgeClassesV10(node) {
+                if (node.studyState === 'completed') return 'border-green-200 bg-green-50 text-green-700';
+                if (node.studyState === 'locked') return 'border-slate-200 bg-slate-100 text-slate-500';
+                return 'border-blue-200 bg-blue-50 text-blue-700';
+            }
+
+            function starsMarkupV10(value) {
+                if (!Number.isInteger(value) || value <= 0) return '';
+                let markup = '<span class="mini-stars" aria-label="已获得 ' + value + ' 星，共 5 星">';
+                for (let index = 1; index <= 5; index += 1) {
+                    markup += '<i class="ph-fill ph-star' + (index <= value ? ' is-filled' : '') + '" aria-hidden="true"></i>';
+                }
+                markup += '</span>';
+                return markup;
+            }
+
+            function connectorClassV10(previousNode, nextNode) {
+                if (nextNode.role === 'target') return 'is-target';
+                if (previousNode.role === 'completed' && (nextNode.role === 'completed' || nextNode.role === 'current')) return 'is-passed';
+                if (previousNode.role === 'current') return 'is-current';
+                return '';
+            }
+
+            function targetThemeClassV10() {
+                return 'target-theme-c';
+            }
+
+            function mainlineMarkupV10(ability, selectedNodeId, detailMode) {
+                const ariaLabel = ability.name + '完整主线，共 ' + ability.levels.length + ' 个等级节点';
+                const abilitySequence = String(abilitiesV10.findIndex(function (item) { return item.id === ability.id; }) + 1).padStart(2, '0');
+                let markup = '<ol class="mainline-list flex items-center ' + targetThemeClassV10(ability) + '" aria-label="' + escapeHtmlV10(ariaLabel) + '">';
+                if (!detailMode) {
+                    markup +=
+                        '<li>' +
+                            '<div class="ability-name-card">' +
+                                '<span class="ability-sequence" aria-hidden="true">' + abilitySequence + '</span>' +
+                                '<span id="ability-title-' + escapeHtmlV10(ability.id) + '" class="card-title tracking-[-0.02em] text-slate-950">' + escapeHtmlV10(ability.name) + '</span>' +
+                            '</div>' +
+                        '</li>' +
+                        '<li class="mainline-label-gap" aria-hidden="true"></li>';
+                }
+                ability.levels.forEach(function (node, index) {
+                    if (index > 0) {
+                        const previousNode = ability.levels[index - 1];
+                        markup += '<li class="mainline-connector ' + connectorClassV10(previousNode, node) + '" aria-hidden="true"><i class="ph-bold ph-caret-right"></i></li>';
+                    }
+                    const selectedClass = node.id === selectedNodeId ? ' is-selected' : '';
+                    const stateClass = ' state-' + node.studyState;
+                    const nodeLabel = detailMode ? roleLabelV10(node) : overviewRoleLabelV10(node);
+                    const levelMarkup = '<span class="node-level-row"><span class="node-level">' + formatLevelV10(node.level) + '</span><i class="target-marker ph-bold ph-flag" aria-hidden="true"></i></span>';
+                    const currentBadgeMarkup = node.role === 'current' ? '<span class="node-current-badge">当前阶段</span>' : '';
+                    const lockBadgeMarkup = node.studyState === 'locked' ? '<span class="node-lock-badge" aria-label="未解锁"><i class="ph-bold ph-lock-key" aria-hidden="true"></i></span>' : '';
+                    const nodeStarsMarkup = detailMode || node.role === 'completed' ? starsMarkupV10(node.masteryStars) : '';
+                    const nodeContent = currentBadgeMarkup + lockBadgeMarkup + levelMarkup + '<span class="node-caption">' + escapeHtmlV10(node.definition) + '</span>' + nodeStarsMarkup;
+                    const isViewed = detailMode && node.id === selectedNodeId;
+                    const aria = ability.name + ' ' + formatLevelV10(node.level) + '，' + node.definition + '，' + nodeLabel + (isViewed ? '，正在查看' : '');
+                    markup +=
+                        '<li>' +
+                            '<button type="button" data-level-node-id="' + escapeHtmlV10(node.id) + '" class="mainline-node role-' + node.role + stateClass + selectedClass + '" aria-label="' + escapeHtmlV10(aria) + '"' + (detailMode ? ' aria-pressed="' + (isViewed ? 'true' : 'false') + '"' : '') + '>' +
+                                nodeContent +
+                            '</button>' +
+                        '</li>';
+                });
+                markup += '</ol>';
+                return markup;
+            }
+
+            function validateTopologyLayoutV10() {
+                const abilityIds = new Set(abilitiesV10.map(function (ability) { return ability.id; }));
+                const orderedIds = new Set(topologyAbilityOrderV10);
+                if (abilityIds.size !== orderedIds.size || topologyAbilityOrderV10.some(function (id) { return !abilityIds.has(id); })) {
+                    throw new Error('关系图主线顺序未覆盖全部能力。');
+                }
+                abilitiesV10.forEach(function (ability) {
+                    ability.levels.forEach(function (node, levelIndex) {
+                        const metrics = topologyStageMetricsV10(ability, levelIndex);
+                        if (metrics.x < 0 || metrics.y < 0 || metrics.x + metrics.width > topologyLayoutV10.viewWidth || metrics.y + metrics.height > topologyLayoutV10.viewHeight) {
+                            throw new Error(node.id + '超出关系图画布。');
+                        }
+                    });
+                });
+                const edges = graphStageEdgesV10();
+                const targetChannelsByDirectionAndLevel = new Map();
+                const sourcePortsByNode = new Map();
+                const targetPortsByNode = new Map();
+                edges.forEach(function (edge) {
+                    const sourceNode = levelNodeByIdV10(edge.source);
+                    const targetNode = levelNodeByIdV10(edge.target);
+                    const sourceRow = topologyAbilityOrderV10.indexOf(sourceNode.abilityId);
+                    const targetRow = topologyAbilityOrderV10.indexOf(targetNode.abilityId);
+                    if (sourceRow === targetRow) throw new Error(edge.id + '不是跨主线关系。');
+                    const route = topologyPathV10(edge, edges);
+                    const sourceMetrics = topologyMetricsForNodeV10(edge.source);
+                    const targetMetrics = topologyMetricsForNodeV10(edge.target);
+                    if (!route) throw new Error(edge.id + '缺少有效路由。');
+                    const isDownward = route.direction === 'down';
+                    const expectedStartX = isDownward ? sourceMetrics.x + sourceMetrics.width : sourceMetrics.x;
+                    const expectedEndX = isDownward ? targetMetrics.x : targetMetrics.x + targetMetrics.width;
+                    if (route.start.x !== expectedStartX || route.end.x !== expectedEndX) throw new Error(edge.id + '未按真实方向对齐节点锚点。');
+                    if (route.start.y <= sourceMetrics.y || route.start.y >= sourceMetrics.y + sourceMetrics.height || route.end.y <= targetMetrics.y || route.end.y >= targetMetrics.y + targetMetrics.height) {
+                        throw new Error(edge.id + '的锚点超出节点边界。');
+                    }
+                    const targetGap = topologyHorizontalGapV10(targetNode, isDownward ? 'left' : 'right');
+                    if (route.targetChannelX <= targetGap.min || route.targetChannelX >= targetGap.max) {
+                        throw new Error(edge.id + '的独立入线通道超出节点侧方间距。');
+                    }
+                    const channelKey = route.direction + '-' + String(targetNode.level);
+                    const levelChannels = targetChannelsByDirectionAndLevel.get(channelKey) || [];
+                    levelChannels.push(route.targetChannelX);
+                    targetChannelsByDirectionAndLevel.set(channelKey, levelChannels);
+                    const sourcePorts = sourcePortsByNode.get(edge.source) || [];
+                    sourcePorts.push(route.start.y);
+                    sourcePortsByNode.set(edge.source, sourcePorts);
+                    const targetPorts = targetPortsByNode.get(edge.target) || [];
+                    targetPorts.push(route.end.y);
+                    targetPortsByNode.set(edge.target, targetPorts);
+                });
+                targetChannelsByDirectionAndLevel.forEach(function (channels) {
+                    const uniqueChannels = new Set(channels.map(function (value) { return value.toFixed(2); }));
+                    if (uniqueChannels.size !== channels.length) throw new Error('跨主线入线通道发生重叠。');
+                });
+                [sourcePortsByNode, targetPortsByNode].forEach(function (portMap) {
+                    portMap.forEach(function (ports) {
+                        const uniquePorts = new Set(ports.map(function (value) { return value.toFixed(2); }));
+                        if (uniquePorts.size !== ports.length) throw new Error('同一节点存在重叠锚点。');
+                    });
+                });
+
+                const downwardProbe = edges.find(function (edge) {
+                    return topologyRelationshipDirectionV10(edge) === 'down';
+                });
+                if (downwardProbe) {
+                    const upwardProbe = {
+                        id: 'layout-upward-probe',
+                        source: downwardProbe.target,
+                        target: downwardProbe.source,
+                        sourceAbilityId: downwardProbe.targetAbilityId,
+                        targetAbilityId: downwardProbe.sourceAbilityId,
+                        reviewState: 'normal'
+                    };
+                    const upwardRoute = topologyPathV10(upwardProbe, [upwardProbe]);
+                    const upwardSourceMetrics = topologyMetricsForNodeV10(upwardProbe.source);
+                    const upwardTargetMetrics = topologyMetricsForNodeV10(upwardProbe.target);
+                    if (!upwardRoute || upwardRoute.direction !== 'up' || upwardRoute.start.x !== upwardSourceMetrics.x || upwardRoute.end.x !== upwardTargetMetrics.x + upwardTargetMetrics.width || upwardRoute.targetChannelX <= upwardRoute.end.x) {
+                        throw new Error('关系图未通过向上依赖路由校验。');
+                    }
+                    if (detectRelationshipCycleEdgeIdsV10([upwardProbe]).size !== 0) {
+                        throw new Error('向上依赖被错误识别为循环关系。');
+                    }
+                    const cycleProbeIds = detectRelationshipCycleEdgeIdsV10([downwardProbe, upwardProbe]);
+                    if (!cycleProbeIds.has(downwardProbe.id) || !cycleProbeIds.has(upwardProbe.id)) {
+                        throw new Error('关系图未通过循环关系独立检测校验。');
+                    }
+                }
+            }
+
+            function validateDataV10() {
+                const nodeIds = new Set();
+                abilitiesV10.forEach(function (ability) {
+                    if (!ability.levels.length) throw new Error(ability.name + '缺少主线节点。');
+                    ability.levels.forEach(function (node, index) {
+                        if (nodeIds.has(node.id)) throw new Error('重复节点：' + node.id);
+                        nodeIds.add(node.id);
+                        if (node.level !== index + 1) throw new Error(ability.name + '主线等级不连续。');
+                        if (!Number.isInteger(node.masteryStars) || node.masteryStars < 0 || node.masteryStars > 5) {
+                            throw new Error(node.id + '星级无效。');
+                        }
+                        if (typeof node.canStudy !== 'boolean') throw new Error(node.id + '缺少明确学习权限。');
+                    });
+                    if (!levelNodeByIdV10(ability.currentLevelNodeId) || !levelNodeByIdV10(ability.targetLevelNodeId)) {
+                        throw new Error(ability.name + '缺少当前或目标节点。');
+                    }
+                    if (currentNodeV10(ability).role !== 'current' || targetNodeV10(ability).role !== 'target') {
+                        throw new Error(ability.name + '的主线角色标记不完整。');
+                    }
+                });
+                levelRelationshipsV10.forEach(function (relationship) {
+                    const source = levelNodeByIdV10(relationship.source);
+                    const target = levelNodeByIdV10(relationship.target);
+                    if (!source || !target) throw new Error('子关系引用了不存在的节点。');
+                    if (source.abilityId === target.abilityId) throw new Error('能力内部连续等级不得写入子关系。');
+                });
+                validateTopologyLayoutV10();
+            }
+
+            function renderOverviewV10() {
+                const stageCount = abilitiesV10.reduce(function (total, ability) {
+                    return total + ability.levels.length;
+                }, 0);
+                document.getElementById('overview-meta').textContent = abilitiesV10.length + ' 条主线 · ' + stageCount + ' 个能力阶段';
+                abilityGridV10.innerHTML = abilitiesV10.map(function (ability) {
+                    return (
+                        '<article class="ability-row min-w-0 overflow-hidden" data-ability-row="' + escapeHtmlV10(ability.id) + '" aria-labelledby="ability-title-' + escapeHtmlV10(ability.id) + '">' +
+                            '<div class="overview-mainline ability-row-scroll horizontal-scroll" data-ability-scroll="' + escapeHtmlV10(ability.id) + '">' +
+                                mainlineMarkupV10(ability, null, false) +
+                            '</div>' +
+                            '<button type="button" class="ability-row-entry is-visible" data-ability-more="' + escapeHtmlV10(ability.id) + '" aria-label="查看' + escapeHtmlV10(ability.name) + '后续阶段" aria-hidden="false" tabindex="0"><i class="ph-bold ph-caret-right" aria-hidden="true"></i></button>' +
+                        '</article>'
+                    );
+                }).join('');
+                window.requestAnimationFrame(function () {
+                    updateOverviewScrollCueV10();
+                    updateAbilityRowOverflowV10();
+                });
+            }
+
+            function updateAbilityRowOverflowV10() {
+                abilityGridV10.querySelectorAll('[data-ability-row]').forEach(function (row) {
+                    const scroller = row.querySelector('[data-ability-scroll]');
+                    const moreButton = row.querySelector('[data-ability-more]');
+                    if (!scroller || !moreButton) return;
+                    moreButton.classList.add('is-visible');
+                    moreButton.setAttribute('aria-hidden', 'false');
+                    moreButton.tabIndex = 0;
+                });
+            }
+
+            function updateOverviewScrollCueV10() {
+                if (!overviewScrollV10 || !overviewScrollCueV10) return;
+                const overflow = overviewScrollV10.scrollHeight > overviewScrollV10.clientHeight + 2;
+                const remaining = overviewScrollV10.scrollHeight - overviewScrollV10.clientHeight - overviewScrollV10.scrollTop;
+                const nearStart = overviewScrollV10.scrollTop <= 12;
+                const shouldShow = overflow && remaining > 4 && overviewScrollV10.scrollTop < 112;
+                overviewScrollCueV10.classList.toggle('is-visible', shouldShow);
+                overviewScrollCueV10.classList.toggle('is-soft', shouldShow && !nearStart);
+            }
+
+            function selectedNodeV10() {
+                return levelNodeByIdV10(stateV10.selectedLevelNodeId);
+            }
+
+            function relationStateMarkupV10(node) {
+                let markup = '';
+                if (node.role === 'completed') {
+                    markup += '<span class="dependency-node-state is-completed"><i class="ph-bold ph-check" aria-hidden="true"></i>已完成</span>';
+                }
+                if (node.role === 'current') {
+                    markup += '<span class="dependency-node-state is-current">当前阶段</span>';
+                }
+                if (node.role === 'target') {
+                    markup += '<span class="dependency-node-state is-target"><i class="ph-bold ph-flag" aria-hidden="true"></i>目标</span>';
+                }
+                if (node.studyState === 'locked') {
+                    markup += '<span class="dependency-node-state is-locked"><i class="ph-bold ph-lock-key" aria-hidden="true"></i>未解锁</span>';
+                }
+                return markup;
+            }
+
+            function relationChipMarkupV10(node, relationKind) {
+                const ability = abilityForNodeV10(node);
+                const aria = '查看' + ability.name + ' ' + formatLevelV10(node.level);
+                const relationKindLabel = relationKind === 'mainline' ? '本主线' : '跨主线';
+                return (
+                    '<button type="button" data-jump-level-node="' + escapeHtmlV10(node.id) + '" class="dependency-chip role-' + escapeHtmlV10(node.role) + ' state-' + escapeHtmlV10(node.studyState) + '" aria-label="' + escapeHtmlV10(aria) + '">' +
+                        '<span class="min-w-0 flex-1">' +
+                            '<span class="mb-1.5 flex flex-wrap items-center gap-1.5">' +
+                                '<span class="dependency-relation-kind ' + (relationKind === 'mainline' ? 'is-mainline' : 'is-crossline') + '">' + relationKindLabel + '</span>' +
+                                relationStateMarkupV10(node) +
+                            '</span>' +
+                            '<span class="block truncate text-[13px] font-extrabold text-slate-800">' + escapeHtmlV10(ability.name) + '<span class="mx-1 font-bold text-slate-400">· ' + formatLevelV10(node.level) + ' ·</span>' + escapeHtmlV10(node.definition) + '</span>' +
+                        '</span>' +
+                        '<i class="dependency-chip-caret ph-bold ph-caret-right" aria-hidden="true"></i>' +
+                    '</button>'
+                );
+            }
+
+            function emptyRelationMarkupV10(label) {
+                return '<div class="dependency-empty"><i class="ph-bold ph-minus" aria-hidden="true"></i><span>' + label + '</span></div>';
+            }
+
+            function renderDependenciesV10(node) {
+                const ability = abilityForNodeV10(node);
+                const levelIndex = ability.levels.findIndex(function (item) { return item.id === node.id; });
+                const previousNode = levelIndex > 0 ? ability.levels[levelIndex - 1] : null;
+                const nextNode = levelIndex < ability.levels.length - 1 ? ability.levels[levelIndex + 1] : null;
+                const incoming = (previousNode ? [{ node: previousNode, relationKind: 'mainline' }] : []).concat(levelRelationshipsV10.filter(function (relationship) {
+                    return relationship.target === node.id;
+                }).map(function (relationship) {
+                    return { node: levelNodeByIdV10(relationship.source), relationKind: 'crossline' };
+                }));
+                const outgoing = (nextNode ? [{ node: nextNode, relationKind: 'mainline' }] : []).concat(levelRelationshipsV10.filter(function (relationship) {
+                    return relationship.source === node.id;
+                }).map(function (relationship) {
+                    return { node: levelNodeByIdV10(relationship.target), relationKind: 'crossline' };
+                }));
+                document.getElementById('dependency-view').innerHTML =
+                    '<div class="dependency-layout">' +
+                        '<div class="dependency-column' + (incoming.length ? '' : ' is-empty') + '">' +
+                            '<div class="mb-2 flex items-center justify-between gap-2 text-[12px] font-extrabold text-slate-600"><span>直接前置</span><span class="font-mono text-[10px] text-slate-400">' + incoming.length + '</span></div>' +
+                            '<div class="space-y-2">' + (incoming.length ? incoming.map(function (item) { return relationChipMarkupV10(item.node, item.relationKind); }).join('') : emptyRelationMarkupV10('无直接前置')) + '</div>' +
+                        '</div>' +
+                        '<div class="dependency-arrow" aria-hidden="true"><i class="ph-bold ph-arrow-right text-[22px]"></i></div>' +
+                        '<div class="dependency-focus">' +
+                            '<span class="dependency-focus-label mb-2"><i class="ph-bold ph-crosshair" aria-hidden="true"></i>正在查看</span>' +
+                            '<strong class="card-title text-center text-slate-950">' + escapeHtmlV10(ability.name) + '<span class="mx-1 text-[13px] font-bold text-brand">· ' + formatLevelV10(node.level) + ' ·</span>' + escapeHtmlV10(node.definition) + '</strong>' +
+                            '<span class="mt-2 text-[12px] font-semibold leading-[1.4] text-slate-500">' + escapeHtmlV10(node.description) + '</span>' +
+                            '<span class="mt-2 flex flex-wrap items-center justify-center gap-1.5">' + relationStateMarkupV10(node) + '</span>' +
+                        '</div>' +
+                        '<div class="dependency-arrow" aria-hidden="true"><i class="ph-bold ph-arrow-right text-[22px]"></i></div>' +
+                        '<div class="dependency-column' + (outgoing.length ? '' : ' is-empty') + '">' +
+                            '<div class="mb-2 flex items-center justify-between gap-2 text-[12px] font-extrabold text-slate-600"><span>直接后续</span><span class="font-mono text-[10px] text-slate-400">' + outgoing.length + '</span></div>' +
+                            '<div class="space-y-2">' + (outgoing.length ? outgoing.map(function (item) { return relationChipMarkupV10(item.node, item.relationKind); }).join('') : emptyRelationMarkupV10('无直接后续')) + '</div>' +
+                        '</div>' +
+                    '</div>';
+            }
+
+            function renderLearningV10(ability, node) {
+                document.getElementById('learning-title').textContent = ability.name + ' · ' + formatLevelV10(node.level) + ' 学习内容';
+                const status = document.getElementById('learning-status');
+                status.className = 'shrink-0 rounded-[6px] border px-2 py-1 text-[11px] font-extrabold ' + stateBadgeClassesV10(node);
+                status.textContent = node.canStudy ? (node.studyState === 'completed' ? '可复习' : '可学习') : '暂不可用';
+                document.getElementById('learning-grid').innerHTML = learningTypesV10.map(function (type) {
+                    const disabled = !node.canStudy;
+                    const actionLabel = '开始';
+                    return (
+                        '<button type="button" data-learning-type="' + escapeHtmlV10(type.name) + '" class="learning-card group flex min-h-[72px] w-full items-center gap-3 rounded-[14px] p-3 text-left active:scale-[0.97]"' + (disabled ? ' disabled aria-disabled="true"' : '') + ' aria-label="' + escapeHtmlV10((disabled ? '待解锁' : actionLabel) + ability.name + ' ' + formatLevelV10(node.level) + '的' + type.name) + '">' +
+                            '<span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] ' + (disabled ? 'bg-slate-100 opacity-55' : type.iconClass) + '"><img src="' + type.icon + '" alt="" class="' + type.iconSizeClass + '" aria-hidden="true"></span>' +
+                            '<span class="card-title min-w-0 flex-1 truncate ' + (disabled ? 'text-slate-400' : 'text-slate-900') + '">' + escapeHtmlV10(type.name) + '</span>' +
+                            (disabled
+                                ? '<span class="shrink-0 text-[11px] font-extrabold text-slate-400">待解锁</span>'
+                                : '<span class="flex shrink-0 items-center gap-1 text-[12px] font-extrabold text-brand">' + actionLabel + '<i class="ph-bold ph-caret-right text-[14px]" aria-hidden="true"></i></span>') +
+                        '</button>'
+                    );
+                }).join('');
+            }
+
+            function teacherReviewContextV10(ability, node) {
+                const nodeIndex = ability.levels.findIndex(function (item) { return item.id === node.id; });
+                const previousNode = nodeIndex > 0 ? ability.levels[nodeIndex - 1] : null;
+                const nextNode = nodeIndex < ability.levels.length - 1 ? ability.levels[nodeIndex + 1] : null;
+                if (node.role === 'completed' && nextNode && nextNode.role === 'current' && nextNode.studyState === 'locked') {
+                    return { assessmentNode: node, nextNode: nextNode, isGateReview: true };
+                }
+                if (node.role === 'current' && node.studyState === 'locked' && previousNode && previousNode.role === 'completed') {
+                    return { assessmentNode: previousNode, nextNode: node, isGateReview: true };
+                }
+                if (node.role === 'current' && node.canStudy && nextNode) {
+                    return { assessmentNode: node, nextNode: nextNode, isGateReview: false };
+                }
+                return null;
+            }
+
+            function renderTeacherReviewV10(ability, node) {
+                const container = document.getElementById('teacher-review');
+                const context = teacherReviewContextV10(ability, node);
+                if (!context) {
+                    container.hidden = true;
+                    container.className = '';
+                    container.innerHTML = '';
+                    return;
+                }
+                const reminderKey = context.assessmentNode.id + '--' + context.nextNode.id;
+                const reminded = teacherReminderKeysV10.has(reminderKey);
+                const starCopy = context.assessmentNode.masteryStars > 0 ? context.assessmentNode.masteryStars + ' 星记录' : '本阶段表现';
+                const guidance = context.isGateReview
+                    ? '请老师复核 ' + formatLevelV10(context.assessmentNode.level) + ' 的 ' + starCopy + '，并确认是否进入 ' + formatLevelV10(context.nextNode.level)
+                    : '完成后提醒老师评定星级，并确认是否进入 ' + formatLevelV10(context.nextNode.level);
+                const stateBadge = reminded
+                    ? '<span class="rounded-[6px] border border-green-200 bg-green-50 px-1.5 py-1 text-[10px] font-extrabold text-green-700">已送达</span>'
+                    : '<span class="rounded-[6px] border border-blue-100 bg-white px-1.5 py-1 text-[10px] font-extrabold text-blue-600">待评定</span>';
+                const actionMarkup = reminded
+                    ? '<button type="button" class="flex min-h-11 shrink-0 cursor-default items-center justify-center gap-1.5 rounded-[10px] border border-green-200 bg-green-50 px-3 text-[13px] font-extrabold text-green-700" disabled aria-disabled="true"><i class="ph-bold ph-check-circle text-[17px]" aria-hidden="true"></i>已提醒</button>'
+                    : '<button type="button" data-teacher-reminder="' + escapeHtmlV10(reminderKey) + '" class="flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-[10px] border border-blue-200 bg-white px-3 text-[13px] font-extrabold text-brand transition active:scale-95" aria-label="提醒老师评定星级并确认是否进入下一节点"><i class="ph-bold ph-bell-ringing text-[17px]" aria-hidden="true"></i>提醒老师</button>';
+                container.hidden = false;
+                container.className = 'mt-3';
+                container.innerHTML =
+                    '<div class="flex min-h-[64px] flex-wrap items-center gap-3 rounded-[14px] border border-blue-100 bg-blue-50/40 px-3 py-2.5 sm:flex-nowrap">' +
+                        '<span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-white text-brand shadow-sm"><i class="ph-bold ph-chalkboard-teacher text-[19px]" aria-hidden="true"></i></span>' +
+                        '<span class="min-w-[180px] flex-1">' +
+                            '<span class="flex flex-wrap items-center gap-2"><strong class="text-[13px] font-extrabold text-slate-800">阶段评定</strong>' + stateBadge + '</span>' +
+                            '<span class="mt-1 block text-[12px] font-semibold leading-[1.4] text-slate-500">' + escapeHtmlV10(reminded ? '老师处理后会同步星级与下一节点状态' : guidance) + '</span>' +
+                        '</span>' +
+                        actionMarkup +
+                    '</div>';
+            }
+
+            function renderDetailV10() {
+                const ability = abilityByIdV10(stateV10.selectedAbilityId);
+                const node = selectedNodeV10();
+                if (!ability || !node || node.abilityId !== ability.id) return;
+                document.getElementById('detail-header-title').textContent = ability.name;
+                document.getElementById('detail-mainline').innerHTML = mainlineMarkupV10(ability, node.id, true);
+                renderDependenciesV10(node);
+                renderLearningV10(ability, node);
+                renderTeacherReviewV10(ability, node);
+            }
+
+            function revealSelectedDetailNodeV10(smooth) {
+                window.requestAnimationFrame(function () {
+                    const scroller = document.getElementById('detail-mainline');
+                    const selected = scroller ? scroller.querySelector('[data-level-node-id="' + stateV10.selectedLevelNodeId + '"]') : null;
+                    if (!scroller || !selected) return;
+                    const targetLeft = Math.max(0, selected.offsetLeft - (scroller.clientWidth - selected.offsetWidth) / 2);
+                    scroller.scrollTo({ left: targetLeft, behavior: smooth ? 'smooth' : 'auto' });
+                });
+            }
+
+            function detailSwitchTargetsV10(includeHeader) {
+                const selectors = [
+                    '#dependency-view',
+                    '#learning-title',
+                    '#learning-status',
+                    '#learning-grid',
+                    '#teacher-review'
+                ];
+                if (includeHeader) selectors.unshift('#detail-header-title', '#detail-mainline');
+                return Array.from(document.querySelectorAll(selectors.join(',')));
+            }
+
+            function clearDetailSwitchGhostsV10() {
+                detailSwitchGhostsV10.forEach(function (ghost) { ghost.remove(); });
+                detailSwitchGhostsV10 = [];
+            }
+
+            function captureDetailSwitchGhostsV10(targets) {
+                if (!detailMotionLayerV10) return [];
+                const viewportWidth = document.documentElement.clientWidth;
+                const viewportHeight = document.documentElement.clientHeight;
+                detailSwitchGhostsV10 = targets.map(function (target) {
+                    const rect = target.getBoundingClientRect();
+                    if (rect.width < 1 || rect.height < 1 || rect.right <= 0 || rect.bottom <= 0 || rect.left >= viewportWidth || rect.top >= viewportHeight) return null;
+                    const shell = document.createElement('div');
+                    const clone = target.cloneNode(true);
+                    shell.className = 'detail-switch-ghost';
+                    shell.style.left = rect.left + 'px';
+                    shell.style.top = rect.top + 'px';
+                    shell.style.width = rect.width + 'px';
+                    shell.style.height = rect.height + 'px';
+                    clone.removeAttribute('id');
+                    clone.removeAttribute('aria-live');
+                    clone.setAttribute('aria-hidden', 'true');
+                    clone.setAttribute('inert', '');
+                    clone.querySelectorAll('[id]').forEach(function (element) { element.removeAttribute('id'); });
+                    clone.querySelectorAll('button, a, input, [tabindex]').forEach(function (element) { element.setAttribute('tabindex', '-1'); });
+                    shell.appendChild(clone);
+                    detailMotionLayerV10.appendChild(shell);
+                    clone.scrollLeft = target.scrollLeft;
+                    clone.scrollTop = target.scrollTop;
+                    return shell;
+                }).filter(Boolean);
+                return detailSwitchGhostsV10;
+            }
+
+            function resetDetailSwitchMotionV10() {
+                detailSwitchSequenceV10 += 1;
+                if (detailSwitchTimelineV10) {
+                    detailSwitchTimelineV10.kill();
+                    detailSwitchTimelineV10 = null;
+                }
+                clearDetailSwitchGhostsV10();
+                if (window.gsap) {
+                    const activeTargets = detailSwitchTargetsV10(true);
+                    if (activeTargets.length) window.gsap.set(activeTargets, { clearProps: 'opacity,transform,willChange' });
+                }
+                pagesV10.detail.removeAttribute('aria-busy');
+            }
+
+            function updateDetailMainlineSelectionV10(ability, node) {
+                const mainline = document.getElementById('detail-mainline');
+                if (!mainline) return;
+                mainline.querySelectorAll('[data-level-node-id]').forEach(function (button) {
+                    const buttonNode = levelNodeByIdV10(button.dataset.levelNodeId);
+                    if (!buttonNode) return;
+                    const isViewed = buttonNode.id === node.id;
+                    button.classList.toggle('is-selected', isViewed);
+                    button.setAttribute('aria-pressed', isViewed ? 'true' : 'false');
+                    button.setAttribute('aria-label', ability.name + ' ' + formatLevelV10(buttonNode.level) + '，' + buttonNode.definition + '，' + roleLabelV10(buttonNode) + (isViewed ? '，正在查看' : ''));
+                });
+            }
+
+            function detailSwitchDirectionV10(ability, node) {
+                const previousNode = selectedNodeV10();
+                if (!previousNode) return 1;
+                if (previousNode.abilityId === ability.id) {
+                    const previousIndex = ability.levels.findIndex(function (item) { return item.id === previousNode.id; });
+                    const nextIndex = ability.levels.findIndex(function (item) { return item.id === node.id; });
+                    return nextIndex < previousIndex ? -1 : 1;
+                }
+                const previousAbilityIndex = abilitiesV10.findIndex(function (item) { return item.id === previousNode.abilityId; });
+                const nextAbilityIndex = abilitiesV10.findIndex(function (item) { return item.id === ability.id; });
+                return nextAbilityIndex < previousAbilityIndex ? -1 : 1;
+            }
+
+            function commitDetailSelectionV10(ability, node, resetScroll, smoothScroll, abilityChanged) {
+                stateV10.selectedAbilityId = ability.id;
+                stateV10.selectedLevelNodeId = node.id;
+                if (abilityChanged) {
+                    renderDetailV10();
+                } else {
+                    updateDetailMainlineSelectionV10(ability, node);
+                    renderDependenciesV10(node);
+                    renderLearningV10(ability, node);
+                    renderTeacherReviewV10(ability, node);
+                }
+                revealSelectedDetailNodeV10(smoothScroll);
+                if (resetScroll) {
+                    const detailScroller = document.querySelector('#detail-page .native-scroll');
+                    if (detailScroller) detailScroller.scrollTop = 0;
+                }
+            }
+
+            function animateDetailSelectionV10(ability, node, resetScroll) {
+                if (!ability || !node) return;
+                const abilityChanged = ability.id !== stateV10.selectedAbilityId;
+                if (!abilityChanged && node.id === stateV10.selectedLevelNodeId) return;
+                const reducedMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                const direction = detailSwitchDirectionV10(ability, node);
+                resetDetailSwitchMotionV10();
+                const sequence = detailSwitchSequenceV10;
+                if (!window.gsap || reducedMotion) {
+                    commitDetailSelectionV10(ability, node, resetScroll, false, abilityChanged);
+                    return;
+                }
+
+                const outgoingTargets = detailSwitchTargetsV10(abilityChanged);
+                const outgoingGhosts = captureDetailSwitchGhostsV10(outgoingTargets);
+                commitDetailSelectionV10(ability, node, resetScroll, true, abilityChanged);
+                const incomingTargets = detailSwitchTargetsV10(abilityChanged);
+                pagesV10.detail.setAttribute('aria-busy', 'true');
+                window.gsap.set(incomingTargets, {
+                    opacity: 0,
+                    x: direction * 12,
+                    force3D: true,
+                    willChange: 'transform,opacity'
+                });
+                detailSwitchTimelineV10 = window.gsap.timeline({
+                    onComplete: function () {
+                        if (sequence !== detailSwitchSequenceV10) return;
+                        clearDetailSwitchGhostsV10();
+                        pagesV10.detail.removeAttribute('aria-busy');
+                        detailSwitchTimelineV10 = null;
+                    }
+                });
+                if (outgoingGhosts.length) {
+                    detailSwitchTimelineV10.to(outgoingGhosts, {
+                        opacity: 0,
+                        x: direction * -12,
+                        duration: 0.28,
+                        ease: 'sine.inOut'
+                    }, 0);
+                }
+                detailSwitchTimelineV10.to(incomingTargets, {
+                    opacity: 1,
+                    x: 0,
+                    duration: 0.28,
+                    ease: 'sine.inOut',
+                    clearProps: 'opacity,transform,willChange'
+                }, 0);
+            }
+
+            function showPageV10(name) {
+                if (name !== 'detail') resetDetailSwitchMotionV10();
+                Object.keys(pagesV10).forEach(function (pageName) {
+                    pagesV10[pageName].classList.toggle('is-active', pageName === name);
+                });
+                stateV10.view = name;
+                if (name === 'overview') {
+                    window.requestAnimationFrame(function () {
+                        updateOverviewScrollCueV10();
+                        updateAbilityRowOverflowV10();
+                    });
+                }
+            }
+
+            function openDetailV10(abilityId, levelNodeId) {
+                const ability = abilityByIdV10(abilityId);
+                if (!ability) return;
+                const requested = levelNodeByIdV10(levelNodeId);
+                const node = requested && requested.abilityId === ability.id ? requested : levelNodeByIdV10(ability.currentLevelNodeId);
+                if (!node) return;
+                if (stateV10.view === 'detail') {
+                    animateDetailSelectionV10(ability, node, true);
+                    return;
+                }
+                stateV10.selectedAbilityId = ability.id;
+                stateV10.selectedLevelNodeId = node.id;
+                showPageV10('detail');
+                renderDetailV10();
+                revealSelectedDetailNodeV10(false);
+                const detailScroller = document.querySelector('#detail-page .native-scroll');
+                if (detailScroller) detailScroller.scrollTop = 0;
+            }
+
+            function selectDetailNodeV10(levelNodeId) {
+                const node = levelNodeByIdV10(levelNodeId);
+                if (!node || node.abilityId !== stateV10.selectedAbilityId) return;
+                const ability = abilityByIdV10(node.abilityId);
+                animateDetailSelectionV10(ability, node, false);
+            }
+
+            function showToastV10(message) {
+                const toast = document.getElementById('action-toast');
+                document.getElementById('action-toast-text').textContent = message;
+                window.clearTimeout(toastTimerV10);
+                toast.classList.add('is-visible');
+                toastTimerV10 = window.setTimeout(function () {
+                    toast.classList.remove('is-visible');
+                }, 1800);
+            }
+
+            function svgElementV10(name, attributes, text) {
+                const element = document.createElementNS('http://www.w3.org/2000/svg', name);
+                Object.keys(attributes || {}).forEach(function (key) {
+                    element.setAttribute(key, String(attributes[key]));
+                });
+                if (typeof text === 'string') element.textContent = text;
+                return element;
+            }
+
+            function appendTopologyLockIconV10(parent, metrics) {
+                const foreignObject = svgElementV10('foreignObject', {
+                    x: String(metrics.x + metrics.width - 28),
+                    y: String(metrics.y + metrics.height - 27),
+                    width: '20',
+                    height: '20',
+                    'pointer-events': 'none'
+                });
+                const wrapper = document.createElementNS('http://www.w3.org/1999/xhtml', 'span');
+                wrapper.setAttribute('class', 'topology-lock-icon');
+                const icon = document.createElementNS('http://www.w3.org/1999/xhtml', 'i');
+                icon.setAttribute('class', 'ph-bold ph-lock-key');
+                icon.setAttribute('aria-hidden', 'true');
+                wrapper.appendChild(icon);
+                foreignObject.appendChild(wrapper);
+                parent.appendChild(foreignObject);
+            }
+
+            function graphStageEdgesV10() {
+                return levelRelationshipsV10.map(function (relationship, index) {
+                    const sourceNode = levelNodeByIdV10(relationship.source);
+                    const targetNode = levelNodeByIdV10(relationship.target);
+                    return {
+                        id: relationship.id || 'stage-edge-' + index,
+                        source: sourceNode.id,
+                        target: targetNode.id,
+                        sourceAbilityId: sourceNode.abilityId,
+                        targetAbilityId: targetNode.abilityId,
+                        reviewState: relationship.reviewState || 'normal'
+                    };
+                });
+            }
+
+            function collectTopologyFocusV10(selectedNodeId) {
+                const nodeIds = new Set();
+                const incomingNodeIds = new Set();
+                const outgoingNodeIds = new Set();
+                const edgeIds = new Set();
+                const mainlineEdgeIds = new Set();
+                function result() {
+                    return {
+                        nodeIds: nodeIds,
+                        incomingNodeIds: incomingNodeIds,
+                        outgoingNodeIds: outgoingNodeIds,
+                        edgeIds: edgeIds,
+                        mainlineEdgeIds: mainlineEdgeIds
+                    };
+                }
+                function includeNode(node) {
+                    if (!node) return;
+                    nodeIds.add(node.id);
+                }
+                if (!selectedNodeId) return result();
+                const selectedNode = levelNodeByIdV10(selectedNodeId);
+                if (!selectedNode) return result();
+                includeNode(selectedNode);
+                const selectedAbility = abilityForNodeV10(selectedNode);
+                const selectedIndex = selectedAbility.levels.findIndex(function (node) { return node.id === selectedNode.id; });
+                const previousNode = selectedIndex > 0 ? selectedAbility.levels[selectedIndex - 1] : null;
+                const nextNode = selectedIndex < selectedAbility.levels.length - 1 ? selectedAbility.levels[selectedIndex + 1] : null;
+                if (previousNode) {
+                    incomingNodeIds.add(previousNode.id);
+                    mainlineEdgeIds.add(previousNode.id + '->' + selectedNode.id);
+                    includeNode(previousNode);
+                }
+                if (nextNode) {
+                    outgoingNodeIds.add(nextNode.id);
+                    mainlineEdgeIds.add(selectedNode.id + '->' + nextNode.id);
+                    includeNode(nextNode);
+                }
+                const edges = graphStageEdgesV10();
+                edges.forEach(function (edge) {
+                    if (edge.source !== selectedNode.id && edge.target !== selectedNode.id) return;
+                    edgeIds.add(edge.id);
+                    if (edge.target === selectedNode.id) {
+                        incomingNodeIds.add(edge.source);
+                        includeNode(levelNodeByIdV10(edge.source));
+                    }
+                    if (edge.source === selectedNode.id) {
+                        outgoingNodeIds.add(edge.target);
+                        includeNode(levelNodeByIdV10(edge.target));
+                    }
+                });
+                return result();
+            }
+
+            function topologyNodePaletteV10(node) {
+                if (node.role === 'completed') return { fill: '#F3FCF6', stroke: '#BFE7CB', text: '#166534', dash: '' };
+                if (node.role === 'current') return { fill: '#FFFBEB', stroke: '#F0C36A', text: '#92400E', dash: node.studyState === 'locked' ? '5 3' : '' };
+                if (node.role === 'target') return { fill: '#EDF3FF', stroke: '#5D8AFF', text: '#1746B2', dash: '6 4' };
+                if (node.studyState === 'locked') return { fill: '#FFFFFF', stroke: '#AEB9C8', text: '#526174', dash: '5 3' };
+                return { fill: '#F7F9FF', stroke: '#C9D8FF', text: '#405572', dash: '' };
+            }
+
+            function topologyStageMetricsV10(ability, levelIndex) {
+                const rowIndex = topologyAbilityOrderV10.indexOf(ability.id);
+                const x = topologyLayoutV10.stageStartX + levelIndex * topologyLayoutV10.stageStepX;
+                const y = topologyLayoutV10.rowStartY + rowIndex * topologyLayoutV10.rowPitch;
+                return {
+                    x: x,
+                    y: y,
+                    width: topologyLayoutV10.stageWidth,
+                    height: topologyLayoutV10.stageHeight,
+                    centerX: x + topologyLayoutV10.stageWidth / 2,
+                    centerY: y + topologyLayoutV10.stageHeight / 2
+                };
+            }
+
+            function topologyMetricsForNodeV10(nodeId) {
+                const node = levelNodeByIdV10(nodeId);
+                const ability = abilityForNodeV10(node);
+                if (!node || !ability) return null;
+                return topologyStageMetricsV10(ability, ability.levels.findIndex(function (item) { return item.id === node.id; }));
+            }
+
+            function topologyNodeRowV10(nodeId) {
+                const node = levelNodeByIdV10(nodeId);
+                return node ? topologyAbilityOrderV10.indexOf(node.abilityId) : -1;
+            }
+
+            function topologyRelationshipDirectionV10(edge) {
+                return topologyNodeRowV10(edge.target) > topologyNodeRowV10(edge.source) ? 'down' : 'up';
+            }
+
+            function topologyEndpointPeersV10(edges, edge, endpoint) {
+                const peerEndpoint = endpoint === 'source' ? 'target' : 'source';
+                return edges.filter(function (item) {
+                    return item[endpoint] === edge[endpoint] && topologyRelationshipDirectionV10(item) === topologyRelationshipDirectionV10(edge);
+                }).sort(function (first, second) {
+                    const rowDifference = topologyNodeRowV10(first[peerEndpoint]) - topologyNodeRowV10(second[peerEndpoint]);
+                    const firstPeer = levelNodeByIdV10(first[peerEndpoint]);
+                    const secondPeer = levelNodeByIdV10(second[peerEndpoint]);
+                    const levelDifference = firstPeer.level - secondPeer.level;
+                    return rowDifference || levelDifference || edges.indexOf(first) - edges.indexOf(second);
+                });
+            }
+
+            function topologyTargetChannelPeersV10(edges, edge) {
+                const targetNode = levelNodeByIdV10(edge.target);
+                const direction = topologyRelationshipDirectionV10(edge);
+                return edges.filter(function (item) {
+                    const itemTarget = levelNodeByIdV10(item.target);
+                    return itemTarget && targetNode && itemTarget.level === targetNode.level && topologyRelationshipDirectionV10(item) === direction;
+                }).sort(function (first, second) {
+                    const targetRowDifference = topologyNodeRowV10(first.target) - topologyNodeRowV10(second.target);
+                    const sourceRowDifference = topologyNodeRowV10(first.source) - topologyNodeRowV10(second.source);
+                    return targetRowDifference || sourceRowDifference || edges.indexOf(first) - edges.indexOf(second);
+                });
+            }
+
+            function topologyHorizontalGapV10(node, side) {
+                const ability = abilityForNodeV10(node);
+                const index = ability.levels.findIndex(function (item) { return item.id === node.id; });
+                const metrics = topologyStageMetricsV10(ability, index);
+                if (side === 'left') {
+                    const previousRight = index === 0
+                        ? topologyLayoutV10.labelX + topologyLayoutV10.labelWidth
+                        : topologyStageMetricsV10(ability, index - 1).x + topologyLayoutV10.stageWidth;
+                    return { min: previousRight + 4, max: metrics.x - 4 };
+                }
+                const nextLeft = index === ability.levels.length - 1
+                    ? topologyLayoutV10.viewWidth - 8
+                    : topologyStageMetricsV10(ability, index + 1).x;
+                return { min: metrics.x + metrics.width + 4, max: nextLeft - 4 };
+            }
+
+            function topologyChannelXInGapV10(node, side, peerCount, peerIndex) {
+                const gap = topologyHorizontalGapV10(node, side);
+                const fraction = (peerIndex + 1) / (peerCount + 1);
+                return side === 'left'
+                    ? gap.max - (gap.max - gap.min) * fraction
+                    : gap.min + (gap.max - gap.min) * fraction;
+            }
+
+            function topologyPortYV10(metrics, peerCount, peerIndex, half) {
+                const topMin = metrics.y + 13;
+                const topMax = metrics.centerY - 6;
+                const bottomMin = metrics.centerY + 6;
+                const bottomMax = metrics.y + metrics.height - 13;
+                const start = half === 'top' ? topMin : bottomMin;
+                const end = half === 'top' ? topMax : bottomMax;
+                if (peerCount <= 1) return (start + end) / 2;
+                return start + (end - start) * peerIndex / (peerCount - 1);
+            }
+
+            function topologySourceLaneYV10(metrics, direction, peerCount, peerIndex) {
+                const rowGap = topologyLayoutV10.rowPitch - topologyLayoutV10.stageHeight;
+                const start = direction === 'down'
+                    ? metrics.y + metrics.height + rowGap / 2 + 1
+                    : metrics.y - rowGap + 4;
+                const end = direction === 'down'
+                    ? metrics.y + metrics.height + rowGap - 4
+                    : metrics.y - rowGap / 2 - 1;
+                if (peerCount <= 1) return (start + end) / 2;
+                return start + (end - start) * peerIndex / (peerCount - 1);
+            }
+
+            function topologyPathV10(edge, edges) {
+                const sourceMetrics = topologyMetricsForNodeV10(edge.source);
+                const targetMetrics = topologyMetricsForNodeV10(edge.target);
+                if (!sourceMetrics || !targetMetrics) return null;
+                const sourceNode = levelNodeByIdV10(edge.source);
+                const targetNode = levelNodeByIdV10(edge.target);
+                const sourcePeers = topologyEndpointPeersV10(edges, edge, 'source');
+                const targetPeers = topologyEndpointPeersV10(edges, edge, 'target');
+                const targetChannelPeers = topologyTargetChannelPeersV10(edges, edge);
+                const sourceIndex = sourcePeers.findIndex(function (item) { return item.id === edge.id; });
+                const targetIndex = targetPeers.findIndex(function (item) { return item.id === edge.id; });
+                const targetChannelIndex = targetChannelPeers.findIndex(function (item) { return item.id === edge.id; });
+                const direction = topologyRelationshipDirectionV10(edge);
+                const sourceSide = direction === 'down' ? 'right' : 'left';
+                const targetSide = direction === 'down' ? 'left' : 'right';
+                const start = {
+                    x: sourceSide === 'right' ? sourceMetrics.x + sourceMetrics.width : sourceMetrics.x,
+                    y: topologyPortYV10(sourceMetrics, sourcePeers.length, sourceIndex, direction === 'down' ? 'bottom' : 'top')
+                };
+                const end = {
+                    x: targetSide === 'left' ? targetMetrics.x : targetMetrics.x + targetMetrics.width,
+                    y: topologyPortYV10(targetMetrics, targetPeers.length, targetIndex, direction === 'down' ? 'top' : 'bottom')
+                };
+                const sourceExitX = topologyChannelXInGapV10(sourceNode, sourceSide, sourcePeers.length, sourceIndex);
+                const sourceLaneY = topologySourceLaneYV10(sourceMetrics, direction, sourcePeers.length, sourceIndex);
+                const targetChannelX = topologyChannelXInGapV10(targetNode, targetSide, targetChannelPeers.length, targetChannelIndex);
+                return {
+                    d: 'M ' + start.x.toFixed(2) + ' ' + start.y.toFixed(2) +
+                        ' H ' + sourceExitX.toFixed(2) +
+                        ' V ' + sourceLaneY.toFixed(2) +
+                        ' H ' + targetChannelX.toFixed(2) +
+                        ' V ' + end.y.toFixed(2) +
+                        ' H ' + end.x.toFixed(2),
+                    start: start,
+                    end: end,
+                    sourceExitX: sourceExitX,
+                    sourceLaneY: sourceLaneY,
+                    targetChannelX: targetChannelX,
+                    sourceIndex: sourceIndex,
+                    targetIndex: targetIndex,
+                    targetChannelIndex: targetChannelIndex,
+                    sourceNode: sourceNode,
+                    targetNode: targetNode,
+                    direction: direction
+                };
+            }
+
+            function detectRelationshipCycleEdgeIdsV10(edges) {
+                const adjacency = new Map();
+                const nodeIds = new Set();
+                edges.forEach(function (edge) {
+                    nodeIds.add(edge.source);
+                    nodeIds.add(edge.target);
+                    const outgoing = adjacency.get(edge.source) || [];
+                    outgoing.push(edge);
+                    adjacency.set(edge.source, outgoing);
+                });
+                let visitIndex = 0;
+                const indexes = new Map();
+                const lowLinks = new Map();
+                const stack = [];
+                const onStack = new Set();
+                const componentByNode = new Map();
+                const componentSizes = new Map();
+                let componentIndex = 0;
+
+                function visit(nodeId) {
+                    indexes.set(nodeId, visitIndex);
+                    lowLinks.set(nodeId, visitIndex);
+                    visitIndex += 1;
+                    stack.push(nodeId);
+                    onStack.add(nodeId);
+                    (adjacency.get(nodeId) || []).forEach(function (edge) {
+                        if (!indexes.has(edge.target)) {
+                            visit(edge.target);
+                            lowLinks.set(nodeId, Math.min(lowLinks.get(nodeId), lowLinks.get(edge.target)));
+                        } else if (onStack.has(edge.target)) {
+                            lowLinks.set(nodeId, Math.min(lowLinks.get(nodeId), indexes.get(edge.target)));
+                        }
+                    });
+                    if (lowLinks.get(nodeId) !== indexes.get(nodeId)) return;
+                    let memberCount = 0;
+                    let memberId = null;
+                    do {
+                        memberId = stack.pop();
+                        onStack.delete(memberId);
+                        componentByNode.set(memberId, componentIndex);
+                        memberCount += 1;
+                    } while (memberId !== nodeId);
+                    componentSizes.set(componentIndex, memberCount);
+                    componentIndex += 1;
+                }
+
+                nodeIds.forEach(function (nodeId) {
+                    if (!indexes.has(nodeId)) visit(nodeId);
+                });
+                const cycleEdgeIds = new Set();
+                edges.forEach(function (edge) {
+                    const component = componentByNode.get(edge.source);
+                    if (component !== componentByNode.get(edge.target)) return;
+                    if (edge.source === edge.target || componentSizes.get(component) > 1) cycleEdgeIds.add(edge.id);
+                });
+                return cycleEdgeIds;
+            }
+
+            function relationshipAuditVisibleV10() {
+                const params = new URLSearchParams(window.location.search);
+                return params.get('debug') === '1' || params.get('audience') === 'teacher' || params.get('audience') === 'admin';
+            }
+
+            function invalidCycleEdgeIdsV10(edges) {
+                if (!relationshipAuditVisibleV10()) return new Set();
+                const structuralCycleEdgeIds = detectRelationshipCycleEdgeIdsV10(edges);
+                return new Set(edges.filter(function (edge) {
+                    return edge.reviewState === 'invalid-cycle' && structuralCycleEdgeIds.has(edge.id);
+                }).map(function (edge) { return edge.id; }));
+            }
+
+            function appendTopologyMarkerV10(defs, id, color, size) {
+                const marker = svgElementV10('marker', {
+                    id: id,
+                    viewBox: '0 0 10 10',
+                    refX: '9.5',
+                    refY: '5',
+                    markerWidth: String(size),
+                    markerHeight: String(size),
+                    markerUnits: 'userSpaceOnUse',
+                    orient: 'auto',
+                    overflow: 'visible'
+                });
+                marker.appendChild(svgElementV10('path', { d: 'M 0 0 L 10 5 L 0 10 L 2.4 5 Z', fill: color }));
+                defs.appendChild(marker);
+            }
+
+            function topologyDependencyStyleV10(kind, auditWarning) {
+                const markerPrefix = kind === 'cross' ? 'topology-cross-arrow-v10-' : 'topology-main-arrow-v10-';
+                if (kind === 'mainline') {
+                    return {
+                        stroke: '#718096',
+                        strokeWidth: 1.8,
+                        opacity: 0.84,
+                        underlayWidth: 5,
+                        underlayOpacity: 0.94,
+                        marker: 'url(#' + markerPrefix + 'default)'
+                    };
+                }
+                return {
+                    stroke: auditWarning ? '#C57A17' : '#1F5FFF',
+                    strokeWidth: 2.9,
+                    opacity: 1,
+                    underlayWidth: 7.2,
+                    underlayOpacity: 0.98,
+                    marker: 'url(#' + markerPrefix + (auditWarning ? 'warning' : 'focus') + ')'
+                };
+            }
+
+            function updateTopologyContextV10(selectedNode) {
+                const hasFocus = Boolean(selectedNode);
+                topologyModeBadgeV10.textContent = hasFocus ? '聚焦' : '全图';
+                topologyModeBadgeV10.classList.toggle('is-focus', hasFocus);
+                topologyResetButtonV10.hidden = !hasFocus;
+                if (!hasFocus) {
+                    topologyContextLabelV10.textContent = '可点击任一节点切换查看其直接前置与后续关系';
+                    topologySvgV10.setAttribute('aria-label', '全部能力主线与阶段；主线内相邻连接始终显示；跨主线关联默认隐藏；点按阶段查看本主线相邻阶段与全部一层直接跨主线关系');
+                    return;
+                }
+                const ability = abilityForNodeV10(selectedNode);
+                const focusName = ability.name + ' ' + formatLevelV10(selectedNode.level) + ' · ' + selectedNode.definition;
+                topologyContextLabelV10.textContent = '可点击任一节点切换查看其直接前置与后续关系';
+                topologySvgV10.setAttribute('aria-label', '已聚焦' + focusName + '；显示本主线相邻阶段与全部一层直接跨主线前置及后续；其他节点仅降低透明度；再次点按焦点或点按空白恢复全图');
+            }
+
+            function renderTopologyV10() {
+                const selectedNodeId = stateV10.topologySelectedNodeId;
+                const selectedNode = levelNodeByIdV10(selectedNodeId);
+                const hasFocus = Boolean(selectedNode);
+                const focus = collectTopologyFocusV10(selectedNodeId);
+                updateTopologyContextV10(selectedNode);
+                while (topologyViewportV10.firstChild) topologyViewportV10.removeChild(topologyViewportV10.firstChild);
+
+                const defs = svgElementV10('defs');
+                appendTopologyMarkerV10(defs, 'topology-cross-arrow-v10-focus', '#1F5FFF', 12.4);
+                appendTopologyMarkerV10(defs, 'topology-cross-arrow-v10-warning', '#C57A17', 12.4);
+                appendTopologyMarkerV10(defs, 'topology-main-arrow-v10-default', '#718096', 9.4);
+                appendTopologyMarkerV10(defs, 'topology-main-arrow-v10-focus', '#315DCC', 10.8);
+                topologyViewportV10.appendChild(defs);
+
+                const laneGroup = svgElementV10('g', { 'aria-hidden': 'true' });
+                topologyAbilityOrderV10.forEach(function (abilityId, rowIndex) {
+                    const ability = abilityByIdV10(abilityId);
+                    const y = topologyLayoutV10.rowStartY + rowIndex * topologyLayoutV10.rowPitch;
+                    laneGroup.appendChild(svgElementV10('rect', {
+                        x: String(topologyLayoutV10.laneX),
+                        y: String(y - 4),
+                        width: String(topologyLayoutV10.laneRightX - topologyLayoutV10.laneX),
+                        height: String(topologyLayoutV10.stageHeight + 8),
+                        rx: '14',
+                        fill: '#FFFFFF',
+                        stroke: '#E8EDF4',
+                        'stroke-width': '1',
+                        opacity: '0.9'
+                    }));
+                    laneGroup.appendChild(svgElementV10('rect', {
+                        x: String(topologyLayoutV10.labelX),
+                        y: String(y),
+                        width: String(topologyLayoutV10.labelWidth),
+                        height: String(topologyLayoutV10.stageHeight),
+                        rx: '12',
+                        fill: '#F4F7FF',
+                        stroke: '#C9D8FF',
+                        'stroke-width': '1',
+                        opacity: '1'
+                    }));
+                    laneGroup.appendChild(svgElementV10('rect', {
+                        x: String(topologyLayoutV10.labelX),
+                        y: String(y + 14),
+                        width: '4',
+                        height: String(topologyLayoutV10.stageHeight - 28),
+                        rx: '2',
+                        fill: '#7DA1FF',
+                        opacity: '1'
+                    }));
+                    laneGroup.appendChild(svgElementV10('text', {
+                        x: String(topologyLayoutV10.labelX + 18),
+                        y: String(y + topologyLayoutV10.stageHeight / 2 + 7),
+                        fill: '#173E9C',
+                        'font-size': '18',
+                        'font-weight': '900',
+                        opacity: '1'
+                    }, ability.name));
+                });
+                topologyViewportV10.appendChild(laneGroup);
+
+                const edges = graphStageEdgesV10();
+                const routeRecords = edges.map(function (edge) {
+                    return { edge: edge, route: topologyPathV10(edge, edges) };
+                }).filter(function (record) { return Boolean(record.route); });
+                const visibleRouteRecords = hasFocus
+                    ? routeRecords.filter(function (record) { return focus.edgeIds.has(record.edge.id); })
+                    : [];
+                const invalidCycleEdgeIds = invalidCycleEdgeIdsV10(edges);
+
+                const mainlineConnectorGroup = svgElementV10('g', { 'aria-label': '主线内相邻阶段依赖', 'data-topology-layer': 'mainline' });
+                topologyAbilityOrderV10.forEach(function (abilityId) {
+                    const ability = abilityByIdV10(abilityId);
+                    ability.levels.forEach(function (node, index) {
+                        if (index === 0) return;
+                        const previousNode = ability.levels[index - 1];
+                        const previousMetrics = topologyStageMetricsV10(ability, index - 1);
+                        const metrics = topologyStageMetricsV10(ability, index);
+                        const style = topologyDependencyStyleV10('mainline', false);
+                        const edgeKey = previousNode.id + '->' + node.id;
+                        const isDirectFocusEdge = hasFocus && focus.mainlineEdgeIds.has(edgeKey);
+                        const connectorStroke = isDirectFocusEdge ? '#315DCC' : style.stroke;
+                        const connectorOpacity = hasFocus ? (isDirectFocusEdge ? 1 : 0.13) : style.opacity;
+                        const connectorWidth = isDirectFocusEdge ? 2.4 : style.strokeWidth;
+                        const connectorMarker = isDirectFocusEdge ? 'url(#topology-main-arrow-v10-focus)' : style.marker;
+                        const d = 'M ' + (previousMetrics.x + previousMetrics.width).toFixed(2) + ' ' + previousMetrics.centerY.toFixed(2) +
+                            ' H ' + metrics.x.toFixed(2);
+                        mainlineConnectorGroup.appendChild(svgElementV10('path', {
+                            d: d,
+                            fill: 'none',
+                            stroke: '#FFFFFF',
+                            'stroke-width': String(style.underlayWidth),
+                            'stroke-linecap': 'square',
+                            opacity: String(hasFocus ? (isDirectFocusEdge ? style.underlayOpacity : 0.16) : style.underlayOpacity),
+                            'vector-effect': 'non-scaling-stroke'
+                        }));
+                        const connector = svgElementV10('path', {
+                            d: d,
+                            fill: 'none',
+                            stroke: connectorStroke,
+                            'stroke-width': String(connectorWidth),
+                            'stroke-linecap': 'square',
+                            opacity: String(connectorOpacity),
+                            'vector-effect': 'non-scaling-stroke',
+                            'marker-end': connectorMarker
+                        });
+                        connector.appendChild(svgElementV10('title', {}, ability.name + ' ' + formatLevelV10(previousNode.level) + '前置于' + formatLevelV10(node.level)));
+                        mainlineConnectorGroup.appendChild(connector);
+                    });
+                });
+                topologyViewportV10.appendChild(mainlineConnectorGroup);
+
+                const edgeLayer = svgElementV10('g', { 'aria-label': '正在查看节点的直接跨主线依赖', 'data-topology-layer': 'crossline', 'pointer-events': 'none' });
+                visibleRouteRecords.forEach(function (record) {
+                    const edge = record.edge;
+                    const route = record.route;
+                    const auditWarning = invalidCycleEdgeIds.has(edge.id);
+                    const style = topologyDependencyStyleV10('cross', auditWarning);
+                    const edgePair = svgElementV10('g', {
+                        'pointer-events': 'none',
+                        'data-topology-edge-id': edge.id,
+                        'data-route-direction': route.direction,
+                        'data-cycle-review': auditWarning ? 'invalid' : 'normal'
+                    });
+                    edgePair.appendChild(svgElementV10('path', {
+                        d: route.d,
+                        fill: 'none',
+                        stroke: '#FFFFFF',
+                        'stroke-width': String(style.underlayWidth),
+                        'stroke-linecap': 'round',
+                        'stroke-linejoin': 'round',
+                        opacity: String(style.underlayOpacity),
+                        'vector-effect': 'non-scaling-stroke'
+                    }));
+                    const path = svgElementV10('path', {
+                        d: route.d,
+                        fill: 'none',
+                        stroke: style.stroke,
+                        'stroke-width': String(style.strokeWidth),
+                        'stroke-linecap': 'round',
+                        'stroke-linejoin': 'round',
+                        opacity: String(style.opacity),
+                        'vector-effect': 'non-scaling-stroke',
+                        'marker-end': style.marker,
+                        'pointer-events': 'none'
+                    });
+                    const sourceNode = levelNodeByIdV10(edge.source);
+                    const targetNode = levelNodeByIdV10(edge.target);
+                    const sourceAbility = abilityForNodeV10(sourceNode);
+                    const targetAbility = abilityForNodeV10(targetNode);
+                    path.appendChild(svgElementV10('title', {}, sourceAbility.name + ' ' + formatLevelV10(sourceNode.level) + ' ' + sourceNode.definition + '，前置于' + targetAbility.name + ' ' + formatLevelV10(targetNode.level) + ' ' + targetNode.definition));
+                    edgePair.appendChild(path);
+                    edgeLayer.appendChild(edgePair);
+                });
+                topologyViewportV10.appendChild(edgeLayer);
+
+                const stageGroup = svgElementV10('g');
+                topologyAbilityOrderV10.forEach(function (abilityId) {
+                    const ability = abilityByIdV10(abilityId);
+                    ability.levels.forEach(function (node, index) {
+                        const metrics = topologyStageMetricsV10(ability, index);
+                        const palette = topologyNodePaletteV10(node);
+                        const selected = hasFocus && selectedNode.id === node.id;
+                        const isIncoming = hasFocus && focus.incomingNodeIds.has(node.id);
+                        const isOutgoing = hasFocus && focus.outgoingNodeIds.has(node.id);
+                        const relationLabel = isIncoming && isOutgoing ? '焦点阶段的直接前置及后续' : (isIncoming ? '焦点阶段的直接前置' : (isOutgoing ? '焦点阶段的直接后续' : ''));
+                        const actionLabel = selected ? '正在查看，点按取消聚焦' : (relationLabel ? relationLabel + '，点按切换查看' : '点按查看');
+                        const isDirectlyRelated = hasFocus && focus.nodeIds.has(node.id);
+                        const stage = svgElementV10('g', {
+                            class: 'topology-stage-node',
+                            role: 'button',
+                            tabindex: '0',
+                            'data-topology-node-id': node.id,
+                            'aria-pressed': selected ? 'true' : 'false',
+                            'data-focus-state': selected ? 'selected' : (relationLabel ? 'related' : 'none'),
+                            'aria-label': actionLabel + '，' + ability.name + ' ' + formatLevelV10(node.level) + ' ' + node.definition + '，' + roleLabelV10(node) + (node.masteryStars > 0 ? '，' + node.masteryStars + ' 星' : '')
+                        });
+                        const visual = svgElementV10('g', {
+                            class: 'topology-stage-visual',
+                            opacity: String(hasFocus && !isDirectlyRelated ? 0.24 : 1)
+                        });
+                        stage.appendChild(svgElementV10('title', {}, ability.name + ' · ' + formatLevelV10(node.level) + ' ' + node.definition + ' · ' + roleLabelV10(node) + (node.masteryStars > 0 ? ' · ' + node.masteryStars + ' 星' : '') + '。点按查看一层直接依赖。'));
+                        if (selected) {
+                            visual.appendChild(svgElementV10('rect', {
+                                x: String(metrics.x - 7),
+                                y: String(metrics.y - 7),
+                                width: String(metrics.width + 14),
+                                height: String(metrics.height + 14),
+                                rx: '16',
+                                fill: 'none',
+                                stroke: '#DCE8FF',
+                                'stroke-width': '5.5',
+                                opacity: '0.92'
+                            }));
+                            visual.appendChild(svgElementV10('rect', {
+                                x: String(metrics.x - 4),
+                                y: String(metrics.y - 4),
+                                width: String(metrics.width + 8),
+                                height: String(metrics.height + 8),
+                                rx: '14',
+                                fill: 'none',
+                                stroke: '#1F5FFF',
+                                'stroke-width': '2.2'
+                            }));
+                        }
+                        visual.appendChild(svgElementV10('rect', {
+                            x: String(metrics.x),
+                            y: String(metrics.y),
+                            width: String(metrics.width),
+                            height: String(metrics.height),
+                            rx: '11',
+                            fill: palette.fill,
+                            stroke: palette.stroke,
+                            'stroke-width': node.role === 'current' ? '1.7' : (node.role === 'target' || node.studyState === 'locked' ? '1.4' : '1.1'),
+                            'stroke-dasharray': palette.dash
+                        }));
+                        visual.appendChild(svgElementV10('text', {
+                            x: String(metrics.x + 13),
+                            y: String(metrics.centerY + 7),
+                            fill: palette.text,
+                            'font-size': '16',
+                            'font-weight': '900'
+                        }, formatLevelV10(node.level)));
+                        visual.appendChild(svgElementV10('text', {
+                            x: String(metrics.x + 48),
+                            y: String(metrics.centerY + 7),
+                            fill: palette.text,
+                            'font-size': '14',
+                            'font-weight': '800'
+                        }, node.definition));
+                        if (node.role === 'current' || node.role === 'target') {
+                            const badgeLabel = node.role === 'current' ? '当前阶段' : '目标';
+                            const badgeWidth = node.role === 'current' ? 52 : 34;
+                            visual.appendChild(svgElementV10('rect', {
+                                x: String(metrics.x + metrics.width - badgeWidth - 7),
+                                y: String(metrics.y + 5),
+                                width: String(badgeWidth),
+                                height: '14',
+                                rx: '4',
+                                fill: node.role === 'current' ? '#FFF4CF' : '#EDF3FF',
+                                stroke: node.role === 'current' ? '#F4CF79' : '#5D8AFF',
+                                'stroke-width': '0.8',
+                                'stroke-dasharray': node.role === 'target' ? '3 2' : ''
+                            }));
+                            visual.appendChild(svgElementV10('text', {
+                                x: String(metrics.x + metrics.width - badgeWidth / 2 - 7),
+                                y: String(metrics.y + 15),
+                                'text-anchor': 'middle',
+                                fill: node.role === 'current' ? '#8A4B08' : '#1746B2',
+                                'font-size': '9',
+                                'font-weight': '900'
+                            }, badgeLabel));
+                        } else if (node.role === 'completed') {
+                            visual.appendChild(svgElementV10('circle', {
+                                cx: String(metrics.x + metrics.width - 14),
+                                cy: String(metrics.y + 13),
+                                r: '7',
+                                fill: '#DFF5E6'
+                            }));
+                            visual.appendChild(svgElementV10('text', {
+                                x: String(metrics.x + metrics.width - 14),
+                                y: String(metrics.y + 16),
+                                'text-anchor': 'middle',
+                                fill: '#198444',
+                                'font-size': '10',
+                                'font-weight': '900'
+                            }, '✓'));
+                            visual.appendChild(svgElementV10('text', {
+                                x: String(metrics.x + metrics.width - 11),
+                                y: String(metrics.y + metrics.height - 9),
+                                'text-anchor': 'end',
+                                fill: '#198444',
+                                'font-size': '10',
+                                'font-weight': '900'
+                            }, String(node.masteryStars) + ' 星'));
+                        }
+                        if (node.studyState === 'locked') appendTopologyLockIconV10(visual, metrics);
+                        stage.appendChild(visual);
+                        stageGroup.appendChild(stage);
+                    });
+                });
+                topologyViewportV10.appendChild(stageGroup);
+
+                const anchorGroup = svgElementV10('g', { 'aria-hidden': 'true', 'pointer-events': 'none' });
+                visibleRouteRecords.forEach(function (record) {
+                    const style = topologyDependencyStyleV10('cross', invalidCycleEdgeIds.has(record.edge.id));
+                    anchorGroup.appendChild(svgElementV10('circle', {
+                        cx: String(record.route.start.x),
+                        cy: String(record.route.start.y),
+                        r: '3.8',
+                        fill: '#FFFFFF',
+                        stroke: style.stroke,
+                        'stroke-width': '1.9',
+                        opacity: '1',
+                        'vector-effect': 'non-scaling-stroke'
+                    }));
+                });
+                topologyViewportV10.appendChild(anchorGroup);
+            }
+
+            function initialiseTopologyPanZoomV10() {
+                if (topologyPanZoomV10) {
+                    topologyPanZoomV10.resize();
+                    topologyPanZoomV10.fit();
+                    topologyPanZoomV10.center();
+                    return;
+                }
+                if (typeof window.svgPanZoom !== 'function') return;
+                topologyPanZoomV10 = window.svgPanZoom('#topology-svg', {
+                    viewportSelector: '#topology-viewport',
+                    controlIconsEnabled: false,
+                    zoomEnabled: true,
+                    panEnabled: true,
+                    dblClickZoomEnabled: false,
+                    mouseWheelZoomEnabled: true,
+                    preventMouseEventsDefault: true,
+                    minZoom: 0.5,
+                    maxZoom: 2.8,
+                    fit: true,
+                    center: true
+                });
+            }
+
+            function fitTopologyV10() {
+                if (!topologyPanZoomV10) return;
+                topologyPanZoomV10.resize();
+                topologyPanZoomV10.fit();
+                topologyPanZoomV10.center();
+            }
+
+            function clearTopologyFocusV10() {
+                if (!stateV10.topologySelectedNodeId) return;
+                stateV10.topologySelectedNodeId = null;
+                renderTopologyV10();
+                hideTopologyHintV10();
+                window.requestAnimationFrame(fitTopologyV10);
+            }
+
+            function hideTopologyHintV10() {
+                const hint = document.getElementById('topology-hint');
+                window.clearTimeout(topologyHintTimerV10);
+                hint.classList.remove('is-visible', 'is-warning');
+            }
+
+            function showTopologyMessageV10(message, duration, warning) {
+                const hint = document.getElementById('topology-hint');
+                window.clearTimeout(topologyHintTimerV10);
+                hint.textContent = message;
+                hint.classList.toggle('is-warning', Boolean(warning));
+                hint.classList.add('is-visible');
+                topologyHintTimerV10 = window.setTimeout(function () {
+                    hint.classList.remove('is-visible');
+                }, duration || 2400);
+            }
+
+            function showTopologyGuidanceV10() {
+                if (stateV10.topologyHintShown) return;
+                stateV10.topologyHintShown = true;
+                showTopologyMessageV10('点按阶段查看其他主线关联', 2400, false);
+            }
+
+            function announceTopologyFocusV10() {
+                const selectedNode = levelNodeByIdV10(stateV10.topologySelectedNodeId);
+                if (!selectedNode) {
+                    hideTopologyHintV10();
+                    return;
+                }
+                const focus = collectTopologyFocusV10(selectedNode.id);
+                const invalidCycleEdgeIds = invalidCycleEdgeIdsV10(graphStageEdgesV10());
+                const focusedInvalidCycle = Array.from(focus.edgeIds).some(function (edgeId) {
+                    return invalidCycleEdgeIds.has(edgeId);
+                });
+                if (focusedInvalidCycle) {
+                    showTopologyMessageV10('存在循环关系，请检查配置', 2800, true);
+                    return;
+                }
+                if (focus.edgeIds.size === 0) {
+                    showTopologyMessageV10('该节点暂无跨主线直接关联', 2600, false);
+                    return;
+                }
+                hideTopologyHintV10();
+            }
+
+            function openTopologyV10() {
+                stateV10.previousView = stateV10.view === 'detail' ? 'detail' : 'overview';
+                stateV10.topologySelectedNodeId = stateV10.view === 'detail' ? stateV10.selectedLevelNodeId : null;
+                showPageV10('topology');
+                renderTopologyV10();
+                if (stateV10.topologySelectedNodeId) {
+                    announceTopologyFocusV10();
+                } else {
+                    const invalidCycleEdgeIds = invalidCycleEdgeIdsV10(graphStageEdgesV10());
+                    if (invalidCycleEdgeIds.size) showTopologyMessageV10('存在循环关系，请检查配置', 2800, true);
+                    else showTopologyGuidanceV10();
+                }
+                window.requestAnimationFrame(function () {
+                    initialiseTopologyPanZoomV10();
+                    fitTopologyV10();
+                });
+            }
+
+            abilityGridV10.addEventListener('click', function (event) {
+                const element = event.target instanceof Element ? event.target : null;
+                if (!element) return;
+                const moreButton = element.closest('[data-ability-more]');
+                if (moreButton) {
+                    event.stopPropagation();
+                    const row = moreButton.closest('[data-ability-row]');
+                    const scroller = row ? row.querySelector('[data-ability-scroll]') : null;
+                    if (scroller) {
+                        const remaining = scroller.scrollWidth - scroller.clientWidth - scroller.scrollLeft;
+                        if (remaining > 3) {
+                            scroller.scrollBy({ left: Math.max(360, scroller.clientWidth * 0.58), behavior: 'smooth' });
+                            window.setTimeout(updateAbilityRowOverflowV10, 360);
+                        } else if (row) {
+                            openDetailV10(row.dataset.abilityRow);
+                        }
+                    }
+                    return;
+                }
+                const levelButton = element.closest('[data-level-node-id]');
+                if (levelButton) {
+                    const node = levelNodeByIdV10(levelButton.dataset.levelNodeId);
+                    if (node) openDetailV10(node.abilityId, node.id);
+                    return;
+                }
+                const abilityRow = element.closest('[data-ability-row]');
+                if (abilityRow) openDetailV10(abilityRow.dataset.abilityRow);
+            });
+
+            overviewScrollV10.addEventListener('scroll', updateOverviewScrollCueV10, { passive: true });
+            abilityGridV10.addEventListener('scroll', function (event) {
+                if (event.target instanceof Element && event.target.matches('[data-ability-scroll]')) updateAbilityRowOverflowV10();
+            }, { passive: true, capture: true });
+
+            document.getElementById('detail-mainline').addEventListener('click', function (event) {
+                const target = event.target instanceof Element ? event.target.closest('[data-level-node-id]') : null;
+                if (target) selectDetailNodeV10(target.dataset.levelNodeId);
+            });
+
+            document.getElementById('dependency-view').addEventListener('click', function (event) {
+                const target = event.target instanceof Element ? event.target.closest('[data-jump-level-node]') : null;
+                if (!target) return;
+                const node = levelNodeByIdV10(target.dataset.jumpLevelNode);
+                if (node) openDetailV10(node.abilityId, node.id);
+            });
+
+            document.getElementById('learning-grid').addEventListener('click', function (event) {
+                const target = event.target instanceof Element ? event.target.closest('[data-learning-type]') : null;
+                if (!target || target.disabled) return;
+                const ability = abilityByIdV10(stateV10.selectedAbilityId);
+                const node = selectedNodeV10();
+                showToastV10('已选择 ' + ability.name + ' ' + formatLevelV10(node.level) + ' · ' + target.dataset.learningType);
+            });
+
+            document.getElementById('teacher-review').addEventListener('click', function (event) {
+                const target = event.target instanceof Element ? event.target.closest('[data-teacher-reminder]') : null;
+                if (!target || target.disabled) return;
+                const ability = abilityByIdV10(stateV10.selectedAbilityId);
+                const node = selectedNodeV10();
+                const context = ability && node ? teacherReviewContextV10(ability, node) : null;
+                if (!context) return;
+                const reminderKey = context.assessmentNode.id + '--' + context.nextNode.id;
+                if (target.dataset.teacherReminder !== reminderKey || teacherReminderKeysV10.has(reminderKey)) return;
+                teacherReminderKeysV10.add(reminderKey);
+                renderTeacherReviewV10(ability, node);
+                showToastV10('已提醒老师评定 ' + formatLevelV10(context.assessmentNode.level) + '，结果会同步到能力路径');
+            });
+
+            topologySvgV10.addEventListener('click', function (event) {
+                const element = event.target instanceof Element ? event.target : null;
+                if (!element) return;
+                const stageTarget = element.closest('[data-topology-node-id]');
+                if (stageTarget) {
+                    const nodeId = stageTarget.dataset.topologyNodeId;
+                    if (stateV10.topologySelectedNodeId === nodeId) {
+                        clearTopologyFocusV10();
+                        return;
+                    }
+                    stateV10.topologySelectedNodeId = nodeId;
+                    renderTopologyV10();
+                    announceTopologyFocusV10();
+                    return;
+                }
+                clearTopologyFocusV10();
+            });
+
+            topologySvgV10.addEventListener('keydown', function (event) {
+                if (event.key !== 'Enter' && event.key !== ' ') return;
+                const element = event.target instanceof Element ? event.target.closest('[data-topology-node-id]') : null;
+                if (!element) return;
+                const nodeId = element.dataset.topologyNodeId;
+                if (stateV10.topologySelectedNodeId === nodeId) {
+                    clearTopologyFocusV10();
+                    return;
+                }
+                stateV10.topologySelectedNodeId = nodeId;
+                renderTopologyV10();
+                announceTopologyFocusV10();
+            });
+
+            document.getElementById('overview-back-button').addEventListener('click', function () {
+                window.history.back();
+            });
+            document.getElementById('overview-topology-button').addEventListener('click', openTopologyV10);
+            document.getElementById('detail-back-button').addEventListener('click', function () {
+                showPageV10('overview');
+            });
+            document.getElementById('detail-breadcrumb-overview').addEventListener('click', function () {
+                showPageV10('overview');
+            });
+            document.getElementById('detail-topology-button').addEventListener('click', openTopologyV10);
+            document.getElementById('topology-back-button').addEventListener('click', function () {
+                showPageV10(stateV10.previousView);
+                if (stateV10.previousView === 'detail') renderDetailV10();
+            });
+            document.getElementById('topology-breadcrumb-overview').addEventListener('click', function () {
+                showPageV10('overview');
+            });
+            document.getElementById('topology-zoom-out').addEventListener('click', function () {
+                if (topologyPanZoomV10) topologyPanZoomV10.zoomOut();
+            });
+            document.getElementById('topology-zoom-in').addEventListener('click', function () {
+                if (topologyPanZoomV10) topologyPanZoomV10.zoomIn();
+            });
+            document.getElementById('topology-fit').addEventListener('click', fitTopologyV10);
+            topologyResetButtonV10.addEventListener('click', clearTopologyFocusV10);
+
+            if (typeof ResizeObserver !== 'undefined') {
+                const topologyResizeObserver = new ResizeObserver(function () {
+                    if (stateV10.view === 'topology') window.requestAnimationFrame(fitTopologyV10);
+                });
+                topologyResizeObserver.observe(document.getElementById('topology-surface'));
+                const overviewResizeObserver = new ResizeObserver(function () {
+                    if (stateV10.view === 'overview') {
+                        window.requestAnimationFrame(function () {
+                            updateOverviewScrollCueV10();
+                            updateAbilityRowOverflowV10();
+                        });
+                    }
+                });
+                overviewResizeObserver.observe(overviewScrollV10);
+                overviewResizeObserver.observe(abilityGridV10);
+            }
+
+            validateDataV10();
+            renderOverviewV10();
+            renderDetailV10();
+            renderTopologyV10();
+        }());
+    </script>
+</body>
+</html>
