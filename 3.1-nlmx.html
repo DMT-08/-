@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<!-- 版本 12.0：详情节点历史返回。继承 11.9 的完成星级与教师确认提醒；详情内所有节点切换按访问顺序记录，左上角返回键优先返回上一节点，历史耗尽后再返回能力总览。 -->
+<!-- 版本 12.1：状态语义与场景强度统一。首页及详情主线以黄色整卡表达当前阶段；当前未解锁改用淡黄色底、橙色虚线与强化锁图标；普通未解锁保持灰色、已完成保持绿色；依赖关系节点改用中性卡片，仅由状态标签表达当前阶段。 -->
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#EFF6FF">
-    <title>抖学 AI 能力模型 12.0 · 详情节点历史返回</title>
+    <title>抖学 AI 能力模型 12.1 · 状态语义与场景强度统一</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -184,19 +184,32 @@
             left: 8px;
             top: 7px;
             display: inline-flex;
+            width: 22px;
+            height: 22px;
             align-items: center;
             justify-content: center;
+            border: 1px solid #CBD5E1;
+            border-radius: 6px;
+            background: #FFFFFF;
             color: #64748B;
-            font-size: 12px;
+            font-size: 13px;
             line-height: 1;
+            box-shadow: 0 2px 5px rgba(15, 23, 42, 0.06);
+            pointer-events: none;
         }
 
-        .mainline-node.role-current .node-lock-badge {
-            color: #9A5B13;
+        .mainline-node.role-current.state-locked .node-lock-badge {
+            width: 26px;
+            height: 26px;
+            border-color: #F6C76B;
+            background: #FFF2C2;
+            color: #C56A07;
+            font-size: 15px;
+            box-shadow: 0 3px 8px rgba(197, 106, 7, 0.12);
         }
 
         .mainline-node.role-target .node-lock-badge {
-            color: #1746B2;
+            color: #64748B;
         }
 
         .mainline-node {
@@ -226,17 +239,18 @@
 
         .mainline-node.role-current {
             border-color: #F0C36A;
-            background: #FFFBEB;
+            background: #FFF4CF;
             color: #92400E;
-            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.07);
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.09);
         }
 
         .mainline-node.role-current.state-locked {
-            border-color: #E5B453;
+            border-width: 2px;
+            border-color: #F59E0B;
             border-style: dashed;
-            background: #FFFBEB;
-            color: #92400E;
-            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.05);
+            background: #FFFCF2;
+            color: #9A5B13;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.05);
         }
 
         .mainline-node.role-upcoming {
@@ -448,19 +462,19 @@
         }
 
         .dependency-chip.role-completed {
-            border-color: #CBEBD5;
-            background: #F7FCF8;
+            border-color: #E2E8F0;
+            background: #FFFFFF;
         }
 
         .dependency-chip.role-current {
-            border-color: #F4D58D;
-            background: #FFFCF3;
+            border-color: #E2E8F0;
+            background: #FFFFFF;
         }
 
         .dependency-chip.role-target {
-            border-color: #6F98FF;
-            border-style: dashed;
-            background: #EDF3FF;
+            border-color: #E2E8F0;
+            border-style: solid;
+            background: #FFFFFF;
         }
 
         .dependency-relation-kind,
@@ -1055,6 +1069,23 @@
             box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.72);
         }
 
+        .mainline-node.state-locked:not(.role-current),
+        .target-theme-c .mainline-node.role-target.state-locked {
+            border-width: 1px;
+            border-color: #D8E0EA;
+            border-style: solid;
+            background: #F1F5F9;
+            color: #64748B;
+            box-shadow: none;
+        }
+
+        .mainline-node.state-locked:not(.role-current) .node-lock-badge {
+            border-color: #CBD5E1;
+            background: #E8EDF3;
+            color: #64748B;
+            box-shadow: none;
+        }
+
         .target-theme-c .mainline-node.role-target .target-marker {
             display: inline-block;
         }
@@ -1108,8 +1139,9 @@
         }
 
         .legend-swatch.is-current {
-            border: 1px solid #F0C36A;
-            background: #FFFBEB;
+            border: 1px solid #D7E0EA;
+            background: #FFFFFF;
+            box-shadow: inset 0 4px 0 #FFF1B8;
         }
 
         .legend-swatch.is-target {
@@ -2424,9 +2456,9 @@
 
             function topologyNodePaletteV10(node) {
                 if (node.role === 'completed') return { fill: '#F3FCF6', stroke: '#BFE7CB', text: '#166534', dash: '' };
-                if (node.role === 'current') return { fill: '#FFFBEB', stroke: '#F0C36A', text: '#92400E', dash: node.studyState === 'locked' ? '5 3' : '' };
+                if (node.studyState === 'locked') return { fill: '#F1F5F9', stroke: '#CBD5E1', text: '#64748B', dash: '5 3' };
+                if (node.role === 'current') return { fill: '#FFFFFF', stroke: '#D7E0EA', text: '#475569', dash: '' };
                 if (node.role === 'target') return { fill: '#EDF3FF', stroke: '#5D8AFF', text: '#1746B2', dash: '6 4' };
-                if (node.studyState === 'locked') return { fill: '#FFFFFF', stroke: '#AEB9C8', text: '#526174', dash: '5 3' };
                 return { fill: '#F7F9FF', stroke: '#C9D8FF', text: '#405572', dash: '' };
             }
 
