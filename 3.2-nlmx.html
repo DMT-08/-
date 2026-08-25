@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<!-- 版本 13.8：核心词汇 L3 扩充为四类各三条学习任务；全局依赖画布改用 Pointer Events，修复 iPadOS Safari 点击、平移与缩放；清理被覆盖的旧拓扑实现及重复运行链路。 -->
+<!-- 版本 14.6：学习任务处于未解锁或空状态时，任务网格切换为单列弹性通栏，消除 268px 固定列布局在右侧留下的空白；正常任务卡继续保持固定列与左对齐。 -->
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#EFF6FF">
-    <title>抖学 AI 能力模型 13.8 · Pointer Events 触控与运行链路清理</title>
+    <title>抖学 AI 能力模型 14.6 · 未解锁任务通栏修复</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -1842,6 +1842,15 @@
             align-items: stretch;
         }
 
+        /* 14.6：空状态不继承固定任务卡列宽，始终完整占满学习任务区域。 */
+        .learning-grid.is-empty {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .learning-grid.is-empty .learning-empty-state {
+            width: 100%;
+        }
+
         .learning-card {
             width: 268px;
             min-height: 76px;
@@ -2031,6 +2040,7 @@
 
             const graphScenarioRawV136 = new URLSearchParams(window.location.search).get('graphScenario');
             const graphScenarioV136 = graphScenarioRawV136 === 'cycle' ? 'cycle' : 'default';
+            const fullDependencyAuditV141 = new URLSearchParams(window.location.search).get('dependencyAudit') === 'full';
 
             const officialAbilitiesV136 = [
                 {
@@ -2225,27 +2235,31 @@
                 });
             });
 
-            // 后台关系保持真实 source → target；若后台判定循环非法，可在对应关系返回 reviewState: 'invalid-cycle'。
+            // 14.5：本数组模拟后台依赖接口；只有显式 dependencyDepth: 1 的记录可进入共享一级边模型。
+            // “1800词→段落大意”保留为二级回归样本，证明任何详情或全局视图都不会把它误画成直接边。
+            // “常见句式→完整句子”保留为后台一级冗余样本；因已有“常见句式→完整句意→完整句子”，两个依赖视图都会隐藏该跨级箭头。
+            // 循环审核数据也参与同一约简；只有删除后仍可达的循环冗余边会被隐藏。
             const officialLevelRelationshipsV136 = [
-                { source: 'phonics-l2', target: 'listening-l2' },
-                { source: 'vocabulary-l3', target: 'sentence-l3' },
-                { source: 'grammar-l2', target: 'sentence-l3' },
-                { source: 'vocabulary-l3', target: 'reading-l2' },
-                { source: 'sentence-l3', target: 'reading-l2' },
-                { source: 'phonics-l2', target: 'speaking-l2' },
-                { source: 'vocabulary-l3', target: 'speaking-l2' },
-                { source: 'grammar-l2', target: 'writing-l1' },
-                { source: 'sentence-l3', target: 'writing-l1' },
-                { source: 'listening-l2', target: 'communication-l1' },
-                { source: 'reading-l2', target: 'communication-l1' },
-                { source: 'speaking-l2', target: 'communication-l1' },
-                { source: 'writing-l1', target: 'communication-l1' }
+                { source: 'phonics-l2', target: 'listening-l2', dependencyDepth: 1 },
+                { source: 'vocabulary-l3', target: 'sentence-l3', dependencyDepth: 1 },
+                { source: 'grammar-l2', target: 'sentence-l3', dependencyDepth: 1 },
+                { source: 'sentence-l3', target: 'reading-l2', dependencyDepth: 1 },
+                { source: 'vocabulary-l3', target: 'reading-l2', dependencyDepth: 2, relationType: 'transitive', inferred: true },
+                { source: 'phonics-l2', target: 'speaking-l2', dependencyDepth: 1 },
+                { source: 'vocabulary-l3', target: 'speaking-l2', dependencyDepth: 1 },
+                { source: 'grammar-l2', target: 'writing-l1', dependencyDepth: 1 },
+                { source: 'sentence-l3', target: 'writing-l1', dependencyDepth: 1 },
+                { source: 'listening-l2', target: 'communication-l1', dependencyDepth: 1 },
+                { source: 'reading-l2', target: 'communication-l1', dependencyDepth: 1 },
+                { source: 'speaking-l2', target: 'communication-l1', dependencyDepth: 1 },
+                { source: 'writing-l1', target: 'communication-l1', dependencyDepth: 1 }
             ];
 
             const cycleStressRelationshipsV136 = [
-                { id: 'cycle-alpha-beta', source: 'cycle-alpha-l1', target: 'cycle-beta-l1', reviewState: 'invalid-cycle' },
-                { id: 'cycle-beta-gamma', source: 'cycle-beta-l1', target: 'cycle-gamma-l1', reviewState: 'invalid-cycle' },
-                { id: 'cycle-gamma-alpha', source: 'cycle-gamma-l1', target: 'cycle-alpha-l1', reviewState: 'invalid-cycle' }
+                { id: 'cycle-alpha-beta', source: 'cycle-alpha-l1', target: 'cycle-beta-l1', dependencyDepth: 1, reviewState: 'invalid-cycle' },
+                { id: 'cycle-beta-gamma', source: 'cycle-beta-l1', target: 'cycle-gamma-l1', dependencyDepth: 1, reviewState: 'invalid-cycle' },
+                { id: 'cycle-gamma-alpha', source: 'cycle-gamma-l1', target: 'cycle-alpha-l1', dependencyDepth: 1, reviewState: 'invalid-cycle' },
+                { id: 'cycle-alpha-gamma-redundant', source: 'cycle-alpha-l1', target: 'cycle-gamma-l1', dependencyDepth: 1, reviewState: 'invalid-cycle' }
             ];
 
             const relationshipDatasetsV136 = {
@@ -2490,7 +2504,7 @@
                 ability.levels.forEach(function (node, index) {
                     if (index > 0) {
                         const previousNode = ability.levels[index - 1];
-                        markup += '<li class="mainline-connector ' + connectorClassV10(previousNode, node) + '" aria-hidden="true"><i class="ph-bold ph-caret-right"></i></li>';
+                        markup += '<li class="mainline-connector ' + connectorClassV10(previousNode, node) + '" data-mainline-edge-source="' + escapeHtmlV10(previousNode.id) + '" data-mainline-edge-target="' + escapeHtmlV10(node.id) + '" data-dependency-depth="1" data-dependency-provenance="mock-mainline-adjacent" aria-hidden="true"><i class="ph-bold ph-caret-right"></i></li>';
                     }
                     const selectedClass = node.id === selectedNodeId ? ' is-selected' : '';
                     const stateClass = ' state-' + node.studyState;
@@ -2541,11 +2555,13 @@
                         throw new Error(ability.name + '的主线角色标记不完整。');
                     }
                 });
-                levelRelationshipsV10.forEach(function (relationship) {
+                const explicitRawEdgeKeys = new Set();
+                levelRelationshipsV10.filter(isExplicitDirectRelationshipV139).forEach(function (relationship) {
                     const source = levelNodeByIdV10(relationship.source);
                     const target = levelNodeByIdV10(relationship.target);
                     if (!source || !target) throw new Error('子关系引用了不存在的节点。');
                     if (source.abilityId === target.abilityId) throw new Error('能力内部连续等级不得写入子关系。');
+                    explicitRawEdgeKeys.add(source.id + '→' + target.id);
                 });
                 const relatedProbe = collectRelatedNodeIdsV133('root', [
                     { source: 'ancestor-2', target: 'ancestor-1' },
@@ -2559,10 +2575,82 @@
                     throw new Error('相关子图有向可达性过滤失败。');
                 }
 
+                const directOnlyProbeEdges = [
+                    { id: 'probe-a-b', source: 'probe-a', target: 'probe-b' },
+                    { id: 'probe-b-c', source: 'probe-b', target: 'probe-c' }
+                ];
+                const directOnlyProbeNodes = collectRelatedNodeIdsV133('probe-b', directOnlyProbeEdges);
+                const directOnlyProjection = directOnlyProbeEdges.filter(function (edge) {
+                    return directOnlyProbeNodes.has(edge.source) && directOnlyProbeNodes.has(edge.target);
+                });
+                if (directOnlyProjection.length !== 2 || directOnlyProjection.some(function (edge) {
+                    return edge.source === 'probe-a' && edge.target === 'probe-c';
+                })) {
+                    throw new Error('一级依赖投影错误地生成了传递边 A→C。');
+                }
+                const multiLevelReductionProbe = stableReduceDependencyEdgesV145([
+                    { id: 'probe-a-b', source: 'probe-a', target: 'probe-b', rawIndex: 0 },
+                    { id: 'probe-b-c', source: 'probe-b', target: 'probe-c', rawIndex: 1 },
+                    { id: 'probe-c-d', source: 'probe-c', target: 'probe-d', rawIndex: 2 },
+                    { id: 'probe-a-c', source: 'probe-a', target: 'probe-c', rawIndex: 3 },
+                    { id: 'probe-b-d', source: 'probe-b', target: 'probe-d', rawIndex: 4 },
+                    { id: 'probe-a-d', source: 'probe-a', target: 'probe-d', rawIndex: 5 }
+                ]);
+                const multiLevelActiveIds = new Set(multiLevelReductionProbe.edges.map(function (edge) { return edge.id; }));
+                const multiLevelHiddenOrder = multiLevelReductionProbe.hiddenEdges.map(function (edge) { return edge.id; });
+                if (multiLevelActiveIds.size !== 3 || !multiLevelActiveIds.has('probe-a-b') || !multiLevelActiveIds.has('probe-b-c') ||
+                    !multiLevelActiveIds.has('probe-c-d') || multiLevelHiddenOrder.join('|') !== 'probe-a-d|probe-a-c|probe-b-d') {
+                    throw new Error('多级依赖未按跨度降序、后台顺序稳定约简为 A→B→C→D。');
+                }
+                const cycleReductionProbe = stableReduceDependencyEdgesV145([
+                    { id: 'probe-cycle-a-b', source: 'probe-cycle-a', target: 'probe-cycle-b', rawIndex: 0 },
+                    { id: 'probe-cycle-b-c', source: 'probe-cycle-b', target: 'probe-cycle-c', rawIndex: 1 },
+                    { id: 'probe-cycle-c-a', source: 'probe-cycle-c', target: 'probe-cycle-a', rawIndex: 2 },
+                    { id: 'probe-cycle-a-c', source: 'probe-cycle-a', target: 'probe-cycle-c', rawIndex: 3 }
+                ]);
+                if (cycleReductionProbe.edges.length !== 3 || cycleReductionProbe.hiddenEdges.length !== 1 ||
+                    cycleReductionProbe.hiddenEdges[0].id !== 'probe-cycle-a-c' || cycleReductionProbe.cycleEdgeIds.size !== 3) {
+                    throw new Error('循环依赖未在保持三节点互相可达的前提下删除冗余弦边。');
+                }
+                if (isExplicitDirectRelationshipV139({ source: 'probe-a', target: 'probe-c', dependencyDepth: 2 }) ||
+                    isExplicitDirectRelationshipV139({ source: 'probe-a', target: 'probe-c', inferred: true }) ||
+                    isExplicitDirectRelationshipV139({ source: 'probe-a', target: 'probe-c' })) {
+                    throw new Error('传递、推导或未明确层级的关系错误地进入了一级边集合。');
+                }
+
+                const directModel = directDependencyModelV145();
                 const activeEdges = graphStageEdgesV10();
+                if (activeEdges !== directModel.edges || directModel.rawEdges.length !== explicitRawEdgeKeys.size ||
+                    activeEdges.length + directModel.hiddenRedundantEdges.length !== directModel.rawEdges.length) {
+                    throw new Error('详情与全局依赖未共享同一份稳定传递约简结果。');
+                }
+                directModel.rawEdges.forEach(function (edge) {
+                    const edgeKey = edge.source + '→' + edge.target;
+                    if (!explicitRawEdgeKeys.has(edgeKey) || edge.dependencyDepth !== 1 || edge.provenance !== 'backend-direct') {
+                        throw new Error(edgeKey + '缺少后台一级依赖溯源。');
+                    }
+                });
                 const relationshipKeys = new Set(activeEdges.map(function (edge) { return edge.source + '→' + edge.target; }));
+                const hiddenRelationshipKeys = new Set(directModel.hiddenRedundantEdges.map(function (edge) { return edge.source + '→' + edge.target; }));
+                if (relationshipKeys.size + hiddenRelationshipKeys.size !== explicitRawEdgeKeys.size ||
+                    Array.from(explicitRawEdgeKeys).some(function (key) { return !relationshipKeys.has(key) && !hiddenRelationshipKeys.has(key); })) {
+                    throw new Error('后台显式一级边未被完整归入逐级边或冗余边。');
+                }
+                directModel.hiddenRedundantEdges.forEach(function (edge) {
+                    if (!Number.isFinite(dependencyPathHopsV145(activeEdges, edge.source, edge.target, null))) {
+                        throw new Error(edge.source + '→' + edge.target + '被隐藏后未保留替代链路。');
+                    }
+                });
+                activeEdges.forEach(function (edge) {
+                    if (Number.isFinite(dependencyPathHopsV145(activeEdges, edge.source, edge.target, edge.id))) {
+                        throw new Error(edge.source + '→' + edge.target + '仍是可由逐级路径替代的冗余箭头。');
+                    }
+                });
                 function requireRelationship(source, target, message) {
                     if (!relationshipKeys.has(source + '→' + target)) throw new Error(message);
+                }
+                function requireHiddenRelationship(source, target, message) {
+                    if (!hiddenRelationshipKeys.has(source + '→' + target)) throw new Error(message);
                 }
 
                 if (graphScenarioV136 === 'default') {
@@ -2572,25 +2660,238 @@
                     if (isolatedGraph.nodes.length !== 1 || isolatedGraph.edges.length !== 0) throw new Error('无跨主线依赖场景校验失败。');
 
                     const vocabularyBranches = activeEdges.filter(function (edge) { return edge.source === 'vocabulary-l3'; });
-                    if (vocabularyBranches.length < 3) throw new Error('正式数据缺少普通分叉场景。');
+                    if (vocabularyBranches.length < 2) throw new Error('正式数据缺少普通分叉场景。');
                     const communicationMerge = activeEdges.filter(function (edge) { return edge.target === 'communication-l1'; });
                     if (communicationMerge.length < 4) throw new Error('正式数据缺少普通汇聚场景。');
 
-                    requireRelationship('vocabulary-l3', 'sentence-l3', '特殊直接依赖缺少 A→B。');
-                    requireRelationship('vocabulary-l3', 'reading-l2', '特殊直接依赖缺少 A→C。');
-                    requireRelationship('sentence-l3', 'reading-l2', '特殊直接依赖缺少 B→C。');
+                    requireRelationship('vocabulary-l3', 'sentence-l3', '直接依赖缺少 1800词→完整句意。');
+                    requireRelationship('sentence-l3', 'reading-l2', '直接依赖缺少 完整句意→段落大意。');
+                    if (relationshipKeys.has('vocabulary-l3→reading-l2')) {
+                        throw new Error('错误生成了传递边 1800词→段落大意。');
+                    }
+                    requireRelationship('grammar-l2', 'sentence-l3', '直接依赖缺少 常见句式→完整句意。');
+                    requireRelationship('sentence-l3', 'writing-l1', '逐级依赖缺少 完整句意→完整句子。');
+                    requireHiddenRelationship('grammar-l2', 'writing-l1', '常见句式→完整句子 的跨级冗余箭头未被隐藏。');
                     const specialGraph = collectGlobalDependencyGraphV129('vocabulary-l3');
                     const preservesInternalEdge = specialGraph.edges.some(function (edge) {
                         return edge.source === 'sentence-l3' && edge.target === 'reading-l2';
                     });
                     if (!preservesInternalEdge) throw new Error('全局依赖未保留直接同侧节点之间的真实边。');
+                    if (!specialGraph.nodes.some(function (node) { return node.id === 'reading-l2'; })) {
+                        throw new Error('全局依赖未展示经直接链路可达的段落大意节点。');
+                    }
+                    if (specialGraph.edges.some(function (edge) {
+                        return edge.source === 'vocabulary-l3' && edge.target === 'reading-l2';
+                    })) {
+                        throw new Error('全局依赖把传递可达关系错误投影成了直接边。');
+                    }
                 } else {
                     const cycleEdgeIds = detectRelationshipCycleEdgeIdsV10(activeEdges);
                     const cycleGraph = collectGlobalDependencyGraphV129('cycle-alpha-l1');
-                    if (cycleEdgeIds.size !== 3 || cycleGraph.nodes.length !== 3 || cycleGraph.edges.length !== 3) {
-                        throw new Error('独立循环压力场景未形成完整三节点循环。');
+                    if (directModel.rawCycleEdgeIds.size !== 4 || cycleEdgeIds.size !== 3 || cycleGraph.nodes.length !== 3 || cycleGraph.edges.length !== 3 ||
+                        !hiddenRelationshipKeys.has('cycle-alpha-l1→cycle-gamma-l1')) {
+                        throw new Error('循环压力场景未保持可达性或未删除冗余弦边。');
                     }
                 }
+
+                const sharedTrackProbeRecords = [
+                    { edge: { id: 'probe-in-top', source: 'probe-left-top', target: 'probe-center', dependencyDepth: 1 }, start: { x: 100, y: 80 }, end: { x: 300, y: 144 } },
+                    { edge: { id: 'probe-in-bottom', source: 'probe-left-bottom', target: 'probe-center', dependencyDepth: 1 }, start: { x: 100, y: 220 }, end: { x: 300, y: 156 } },
+                    { edge: { id: 'probe-out-top', source: 'probe-center', target: 'probe-right-top', dependencyDepth: 1 }, start: { x: 500, y: 144 }, end: { x: 700, y: 80 } },
+                    { edge: { id: 'probe-out-bottom', source: 'probe-center', target: 'probe-right-bottom', dependencyDepth: 1 }, start: { x: 500, y: 156 }, end: { x: 700, y: 220 } }
+                ];
+                const sharedTrackProbeRoutes = routeLocalDependencyRecordsV143(sharedTrackProbeRecords, 800, 300);
+                const sharedTrackProbeIncoming = sharedTrackProbeRoutes.filter(function (route) { return route.edge.target === 'probe-center'; });
+                const sharedTrackProbeOutgoing = sharedTrackProbeRoutes.filter(function (route) { return route.edge.source === 'probe-center'; });
+                function uniformSharedTrack(routes) {
+                    return routes.length === 2 && routes.every(function (route) {
+                        return Number.isFinite(route.sharedTrackX) && Math.abs(route.sharedTrackX - routes[0].sharedTrackX) < 0.1;
+                    });
+                }
+                const sharedTrackProbeBands = new Set(sharedTrackProbeRoutes.map(function (route) { return route.channelBand; }));
+                const sharedTrackProbeMirrorDistance = Math.abs((300 - sharedTrackProbeIncoming[0].sharedTrackX) - (sharedTrackProbeOutgoing[0].sharedTrackX - 500));
+                if (!uniformSharedTrack(sharedTrackProbeIncoming) || !uniformSharedTrack(sharedTrackProbeOutgoing) ||
+                    sharedTrackProbeRoutes.some(function (route) { return route.bends !== 2 || route.crossings !== 0 || route.trackViolations !== 0; }) ||
+                    !sharedTrackProbeBands.has('top') || !sharedTrackProbeBands.has('bottom') || sharedTrackProbeMirrorDistance > 0.1) {
+                    throw new Error('通用 2→1→2 场景未形成对齐、等距且上下对称的共享汇入/分出轨道。');
+                }
+
+                function layoutProbeNode(id, level) {
+                    return { id: id, abilityId: 'layout-probe', level: level };
+                }
+                const splitLayoutProbe = topologyLayeredLayoutV132({
+                    rootNodeId: 'layout-parent',
+                    nodes: [layoutProbeNode('layout-parent', 1), layoutProbeNode('layout-child-top', 2), layoutProbeNode('layout-child-middle', 2), layoutProbeNode('layout-child-bottom', 2)],
+                    edges: [
+                        { id: 'layout-parent-child-top', source: 'layout-parent', target: 'layout-child-top' },
+                        { id: 'layout-parent-child-middle', source: 'layout-parent', target: 'layout-child-middle' },
+                        { id: 'layout-parent-child-bottom', source: 'layout-parent', target: 'layout-child-bottom' }
+                    ]
+                });
+                const splitParentLane = splitLayoutProbe.metricsById.get('layout-parent').lane;
+                const splitChildMetrics = ['layout-child-top', 'layout-child-middle', 'layout-child-bottom'].map(function (nodeId) {
+                    return splitLayoutProbe.metricsById.get(nodeId);
+                }).sort(function (first, second) { return first.centerY - second.centerY; });
+                const splitChildCenterLane = splitChildMetrics.reduce(function (sum, metrics) { return sum + metrics.lane; }, 0) / splitChildMetrics.length;
+                const splitChildSteps = splitChildMetrics.slice(1).map(function (metrics, index) { return metrics.centerY - splitChildMetrics[index].centerY; });
+                const mergeLayoutProbe = topologyLayeredLayoutV132({
+                    rootNodeId: 'layout-target',
+                    nodes: [layoutProbeNode('layout-parent-top', 1), layoutProbeNode('layout-parent-middle', 1), layoutProbeNode('layout-parent-bottom', 1), layoutProbeNode('layout-target', 2)],
+                    edges: [
+                        { id: 'layout-parent-top-target', source: 'layout-parent-top', target: 'layout-target' },
+                        { id: 'layout-parent-middle-target', source: 'layout-parent-middle', target: 'layout-target' },
+                        { id: 'layout-parent-bottom-target', source: 'layout-parent-bottom', target: 'layout-target' }
+                    ]
+                });
+                const mergeTargetLane = mergeLayoutProbe.metricsById.get('layout-target').lane;
+                const mergeParentCenterLane = ['layout-parent-top', 'layout-parent-middle', 'layout-parent-bottom'].reduce(function (sum, nodeId) {
+                    return sum + mergeLayoutProbe.metricsById.get(nodeId).lane;
+                }, 0) / 3;
+                if (Math.abs(splitParentLane) > 0.1 || Math.abs(splitChildCenterLane - splitParentLane) > 0.1 ||
+                    splitChildSteps.some(function (step) { return Math.abs(step - splitLayoutProbe.rowStep) > 0.1; }) ||
+                    Math.abs(mergeTargetLane) > 0.1 || Math.abs(mergeParentCenterLane - mergeTargetLane) > 0.1 ||
+                    splitLayoutProbe.rowGap !== topologyRoutingConfigV143.nodeClearance * 2 || splitLayoutProbe.maximumLayerDrift > 0.5) {
+                    throw new Error('通用 1→N / N→1 场景未保持根锚定、组中心对齐与统一紧凑层间距。');
+                }
+
+                const auditedGraphSignatures = new Set();
+                let routedGraphCount = 0;
+                let routedLocalViewCount = 0;
+                let initialLayerCrossingCount = 0;
+                let optimizedLayerCrossingCount = 0;
+                let initialLayerObstacleCount = 0;
+                let optimizedLayerObstacleCount = 0;
+                let initialAlignmentScore = 0;
+                let optimizedAlignmentScore = 0;
+                let initialEdgeSpan = 0;
+                let optimizedEdgeSpan = 0;
+                let maximumLayerDrift = 0;
+                let maximumCompactnessScore = 0;
+                let routedCrossingCount = 0;
+                let sharedTrackRouteCount = 0;
+                let trackViolationCount = 0;
+                levelNodesV10.forEach(function (node) {
+                    const adjacency = directDependenciesForNodeV145(node.id);
+                    const incomingIds = adjacency.incoming.map(function (edge) { return edge.id; }).sort();
+                    const outgoingIds = adjacency.outgoing.map(function (edge) { return edge.id; }).sort();
+                    const expectedIncomingIds = activeEdges.filter(function (edge) { return edge.target === node.id; }).map(function (edge) { return edge.id; }).sort();
+                    const expectedOutgoingIds = activeEdges.filter(function (edge) { return edge.source === node.id; }).map(function (edge) { return edge.id; }).sort();
+                    if (incomingIds.join('|') !== expectedIncomingIds.join('|') || outgoingIds.join('|') !== expectedOutgoingIds.join('|')) {
+                        throw new Error(node.id + '的详情一跳关系与共享逐级边不一致。');
+                    }
+
+                    if (fullDependencyAuditV141) {
+                        const localMaximumDegree = Math.max(adjacency.incoming.length, adjacency.outgoing.length, 1);
+                        const localViewHeight = Math.max(82, localMaximumDegree * 44 + (localMaximumDegree - 1) * 5);
+                        const localCenterY = localViewHeight / 2;
+                        const localNodeHeight = 46;
+                        const localRecords = [];
+                        const localIncomingOffsets = topologyPortOffsetsV143(adjacency.incoming.length, { height: localNodeHeight });
+                        const localOutgoingOffsets = topologyPortOffsetsV143(adjacency.outgoing.length, { height: localNodeHeight });
+                        adjacency.incoming.forEach(function (edge, index) {
+                            localRecords.push({
+                                edge: edge,
+                                start: { x: 202, y: localCenterY + (index - (adjacency.incoming.length - 1) / 2) * 49 },
+                                end: { x: 258, y: localCenterY + localIncomingOffsets[index] }
+                            });
+                        });
+                        adjacency.outgoing.forEach(function (edge, index) {
+                            localRecords.push({
+                                edge: edge,
+                                start: { x: 422, y: localCenterY + localOutgoingOffsets[index] },
+                                end: { x: 478, y: localCenterY + (index - (adjacency.outgoing.length - 1) / 2) * 49 }
+                            });
+                        });
+                        const localRoutes = routeLocalDependencyRecordsV143(localRecords, 680, localViewHeight);
+                        if (localRoutes.length !== adjacency.incoming.length + adjacency.outgoing.length) {
+                            throw new Error(node.id + '的详情一级边路由数量不完整。');
+                        }
+                        routedLocalViewCount += 1;
+                    }
+
+                    const graph = collectGlobalDependencyGraphV129(node.id);
+                    if (graph.edges.some(function (edge) { return !relationshipKeys.has(edge.source + '→' + edge.target); })) {
+                        throw new Error(node.id + '的全局图混入了非逐级依赖。');
+                    }
+                    if (!fullDependencyAuditV141) return;
+                    const signature = graph.nodes.map(function (item) { return item.id; }).sort().join(',') + '::' + graph.edges.map(function (edge) { return edge.id; }).sort().join(',');
+                    if (auditedGraphSignatures.has(signature)) return;
+                    auditedGraphSignatures.add(signature);
+                    const layout = topologyLayeredLayoutV132(graph);
+                    const rootMetrics = layout.metricsById.get(graph.rootNodeId);
+                    if (layout.orderingMethod !== 'sugiyama-barycenter-median-anchored-compact' || layout.crossingCount > layout.initialCrossingCount ||
+                        !rootMetrics || Math.abs(rootMetrics.lane) > 0.1 || layout.maximumLayerDrift > 0.5001 || layout.compactnessScore > 0.1 ||
+                        layout.rowGap !== topologyRoutingConfigV143.nodeClearance * 2 ||
+                        (layout.crossingCount === layout.initialCrossingCount && layout.alignmentScore > layout.initialAlignmentScore + 0.1)) {
+                        throw new Error(node.id + '的共享分层布局未保持交叉最小化、根锚定或紧凑父子对齐。');
+                    }
+                    const routes = topologyRoutesV143(graph, layout);
+                    if (routes.some(function (route) {
+                        return route.bends > topologyRoutingConfigV143.maximumBends || topologyForwardBacktrackV139(route.points) ||
+                            route.length < topologyEdgeBaselineV137(route.edge, layout) - 0.1 || route.trackViolations !== 0;
+                    })) {
+                        throw new Error(node.id + '的全局依赖存在无效长线或回折。');
+                    }
+                    initialLayerCrossingCount += layout.initialCrossingCount;
+                    optimizedLayerCrossingCount += layout.crossingCount;
+                    initialLayerObstacleCount += layout.initialObstacleCount;
+                    optimizedLayerObstacleCount += layout.obstacleCount;
+                    initialAlignmentScore += layout.initialAlignmentScore;
+                    optimizedAlignmentScore += layout.alignmentScore;
+                    initialEdgeSpan += layout.initialEdgeSpan;
+                    optimizedEdgeSpan += layout.edgeSpan;
+                    maximumLayerDrift = Math.max(maximumLayerDrift, layout.maximumLayerDrift);
+                    maximumCompactnessScore = Math.max(maximumCompactnessScore, layout.compactnessScore);
+                    routedCrossingCount += routes.reduce(function (sum, route) { return sum + route.crossings; }, 0);
+                    sharedTrackRouteCount += routes.filter(function (route) { return Number.isFinite(route.sharedTrackX); }).length;
+                    trackViolationCount += routes.reduce(function (sum, route) { return sum + route.trackViolations; }, 0);
+                    routedGraphCount += 1;
+                });
+                Object.defineProperty(window, '__DOUXUE_DEPENDENCY_AUDIT__', {
+                    configurable: true,
+                    value: Object.freeze({
+                        version: '14.6',
+                        scenario: graphScenarioV136,
+                        full: fullDependencyAuditV141,
+                        nodeCount: levelNodesV10.length,
+                        mainlineDirectEdgeCount: abilitiesV10.reduce(function (sum, ability) { return sum + Math.max(0, ability.levels.length - 1); }, 0),
+                        backendDirectEdgeCount: directModel.rawEdges.length,
+                        directEdgeCount: activeEdges.length,
+                        visibleProgressiveEdgeCount: activeEdges.length,
+                        hiddenRedundantEdgeCount: directModel.hiddenRedundantEdges.length,
+                        reductionOrder: Object.freeze(directModel.reductionRecords.map(function (record) {
+                            return Object.freeze({
+                                edgeId: record.edge.id,
+                                source: record.edge.source,
+                                target: record.edge.target,
+                                span: record.span,
+                                replacementHops: record.replacementHops,
+                                backendOrder: record.backendOrder
+                            });
+                        })),
+                        excludedNonDirectEdgeCount: levelRelationshipsV10.length - directModel.rawEdges.length,
+                        routedLocalViewCount: routedLocalViewCount,
+                        routedGraphCount: routedGraphCount,
+                        initialLayerCrossingCount: initialLayerCrossingCount,
+                        optimizedLayerCrossingCount: optimizedLayerCrossingCount,
+                        initialLayerObstacleCount: initialLayerObstacleCount,
+                        optimizedLayerObstacleCount: optimizedLayerObstacleCount,
+                        initialAlignmentScore: initialAlignmentScore,
+                        optimizedAlignmentScore: optimizedAlignmentScore,
+                        initialEdgeSpan: initialEdgeSpan,
+                        optimizedEdgeSpan: optimizedEdgeSpan,
+                        maximumLayerDrift: maximumLayerDrift,
+                        maximumCompactnessScore: maximumCompactnessScore,
+                        routedCrossingCount: routedCrossingCount,
+                        sharedTrackRouteCount: sharedTrackRouteCount,
+                        trackViolationCount: trackViolationCount,
+                        sharedTrackProbePassed: true,
+                        compactAlignmentProbePassed: true,
+                        stableTransitiveReductionPassed: true,
+                        reachabilityPreserved: true,
+                        passed: true
+                    })
+                });
             }
 
             function scheduleOverviewMetricsV138() {
@@ -2711,19 +3012,22 @@
 
             function renderLearningV10(node) {
                 const tasks = learningTasksByNodeV127[node.id] || [];
+                const learningGrid = document.getElementById('learning-grid');
+                const emptyLayout = node.studyState === 'locked' || tasks.length === 0;
                 document.getElementById('learning-title').textContent = '学习任务';
+                learningGrid.classList.toggle('is-empty', emptyLayout);
 
                 if (node.studyState === 'locked') {
-                    document.getElementById('learning-grid').innerHTML = '<div class="learning-empty-state is-locked"><i class="ph-bold ph-lock-key text-[18px]" aria-hidden="true"></i><span>未解锁</span></div>';
+                    learningGrid.innerHTML = '<div class="learning-empty-state is-locked"><i class="ph-bold ph-lock-key text-[18px]" aria-hidden="true"></i><span>未解锁</span></div>';
                     return;
                 }
 
                 if (tasks.length === 0) {
-                    document.getElementById('learning-grid').innerHTML = '<div class="learning-empty-state"><i class="ph-bold ph-minus text-[18px]" aria-hidden="true"></i><span>暂无学习任务</span></div>';
+                    learningGrid.innerHTML = '<div class="learning-empty-state"><i class="ph-bold ph-minus text-[18px]" aria-hidden="true"></i><span>暂无学习任务</span></div>';
                     return;
                 }
 
-                document.getElementById('learning-grid').innerHTML = tasks.map(function (task) {
+                learningGrid.innerHTML = tasks.map(function (task) {
                     const disabled = !node.canStudy;
                     const actionLabel = learningTaskActionV127(task);
                     const statusLabel = task.status === 'in_progress' ? '，进行中' : (task.status === 'completed' ? '，已完成' : '');
@@ -3004,26 +3308,216 @@
 
             /* 13.8：保留最终拓扑布局所需的唯一公共链路，移除 10.x、12.x 与 13.0 的被覆盖实现。 */
 
-            function graphStageEdgesV10() {
-                return levelRelationshipsV10.map(function (relationship, index) {
+            /* 14.5：所有依赖视图只读同一份稳定约简结果；后台原始一级边仅用于溯源，不直接决定最终箭头数量。 */
+            let directDependencyModelCacheV145 = null;
+
+            function isExplicitDirectRelationshipV139(relationship) {
+                if (!relationship || !relationship.source || !relationship.target || relationship.source === relationship.target) return false;
+                if (relationship.inferred === true || relationship.transitive === true || relationship.isDirect === false) return false;
+                const hasDepth = relationship.dependencyDepth != null;
+                const hasDirectFlag = relationship.isDirect != null;
+                const hasRelationType = relationship.relationType != null;
+                if (hasDepth && Number(relationship.dependencyDepth) !== 1) return false;
+                if (hasDirectFlag && relationship.isDirect !== true) return false;
+                if (hasRelationType && relationship.relationType !== 'direct') return false;
+                return (hasDepth && Number(relationship.dependencyDepth) === 1) ||
+                    (hasDirectFlag && relationship.isDirect === true) ||
+                    (hasRelationType && relationship.relationType === 'direct');
+            }
+
+            function directDependencyEdgeIdV145(sourceId, targetId) {
+                return 'direct-' + sourceId + '--' + targetId;
+            }
+
+            function dependencyPathHopsV145(edges, sourceId, targetId, excludedEdgeId) {
+                const outgoing = new Map();
+                edges.forEach(function (edge) {
+                    if (edge.id === excludedEdgeId) return;
+                    if (!outgoing.has(edge.source)) outgoing.set(edge.source, []);
+                    outgoing.get(edge.source).push(edge.target);
+                });
+                const distanceByNodeId = new Map([[sourceId, 0]]);
+                const queue = [sourceId];
+                while (queue.length) {
+                    const currentId = queue.shift();
+                    const nextDistance = distanceByNodeId.get(currentId) + 1;
+                    const nextIds = outgoing.get(currentId) || [];
+                    for (let index = 0; index < nextIds.length; index += 1) {
+                        const nextId = nextIds[index];
+                        if (nextId === targetId) return nextDistance;
+                        if (distanceByNodeId.has(nextId)) continue;
+                        distanceByNodeId.set(nextId, nextDistance);
+                        queue.push(nextId);
+                    }
+                }
+                return Number.POSITIVE_INFINITY;
+            }
+
+            function dependencyHierarchyRanksV145(edges) {
+                const nodeIds = new Set();
+                edges.forEach(function (edge) {
+                    nodeIds.add(edge.source);
+                    nodeIds.add(edge.target);
+                });
+                if (!nodeIds.size) return new Map();
+                const strong = topologyStrongComponentsV132({
+                    nodes: Array.from(nodeIds).map(function (id) { return { id: id }; }),
+                    edges: edges
+                });
+                const componentCount = strong.components.length;
+                const outgoing = new Map();
+                const indegree = new Map();
+                const ranks = new Map();
+                for (let componentId = 0; componentId < componentCount; componentId += 1) {
+                    outgoing.set(componentId, new Set());
+                    indegree.set(componentId, 0);
+                    ranks.set(componentId, 0);
+                }
+                edges.forEach(function (edge) {
+                    const sourceComponent = strong.componentByNode.get(edge.source);
+                    const targetComponent = strong.componentByNode.get(edge.target);
+                    if (sourceComponent === targetComponent || outgoing.get(sourceComponent).has(targetComponent)) return;
+                    outgoing.get(sourceComponent).add(targetComponent);
+                    indegree.set(targetComponent, indegree.get(targetComponent) + 1);
+                });
+                const ready = Array.from(indegree.keys()).filter(function (componentId) {
+                    return indegree.get(componentId) === 0;
+                }).sort(function (first, second) { return first - second; });
+                while (ready.length) {
+                    const componentId = ready.shift();
+                    Array.from(outgoing.get(componentId)).sort(function (first, second) { return first - second; }).forEach(function (targetComponent) {
+                        ranks.set(targetComponent, Math.max(ranks.get(targetComponent), ranks.get(componentId) + 1));
+                        indegree.set(targetComponent, indegree.get(targetComponent) - 1);
+                        if (indegree.get(targetComponent) === 0) {
+                            ready.push(targetComponent);
+                            ready.sort(function (first, second) { return first - second; });
+                        }
+                    });
+                }
+                return new Map(Array.from(nodeIds).map(function (nodeId) {
+                    return [nodeId, ranks.get(strong.componentByNode.get(nodeId)) || 0];
+                }));
+            }
+
+            function stableReduceDependencyEdgesV145(edges) {
+                const rankByNodeId = dependencyHierarchyRanksV145(edges);
+                const candidates = edges.map(function (edge, index) {
+                    const hierarchySpan = Math.max(0, (rankByNodeId.get(edge.target) || 0) - (rankByNodeId.get(edge.source) || 0));
+                    const alternateHops = dependencyPathHopsV145(edges, edge.source, edge.target, edge.id);
+                    return {
+                        edge: edge,
+                        backendOrder: Number.isFinite(edge.rawIndex) ? edge.rawIndex : index,
+                        span: Math.max(1, hierarchySpan, Number.isFinite(alternateHops) ? alternateHops : 1)
+                    };
+                }).sort(function (first, second) {
+                    return second.span - first.span ||
+                        first.backendOrder - second.backendOrder ||
+                        first.edge.id.localeCompare(second.edge.id);
+                });
+                const activeEdges = edges.slice();
+                const hiddenRecords = [];
+                candidates.forEach(function (candidate) {
+                    const activeIndex = activeEdges.findIndex(function (edge) { return edge.id === candidate.edge.id; });
+                    if (activeIndex < 0) return;
+                    const replacementHops = dependencyPathHopsV145(activeEdges, candidate.edge.source, candidate.edge.target, candidate.edge.id);
+                    if (!Number.isFinite(replacementHops)) return;
+                    activeEdges.splice(activeIndex, 1);
+                    hiddenRecords.push(Object.freeze({
+                        edge: candidate.edge,
+                        span: candidate.span,
+                        replacementHops: replacementHops,
+                        backendOrder: candidate.backendOrder
+                    }));
+                });
+                return {
+                    edges: activeEdges,
+                    hiddenEdges: hiddenRecords.map(function (record) { return record.edge; }),
+                    hiddenRecords: hiddenRecords,
+                    hiddenEdgeIds: new Set(hiddenRecords.map(function (record) { return record.edge.id; })),
+                    candidateOrder: candidates.map(function (candidate) { return candidate.edge.id; }),
+                    rawCycleEdgeIds: detectRelationshipCycleEdgeIdsV10(edges),
+                    cycleEdgeIds: detectRelationshipCycleEdgeIdsV10(activeEdges)
+                };
+            }
+
+            function createDirectDependencyModelV145(rawRelationships) {
+                const seenPairs = new Set();
+                const rawEdges = [];
+                const incomingByNodeId = new Map(levelNodesV10.map(function (node) { return [node.id, []]; }));
+                const outgoingByNodeId = new Map(levelNodesV10.map(function (node) { return [node.id, []]; }));
+                const edgeById = new Map();
+
+                rawRelationships.forEach(function (relationship, index) {
+                    if (!isExplicitDirectRelationshipV139(relationship)) return;
                     const sourceNode = levelNodeByIdV10(relationship.source);
                     const targetNode = levelNodeByIdV10(relationship.target);
-                    return {
-                        id: relationship.id || 'stage-edge-' + index,
+                    if (!sourceNode || !targetNode) throw new Error('一级依赖引用了不存在的节点。');
+                    if (sourceNode.abilityId === targetNode.abilityId) throw new Error('能力内部连续等级不得写入跨主线一级依赖。');
+                    const directKey = sourceNode.id + '→' + targetNode.id;
+                    if (seenPairs.has(directKey)) return;
+                    seenPairs.add(directKey);
+                    const edge = Object.freeze({
+                        id: directDependencyEdgeIdV145(sourceNode.id, targetNode.id),
+                        backendId: relationship.id || null,
+                        rawIndex: index,
                         source: sourceNode.id,
                         target: targetNode.id,
                         sourceAbilityId: sourceNode.abilityId,
                         targetAbilityId: targetNode.abilityId,
-                        reviewState: relationship.reviewState || 'normal'
-                    };
+                        reviewState: relationship.reviewState || 'normal',
+                        dependencyDepth: 1,
+                        provenance: 'backend-direct'
+                    });
+                    rawEdges.push(edge);
                 });
+
+                const reduction = stableReduceDependencyEdgesV145(rawEdges);
+                const edges = reduction.edges;
+                edges.forEach(function (edge) {
+                    edgeById.set(edge.id, edge);
+                    outgoingByNodeId.get(edge.source).push(edge);
+                    incomingByNodeId.get(edge.target).push(edge);
+                });
+
+                incomingByNodeId.forEach(function (nodeEdges) { Object.freeze(nodeEdges); });
+                outgoingByNodeId.forEach(function (nodeEdges) { Object.freeze(nodeEdges); });
+                return Object.freeze({
+                    rawEdges: Object.freeze(rawEdges),
+                    edges: Object.freeze(edges),
+                    hiddenRedundantEdges: Object.freeze(reduction.hiddenEdges),
+                    reductionRecords: Object.freeze(reduction.hiddenRecords),
+                    reductionCandidateOrder: Object.freeze(reduction.candidateOrder),
+                    rawEdgeKeys: seenPairs,
+                    edgeKeys: new Set(edges.map(function (edge) { return edge.source + '→' + edge.target; })),
+                    edgeById: edgeById,
+                    incomingByNodeId: incomingByNodeId,
+                    outgoingByNodeId: outgoingByNodeId,
+                    rawCycleEdgeIds: reduction.rawCycleEdgeIds,
+                    cycleEdgeIds: reduction.cycleEdgeIds
+                });
+            }
+
+            function directDependencyModelV145() {
+                if (!directDependencyModelCacheV145) directDependencyModelCacheV145 = createDirectDependencyModelV145(levelRelationshipsV10);
+                return directDependencyModelCacheV145;
+            }
+
+            function directDependenciesForNodeV145(nodeId) {
+                const model = directDependencyModelV145();
+                return {
+                    incoming: model.incomingByNodeId.get(nodeId) || [],
+                    outgoing: model.outgoingByNodeId.get(nodeId) || []
+                };
+            }
+
+            function graphStageEdgesV10() {
+                return directDependencyModelV145().edges;
             }
 
             function topologyNodePaletteV10(node) {
                 if (node.role === 'completed') return { fill: '#F3FCF6', stroke: '#BFE7CB', text: '#166534', dash: '' };
-                if (node.role === 'current' && node.studyState === 'locked') return { fill: '#FFFBF1', stroke: '#EDC66F', text: '#9A6B17', dash: '' };
-                if (node.role === 'current') return { fill: '#FFF4CF', stroke: '#F0C36A', text: '#92400E', dash: '' };
                 if (node.studyState === 'locked') return { fill: '#F1F5F9', stroke: '#CBD5E1', text: '#64748B', dash: '5 3' };
+                if (node.role === 'current') return { fill: '#FFF4CF', stroke: '#F0C36A', text: '#92400E', dash: '' };
                 if (node.role === 'target') return { fill: '#EDF3FF', stroke: '#5D8AFF', text: '#1746B2', dash: '6 4' };
                 return { fill: '#F7F9FF', stroke: '#C9D8FF', text: '#405572', dash: '' };
             }
@@ -3489,6 +3983,7 @@
                     if (second.id === rootNodeId) return 1;
                     return topologyNodeOrderV129(first, second);
                 });
+                // 相关节点沿约简后的上下游递归收集；边只能投影共享逐级边，禁止重新补回后台冗余直连。
                 const edges = allEdges.filter(function (edge) {
                     return nodeIds.has(edge.source) && nodeIds.has(edge.target);
                 });
@@ -3632,12 +4127,13 @@
 
             function localDependencyNodeMarkupV132(item) {
                 const node = item.node;
+                const edge = item.edge;
                 const naming = nodeNamingV137(node);
                 const locked = node.studyState === 'locked';
                 const relationCopy = item.direction === 'incoming' ? '当前能力的直接前置' : '当前能力的直接后续';
                 const aria = '查看' + naming.canonical + '，' + relationCopy + (locked ? '，未解锁' : '');
                 return (
-                    '<button type="button" data-jump-level-node="' + escapeHtmlV10(node.id) + '" data-local-dependency-node="' + escapeHtmlV10(item.direction) + '" class="local-dependency-node' + (locked ? ' is-locked' : '') + '" aria-label="' + escapeHtmlV10(aria) + '">' +
+                    '<button type="button" data-jump-level-node="' + escapeHtmlV10(node.id) + '" data-local-dependency-node="' + escapeHtmlV10(item.direction) + '" data-direct-edge-id="' + escapeHtmlV10(edge.id) + '" data-direct-edge-source="' + escapeHtmlV10(edge.source) + '" data-direct-edge-target="' + escapeHtmlV10(edge.target) + '" data-dependency-depth="1" data-dependency-provenance="backend-direct" class="local-dependency-node' + (locked ? ' is-locked' : '') + '" aria-label="' + escapeHtmlV10(aria) + '">' +
                         '<span class="local-dependency-node-copy">' +
                             '<strong class="local-dependency-node-name">' + escapeHtmlV10(naming.relationPrimary) + '</strong>' +
                             '<span class="local-dependency-node-definition">' + escapeHtmlV10(naming.relationSecondary) + '</span>' +
@@ -3667,37 +4163,83 @@
             }
 
             function localDependencyPathDataV132(points) {
-                const compact = [];
-                points.forEach(function (point) {
-                    const previous = compact[compact.length - 1];
-                    if (previous && Math.abs(previous.x - point.x) < 0.1 && Math.abs(previous.y - point.y) < 0.1) return;
-                    compact.push(point);
-                });
-                let path = '';
-                compact.forEach(function (point, index) {
-                    if (index === 0) {
-                        path = 'M ' + point.x.toFixed(2) + ' ' + point.y.toFixed(2);
-                        return;
-                    }
-                    const previous = compact[index - 1];
-                    if (Math.abs(previous.y - point.y) < 0.1) {
-                        path += ' H ' + point.x.toFixed(2);
-                    } else if (Math.abs(previous.x - point.x) < 0.1) {
-                        path += ' V ' + point.y.toFixed(2);
-                    } else {
-                        path += ' H ' + point.x.toFixed(2) + ' V ' + point.y.toFixed(2);
-                    }
-                });
-                return path;
+                return topologyOrthogonalPathDataV132(points);
             }
 
-            function appendLocalDependencyPathV132(layer, points, arrow) {
+            function appendLocalDependencyPathV132(layer, route) {
+                const edge = route.edge;
                 const path = svgElementV10('path', {
                     class: 'local-dependency-line',
-                    d: localDependencyPathDataV132(points),
-                    'marker-end': arrow ? 'url(#local-dependency-arrow-v133)' : ''
+                    d: localDependencyPathDataV132(route.points),
+                    'marker-end': 'url(#local-dependency-arrow-v133)',
+                    'data-local-edge-id': edge.id,
+                    'data-local-edge-source': edge.source,
+                    'data-local-edge-target': edge.target,
+                    'data-dependency-depth': '1',
+                    'data-dependency-provenance': edge.provenance,
+                    'data-route-kind': route.kind,
+                    'data-route-bends': String(route.bends),
+                    'data-route-length': String(Math.round(route.length * 10) / 10),
+                    'data-route-channel': route.channelBand,
+                    'data-route-crossings': String(route.crossings),
+                    'data-route-track-x': Number.isFinite(route.sharedTrackX) ? String(Math.round(route.sharedTrackX * 10) / 10) : '',
+                    'data-route-track-group': route.trackGroupKey || ''
                 });
                 layer.appendChild(path);
+            }
+
+            function routeLocalDependencyRecordsV143(records, width, height, metricsById) {
+                const localMetricsById = metricsById || new Map();
+                const localBounds = { top: height, bottom: 0 };
+                localMetricsById.forEach(function (metrics) {
+                    localBounds.top = Math.min(localBounds.top, metrics.y);
+                    localBounds.bottom = Math.max(localBounds.bottom, metrics.y + metrics.height);
+                });
+                if (!localMetricsById.size) localBounds.top = 0;
+                const localLayout = {
+                    bounds: localBounds,
+                    viewWidth: width,
+                    viewHeight: height,
+                    metricsById: localMetricsById
+                };
+                const yValues = new Set();
+                localMetricsById.forEach(function (metrics) {
+                    yValues.add(metrics.y - topologyRoutingConfigV143.nodeClearance);
+                    yValues.add(metrics.y + metrics.height + topologyRoutingConfigV143.nodeClearance);
+                });
+                for (let y = topologyRoutingConfigV143.grid; y < height; y += topologyRoutingConfigV143.grid) yValues.add(y);
+
+                return routeOrthogonalRecordsV143(records, {
+                    candidates: function (record, trackAssignment) {
+                        const xValues = [];
+                        const horizontalGap = record.end.x - record.start.x;
+                        const edgeInset = Math.min(topologyRoutingConfigV143.trackInset, Math.max(1, horizontalGap - 1));
+                        const fixedTracks = [record.start.x + edgeInset, record.end.x - edgeInset];
+                        fixedTracks.forEach(function (x) {
+                            if (x > record.start.x + 0.1 && x < record.end.x - 0.1 && !xValues.some(function (value) { return Math.abs(value - x) < 0.1; })) xValues.push(x);
+                        });
+                        for (let x = record.start.x + topologyRoutingConfigV143.grid; x < record.end.x - 0.1; x += topologyRoutingConfigV143.grid) {
+                            if (!xValues.some(function (value) { return Math.abs(value - x) < 0.1; })) xValues.push(x);
+                        }
+                        return topologyCandidatePathsV143(
+                            { point: record.start },
+                            { point: record.end },
+                            { x: xValues, y: Array.from(yValues).filter(function (y) { return y > 0 && y < height; }) },
+                            localLayout,
+                            trackAssignment
+                        );
+                    },
+                    pathIsClear: function (points, record) {
+                        return !localMetricsById.size || topologyCandidatePathClearV143(points, record.edge, localLayout);
+                    },
+                    validate: function (routes) {
+                        if (routes.length !== records.length || routes.some(function (route) {
+                            return route.bends > topologyRoutingConfigV143.maximumBends || topologyForwardBacktrackV139(route.points) || route.edge.dependencyDepth !== 1;
+                        })) {
+                            throw new Error('局部依赖未遵循共享分层正交路由。');
+                        }
+                    }
+                });
             }
 
             function drawLocalDependencyLinesV132() {
@@ -3716,46 +4258,57 @@
                 const currentCenterY = currentRect.top - mapRect.top + currentRect.height / 2;
                 const currentLeftX = currentRect.left - mapRect.left;
                 const currentRightX = currentRect.right - mapRect.left;
-                const incoming = Array.from(map.querySelectorAll('[data-local-dependency-node="incoming"]')).map(function (element) {
-                    const rect = element.getBoundingClientRect();
-                    return { x: rect.right - mapRect.left, y: rect.top - mapRect.top + rect.height / 2 };
-                });
-                const outgoing = Array.from(map.querySelectorAll('[data-local-dependency-node="outgoing"]')).map(function (element) {
-                    const rect = element.getBoundingClientRect();
-                    return { x: rect.left - mapRect.left, y: rect.top - mapRect.top + rect.height / 2 };
-                });
+                const incomingElements = Array.from(map.querySelectorAll('[data-local-dependency-node="incoming"]'));
+                const outgoingElements = Array.from(map.querySelectorAll('[data-local-dependency-node="outgoing"]'));
+                const incomingOffsets = topologyPortOffsetsV143(incomingElements.length, { height: currentRect.height });
+                const outgoingOffsets = topologyPortOffsetsV143(outgoingElements.length, { height: currentRect.height });
+                const records = [];
+                const localMetricsById = new Map();
 
-                function appendVerticalTrunk(x, yValues) {
-                    if (yValues.length < 2) return;
-                    const minimumY = Math.min.apply(null, yValues);
-                    const maximumY = Math.max.apply(null, yValues);
-                    if (maximumY - minimumY < 0.1) return;
-                    appendLocalDependencyPathV132(layer, [{ x: x, y: minimumY }, { x: x, y: maximumY }], false);
-                }
-
-                if (incoming.length) {
-                    const branchStartX = incoming[0].x;
-                    const availableWidth = Math.max(1, currentLeftX - branchStartX);
-                    const branchLength = Math.max(22, Math.min(32, availableWidth * 0.3));
-                    const trunkX = branchStartX + branchLength;
-                    incoming.forEach(function (start) {
-                        appendLocalDependencyPathV132(layer, [start, { x: trunkX, y: start.y }], false);
-                    });
-                    appendVerticalTrunk(trunkX, incoming.map(function (start) { return start.y; }).concat(currentCenterY));
-                    appendLocalDependencyPathV132(layer, [{ x: trunkX, y: currentCenterY }, { x: currentLeftX, y: currentCenterY }], true);
-                }
-
-                if (outgoing.length) {
-                    const branchEndX = outgoing[0].x;
-                    const availableWidth = Math.max(1, branchEndX - currentRightX);
-                    const branchLength = Math.max(22, Math.min(32, availableWidth * 0.3));
-                    const trunkX = branchEndX - branchLength;
-                    appendLocalDependencyPathV132(layer, [{ x: currentRightX, y: currentCenterY }, { x: trunkX, y: currentCenterY }], false);
-                    appendVerticalTrunk(trunkX, outgoing.map(function (end) { return end.y; }).concat(currentCenterY));
-                    outgoing.forEach(function (end) {
-                        appendLocalDependencyPathV132(layer, [{ x: trunkX, y: end.y }, end], true);
+                function localMetricsForRect(nodeId, rect) {
+                    localMetricsById.set(nodeId, {
+                        id: nodeId,
+                        x: rect.left - mapRect.left,
+                        y: rect.top - mapRect.top,
+                        width: rect.width,
+                        height: rect.height,
+                        centerX: rect.left - mapRect.left + rect.width / 2,
+                        centerY: rect.top - mapRect.top + rect.height / 2
                     });
                 }
+
+                function directEdgeForElement(element) {
+                    const edge = directDependencyModelV145().edgeById.get(element.dataset.directEdgeId);
+                    if (!edge) throw new Error('局部依赖节点缺少共享逐级边。');
+                    return edge;
+                }
+
+                incomingElements.forEach(function (element, index) {
+                    const rect = element.getBoundingClientRect();
+                    const edge = directEdgeForElement(element);
+                    localMetricsForRect(edge.source, rect);
+                    localMetricsForRect(edge.target, currentRect);
+                    records.push({
+                        edge: edge,
+                        start: { x: rect.right - mapRect.left, y: rect.top - mapRect.top + rect.height / 2 },
+                        end: { x: currentLeftX, y: currentCenterY + incomingOffsets[index] }
+                    });
+                });
+                outgoingElements.forEach(function (element, index) {
+                    const rect = element.getBoundingClientRect();
+                    const edge = directEdgeForElement(element);
+                    localMetricsForRect(edge.source, currentRect);
+                    localMetricsForRect(edge.target, rect);
+                    records.push({
+                        edge: edge,
+                        start: { x: currentRightX, y: currentCenterY + outgoingOffsets[index] },
+                        end: { x: rect.left - mapRect.left, y: rect.top - mapRect.top + rect.height / 2 }
+                    });
+                });
+
+                routeLocalDependencyRecordsV143(records, width, height, localMetricsById).forEach(function (route) {
+                    appendLocalDependencyPathV132(layer, route);
+                });
             }
 
             function scheduleLocalDependencyLinesV132() {
@@ -3777,23 +4330,19 @@
             }
 
             function renderDependenciesV10(node) {
-                const incoming = [];
-                const outgoing = [];
-                levelRelationshipsV10.forEach(function (relationship) {
-                    if (relationship.target === node.id) {
-                        const incomingNode = levelNodeByIdV10(relationship.source);
-                        if (incomingNode) incoming.push({ node: incomingNode, direction: 'incoming' });
-                    }
-                    if (relationship.source === node.id) {
-                        const outgoingNode = levelNodeByIdV10(relationship.target);
-                        if (outgoingNode) outgoing.push({ node: outgoingNode, direction: 'outgoing' });
-                    }
-                });
+                const adjacency = directDependenciesForNodeV145(node.id);
+                // 局部一跳与全局图共用同一份稳定约简后的逐级边；这里不再扫描或解释原始关系。
+                const incoming = adjacency.incoming.map(function (edge) {
+                    return { node: levelNodeByIdV10(edge.source), edge: edge, direction: 'incoming' };
+                }).filter(function (item) { return Boolean(item.node); });
+                const outgoing = adjacency.outgoing.map(function (edge) {
+                    return { node: levelNodeByIdV10(edge.target), edge: edge, direction: 'outgoing' };
+                }).filter(function (item) { return Boolean(item.node); });
                 incoming.sort(dependencySortV125);
                 outgoing.sort(dependencySortV125);
                 document.getElementById('dependency-view').innerHTML = (
                     '<div class="local-dependency-scroll">' +
-                        '<div class="local-dependency-map" data-local-dependency-map aria-label="当前能力的一跳直接跨主线关系；左侧节点指向当前能力，当前能力指向右侧节点">' +
+                        '<div class="local-dependency-map" data-local-dependency-map aria-label="当前能力的一跳逐级跨主线关系；左侧节点指向当前能力，当前能力指向右侧节点">' +
                             '<svg class="local-dependency-lines" data-local-dependency-lines aria-hidden="true"></svg>' +
                             '<section class="local-dependency-side is-incoming" aria-label="左侧：当前能力的直接前置">' +
                                 '<div class="local-dependency-node-list">' + (incoming.length ? incoming.map(localDependencyNodeMarkupV132).join('') : localDependencyEmptyMarkupV132('无')) + '</div>' +
@@ -3856,30 +4405,35 @@
                 return { componentByNode: componentByNode, components: components };
             }
 
-            function topologyComponentOrderV132(componentId, components) {
-                return components[componentId].map(levelNodeByIdV10).filter(Boolean).sort(topologyNodeOrderV129)[0];
+            function topologyComponentOrderV144(componentId, components, nodeById) {
+                return components[componentId].map(function (nodeId) { return nodeById.get(nodeId); }).filter(Boolean).sort(topologyNodeOrderV129)[0];
             }
 
             function topologyRankDataV132(graph) {
                 const strong = topologyStrongComponentsV132(graph);
+                const nodeById = new Map(graph.nodes.map(function (node) { return [node.id, node]; }));
                 const outgoing = new Map(strong.components.map(function (_, index) { return [index, new Set()]; }));
+                const incoming = new Map(strong.components.map(function (_, index) { return [index, new Set()]; }));
                 const indegree = new Map(strong.components.map(function (_, index) { return [index, 0]; }));
                 graph.edges.forEach(function (edge) {
                     const sourceComponent = strong.componentByNode.get(edge.source);
                     const targetComponent = strong.componentByNode.get(edge.target);
                     if (sourceComponent === targetComponent || outgoing.get(sourceComponent).has(targetComponent)) return;
                     outgoing.get(sourceComponent).add(targetComponent);
+                    incoming.get(targetComponent).add(sourceComponent);
                     indegree.set(targetComponent, indegree.get(targetComponent) + 1);
                 });
                 const componentRanks = new Map(strong.components.map(function (_, index) { return [index, 0]; }));
+                const topologicalComponents = [];
                 const compareComponents = function (first, second) {
-                    const firstNode = topologyComponentOrderV132(first, strong.components);
-                    const secondNode = topologyComponentOrderV132(second, strong.components);
+                    const firstNode = topologyComponentOrderV144(first, strong.components, nodeById);
+                    const secondNode = topologyComponentOrderV144(second, strong.components, nodeById);
                     return topologyNodeOrderV129(firstNode, secondNode);
                 };
                 const ready = Array.from(indegree.keys()).filter(function (componentId) { return indegree.get(componentId) === 0; }).sort(compareComponents);
                 while (ready.length) {
                     const componentId = ready.shift();
+                    topologicalComponents.push(componentId);
                     Array.from(outgoing.get(componentId)).sort(compareComponents).forEach(function (targetComponent) {
                         componentRanks.set(targetComponent, Math.max(componentRanks.get(targetComponent), componentRanks.get(componentId) + 1));
                         indegree.set(targetComponent, indegree.get(targetComponent) - 1);
@@ -3889,7 +4443,100 @@
                         }
                     });
                 }
+
                 const rootComponent = strong.componentByNode.get(graph.rootNodeId);
+                // 同时从源端和汇端生成合法分层，再统一压缩；避免单向最长层级制造可消除的跨层长线。
+                const maximumRank = Math.max(0, ...Array.from(componentRanks.values()));
+                const distanceToSink = new Map(strong.components.map(function (_, index) { return [index, 0]; }));
+                topologicalComponents.slice().reverse().forEach(function (componentId) {
+                    const successors = Array.from(outgoing.get(componentId));
+                    if (!successors.length) return;
+                    distanceToSink.set(componentId, Math.max.apply(null, successors.map(function (id) { return distanceToSink.get(id) + 1; })));
+                });
+                const latestRanks = new Map(strong.components.map(function (_, componentId) {
+                    return [componentId, maximumRank - distanceToSink.get(componentId)];
+                }));
+
+                function optimizeRankAssignmentV141(seedRanks) {
+                    const ranks = new Map(seedRanks);
+                    const assignmentMaximum = Math.max(0, ...Array.from(ranks.values()));
+                    const componentOrder = Array.from(ranks.keys()).sort(compareComponents);
+                    let changed = true;
+                    let pass = 0;
+                    while (changed && pass < Math.max(4, strong.components.length * 4)) {
+                        changed = false;
+                        const order = pass % 2 === 0 ? componentOrder.slice().reverse() : componentOrder.slice();
+                        order.forEach(function (componentId) {
+                            const predecessors = Array.from(incoming.get(componentId));
+                            const successors = Array.from(outgoing.get(componentId));
+                            const lower = predecessors.length ? Math.max.apply(null, predecessors.map(function (id) { return ranks.get(id) + 1; })) : 0;
+                            const upper = successors.length ? Math.min.apply(null, successors.map(function (id) { return ranks.get(id) - 1; })) : assignmentMaximum;
+                            if (upper < lower) return;
+                            const currentRank = ranks.get(componentId);
+                            const candidates = [];
+                            for (let rank = lower; rank <= upper; rank += 1) {
+                                let totalSpan = 0;
+                                let nonAdjacentCount = 0;
+                                predecessors.forEach(function (id) {
+                                    const span = rank - ranks.get(id);
+                                    totalSpan += span;
+                                    if (span !== 1) nonAdjacentCount += 1;
+                                });
+                                successors.forEach(function (id) {
+                                    const span = ranks.get(id) - rank;
+                                    totalSpan += span;
+                                    if (span !== 1) nonAdjacentCount += 1;
+                                });
+                                candidates.push({ rank: rank, totalSpan: totalSpan, nonAdjacentCount: nonAdjacentCount });
+                            }
+                            candidates.sort(function (first, second) {
+                                return first.totalSpan - second.totalSpan ||
+                                    first.nonAdjacentCount - second.nonAdjacentCount ||
+                                    Math.abs(first.rank - currentRank) - Math.abs(second.rank - currentRank) ||
+                                    first.rank - second.rank;
+                            });
+                            if (candidates[0] && candidates[0].rank !== currentRank) {
+                                ranks.set(componentId, candidates[0].rank);
+                                changed = true;
+                            }
+                        });
+                        pass += 1;
+                    }
+                    const usedRanks = Array.from(new Set(ranks.values())).sort(function (first, second) { return first - second; });
+                    const compactRank = new Map(usedRanks.map(function (rank, index) { return [rank, index]; }));
+                    ranks.forEach(function (rank, componentId) { ranks.set(componentId, compactRank.get(rank)); });
+                    return ranks;
+                }
+
+                function rankAssignmentScoreV141(ranks) {
+                    let totalSpan = 0;
+                    let nonAdjacentCount = 0;
+                    let rootSpan = 0;
+                    let maximumSpan = 0;
+                    graph.edges.forEach(function (edge) {
+                        const sourceComponent = strong.componentByNode.get(edge.source);
+                        const targetComponent = strong.componentByNode.get(edge.target);
+                        if (sourceComponent === targetComponent) return;
+                        const span = ranks.get(targetComponent) - ranks.get(sourceComponent);
+                        totalSpan += span;
+                        maximumSpan = Math.max(maximumSpan, span);
+                        if (span !== 1) nonAdjacentCount += 1;
+                        if (sourceComponent === rootComponent || targetComponent === rootComponent) rootSpan += span;
+                    });
+                    return { ranks: ranks, totalSpan: totalSpan, nonAdjacentCount: nonAdjacentCount, rootSpan: rootSpan, maximumSpan: maximumSpan };
+                }
+
+                const assignments = [
+                    rankAssignmentScoreV141(optimizeRankAssignmentV141(componentRanks)),
+                    rankAssignmentScoreV141(optimizeRankAssignmentV141(latestRanks))
+                ].sort(function (first, second) {
+                    return first.totalSpan - second.totalSpan ||
+                        first.nonAdjacentCount - second.nonAdjacentCount ||
+                        first.rootSpan - second.rootSpan ||
+                        first.maximumSpan - second.maximumSpan;
+                });
+                componentRanks.clear();
+                assignments[0].ranks.forEach(function (rank, componentId) { componentRanks.set(componentId, rank); });
                 const rootRank = componentRanks.get(rootComponent) || 0;
                 const rankById = new Map();
                 graph.nodes.forEach(function (node) {
@@ -3902,7 +4549,139 @@
                 };
             }
 
-            function topologyLaneSlotsV132(graph, rankById) {
+            /* 14.4：Sugiyama 分层内使用双向 barycenter / median sweep；坐标阶段增加根锚定、分叉/汇聚中心对齐与紧凑层约束。 */
+            function topologyLayerCrossingCountV143(graph, rankById, slots) {
+                const segmentsByGap = new Map();
+                graph.edges.forEach(function (edge) {
+                    const sourceRank = rankById.get(edge.source) || 0;
+                    const targetRank = rankById.get(edge.target) || 0;
+                    if (targetRank <= sourceRank) return;
+                    const span = targetRank - sourceRank;
+                    const sourceSlot = slots.get(edge.source) || 0;
+                    const targetSlot = slots.get(edge.target) || 0;
+                    for (let gapRank = sourceRank; gapRank < targetRank; gapRank += 1) {
+                        const leftRatio = (gapRank - sourceRank) / span;
+                        const rightRatio = (gapRank + 1 - sourceRank) / span;
+                        if (!segmentsByGap.has(gapRank)) segmentsByGap.set(gapRank, []);
+                        segmentsByGap.get(gapRank).push({
+                            edge: edge,
+                            left: sourceSlot + (targetSlot - sourceSlot) * leftRatio,
+                            right: sourceSlot + (targetSlot - sourceSlot) * rightRatio
+                        });
+                    }
+                });
+                const crossedPairs = new Set();
+                segmentsByGap.forEach(function (segments) {
+                    for (let firstIndex = 0; firstIndex < segments.length; firstIndex += 1) {
+                        for (let secondIndex = firstIndex + 1; secondIndex < segments.length; secondIndex += 1) {
+                            const first = segments[firstIndex];
+                            const second = segments[secondIndex];
+                            if (first.edge.source === second.edge.source || first.edge.source === second.edge.target ||
+                                first.edge.target === second.edge.source || first.edge.target === second.edge.target) continue;
+                            const leftDelta = first.left - second.left;
+                            const rightDelta = first.right - second.right;
+                            if (leftDelta * rightDelta >= -0.0001) continue;
+                            crossedPairs.add([first.edge.id, second.edge.id].sort().join('|'));
+                        }
+                    }
+                });
+                return crossedPairs.size;
+            }
+
+            function topologyLayerObstacleCountV143(graph, rankById, slots) {
+                let obstructionCount = 0;
+                graph.edges.forEach(function (edge) {
+                    const sourceRank = rankById.get(edge.source) || 0;
+                    const targetRank = rankById.get(edge.target) || 0;
+                    if (targetRank <= sourceRank + 1) return;
+                    const span = targetRank - sourceRank;
+                    const sourceSlot = slots.get(edge.source) || 0;
+                    const targetSlot = slots.get(edge.target) || 0;
+                    graph.nodes.forEach(function (node) {
+                        const nodeRank = rankById.get(node.id) || 0;
+                        if (nodeRank <= sourceRank || nodeRank >= targetRank) return;
+                        const ratio = (nodeRank - sourceRank) / span;
+                        const virtualSlot = sourceSlot + (targetSlot - sourceSlot) * ratio;
+                        if (Math.abs(virtualSlot - (slots.get(node.id) || 0)) < 0.95) obstructionCount += 1;
+                    });
+                });
+                return obstructionCount;
+            }
+
+            function topologyLayerAlignmentMetricsV144(graph, rankById, slots) {
+                const outgoing = new Map(graph.nodes.map(function (node) { return [node.id, []]; }));
+                const incoming = new Map(graph.nodes.map(function (node) { return [node.id, []]; }));
+                const layers = new Map();
+                graph.nodes.forEach(function (node) {
+                    const rank = rankById.get(node.id) || 0;
+                    if (!layers.has(rank)) layers.set(rank, []);
+                    layers.get(rank).push(node.id);
+                });
+                graph.edges.forEach(function (edge) {
+                    const sourceRank = rankById.get(edge.source) || 0;
+                    const targetRank = rankById.get(edge.target) || 0;
+                    if (targetRank <= sourceRank) return;
+                    outgoing.get(edge.source).push(edge.target);
+                    incoming.get(edge.target).push(edge.source);
+                });
+
+                function averageNodeSlot(nodeIds) {
+                    return nodeIds.reduce(function (sum, nodeId) { return sum + (slots.get(nodeId) || 0); }, 0) / Math.max(1, nodeIds.length);
+                }
+
+                let splitMisalignment = 0;
+                let mergeMisalignment = 0;
+                let rootGroupMisalignment = 0;
+                let maximumGroupMisalignment = 0;
+                outgoing.forEach(function (childIds, sourceId) {
+                    if (childIds.length < 2) return;
+                    const delta = Math.abs((slots.get(sourceId) || 0) - averageNodeSlot(childIds));
+                    splitMisalignment += delta * childIds.length;
+                    if (sourceId === graph.rootNodeId) rootGroupMisalignment += delta;
+                    maximumGroupMisalignment = Math.max(maximumGroupMisalignment, delta);
+                });
+                incoming.forEach(function (parentIds, targetId) {
+                    if (parentIds.length < 2) return;
+                    const delta = Math.abs((slots.get(targetId) || 0) - averageNodeSlot(parentIds));
+                    mergeMisalignment += delta * parentIds.length;
+                    if (targetId === graph.rootNodeId) rootGroupMisalignment += delta;
+                    maximumGroupMisalignment = Math.max(maximumGroupMisalignment, delta);
+                });
+
+                const rootRank = rankById.get(graph.rootNodeId) || 0;
+                let layerDrift = 0;
+                let maximumLayerDrift = 0;
+                let compactness = 0;
+                layers.forEach(function (nodeIds, rank) {
+                    const orderedSlots = nodeIds.map(function (nodeId) { return slots.get(nodeId) || 0; }).sort(function (first, second) { return first - second; });
+                    const center = orderedSlots.reduce(function (sum, slot) { return sum + slot; }, 0) / Math.max(1, orderedSlots.length);
+                    if (rank !== rootRank) {
+                        layerDrift += Math.abs(center);
+                        maximumLayerDrift = Math.max(maximumLayerDrift, Math.abs(center));
+                    }
+                    for (let index = 1; index < orderedSlots.length; index += 1) {
+                        compactness += Math.abs((orderedSlots[index] - orderedSlots[index - 1]) - 1);
+                    }
+                });
+                const edgeSpan = graph.edges.reduce(function (sum, edge) {
+                    return sum + Math.abs((slots.get(edge.source) || 0) - (slots.get(edge.target) || 0));
+                }, 0);
+                return {
+                    anchorDrift: Math.abs(slots.get(graph.rootNodeId) || 0),
+                    rootGroupMisalignment: rootGroupMisalignment,
+                    splitMisalignment: splitMisalignment,
+                    mergeMisalignment: mergeMisalignment,
+                    groupMisalignment: splitMisalignment + mergeMisalignment,
+                    maximumGroupMisalignment: maximumGroupMisalignment,
+                    layerDrift: layerDrift,
+                    maximumLayerDrift: maximumLayerDrift,
+                    edgeSpan: edgeSpan,
+                    compactness: compactness
+                };
+            }
+
+            function topologyLaneSlotsV144(graph, rankById) {
+                const nodeById = new Map(graph.nodes.map(function (node) { return [node.id, node]; }));
                 const adjacency = new Map(graph.nodes.map(function (node) { return [node.id, new Set()]; }));
                 graph.edges.forEach(function (edge) {
                     adjacency.get(edge.source).add(edge.target);
@@ -3918,41 +4697,219 @@
                         queue.push(nextId);
                     });
                 }
-                const groups = new Map();
+
+                const initialOrders = new Map();
                 graph.nodes.forEach(function (node) {
                     const rank = rankById.get(node.id) || 0;
-                    if (!groups.has(rank)) groups.set(rank, []);
-                    groups.get(rank).push(node);
+                    if (!initialOrders.has(rank)) initialOrders.set(rank, []);
+                    initialOrders.get(rank).push(node.id);
                 });
-                const slots = new Map();
-                groups.forEach(function (nodes, rank) {
-                    const ordered = nodes.slice().sort(function (first, second) {
-                        if (first.id === graph.rootNodeId) return -1;
-                        if (second.id === graph.rootNodeId) return 1;
-                        const distanceDifference = (distances.get(first.id) || 999) - (distances.get(second.id) || 999);
+                initialOrders.forEach(function (nodeIds) {
+                    nodeIds.sort(function (firstId, secondId) {
+                        if (firstId === graph.rootNodeId) return -1;
+                        if (secondId === graph.rootNodeId) return 1;
+                        const distanceDifference = (distances.get(firstId) || 999) - (distances.get(secondId) || 999);
                         if (distanceDifference) return distanceDifference;
-                        const degreeDifference = adjacency.get(second.id).size - adjacency.get(first.id).size;
-                        return degreeDifference || topologyNodeOrderV129(first, second);
-                    });
-                    if (rank === 0 && ordered.some(function (node) { return node.id === graph.rootNodeId; })) {
-                        slots.set(graph.rootNodeId, 0);
-                        ordered.filter(function (node) { return node.id !== graph.rootNodeId; }).forEach(function (node, index) {
-                            const distance = Math.floor(index / 2) + 1;
-                            slots.set(node.id, index % 2 === 0 ? -distance : distance);
-                        });
-                        return;
-                    }
-                    ordered.forEach(function (node, index) {
-                        slots.set(node.id, index - (ordered.length - 1) / 2);
+                        const degreeDifference = adjacency.get(secondId).size - adjacency.get(firstId).size;
+                        return degreeDifference || topologyNodeOrderV129(nodeById.get(firstId), nodeById.get(secondId));
                     });
                 });
-                return slots;
+
+                function copyOrders(orders) {
+                    return new Map(Array.from(orders.entries()).map(function (entry) { return [entry[0], entry[1].slice()]; }));
+                }
+
+                function slotsForOrders(orders) {
+                    const slots = new Map();
+                    orders.forEach(function (nodeIds) {
+                        const center = (nodeIds.length - 1) / 2;
+                        nodeIds.forEach(function (nodeId, index) { slots.set(nodeId, index - center); });
+                        const rootIndex = nodeIds.indexOf(graph.rootNodeId);
+                        if (rootIndex < 0) return;
+                        const rootOffset = rootIndex - center;
+                        nodeIds.forEach(function (nodeId) { slots.set(nodeId, slots.get(nodeId) - rootOffset); });
+                    });
+                    return slots;
+                }
+
+                function neighborScore(nodeId, direction, slots) {
+                    const rank = rankById.get(nodeId) || 0;
+                    const values = [];
+                    graph.edges.forEach(function (edge) {
+                        let neighborId = null;
+                        if (direction === 'forward' && edge.target === nodeId && (rankById.get(edge.source) || 0) < rank) neighborId = edge.source;
+                        if (direction === 'backward' && edge.source === nodeId && (rankById.get(edge.target) || 0) > rank) neighborId = edge.target;
+                        if (!neighborId) return;
+                        const span = Math.max(1, Math.abs((rankById.get(neighborId) || 0) - rank));
+                        values.push({ value: slots.get(neighborId) || 0, weight: 1 / span });
+                    });
+                    if (!values.length) return null;
+                    values.sort(function (first, second) { return first.value - second.value; });
+                    const totalWeight = values.reduce(function (sum, item) { return sum + item.weight; }, 0);
+                    let consumedWeight = 0;
+                    let median = values[values.length - 1].value;
+                    for (let index = 0; index < values.length; index += 1) {
+                        consumedWeight += values[index].weight;
+                        if (consumedWeight >= totalWeight / 2) {
+                            median = values[index].value;
+                            break;
+                        }
+                    }
+                    const barycenter = values.reduce(function (sum, item) { return sum + item.value * item.weight; }, 0) / totalWeight;
+                    return { median: median, barycenter: barycenter };
+                }
+
+                function sweep(orders, direction) {
+                    const ranks = Array.from(orders.keys()).sort(function (first, second) { return first - second; });
+                    if (direction === 'backward') ranks.reverse();
+                    ranks.forEach(function (rank) {
+                        const nodeIds = orders.get(rank);
+                        if (nodeIds.length < 2) return;
+                        const slots = slotsForOrders(orders);
+                        const previousIndex = new Map(nodeIds.map(function (nodeId, index) { return [nodeId, index]; }));
+                        nodeIds.sort(function (firstId, secondId) {
+                            const firstScore = neighborScore(firstId, direction, slots);
+                            const secondScore = neighborScore(secondId, direction, slots);
+                            if (firstScore && secondScore) {
+                                return firstScore.median - secondScore.median ||
+                                    firstScore.barycenter - secondScore.barycenter ||
+                                    previousIndex.get(firstId) - previousIndex.get(secondId) ||
+                                    topologyNodeOrderV129(nodeById.get(firstId), nodeById.get(secondId));
+                            }
+                            if (firstScore) return -1;
+                            if (secondScore) return 1;
+                            return previousIndex.get(firstId) - previousIndex.get(secondId) ||
+                                topologyNodeOrderV129(nodeById.get(firstId), nodeById.get(secondId));
+                        });
+                    });
+                }
+
+                function orderingScore(orders, initialIndexById) {
+                    const slots = slotsForOrders(orders);
+                    const crossings = topologyLayerCrossingCountV143(graph, rankById, slots);
+                    const obstructions = topologyLayerObstacleCountV143(graph, rankById, slots);
+                    const alignment = topologyLayerAlignmentMetricsV144(graph, rankById, slots);
+                    let movement = 0;
+                    orders.forEach(function (nodeIds) {
+                        nodeIds.forEach(function (nodeId, index) { movement += Math.abs(index - initialIndexById.get(nodeId)); });
+                    });
+                    return { orders: copyOrders(orders), slots: slots, crossings: crossings, obstructions: obstructions, alignment: alignment, movement: movement };
+                }
+
+                const initialIndexById = new Map();
+                initialOrders.forEach(function (nodeIds) {
+                    nodeIds.forEach(function (nodeId, index) { initialIndexById.set(nodeId, index); });
+                });
+                const initialScore = orderingScore(initialOrders, initialIndexById);
+                const candidates = [initialScore];
+                [copyOrders(initialOrders), new Map(Array.from(initialOrders.entries()).map(function (entry) {
+                    return [entry[0], entry[1].slice().reverse()];
+                }))].forEach(function (seed) {
+                    const orders = copyOrders(seed);
+                    for (let pass = 0; pass < 10; pass += 1) {
+                        sweep(orders, pass % 2 === 0 ? 'forward' : 'backward');
+                        candidates.push(orderingScore(orders, initialIndexById));
+                    }
+                });
+                candidates.sort(function (first, second) {
+                    return first.crossings - second.crossings ||
+                        first.alignment.anchorDrift - second.alignment.anchorDrift ||
+                        first.alignment.rootGroupMisalignment - second.alignment.rootGroupMisalignment ||
+                        first.alignment.groupMisalignment - second.alignment.groupMisalignment ||
+                        first.alignment.maximumGroupMisalignment - second.alignment.maximumGroupMisalignment ||
+                        first.alignment.layerDrift - second.alignment.layerDrift ||
+                        first.alignment.edgeSpan - second.alignment.edgeSpan ||
+                        first.obstructions - second.obstructions ||
+                        first.movement - second.movement;
+                });
+                // 根层保持绝对锚定；其他层仅允许半个 lane 的奇偶校正，禁止为虚拟长边整体漂移数个 lane。
+                function optimizeLayerOffsets(orders) {
+                    const rootRank = rankById.get(graph.rootNodeId) || 0;
+                    const baseSlots = slotsForOrders(orders);
+                    function offsetSlots(offsets) {
+                        const slots = new Map(baseSlots);
+                        offsets.forEach(function (offset, rank) {
+                            if (rank === rootRank || Math.abs(offset) < 0.1) return;
+                            (orders.get(rank) || []).forEach(function (nodeId) { slots.set(nodeId, (slots.get(nodeId) || 0) + offset); });
+                        });
+                        return slots;
+                    }
+                    function offsetScore(offsets) {
+                        const candidateSlots = offsetSlots(offsets);
+                        const alignment = topologyLayerAlignmentMetricsV144(graph, rankById, candidateSlots);
+                        let movement = 0;
+                        candidateSlots.forEach(function (slot, nodeId) { movement += Math.abs(slot - (baseSlots.get(nodeId) || 0)); });
+                        return {
+                            slots: candidateSlots,
+                            crossings: topologyLayerCrossingCountV143(graph, rankById, candidateSlots),
+                            obstructions: topologyLayerObstacleCountV143(graph, rankById, candidateSlots),
+                            alignment: alignment,
+                            movement: movement,
+                            offsets: new Map(offsets)
+                        };
+                    }
+                    function compareOffsetScores(first, second) {
+                        return first.crossings - second.crossings ||
+                            first.alignment.anchorDrift - second.alignment.anchorDrift ||
+                            first.alignment.rootGroupMisalignment - second.alignment.rootGroupMisalignment ||
+                            first.alignment.groupMisalignment - second.alignment.groupMisalignment ||
+                            first.alignment.maximumGroupMisalignment - second.alignment.maximumGroupMisalignment ||
+                            first.alignment.layerDrift - second.alignment.layerDrift ||
+                            first.alignment.edgeSpan - second.alignment.edgeSpan ||
+                            first.obstructions - second.obstructions ||
+                            first.movement - second.movement;
+                    }
+                    const ranks = Array.from(orders.keys()).filter(function (rank) { return rank !== rootRank; }).sort(function (first, second) {
+                        return Math.abs(first - rootRank) - Math.abs(second - rootRank) || first - second;
+                    });
+                    const beamWidth = ranks.length <= 7 ? Math.pow(3, ranks.length) : 128;
+                    let states = [{ offsets: new Map([[rootRank, 0]]), score: offsetScore(new Map([[rootRank, 0]])) }];
+                    ranks.forEach(function (rank) {
+                        const expanded = [];
+                        states.forEach(function (state) {
+                            [-0.5, 0, 0.5].forEach(function (offset) {
+                                const offsets = new Map(state.offsets);
+                                offsets.set(rank, offset);
+                                expanded.push({ offsets: offsets, score: offsetScore(offsets) });
+                            });
+                        });
+                        expanded.sort(function (first, second) { return compareOffsetScores(first.score, second.score); });
+                        states = expanded.slice(0, beamWidth);
+                    });
+                    states.sort(function (first, second) { return compareOffsetScores(first.score, second.score); });
+                    return states[0].score;
+                }
+                const shifted = optimizeLayerOffsets(candidates[0].orders);
+                return {
+                    slots: shifted.slots,
+                    initialCrossingCount: initialScore.crossings,
+                    crossingCount: shifted.crossings,
+                    initialObstacleCount: initialScore.obstructions,
+                    obstacleCount: shifted.obstructions,
+                    initialAlignmentScore: initialScore.alignment.groupMisalignment,
+                    alignmentScore: shifted.alignment.groupMisalignment,
+                    rootGroupMisalignment: shifted.alignment.rootGroupMisalignment,
+                    initialEdgeSpan: initialScore.alignment.edgeSpan,
+                    edgeSpan: shifted.alignment.edgeSpan,
+                    layerDriftScore: shifted.alignment.layerDrift,
+                    maximumLayerDrift: shifted.alignment.maximumLayerDrift,
+                    compactnessScore: shifted.alignment.compactness,
+                    method: 'sugiyama-barycenter-median-anchored-compact'
+                };
             }
 
             function topologyLayeredLayoutV132(graph) {
                 const nodeWidth = 168;
-                const nodeHeight = 76;
-                const rowStep = 116;
+                const incomingDegree = new Map(graph.nodes.map(function (node) { return [node.id, 0]; }));
+                const outgoingDegree = new Map(graph.nodes.map(function (node) { return [node.id, 0]; }));
+                graph.edges.forEach(function (edge) {
+                    outgoingDegree.set(edge.source, (outgoingDegree.get(edge.source) || 0) + 1);
+                    incomingDegree.set(edge.target, (incomingDegree.get(edge.target) || 0) + 1);
+                });
+                const maximumPortDegree = Math.max(1, ...Array.from(incomingDegree.values()), ...Array.from(outgoingDegree.values()));
+                const nodeHeight = Math.max(76, (maximumPortDegree - 1) * 12 + 12);
+                const rowGap = topologyRoutingConfigV143.nodeClearance * 2;
+                const rowStep = nodeHeight + rowGap;
                 const rankData = topologyRankDataV132(graph);
                 const routingPlan = topologyRoutingPlanV137(graph, rankData.rankById);
                 const channelCounts = new Map();
@@ -3971,7 +4928,8 @@
                 const maximumChannelDemand = Math.max(1, ...Array.from(channelCounts.values()));
                 const corridorGap = Math.max(72, 24 + (maximumChannelDemand - 1) * 12);
                 const columnStep = nodeWidth + corridorGap;
-                const laneSlots = topologyLaneSlotsV132(graph, rankData.rankById);
+                const laneLayout = topologyLaneSlotsV144(graph, rankData.rankById);
+                const laneSlots = laneLayout.slots;
                 const rawMetrics = new Map();
                 graph.nodes.forEach(function (node) {
                     const centerX = (rankData.rankById.get(node.id) || 0) * columnStep;
@@ -4051,16 +5009,25 @@
                     bounds: bounds,
                     layerCenters: layerCenters,
                     nodeWidth: nodeWidth,
+                    nodeHeight: nodeHeight,
+                    rowGap: rowGap,
+                    rowStep: rowStep,
                     columnStep: columnStep,
-                    rankZeroX: shiftX
+                    rankZeroX: shiftX,
+                    orderingMethod: laneLayout.method,
+                    initialCrossingCount: laneLayout.initialCrossingCount,
+                    crossingCount: laneLayout.crossingCount,
+                    initialObstacleCount: laneLayout.initialObstacleCount,
+                    obstacleCount: laneLayout.obstacleCount,
+                    initialAlignmentScore: laneLayout.initialAlignmentScore,
+                    alignmentScore: laneLayout.alignmentScore,
+                    rootGroupMisalignment: laneLayout.rootGroupMisalignment,
+                    initialEdgeSpan: laneLayout.initialEdgeSpan,
+                    edgeSpan: laneLayout.edgeSpan,
+                    layerDriftScore: laneLayout.layerDriftScore,
+                    maximumLayerDrift: laneLayout.maximumLayerDrift,
+                    compactnessScore: laneLayout.compactnessScore
                 };
-            }
-
-            function topologyFixedPortV132(metrics, side) {
-                if (side === 'left') return { x: metrics.x, y: metrics.centerY };
-                if (side === 'right') return { x: metrics.x + metrics.width, y: metrics.centerY };
-                if (side === 'top') return { x: metrics.centerX, y: metrics.y };
-                return { x: metrics.centerX, y: metrics.y + metrics.height };
             }
 
             function topologyCompactOrthogonalPointsV132(points) {
@@ -4100,7 +5067,7 @@
                 let blocked = false;
                 metricsById.forEach(function (metrics, nodeId) {
                     if (blocked || nodeId === edge.source || nodeId === edge.target) return;
-                    const padding = 12;
+                    const padding = topologyRoutingConfigV143.nodeClearance;
                     const left = metrics.x - padding;
                     const right = metrics.x + metrics.width + padding;
                     const top = metrics.y - padding;
@@ -4160,37 +5127,89 @@
                 return { corridorGroups: corridorGroups, outer: outer };
             }
 
-            function topologyPortPointV137(metrics, side, offset) {
-                if (side === 'left') return { x: metrics.x, y: metrics.centerY + offset };
-                if (side === 'right') return { x: metrics.x + metrics.width, y: metrics.centerY + offset };
-                if (side === 'top') return { x: metrics.centerX + offset, y: metrics.y };
-                return { x: metrics.centerX + offset, y: metrics.y + metrics.height };
+            /* 14.3：端口与通道均由对端 Y 顺序推导；12px 线距、16px 节点净空在所有依赖图中共享。 */
+            const topologyRoutingConfigV143 = Object.freeze({
+                grid: 12,
+                lineSeparation: 12,
+                nodeClearance: 16,
+                trackInset: 28,
+                outerMargin: 24,
+                maximumBends: 4
+            });
+
+            function topologyPortPointV143(metrics, side, offset) {
+                return {
+                    x: side === 'right' ? metrics.x + metrics.width : metrics.x,
+                    y: metrics.centerY + offset
+                };
             }
 
-            function topologyAvailablePortV137(nodeId, metrics, side, usedPorts) {
-                const offsets = [0, -12, 12, -24, 24];
-                for (let index = 0; index < offsets.length; index += 1) {
-                    const key = nodeId + ':' + side + ':' + index;
-                    if (!usedPorts.has(key)) return { key: key, side: side, point: topologyPortPointV137(metrics, side, offsets[index]), slotIndex: index };
-                }
-                return null;
+            function topologyPortOffsetsV143(count, metrics) {
+                if (count <= 1) return [0];
+                const halfSpan = Math.min((count - 1) * 6, metrics.height / 2 - 3);
+                const step = halfSpan * 2 / (count - 1);
+                return Array.from({ length: count }, function (_, index) {
+                    return -halfSpan + step * index;
+                });
             }
 
-            function topologySidePairsV137(sourceMetrics, targetMetrics) {
-                const horizontal = Math.abs(targetMetrics.centerX - sourceMetrics.centerX) >= Math.abs(targetMetrics.centerY - sourceMetrics.centerY);
-                if (horizontal && targetMetrics.centerX >= sourceMetrics.centerX) {
-                    return [['right', 'left'], ['right', 'top'], ['right', 'bottom'], ['top', 'left'], ['bottom', 'left'], ['top', 'top'], ['bottom', 'bottom']];
-                }
-                if (horizontal) {
-                    return [['left', 'right'], ['left', 'top'], ['left', 'bottom'], ['top', 'right'], ['bottom', 'right'], ['top', 'top'], ['bottom', 'bottom']];
-                }
-                if (targetMetrics.centerY >= sourceMetrics.centerY) {
-                    return [['bottom', 'top'], ['right', 'right'], ['left', 'left'], ['bottom', 'left'], ['bottom', 'right'], ['left', 'top'], ['right', 'top']];
-                }
-                return [['top', 'bottom'], ['right', 'right'], ['left', 'left'], ['top', 'left'], ['top', 'right'], ['left', 'bottom'], ['right', 'bottom']];
+            function topologyEdgePortsV143(graph, layout) {
+                const outgoing = new Map();
+                const incoming = new Map();
+                const assignments = new Map();
+                graph.edges.forEach(function (edge) {
+                    if (!outgoing.has(edge.source)) outgoing.set(edge.source, []);
+                    if (!incoming.has(edge.target)) incoming.set(edge.target, []);
+                    outgoing.get(edge.source).push(edge);
+                    incoming.get(edge.target).push(edge);
+                    assignments.set(edge.id, {});
+                });
+
+                outgoing.forEach(function (edges, nodeId) {
+                    const metrics = layout.metricsById.get(nodeId);
+                    const ordered = edges.slice().sort(function (first, second) {
+                        const firstTarget = layout.metricsById.get(first.target);
+                        const secondTarget = layout.metricsById.get(second.target);
+                        return firstTarget.centerY - secondTarget.centerY || firstTarget.centerX - secondTarget.centerX || first.id.localeCompare(second.id);
+                    });
+                    const offsets = topologyPortOffsetsV143(ordered.length, metrics);
+                    ordered.forEach(function (edge, index) {
+                        assignments.get(edge.id).startPort = {
+                            key: nodeId + ':right:' + index,
+                            side: 'right',
+                            point: topologyPortPointV143(metrics, 'right', offsets[index]),
+                            slotIndex: index
+                        };
+                    });
+                });
+
+                incoming.forEach(function (edges, nodeId) {
+                    const metrics = layout.metricsById.get(nodeId);
+                    const ordered = edges.slice().sort(function (first, second) {
+                        const firstSource = layout.metricsById.get(first.source);
+                        const secondSource = layout.metricsById.get(second.source);
+                        // Y 相同或极近时，近端边靠内、跨层长边靠外，避免长边在汇入前切穿短边。
+                        return firstSource.centerY - secondSource.centerY || secondSource.centerX - firstSource.centerX || first.id.localeCompare(second.id);
+                    });
+                    const offsets = topologyPortOffsetsV143(ordered.length, metrics);
+                    ordered.forEach(function (edge, index) {
+                        assignments.get(edge.id).endPort = {
+                            key: nodeId + ':left:' + index,
+                            side: 'left',
+                            point: topologyPortPointV143(metrics, 'left', offsets[index]),
+                            slotIndex: index
+                        };
+                    });
+                });
+
+                graph.edges.forEach(function (edge) {
+                    const assignment = assignments.get(edge.id);
+                    if (!assignment || !assignment.startPort || !assignment.endPort) throw new Error(edge.id + '缺少右出左入端口。');
+                });
+                return assignments;
             }
 
-            function topologyRoutingLanesV137(layout) {
+            function topologyRoutingLanesV143(layout) {
                 const xValues = new Set();
                 const yValues = new Set();
                 const ranks = Array.from(layout.layerCenters.keys());
@@ -4199,36 +5218,32 @@
                 const gapWidth = layout.columnStep - layout.nodeWidth;
                 for (let rank = minimumRank - 1; rank <= maximumRank; rank += 1) {
                     const gapLeft = layout.rankZeroX + rank * layout.columnStep + layout.nodeWidth / 2;
-                    for (let offset = 12; offset <= gapWidth - 12 + 0.1; offset += 12) xValues.add(gapLeft + offset);
+                    for (let offset = topologyRoutingConfigV143.nodeClearance; offset <= gapWidth - topologyRoutingConfigV143.nodeClearance + 0.1; offset += topologyRoutingConfigV143.grid) xValues.add(gapLeft + offset);
                 }
                 layout.metricsById.forEach(function (metrics) {
-                    xValues.add(metrics.x - 12);
-                    xValues.add(metrics.x + metrics.width + 12);
-                    yValues.add(metrics.y - 12);
-                    yValues.add(metrics.y + metrics.height + 12);
+                    xValues.add(metrics.x - topologyRoutingConfigV143.nodeClearance);
+                    xValues.add(metrics.x + metrics.width + topologyRoutingConfigV143.nodeClearance);
+                    yValues.add(metrics.y - topologyRoutingConfigV143.nodeClearance);
+                    yValues.add(metrics.y + metrics.height + topologyRoutingConfigV143.nodeClearance);
                 });
-                const yStart = Math.floor((layout.bounds.top - 36) / 12) * 12;
-                const yEnd = Math.ceil((layout.bounds.bottom + 36) / 12) * 12;
-                for (let y = yStart; y <= yEnd; y += 12) yValues.add(y);
+                const yStart = Math.floor((layout.bounds.top - topologyRoutingConfigV143.outerMargin * 2) / topologyRoutingConfigV143.grid) * topologyRoutingConfigV143.grid;
+                const yEnd = Math.ceil((layout.bounds.bottom + topologyRoutingConfigV143.outerMargin * 2) / topologyRoutingConfigV143.grid) * topologyRoutingConfigV143.grid;
+                for (let y = yStart; y <= yEnd; y += topologyRoutingConfigV143.grid) yValues.add(y);
                 return {
                     x: Array.from(xValues).filter(function (value) { return value > 0 && value < layout.viewWidth; }).sort(function (first, second) { return first - second; }),
                     y: Array.from(yValues).filter(function (value) { return value > 0 && value < layout.viewHeight; }).sort(function (first, second) { return first - second; })
                 };
             }
 
-            function topologyPortDirectionValidV137(side, first, second, source) {
-                const deltaX = second.x - first.x;
-                const deltaY = second.y - first.y;
-                if (source) {
-                    if (side === 'right') return deltaX > 0.1 && Math.abs(deltaY) < 0.1;
-                    if (side === 'left') return deltaX < -0.1 && Math.abs(deltaY) < 0.1;
-                    if (side === 'top') return deltaY < -0.1 && Math.abs(deltaX) < 0.1;
-                    return deltaY > 0.1 && Math.abs(deltaX) < 0.1;
-                }
-                if (side === 'left') return deltaX > 0.1 && Math.abs(deltaY) < 0.1;
-                if (side === 'right') return deltaX < -0.1 && Math.abs(deltaY) < 0.1;
-                if (side === 'top') return deltaY > 0.1 && Math.abs(deltaX) < 0.1;
-                return deltaY < -0.1 && Math.abs(deltaX) < 0.1;
+            function topologyRightLeftDirectionValidV139(points) {
+                if (points.length < 2) return false;
+                const start = points[0];
+                const afterStart = points[1];
+                const beforeEnd = points[points.length - 2];
+                const end = points[points.length - 1];
+                const exitsRight = afterStart.x - start.x > 0.1 && Math.abs(afterStart.y - start.y) < 0.1;
+                const entersLeft = end.x - beforeEnd.x > 0.1 && Math.abs(end.y - beforeEnd.y) < 0.1;
+                return exitsRight && entersLeft;
             }
 
             function topologySegmentHitsMetricsV137(first, second, metrics, padding) {
@@ -4245,22 +5260,35 @@
                 return first.x > left && first.x < right && Math.max(first.y, second.y) > top && Math.min(first.y, second.y) < bottom;
             }
 
-            function topologyCandidatePathClearV137(points, edge, layout) {
+            function topologyCandidatePathClearV143(points, edge, layout) {
                 for (let segmentIndex = 0; segmentIndex < points.length - 1; segmentIndex += 1) {
                     let blocked = false;
                     layout.metricsById.forEach(function (metrics, nodeId) {
                         if (blocked) return;
                         if (nodeId === edge.source && segmentIndex === 0) return;
                         if (nodeId === edge.target && segmentIndex === points.length - 2) return;
-                        if (topologySegmentHitsMetricsV137(points[segmentIndex], points[segmentIndex + 1], metrics, 12)) blocked = true;
+                        if (topologySegmentHitsMetricsV137(points[segmentIndex], points[segmentIndex + 1], metrics, topologyRoutingConfigV143.nodeClearance)) blocked = true;
                     });
                     if (blocked) return false;
                 }
                 return true;
             }
 
-            function topologyCandidateConflictV137(points, routed) {
+            function topologyCandidateConflictV143(points, routed, trackAssignment, edge) {
                 let crossings = 0;
+                function sharesIntentionalTrack(route, fixedX) {
+                    if (!trackAssignment || !edge) return false;
+                    const candidateKeys = topologyIntentionalTrackKeysV143(trackAssignment, fixedX);
+                    const routeKeys = topologyIntentionalTrackKeysV143(route, fixedX);
+                    const sharedFamily = candidateKeys.some(function (key) { return routeKeys.includes(key); });
+                    const sharedGroup = trackAssignment.groupKey && route.trackGroupKey === trackAssignment.groupKey && Number.isFinite(trackAssignment.sharedTrackX) &&
+                        Math.abs(fixedX - trackAssignment.sharedTrackX) < 0.1;
+                    const sharedSource = route.edge.source === edge.source && Number.isFinite(trackAssignment.sourceTrackX) && Number.isFinite(route.sourceTrackX) &&
+                        Math.abs(fixedX - trackAssignment.sourceTrackX) < 0.1 && Math.abs(route.sourceTrackX - trackAssignment.sourceTrackX) < 0.1;
+                    const sharedTarget = route.edge.target === edge.target && Number.isFinite(trackAssignment.targetTrackX) && Number.isFinite(route.targetTrackX) &&
+                        Math.abs(fixedX - trackAssignment.targetTrackX) < 0.1 && Math.abs(route.targetTrackX - trackAssignment.targetTrackX) < 0.1;
+                    return sharedFamily || sharedGroup || sharedSource || sharedTarget;
+                }
                 for (let firstIndex = 0; firstIndex < points.length - 1; firstIndex += 1) {
                     const firstStart = points[firstIndex];
                     const firstEnd = points[firstIndex + 1];
@@ -4279,7 +5307,8 @@
                                 const secondMinimum = secondHorizontal ? Math.min(secondStart.x, secondEnd.x) : Math.min(secondStart.y, secondEnd.y);
                                 const secondMaximum = secondHorizontal ? Math.max(secondStart.x, secondEnd.x) : Math.max(secondStart.y, secondEnd.y);
                                 const overlap = Math.min(firstMaximum, secondMaximum) - Math.max(firstMinimum, secondMinimum);
-                                if (overlap > 0.5 && Math.abs(firstFixed - secondFixed) < 11.5) return { conflict: true, crossings: crossings };
+                                const intentionalSharedTrack = !firstHorizontal && sharesIntentionalTrack(route, firstFixed) && Math.abs(firstFixed - secondFixed) < 0.1;
+                                if (overlap > 0.5 && Math.abs(firstFixed - secondFixed) < topologyRoutingConfigV143.lineSeparation - 0.5 && !intentionalSharedTrack) return { conflict: true, crossings: crossings };
                                 continue;
                             }
                             const horizontalStart = firstHorizontal ? firstStart : secondStart;
@@ -4288,11 +5317,353 @@
                             const verticalEnd = firstHorizontal ? secondEnd : firstEnd;
                             const crossX = verticalStart.x;
                             const crossY = horizontalStart.y;
-                            if (crossX > Math.min(horizontalStart.x, horizontalEnd.x) + 1 && crossX < Math.max(horizontalStart.x, horizontalEnd.x) - 1 && crossY > Math.min(verticalStart.y, verticalEnd.y) + 1 && crossY < Math.max(verticalStart.y, verticalEnd.y) - 1) crossings += 1;
+                            if (crossX > Math.min(horizontalStart.x, horizontalEnd.x) + 1 && crossX < Math.max(horizontalStart.x, horizontalEnd.x) - 1 && crossY > Math.min(verticalStart.y, verticalEnd.y) + 1 && crossY < Math.max(verticalStart.y, verticalEnd.y) - 1) {
+                                if (!sharesIntentionalTrack(route, crossX)) crossings += 1;
+                            }
                         }
                     }
                 }
                 return { conflict: false, crossings: crossings };
+            }
+
+            function topologyChannelIntentV143(index, count) {
+                if (count <= 1) return { band: 'middle', depth: 0, index: index, count: count };
+                const centeredIndex = index - (count - 1) / 2;
+                return {
+                    band: Math.abs(centeredIndex) < 0.1 ? 'middle' : (centeredIndex < 0 ? 'top' : 'bottom'),
+                    depth: Math.abs(centeredIndex),
+                    index: index,
+                    count: count
+                };
+            }
+
+            function topologyEdgeChannelProfilesV143(records) {
+                const outgoing = new Map();
+                const incoming = new Map();
+                const profiles = new Map(records.map(function (record) {
+                    return [record.edge.id, { record: record, sourceIntent: null, targetIntent: null }];
+                }));
+                records.forEach(function (record) {
+                    if (!outgoing.has(record.edge.source)) outgoing.set(record.edge.source, []);
+                    if (!incoming.has(record.edge.target)) incoming.set(record.edge.target, []);
+                    outgoing.get(record.edge.source).push(record);
+                    incoming.get(record.edge.target).push(record);
+                });
+                outgoing.forEach(function (group) {
+                    group.sort(function (first, second) {
+                        return first.end.y - second.end.y || first.end.x - second.end.x || first.edge.id.localeCompare(second.edge.id);
+                    });
+                    group.forEach(function (record, index) {
+                        const slotIndex = record.startPort && Number.isInteger(record.startPort.slotIndex) ? record.startPort.slotIndex : index;
+                        profiles.get(record.edge.id).sourceIntent = topologyChannelIntentV143(slotIndex, group.length);
+                    });
+                });
+                incoming.forEach(function (group) {
+                    group.sort(function (first, second) {
+                        return first.start.y - second.start.y || first.start.x - second.start.x || first.edge.id.localeCompare(second.edge.id);
+                    });
+                    group.forEach(function (record, index) {
+                        const slotIndex = record.endPort && Number.isInteger(record.endPort.slotIndex) ? record.endPort.slotIndex : index;
+                        profiles.get(record.edge.id).targetIntent = topologyChannelIntentV143(slotIndex, group.length);
+                    });
+                });
+                profiles.forEach(function (profile) {
+                    const sourceIntent = profile.sourceIntent || topologyChannelIntentV143(0, 1);
+                    const targetIntent = profile.targetIntent || topologyChannelIntentV143(0, 1);
+                    const activeIntents = [sourceIntent, targetIntent].filter(function (intent) { return intent.band !== 'middle'; });
+                    let preferredBand = 'middle';
+                    if (activeIntents.length === 1 || (activeIntents.length === 2 && activeIntents[0].band === activeIntents[1].band)) {
+                        preferredBand = activeIntents[0].band;
+                    } else if (activeIntents.length === 2) {
+                        const deltaY = profile.record.end.y - profile.record.start.y;
+                        const naturalBand = Math.abs(deltaY) < 0.1 ? null : (deltaY < 0 ? 'top' : 'bottom');
+                        if (naturalBand && activeIntents.some(function (intent) { return intent.band === naturalBand; })) {
+                            preferredBand = naturalBand;
+                        } else {
+                            preferredBand = targetIntent.count >= sourceIntent.count ? targetIntent.band : sourceIntent.band;
+                        }
+                    }
+                    profile.preferredBand = preferredBand;
+                    profile.depth = Math.max.apply(null, [sourceIntent, targetIntent].filter(function (intent) {
+                        return intent.band === preferredBand;
+                    }).map(function (intent) { return intent.depth; }).concat([0]));
+                    profile.pressure = Math.max(sourceIntent.count, targetIntent.count);
+                });
+                return profiles;
+            }
+
+            function topologySharedTrackAssignmentsV143(records) {
+                const assignments = new Map(records.map(function (record) {
+                    const sourceTrackX = Number.isFinite(record.defaultSourceTrackX) ? record.defaultSourceTrackX : null;
+                    const targetTrackX = Number.isFinite(record.defaultTargetTrackX) ? record.defaultTargetTrackX : null;
+                    const sharedTrackX = Number.isFinite(sourceTrackX) && Number.isFinite(targetTrackX) && Math.abs(sourceTrackX - targetTrackX) < 0.1
+                        ? sourceTrackX
+                        : null;
+                    return [record.edge.id, {
+                        sharedTrackX: sharedTrackX,
+                        sourceTrackX: sourceTrackX,
+                        targetTrackX: targetTrackX,
+                        sourceGroupKey: '',
+                        targetGroupKey: '',
+                        groupKey: ''
+                    }];
+                }));
+                const outgoing = new Map();
+                const incoming = new Map();
+                records.forEach(function (record) {
+                    if (!outgoing.has(record.edge.source)) outgoing.set(record.edge.source, []);
+                    if (!incoming.has(record.edge.target)) incoming.set(record.edge.target, []);
+                    outgoing.get(record.edge.source).push(record);
+                    incoming.get(record.edge.target).push(record);
+                });
+
+                function average(values) {
+                    return values.reduce(function (sum, value) { return sum + value; }, 0) / Math.max(1, values.length);
+                }
+
+                outgoing.forEach(function (group, sourceId) {
+                    if (group.length < 2) return;
+                    const forwardGroup = group.filter(function (record) { return record.end.x > record.start.x + 0.1; });
+                    if (!forwardGroup.length) return;
+                    const explicitTracks = forwardGroup.map(function (record) { return record.defaultSourceTrackX; }).filter(Number.isFinite);
+                    const commonStartX = average(forwardGroup.map(function (record) { return record.start.x; }));
+                    const nearestEndX = Math.min.apply(null, forwardGroup.map(function (record) { return record.end.x; }));
+                    const trackX = explicitTracks.length ? average(explicitTracks) : (commonStartX + nearestEndX) / 2;
+                    forwardGroup.forEach(function (record) {
+                        const assignment = assignments.get(record.edge.id);
+                        assignment.sourceTrackX = trackX;
+                        assignment.sourceGroupKey = 'source:' + sourceId;
+                    });
+                });
+
+                incoming.forEach(function (group, targetId) {
+                    if (group.length < 2) return;
+                    const forwardGroup = group.filter(function (record) { return record.end.x > record.start.x + 0.1; });
+                    if (!forwardGroup.length) return;
+                    const explicitTracks = forwardGroup.map(function (record) { return record.defaultTargetTrackX; }).filter(Number.isFinite);
+                    const nearestStartX = Math.max.apply(null, forwardGroup.map(function (record) { return record.start.x; }));
+                    const commonEndX = average(forwardGroup.map(function (record) { return record.end.x; }));
+                    const trackX = explicitTracks.length ? average(explicitTracks) : (nearestStartX + commonEndX) / 2;
+                    forwardGroup.forEach(function (record) {
+                        const assignment = assignments.get(record.edge.id);
+                        assignment.targetTrackX = trackX;
+                        assignment.targetGroupKey = 'target:' + targetId;
+                    });
+                });
+
+                const adjacent = records.filter(function (record) {
+                    return record.end.x > record.start.x + 0.1 && (record.span == null || record.span <= 1);
+                });
+                const parent = new Map(adjacent.map(function (record) { return [record.edge.id, record.edge.id]; }));
+                function find(edgeId) {
+                    const currentParent = parent.get(edgeId);
+                    if (currentParent === edgeId) return edgeId;
+                    const root = find(currentParent);
+                    parent.set(edgeId, root);
+                    return root;
+                }
+                function union(firstId, secondId) {
+                    const firstRoot = find(firstId);
+                    const secondRoot = find(secondId);
+                    if (firstRoot !== secondRoot) parent.set(secondRoot, firstRoot);
+                }
+                [outgoing, incoming].forEach(function (groups) {
+                    groups.forEach(function (group) {
+                        const adjacentGroup = group.filter(function (record) { return parent.has(record.edge.id); });
+                        if (adjacentGroup.length < 2) return;
+                        adjacentGroup.slice(1).forEach(function (record) { union(adjacentGroup[0].edge.id, record.edge.id); });
+                    });
+                });
+                const components = new Map();
+                adjacent.forEach(function (record) {
+                    const root = find(record.edge.id);
+                    if (!components.has(root)) components.set(root, []);
+                    components.get(root).push(record);
+                });
+                components.forEach(function (component, root) {
+                    if (component.length < 2) return;
+                    const explicitTracks = component.flatMap(function (record) {
+                        return [record.defaultSourceTrackX, record.defaultTargetTrackX].filter(Number.isFinite);
+                    });
+                    const leftBoundary = Math.max.apply(null, component.map(function (record) { return record.start.x; }));
+                    const rightBoundary = Math.min.apply(null, component.map(function (record) { return record.end.x; }));
+                    if (rightBoundary <= leftBoundary + 0.1) return;
+                    const trackX = explicitTracks.length ? average(explicitTracks) : (leftBoundary + rightBoundary) / 2;
+                    component.forEach(function (record) {
+                        const assignment = assignments.get(record.edge.id);
+                        assignment.sharedTrackX = trackX;
+                        assignment.sourceTrackX = trackX;
+                        assignment.targetTrackX = trackX;
+                        assignment.groupKey = root;
+                    });
+                });
+
+                // 一条相邻边同时属于“同源分出组”和“同目标汇入组”时，两组实际位于同一层间干线列。
+                // 将它们合并为轨道家族，长边在首尾层间也能复用对应家族，而不会绕开自己的共享干线。
+                const familyParent = new Map();
+                function addFamily(key) {
+                    if (key && !familyParent.has(key)) familyParent.set(key, key);
+                }
+                function findFamily(key) {
+                    const current = familyParent.get(key);
+                    if (!current || current === key) return key;
+                    const root = findFamily(current);
+                    familyParent.set(key, root);
+                    return root;
+                }
+                function unionFamily(firstKey, secondKey) {
+                    addFamily(firstKey);
+                    addFamily(secondKey);
+                    const firstRoot = findFamily(firstKey);
+                    const secondRoot = findFamily(secondKey);
+                    if (firstRoot !== secondRoot) familyParent.set(secondRoot, firstRoot);
+                }
+                assignments.forEach(function (assignment) {
+                    addFamily(assignment.sourceGroupKey);
+                    addFamily(assignment.targetGroupKey);
+                    if (assignment.sourceGroupKey && assignment.targetGroupKey &&
+                        Number.isFinite(assignment.sourceTrackX) && Number.isFinite(assignment.targetTrackX) &&
+                        Math.abs(assignment.sourceTrackX - assignment.targetTrackX) < 0.1) {
+                        unionFamily(assignment.sourceGroupKey, assignment.targetGroupKey);
+                    }
+                });
+                assignments.forEach(function (assignment) {
+                    if (assignment.sourceGroupKey) assignment.sourceGroupKey = findFamily(assignment.sourceGroupKey);
+                    if (assignment.targetGroupKey) assignment.targetGroupKey = findFamily(assignment.targetGroupKey);
+                    if (!Number.isFinite(assignment.sharedTrackX)) return;
+                    const matchingFamily = [
+                        Number.isFinite(assignment.sourceTrackX) && Math.abs(assignment.sourceTrackX - assignment.sharedTrackX) < 0.1 ? assignment.sourceGroupKey : '',
+                        Number.isFinite(assignment.targetTrackX) && Math.abs(assignment.targetTrackX - assignment.sharedTrackX) < 0.1 ? assignment.targetGroupKey : ''
+                    ].find(Boolean);
+                    if (matchingFamily) assignment.groupKey = matchingFamily;
+                });
+                return assignments;
+            }
+
+            function topologyIntentionalTrackKeysV143(track, fixedX) {
+                if (!track || !Number.isFinite(fixedX)) return [];
+                const keys = [];
+                function include(trackX, key) {
+                    if (key && Number.isFinite(trackX) && Math.abs(trackX - fixedX) < 0.1 && !keys.includes(key)) keys.push(key);
+                }
+                include(track.sourceTrackX, track.sourceGroupKey);
+                include(track.targetTrackX, track.targetGroupKey);
+                include(track.sharedTrackX, track.groupKey || track.trackGroupKey);
+                return keys;
+            }
+
+            function topologyPathTrunkYV143(points) {
+                const horizontalSegments = [];
+                for (let index = 0; index < points.length - 1; index += 1) {
+                    if (Math.abs(points[index].y - points[index + 1].y) > 0.1) continue;
+                    horizontalSegments.push({
+                        y: points[index].y,
+                        length: Math.abs(points[index + 1].x - points[index].x),
+                        interior: index > 0 && index < points.length - 2
+                    });
+                }
+                horizontalSegments.sort(function (first, second) {
+                    return second.length - first.length || Number(second.interior) - Number(first.interior) || first.y - second.y;
+                });
+                return horizontalSegments.length ? horizontalSegments[0].y : (points[0].y + points[points.length - 1].y) / 2;
+            }
+
+            function topologyCandidateChannelScoreV143(points, profile) {
+                if (!profile) return { violations: 0, preferredViolation: 0, deviation: 0, trunkY: topologyPathTrunkYV143(points) };
+                const trunkY = topologyPathTrunkYV143(points);
+                let violations = 0;
+                let deviation = 0;
+                const verticalSegments = [];
+                for (let index = 0; index < points.length - 1; index += 1) {
+                    if (Math.abs(points[index].x - points[index + 1].x) < 0.1 && Math.abs(points[index].y - points[index + 1].y) > 0.1) {
+                        verticalSegments.push({ fromY: points[index].y, toY: points[index + 1].y });
+                    }
+                }
+                function intentResult(intent, endpoint) {
+                    if (!intent || intent.band === 'middle' || !verticalSegments.length) return { violation: 0, deviation: 0 };
+                    const segment = endpoint === 'source' ? verticalSegments[0] : verticalSegments[verticalSegments.length - 1];
+                    let signedDistance = 0;
+                    if (endpoint === 'source') signedDistance = segment.toY - segment.fromY;
+                    else signedDistance = segment.fromY - segment.toY;
+                    if (intent.band === 'top' && signedDistance > 0.1) return { violation: 1, deviation: signedDistance };
+                    if (intent.band === 'bottom' && signedDistance < -0.1) return { violation: 1, deviation: -signedDistance };
+                    return { violation: 0, deviation: 0 };
+                }
+                const sourceResult = intentResult(profile.sourceIntent, 'source');
+                const targetResult = intentResult(profile.targetIntent, 'target');
+                violations = sourceResult.violation + targetResult.violation;
+                deviation = sourceResult.deviation + targetResult.deviation;
+                let preferredViolation = 0;
+                if (profile.sourceIntent && profile.sourceIntent.band === profile.preferredBand) preferredViolation += sourceResult.violation;
+                if (profile.targetIntent && profile.targetIntent.band === profile.preferredBand) preferredViolation += targetResult.violation;
+                return { violations: violations, preferredViolation: preferredViolation, deviation: deviation, trunkY: trunkY };
+            }
+
+            function topologyCandidateTrackScoreV143(points, assignment) {
+                if (!assignment || points.length === 2) return { violations: 0, deviation: 0 };
+                const verticalXs = [];
+                for (let index = 0; index < points.length - 1; index += 1) {
+                    if (Math.abs(points[index].x - points[index + 1].x) < 0.1 && Math.abs(points[index].y - points[index + 1].y) > 0.1) {
+                        verticalXs.push(points[index].x);
+                    }
+                }
+                if (!verticalXs.length) return { violations: 0, deviation: 0 };
+                let violations = 0;
+                let deviation = 0;
+                function recordDeviation(expectedX, actualX) {
+                    if (!Number.isFinite(expectedX)) return;
+                    const distance = Math.abs(expectedX - actualX);
+                    deviation += distance;
+                    if (distance > 0.1) violations += 1;
+                }
+                if (Number.isFinite(assignment.sharedTrackX)) {
+                    const distance = Math.min.apply(null, verticalXs.map(function (x) { return Math.abs(x - assignment.sharedTrackX); }));
+                    deviation += distance;
+                    if (distance > 0.1) violations += 1;
+                    return { violations: violations, deviation: deviation };
+                }
+                recordDeviation(assignment.sourceTrackX, verticalXs[0]);
+                recordDeviation(assignment.targetTrackX, verticalXs[verticalXs.length - 1]);
+                return { violations: violations, deviation: deviation };
+            }
+
+            /* 14.3：共享选路器先比较交叉，再执行通道约束；节点和近距线路在入选前即被硬过滤。 */
+            function selectLayeredOrthogonalRouteV143(options) {
+                const ranked = [];
+                options.candidates.forEach(function (candidatePoints, laneIndex) {
+                    const points = topologyCompactOrthogonalPointsV132(candidatePoints);
+                    if (!topologyRightLeftDirectionValidV139(points) || topologyForwardBacktrackV139(points)) return;
+                    if (options.pathIsClear && !options.pathIsClear(points)) return;
+                    const relation = topologyCandidateConflictV143(points, options.routed || [], options.trackAssignment, options.edge);
+                    if (relation.conflict) return;
+                    const channel = topologyCandidateChannelScoreV143(points, options.channelProfile);
+                    const track = topologyCandidateTrackScoreV143(points, options.trackAssignment);
+                    ranked.push({
+                        points: points,
+                        length: topologyPathLengthV132(points),
+                        bends: Math.max(0, points.length - 2),
+                        crossings: relation.crossings,
+                        channelViolations: channel.violations,
+                        preferredChannelViolation: channel.preferredViolation,
+                        channelDeviation: channel.deviation,
+                        trackViolations: track.violations,
+                        trackDeviation: track.deviation,
+                        trunkY: channel.trunkY,
+                        laneIndex: laneIndex
+                    });
+                });
+                ranked.sort(function (first, second) {
+                    return first.crossings - second.crossings ||
+                        first.trackViolations - second.trackViolations ||
+                        first.preferredChannelViolation - second.preferredChannelViolation ||
+                        first.channelViolations - second.channelViolations ||
+                        first.length - second.length ||
+                        first.bends - second.bends ||
+                        first.trackDeviation - second.trackDeviation ||
+                        first.channelDeviation - second.channelDeviation ||
+                        first.laneIndex - second.laneIndex;
+                });
+                return ranked[0] || null;
             }
 
             function topologyEdgeBaselineV137(edge, layout) {
@@ -4303,131 +5674,254 @@
                 return Math.max(44, horizontalGap + verticalGap);
             }
 
-            function topologyCandidatePathsV137(startPort, endPort, lanes, baseline) {
+            function topologyCandidatePathsV143(startPort, endPort, lanes, layout, trackAssignment) {
                 const start = startPort.point;
                 const end = endPort.point;
-                const horizontalStart = startPort.side === 'left' || startPort.side === 'right';
-                const horizontalEnd = endPort.side === 'left' || endPort.side === 'right';
-                const xMargin = Math.min(120, Math.max(48, baseline * 0.28));
-                const yMargin = Math.min(156, Math.max(60, baseline * 0.36));
-                const xLanes = lanes.x.filter(function (value) { return value >= Math.min(start.x, end.x) - xMargin && value <= Math.max(start.x, end.x) + xMargin; });
-                const yLanes = lanes.y.filter(function (value) { return value >= Math.min(start.y, end.y) - yMargin && value <= Math.max(start.y, end.y) + yMargin; });
                 const candidates = [];
                 const seen = new Set();
                 function add(points) {
                     const compact = topologyCompactOrthogonalPointsV132(points);
-                    if (compact.length < 2 || compact.length - 2 > 3) return;
+                    if (compact.length < 2 || compact.length - 2 > topologyRoutingConfigV143.maximumBends) return;
                     const key = compact.map(function (point) { return point.x.toFixed(1) + ':' + point.y.toFixed(1); }).join('|');
                     if (seen.has(key)) return;
                     seen.add(key);
                     candidates.push(compact);
                 }
-                if (horizontalStart && horizontalEnd) {
-                    if (Math.abs(start.y - end.y) < 0.1) add([start, end]);
-                    xLanes.forEach(function (x) { add([start, { x: x, y: start.y }, { x: x, y: end.y }, end]); });
-                } else if (!horizontalStart && !horizontalEnd) {
-                    if (Math.abs(start.x - end.x) < 0.1) add([start, end]);
-                    yLanes.forEach(function (y) { add([start, { x: start.x, y: y }, { x: end.x, y: y }, end]); });
-                } else if (horizontalStart) {
-                    add([start, { x: end.x, y: start.y }, end]);
-                    xLanes.forEach(function (x) {
-                        yLanes.forEach(function (y) { add([start, { x: x, y: start.y }, { x: x, y: y }, { x: end.x, y: y }, end]); });
+
+                function prioritizeTracks(values, preferredTracks, minimum, maximum) {
+                    const prioritized = [];
+                    (preferredTracks || []).filter(Number.isFinite).forEach(function (trackX) {
+                        if (trackX <= minimum + 0.1 || trackX >= maximum - 0.1) return;
+                        if (!prioritized.some(function (value) { return Math.abs(value - trackX) < 0.1; })) prioritized.push(trackX);
                     });
-                } else {
-                    add([start, { x: start.x, y: end.y }, end]);
-                    yLanes.forEach(function (y) {
-                        xLanes.forEach(function (x) { add([start, { x: start.x, y: y }, { x: x, y: y }, { x: x, y: end.y }, end]); });
+                    values.forEach(function (value) {
+                        if (!prioritized.some(function (trackX) { return Math.abs(value - trackX) < 0.1; })) prioritized.push(value);
                     });
+                    return prioritized;
                 }
+
+                if (end.x > start.x + 0.1 && Math.abs(start.y - end.y) < 0.1) add([start, end]);
+
+                const fixedInsetColumns = [
+                    start.x + Math.min(topologyRoutingConfigV143.trackInset, Math.max(1, end.x - start.x - 1)),
+                    end.x - Math.min(topologyRoutingConfigV143.trackInset, Math.max(1, end.x - start.x - 1))
+                ];
+                const assignedColumns = trackAssignment
+                    ? [trackAssignment.sharedTrackX, trackAssignment.sourceTrackX, trackAssignment.targetTrackX].filter(Number.isFinite)
+                    : [];
+                const referenceColumns = assignedColumns.length ? assignedColumns : fixedInsetColumns;
+                let corridorXs = lanes.x.filter(function (x) {
+                    return x > start.x + 0.1 && x < end.x - 0.1;
+                }).sort(function (first, second) {
+                    const firstDistance = Math.min.apply(null, referenceColumns.map(function (columnX) { return Math.abs(first - columnX); }));
+                    const secondDistance = Math.min.apply(null, referenceColumns.map(function (columnX) { return Math.abs(second - columnX); }));
+                    return firstDistance - secondDistance || first - second;
+                });
+                corridorXs = prioritizeTracks(corridorXs, trackAssignment ? [trackAssignment.sharedTrackX, trackAssignment.sourceTrackX, trackAssignment.targetTrackX] : [], start.x, end.x);
+                corridorXs.forEach(function (x) {
+                    add([start, { x: x, y: start.y }, { x: x, y: end.y }, end]);
+                });
+
+                // 四折点只作为真实节点阻挡、端口黏线或循环反向边的外围避障回退。
+                const forward = end.x > start.x;
+                let sourceXs = lanes.x.filter(function (x) {
+                    return x > start.x + 0.1 && (!forward || x < end.x - 0.1);
+                }).sort(function (first, second) {
+                    return Math.abs(first - start.x) - Math.abs(second - start.x) || first - second;
+                }).slice(0, 8);
+                sourceXs = prioritizeTracks(sourceXs, trackAssignment ? [trackAssignment.sharedTrackX, trackAssignment.sourceTrackX] : [], start.x, forward ? end.x : layout.viewWidth);
+                let targetXs = lanes.x.filter(function (x) {
+                    return x < end.x - 0.1 && (!forward || x > start.x + 0.1);
+                }).sort(function (first, second) {
+                    return Math.abs(first - end.x) - Math.abs(second - end.x) || second - first;
+                }).slice(0, 8);
+                targetXs = prioritizeTracks(targetXs, trackAssignment ? [trackAssignment.sharedTrackX, trackAssignment.targetTrackX] : [], forward ? start.x : 0, end.x);
+                const yValues = Array.from(new Set(lanes.y.concat([
+                    layout.bounds.top - topologyRoutingConfigV143.outerMargin,
+                    layout.bounds.bottom + topologyRoutingConfigV143.outerMargin
+                ]))).filter(function (y) {
+                    return y > 0 && y < layout.viewHeight;
+                }).sort(function (first, second) {
+                    const firstCost = Math.abs(first - start.y) + Math.abs(first - end.y);
+                    const secondCost = Math.abs(second - start.y) + Math.abs(second - end.y);
+                    return firstCost - secondCost || Math.abs(first - (start.y + end.y) / 2) - Math.abs(second - (start.y + end.y) / 2) || first - second;
+                });
+                sourceXs.forEach(function (sourceX) {
+                    targetXs.forEach(function (targetX) {
+                        if (forward && sourceX > targetX + 0.1) return;
+                        yValues.forEach(function (y) {
+                            add([
+                                start,
+                                { x: sourceX, y: start.y },
+                                { x: sourceX, y: y },
+                                { x: targetX, y: y },
+                                { x: targetX, y: end.y },
+                                end
+                            ]);
+                        });
+                    });
+                });
                 return candidates;
             }
 
-            function topologyRouteAttemptV137(graph, layout, orderedEdges, lanes) {
-                const usedPorts = new Set();
-                const routed = [];
-                orderedEdges.forEach(function (edge) {
-                    const sourceMetrics = layout.metricsById.get(edge.source);
-                    const targetMetrics = layout.metricsById.get(edge.target);
-                    const baseline = topologyEdgeBaselineV137(edge, layout);
-                    const maximumLength = baseline * 2 + 12;
-                    const candidates = [];
-                    topologySidePairsV137(sourceMetrics, targetMetrics).forEach(function (sides, sidePriority) {
-                        const startPort = topologyAvailablePortV137(edge.source, sourceMetrics, sides[0], usedPorts);
-                        const endPort = topologyAvailablePortV137(edge.target, targetMetrics, sides[1], usedPorts);
-                        if (!startPort || !endPort || startPort.key === endPort.key) return;
-                        topologyCandidatePathsV137(startPort, endPort, lanes, baseline).forEach(function (points) {
-                            if (!topologyPortDirectionValidV137(startPort.side, points[0], points[1], true)) return;
-                            if (!topologyPortDirectionValidV137(endPort.side, points[points.length - 2], points[points.length - 1], false)) return;
-                            if (!topologyCandidatePathClearV137(points, edge, layout)) return;
-                            const length = topologyPathLengthV132(points);
-                            if (length > maximumLength + 0.1) return;
-                            const relation = topologyCandidateConflictV137(points, routed);
-                            if (relation.conflict) return;
-                            candidates.push({
-                                points: points,
-                                length: length,
-                                bends: points.length - 2,
-                                crossings: relation.crossings,
-                                sidePriority: sidePriority,
-                                startPort: startPort,
-                                endPort: endPort
-                            });
-                        });
-                    });
-                    candidates.sort(function (first, second) {
-                        return first.length - second.length || first.crossings - second.crossings || first.bends - second.bends || first.sidePriority - second.sidePriority || first.startPort.slotIndex - second.startPort.slotIndex || first.endPort.slotIndex - second.endPort.slotIndex;
-                    });
-                    const selected = candidates[0];
-                    if (!selected) throw new Error(edge.id + '在 2 倍合理最短路径与 3 个折点内没有可用通道。');
-                    usedPorts.add(selected.startPort.key);
-                    usedPorts.add(selected.endPort.key);
-                    routed.push({
-                        edge: edge,
-                        points: selected.points,
-                        d: topologyOrthogonalPathDataV132(selected.points),
-                        kind: selected.bends === 0 ? 'direct' : 'local-orthogonal',
-                        laneIndex: selected.sidePriority,
-                        length: selected.length,
-                        bends: selected.bends
-                    });
-                });
-                validateTopologyRoutesV133(graph, layout, routed);
-                return routed;
+            function topologyForwardBacktrackV139(points) {
+                const forward = points[points.length - 1].x > points[0].x;
+                if (!forward) return false;
+                for (let index = 0; index < points.length - 1; index += 1) {
+                    const horizontal = Math.abs(points[index + 1].y - points[index].y) < 0.1;
+                    if (horizontal && points[index + 1].x < points[index].x - 0.1) return true;
+                }
+                return false;
             }
 
-            function topologyRoutesV132(graph, layout) {
-                const lanes = topologyRoutingLanesV137(layout);
-                const degree = new Map(graph.nodes.map(function (node) { return [node.id, 0]; }));
-                graph.edges.forEach(function (edge) {
-                    degree.set(edge.source, (degree.get(edge.source) || 0) + 1);
-                    degree.set(edge.target, (degree.get(edge.target) || 0) + 1);
+            function routeOrthogonalRecordsV143(records, options) {
+                const profiles = topologyEdgeChannelProfilesV143(records);
+                const trackAssignments = topologySharedTrackAssignmentsV143(records);
+                function baseLength(record) {
+                    return record.baseline != null
+                        ? record.baseline
+                        : Math.abs(record.end.x - record.start.x) + Math.abs(record.end.y - record.start.y);
+                }
+                function compareId(first, second) {
+                    return first.edge.id.localeCompare(second.edge.id);
+                }
+                const strategies = [
+                    records.slice().sort(function (first, second) {
+                        const firstProfile = profiles.get(first.edge.id);
+                        const secondProfile = profiles.get(second.edge.id);
+                        return firstProfile.depth - secondProfile.depth ||
+                            (first.span || 1) - (second.span || 1) ||
+                            baseLength(first) - baseLength(second) || compareId(first, second);
+                    }),
+                    records.slice().sort(function (first, second) {
+                        return first.end.y - second.end.y || first.start.y - second.start.y || compareId(first, second);
+                    }),
+                    records.slice().sort(function (first, second) {
+                        return first.start.y - second.start.y || first.end.y - second.end.y || compareId(first, second);
+                    }),
+                    records.slice().sort(function (first, second) {
+                        return baseLength(first) - baseLength(second) || (first.span || 1) - (second.span || 1) || compareId(first, second);
+                    }),
+                    records.slice().sort(function (first, second) {
+                        const firstProfile = profiles.get(first.edge.id);
+                        const secondProfile = profiles.get(second.edge.id);
+                        return secondProfile.pressure - firstProfile.pressure ||
+                            firstProfile.depth - secondProfile.depth || baseLength(first) - baseLength(second) || compareId(first, second);
+                    })
+                ];
+                strategies.push(strategies[0].slice().reverse());
+                const uniqueStrategies = [];
+                const seenStrategies = new Set();
+                strategies.forEach(function (strategy) {
+                    const signature = strategy.map(function (record) { return record.edge.id; }).join('|');
+                    if (seenStrategies.has(signature)) return;
+                    seenStrategies.add(signature);
+                    uniqueStrategies.push(strategy);
                 });
-                const shortestFirst = graph.edges.slice().sort(function (first, second) {
-                    return topologyEdgeBaselineV137(first, layout) - topologyEdgeBaselineV137(second, layout) || first.id.localeCompare(second.id);
-                });
-                const busiestFirst = graph.edges.slice().sort(function (first, second) {
-                    const firstDegree = (degree.get(first.source) || 0) + (degree.get(first.target) || 0);
-                    const secondDegree = (degree.get(second.source) || 0) + (degree.get(second.target) || 0);
-                    return secondDegree - firstDegree || topologyEdgeBaselineV137(first, layout) - topologyEdgeBaselineV137(second, layout) || first.id.localeCompare(second.id);
-                });
-                const strategies = [shortestFirst, busiestFirst, graph.edges.slice()];
+
                 const successful = [];
                 let lastError = null;
-                strategies.forEach(function (orderedEdges) {
+                uniqueStrategies.forEach(function (orderedRecords) {
                     try {
-                        const routes = topologyRouteAttemptV137(graph, layout, orderedEdges, lanes);
+                        const routed = [];
+                        orderedRecords.forEach(function (record) {
+                            const profile = profiles.get(record.edge.id);
+                            const trackAssignment = trackAssignments.get(record.edge.id);
+                            const selected = selectLayeredOrthogonalRouteV143({
+                                edge: record.edge,
+                                candidates: options.candidates(record, trackAssignment),
+                                routed: routed,
+                                channelProfile: profile,
+                                trackAssignment: trackAssignment,
+                                pathIsClear: function (points) { return options.pathIsClear(points, record); }
+                            });
+                            if (!selected) throw new Error(record.edge.id + '在共享正交通道内没有可用路径。');
+                            routed.push({
+                                edge: record.edge,
+                                points: selected.points,
+                                d: topologyOrthogonalPathDataV132(selected.points),
+                                kind: selected.bends === 0 ? 'direct' : (selected.bends <= 2 ? 'single-dogleg' : 'obstacle-detour'),
+                                laneIndex: selected.laneIndex,
+                                length: selected.length,
+                                bends: selected.bends,
+                                crossings: selected.crossings,
+                                channelBand: profile.preferredBand,
+                                channelDepth: profile.depth,
+                                channelViolations: selected.channelViolations,
+                                preferredChannelViolation: selected.preferredChannelViolation,
+                                trackViolations: selected.trackViolations,
+                                trackDeviation: selected.trackDeviation,
+                                sharedTrackX: trackAssignment.sharedTrackX,
+                                sourceTrackX: trackAssignment.sourceTrackX,
+                                targetTrackX: trackAssignment.targetTrackX,
+                                sourceGroupKey: trackAssignment.sourceGroupKey,
+                                targetGroupKey: trackAssignment.targetGroupKey,
+                                trackGroupKey: trackAssignment.groupKey,
+                                trunkY: selected.trunkY
+                            });
+                        });
+                        if (options.validate) options.validate(routed);
                         successful.push({
-                            routes: routes,
-                            length: routes.reduce(function (sum, route) { return sum + route.length; }, 0),
-                            bends: routes.reduce(function (sum, route) { return sum + route.bends; }, 0)
+                            routes: routed,
+                            crossings: routed.reduce(function (sum, route) { return sum + route.crossings; }, 0),
+                            trackViolations: routed.reduce(function (sum, route) { return sum + route.trackViolations; }, 0),
+                            trackDeviation: routed.reduce(function (sum, route) { return sum + route.trackDeviation; }, 0),
+                            preferredChannelViolations: routed.reduce(function (sum, route) { return sum + route.preferredChannelViolation; }, 0),
+                            channelViolations: routed.reduce(function (sum, route) { return sum + route.channelViolations; }, 0),
+                            length: routed.reduce(function (sum, route) { return sum + route.length; }, 0),
+                            bends: routed.reduce(function (sum, route) { return sum + route.bends; }, 0),
+                            directCount: routed.filter(function (route) { return route.bends === 0; }).length
                         });
                     } catch (error) {
                         lastError = error;
                     }
                 });
-                successful.sort(function (first, second) { return first.length - second.length || first.bends - second.bends; });
-                if (!successful.length) throw lastError || new Error('全局依赖图自动布线失败。');
+                successful.sort(function (first, second) {
+                    return first.crossings - second.crossings ||
+                        first.trackViolations - second.trackViolations ||
+                        first.preferredChannelViolations - second.preferredChannelViolations ||
+                        first.channelViolations - second.channelViolations ||
+                        first.length - second.length ||
+                        first.bends - second.bends ||
+                        first.trackDeviation - second.trackDeviation ||
+                        second.directCount - first.directCount;
+                });
+                if (!successful.length) throw lastError || new Error('共享正交自动布线失败。');
                 return successful[0].routes;
+            }
+
+            function topologyRoutesV143(graph, layout) {
+                const lanes = topologyRoutingLanesV143(layout);
+                const portAssignments = topologyEdgePortsV143(graph, layout);
+                const records = graph.edges.map(function (edge) {
+                    const ports = portAssignments.get(edge.id);
+                    const sourceRank = layout.rankById.get(edge.source) || 0;
+                    const targetRank = layout.rankById.get(edge.target) || 0;
+                    const forward = targetRank > sourceRank;
+                    const gapWidth = layout.columnStep - layout.nodeWidth;
+                    return {
+                        edge: edge,
+                        start: ports.startPort.point,
+                        end: ports.endPort.point,
+                        startPort: ports.startPort,
+                        endPort: ports.endPort,
+                        baseline: topologyEdgeBaselineV137(edge, layout),
+                        span: Math.abs(targetRank - sourceRank),
+                        defaultSourceTrackX: forward ? layout.rankZeroX + sourceRank * layout.columnStep + layout.nodeWidth / 2 + gapWidth / 2 : null,
+                        defaultTargetTrackX: forward ? layout.rankZeroX + (targetRank - 1) * layout.columnStep + layout.nodeWidth / 2 + gapWidth / 2 : null
+                    };
+                });
+                return routeOrthogonalRecordsV143(records, {
+                    candidates: function (record, trackAssignment) {
+                        return topologyCandidatePathsV143(record.startPort, record.endPort, lanes, layout, trackAssignment);
+                    },
+                    pathIsClear: function (points, record) {
+                        return topologyCandidatePathClearV143(points, record.edge, layout);
+                    },
+                    validate: function (routes) {
+                        validateTopologyRoutesV133(graph, layout, routes);
+                    }
+                });
             }
 
             function validateTopologyRoutesV133(graph, layout, routes) {
@@ -4460,6 +5954,12 @@
                     const start = route.points[0];
                     const end = route.points[route.points.length - 1];
                     if (!onNodeBoundary(start, sourceMetrics) || !onNodeBoundary(end, targetMetrics)) throw new Error(route.edge.id + '未连接固定节点锚点。');
+                    if (Math.abs(start.x - sourceMetrics.x - sourceMetrics.width) > 0.11 || Math.abs(end.x - targetMetrics.x) > 0.11) {
+                        throw new Error(route.edge.id + '违反统一右侧出线、左侧入线规则。');
+                    }
+                    if (!topologyRightLeftDirectionValidV139(route.points)) throw new Error(route.edge.id + '端口方向发生回折。');
+                    if (route.bends !== route.points.length - 2 || route.bends > topologyRoutingConfigV143.maximumBends) throw new Error(route.edge.id + '折弯计数无效。');
+                    if (topologyForwardBacktrackV139(route.points)) throw new Error(route.edge.id + '存在无意义的前向回折。');
                     recordAnchor(endpointAnchors, route.edge.source, start);
                     recordAnchor(endpointAnchors, route.edge.target, end);
                     if (!incomingArrowPoints.has(route.edge.target)) incomingArrowPoints.set(route.edge.target, []);
@@ -4479,10 +5979,36 @@
                     for (let firstIndex = 0; firstIndex < points.length; firstIndex += 1) {
                         for (let secondIndex = firstIndex + 1; secondIndex < points.length; secondIndex += 1) {
                             const distance = Math.hypot(points[firstIndex].x - points[secondIndex].x, points[firstIndex].y - points[secondIndex].y);
-                            if (distance < 11.5) throw new Error(nodeId + '的依赖箭头发生重叠。');
+                            if (distance < topologyRoutingConfigV143.lineSeparation - 0.5) throw new Error(nodeId + '的依赖箭头发生重叠。');
                         }
                     }
                 });
+
+                function validateOrderedPorts(groupedRoutes, oppositeNodeId, endpoint, xDirection) {
+                    groupedRoutes.forEach(function (nodeRoutes, nodeId) {
+                        const ordered = nodeRoutes.slice().sort(function (first, second) {
+                            const firstMetrics = layout.metricsById.get(oppositeNodeId(first.edge));
+                            const secondMetrics = layout.metricsById.get(oppositeNodeId(second.edge));
+                            return firstMetrics.centerY - secondMetrics.centerY || (firstMetrics.centerX - secondMetrics.centerX) * xDirection || first.edge.id.localeCompare(second.edge.id);
+                        });
+                        for (let index = 1; index < ordered.length; index += 1) {
+                            const previousY = endpoint(ordered[index - 1]).y;
+                            const currentY = endpoint(ordered[index]).y;
+                            if (currentY < previousY - 0.1) throw new Error(nodeId + '的多边端口顺序与对端 Y 顺序不一致。');
+                        }
+                    });
+                }
+
+                const routesBySource = new Map();
+                const routesByTarget = new Map();
+                routes.forEach(function (route) {
+                    if (!routesBySource.has(route.edge.source)) routesBySource.set(route.edge.source, []);
+                    if (!routesByTarget.has(route.edge.target)) routesByTarget.set(route.edge.target, []);
+                    routesBySource.get(route.edge.source).push(route);
+                    routesByTarget.get(route.edge.target).push(route);
+                });
+                validateOrderedPorts(routesBySource, function (edge) { return edge.target; }, function (route) { return route.points[0]; }, 1);
+                validateOrderedPorts(routesByTarget, function (edge) { return edge.source; }, function (route) { return route.points[route.points.length - 1]; }, -1);
 
                 function routeSegments(route) {
                     const segments = [];
@@ -4491,6 +6017,7 @@
                         const second = route.points[index + 1];
                         const horizontal = Math.abs(first.y - second.y) < 0.1;
                         segments.push({
+                            route: route,
                             horizontal: horizontal,
                             fixed: horizontal ? first.y : first.x,
                             minimum: horizontal ? Math.min(first.x, second.x) : Math.min(first.y, second.y),
@@ -4510,7 +6037,25 @@
                                 const overlap = Math.min(firstSegment.maximum, secondSegment.maximum) - Math.max(firstSegment.minimum, secondSegment.minimum);
                                 if (overlap <= 0.5) return;
                                 const separation = Math.abs(firstSegment.fixed - secondSegment.fixed);
-                                if (separation < 11.5) {
+                                if (separation < topologyRoutingConfigV143.lineSeparation - 0.5) {
+                                    const firstRoute = firstSegment.route;
+                                    const secondRoute = secondSegment.route;
+                                    const intentionalComponentTrack = !firstSegment.horizontal && firstRoute.trackGroupKey &&
+                                        firstRoute.trackGroupKey === secondRoute.trackGroupKey && Number.isFinite(firstRoute.sharedTrackX) &&
+                                        Math.abs(firstSegment.fixed - firstRoute.sharedTrackX) < 0.1 && Math.abs(secondSegment.fixed - firstRoute.sharedTrackX) < 0.1;
+                                    const intentionalSourceTrack = !firstSegment.horizontal && firstRoute.edge.source === secondRoute.edge.source &&
+                                        Number.isFinite(firstRoute.sourceTrackX) && Number.isFinite(secondRoute.sourceTrackX) &&
+                                        Math.abs(firstSegment.fixed - firstRoute.sourceTrackX) < 0.1 && Math.abs(secondSegment.fixed - firstRoute.sourceTrackX) < 0.1 &&
+                                        Math.abs(firstRoute.sourceTrackX - secondRoute.sourceTrackX) < 0.1;
+                                    const intentionalTargetTrack = !firstSegment.horizontal && firstRoute.edge.target === secondRoute.edge.target &&
+                                        Number.isFinite(firstRoute.targetTrackX) && Number.isFinite(secondRoute.targetTrackX) &&
+                                        Math.abs(firstSegment.fixed - firstRoute.targetTrackX) < 0.1 && Math.abs(secondSegment.fixed - firstRoute.targetTrackX) < 0.1 &&
+                                        Math.abs(firstRoute.targetTrackX - secondRoute.targetTrackX) < 0.1;
+                                    const firstTrackKeys = topologyIntentionalTrackKeysV143(firstRoute, firstSegment.fixed);
+                                    const secondTrackKeys = topologyIntentionalTrackKeysV143(secondRoute, secondSegment.fixed);
+                                    const intentionalTrackFamily = !firstSegment.horizontal && firstTrackKeys.some(function (key) { return secondTrackKeys.includes(key); });
+                                    const intentionalSharedTrack = intentionalComponentTrack || intentionalSourceTrack || intentionalTargetTrack || intentionalTrackFamily;
+                                    if (intentionalSharedTrack) return;
                                     throw new Error(routes[firstRouteIndex].edge.id + '与' + routes[secondRouteIndex].edge.id + '存在小于 12px 的平行黏线。');
                                 }
                             });
@@ -4519,23 +6064,24 @@
                 }
             }
 
-            function appendTopologyPortsV132(stage, metrics) {
-                ['left', 'right', 'top', 'bottom'].forEach(function (side) {
-                    const point = topologyFixedPortV132(metrics, side);
+            function appendTopologyPortsV139(stage, ports) {
+                ports.forEach(function (port) {
+                    const point = port.point;
                     stage.appendChild(svgElementV10('circle', {
                         class: 'topology-port-dot',
                         cx: point.x,
                         cy: point.y,
                         r: '3',
+                        'data-port-side': port.side,
                         'pointer-events': 'none'
                     }));
                 });
             }
 
-            function appendTopologyNodeV132(parent, node, metrics, selected) {
+            function appendTopologyNodeV139(parent, node, metrics, selected, ports) {
                 appendTopologyNodeV129(parent, node, metrics, selected);
                 const stage = parent.lastElementChild;
-                if (stage) appendTopologyPortsV132(stage, metrics);
+                if (stage) appendTopologyPortsV139(stage, ports);
             }
 
             function drawTopologyLayoutV132(layout, graph, selectedNode) {
@@ -4551,12 +6097,21 @@
                 appendTopologyMarkerV10(defs, 'topology-global-arrow-v133-focus', '#1F5FFF', 8.5);
                 topologyViewportV10.appendChild(defs);
 
-                const routes = topologyRoutesV132(graph, layout);
+                const routes = topologyRoutesV143(graph, layout);
                 routes.sort(function (first, second) {
                     const firstFocus = first.edge.source === selectedNode.id || first.edge.target === selectedNode.id;
                     const secondFocus = second.edge.source === selectedNode.id || second.edge.target === selectedNode.id;
                     if (firstFocus !== secondFocus) return firstFocus ? 1 : -1;
                     return first.edge.id.localeCompare(second.edge.id);
+                });
+                const portsByNode = new Map();
+                function recordPort(nodeId, side, point) {
+                    if (!portsByNode.has(nodeId)) portsByNode.set(nodeId, []);
+                    portsByNode.get(nodeId).push({ side: side, point: point });
+                }
+                routes.forEach(function (route) {
+                    recordPort(route.edge.source, 'right', route.points[0]);
+                    recordPort(route.edge.target, 'left', route.points[route.points.length - 1]);
                 });
                 const edgeLayer = svgElementV10('g', { 'aria-label': '正交有向依赖连线', 'pointer-events': 'none' });
                 routes.forEach(function (route) {
@@ -4589,8 +6144,16 @@
                         'data-topology-edge-id': edge.id,
                         'data-topology-edge-source': edge.source,
                         'data-topology-edge-target': edge.target,
+                        'data-dependency-depth': '1',
+                        'data-dependency-provenance': edge.provenance,
                         'data-route-kind': route.kind,
+                        'data-route-bends': String(route.bends),
+                        'data-route-length': String(Math.round(route.length * 10) / 10),
                         'data-route-lane': String(route.laneIndex),
+                        'data-route-channel': route.channelBand,
+                        'data-route-crossings': String(route.crossings),
+                        'data-route-track-x': Number.isFinite(route.sharedTrackX) ? String(Math.round(route.sharedTrackX * 10) / 10) : '',
+                        'data-route-track-group': route.trackGroupKey || '',
                         'data-cycle-edge': cycle ? 'true' : 'false'
                     });
                     const sourceNode = levelNodeByIdV10(edge.source);
@@ -4607,7 +6170,7 @@
                     return firstMetrics.rank - secondMetrics.rank || firstMetrics.lane - secondMetrics.lane || topologyNodeOrderV129(first, second);
                 }).forEach(function (node) {
                     const metrics = layout.metricsById.get(node.id);
-                    if (metrics) appendTopologyNodeV132(nodeLayer, node, metrics, node.id === selectedNode.id);
+                    if (metrics) appendTopologyNodeV139(nodeLayer, node, metrics, node.id === selectedNode.id, portsByNode.get(node.id) || []);
                 });
                 topologyViewportV10.appendChild(nodeLayer);
             }
