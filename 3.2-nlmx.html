@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<!-- 版本 13.4：延续 13.3 的相关子图与统一连线；学习任务按能力节点全量直显，每张卡片仅保留任务类型、标题、必要状态与学习入口。 -->
+<!-- 版本 13.7：删除未经确认的任务发布语义；任务卡固定收窄；统一能力阶段命名；全局依赖改为 12px 独占通道、多端口与跨层外环分流。 -->
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#EFF6FF">
-    <title>抖学 AI 能力模型 13.4 · 学习任务入口极简化</title>
+    <title>抖学 AI 能力模型 13.7 · 独立依赖分流与节点命名统一</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -2217,6 +2217,334 @@
         .topology-port-dot {
             display: none;
         }
+
+        /* 13.5：以高密度关系工作台收口详情页，尺寸层级由信息结构而非卡片体积建立。 */
+        .overview-mainline .mainline-node.role-current {
+            border-color: #F0C36A;
+            border-style: solid;
+            background: #FFF4CF;
+            color: #92400E;
+        }
+
+        .overview-mainline .mainline-node.role-current.state-locked {
+            border-width: 2px;
+            border-color: #F59E0B;
+            border-style: dashed;
+            background: #FFF4CF;
+            color: #92400E;
+        }
+
+        .overview-mainline .mainline-node.state-locked:not(.role-current) {
+            border-width: 1px;
+            border-color: #D8E0EA;
+            border-style: solid;
+            background: #F1F5F9;
+            color: #64748B;
+        }
+
+        .dependency-section {
+            padding-top: 8px;
+            padding-bottom: 8px;
+        }
+
+        .dependency-mode-label,
+        #dependency-mode-button-caret {
+            display: none !important;
+        }
+
+        .global-dependency-button {
+            box-shadow: none;
+        }
+
+        #dependency-direct-panel,
+        #dependency-global-panel {
+            margin-top: 4px;
+        }
+
+        .local-dependency-scroll {
+            padding-block: 0 2px;
+        }
+
+        .local-dependency-map {
+            min-width: 680px;
+            min-height: 46px;
+            grid-template-columns: minmax(186px, 1fr) 164px minmax(186px, 1fr);
+            gap: 56px;
+            padding: 1px 2px 2px;
+        }
+
+        .local-dependency-side {
+            justify-content: center;
+        }
+
+        .local-dependency-side-title {
+            display: none;
+        }
+
+        .local-dependency-node-list {
+            min-height: 44px;
+            gap: 5px;
+            padding-top: 0;
+        }
+
+        .local-dependency-node {
+            width: 196px;
+            height: 44px;
+            min-height: 44px;
+            border-radius: 10px;
+            padding: 6px 9px;
+            box-shadow: none;
+        }
+
+        .local-dependency-node-name {
+            font-size: 12px;
+        }
+
+        .local-dependency-current {
+            min-height: 46px;
+            height: 46px;
+            margin-top: 0;
+            border-width: 1.5px;
+            border-radius: 10px;
+            padding: 7px 9px;
+            box-shadow: 0 0 0 3px rgba(31, 95, 255, 0.06);
+        }
+
+        .local-dependency-current .local-dependency-node-name {
+            font-size: 12px;
+        }
+
+        .local-dependency-current .local-dependency-lock {
+            position: static;
+        }
+
+        .local-dependency-empty {
+            min-height: 44px;
+        }
+
+        .local-dependency-line {
+            stroke-width: 1.4;
+            stroke-linecap: square;
+            stroke-linejoin: miter;
+        }
+
+        .learning-grid {
+            gap: 8px;
+        }
+
+        .learning-card {
+            min-height: 60px;
+            gap: 10px;
+            border-radius: 12px;
+            padding: 7px 8px 7px 10px;
+            box-shadow: none;
+        }
+
+        .learning-task-leading {
+            gap: 9px;
+        }
+
+        .learning-task-copy {
+            gap: 3px;
+        }
+
+        .learning-task-heading {
+            gap: 6px;
+        }
+
+        .learning-task-title {
+            font-size: 15px;
+        }
+
+        .learning-task-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            font-size: 17px;
+        }
+
+        .learning-task-icon-image {
+            width: 24px;
+            height: 24px;
+        }
+
+        .learning-task-icon-image.is-game {
+            width: 27px;
+            height: 27px;
+        }
+
+        .learning-task-type {
+            font-size: 10px;
+        }
+
+        .learning-task-semantic {
+            min-height: 18px;
+            padding-inline: 5px;
+            font-size: 9px;
+        }
+
+        .learning-task-action {
+            min-width: 88px;
+            min-height: 44px;
+            border-radius: 9px;
+            padding-inline: 9px;
+            font-size: 12px;
+        }
+
+        .learning-empty-state {
+            min-height: 72px;
+            border-radius: 12px;
+        }
+
+        .inline-topology-shell {
+            border-radius: 12px;
+            box-shadow: none;
+        }
+
+        .inline-topology-toolbar {
+            min-height: 46px;
+            justify-content: flex-end;
+            padding: 3px 8px;
+        }
+
+        .topology-root-copy {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+            clip-path: inset(50%);
+            white-space: nowrap;
+        }
+
+        .inline-topology-surface {
+            height: clamp(420px, 56vh, 520px);
+            min-height: 420px;
+        }
+
+        .topology-stage-node[aria-pressed="true"] .topology-stage-visual {
+            animation: topology-root-confirm 230ms ease-out both;
+        }
+
+        @keyframes topology-root-confirm {
+            from {
+                opacity: 0.78;
+                transform: scale(0.96);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @media (max-width: 760px) {
+            .local-dependency-map {
+                min-width: 660px;
+                grid-template-columns: 188px 154px 188px;
+                gap: 55px;
+            }
+
+            .inline-topology-toolbar {
+                align-items: center;
+                flex-direction: row;
+                padding: 3px 8px;
+            }
+
+            .inline-topology-toolbar .graph-controls {
+                width: auto;
+            }
+
+            .inline-topology-surface {
+                height: 440px;
+                min-height: 440px;
+            }
+        }
+
+        /* 13.7：任务卡使用 268px 固定列，常见 iPad 横屏优先容纳四张且始终左对齐。 */
+        .learning-grid {
+            grid-template-columns: repeat(auto-fill, 268px);
+            justify-content: start;
+            align-items: stretch;
+        }
+
+        .learning-card {
+            width: 268px;
+            min-height: 76px;
+            height: auto;
+            gap: 11px;
+            border-radius: 14px;
+            padding: 10px 11px 10px 13px;
+        }
+
+        .learning-card:disabled {
+            cursor: default;
+        }
+
+        .mainline-node.role-current.state-locked,
+        .overview-mainline .mainline-node.role-current.state-locked {
+            border-color: #EDC66F;
+            background: #FFFBF1;
+            color: #9A6B17;
+        }
+
+        .local-dependency-current {
+            background: #F3F7FF;
+        }
+
+        .local-dependency-current.is-locked {
+            border-color: #AFC3FF;
+            background: #FCFDFF;
+            box-shadow: 0 0 0 3px rgba(31, 95, 255, 0.035);
+        }
+
+        /* 13.7：关系节点统一为“能力名 L等级”主行 + 阶段名次行。 */
+        .local-dependency-node-copy {
+            flex: 1 1 auto;
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .local-dependency-node-name {
+            max-width: 100%;
+        }
+
+        .local-dependency-node-definition {
+            display: block;
+            max-width: 100%;
+            overflow: hidden;
+            color: #7B8BA4;
+            font-size: 10px;
+            font-weight: 750;
+            line-height: 1.2;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .local-dependency-current .local-dependency-node-copy {
+            align-items: center;
+            text-align: center;
+        }
+
+        /* 13.7：仅压缩依赖工作区，不改动顶部主线阶段尺寸。 */
+        .inline-topology-surface {
+            height: clamp(280px, 34vh, 340px);
+            min-height: 280px;
+        }
+
+        .learning-empty-state.is-locked {
+            border-style: solid;
+            background: #F8FAFC;
+            color: #64748B;
+        }
+
+        @media (max-width: 760px) {
+            .inline-topology-surface {
+                height: 300px;
+                min-height: 300px;
+            }
+        }
     </style>
 </head>
 <body class="font-sans text-ink antialiased">
@@ -2228,7 +2556,6 @@
                 </button>
                 <div class="min-w-0">
                     <h1 class="page-title truncate text-slate-950">英语能力</h1>
-                    <p id="overview-meta" class="meta-text mt-1 font-semibold text-slate-400">10 条主线 · 50 个能力阶段</p>
                 </div>
             </div>
         </header>
@@ -2248,11 +2575,9 @@
                     <i class="ph-bold ph-caret-left text-[20px]" aria-hidden="true"></i>
                 </button>
                 <div class="min-w-0">
-                    <nav aria-label="面包屑">
+                    <nav aria-label="父级页面">
                         <ol class="label-text flex items-center gap-1.5 font-extrabold tracking-[0.08em] text-brand">
                             <li><button id="detail-breadcrumb-overview" type="button" class="min-h-6 rounded-[6px] px-1 transition active:scale-95">英语能力</button></li>
-                            <li aria-hidden="true"><i class="ph-bold ph-caret-right text-[10px]"></i></li>
-                            <li aria-current="page">能力详情</li>
                         </ol>
                     </nav>
                     <h1 id="detail-header-title" class="page-title mt-0.5 truncate text-slate-950"></h1>
@@ -2267,11 +2592,11 @@
                     <div id="detail-mainline" class="detail-mainline horizontal-scroll mt-3 pb-1" aria-live="polite"></div>
                 </section>
 
-                <section id="dependency-section" class="dependency-section border-y border-blue-100/70 bg-blue-50/30 px-5 py-3" aria-labelledby="dependency-title" data-dependency-mode="direct">
+                <section id="dependency-section" class="dependency-section border-y border-blue-100/70 bg-blue-50/30 px-5 py-2" aria-labelledby="dependency-title" data-dependency-mode="direct">
                     <div class="flex min-h-11 items-center justify-between gap-3">
                         <div class="flex min-w-0 items-center gap-2">
                             <h2 id="dependency-title" class="section-title shrink-0 text-slate-950">跨主线依赖</h2>
-                            <span id="dependency-mode-label" class="dependency-mode-label">一级关系</span>
+                            <span id="dependency-mode-label" class="dependency-mode-label">直接依赖</span>
                         </div>
                         <button id="dependency-global-button" type="button" class="global-dependency-button flex min-h-11 shrink-0 items-center gap-2 rounded-[10px] border border-blue-200 bg-white px-3 text-[13px] font-extrabold text-brand transition active:scale-95" aria-label="在当前位置查看全局依赖">
                             <i id="dependency-mode-button-icon" class="ph-bold ph-share-network text-[17px]" aria-hidden="true"></i>
@@ -2279,10 +2604,10 @@
                             <i id="dependency-mode-button-caret" class="ph-bold ph-caret-down text-[13px]" aria-hidden="true"></i>
                         </button>
                     </div>
-                    <div id="dependency-direct-panel" class="dependency-panel mt-2" aria-live="polite">
+                    <div id="dependency-direct-panel" class="dependency-panel mt-1" aria-live="polite">
                         <div id="dependency-view"></div>
                     </div>
-                    <div id="dependency-global-panel" class="dependency-panel mt-2" aria-live="polite" hidden>
+                    <div id="dependency-global-panel" class="dependency-panel mt-1" aria-live="polite" hidden>
                         <div class="inline-topology-shell">
                             <div class="inline-topology-toolbar">
                                 <div class="topology-root-copy" role="status" aria-live="polite" aria-atomic="true">
@@ -2307,11 +2632,11 @@
                     </div>
                 </section>
 
-                <section class="learning-section px-5 pb-6 pt-4" aria-labelledby="learning-title">
+                <section class="learning-section px-5 pb-5 pt-3" aria-labelledby="learning-title">
                     <div class="flex items-center">
                         <h2 id="learning-title" class="section-title text-slate-950">学习任务</h2>
                     </div>
-                    <div id="learning-grid" class="learning-grid mt-4 grid gap-3"></div>
+                    <div id="learning-grid" class="learning-grid mt-2 grid gap-2"></div>
                 </section>
             </div>
         </main>
@@ -2328,7 +2653,10 @@
         (function () {
             'use strict';
 
-            const abilitiesV10 = [
+            const graphScenarioRawV136 = new URLSearchParams(window.location.search).get('graphScenario');
+            const graphScenarioV136 = graphScenarioRawV136 === 'cycle' ? 'cycle' : 'default';
+
+            const officialAbilitiesV136 = [
                 {
                     id: 'vocabulary',
                     name: '核心词汇',
@@ -2471,6 +2799,48 @@
                 }
             ];
 
+            const cycleStressAbilitiesV136 = [
+                {
+                    id: 'cycle-alpha',
+                    name: '循环甲线',
+                    currentLevelNodeId: 'cycle-alpha-l1',
+                    targetLevelNodeId: 'cycle-alpha-l2',
+                    topologyOrder: 0,
+                    levels: [
+                        { id: 'cycle-alpha-l1', level: 1, definition: '输入识别', description: '循环压力测试甲节点', masteryStars: 2, role: 'current', studyState: 'available', canStudy: true },
+                        { id: 'cycle-alpha-l2', level: 2, definition: '甲线目标', description: '循环压力测试甲目标', masteryStars: 0, role: 'target', studyState: 'locked', canStudy: false }
+                    ]
+                },
+                {
+                    id: 'cycle-beta',
+                    name: '循环乙线',
+                    currentLevelNodeId: 'cycle-beta-l1',
+                    targetLevelNodeId: 'cycle-beta-l2',
+                    topologyOrder: 1,
+                    levels: [
+                        { id: 'cycle-beta-l1', level: 1, definition: '规则组合', description: '循环压力测试乙节点', masteryStars: 1, role: 'current', studyState: 'locked', canStudy: false },
+                        { id: 'cycle-beta-l2', level: 2, definition: '乙线目标', description: '循环压力测试乙目标', masteryStars: 0, role: 'target', studyState: 'locked', canStudy: false }
+                    ]
+                },
+                {
+                    id: 'cycle-gamma',
+                    name: '循环丙线',
+                    currentLevelNodeId: 'cycle-gamma-l1',
+                    targetLevelNodeId: 'cycle-gamma-l2',
+                    topologyOrder: 2,
+                    levels: [
+                        { id: 'cycle-gamma-l1', level: 1, definition: '结果校验', description: '循环压力测试丙节点', masteryStars: 1, role: 'current', studyState: 'locked', canStudy: false },
+                        { id: 'cycle-gamma-l2', level: 2, definition: '丙线目标', description: '循环压力测试丙目标', masteryStars: 0, role: 'target', studyState: 'locked', canStudy: false }
+                    ]
+                }
+            ];
+
+            const abilityDatasetsV136 = {
+                default: officialAbilitiesV136,
+                cycle: cycleStressAbilitiesV136
+            };
+            const abilitiesV10 = abilityDatasetsV136[graphScenarioV136];
+
             const levelNodesV10 = [];
             abilitiesV10.forEach(function (ability) {
                 ability.levels.forEach(function (node) {
@@ -2480,7 +2850,7 @@
             });
 
             // 后台关系保持真实 source → target；若后台判定循环非法，可在对应关系返回 reviewState: 'invalid-cycle'。
-            const levelRelationshipsV10 = [
+            const officialLevelRelationshipsV136 = [
                 { source: 'phonics-l2', target: 'listening-l2' },
                 { source: 'vocabulary-l3', target: 'sentence-l3' },
                 { source: 'grammar-l2', target: 'sentence-l3' },
@@ -2495,6 +2865,18 @@
                 { source: 'speaking-l2', target: 'communication-l1' },
                 { source: 'writing-l1', target: 'communication-l1' }
             ];
+
+            const cycleStressRelationshipsV136 = [
+                { id: 'cycle-alpha-beta', source: 'cycle-alpha-l1', target: 'cycle-beta-l1', reviewState: 'invalid-cycle' },
+                { id: 'cycle-beta-gamma', source: 'cycle-beta-l1', target: 'cycle-gamma-l1', reviewState: 'invalid-cycle' },
+                { id: 'cycle-gamma-alpha', source: 'cycle-gamma-l1', target: 'cycle-alpha-l1', reviewState: 'invalid-cycle' }
+            ];
+
+            const relationshipDatasetsV136 = {
+                default: officialLevelRelationshipsV136,
+                cycle: cycleStressRelationshipsV136
+            };
+            const levelRelationshipsV10 = relationshipDatasetsV136[graphScenarioV136];
 
             // 13.1：按后台业务类型复用 icon 文件夹内原始图标；课堂暂无对应原始资源，继续使用 Phosphor 图标。
             const learningTaskIconAssetsV128 = {
@@ -2577,29 +2959,35 @@
                 rowPitch: 112
             };
 
-            const topologyAbilityOrderV10 = [
-                'phonics',
-                'vocabulary',
-                'grammar',
-                'listening',
-                'sentence',
-                'speaking',
-                'reading',
-                'writing',
-                'communication',
-                'pragmatics'
-            ];
+            const topologyAbilityOrderV10 = graphScenarioV136 === 'cycle'
+                ? cycleStressAbilitiesV136.map(function (ability) { return ability.id; })
+                : [
+                    'phonics',
+                    'vocabulary',
+                    'grammar',
+                    'listening',
+                    'sentence',
+                    'speaking',
+                    'reading',
+                    'writing',
+                    'communication',
+                    'pragmatics'
+                ];
+
+            const initialAbilityIdV136 = graphScenarioV136 === 'cycle' ? 'cycle-alpha' : 'vocabulary';
+            const initialAbilityV136 = abilitiesV10.find(function (ability) { return ability.id === initialAbilityIdV136; }) || abilitiesV10[0];
+            const initialLevelNodeIdV136 = initialAbilityV136.currentLevelNodeId;
 
             const stateV10 = {
                 view: 'overview',
                 previousView: 'overview',
                 detailReturnView: 'overview',
                 dependencyMode: 'direct',
-                selectedAbilityId: 'vocabulary',
-                selectedLevelNodeId: 'vocabulary-l3',
+                selectedAbilityId: initialAbilityV136.id,
+                selectedLevelNodeId: initialLevelNodeIdV136,
                 detailNodeHistory: [],
-                topologySelectedNodeId: 'vocabulary-l3',
-                topologyEntryNodeId: 'vocabulary-l3',
+                topologySelectedNodeId: initialLevelNodeIdV136,
+                topologyEntryNodeId: initialLevelNodeIdV136,
                 topologyHintShown: false
             };
 
@@ -2671,6 +3059,18 @@
                 return 'L' + String(level);
             }
 
+            function nodeNamingV137(node) {
+                const ability = abilityForNodeV10(node);
+                const level = formatLevelV10(node.level);
+                return {
+                    ability: ability.name,
+                    level: level,
+                    stage: node.definition,
+                    relationPrimary: ability.name + ' ' + level,
+                    canonical: ability.name + ' · ' + level + ' · ' + node.definition
+                };
+            }
+
             function roleLabelV10(node) {
                 if (node.role === 'completed') return '已完成';
                 if (node.role === 'current') return node.studyState === 'locked' ? '当前阶段，未解锁' : '当前阶段';
@@ -2734,13 +3134,14 @@
                     const selectedClass = node.id === selectedNodeId ? ' is-selected' : '';
                     const stateClass = ' state-' + node.studyState;
                     const nodeLabel = detailMode ? roleLabelV10(node) : overviewRoleLabelV10(node);
-                    const levelMarkup = '<span class="node-level-row"><span class="node-level">' + formatLevelV10(node.level) + '</span><i class="target-marker ph-bold ph-flag" aria-hidden="true"></i></span>';
+                    const naming = nodeNamingV137(node);
+                    const levelMarkup = '<span class="node-level-row"><span class="node-level">' + escapeHtmlV10(naming.level) + '</span><i class="target-marker ph-bold ph-flag" aria-hidden="true"></i></span>';
                     const currentBadgeMarkup = node.role === 'current' ? '<span class="node-current-badge">当前阶段</span>' : '';
                     const lockBadgeMarkup = node.studyState === 'locked' ? '<span class="node-lock-badge" aria-label="未解锁"><i class="ph-bold ph-lock-key" aria-hidden="true"></i></span>' : '';
                     const nodeStarsMarkup = detailMode || node.role === 'completed' ? starsMarkupV10(node.masteryStars) : '';
-                    const nodeContent = currentBadgeMarkup + lockBadgeMarkup + levelMarkup + '<span class="node-caption">' + escapeHtmlV10(node.definition) + '</span>' + nodeStarsMarkup;
+                    const nodeContent = currentBadgeMarkup + lockBadgeMarkup + levelMarkup + '<span class="node-caption">' + escapeHtmlV10(naming.stage) + '</span>' + nodeStarsMarkup;
                     const isViewed = detailMode && node.id === selectedNodeId;
-                    const aria = ability.name + ' ' + formatLevelV10(node.level) + '，' + node.definition + '，' + nodeLabel + (isViewed ? '，正在查看' : '');
+                    const aria = naming.canonical + '，' + nodeLabel + (isViewed ? '，正在查看' : '');
                     markup +=
                         '<li>' +
                             '<button type="button" data-level-node-id="' + escapeHtmlV10(node.id) + '" class="mainline-node role-' + node.role + stateClass + selectedClass + '" aria-label="' + escapeHtmlV10(aria) + '"' + (detailMode ? ' aria-pressed="' + (isViewed ? 'true' : 'false') + '"' : '') + '>' +
@@ -2878,14 +3279,43 @@
                 if (!relatedProbe.has('ancestor-2') || !relatedProbe.has('cycle') || relatedProbe.has('side-branch')) {
                     throw new Error('相关子图有向可达性过滤失败。');
                 }
+
+                const activeEdges = graphStageEdgesV10();
+                const relationshipKeys = new Set(activeEdges.map(function (edge) { return edge.source + '→' + edge.target; }));
+                function requireRelationship(source, target, message) {
+                    if (!relationshipKeys.has(source + '→' + target)) throw new Error(message);
+                }
+
+                if (graphScenarioV136 === 'default') {
+                    if (detectRelationshipCycleEdgeIdsV10(activeEdges).size !== 0) throw new Error('正式能力前置关系必须保持 DAG。');
+
+                    const isolatedGraph = collectGlobalDependencyGraphV129('pragmatics-l1');
+                    if (isolatedGraph.nodes.length !== 1 || isolatedGraph.edges.length !== 0) throw new Error('无跨主线依赖场景校验失败。');
+
+                    const vocabularyBranches = activeEdges.filter(function (edge) { return edge.source === 'vocabulary-l3'; });
+                    if (vocabularyBranches.length < 3) throw new Error('正式数据缺少普通分叉场景。');
+                    const communicationMerge = activeEdges.filter(function (edge) { return edge.target === 'communication-l1'; });
+                    if (communicationMerge.length < 4) throw new Error('正式数据缺少普通汇聚场景。');
+
+                    requireRelationship('vocabulary-l3', 'sentence-l3', '特殊直接依赖缺少 A→B。');
+                    requireRelationship('vocabulary-l3', 'reading-l2', '特殊直接依赖缺少 A→C。');
+                    requireRelationship('sentence-l3', 'reading-l2', '特殊直接依赖缺少 B→C。');
+                    const specialGraph = collectGlobalDependencyGraphV129('vocabulary-l3');
+                    const preservesInternalEdge = specialGraph.edges.some(function (edge) {
+                        return edge.source === 'sentence-l3' && edge.target === 'reading-l2';
+                    });
+                    if (!preservesInternalEdge) throw new Error('全局依赖未保留直接同侧节点之间的真实边。');
+                } else {
+                    const cycleEdgeIds = detectRelationshipCycleEdgeIdsV10(activeEdges);
+                    const cycleGraph = collectGlobalDependencyGraphV129('cycle-alpha-l1');
+                    if (cycleEdgeIds.size !== 3 || cycleGraph.nodes.length !== 3 || cycleGraph.edges.length !== 3) {
+                        throw new Error('独立循环压力场景未形成完整三节点循环。');
+                    }
+                }
                 validateTopologyLayoutV10();
             }
 
             function renderOverviewV10() {
-                const stageCount = abilitiesV10.reduce(function (total, ability) {
-                    return total + ability.levels.length;
-                }, 0);
-                document.getElementById('overview-meta').textContent = abilitiesV10.length + ' 条主线 · ' + stageCount + ' 个能力阶段';
                 abilityGridV10.innerHTML = abilitiesV10.map(function (ability) {
                     return (
                         '<article class="ability-row min-w-0 overflow-hidden" data-ability-row="' + escapeHtmlV10(ability.id) + '" aria-labelledby="ability-title-' + escapeHtmlV10(ability.id) + '">' +
@@ -3043,7 +3473,7 @@
             }
 
             function learningTaskActionV127(task) {
-                if (task.status === 'completed') return '再次学习';
+                if (task.status === 'completed') return '已完成';
                 if (task.status === 'in_progress') return '继续学习';
                 return '开始学习';
             }
@@ -3062,19 +3492,25 @@
                 const tasks = learningTasksByNodeV127[node.id] || [];
                 document.getElementById('learning-title').textContent = '学习任务';
 
+                if (node.studyState === 'locked') {
+                    document.getElementById('learning-grid').innerHTML = '<div class="learning-empty-state is-locked"><i class="ph-bold ph-lock-key text-[18px]" aria-hidden="true"></i><span>未解锁</span></div>';
+                    return;
+                }
+
                 if (tasks.length === 0) {
-                    document.getElementById('learning-grid').innerHTML = '<div class="learning-empty-state"><i class="ph-bold ph-calendar-blank text-[18px]" aria-hidden="true"></i><span>该能力节点暂未发布学习任务</span></div>';
+                    document.getElementById('learning-grid').innerHTML = '<div class="learning-empty-state"><i class="ph-bold ph-minus text-[18px]" aria-hidden="true"></i><span>暂无学习任务</span></div>';
                     return;
                 }
 
                 document.getElementById('learning-grid').innerHTML = tasks.map(function (task) {
-                    const disabled = !node.canStudy;
+                    const taskCompleted = task.status === 'completed';
+                    const disabled = !node.canStudy || taskCompleted;
                     const actionLabel = learningTaskActionV127(task);
                     const statusLabel = task.status === 'in_progress' ? '，进行中' : (task.status === 'completed' ? '，已完成' : '');
-                    const unavailableLabel = disabled ? (node.studyState === 'locked' ? '，当前能力待解锁' : '，当前暂不可用') : '';
-                    const aria = actionLabel + '：' + task.title + '，任务类型' + task.form + statusLabel + unavailableLabel;
+                    const aria = actionLabel + '：' + task.title + '，任务类型' + task.form + statusLabel;
+                    const actionIcon = taskCompleted ? 'ph-check' : 'ph-caret-right';
                     return (
-                        '<button type="button" data-learning-task-id="' + escapeHtmlV10(task.id) + '" data-learning-type="' + escapeHtmlV10(task.form) + '" class="learning-card group w-full active:scale-[0.95]"' + (disabled ? ' disabled aria-disabled="true"' : '') + ' aria-label="' + escapeHtmlV10(aria) + '">' +
+                        '<button type="button" data-learning-task-id="' + escapeHtmlV10(task.id) + '" data-learning-type="' + escapeHtmlV10(task.form) + '" data-learning-status="' + escapeHtmlV10(task.status) + '" class="learning-card group w-full active:scale-[0.95]"' + (disabled ? ' disabled aria-disabled="true"' : '') + ' aria-label="' + escapeHtmlV10(aria) + '">' +
                             '<span class="learning-task-leading">' +
                                 learningTaskIconMarkupV128(task) +
                                 '<span class="learning-task-copy">' +
@@ -3087,7 +3523,7 @@
                             '</span>' +
                             '<span class="learning-task-action">' +
                                 escapeHtmlV10(actionLabel) +
-                                '<i class="ph-bold ph-caret-right text-[13px]" aria-hidden="true"></i>' +
+                                '<i class="ph-bold ' + actionIcon + ' text-[13px]" aria-hidden="true"></i>' +
                             '</span>' +
                         '</button>'
                     );
@@ -3104,7 +3540,7 @@
                 renderLearningV10(ability, node);
                 if (stateV10.dependencyMode === 'global') {
                     stateV10.topologySelectedNodeId = node.id;
-                    stateV10.topologyEntryNodeId = node.id;
+                    if (!stateV10.topologyEntryNodeId) stateV10.topologyEntryNodeId = node.id;
                     renderTopologyV10();
                 }
                 updateDetailBackButtonV10();
@@ -3216,7 +3652,6 @@
                 }
                 if (!abilityChanged && stateV10.dependencyMode === 'global') {
                     stateV10.topologySelectedNodeId = node.id;
-                    stateV10.topologyEntryNodeId = node.id;
                     renderTopologyV10();
                 }
                 revealSelectedDetailNodeV10(smoothScroll);
@@ -3439,6 +3874,7 @@
 
             function topologyNodePaletteV10(node) {
                 if (node.role === 'completed') return { fill: '#F3FCF6', stroke: '#BFE7CB', text: '#166534', dash: '' };
+                if (node.role === 'current' && node.studyState === 'locked') return { fill: '#FFFBF1', stroke: '#EDC66F', text: '#9A6B17', dash: '' };
                 if (node.role === 'current') return { fill: '#FFF4CF', stroke: '#F0C36A', text: '#92400E', dash: '' };
                 if (node.studyState === 'locked') return { fill: '#F1F5F9', stroke: '#CBD5E1', text: '#64748B', dash: '5 3' };
                 if (node.role === 'target') return { fill: '#EDF3FF', stroke: '#5D8AFF', text: '#1746B2', dash: '6 4' };
@@ -3655,7 +4091,7 @@
 
             function relationshipAuditVisibleV10() {
                 const params = new URLSearchParams(window.location.search);
-                return params.get('debug') === '1' || params.get('audience') === 'teacher' || params.get('audience') === 'admin';
+                return graphScenarioV136 === 'cycle' || params.get('debug') === '1' || params.get('audience') === 'teacher' || params.get('audience') === 'admin';
             }
 
             function invalidCycleEdgeIdsV10(edges) {
@@ -4411,7 +4847,7 @@
                     const ability = abilityForNodeV10(node);
                     const palette = topologyNodePaletteV10(node);
                     const selected = node.id === selectedNode.id;
-                    const actionLabel = selected ? '当前能力，再次点按进入能力详情' : '点按设为当前能力';
+                    const actionLabel = selected ? '当前能力与依赖根节点' : '点按切换能力与依赖根节点';
                     const stage = svgElementV10('g', {
                         class: 'topology-stage-node', role: 'button', tabindex: '0',
                         'data-topology-node-id': node.id, 'aria-pressed': selected ? 'true' : 'false',
@@ -4477,7 +4913,7 @@
             showTopologyGuidanceV10 = function () {
                 if (stateV10.topologyHintShown) return;
                 stateV10.topologyHintShown = true;
-                showTopologyMessageV10('点按节点切换中心，再次点按进入能力详情', 2800, false);
+                showTopologyMessageV10('点按节点同步切换能力详情与依赖根节点', 2800, false);
             };
 
             announceTopologyFocusV10 = function () {
@@ -5023,15 +5459,14 @@
 
             function topologyStatusV129(node) {
                 if (node.role === 'completed') return { label: '已完成', fill: '#F1FAF4', stroke: '#BFE7CB', text: '#198444' };
-                if (node.role === 'current' && node.studyState === 'locked') return { label: '当前 · 待解锁', fill: '#FFF8E6', stroke: '#F4CF79', text: '#8A4B08' };
+                if (node.studyState === 'locked') return { label: '未解锁', fill: '#F1F5F9', stroke: '#D7E0EA', text: '#64748B' };
                 if (node.role === 'current') return { label: '当前阶段', fill: '#FFF8E6', stroke: '#F4CF79', text: '#8A4B08' };
                 if (node.role === 'target') return { label: '目标阶段', fill: '#EDF3FF', stroke: '#9EB8FF', text: '#1746B2' };
-                if (node.studyState === 'locked') return { label: '未解锁', fill: '#F1F5F9', stroke: '#D7E0EA', text: '#64748B' };
                 return { label: '可学习', fill: '#EDF3FF', stroke: '#C9D8FF', text: '#315DCC' };
             }
 
             function appendTopologyNodeV129(parent, node, metrics, selected, graph) {
-                const ability = abilityForNodeV10(node);
+                const naming = nodeNamingV137(node);
                 const palette = topologyNodePaletteV10(node);
                 const status = topologyStatusV129(node);
                 const stage = svgElementV10('g', {
@@ -5040,69 +5475,43 @@
                     tabindex: '0',
                     'data-topology-node-id': node.id,
                     'aria-pressed': selected ? 'true' : 'false',
-                    'aria-label': (selected ? '当前能力' : '设为当前能力') + '，' + ability.name + ' ' + formatLevelV10(node.level) + ' ' + node.definition + '，' + status.label
+                    'aria-label': (selected ? '当前能力与依赖根节点' : '打开并设为依赖根节点') + '，' + naming.canonical + '，' + status.label
                 });
                 const visual = svgElementV10('g', { class: 'topology-stage-visual' });
-                stage.appendChild(svgElementV10('title', {}, ability.name + ' · ' + formatLevelV10(node.level) + ' · ' + node.definition + ' · ' + status.label));
+                stage.appendChild(svgElementV10('title', {}, naming.canonical + ' · ' + status.label));
                 visual.appendChild(svgElementV10('rect', {
-                    x: String(metrics.x), y: String(metrics.y), width: String(metrics.width), height: String(metrics.height), rx: '15',
+                    x: String(metrics.x), y: String(metrics.y), width: String(metrics.width), height: String(metrics.height), rx: '10',
                     fill: palette.fill, stroke: selected ? '#1F5FFF' : palette.stroke,
                     'stroke-width': selected ? '2' : '1.4', 'stroke-dasharray': selected ? '' : palette.dash
                 }));
                 visual.appendChild(svgElementV10('text', {
-                    x: String(metrics.x + 14), y: String(metrics.y + 23), fill: selected ? '#1F5FFF' : '#64748B',
-                    'font-size': '11', 'font-weight': '900'
-                }, ability.name));
+                    x: String(metrics.x + 10), y: String(metrics.y + 16), fill: selected ? '#1F5FFF' : '#64748B',
+                    'font-size': '10.5', 'font-weight': '900'
+                }, naming.relationPrimary));
                 visual.appendChild(svgElementV10('text', {
-                    x: String(metrics.x + metrics.width - 14), y: String(metrics.y + 23), 'text-anchor': 'end',
-                    fill: selected ? '#1F5FFF' : palette.text, 'font-size': '11', 'font-weight': '900', 'font-family': 'monospace'
-                }, formatLevelV10(node.level)));
-                visual.appendChild(svgElementV10('text', {
-                    x: String(metrics.x + 14), y: String(metrics.y + 50), fill: selected ? '#172033' : palette.text,
-                    'font-size': '16', 'font-weight': '900'
-                }, node.definition));
-                const statusWidth = Math.min(90, Math.max(48, status.label.length * 11 + 14));
+                    x: String(metrics.x + 10), y: String(metrics.y + 37), fill: selected ? '#172033' : palette.text,
+                    'font-size': '12.5', 'font-weight': '900'
+                }, naming.stage));
+                const statusWidth = Math.min(78, Math.max(42, status.label.length * 8 + 12));
                 visual.appendChild(svgElementV10('rect', {
-                    x: String(metrics.x + 14), y: String(metrics.y + 67), width: String(statusWidth), height: '22', rx: '6',
+                    x: String(metrics.x + 10), y: String(metrics.y + 48), width: String(statusWidth), height: '18', rx: '6',
                     fill: status.fill, stroke: status.stroke, 'stroke-width': '1'
                 }));
                 visual.appendChild(svgElementV10('text', {
-                    x: String(metrics.x + 14 + statusWidth / 2), y: String(metrics.y + 82), 'text-anchor': 'middle',
-                    fill: status.text, 'font-size': '10', 'font-weight': '900'
+                    x: String(metrics.x + 10 + statusWidth / 2), y: String(metrics.y + 60.5), 'text-anchor': 'middle',
+                    fill: status.text, 'font-size': '8.5', 'font-weight': '900'
                 }, status.label));
                 stage.appendChild(visual);
-
-                const detail = svgElementV10('g', {
-                    class: 'topology-stage-detail',
-                    role: 'button',
-                    tabindex: '0',
-                    'data-topology-detail-id': node.id,
-                    'aria-label': '查看' + ability.name + ' ' + formatLevelV10(node.level) + ' ' + node.definition + '的能力详情'
-                });
-                detail.appendChild(svgElementV10('rect', {
-                    x: String(metrics.x + metrics.width - 102), y: String(metrics.y + 62), width: '94', height: '48', rx: '10',
-                    fill: 'transparent', stroke: 'transparent'
-                }));
-                detail.appendChild(svgElementV10('rect', {
-                    class: 'topology-stage-detail-visual',
-                    x: String(metrics.x + metrics.width - 96), y: String(metrics.y + 70), width: '84', height: '32', rx: '9',
-                    fill: selected ? '#EDF3FF' : '#FFFFFF', stroke: selected ? '#BFD0FF' : '#DCE4EF', 'stroke-width': '1'
-                }));
-                detail.appendChild(svgElementV10('text', {
-                    x: String(metrics.x + metrics.width - 54), y: String(metrics.y + 91), 'text-anchor': 'middle',
-                    fill: selected ? '#1F5FFF' : '#526174', 'font-size': '10', 'font-weight': '900', 'pointer-events': 'none'
-                }, '查看详情'));
-                stage.appendChild(detail);
                 parent.appendChild(stage);
             }
 
             function updateTopologyContextV129(selectedNode, graph) {
-                const ability = abilityForNodeV10(selectedNode);
+                const naming = nodeNamingV137(selectedNode);
                 const cycleCount = detectRelationshipCycleEdgeIdsV10(graph.edges).size;
-                topologyRootTitleV127.textContent = ability.name + ' ' + formatLevelV10(selectedNode.level) + ' · ' + selectedNode.definition;
+                topologyRootTitleV127.textContent = naming.canonical;
                 topologyContextLabelV10.textContent = '';
                 topologyResetButtonV10.hidden = stateV10.topologySelectedNodeId === stateV10.topologyEntryNodeId;
-                topologySvgV10.setAttribute('aria-label', '以' + ability.name + formatLevelV10(selectedNode.level) + selectedNode.definition + '为中心的完整有向依赖图，共' + graph.nodes.length + '个相关节点、' + graph.edges.length + '条真实关系' + (cycleCount ? '，其中' + cycleCount + '条位于循环链路' : '') + '；箭头统一指向后续能力；点按其他节点可设为当前能力');
+                topologySvgV10.setAttribute('aria-label', '以' + naming.canonical + '为中心的完整有向依赖图，共' + graph.nodes.length + '个相关节点、' + graph.edges.length + '条真实关系' + (cycleCount ? '，其中' + cycleCount + '条位于循环链路' : '') + '；箭头统一指向后续能力；点按节点可同步切换能力详情与依赖根节点');
             }
 
             function drawTopologyLayoutV129(layout, graph, selectedNode) {
@@ -5236,7 +5645,7 @@
                 dependencySectionV127.classList.toggle('is-global', globalMode);
                 dependencyDirectPanelV127.hidden = globalMode;
                 dependencyGlobalPanelV127.hidden = !globalMode;
-                dependencyModeLabelV127.textContent = globalMode ? '全局依赖' : '一级关系';
+                dependencyModeLabelV127.textContent = globalMode ? '全局依赖' : '直接依赖';
                 dependencyModeLabelV127.classList.toggle('is-global', globalMode);
                 document.getElementById('dependency-mode-button-text').textContent = globalMode ? '返回直接依赖' : '查看全局依赖';
                 document.getElementById('dependency-mode-button-icon').className = 'ph-bold ' + (globalMode ? 'ph-arrow-u-up-left' : 'ph-share-network') + ' text-[17px]';
@@ -5269,33 +5678,36 @@
 
             clearTopologyFocusV10 = function () {
                 if (!stateV10.topologyEntryNodeId || stateV10.topologySelectedNodeId === stateV10.topologyEntryNodeId) return;
-                stateV10.topologySelectedNodeId = stateV10.topologyEntryNodeId;
-                renderTopologyV10();
+                navigateTopologyNodeV136(stateV10.topologyEntryNodeId);
             };
 
             showTopologyGuidanceV10 = function () {
                 if (stateV10.topologyHintShown) return;
                 stateV10.topologyHintShown = true;
-                showTopologyMessageV10('拖动画布或缩放查看，点按节点可设为当前能力', 2800, false);
+                showTopologyMessageV10('拖动画布或缩放查看，点按节点可切换能力与依赖根节点', 2800, false);
             };
 
             announceTopologyFocusV10 = function () {
                 const selectedNode = levelNodeByIdV10(stateV10.topologySelectedNodeId);
                 if (!selectedNode) return;
                 const graph = collectGlobalDependencyGraphV129(selectedNode.id);
-                if (graph.edges.length === 0) showTopologyMessageV10('该能力暂无跨主线依赖', 2200, false);
-                else hideTopologyHintV10();
+                if (graph.edges.length === 0) {
+                    showTopologyMessageV10('该能力暂无跨主线依赖', 2200, false);
+                    return;
+                }
+                const ability = abilityForNodeV10(selectedNode);
+                showTopologyMessageV10('正在查看 · ' + ability.name + ' ' + formatLevelV10(selectedNode.level), 1500, false);
             };
 
-            function openTopologyNodeDetailV127(nodeId) {
+            function navigateTopologyNodeV136(nodeId) {
                 const node = levelNodeByIdV10(nodeId);
                 if (!node) return;
                 const ability = abilityByIdV10(node.abilityId);
-                setDependencyModeV127('direct', true);
+                if (!ability) return;
                 animateDetailSelectionV10(ability, node, true, true);
             }
 
-            /* 13.2：局部一级关系以左前置 → 当前 → 右后续的真实有向关系条呈现。 */
+            /* 13.5：局部直接关系仅以左侧节点 → 当前 → 右侧节点的一跳有向摘要呈现。 */
             let localDependencyResizeObserverV132 = null;
             let localDependencyLineFrameV132 = 0;
 
@@ -5306,15 +5718,15 @@
 
             function localDependencyNodeMarkupV132(item) {
                 const node = item.node;
-                const ability = abilityForNodeV10(node);
+                const naming = nodeNamingV137(node);
                 const locked = node.studyState === 'locked';
                 const relationCopy = item.direction === 'incoming' ? '当前能力的直接前置' : '当前能力的直接后续';
-                const aria = '查看' + ability.name + ' ' + formatLevelV10(node.level) + '，' + relationCopy + (locked ? '，未解锁' : '');
+                const aria = '查看' + naming.canonical + '，' + relationCopy + (locked ? '，未解锁' : '');
                 return (
                     '<button type="button" data-jump-level-node="' + escapeHtmlV10(node.id) + '" data-local-dependency-node="' + escapeHtmlV10(item.direction) + '" class="local-dependency-node' + (locked ? ' is-locked' : '') + '" aria-label="' + escapeHtmlV10(aria) + '">' +
                         '<span class="local-dependency-node-copy">' +
-                            '<strong class="local-dependency-node-name">' + escapeHtmlV10(ability.name) + '</strong>' +
-                            '<span class="local-dependency-node-level">' + formatLevelV10(node.level) + '</span>' +
+                            '<strong class="local-dependency-node-name">' + escapeHtmlV10(naming.relationPrimary) + '</strong>' +
+                            '<span class="local-dependency-node-definition">' + escapeHtmlV10(naming.stage) + '</span>' +
                         '</span>' +
                         localDependencyLockMarkupV132(node) +
                     '</button>'
@@ -5322,13 +5734,15 @@
             }
 
             function localDependencyCurrentMarkupV132(node) {
-                const ability = abilityForNodeV10(node);
+                const naming = nodeNamingV137(node);
                 const locked = node.studyState === 'locked';
                 return (
-                    '<div class="local-dependency-current' + (locked ? ' is-locked' : '') + '" data-local-dependency-current role="group" aria-label="当前能力，' + escapeHtmlV10(ability.name) + ' ' + formatLevelV10(node.level) + (locked ? '，未解锁' : '') + '">' +
+                    '<div class="local-dependency-current' + (locked ? ' is-locked' : '') + '" data-local-dependency-current role="group" aria-label="当前能力，' + escapeHtmlV10(naming.canonical) + (locked ? '，未解锁' : '') + '">' +
                         '<span class="sr-only">当前能力</span>' +
-                        '<strong class="local-dependency-node-name">' + escapeHtmlV10(ability.name) + '</strong>' +
-                        '<span class="local-dependency-node-level">' + formatLevelV10(node.level) + '</span>' +
+                        '<span class="local-dependency-node-copy">' +
+                            '<strong class="local-dependency-node-name">' + escapeHtmlV10(naming.relationPrimary) + '</strong>' +
+                            '<span class="local-dependency-node-definition">' + escapeHtmlV10(naming.stage) + '</span>' +
+                        '</span>' +
                         localDependencyLockMarkupV132(node) +
                     '</div>'
                 );
@@ -5397,25 +5811,37 @@
                     return { x: rect.left - mapRect.left, y: rect.top - mapRect.top + rect.height / 2 };
                 });
 
-                function currentAnchorY(index, count) {
-                    if (count <= 1) return currentCenterY;
-                    const step = Math.min(14, Math.max(8, (currentRect.height - 24) / (count - 1)));
-                    return currentCenterY + (index - (count - 1) / 2) * step;
+                function appendVerticalTrunk(x, yValues) {
+                    if (yValues.length < 2) return;
+                    const minimumY = Math.min.apply(null, yValues);
+                    const maximumY = Math.max.apply(null, yValues);
+                    if (maximumY - minimumY < 0.1) return;
+                    appendLocalDependencyPathV132(layer, [{ x: x, y: minimumY }, { x: x, y: maximumY }], false);
                 }
 
-                incoming.forEach(function (start, index) {
-                    const end = { x: currentLeftX, y: currentAnchorY(index, incoming.length) };
-                    const laneRatio = incoming.length <= 1 ? 0.5 : 0.38 + index / (incoming.length - 1) * 0.18;
-                    const laneX = start.x + (end.x - start.x) * laneRatio;
-                    appendLocalDependencyPathV132(layer, [start, { x: laneX, y: start.y }, { x: laneX, y: end.y }, end], true);
-                });
+                if (incoming.length) {
+                    const branchStartX = incoming[0].x;
+                    const availableWidth = Math.max(1, currentLeftX - branchStartX);
+                    const branchLength = Math.max(22, Math.min(32, availableWidth * 0.3));
+                    const trunkX = branchStartX + branchLength;
+                    incoming.forEach(function (start) {
+                        appendLocalDependencyPathV132(layer, [start, { x: trunkX, y: start.y }], false);
+                    });
+                    appendVerticalTrunk(trunkX, incoming.map(function (start) { return start.y; }).concat(currentCenterY));
+                    appendLocalDependencyPathV132(layer, [{ x: trunkX, y: currentCenterY }, { x: currentLeftX, y: currentCenterY }], true);
+                }
 
-                outgoing.forEach(function (end, index) {
-                    const start = { x: currentRightX, y: currentAnchorY(index, outgoing.length) };
-                    const laneRatio = outgoing.length <= 1 ? 0.5 : 0.38 + index / (outgoing.length - 1) * 0.18;
-                    const laneX = start.x + (end.x - start.x) * laneRatio;
-                    appendLocalDependencyPathV132(layer, [start, { x: laneX, y: start.y }, { x: laneX, y: end.y }, end], true);
-                });
+                if (outgoing.length) {
+                    const branchEndX = outgoing[0].x;
+                    const availableWidth = Math.max(1, branchEndX - currentRightX);
+                    const branchLength = Math.max(22, Math.min(32, availableWidth * 0.3));
+                    const trunkX = branchEndX - branchLength;
+                    appendLocalDependencyPathV132(layer, [{ x: currentRightX, y: currentCenterY }, { x: trunkX, y: currentCenterY }], false);
+                    appendVerticalTrunk(trunkX, outgoing.map(function (end) { return end.y; }).concat(currentCenterY));
+                    outgoing.forEach(function (end) {
+                        appendLocalDependencyPathV132(layer, [{ x: trunkX, y: end.y }, end], true);
+                    });
+                }
             }
 
             function scheduleLocalDependencyLinesV132() {
@@ -5451,15 +5877,13 @@
                 outgoing.sort(dependencySortV125);
                 document.getElementById('dependency-view').innerHTML = (
                     '<div class="local-dependency-scroll">' +
-                        '<div class="local-dependency-map" data-local-dependency-map aria-label="当前能力的直接一级跨主线有向关系">' +
+                        '<div class="local-dependency-map" data-local-dependency-map aria-label="当前能力的一跳直接跨主线关系；左侧节点指向当前能力，当前能力指向右侧节点">' +
                             '<svg class="local-dependency-lines" data-local-dependency-lines aria-hidden="true"></svg>' +
-                            '<section class="local-dependency-side is-incoming" aria-label="直接前置">' +
-                                '<h3 class="local-dependency-side-title">前置</h3>' +
+                            '<section class="local-dependency-side is-incoming" aria-label="左侧：当前能力的直接前置">' +
                                 '<div class="local-dependency-node-list">' + (incoming.length ? incoming.map(localDependencyNodeMarkupV132).join('') : localDependencyEmptyMarkupV132('无')) + '</div>' +
                             '</section>' +
                             localDependencyCurrentMarkupV132(node) +
-                            '<section class="local-dependency-side is-outgoing" aria-label="直接后续">' +
-                                '<h3 class="local-dependency-side-title">后续</h3>' +
+                            '<section class="local-dependency-side is-outgoing" aria-label="右侧：当前能力的直接后续">' +
                                 '<div class="local-dependency-node-list">' + (outgoing.length ? outgoing.map(localDependencyNodeMarkupV132).join('') : localDependencyEmptyMarkupV132('无')) + '</div>' +
                             '</section>' +
                         '</div>' +
@@ -5610,11 +6034,27 @@
             }
 
             function topologyLayeredLayoutV132(graph) {
-                const nodeWidth = 210;
-                const nodeHeight = 112;
-                const columnStep = 312;
-                const rowStep = 142;
+                const nodeWidth = 168;
+                const nodeHeight = 76;
+                const rowStep = 98;
                 const rankData = topologyRankDataV132(graph);
+                const routingPlan = topologyRoutingPlanV137(graph, rankData.rankById);
+                const channelCounts = new Map();
+                function reserveChannels(gapRank, count) {
+                    channelCounts.set(gapRank, (channelCounts.get(gapRank) || 0) + count);
+                }
+                routingPlan.corridorGroups.forEach(function (edges, key) {
+                    reserveChannels(Number(key.split(':')[0]), edges.length);
+                });
+                routingPlan.outer.forEach(function (record) {
+                    [record.edge.source, record.edge.target].forEach(function (nodeId) {
+                        const rank = rankData.rankById.get(nodeId) || 0;
+                        reserveChannels(record.side === 'right' ? rank : rank - 1, 1);
+                    });
+                });
+                const maximumChannelDemand = Math.max(1, ...Array.from(channelCounts.values()));
+                const corridorGap = Math.max(72, 24 + (maximumChannelDemand - 1) * 12);
+                const columnStep = nodeWidth + corridorGap;
                 const laneSlots = topologyLaneSlotsV132(graph, rankData.rankById);
                 const rawMetrics = new Map();
                 graph.nodes.forEach(function (node) {
@@ -5693,30 +6133,15 @@
                     cycleEdgeIds: rankData.cycleEdgeIds,
                     componentByNode: rankData.componentByNode,
                     bounds: bounds,
-                    layerCenters: layerCenters
+                    layerCenters: layerCenters,
+                    nodeWidth: nodeWidth,
+                    columnStep: columnStep,
+                    rankZeroX: shiftX
                 };
             }
 
             function appendTopologyLayerGuidesV132(parent, layout) {
-                const group = svgElementV10('g', { 'aria-hidden': 'true', 'pointer-events': 'none' });
-                Array.from(layout.layerCenters.keys()).sort(function (first, second) { return first - second; }).forEach(function (rank) {
-                    const centerX = layout.layerCenters.get(rank);
-                    const label = rank < 0 ? '上游 · ' + Math.abs(rank) : (rank > 0 ? '下游 · ' + rank : '当前所在层');
-                    group.appendChild(svgElementV10('line', {
-                        class: 'topology-layer-guide',
-                        x1: centerX,
-                        y1: layout.bounds.top - 48,
-                        x2: centerX,
-                        y2: layout.bounds.bottom + 48
-                    }));
-                    group.appendChild(svgElementV10('text', {
-                        class: 'topology-layer-label',
-                        x: centerX,
-                        y: layout.bounds.top - 68,
-                        'text-anchor': 'middle'
-                    }, label));
-                });
-                parent.appendChild(group);
+                // 13.5：列位置仅服务布局，不显示固定“上游 / 下游 / 当前层”语义。
             }
 
             function topologyFixedPortV132(metrics, side) {
@@ -5823,40 +6248,77 @@
                 return crossings;
             }
 
-            function topologyRouteDescriptorsV133(graph, layout, rootNodeId) {
-                const forward = [];
-                const outer = [];
+            function topologyRoutingPlanV137(graph, rankById) {
+                const corridorGroups = new Map();
+                const outerEdges = [];
                 graph.edges.forEach(function (edge) {
-                    const sourceRank = layout.rankById.get(edge.source) || 0;
-                    const targetRank = layout.rankById.get(edge.target) || 0;
-                    if (layout.cycleEdgeIds.has(edge.id) || targetRank <= sourceRank) outer.push(edge);
-                    else forward.push(edge);
+                    const sourceRank = rankById.get(edge.source) || 0;
+                    const targetRank = rankById.get(edge.target) || 0;
+                    const cycle = targetRank <= sourceRank;
+                    if (!cycle && targetRank === sourceRank + 1) {
+                        const key = sourceRank + ':' + targetRank;
+                        if (!corridorGroups.has(key)) corridorGroups.set(key, []);
+                        corridorGroups.get(key).push(edge);
+                        return;
+                    }
+                    outerEdges.push(edge);
                 });
-                forward.sort(function (first, second) {
-                    const firstTouchesRoot = first.source === rootNodeId || first.target === rootNodeId;
-                    const secondTouchesRoot = second.source === rootNodeId || second.target === rootNodeId;
-                    if (firstTouchesRoot !== secondTouchesRoot) return firstTouchesRoot ? -1 : 1;
-                    const firstSpan = (layout.rankById.get(first.target) || 0) - (layout.rankById.get(first.source) || 0);
-                    const secondSpan = (layout.rankById.get(second.target) || 0) - (layout.rankById.get(second.source) || 0);
-                    return firstSpan - secondSpan || first.id.localeCompare(second.id);
+                outerEdges.sort(function (first, second) {
+                    const firstSpan = Math.abs((rankById.get(first.target) || 0) - (rankById.get(first.source) || 0));
+                    const secondSpan = Math.abs((rankById.get(second.target) || 0) - (rankById.get(second.source) || 0));
+                    return secondSpan - firstSpan || first.id.localeCompare(second.id);
                 });
-                outer.sort(function (first, second) {
-                    const firstTouchesRoot = first.source === rootNodeId || first.target === rootNodeId;
-                    const secondTouchesRoot = second.source === rootNodeId || second.target === rootNodeId;
-                    return (firstTouchesRoot === secondTouchesRoot ? 0 : (firstTouchesRoot ? -1 : 1)) || first.id.localeCompare(second.id);
-                });
-                const descriptors = forward.map(function (edge) {
-                    return { edge: edge, kind: 'orthogonal', sourceSide: 'right', targetSide: 'left', outerIndex: -1 };
-                });
-                outer.forEach(function (edge, index) {
-                    const positive = index % 2 === 0;
-                    const side = positive ? 'right' : 'left';
-                    descriptors.push({
+                let upperLaneCount = 0;
+                let lowerLaneCount = 0;
+                const outer = outerEdges.map(function (edge, index) {
+                    const upper = index % 2 === 0;
+                    return {
                         edge: edge,
+                        side: upper ? 'right' : 'left',
+                        band: upper ? 'top' : 'bottom',
+                        laneIndex: upper ? upperLaneCount++ : lowerLaneCount++
+                    };
+                });
+                return { corridorGroups: corridorGroups, outer: outer };
+            }
+
+            function topologyRouteDescriptorsV133(graph, layout, rootNodeId) {
+                const plan = topologyRoutingPlanV137(graph, layout.rankById);
+                const descriptors = [];
+                Array.from(plan.corridorGroups.keys()).sort(function (first, second) {
+                    return Number(first.split(':')[0]) - Number(second.split(':')[0]);
+                }).forEach(function (key) {
+                    const edges = plan.corridorGroups.get(key).slice();
+                    edges.sort(function (first, second) {
+                        const firstSource = layout.metricsById.get(first.source);
+                        const secondSource = layout.metricsById.get(second.source);
+                        const firstTarget = layout.metricsById.get(first.target);
+                        const secondTarget = layout.metricsById.get(second.target);
+                        const firstMiddle = (firstSource.centerY + firstTarget.centerY) / 2;
+                        const secondMiddle = (secondSource.centerY + secondTarget.centerY) / 2;
+                        return firstMiddle - secondMiddle || firstSource.centerY - secondSource.centerY || firstTarget.centerY - secondTarget.centerY || first.id.localeCompare(second.id);
+                    });
+                    edges.forEach(function (edge, index) {
+                        descriptors.push({
+                            edge: edge,
+                            kind: 'corridor',
+                            sourceSide: 'right',
+                            targetSide: 'left',
+                            corridorKey: key,
+                            corridorIndex: index,
+                            corridorCount: edges.length,
+                            outerLaneIndex: -1
+                        });
+                    });
+                });
+                plan.outer.forEach(function (record) {
+                    descriptors.push({
+                        edge: record.edge,
                         kind: 'outer-loop',
-                        sourceSide: side,
-                        targetSide: side,
-                        outerIndex: index
+                        sourceSide: record.side,
+                        targetSide: record.side,
+                        outerBand: record.band,
+                        outerLaneIndex: record.laneIndex
                     });
                 });
                 return descriptors;
@@ -5889,8 +6351,11 @@
                     records.forEach(function (record, index) {
                         const metrics = layout.metricsById.get(record.nodeId);
                         const verticalSide = record.side === 'left' || record.side === 'right';
-                        const available = verticalSide ? metrics.height - 34 : metrics.width - 42;
-                        const step = records.length > 1 ? Math.min(18, available / (records.length - 1)) : 0;
+                        const dimension = verticalSide ? metrics.height : metrics.width;
+                        const step = records.length > 1 ? 12 : 0;
+                        const requiredHalfSpan = (records.length - 1) * step / 2;
+                        const availableHalfSpan = (dimension - 24) / 2;
+                        if (requiredHalfSpan > availableHalfSpan + 0.1) throw new Error(record.nodeId + '的固定锚点空间不足。');
                         const offset = (index - (records.length - 1) / 2) * step;
                         let point;
                         if (record.side === 'left') point = { x: metrics.x, y: metrics.centerY + offset };
@@ -5908,57 +6373,76 @@
                 return assignments;
             }
 
-            function topologyForwardRouteV132(descriptor, graph, layout, routed, ports) {
+            function topologyChannelAssignmentsV137(descriptors, layout, ports) {
+                const groups = new Map();
+                function addRecord(record) {
+                    if (!groups.has(record.gapRank)) groups.set(record.gapRank, []);
+                    groups.get(record.gapRank).push(record);
+                }
+                descriptors.forEach(function (descriptor) {
+                    const edge = descriptor.edge;
+                    if (descriptor.kind === 'corridor') {
+                        const sourceRank = layout.rankById.get(edge.source) || 0;
+                        const start = ports.get(edge.id + ':source').point;
+                        const end = ports.get(edge.id + ':target').point;
+                        addRecord({ key: edge.id + ':corridor', gapRank: sourceRank, y: (start.y + end.y) / 2, edgeId: edge.id });
+                        return;
+                    }
+                    ['source', 'target'].forEach(function (endpoint) {
+                        const nodeId = edge[endpoint];
+                        const rank = layout.rankById.get(nodeId) || 0;
+                        const side = endpoint === 'source' ? descriptor.sourceSide : descriptor.targetSide;
+                        addRecord({
+                            key: edge.id + ':' + endpoint + '-channel',
+                            gapRank: side === 'right' ? rank : rank - 1,
+                            y: ports.get(edge.id + ':' + endpoint).point.y,
+                            edgeId: edge.id,
+                            endpoint: endpoint
+                        });
+                    });
+                });
+                const assignments = new Map();
+                groups.forEach(function (records, gapRank) {
+                    records.sort(function (first, second) {
+                        return first.y - second.y || first.edgeId.localeCompare(second.edgeId) || String(first.endpoint || '').localeCompare(String(second.endpoint || ''));
+                    });
+                    const gapLeft = layout.rankZeroX + gapRank * layout.columnStep + layout.nodeWidth / 2;
+                    const gapWidth = layout.columnStep - layout.nodeWidth;
+                    records.forEach(function (record, index) {
+                        const x = gapLeft + gapWidth / 2 + (index - (records.length - 1) / 2) * 12;
+                        if (x < gapLeft + 11.9 || x > gapLeft + gapWidth - 11.9) throw new Error('依赖通道未保留 12px 节点间距。');
+                        assignments.set(record.key, { x: x, index: index, count: records.length, gapRank: gapRank });
+                    });
+                });
+                return assignments;
+            }
+
+            function topologyForwardRouteV132(descriptor, graph, layout, routed, ports, channels) {
                 const edge = descriptor.edge;
                 const startRecord = ports.get(edge.id + ':source');
                 const endRecord = ports.get(edge.id + ':target');
                 const start = startRecord.point;
                 const end = endRecord.point;
-                const gap = Math.max(64, end.x - start.x);
-                const maximumChannelOffset = Math.max(28, (gap - 20) / 2);
-                const sourceOffset = Math.min(28 + startRecord.index * 7, maximumChannelOffset);
-                const targetOffset = Math.min(28 + endRecord.index * 7, maximumChannelOffset);
-                const sourceChannelX = start.x + sourceOffset;
-                const targetChannelX = end.x - targetOffset;
-                const middleChannelX = (sourceChannelX + targetChannelX) / 2;
-                const edgeIndex = Math.max(0, graph.edges.findIndex(function (item) { return item.id === edge.id; }));
-                const topLane = layout.bounds.top - 58 - (edgeIndex % 4) * 14;
-                const bottomLane = layout.bounds.bottom + 58 + (edgeIndex % 4) * 14;
-                const candidates = [];
-
-                function addCandidate(points, preference) {
-                    const compact = topologyCompactOrthogonalPointsV132(points);
-                    if (!topologyPathClearV132(compact, edge, layout.metricsById)) return;
-                    candidates.push({
-                        points: compact,
-                        score: topologyPathLengthV132(compact) + Math.max(0, compact.length - 2) * 18 + topologyProperCrossingsV132(compact, routed) * 220 + preference
-                    });
-                }
-
-                if (Math.abs(start.y - end.y) < 0.1) addCandidate([start, end], 0);
-                addCandidate([start, { x: targetChannelX, y: start.y }, { x: targetChannelX, y: end.y }, end], 4);
-                addCandidate([start, { x: sourceChannelX, y: start.y }, { x: sourceChannelX, y: end.y }, end], 8);
-                addCandidate([start, { x: middleChannelX, y: start.y }, { x: middleChannelX, y: end.y }, end], 12);
-                addCandidate([start, { x: sourceChannelX, y: start.y }, { x: sourceChannelX, y: topLane }, { x: targetChannelX, y: topLane }, { x: targetChannelX, y: end.y }, end], 120);
-                addCandidate([start, { x: sourceChannelX, y: start.y }, { x: sourceChannelX, y: bottomLane }, { x: targetChannelX, y: bottomLane }, { x: targetChannelX, y: end.y }, end], 120);
-                candidates.sort(function (first, second) { return first.score - second.score || first.points.length - second.points.length; });
-                const selected = candidates[0] || {
-                    points: topologyCompactOrthogonalPointsV132([start, { x: sourceChannelX, y: start.y }, { x: sourceChannelX, y: topLane }, { x: targetChannelX, y: topLane }, { x: targetChannelX, y: end.y }, end])
-                };
-                return { edge: edge, points: selected.points, d: topologyOrthogonalPathDataV132(selected.points), kind: descriptor.kind };
+                const laneX = channels.get(edge.id + ':corridor').x;
+                const points = topologyCompactOrthogonalPointsV132([
+                    start,
+                    { x: laneX, y: start.y },
+                    { x: laneX, y: end.y },
+                    end
+                ]);
+                if (!topologyPathClearV132(points, edge, layout.metricsById)) throw new Error(edge.id + '的独占走廊穿越节点。');
+                return { edge: edge, points: points, d: topologyOrthogonalPathDataV132(points), kind: descriptor.kind, laneIndex: descriptor.corridorIndex };
             }
 
-            function topologyOuterRouteV132(descriptor, layout, ports) {
+            function topologyOuterRouteV132(descriptor, layout, ports, channels) {
                 const edge = descriptor.edge;
                 const start = ports.get(edge.id + ':source').point;
                 const end = ports.get(edge.id + ':target').point;
-                const positive = descriptor.outerIndex % 2 === 0;
-                const laneIndex = Math.floor(descriptor.outerIndex / 2);
-                const direction = positive ? 1 : -1;
-                const laneY = positive ? layout.bounds.top - 62 - laneIndex * 24 : layout.bounds.bottom + 62 + laneIndex * 24;
-                const sourceChannelX = start.x + direction * (28 + laneIndex * 5);
-                let targetChannelX = end.x + direction * (28 + laneIndex * 5);
-                if (Math.abs(sourceChannelX - targetChannelX) < 0.1) targetChannelX += direction * 22;
+                const upper = descriptor.outerBand === 'top';
+                const laneIndex = descriptor.outerLaneIndex;
+                const laneY = upper ? layout.bounds.top - 56 - laneIndex * 16 : layout.bounds.bottom + 56 + laneIndex * 16;
+                const sourceChannelX = channels.get(edge.id + ':source-channel').x;
+                const targetChannelX = channels.get(edge.id + ':target-channel').x;
                 const points = [
                     start,
                     { x: sourceChannelX, y: start.y },
@@ -5968,17 +6452,19 @@
                     end
                 ];
                 const compact = topologyCompactOrthogonalPointsV132(points);
-                return { edge: edge, points: compact, d: topologyOrthogonalPathDataV132(compact), kind: descriptor.kind };
+                if (!topologyPathClearV132(compact, edge, layout.metricsById)) throw new Error(edge.id + '的独占外环穿越节点。');
+                return { edge: edge, points: compact, d: topologyOrthogonalPathDataV132(compact), kind: descriptor.kind, laneIndex: laneIndex };
             }
 
             function topologyRoutesV132(graph, layout, rootNodeId) {
                 const descriptors = topologyRouteDescriptorsV133(graph, layout, rootNodeId);
                 const ports = topologyPortAssignmentsV133(descriptors, layout);
+                const channels = topologyChannelAssignmentsV137(descriptors, layout, ports);
                 const routed = [];
                 descriptors.forEach(function (descriptor) {
                     const route = descriptor.kind === 'outer-loop'
-                        ? topologyOuterRouteV132(descriptor, layout, ports)
-                        : topologyForwardRouteV132(descriptor, graph, layout, routed, ports);
+                        ? topologyOuterRouteV132(descriptor, layout, ports, channels)
+                        : topologyForwardRouteV132(descriptor, graph, layout, routed, ports, channels);
                     routed.push(route);
                 });
                 return routed;
@@ -5987,8 +6473,8 @@
             function validateTopologyRoutesV133(graph, layout, routes) {
                 if (routes.length !== graph.edges.length) throw new Error('依赖路由数量不完整。');
                 const routedEdgeIds = new Set();
-                const sourceAnchors = new Map();
-                const targetAnchors = new Map();
+                const endpointAnchors = new Map();
+                const incomingArrowPoints = new Map();
                 function pointKey(point) {
                     return point.x.toFixed(2) + ':' + point.y.toFixed(2);
                 }
@@ -6014,8 +6500,10 @@
                     const start = route.points[0];
                     const end = route.points[route.points.length - 1];
                     if (!onNodeBoundary(start, sourceMetrics) || !onNodeBoundary(end, targetMetrics)) throw new Error(route.edge.id + '未连接固定节点锚点。');
-                    recordAnchor(sourceAnchors, route.edge.source, start);
-                    recordAnchor(targetAnchors, route.edge.target, end);
+                    recordAnchor(endpointAnchors, route.edge.source, start);
+                    recordAnchor(endpointAnchors, route.edge.target, end);
+                    if (!incomingArrowPoints.has(route.edge.target)) incomingArrowPoints.set(route.edge.target, []);
+                    incomingArrowPoints.get(route.edge.target).push(end);
                     route.points.forEach(function (point) {
                         if (point.x < 0 || point.x > layout.viewWidth || point.y < 0 || point.y > layout.viewHeight) throw new Error(route.edge.id + '超出关系画布。');
                     });
@@ -6026,6 +6514,49 @@
                         if (!orthogonal || topologySegmentHitsNodeV132(first, second, route.edge, layout.metricsById)) throw new Error(route.edge.id + '存在穿越节点的非连续路由。');
                     }
                 });
+
+                incomingArrowPoints.forEach(function (points, nodeId) {
+                    for (let firstIndex = 0; firstIndex < points.length; firstIndex += 1) {
+                        for (let secondIndex = firstIndex + 1; secondIndex < points.length; secondIndex += 1) {
+                            const distance = Math.hypot(points[firstIndex].x - points[secondIndex].x, points[firstIndex].y - points[secondIndex].y);
+                            if (distance < 11.5) throw new Error(nodeId + '的依赖箭头发生重叠。');
+                        }
+                    }
+                });
+
+                function routeSegments(route) {
+                    const segments = [];
+                    for (let index = 0; index < route.points.length - 1; index += 1) {
+                        const first = route.points[index];
+                        const second = route.points[index + 1];
+                        const horizontal = Math.abs(first.y - second.y) < 0.1;
+                        segments.push({
+                            horizontal: horizontal,
+                            fixed: horizontal ? first.y : first.x,
+                            minimum: horizontal ? Math.min(first.x, second.x) : Math.min(first.y, second.y),
+                            maximum: horizontal ? Math.max(first.x, second.x) : Math.max(first.y, second.y)
+                        });
+                    }
+                    return segments;
+                }
+
+                for (let firstRouteIndex = 0; firstRouteIndex < routes.length; firstRouteIndex += 1) {
+                    const firstSegments = routeSegments(routes[firstRouteIndex]);
+                    for (let secondRouteIndex = firstRouteIndex + 1; secondRouteIndex < routes.length; secondRouteIndex += 1) {
+                        const secondSegments = routeSegments(routes[secondRouteIndex]);
+                        firstSegments.forEach(function (firstSegment) {
+                            secondSegments.forEach(function (secondSegment) {
+                                if (firstSegment.horizontal !== secondSegment.horizontal) return;
+                                const overlap = Math.min(firstSegment.maximum, secondSegment.maximum) - Math.max(firstSegment.minimum, secondSegment.minimum);
+                                if (overlap <= 0.5) return;
+                                const separation = Math.abs(firstSegment.fixed - secondSegment.fixed);
+                                if (separation < 11.5) {
+                                    throw new Error(routes[firstRouteIndex].edge.id + '与' + routes[secondRouteIndex].edge.id + '存在小于 12px 的平行黏线。');
+                                }
+                            });
+                        });
+                    }
+                }
             }
 
             function appendTopologyPortsV132(stage, metrics) {
@@ -6063,12 +6594,9 @@
                 const defs = svgElementV10('defs');
                 appendTopologyMarkerV10(defs, 'topology-global-arrow-v133', '#8EA3C2', 8.5);
                 appendTopologyMarkerV10(defs, 'topology-global-arrow-v133-focus', '#1F5FFF', 8.5);
-                appendTopologyMarkerV10(defs, 'topology-global-arrow-v133-cycle', '#B45309', 8.5);
-                appendTopologyMarkerV10(defs, 'topology-global-arrow-v133-warning', '#C2410C', 8.5);
                 topologyViewportV10.appendChild(defs);
                 appendTopologyLayerGuidesV132(topologyViewportV10, layout);
 
-                const invalidCycleIds = invalidCycleEdgeIdsV10(graph.edges);
                 const routes = topologyRoutesV132(graph, layout, selectedNode.id);
                 validateTopologyRoutesV133(graph, layout, routes);
                 routes.sort(function (first, second) {
@@ -6081,14 +6609,20 @@
                 routes.forEach(function (route) {
                     const edge = route.edge;
                     const focused = edge.source === selectedNode.id || edge.target === selectedNode.id;
-                    const warning = invalidCycleIds.has(edge.id);
                     const cycle = layout.cycleEdgeIds.has(edge.id);
-                    const stroke = warning ? '#C2410C' : (cycle ? '#B45309' : (focused ? '#1F5FFF' : '#8EA3C2'));
-                    const marker = warning
-                        ? 'url(#topology-global-arrow-v133-warning)'
-                        : (cycle
-                            ? 'url(#topology-global-arrow-v133-cycle)'
-                            : (focused ? 'url(#topology-global-arrow-v133-focus)' : 'url(#topology-global-arrow-v133)'));
+                    const stroke = focused ? '#1F5FFF' : '#8EA3C2';
+                    const marker = focused ? 'url(#topology-global-arrow-v133-focus)' : 'url(#topology-global-arrow-v133)';
+                    edgeLayer.appendChild(svgElementV10('path', {
+                        d: route.d,
+                        fill: 'none',
+                        stroke: '#FFFFFF',
+                        'stroke-width': '5.5',
+                        'stroke-linecap': 'round',
+                        'stroke-linejoin': 'round',
+                        opacity: '0.96',
+                        'vector-effect': 'non-scaling-stroke',
+                        'data-topology-edge-halo': edge.id
+                    }));
                     const path = svgElementV10('path', {
                         d: route.d,
                         fill: 'none',
@@ -6102,11 +6636,13 @@
                         'data-topology-edge-id': edge.id,
                         'data-topology-edge-source': edge.source,
                         'data-topology-edge-target': edge.target,
-                        'data-route-kind': route.kind
+                        'data-route-kind': route.kind,
+                        'data-route-lane': String(route.laneIndex),
+                        'data-cycle-edge': cycle ? 'true' : 'false'
                     });
                     const sourceNode = levelNodeByIdV10(edge.source);
                     const targetNode = levelNodeByIdV10(edge.target);
-                    path.appendChild(svgElementV10('title', {}, abilityForNodeV10(sourceNode).name + ' ' + formatLevelV10(sourceNode.level) + ' 指向 ' + abilityForNodeV10(targetNode).name + ' ' + formatLevelV10(targetNode.level)));
+                    path.appendChild(svgElementV10('title', {}, nodeNamingV137(sourceNode).canonical + ' 指向 ' + nodeNamingV137(targetNode).canonical));
                     edgeLayer.appendChild(path);
                 });
                 topologyViewportV10.appendChild(edgeLayer);
@@ -6282,18 +6818,9 @@
             topologySvgV10.addEventListener('click', function (event) {
                 const element = event.target instanceof Element ? event.target : null;
                 if (!element) return;
-                const detailTarget = element.closest('[data-topology-detail-id]');
-                if (detailTarget) {
-                    openTopologyNodeDetailV127(detailTarget.dataset.topologyDetailId);
-                    return;
-                }
                 const stageTarget = element.closest('[data-topology-node-id]');
                 if (stageTarget) {
-                    const nodeId = stageTarget.dataset.topologyNodeId;
-                    if (stateV10.topologySelectedNodeId === nodeId) return;
-                    stateV10.topologySelectedNodeId = nodeId;
-                    renderTopologyV10();
-                    announceTopologyFocusV10();
+                    navigateTopologyNodeV136(stageTarget.dataset.topologyNodeId);
                     return;
                 }
                 hideTopologyHintV10();
@@ -6303,20 +6830,10 @@
                 if (event.key !== 'Enter' && event.key !== ' ') return;
                 const rawTarget = event.target instanceof Element ? event.target : null;
                 if (!rawTarget) return;
-                const detailTarget = rawTarget.closest('[data-topology-detail-id]');
-                if (detailTarget) {
-                    event.preventDefault();
-                    openTopologyNodeDetailV127(detailTarget.dataset.topologyDetailId);
-                    return;
-                }
                 const element = rawTarget.closest('[data-topology-node-id]');
                 if (!element) return;
                 event.preventDefault();
-                const nodeId = element.dataset.topologyNodeId;
-                if (stateV10.topologySelectedNodeId === nodeId) return;
-                stateV10.topologySelectedNodeId = nodeId;
-                renderTopologyV10();
-                announceTopologyFocusV10();
+                navigateTopologyNodeV136(element.dataset.topologyNodeId);
             });
 
             document.getElementById('overview-back-button').addEventListener('click', function () {
