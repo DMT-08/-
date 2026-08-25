@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 版本 13.7：删除未经确认的任务发布语义；任务卡固定收窄；统一能力阶段命名；全局依赖改为 12px 独占通道、多端口与跨层外环分流。 -->
+<!-- 版本 13.7：收敛学习任务语义与固定窄卡；恢复 12.6 顶部路由；依赖节点突出具体阶段内容；主线终点旗帜与目标阶段解耦；全局依赖使用 12px 多端口局部最短正交布线。 -->
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -1045,7 +1045,7 @@
             gap: 5px;
         }
 
-        .target-marker {
+        .mainline-end-marker {
             display: none;
             font-size: 11px;
         }
@@ -1086,7 +1086,7 @@
             box-shadow: none;
         }
 
-        .target-theme-c .mainline-node.role-target .target-marker {
+        .mainline-node.is-mainline-end .mainline-end-marker {
             display: inline-block;
         }
 
@@ -1452,21 +1452,20 @@
 
         .learning-task-action {
             display: inline-flex;
-            min-width: 102px;
+            width: 24px;
+            min-width: 24px;
             min-height: 44px;
             flex: 0 0 auto;
             align-items: center;
             justify-content: center;
-            gap: 5px;
-            border: 1px solid #C9D8FF;
-            border-radius: 10px;
-            background: #F5F8FF;
-            padding: 0 12px;
+            border: 0;
+            background: transparent;
+            padding: 0;
             color: #1F5FFF;
-            font-size: 13px;
+            font-size: 18px;
             font-weight: 850;
             line-height: 1;
-            transition: border-color 150ms ease, background-color 150ms ease;
+            transition: color 150ms ease, transform 150ms ease;
         }
 
         .learning-card:disabled .learning-task-title,
@@ -1475,8 +1474,6 @@
         }
 
         .learning-card:disabled .learning-task-action {
-            border-color: #E2E8F0;
-            background: #F1F5F9;
             color: #94A3B8;
         }
 
@@ -1576,8 +1573,10 @@
             }
 
             .learning-card:hover:not(:disabled) .learning-task-action {
-                border-color: #9EB8FF;
-                background: #EDF3FF;
+                border-color: transparent;
+                background: transparent;
+                color: #1F5FFF;
+                transform: translateX(2px);
             }
         }
 
@@ -2384,11 +2383,11 @@
         }
 
         .learning-task-action {
-            min-width: 88px;
+            width: 24px;
+            min-width: 24px;
             min-height: 44px;
-            border-radius: 9px;
-            padding-inline: 9px;
-            font-size: 12px;
+            padding-inline: 0;
+            font-size: 18px;
         }
 
         .learning-empty-state {
@@ -2498,7 +2497,7 @@
             box-shadow: 0 0 0 3px rgba(31, 95, 255, 0.035);
         }
 
-        /* 13.7：关系节点统一为“能力名 L等级”主行 + 阶段名次行。 */
+        /* 13.7：关系节点统一为“具体阶段内容”主行 + “能力线 · L等级”次行。 */
         .local-dependency-node-copy {
             flex: 1 1 auto;
             align-items: flex-start;
@@ -2508,6 +2507,7 @@
 
         .local-dependency-node-name {
             max-width: 100%;
+            font-size: 13px;
         }
 
         .local-dependency-node-definition {
@@ -2515,7 +2515,7 @@
             max-width: 100%;
             overflow: hidden;
             color: #7B8BA4;
-            font-size: 10px;
+            font-size: 10.5px;
             font-weight: 750;
             line-height: 1.2;
             text-overflow: ellipsis;
@@ -2575,9 +2575,11 @@
                     <i class="ph-bold ph-caret-left text-[20px]" aria-hidden="true"></i>
                 </button>
                 <div class="min-w-0">
-                    <nav aria-label="父级页面">
+                    <nav aria-label="面包屑">
                         <ol class="label-text flex items-center gap-1.5 font-extrabold tracking-[0.08em] text-brand">
                             <li><button id="detail-breadcrumb-overview" type="button" class="min-h-6 rounded-[6px] px-1 transition active:scale-95">英语能力</button></li>
+                            <li aria-hidden="true"><i class="ph-bold ph-caret-right text-[10px]"></i></li>
+                            <li aria-current="page">能力详情</li>
                         </ol>
                     </nav>
                     <h1 id="detail-header-title" class="page-title mt-0.5 truncate text-slate-950"></h1>
@@ -3066,7 +3068,8 @@
                     ability: ability.name,
                     level: level,
                     stage: node.definition,
-                    relationPrimary: ability.name + ' ' + level,
+                    relationPrimary: node.definition,
+                    relationSecondary: ability.name + ' · ' + level,
                     canonical: ability.name + ' · ' + level + ' · ' + node.definition
                 };
             }
@@ -3135,16 +3138,18 @@
                     const stateClass = ' state-' + node.studyState;
                     const nodeLabel = detailMode ? roleLabelV10(node) : overviewRoleLabelV10(node);
                     const naming = nodeNamingV137(node);
-                    const levelMarkup = '<span class="node-level-row"><span class="node-level">' + escapeHtmlV10(naming.level) + '</span><i class="target-marker ph-bold ph-flag" aria-hidden="true"></i></span>';
+                    const isMainlineEnd = index === ability.levels.length - 1;
+                    const endMarkerMarkup = isMainlineEnd ? '<i class="mainline-end-marker ph-bold ph-flag" aria-hidden="true"></i>' : '';
+                    const levelMarkup = '<span class="node-level-row"><span class="node-level">' + escapeHtmlV10(naming.level) + '</span>' + endMarkerMarkup + '</span>';
                     const currentBadgeMarkup = node.role === 'current' ? '<span class="node-current-badge">当前阶段</span>' : '';
                     const lockBadgeMarkup = node.studyState === 'locked' ? '<span class="node-lock-badge" aria-label="未解锁"><i class="ph-bold ph-lock-key" aria-hidden="true"></i></span>' : '';
                     const nodeStarsMarkup = detailMode || node.role === 'completed' ? starsMarkupV10(node.masteryStars) : '';
                     const nodeContent = currentBadgeMarkup + lockBadgeMarkup + levelMarkup + '<span class="node-caption">' + escapeHtmlV10(naming.stage) + '</span>' + nodeStarsMarkup;
                     const isViewed = detailMode && node.id === selectedNodeId;
-                    const aria = naming.canonical + '，' + nodeLabel + (isViewed ? '，正在查看' : '');
+                    const aria = naming.canonical + '，' + nodeLabel + (isMainlineEnd ? '，主线终点' : '') + (isViewed ? '，正在查看' : '');
                     markup +=
                         '<li>' +
-                            '<button type="button" data-level-node-id="' + escapeHtmlV10(node.id) + '" class="mainline-node role-' + node.role + stateClass + selectedClass + '" aria-label="' + escapeHtmlV10(aria) + '"' + (detailMode ? ' aria-pressed="' + (isViewed ? 'true' : 'false') + '"' : '') + '>' +
+                            '<button type="button" data-level-node-id="' + escapeHtmlV10(node.id) + '" class="mainline-node role-' + node.role + stateClass + (isMainlineEnd ? ' is-mainline-end' : '') + selectedClass + '" aria-label="' + escapeHtmlV10(aria) + '"' + (detailMode ? ' aria-pressed="' + (isViewed ? 'true' : 'false') + '"' : '') + '>' +
                                 nodeContent +
                             '</button>' +
                         '</li>';
@@ -3503,12 +3508,10 @@
                 }
 
                 document.getElementById('learning-grid').innerHTML = tasks.map(function (task) {
-                    const taskCompleted = task.status === 'completed';
-                    const disabled = !node.canStudy || taskCompleted;
+                    const disabled = !node.canStudy;
                     const actionLabel = learningTaskActionV127(task);
                     const statusLabel = task.status === 'in_progress' ? '，进行中' : (task.status === 'completed' ? '，已完成' : '');
                     const aria = actionLabel + '：' + task.title + '，任务类型' + task.form + statusLabel;
-                    const actionIcon = taskCompleted ? 'ph-check' : 'ph-caret-right';
                     return (
                         '<button type="button" data-learning-task-id="' + escapeHtmlV10(task.id) + '" data-learning-type="' + escapeHtmlV10(task.form) + '" data-learning-status="' + escapeHtmlV10(task.status) + '" class="learning-card group w-full active:scale-[0.95]"' + (disabled ? ' disabled aria-disabled="true"' : '') + ' aria-label="' + escapeHtmlV10(aria) + '">' +
                             '<span class="learning-task-leading">' +
@@ -3521,9 +3524,8 @@
                                     '<strong class="learning-task-title">' + escapeHtmlV10(task.title) + '</strong>' +
                                 '</span>' +
                             '</span>' +
-                            '<span class="learning-task-action">' +
-                                escapeHtmlV10(actionLabel) +
-                                '<i class="ph-bold ' + actionIcon + ' text-[13px]" aria-hidden="true"></i>' +
+                            '<span class="learning-task-action" aria-hidden="true">' +
+                                '<i class="ph-bold ph-caret-right"></i>' +
                             '</span>' +
                         '</button>'
                     );
@@ -5485,13 +5487,13 @@
                     'stroke-width': selected ? '2' : '1.4', 'stroke-dasharray': selected ? '' : palette.dash
                 }));
                 visual.appendChild(svgElementV10('text', {
-                    x: String(metrics.x + 10), y: String(metrics.y + 16), fill: selected ? '#1F5FFF' : '#64748B',
-                    'font-size': '10.5', 'font-weight': '900'
+                    x: String(metrics.x + 10), y: String(metrics.y + 21), fill: selected ? '#1746B2' : palette.text,
+                    'font-size': '13', 'font-weight': '900'
                 }, naming.relationPrimary));
                 visual.appendChild(svgElementV10('text', {
-                    x: String(metrics.x + 10), y: String(metrics.y + 37), fill: selected ? '#172033' : palette.text,
-                    'font-size': '12.5', 'font-weight': '900'
-                }, naming.stage));
+                    x: String(metrics.x + 10), y: String(metrics.y + 40), fill: selected ? '#315DCC' : '#64748B',
+                    'font-size': '10.5', 'font-weight': '800'
+                }, naming.relationSecondary));
                 const statusWidth = Math.min(78, Math.max(42, status.label.length * 8 + 12));
                 visual.appendChild(svgElementV10('rect', {
                     x: String(metrics.x + 10), y: String(metrics.y + 48), width: String(statusWidth), height: '18', rx: '6',
@@ -5726,7 +5728,7 @@
                     '<button type="button" data-jump-level-node="' + escapeHtmlV10(node.id) + '" data-local-dependency-node="' + escapeHtmlV10(item.direction) + '" class="local-dependency-node' + (locked ? ' is-locked' : '') + '" aria-label="' + escapeHtmlV10(aria) + '">' +
                         '<span class="local-dependency-node-copy">' +
                             '<strong class="local-dependency-node-name">' + escapeHtmlV10(naming.relationPrimary) + '</strong>' +
-                            '<span class="local-dependency-node-definition">' + escapeHtmlV10(naming.stage) + '</span>' +
+                            '<span class="local-dependency-node-definition">' + escapeHtmlV10(naming.relationSecondary) + '</span>' +
                         '</span>' +
                         localDependencyLockMarkupV132(node) +
                     '</button>'
@@ -5741,7 +5743,7 @@
                         '<span class="sr-only">当前能力</span>' +
                         '<span class="local-dependency-node-copy">' +
                             '<strong class="local-dependency-node-name">' + escapeHtmlV10(naming.relationPrimary) + '</strong>' +
-                            '<span class="local-dependency-node-definition">' + escapeHtmlV10(naming.stage) + '</span>' +
+                            '<span class="local-dependency-node-definition">' + escapeHtmlV10(naming.relationSecondary) + '</span>' +
                         '</span>' +
                         localDependencyLockMarkupV132(node) +
                     '</div>'
@@ -6036,7 +6038,7 @@
             function topologyLayeredLayoutV132(graph) {
                 const nodeWidth = 168;
                 const nodeHeight = 76;
-                const rowStep = 98;
+                const rowStep = 116;
                 const rankData = topologyRankDataV132(graph);
                 const routingPlan = topologyRoutingPlanV137(graph, rankData.rankById);
                 const channelCounts = new Map();
@@ -6456,18 +6458,274 @@
                 return { edge: edge, points: compact, d: topologyOrthogonalPathDataV132(compact), kind: descriptor.kind, laneIndex: laneIndex };
             }
 
-            function topologyRoutesV132(graph, layout, rootNodeId) {
-                const descriptors = topologyRouteDescriptorsV133(graph, layout, rootNodeId);
-                const ports = topologyPortAssignmentsV133(descriptors, layout);
-                const channels = topologyChannelAssignmentsV137(descriptors, layout, ports);
-                const routed = [];
-                descriptors.forEach(function (descriptor) {
-                    const route = descriptor.kind === 'outer-loop'
-                        ? topologyOuterRouteV132(descriptor, layout, ports, channels)
-                        : topologyForwardRouteV132(descriptor, graph, layout, routed, ports, channels);
-                    routed.push(route);
+            function topologyPortPointV137(metrics, side, offset) {
+                if (side === 'left') return { x: metrics.x, y: metrics.centerY + offset };
+                if (side === 'right') return { x: metrics.x + metrics.width, y: metrics.centerY + offset };
+                if (side === 'top') return { x: metrics.centerX + offset, y: metrics.y };
+                return { x: metrics.centerX + offset, y: metrics.y + metrics.height };
+            }
+
+            function topologyAvailablePortV137(nodeId, metrics, side, usedPorts) {
+                const offsets = [0, -12, 12, -24, 24];
+                for (let index = 0; index < offsets.length; index += 1) {
+                    const key = nodeId + ':' + side + ':' + index;
+                    if (!usedPorts.has(key)) return { key: key, side: side, point: topologyPortPointV137(metrics, side, offsets[index]), slotIndex: index };
+                }
+                return null;
+            }
+
+            function topologySidePairsV137(sourceMetrics, targetMetrics) {
+                const horizontal = Math.abs(targetMetrics.centerX - sourceMetrics.centerX) >= Math.abs(targetMetrics.centerY - sourceMetrics.centerY);
+                if (horizontal && targetMetrics.centerX >= sourceMetrics.centerX) {
+                    return [['right', 'left'], ['right', 'top'], ['right', 'bottom'], ['top', 'left'], ['bottom', 'left'], ['top', 'top'], ['bottom', 'bottom']];
+                }
+                if (horizontal) {
+                    return [['left', 'right'], ['left', 'top'], ['left', 'bottom'], ['top', 'right'], ['bottom', 'right'], ['top', 'top'], ['bottom', 'bottom']];
+                }
+                if (targetMetrics.centerY >= sourceMetrics.centerY) {
+                    return [['bottom', 'top'], ['right', 'right'], ['left', 'left'], ['bottom', 'left'], ['bottom', 'right'], ['left', 'top'], ['right', 'top']];
+                }
+                return [['top', 'bottom'], ['right', 'right'], ['left', 'left'], ['top', 'left'], ['top', 'right'], ['left', 'bottom'], ['right', 'bottom']];
+            }
+
+            function topologyRoutingLanesV137(layout) {
+                const xValues = new Set();
+                const yValues = new Set();
+                const ranks = Array.from(layout.layerCenters.keys());
+                const minimumRank = Math.min(...ranks);
+                const maximumRank = Math.max(...ranks);
+                const gapWidth = layout.columnStep - layout.nodeWidth;
+                for (let rank = minimumRank - 1; rank <= maximumRank; rank += 1) {
+                    const gapLeft = layout.rankZeroX + rank * layout.columnStep + layout.nodeWidth / 2;
+                    for (let offset = 12; offset <= gapWidth - 12 + 0.1; offset += 12) xValues.add(gapLeft + offset);
+                }
+                layout.metricsById.forEach(function (metrics) {
+                    xValues.add(metrics.x - 12);
+                    xValues.add(metrics.x + metrics.width + 12);
+                    yValues.add(metrics.y - 12);
+                    yValues.add(metrics.y + metrics.height + 12);
                 });
+                const yStart = Math.floor((layout.bounds.top - 36) / 12) * 12;
+                const yEnd = Math.ceil((layout.bounds.bottom + 36) / 12) * 12;
+                for (let y = yStart; y <= yEnd; y += 12) yValues.add(y);
+                return {
+                    x: Array.from(xValues).filter(function (value) { return value > 0 && value < layout.viewWidth; }).sort(function (first, second) { return first - second; }),
+                    y: Array.from(yValues).filter(function (value) { return value > 0 && value < layout.viewHeight; }).sort(function (first, second) { return first - second; })
+                };
+            }
+
+            function topologyPortDirectionValidV137(side, first, second, source) {
+                const deltaX = second.x - first.x;
+                const deltaY = second.y - first.y;
+                if (source) {
+                    if (side === 'right') return deltaX > 0.1 && Math.abs(deltaY) < 0.1;
+                    if (side === 'left') return deltaX < -0.1 && Math.abs(deltaY) < 0.1;
+                    if (side === 'top') return deltaY < -0.1 && Math.abs(deltaX) < 0.1;
+                    return deltaY > 0.1 && Math.abs(deltaX) < 0.1;
+                }
+                if (side === 'left') return deltaX > 0.1 && Math.abs(deltaY) < 0.1;
+                if (side === 'right') return deltaX < -0.1 && Math.abs(deltaY) < 0.1;
+                if (side === 'top') return deltaY > 0.1 && Math.abs(deltaX) < 0.1;
+                return deltaY < -0.1 && Math.abs(deltaX) < 0.1;
+            }
+
+            function topologySegmentHitsMetricsV137(first, second, metrics, padding) {
+                const horizontal = Math.abs(first.y - second.y) < 0.1;
+                const vertical = Math.abs(first.x - second.x) < 0.1;
+                if (!horizontal && !vertical) return true;
+                const left = metrics.x - padding;
+                const right = metrics.x + metrics.width + padding;
+                const top = metrics.y - padding;
+                const bottom = metrics.y + metrics.height + padding;
+                if (horizontal) {
+                    return first.y > top && first.y < bottom && Math.max(first.x, second.x) > left && Math.min(first.x, second.x) < right;
+                }
+                return first.x > left && first.x < right && Math.max(first.y, second.y) > top && Math.min(first.y, second.y) < bottom;
+            }
+
+            function topologyCandidatePathClearV137(points, edge, layout) {
+                for (let segmentIndex = 0; segmentIndex < points.length - 1; segmentIndex += 1) {
+                    let blocked = false;
+                    layout.metricsById.forEach(function (metrics, nodeId) {
+                        if (blocked) return;
+                        if (nodeId === edge.source && segmentIndex === 0) return;
+                        if (nodeId === edge.target && segmentIndex === points.length - 2) return;
+                        if (topologySegmentHitsMetricsV137(points[segmentIndex], points[segmentIndex + 1], metrics, 12)) blocked = true;
+                    });
+                    if (blocked) return false;
+                }
+                return true;
+            }
+
+            function topologyCandidateConflictV137(points, routed) {
+                let crossings = 0;
+                for (let firstIndex = 0; firstIndex < points.length - 1; firstIndex += 1) {
+                    const firstStart = points[firstIndex];
+                    const firstEnd = points[firstIndex + 1];
+                    const firstHorizontal = Math.abs(firstStart.y - firstEnd.y) < 0.1;
+                    for (let routeIndex = 0; routeIndex < routed.length; routeIndex += 1) {
+                        const route = routed[routeIndex];
+                        for (let secondIndex = 0; secondIndex < route.points.length - 1; secondIndex += 1) {
+                            const secondStart = route.points[secondIndex];
+                            const secondEnd = route.points[secondIndex + 1];
+                            const secondHorizontal = Math.abs(secondStart.y - secondEnd.y) < 0.1;
+                            if (firstHorizontal === secondHorizontal) {
+                                const firstFixed = firstHorizontal ? firstStart.y : firstStart.x;
+                                const secondFixed = secondHorizontal ? secondStart.y : secondStart.x;
+                                const firstMinimum = firstHorizontal ? Math.min(firstStart.x, firstEnd.x) : Math.min(firstStart.y, firstEnd.y);
+                                const firstMaximum = firstHorizontal ? Math.max(firstStart.x, firstEnd.x) : Math.max(firstStart.y, firstEnd.y);
+                                const secondMinimum = secondHorizontal ? Math.min(secondStart.x, secondEnd.x) : Math.min(secondStart.y, secondEnd.y);
+                                const secondMaximum = secondHorizontal ? Math.max(secondStart.x, secondEnd.x) : Math.max(secondStart.y, secondEnd.y);
+                                const overlap = Math.min(firstMaximum, secondMaximum) - Math.max(firstMinimum, secondMinimum);
+                                if (overlap > 0.5 && Math.abs(firstFixed - secondFixed) < 11.5) return { conflict: true, crossings: crossings };
+                                continue;
+                            }
+                            const horizontalStart = firstHorizontal ? firstStart : secondStart;
+                            const horizontalEnd = firstHorizontal ? firstEnd : secondEnd;
+                            const verticalStart = firstHorizontal ? secondStart : firstStart;
+                            const verticalEnd = firstHorizontal ? secondEnd : firstEnd;
+                            const crossX = verticalStart.x;
+                            const crossY = horizontalStart.y;
+                            if (crossX > Math.min(horizontalStart.x, horizontalEnd.x) + 1 && crossX < Math.max(horizontalStart.x, horizontalEnd.x) - 1 && crossY > Math.min(verticalStart.y, verticalEnd.y) + 1 && crossY < Math.max(verticalStart.y, verticalEnd.y) - 1) crossings += 1;
+                        }
+                    }
+                }
+                return { conflict: false, crossings: crossings };
+            }
+
+            function topologyEdgeBaselineV137(edge, layout) {
+                const source = layout.metricsById.get(edge.source);
+                const target = layout.metricsById.get(edge.target);
+                const horizontalGap = Math.max(0, Math.abs(target.centerX - source.centerX) - (source.width + target.width) / 2);
+                const verticalGap = Math.max(0, Math.abs(target.centerY - source.centerY) - (source.height + target.height) / 2);
+                return Math.max(44, horizontalGap + verticalGap);
+            }
+
+            function topologyCandidatePathsV137(startPort, endPort, lanes, layout, baseline) {
+                const start = startPort.point;
+                const end = endPort.point;
+                const horizontalStart = startPort.side === 'left' || startPort.side === 'right';
+                const horizontalEnd = endPort.side === 'left' || endPort.side === 'right';
+                const xMargin = Math.min(120, Math.max(48, baseline * 0.28));
+                const yMargin = Math.min(156, Math.max(60, baseline * 0.36));
+                const xLanes = lanes.x.filter(function (value) { return value >= Math.min(start.x, end.x) - xMargin && value <= Math.max(start.x, end.x) + xMargin; });
+                const yLanes = lanes.y.filter(function (value) { return value >= Math.min(start.y, end.y) - yMargin && value <= Math.max(start.y, end.y) + yMargin; });
+                const candidates = [];
+                const seen = new Set();
+                function add(points) {
+                    const compact = topologyCompactOrthogonalPointsV132(points);
+                    if (compact.length < 2 || compact.length - 2 > 3) return;
+                    const key = compact.map(function (point) { return point.x.toFixed(1) + ':' + point.y.toFixed(1); }).join('|');
+                    if (seen.has(key)) return;
+                    seen.add(key);
+                    candidates.push(compact);
+                }
+                if (horizontalStart && horizontalEnd) {
+                    if (Math.abs(start.y - end.y) < 0.1) add([start, end]);
+                    xLanes.forEach(function (x) { add([start, { x: x, y: start.y }, { x: x, y: end.y }, end]); });
+                } else if (!horizontalStart && !horizontalEnd) {
+                    if (Math.abs(start.x - end.x) < 0.1) add([start, end]);
+                    yLanes.forEach(function (y) { add([start, { x: start.x, y: y }, { x: end.x, y: y }, end]); });
+                } else if (horizontalStart) {
+                    add([start, { x: end.x, y: start.y }, end]);
+                    xLanes.forEach(function (x) {
+                        yLanes.forEach(function (y) { add([start, { x: x, y: start.y }, { x: x, y: y }, { x: end.x, y: y }, end]); });
+                    });
+                } else {
+                    add([start, { x: start.x, y: end.y }, end]);
+                    yLanes.forEach(function (y) {
+                        xLanes.forEach(function (x) { add([start, { x: start.x, y: y }, { x: x, y: y }, { x: x, y: end.y }, end]); });
+                    });
+                }
+                return candidates;
+            }
+
+            function topologyRouteAttemptV137(graph, layout, orderedEdges, lanes) {
+                const usedPorts = new Set();
+                const routed = [];
+                orderedEdges.forEach(function (edge) {
+                    const sourceMetrics = layout.metricsById.get(edge.source);
+                    const targetMetrics = layout.metricsById.get(edge.target);
+                    const baseline = topologyEdgeBaselineV137(edge, layout);
+                    const maximumLength = baseline * 2 + 12;
+                    const candidates = [];
+                    topologySidePairsV137(sourceMetrics, targetMetrics).forEach(function (sides, sidePriority) {
+                        const startPort = topologyAvailablePortV137(edge.source, sourceMetrics, sides[0], usedPorts);
+                        const endPort = topologyAvailablePortV137(edge.target, targetMetrics, sides[1], usedPorts);
+                        if (!startPort || !endPort || startPort.key === endPort.key) return;
+                        topologyCandidatePathsV137(startPort, endPort, lanes, layout, baseline).forEach(function (points) {
+                            if (!topologyPortDirectionValidV137(startPort.side, points[0], points[1], true)) return;
+                            if (!topologyPortDirectionValidV137(endPort.side, points[points.length - 2], points[points.length - 1], false)) return;
+                            if (!topologyCandidatePathClearV137(points, edge, layout)) return;
+                            const length = topologyPathLengthV132(points);
+                            if (length > maximumLength + 0.1) return;
+                            const relation = topologyCandidateConflictV137(points, routed);
+                            if (relation.conflict) return;
+                            candidates.push({
+                                points: points,
+                                length: length,
+                                bends: points.length - 2,
+                                crossings: relation.crossings,
+                                sidePriority: sidePriority,
+                                startPort: startPort,
+                                endPort: endPort
+                            });
+                        });
+                    });
+                    candidates.sort(function (first, second) {
+                        return first.length - second.length || first.crossings - second.crossings || first.bends - second.bends || first.sidePriority - second.sidePriority || first.startPort.slotIndex - second.startPort.slotIndex || first.endPort.slotIndex - second.endPort.slotIndex;
+                    });
+                    const selected = candidates[0];
+                    if (!selected) throw new Error(edge.id + '在 2 倍合理最短路径与 3 个折点内没有可用通道。');
+                    usedPorts.add(selected.startPort.key);
+                    usedPorts.add(selected.endPort.key);
+                    routed.push({
+                        edge: edge,
+                        points: selected.points,
+                        d: topologyOrthogonalPathDataV132(selected.points),
+                        kind: selected.bends === 0 ? 'direct' : 'local-orthogonal',
+                        laneIndex: selected.sidePriority,
+                        length: selected.length,
+                        bends: selected.bends
+                    });
+                });
+                validateTopologyRoutesV133(graph, layout, routed);
                 return routed;
+            }
+
+            function topologyRoutesV132(graph, layout, rootNodeId) {
+                const lanes = topologyRoutingLanesV137(layout);
+                const degree = new Map(graph.nodes.map(function (node) { return [node.id, 0]; }));
+                graph.edges.forEach(function (edge) {
+                    degree.set(edge.source, (degree.get(edge.source) || 0) + 1);
+                    degree.set(edge.target, (degree.get(edge.target) || 0) + 1);
+                });
+                const shortestFirst = graph.edges.slice().sort(function (first, second) {
+                    return topologyEdgeBaselineV137(first, layout) - topologyEdgeBaselineV137(second, layout) || first.id.localeCompare(second.id);
+                });
+                const busiestFirst = graph.edges.slice().sort(function (first, second) {
+                    const firstDegree = (degree.get(first.source) || 0) + (degree.get(first.target) || 0);
+                    const secondDegree = (degree.get(second.source) || 0) + (degree.get(second.target) || 0);
+                    return secondDegree - firstDegree || topologyEdgeBaselineV137(first, layout) - topologyEdgeBaselineV137(second, layout) || first.id.localeCompare(second.id);
+                });
+                const strategies = [shortestFirst, busiestFirst, graph.edges.slice()];
+                const successful = [];
+                let lastError = null;
+                strategies.forEach(function (orderedEdges) {
+                    try {
+                        const routes = topologyRouteAttemptV137(graph, layout, orderedEdges, lanes);
+                        successful.push({
+                            routes: routes,
+                            length: routes.reduce(function (sum, route) { return sum + route.length; }, 0),
+                            bends: routes.reduce(function (sum, route) { return sum + route.bends; }, 0)
+                        });
+                    } catch (error) {
+                        lastError = error;
+                    }
+                });
+                successful.sort(function (first, second) { return first.length - second.length || first.bends - second.bends; });
+                if (!successful.length) throw lastError || new Error('全局依赖图自动布线失败。');
+                return successful[0].routes;
             }
 
             function validateTopologyRoutesV133(graph, layout, routes) {
