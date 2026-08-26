@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<!-- 版本 14.6：学习任务处于未解锁或空状态时，任务网格切换为单列弹性通栏，消除 268px 固定列布局在右侧留下的空白；正常任务卡继续保持固定列与左对齐。 -->
+<!-- 版本 14.8：节点未返回掌握度时默认归零；未开始节点统一显示五颗灰星，不再以 1 星作为初始占位。 -->
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#EFF6FF">
-    <title>抖学 AI 能力模型 14.6 · 未解锁任务通栏修复</title>
+    <title>抖学 AI 能力模型 14.8 · 默认掌握度归零</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -2164,7 +2164,7 @@
                     targetLevelNodeId: 'communication-l3',
                     topologyOrder: 0,
                     levels: [
-                        { id: 'communication-l1', level: 1, definition: '常见问答', description: '能回应常见问题', masteryStars: 1, role: 'current', studyState: 'locked', canStudy: false },
+                        { id: 'communication-l1', level: 1, definition: '常见问答', description: '能回应常见问题', masteryStars: 0, role: 'current', studyState: 'locked', canStudy: false },
                         { id: 'communication-l2', level: 2, definition: '信息交换', description: '能在熟悉场景中交换基础信息', masteryStars: 0, role: 'upcoming', studyState: 'locked', canStudy: false },
                         { id: 'communication-l3', level: 3, definition: '任务协作', description: '能在真实场景中交换信息并完成基础协作', masteryStars: 0, role: 'target', studyState: 'locked', canStudy: false }
                     ]
@@ -2176,7 +2176,7 @@
                     targetLevelNodeId: 'pragmatics-l5',
                     topologyOrder: 0,
                     levels: [
-                        { id: 'pragmatics-l1', level: 1, definition: '场景识别', description: '能识别常见交流场景与基本意图', masteryStars: 1, role: 'current', studyState: 'locked', canStudy: false },
+                        { id: 'pragmatics-l1', level: 1, definition: '场景识别', description: '能识别常见交流场景与基本意图', masteryStars: 0, role: 'current', studyState: 'locked', canStudy: false },
                         { id: 'pragmatics-l2', level: 2, definition: '得体回应', description: '能根据对象和场景选择得体回应', masteryStars: 0, role: 'upcoming', studyState: 'locked', canStudy: false },
                         { id: 'pragmatics-l3', level: 3, definition: '语气切换', description: '能根据沟通目的调整语气与表达方式', masteryStars: 0, role: 'upcoming', studyState: 'locked', canStudy: false },
                         { id: 'pragmatics-l4', level: 4, definition: '含义判断', description: '能结合语境判断言外之意与表达分寸', masteryStars: 0, role: 'upcoming', studyState: 'locked', canStudy: false },
@@ -2204,7 +2204,7 @@
                     targetLevelNodeId: 'cycle-beta-l2',
                     topologyOrder: 1,
                     levels: [
-                        { id: 'cycle-beta-l1', level: 1, definition: '规则组合', description: '循环压力测试乙节点', masteryStars: 1, role: 'current', studyState: 'locked', canStudy: false },
+                        { id: 'cycle-beta-l1', level: 1, definition: '规则组合', description: '循环压力测试乙节点', masteryStars: 0, role: 'current', studyState: 'locked', canStudy: false },
                         { id: 'cycle-beta-l2', level: 2, definition: '乙线目标', description: '循环压力测试乙目标', masteryStars: 0, role: 'target', studyState: 'locked', canStudy: false }
                     ]
                 },
@@ -2215,7 +2215,7 @@
                     targetLevelNodeId: 'cycle-gamma-l2',
                     topologyOrder: 2,
                     levels: [
-                        { id: 'cycle-gamma-l1', level: 1, definition: '结果校验', description: '循环压力测试丙节点', masteryStars: 1, role: 'current', studyState: 'locked', canStudy: false },
+                        { id: 'cycle-gamma-l1', level: 1, definition: '结果校验', description: '循环压力测试丙节点', masteryStars: 0, role: 'current', studyState: 'locked', canStudy: false },
                         { id: 'cycle-gamma-l2', level: 2, definition: '丙线目标', description: '循环压力测试丙目标', masteryStars: 0, role: 'target', studyState: 'locked', canStudy: false }
                     ]
                 }
@@ -2230,6 +2230,7 @@
             const levelNodesV10 = [];
             abilitiesV10.forEach(function (ability) {
                 ability.levels.forEach(function (node) {
+                    if (node.masteryStars == null) node.masteryStars = 0;
                     node.abilityId = ability.id;
                     levelNodesV10.push(node);
                 });
@@ -2467,13 +2468,17 @@
             }
 
             function starsMarkupV10(value) {
-                if (!Number.isInteger(value) || value <= 0) return '';
-                let markup = '<span class="mini-stars" aria-label="已获得 ' + value + ' 星，共 5 星">';
+                if (!Number.isInteger(value) || value < 0 || value > 5) return '';
+                let markup = '<span class="mini-stars" aria-label="掌握度 ' + value + ' 星，共 5 星">';
                 for (let index = 1; index <= 5; index += 1) {
                     markup += '<i class="ph-fill ph-star' + (index <= value ? ' is-filled' : '') + '" aria-hidden="true"></i>';
                 }
                 markup += '</span>';
                 return markup;
+            }
+
+            function shouldShowMasteryStarsV147(node) {
+                return node.role === 'current' || node.studyState !== 'locked';
             }
 
             function connectorClassV10(previousNode, nextNode) {
@@ -2515,10 +2520,11 @@
                     const levelMarkup = '<span class="node-level-row"><span class="node-level">' + escapeHtmlV10(naming.level) + '</span>' + endMarkerMarkup + '</span>';
                     const currentBadgeMarkup = node.role === 'current' ? '<span class="node-current-badge">当前阶段</span>' : '';
                     const lockBadgeMarkup = node.studyState === 'locked' ? '<span class="node-lock-badge" aria-label="未解锁"><i class="ph-bold ph-lock-key" aria-hidden="true"></i></span>' : '';
-                    const nodeStarsMarkup = detailMode || node.role === 'completed' ? starsMarkupV10(node.masteryStars) : '';
+                    const nodeStarsMarkup = shouldShowMasteryStarsV147(node) ? starsMarkupV10(node.masteryStars) : '';
                     const nodeContent = currentBadgeMarkup + lockBadgeMarkup + levelMarkup + '<span class="node-caption">' + escapeHtmlV10(naming.stage) + '</span>' + nodeStarsMarkup;
                     const isViewed = detailMode && node.id === selectedNodeId;
-                    const aria = naming.canonical + '，' + nodeLabel + (isMainlineEnd ? '，主线终点' : '') + (isViewed ? '，正在查看' : '');
+                    const masteryAria = nodeStarsMarkup ? '，掌握度 ' + node.masteryStars + ' 星，共 5 星' : '';
+                    const aria = naming.canonical + '，' + nodeLabel + masteryAria + (isMainlineEnd ? '，主线终点' : '') + (isViewed ? '，正在查看' : '');
                     markup +=
                         '<li>' +
                             '<button type="button" data-level-node-id="' + escapeHtmlV10(node.id) + '" class="mainline-node role-' + node.role + stateClass + (isMainlineEnd ? ' is-mainline-end' : '') + selectedClass + '" aria-label="' + escapeHtmlV10(aria) + '"' + (detailMode ? ' aria-pressed="' + (isViewed ? 'true' : 'false') + '"' : '') + '>' +
@@ -2850,7 +2856,7 @@
                 Object.defineProperty(window, '__DOUXUE_DEPENDENCY_AUDIT__', {
                     configurable: true,
                     value: Object.freeze({
-                        version: '14.6',
+                        version: '14.8',
                         scenario: graphScenarioV136,
                         full: fullDependencyAuditV141,
                         nodeCount: levelNodesV10.length,
