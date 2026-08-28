@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<!-- 版本 17.8：学习任务补齐“未开始”状态；“进行中”统一使用主线当前阶段的黄色状态色。 -->
+<!-- 版本 17.9：音记、题库、游戏的原始 SVG 以 symbol/use 内嵌，移除三项本地图标路径。 -->
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#F8FAFD">
-    <title>抖学 AI 能力模型 17.8 · 学习任务三态标签</title>
+    <title>抖学 AI 能力模型 17.9 · 学习任务 SVG 单文件内嵌</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -2989,6 +2989,15 @@
             justify-content: center;
         }
 
+        /* 17.9：三项本地图标集中存放于零尺寸 SVG symbol 精灵，不参与页面布局。 */
+        .learning-task-symbol-sprite {
+            position: absolute;
+            width: 0;
+            height: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
         /* 16.7：四类任务图标共用同一容器规格；课堂使用老师与黑板组合语义。 */
         .task-learning-grid .learning-task-icon {
             width: 32px;
@@ -2996,7 +3005,8 @@
             border-radius: 9px;
         }
 
-        .task-learning-grid .learning-task-icon img {
+        .task-learning-grid .learning-task-icon img,
+        .task-learning-grid .learning-task-icon svg {
             display: block;
             width: 22px;
             height: 22px;
@@ -3011,7 +3021,8 @@
             line-height: 1;
         }
 
-        .learning-card:disabled .learning-task-icon img {
+        .learning-card:disabled .learning-task-icon img,
+        .learning-card:disabled .learning-task-icon svg {
             filter: grayscale(1);
             opacity: 0.48;
         }
@@ -3060,6 +3071,27 @@
     </style>
 </head>
 <body class="font-sans text-ink antialiased">
+    <svg class="learning-task-symbol-sprite" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false">
+        <symbol id="learning-task-icon-yinji" viewBox="0 0 30 30" fill="none">
+            <path d="M22.423 18.8791L23.872 17.4301C22.9377 16.4958 22.2106 15.4301 21.6905 14.2332C21.1705 13.0363 20.9105 11.7754 20.9105 10.4506C20.9105 9.12585 21.1705 7.86807 21.6905 6.67729C22.2106 5.4865 22.9377 4.42396 23.872 3.48966L22.423 1.99835C21.2984 3.12303 20.4214 4.41561 19.792 5.8761C19.1627 7.3366 18.848 8.86099 18.848 10.4493C18.848 12.0376 19.1627 13.5585 19.792 15.0119C20.4214 16.4653 21.2984 17.7544 22.423 18.8791ZM26.5639 14.6959L28.0129 13.2469C27.6436 12.8769 27.3503 12.4526 27.133 11.9739C26.9158 11.4951 26.8072 10.9869 26.8072 10.4493C26.8072 9.91163 26.9158 9.40343 27.133 8.9247C27.3503 8.44596 27.6436 8.02163 28.0129 7.6517L26.5639 6.18154C25.9875 6.75798 25.5402 7.40801 25.222 8.13164C24.9038 8.85527 24.7447 9.62077 24.7447 10.4281C24.7447 11.2355 24.9038 12.0088 25.2219 12.748C25.54 13.4872 25.9873 14.1365 26.5639 14.6959ZM10.3125 17.5305C8.98903 17.5305 7.8561 17.0603 6.91366 16.1198C5.97122 15.1793 5.5 14.0454 5.5 12.718C5.5 11.3906 5.97023 10.2567 6.91068 9.31627C7.85114 8.37581 8.98506 7.90559 10.3125 7.90559C11.6398 7.90559 12.7738 8.37581 13.7142 9.31627C14.6547 10.2567 15.1249 11.3906 15.1249 12.718C15.1249 14.0454 14.6537 15.1793 13.7112 16.1198C12.7688 17.0603 11.6359 17.5305 10.3125 17.5305ZM0 28.0016V24.9449C0 24.2504 0.177162 23.6215 0.531487 23.0583C0.885811 22.4951 1.38028 22.0592 2.01489 21.7507C3.1572 21.1813 4.43524 20.7058 5.84902 20.3242C7.26279 19.9425 8.75061 19.7517 10.3125 19.7517C11.8743 19.7517 13.3621 19.9425 14.7759 20.3242C16.1897 20.7058 17.4677 21.1813 18.61 21.7507C19.2446 22.0592 19.7391 22.4951 20.0934 23.0583C20.4477 23.6215 20.6249 24.2504 20.6249 24.9449V28.0016H0ZM2.06245 25.9391H18.5625V24.9449C18.5625 24.6311 18.4774 24.3623 18.3073 24.1384C18.1372 23.9145 17.9225 23.7321 17.6634 23.5911C16.8208 23.1609 15.7521 22.7573 14.4573 22.38C13.1625 22.0028 11.7809 21.8141 10.3125 21.8141C8.84403 21.8141 7.46243 22.0028 6.16763 22.38C4.87284 22.7573 3.80413 23.1609 2.9615 23.5911C2.70237 23.7321 2.48774 23.9145 2.31762 24.1384C2.14751 24.3623 2.06245 24.6311 2.06245 24.9449V25.9391ZM10.3125 15.468C11.0687 15.468 11.7161 15.1988 12.2546 14.6602C12.7932 14.1217 13.0624 13.4743 13.0624 12.718C13.0624 11.9618 12.7932 11.3144 12.2546 10.7758C11.7161 10.2373 11.0687 9.96804 10.3125 9.96804C9.5562 9.96804 8.9088 10.2373 8.37026 10.7758C7.83172 11.3144 7.56245 11.9618 7.56245 12.718C7.56245 13.4743 7.83172 14.1217 8.37026 14.6602C8.9088 15.1988 9.5562 15.468 10.3125 15.468Z" fill="#8B5CF6"/>
+        </symbol>
+        <symbol id="learning-task-icon-tiku" viewBox="0 0 30 30" fill="none">
+            <path d="M4.5 17.5V15.6251H13.25V17.5H4.5ZM4.5 12.5V10.6251H18.25V12.5H4.5ZM4.5 7.50002V5.62506H18.25V7.50002H4.5ZM15.2692 24.375V21.0721L22.0552 14.3173C22.2107 14.1619 22.3785 14.0525 22.5587 13.9892C22.7389 13.9259 22.9191 13.8943 23.0993 13.8943C23.2959 13.8943 23.486 13.9311 23.6697 14.0048C23.8533 14.0785 24.0203 14.1891 24.1706 14.3366L25.3268 15.5048C25.4615 15.6603 25.5656 15.8285 25.6393 16.0096C25.713 16.1907 25.7499 16.3718 25.7499 16.5529C25.7499 16.734 25.7163 16.9183 25.6489 17.1058C25.5816 17.2933 25.4743 17.4647 25.3268 17.6202L18.572 24.375H15.2692ZM16.7596 22.8846H17.9471L22.0048 18.8077L21.4302 18.2139L20.8485 17.6274L16.7596 21.6971V22.8846ZM21.4302 18.2139L20.8485 17.6274L22.0048 18.8077L21.4302 18.2139Z" fill="#3B82F6"/>
+        </symbol>
+        <symbol id="learning-task-icon-game" viewBox="0 0 35 35" fill="none">
+            <g clip-path="url(#clip0_1528_4764)">
+                <path d="M30.8305 9.26044C30.3355 8.76544 29.7505 8.51044 29.0455 8.51044H5.0455C4.3405 8.51044 3.7555 8.75044 3.2605 9.26044C2.7655 9.75544 2.5105 10.3404 2.5105 11.0454V23.0454C2.5105 23.7504 2.7505 24.3354 3.2605 24.8304C3.7555 25.3254 4.3405 25.5804 5.0455 25.5804H29.0455C29.7505 25.5804 30.3355 25.3404 30.8305 24.8304C31.3255 24.3354 31.5805 23.7504 31.5805 23.0454V11.0454C31.5805 10.3404 31.3405 9.75544 30.8305 9.26044ZM29.5105 22.7904C29.5105 23.1954 29.1805 23.5104 28.7905 23.5104H5.3005C4.8955 23.5104 4.5805 23.1804 4.5805 22.7904V11.3004C4.5805 10.8954 4.9105 10.5804 5.3005 10.5804H28.7905C29.1955 10.5804 29.5105 10.9104 29.5105 11.3004V22.7904Z" fill="#F97316"/>
+                <path d="M12.0805 13.0104H10.0105V16.0104H7.0105V18.0804H10.0105V21.0804H12.0805V18.0804H15.0805V16.0104H12.0805V13.0104Z" fill="#F97316"/>
+                <path d="M22.3705 17.7205H19.2205V20.8705H22.3705V17.7205Z" fill="#F97316"/>
+                <path d="M26.8705 13.2205H23.7205V16.3705H26.8705V13.2205Z" fill="#F97316"/>
+            </g>
+            <defs>
+                <clipPath id="clip0_1528_4764">
+                    <rect width="29.07" height="17.07" fill="white" transform="translate(2.5105 8.51044)"/>
+                </clipPath>
+            </defs>
+        </symbol>
+    </svg>
     <div id="overview-page" class="page-view is-active app-shell mx-auto flex-col overflow-hidden px-5 pt-5 pb-0">
         <header class="compact-page-header">
             <div class="compact-header-leading">
@@ -3453,9 +3485,9 @@
 
             // 16.7：课堂使用老师与黑板组合图标，避免被误读为屏幕、电视或视频播放。
             const learningTaskIconSetV165 = Object.freeze({
-                '音记': Object.freeze({ src: './icon/yinji.svg', tone: 'is-violet' }),
-                '题库': Object.freeze({ src: './icon/tiku.svg', tone: 'is-blue' }),
-                '游戏': Object.freeze({ src: './icon/game.svg', tone: 'is-orange' }),
+                '音记': Object.freeze({ symbolId: 'learning-task-icon-yinji', tone: 'is-violet' }),
+                '题库': Object.freeze({ symbolId: 'learning-task-icon-tiku', tone: 'is-blue' }),
+                '游戏': Object.freeze({ symbolId: 'learning-task-icon-game', tone: 'is-orange' }),
                 '课堂': Object.freeze({ phosphor: 'ph-chalkboard-teacher', tone: 'is-purple' })
             });
 
@@ -4260,7 +4292,7 @@
                 Object.defineProperty(window, '__DOUXUE_DEPENDENCY_AUDIT__', {
                     configurable: true,
                     value: Object.freeze({
-                        version: '17.8',
+                        version: '17.9',
                         scenario: graphScenarioV136,
                         full: fullDependencyAuditV141,
                         nodeCount: levelNodesV10.length,
@@ -4388,8 +4420,9 @@
             function learningTaskIconMarkupV165(task) {
                 const visual = learningTaskIconSetV165[task.form];
                 if (!visual) throw new Error('未配置任务类型图标：' + task.form);
-                const iconMarkup = visual.src
-                    ? '<img src="' + escapeHtmlV10(visual.src) + '" alt="" draggable="false">'
+                const symbolHref = visual.symbolId ? '#' + escapeHtmlV10(visual.symbolId) : '';
+                const iconMarkup = visual.symbolId
+                    ? '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false"><use href="' + symbolHref + '" xlink:href="' + symbolHref + '" width="100%" height="100%"></use></svg>'
                     : '<i class="ph ' + escapeHtmlV10(visual.phosphor) + '" aria-hidden="true"></i>';
                 return '<span class="learning-task-icon ' + escapeHtmlV10(visual.tone) + '" aria-hidden="true">' + iconMarkup + '</span>';
             }
