@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<!-- 版本 16.9：撤回学习中星组短线；首页恢复 15.9 的 9px 小星，学习中灰星增加 0.7px 低饱和深橙描边。 -->
+<!-- 版本 17.8：学习任务补齐“未开始”状态；“进行中”统一使用主线当前阶段的黄色状态色。 -->
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#F8FAFD">
-    <title>抖学 AI 能力模型 16.9 · 轻描边学习星级</title>
+    <title>抖学 AI 能力模型 17.8 · 学习任务三态标签</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -2931,18 +2931,22 @@
 
         }
 
-        /* 16.9：首页沿用 15.9 的轻盈比例；未获得星保持浅灰实心，学习中仅增加轻微深橙描边。 */
+        /* 17.7：首页沿用 15.9 的轻盈比例；描边星使用极浅灰实心与纯金描边，无描边星保持更深灰实心。 */
         .mini-stars .star-icon.is-unstarted,
         .mini-stars .star-icon.is-unearned {
-            --star-fill: #D7DFEA;
+            --star-fill: #C3CEDB;
             --star-stroke: transparent;
             --star-stroke-width: 0;
         }
 
         .mini-stars .star-icon.is-learning {
-            --star-fill: #D7DFEA;
-            --star-stroke: #A66F43;
-            --star-stroke-width: 0.7px;
+            --star-fill: #E4E9EF;
+            --star-stroke: #F5B000;
+            --star-stroke-width: 1.2px;
+        }
+
+        .mini-stars .star-icon.is-learning .star-icon__shape {
+            paint-order: fill stroke markers;
         }
 
         /* 跨主线直接关联复用同一星级规则；锁定节点只显示锁，不渲染星级。 */
@@ -3028,6 +3032,19 @@
             font-weight: 700;
             line-height: 1;
             white-space: nowrap;
+        }
+
+        /* 17.8：进行中与主线当前阶段共用同一套浅黄底、金色边框与深棕文字。 */
+        .task-learning-grid .learning-task-semantic.is-in-progress {
+            border-color: #F0C36A;
+            background: #FFF4CF;
+            color: #92400E;
+        }
+
+        .task-learning-grid .learning-task-semantic.is-not-started {
+            border-color: #D8E0EA;
+            background: #F1F5F9;
+            color: #64748B;
         }
 
         .task-learning-grid .learning-task-semantic.is-completed {
@@ -3798,10 +3815,12 @@
                 return isCurrentAvailableV164(node) || isCurrentLearningV164(node);
             }
 
-            function starStatusTextV165(node) {
-                if (!shouldShowMasteryStarsV165(node)) return '';
+            function starStatusTextV165(node, forceLearningOutline) {
+                const isForcedLearning = forceLearningOutline === true && isCurrentAvailableV164(node);
+                if (!isForcedLearning && !shouldShowMasteryStarsV165(node)) return '';
                 if (hasTeacherRatingV163(node)) return '老师已评分 ' + node.masteryStars + ' 星，共 5 星；已获得星使用状态色，剩余为灰色实心星';
-                if (isCurrentLearningV164(node)) return '正在学习，老师尚未评分，5 颗灰色实心星，每颗带轻微深橙色外描边';
+                if (isForcedLearning) return '学习中描边模拟，老师尚未评分，5 颗极浅灰色实心星，每颗带向内覆盖的加粗纯金色描边';
+                if (isCurrentLearningV164(node)) return '正在学习，老师尚未评分，5 颗极浅灰色实心星，每颗带向内覆盖的加粗纯金色描边；无描边星使用更深灰色';
                 return '刚解锁，尚未学习，5 颗灰色实心星';
             }
 
@@ -3809,12 +3828,13 @@
                 return '<svg class="star-icon ' + stateClass + '" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path class="star-icon__shape" d="M8 1.35 10.02 5.44 14.54 6.1 11.27 9.28 12.04 13.77 8 11.65 3.96 13.77 4.73 9.28 1.46 6.1 5.98 5.44Z" stroke-linejoin="round"></path></svg>';
             }
 
-            function starsMarkupV165(node) {
-                if (!shouldShowMasteryStarsV165(node)) return '';
+            function starsMarkupV165(node, forceLearningOutline) {
+                const isForcedLearning = forceLearningOutline === true && isCurrentAvailableV164(node);
+                if (!isForcedLearning && !shouldShowMasteryStarsV165(node)) return '';
                 const isRated = hasTeacherRatingV163(node);
-                const isLearning = isCurrentLearningV164(node);
+                const isLearning = isForcedLearning || isCurrentLearningV164(node);
                 const stateClass = isRated ? ' is-rated' : (isLearning ? ' is-learning-unrated' : ' is-unlearned');
-                let markup = '<span class="mini-stars' + stateClass + '" aria-label="' + escapeHtmlV10(starStatusTextV165(node)) + '">';
+                let markup = '<span class="mini-stars' + stateClass + '" aria-label="' + escapeHtmlV10(starStatusTextV165(node, isForcedLearning)) + '">';
                 for (let index = 1; index <= 5; index += 1) {
                     if (isRated && index <= node.masteryStars) {
                         markup += starSvgMarkupV165('is-earned');
@@ -4240,7 +4260,7 @@
                 Object.defineProperty(window, '__DOUXUE_DEPENDENCY_AUDIT__', {
                     configurable: true,
                     value: Object.freeze({
-                        version: '16.9',
+                        version: '17.8',
                         scenario: graphScenarioV136,
                         full: fullDependencyAuditV141,
                         nodeCount: levelNodesV10.length,
@@ -4382,10 +4402,13 @@
 
             function learningTaskSemanticMarkupV129(task) {
                 if (task.status === 'in_progress') {
-                    return '<span class="learning-task-semantic">进行中</span>';
+                    return '<span class="learning-task-semantic is-in-progress">进行中</span>';
                 }
                 if (task.status === 'completed') {
                     return '<span class="learning-task-semantic is-completed">已完成</span>';
+                }
+                if (task.status === 'not_started') {
+                    return '<span class="learning-task-semantic is-not-started">未开始</span>';
                 }
                 return '';
             }
@@ -4441,10 +4464,11 @@
                     const ability = abilityForNodeV10(item.node);
                     const naming = nodeNamingV137(item.node);
                     const stateClass = ' role-' + item.node.role + ' state-' + item.node.studyState;
-                    const starMarkup = starsMarkupV165(item.node);
+                    const simulateLearningOutline = node.id === 'vocabulary-l3' && item.node.id === 'sentence-l3';
+                    const starMarkup = starsMarkupV165(item.node, simulateLearningOutline);
                     const locked = item.node.studyState === 'locked';
                     const lockMarkup = locked ? '<span class="dependency-hint-lock" aria-hidden="true"><i class="ph-bold ph-lock-key"></i></span>' : '';
-                    const stateAria = starMarkup ? '，' + starStatusTextV165(item.node) : (locked ? '，未解锁' : '');
+                    const stateAria = starMarkup ? '，' + starStatusTextV165(item.node, simulateLearningOutline) : (locked ? '，未解锁' : '');
                     return '<button type="button" class="dependency-hint-item' + stateClass + '" data-cross-mainline-node="' + escapeHtmlV10(item.node.id) + '" aria-label="进入跨主线直接关联节点，' + escapeHtmlV10(naming.canonical + stateAria) + '"><span class="dependency-hint-node-label">' + escapeHtmlV10(ability.name + ' ' + formatLevelV10(item.node.level)) + '</span>' + starMarkup + lockMarkup + '</button>';
                 }).join('');
             }
@@ -4461,7 +4485,9 @@
                 learningGrid.innerHTML = tasks.map(function (task) {
                     const disabled = locked;
                     const actionLabel = learningTaskActionV127(task);
-                    const statusLabel = task.status === 'in_progress' ? '，进行中' : (task.status === 'completed' ? '，已完成' : '');
+                    const statusLabel = task.status === 'in_progress'
+                        ? '，进行中'
+                        : (task.status === 'completed' ? '，已完成' : (task.status === 'not_started' ? '，未开始' : ''));
                     const aria = (disabled ? '暂不可学习' : actionLabel) + '：' + task.title + '，任务类型' + task.form + statusLabel + (disabled ? '，节点未解锁' : '');
                     return (
                         '<button type="button" data-learning-task-id="' + escapeHtmlV10(task.id) + '" data-learning-type="' + escapeHtmlV10(task.form) + '" data-learning-status="' + escapeHtmlV10(task.status) + '" class="learning-card group w-full active:scale-[0.95]"' + (disabled ? ' disabled aria-disabled="true"' : '') + ' aria-label="' + escapeHtmlV10(aria) + '">' +
