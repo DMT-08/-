@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<!-- 版本 17.9：音记、题库、游戏的原始 SVG 以 symbol/use 内嵌，移除三项本地图标路径。 -->
+<!-- 版本 18.3：任务与依赖视图共享同一节点路由历史；视图切换不改历史，返回保持当前视图且历史耗尽后回到英语能力总览。 -->
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#F8FAFD">
-    <title>抖学 AI 能力模型 17.9 · 学习任务 SVG 单文件内嵌</title>
+    <title>抖学 AI 能力模型 18.3 · 统一路由历史与视图无损切换</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -2244,7 +2244,7 @@
         }
 
         .operation-path-button[aria-current="page"] {
-            color: #244A9D;
+            color: #1F5FFF;
             font-weight: 850;
         }
 
@@ -3154,7 +3154,7 @@
     <div id="topology-page" class="page-view app-shell mx-auto flex-col overflow-hidden px-5 pt-5 pb-0">
         <header class="compact-page-header">
             <div class="compact-header-leading">
-                <button id="topology-back-button" type="button" aria-label="返回任务视图" class="compact-header-back">
+                <button id="topology-back-button" type="button" aria-label="返回英语能力总览" class="compact-header-back">
                     <i class="ph-bold ph-caret-left text-[20px]" aria-hidden="true"></i>
                 </button>
                 <div class="compact-header-context">
@@ -3605,10 +3605,8 @@
                 selectedAbilityId: initialAbilityV136.id,
                 entryAbilityId: initialAbilityV136.id,
                 selectedLevelNodeId: initialLevelNodeIdV136,
-                detailNodeHistory: [],
-                topologySelectedNodeId: initialLevelNodeIdV136,
-                topologyEntryNodeId: initialLevelNodeIdV136,
-                topologyPath: []
+                nodeRouteHistory: [],
+                topologyEntryNodeId: initialLevelNodeIdV136
             };
 
             const pagesV10 = {
@@ -3699,7 +3697,71 @@
                 };
             }
 
-            /* 15.5：路由只读取真实点击记录；历史项使用访问索引，允许同一节点在不同访问位置重复出现。 */
+            /* 18.3：任务与依赖视图共用一份节点路由；只有节点变化与返回操作可以修改它。 */
+            function moveRouteToMostRecentV180(routeIds, nodeId) {
+                const nextRoute = routeIds.filter(function (routeId) { return routeId !== nodeId; });
+                if (nodeId) nextRoute.push(nodeId);
+                return nextRoute;
+            }
+
+            function normalizeUniqueRouteV180(routeIds) {
+                return routeIds.reduce(function (uniqueRoute, routeId) {
+                    return moveRouteToMostRecentV180(uniqueRoute, routeId);
+                }, []);
+            }
+
+            function validUniqueNodeRouteIdsV183() {
+                return normalizeUniqueRouteV180(
+                    stateV10.nodeRouteHistory.filter(function (nodeId) {
+                        return Boolean(levelNodeByIdV10(nodeId));
+                    })
+                );
+            }
+
+            function sharedNodeRouteNodesV183() {
+                return validUniqueNodeRouteIdsV183().map(levelNodeByIdV10).filter(Boolean);
+            }
+
+            function syncSelectedNodeV183(node) {
+                const ability = abilityForNodeV10(node);
+                if (!node || !ability) return false;
+                stateV10.selectedAbilityId = ability.id;
+                stateV10.selectedLevelNodeId = node.id;
+                return true;
+            }
+
+            function resetNodeRouteV183(node) {
+                if (!syncSelectedNodeV183(node)) return false;
+                stateV10.nodeRouteHistory = [node.id];
+                return true;
+            }
+
+            function clearNodeRouteV183() {
+                stateV10.nodeRouteHistory.length = 0;
+            }
+
+            function recordNodeRouteVisitV183(node) {
+                if (!node || node.id === stateV10.selectedLevelNodeId) return false;
+                stateV10.nodeRouteHistory = moveRouteToMostRecentV180(
+                    validUniqueNodeRouteIdsV183(),
+                    node.id
+                );
+                return true;
+            }
+
+            function previousNodeRouteV183() {
+                const routeNodes = sharedNodeRouteNodesV183();
+                return routeNodes.length > 1 ? routeNodes[routeNodes.length - 2] : null;
+            }
+
+            function takePreviousNodeRouteV183() {
+                const routeIds = validUniqueNodeRouteIdsV183();
+                if (routeIds.length <= 1) return null;
+                routeIds.pop();
+                stateV10.nodeRouteHistory = routeIds;
+                return levelNodeByIdV10(routeIds[routeIds.length - 1]);
+            }
+
             function operationPathNodeMarkupV150(record, kind, currentIndex, markCurrent) {
                 const naming = nodeNamingV137(record.node);
                 const current = markCurrent && record.index === currentIndex;
@@ -3763,41 +3825,28 @@
                 });
             }
 
-            function detailActualPathNodesV150() {
-                const history = stateV10.detailNodeHistory.map(levelNodeByIdV10).filter(Boolean);
-                stateV10.detailNodeHistory = history.map(function (node) { return node.id; });
-                const current = selectedNodeV10();
-                if (current && (!history.length || history[history.length - 1].id !== current.id)) history.push(current);
-                return history;
-            }
-
             function renderDetailPathV150() {
-                const actualPath = detailActualPathNodesV150();
-                const current = actualPath[actualPath.length - 1];
-                const visitedPath = current && current.id === stateV10.selectedLevelNodeId
-                    ? actualPath.slice(0, -1)
-                    : actualPath;
+                const actualPath = sharedNodeRouteNodesV183();
                 renderAdaptiveOperationPathV150(
                     detailPathNavV150,
                     detailPathListV150,
-                    visitedPath,
+                    actualPath,
                     'detail',
-                    { markCurrent: false }
+                    { markCurrent: true }
                 );
             }
 
             function navigateDetailPathV150(pathIndex) {
-                const nodes = detailActualPathNodesV150();
+                const nodes = sharedNodeRouteNodesV183();
                 const index = Number(pathIndex);
                 const target = Number.isInteger(index) ? nodes[index] : null;
                 if (!target || index === nodes.length - 1) return;
-                stateV10.detailNodeHistory = nodes.slice(0, index).map(function (node) { return node.id; });
                 if (target.id === stateV10.selectedLevelNodeId) {
                     renderDetailPathV150();
                     updateDetailBackButtonV10();
                     return;
                 }
-                animateDetailSelectionV10(abilityForNodeV10(target), target, true, false);
+                animateDetailSelectionV10(abilityForNodeV10(target), target, true, true);
             }
 
             function roleLabelV10(node) {
@@ -4380,35 +4429,13 @@
             function updateDetailBackButtonV10() {
                 const button = document.getElementById('detail-back-button');
                 if (!button) return;
-                const previousNodeId = stateV10.detailNodeHistory[stateV10.detailNodeHistory.length - 1];
-                const previousNode = levelNodeByIdV10(previousNodeId);
+                const previousNode = previousNodeRouteV183();
                 if (!previousNode) {
                     button.setAttribute('aria-label', '返回英语能力首页');
                     return;
                 }
                 const previousAbility = abilityForNodeV10(previousNode);
                 button.setAttribute('aria-label', '返回上一节点，' + previousAbility.name + ' ' + formatLevelV10(previousNode.level));
-            }
-
-            function clearDetailNodeHistoryV10() {
-                stateV10.detailNodeHistory.length = 0;
-                updateDetailBackButtonV10();
-            }
-
-            function recordCurrentDetailNodeV10() {
-                const currentNode = selectedNodeV10();
-                if (!currentNode) return;
-                const lastNodeId = stateV10.detailNodeHistory[stateV10.detailNodeHistory.length - 1];
-                if (lastNodeId !== currentNode.id) stateV10.detailNodeHistory.push(currentNode.id);
-                updateDetailBackButtonV10();
-            }
-
-            function takePreviousDetailNodeV10() {
-                while (stateV10.detailNodeHistory.length) {
-                    const previousNode = levelNodeByIdV10(stateV10.detailNodeHistory.pop());
-                    if (previousNode) return previousNode;
-                }
-                return null;
             }
 
             function dependencySortV125(first, second) {
@@ -4649,8 +4676,7 @@
             }
 
             function commitDetailSelectionV10(ability, node, resetScroll, smoothScroll, abilityChanged) {
-                stateV10.selectedAbilityId = ability.id;
-                stateV10.selectedLevelNodeId = node.id;
+                syncSelectedNodeV183(node);
                 if (abilityChanged) {
                     renderDetailV10();
                 } else {
@@ -4672,9 +4698,9 @@
                 if (!ability || !node) return;
                 const abilityChanged = ability.id !== stateV10.selectedAbilityId;
                 if (!abilityChanged && node.id === stateV10.selectedLevelNodeId) return;
-                if (recordHistory !== false) recordCurrentDetailNodeV10();
                 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
                 const direction = detailSwitchDirectionV10(ability, node);
+                if (recordHistory !== false) recordNodeRouteVisitV183(node);
                 resetDetailSwitchMotionV10();
                 const sequence = detailSwitchSequenceV10;
                 if (!window.gsap || reducedMotion) {
@@ -4720,7 +4746,7 @@
 
             function showPageV10(name) {
                 if (name !== 'detail') resetDetailSwitchMotionV10();
-                if (name === 'overview') clearDetailNodeHistoryV10();
+                if (name === 'overview') clearNodeRouteV183();
                 if (name !== 'topology' && stateV10.dependencyMode === 'global') setDependencyModeV127('direct', false);
                 Object.keys(pagesV10).forEach(function (pageName) {
                     pagesV10[pageName].classList.toggle('is-active', pageName === name);
@@ -4743,10 +4769,8 @@
                     animateDetailSelectionV10(ability, node, true, true);
                     return;
                 }
-                clearDetailNodeHistoryV10();
                 stateV10.entryAbilityId = ability.id;
-                stateV10.selectedAbilityId = ability.id;
-                stateV10.selectedLevelNodeId = node.id;
+                resetNodeRouteV183(node);
                 showPageV10('detail');
                 renderDetailV10();
                 revealSelectedDetailNodeV10(false);
@@ -4762,7 +4786,7 @@
             }
 
             function navigateBackFromDetailV10() {
-                const previousNode = takePreviousDetailNodeV10();
+                const previousNode = takePreviousNodeRouteV183();
                 if (!previousNode) {
                     showPageV10('overview');
                     return;
@@ -5599,7 +5623,7 @@
                 topologyRootTitleV127.textContent = naming.stage;
                 renderTopologyMainlineV160(selectedNode);
                 topologyResetButtonV10.hidden = true;
-                topologySvgV10.setAttribute('aria-label', '以' + naming.canonical + '为中心的完整有向依赖图，共' + graph.nodes.length + '个相关节点、' + graph.edges.length + '条真实关系' + (cycleCount ? '，其中' + cycleCount + '条位于循环链路' : '') + '；箭头统一指向后续能力；点按节点可切换依赖根节点并追加实际访问路径');
+                topologySvgV10.setAttribute('aria-label', '以' + naming.canonical + '为中心的完整有向依赖图，共' + graph.nodes.length + '个相关节点、' + graph.edges.length + '条真实关系' + (cycleCount ? '，其中' + cycleCount + '条位于循环链路' : '') + '；箭头统一指向后续能力；点按节点可切换依赖根节点并更新最近访问顺序');
             }
 
             function dependencyPanelEnterV127(panel) {
@@ -5630,18 +5654,13 @@
             }
 
             function renderTopologyPathV149() {
-                const validPath = stateV10.topologyPath.map(levelNodeByIdV10).filter(Boolean);
-                stateV10.topologyPath = validPath.map(function (node) { return node.id; });
-                const lastNode = validPath[validPath.length - 1];
-                const visitedPath = lastNode && lastNode.id === stateV10.topologySelectedNodeId
-                    ? validPath.slice(0, -1)
-                    : validPath;
+                const validPath = sharedNodeRouteNodesV183();
                 renderAdaptiveOperationPathV150(
                     topologyPathNavV149,
                     topologyPathListV149,
-                    visitedPath,
+                    validPath,
                     'topology',
-                    { markCurrent: false }
+                    { markCurrent: true }
                 );
                 updateTopologyBackButtonV162();
             }
@@ -5649,41 +5668,30 @@
             function updateTopologyBackButtonV162() {
                 const button = document.getElementById('topology-back-button');
                 if (!button) return;
-                const validPath = stateV10.topologyPath.map(levelNodeByIdV10).filter(Boolean);
-                const previousNode = validPath.length > 1 ? validPath[validPath.length - 2] : null;
+                const previousNode = previousNodeRouteV183();
                 if (!previousNode) {
-                    button.setAttribute('aria-label', '返回任务视图');
+                    button.setAttribute('aria-label', '返回英语能力总览');
                     return;
                 }
                 const previousAbility = abilityForNodeV10(previousNode);
                 button.setAttribute('aria-label', '返回上一访问节点，' + previousAbility.name + ' ' + formatLevelV10(previousNode.level));
             }
 
-            function appendTopologyPathV155(nodeId) {
-                const lastNodeId = stateV10.topologyPath[stateV10.topologyPath.length - 1];
-                if (lastNodeId === nodeId) return false;
-                stateV10.topologyPath.push(nodeId);
-                return true;
-            }
-
             function navigateTopologyPathV155(pathIndex) {
-                const validPath = stateV10.topologyPath.map(levelNodeByIdV10).filter(Boolean);
-                stateV10.topologyPath = validPath.map(function (node) { return node.id; });
+                const validPath = sharedNodeRouteNodesV183();
                 const index = Number(pathIndex);
                 const target = Number.isInteger(index) ? validPath[index] : null;
                 if (!target || index === validPath.length - 1) return;
-                const nodeChanged = target.id !== stateV10.topologySelectedNodeId;
-                stateV10.topologyPath = validPath.slice(0, index + 1).map(function (node) { return node.id; });
-                stateV10.topologySelectedNodeId = target.id;
+                const nodeChanged = target.id !== stateV10.selectedLevelNodeId;
+                recordNodeRouteVisitV183(target);
+                syncSelectedNodeV183(target);
                 renderTopologyPathV149();
                 if (nodeChanged) renderTopologyV10();
             }
 
             function openTopologyV10() {
                 const entryNode = selectedNodeV10() || levelNodesV10[0];
-                stateV10.topologySelectedNodeId = entryNode.id;
                 stateV10.topologyEntryNodeId = entryNode.id;
-                stateV10.topologyPath = [entryNode.id];
                 showPageV10('topology');
                 renderTopologyPathV149();
                 setDependencyModeV127('global', false);
@@ -5697,31 +5705,27 @@
             }
 
             function navigateBackFromTopologyV162() {
-                const validPath = stateV10.topologyPath.map(levelNodeByIdV10).filter(Boolean);
-                stateV10.topologyPath = validPath.map(function (node) { return node.id; });
-                if (validPath.length <= 1) {
-                    closeTopologyV149();
+                const previousNode = takePreviousNodeRouteV183();
+                if (!previousNode) {
+                    showPageV10('overview');
                     return;
                 }
-                validPath.pop();
-                const previousNode = validPath[validPath.length - 1];
-                stateV10.topologyPath = validPath.map(function (node) { return node.id; });
-                stateV10.topologySelectedNodeId = previousNode.id;
+                syncSelectedNodeV183(previousNode);
                 renderTopologyPathV149();
                 renderTopologyV10();
             }
 
             function clearTopologyFocusV10() {
-                if (!stateV10.topologyEntryNodeId || stateV10.topologySelectedNodeId === stateV10.topologyEntryNodeId) return;
+                if (!stateV10.topologyEntryNodeId || stateV10.selectedLevelNodeId === stateV10.topologyEntryNodeId) return;
                 navigateTopologyNodeV136(stateV10.topologyEntryNodeId);
             }
 
             function navigateTopologyNodeV136(nodeId) {
                 const node = levelNodeByIdV10(nodeId);
                 if (!node) return;
-                if (node.id === stateV10.topologySelectedNodeId) return;
-                appendTopologyPathV155(node.id);
-                stateV10.topologySelectedNodeId = node.id;
+                if (node.id === stateV10.selectedLevelNodeId) return;
+                recordNodeRouteVisitV183(node);
+                syncSelectedNodeV183(node);
                 renderTopologyPathV149();
                 renderTopologyV10();
             }
@@ -7547,10 +7551,10 @@
 
             function renderTopologyV10() {
                 if (stateV10.dependencyMode !== 'global') return;
-                let selectedNode = levelNodeByIdV10(stateV10.topologySelectedNodeId);
+                let selectedNode = selectedNodeV10();
                 if (!selectedNode) {
-                    selectedNode = selectedNodeV10() || levelNodesV10[0];
-                    stateV10.topologySelectedNodeId = selectedNode.id;
+                    selectedNode = levelNodesV10[0];
+                    syncSelectedNodeV183(selectedNode);
                 }
                 const graph = collectGlobalDependencyGraphV129(selectedNode.id);
                 updateTopologyContextV129(selectedNode, graph);
