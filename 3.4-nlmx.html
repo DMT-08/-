@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<!-- 版本 18.3：任务与依赖视图共享同一节点路由历史；视图切换不改历史，返回保持当前视图且历史耗尽后回到英语能力总览。 -->
+<!-- 版本 18.5：顶部路由以当前节点为中心连续展示；左右隐藏历史分别通过可交互省略号浮层查看和进入。 -->
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#F8FAFD">
-    <title>抖学 AI 能力模型 18.3 · 统一路由历史与视图无损切换</title>
+    <title>抖学 AI 能力模型 18.5 · 双向历史折叠与当前居中</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -2263,15 +2263,101 @@
 
         .operation-path-ellipsis {
             display: inline-flex;
-            min-width: 28px;
-            height: 28px;
+            min-width: 40px;
+            min-height: 44px;
             align-items: center;
             justify-content: center;
+            border: 0;
             border-radius: 7px;
+            background: transparent;
+            padding: 0 7px;
             color: #8291A8;
             font-size: 15px;
             font-weight: 900;
             letter-spacing: 0.08em;
+            touch-action: manipulation;
+            transition: transform 150ms ease, background-color 150ms ease, color 150ms ease;
+        }
+
+        .operation-path-ellipsis:active {
+            transform: scale(0.95);
+        }
+
+        .operation-path-ellipsis.is-open {
+            background: rgba(239, 246, 255, 0.94);
+            color: #1F5FFF;
+        }
+
+        .route-history-popover[hidden] {
+            display: none;
+        }
+
+        .route-history-popover {
+            position: fixed;
+            z-index: 70;
+            width: min(280px, calc(100vw - 24px));
+            overflow: hidden;
+            border: 1px solid rgba(203, 213, 225, 0.9);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.98);
+            padding: 4px;
+            box-shadow: 0 12px 30px -14px rgba(15, 23, 42, 0.22), 0 4px 12px -8px rgba(15, 23, 42, 0.12);
+            backdrop-filter: blur(16px);
+        }
+
+        .route-history-popover-list {
+            max-height: min(332px, calc(100vh - 32px));
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            touch-action: pan-y;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .route-history-popover-list-item + .route-history-popover-list-item {
+            border-top: 1px solid #EEF2F7;
+        }
+
+        .route-history-popover-item {
+            display: grid;
+            width: 100%;
+            min-height: 44px;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 12px;
+            border: 0;
+            border-radius: 10px;
+            background: transparent;
+            padding: 8px 10px;
+            color: #334155;
+            text-align: left;
+            touch-action: manipulation;
+            transition: transform 150ms ease, background-color 150ms ease, color 150ms ease;
+        }
+
+        .route-history-popover-item:active {
+            transform: scale(0.95);
+            background: #EFF6FF;
+            color: #1F5FFF;
+        }
+
+        .route-history-popover-primary {
+            overflow: hidden;
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.25;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .route-history-popover-secondary {
+            color: #8291A8;
+            font-size: 11px;
+            font-weight: 750;
+            line-height: 1;
+            white-space: nowrap;
         }
 
         .view-mode-switch {
@@ -2470,7 +2556,9 @@
 
         @media (hover: hover) and (pointer: fine) {
             .compact-header-back:hover,
-            .operation-path-button:hover:not(:disabled) {
+            .operation-path-button:hover:not(:disabled),
+            .operation-path-ellipsis:hover,
+            .route-history-popover-item:hover {
                 border-color: #BFD0FF;
                 background: rgba(255, 255, 255, 0.86);
                 color: #1F5FFF;
@@ -2788,7 +2876,7 @@
             }
         }
 
-        /* 15.6：当前标题拥有最高空间优先级；路由从最老中间记录开始收起，根节点始终保留。 */
+        /* 18.5：当前标题保持空间优先级；路由在剩余宽度内围绕当前节点连续展开。 */
         .compact-header-context {
             overflow: visible;
         }
@@ -3191,6 +3279,10 @@
                 </div>
             </section>
         </main>
+    </div>
+
+    <div id="route-history-popover" class="route-history-popover" role="dialog" aria-label="隐藏的路由历史" hidden>
+        <ol id="route-history-popover-list" class="route-history-popover-list"></ol>
     </div>
 
     <div id="detail-motion-layer" class="detail-motion-layer" aria-hidden="true"></div>
@@ -3626,6 +3718,8 @@
             const topologyRootTitleV127 = document.getElementById('topology-root-title');
             const topologyPathListV149 = document.getElementById('topology-path-list');
             const topologyPathNavV149 = document.getElementById('topology-path-nav');
+            const routeHistoryPopoverV185 = document.getElementById('route-history-popover');
+            const routeHistoryPopoverListV185 = document.getElementById('route-history-popover-list');
             const topologyMainlineV160 = document.getElementById('topology-mainline');
             const topologyLoadingV127 = document.getElementById('topology-loading');
             const topologyResetButtonV10 = document.getElementById('topology-reset');
@@ -3646,6 +3740,7 @@
             let detailSwitchTimelineV10 = null;
             let detailSwitchSequenceV10 = 0;
             let detailSwitchGhostsV10 = [];
+            let routeHistoryPopoverAnchorV185 = null;
 
             function escapeHtmlV10(value) {
                 return String(value)
@@ -3749,22 +3844,18 @@
                 return true;
             }
 
+            /* 18.4：当前查看位置独立于历史末项；返回只读取左侧相邻记录，不弹出或截断历史。 */
             function previousNodeRouteV183() {
                 const routeNodes = sharedNodeRouteNodesV183();
-                return routeNodes.length > 1 ? routeNodes[routeNodes.length - 2] : null;
+                const currentIndex = routeNodes.findIndex(function (node) {
+                    return node.id === stateV10.selectedLevelNodeId;
+                });
+                return currentIndex > 0 ? routeNodes[currentIndex - 1] : null;
             }
 
-            function takePreviousNodeRouteV183() {
-                const routeIds = validUniqueNodeRouteIdsV183();
-                if (routeIds.length <= 1) return null;
-                routeIds.pop();
-                stateV10.nodeRouteHistory = routeIds;
-                return levelNodeByIdV10(routeIds[routeIds.length - 1]);
-            }
-
-            function operationPathNodeMarkupV150(record, kind, currentIndex, markCurrent) {
+            function operationPathNodeMarkupV150(record, kind, currentNodeId, markCurrent) {
                 const naming = nodeNamingV137(record.node);
-                const current = markCurrent && record.index === currentIndex;
+                const current = markCurrent && record.node.id === currentNodeId;
                 const label = naming.stage;
                 const dataAttribute = kind === 'detail'
                     ? ' data-detail-path-index="' + record.index + '"'
@@ -3783,46 +3874,213 @@
                 return '<li class="operation-path-caret" aria-hidden="true"><i class="ph-bold ph-caret-right"></i></li>';
             }
 
-            function operationPathMarkupV150(nodes, kind, visibleTailCount, markCurrent) {
-                const records = nodes.map(function (node, index) { return { node: node, index: index }; });
-                const normalizedTailCount = Math.max(0, Math.min(records.length, Number(visibleTailCount)));
-                const hiddenCount = Math.max(0, records.length - normalizedTailCount);
-                const visible = hiddenCount > 0 ? records.slice(hiddenCount) : records;
+            function operationPathOverflowMarkupV185(kind, side, startIndex, endIndex) {
+                const hiddenCount = Math.max(0, endIndex - startIndex + 1);
+                if (!hiddenCount) return '';
+                const sideLabel = side === 'before' ? '左侧较早' : '右侧较新';
+                return (
+                    '<li>' +
+                        '<button type="button" class="operation-path-ellipsis"' +
+                            ' data-route-overflow-kind="' + escapeHtmlV10(kind) + '"' +
+                            ' data-route-overflow-side="' + escapeHtmlV10(side) + '"' +
+                            ' data-route-overflow-start="' + startIndex + '"' +
+                            ' data-route-overflow-end="' + endIndex + '"' +
+                            ' aria-label="查看' + sideLabel + '隐藏的 ' + hiddenCount + ' 条路由历史"' +
+                            ' aria-haspopup="dialog" aria-expanded="false" aria-controls="route-history-popover">…</button>' +
+                    '</li>'
+                );
+            }
 
+            function operationPathMarkupV150(nodes, kind, visibleStart, visibleEnd, currentNodeId, markCurrent) {
+                const records = nodes.map(function (node, index) { return { node: node, index: index }; });
                 const homeAttribute = kind === 'detail' ? 'data-detail-home' : 'data-topology-home';
                 let markup = '<li><button type="button" class="operation-path-button" ' + homeAttribute + '>英语能力</button></li>';
-                if (hiddenCount > 0) {
+                if (!records.length) return markup;
+
+                const normalizedStart = Math.max(0, Math.min(records.length - 1, Number(visibleStart)));
+                const normalizedEnd = Math.max(normalizedStart, Math.min(records.length - 1, Number(visibleEnd)));
+                const visible = records.slice(normalizedStart, normalizedEnd + 1);
+                if (normalizedStart > 0) {
                     markup += operationPathCaretMarkupV150();
-                    markup += '<li><span class="operation-path-ellipsis" aria-label="已折叠 ' + hiddenCount + ' 个中间访问记录">…</span></li>';
+                    markup += operationPathOverflowMarkupV185(kind, 'before', 0, normalizedStart - 1);
                 }
                 visible.forEach(function (record) {
                     markup += operationPathCaretMarkupV150();
-                    markup += operationPathNodeMarkupV150(record, kind, records.length - 1, markCurrent);
+                    markup += operationPathNodeMarkupV150(record, kind, currentNodeId, markCurrent);
                 });
+                if (normalizedEnd < records.length - 1) {
+                    markup += operationPathCaretMarkupV150();
+                    markup += operationPathOverflowMarkupV185(kind, 'after', normalizedEnd + 1, records.length - 1);
+                }
                 return markup;
+            }
+
+            function centeredRouteExpansionCandidatesV185(start, end, currentIndex, total) {
+                const beforeCount = currentIndex - start;
+                const afterCount = end - currentIndex;
+                const before = start > 0 ? { start: start - 1, end: end } : null;
+                const after = end < total - 1 ? { start: start, end: end + 1 } : null;
+                if (!before) return after ? [after] : [];
+                if (!after) return [before];
+                return beforeCount <= afterCount ? [before, after] : [after, before];
             }
 
             function renderAdaptiveOperationPathV150(nav, list, nodes, kind, options) {
                 if (!nav || !list) return;
+                closeRouteHistoryPopoverV185(false);
                 const settings = options || {};
                 const markCurrent = settings.markCurrent !== false;
+                const currentNodeId = settings.currentNodeId || stateV10.selectedLevelNodeId;
                 const token = String((Number(nav.dataset.routeRenderToken || 0) + 1) % 1000000);
                 nav.dataset.routeRenderToken = token;
-                list.innerHTML = operationPathMarkupV150(nodes, kind, nodes.length, markCurrent);
+                list.innerHTML = operationPathMarkupV150(nodes, kind, 0, Math.max(0, nodes.length - 1), currentNodeId, markCurrent);
                 nav.dataset.routeVisibleNodes = String(nodes.length);
                 nav.dataset.routeHiddenNodes = '0';
+                nav.dataset.routeHiddenBefore = '0';
+                nav.dataset.routeHiddenAfter = '0';
                 window.requestAnimationFrame(function () {
                     if (nav.dataset.routeRenderToken !== token) return;
-                    let visibleTailCount = nodes.length;
-                    /* 15.6：标题不参与压缩；英语能力根节点固定保留，最老中间访问节点逐个折叠。 */
-                    while (list.scrollWidth > nav.clientWidth + 1 && visibleTailCount > 0) {
-                        visibleTailCount -= 1;
-                        list.innerHTML = operationPathMarkupV150(nodes, kind, visibleTailCount, markCurrent);
+                    if (!nodes.length) {
+                        nav.dataset.routeVisibleNodes = '0';
+                        nav.dataset.routeHiddenNodes = '0';
+                        nav.dataset.routeHiddenBefore = '0';
+                        nav.dataset.routeHiddenAfter = '0';
+                        nav.scrollLeft = 0;
+                        return;
                     }
-                    nav.dataset.routeVisibleNodes = String(visibleTailCount);
-                    nav.dataset.routeHiddenNodes = String(nodes.length - visibleTailCount);
+
+                    const selectedIndex = nodes.findIndex(function (node) { return node.id === currentNodeId; });
+                    const currentIndex = selectedIndex >= 0 ? selectedIndex : nodes.length - 1;
+                    let visibleStart = currentIndex;
+                    let visibleEnd = currentIndex;
+                    list.innerHTML = operationPathMarkupV150(nodes, kind, visibleStart, visibleEnd, currentNodeId, markCurrent);
+
+                    while (true) {
+                        const candidates = centeredRouteExpansionCandidatesV185(
+                            visibleStart,
+                            visibleEnd,
+                            currentIndex,
+                            nodes.length
+                        );
+                        let accepted = null;
+                        for (let index = 0; index < candidates.length; index += 1) {
+                            const candidate = candidates[index];
+                            list.innerHTML = operationPathMarkupV150(
+                                nodes,
+                                kind,
+                                candidate.start,
+                                candidate.end,
+                                currentNodeId,
+                                markCurrent
+                            );
+                            if (list.scrollWidth <= nav.clientWidth + 1) {
+                                accepted = candidate;
+                                break;
+                            }
+                        }
+                        if (!accepted) break;
+                        visibleStart = accepted.start;
+                        visibleEnd = accepted.end;
+                    }
+
+                    list.innerHTML = operationPathMarkupV150(
+                        nodes,
+                        kind,
+                        visibleStart,
+                        visibleEnd,
+                        currentNodeId,
+                        markCurrent
+                    );
+                    const visibleCount = visibleEnd - visibleStart + 1;
+                    nav.dataset.routeVisibleNodes = String(visibleCount);
+                    nav.dataset.routeHiddenNodes = String(nodes.length - visibleCount);
+                    nav.dataset.routeHiddenBefore = String(visibleStart);
+                    nav.dataset.routeHiddenAfter = String(nodes.length - visibleEnd - 1);
+                    nav.dataset.routeVisibleStart = String(visibleStart);
+                    nav.dataset.routeVisibleEnd = String(visibleEnd);
                     nav.scrollLeft = 0;
                 });
+            }
+
+            function routeHistoryPopoverItemsMarkupV185(records, kind) {
+                return records.map(function (record) {
+                    const naming = nodeNamingV137(record.node);
+                    return (
+                        '<li class="route-history-popover-list-item">' +
+                            '<button type="button" class="route-history-popover-item"' +
+                                ' data-route-popover-kind="' + escapeHtmlV10(kind) + '"' +
+                                ' data-route-popover-index="' + record.index + '"' +
+                                ' aria-label="查看 ' + escapeHtmlV10(naming.canonical) + '">' +
+                                '<span class="route-history-popover-primary">' + escapeHtmlV10(naming.stage) + '</span>' +
+                                '<span class="route-history-popover-secondary">' + escapeHtmlV10(naming.relationSecondary) + '</span>' +
+                            '</button>' +
+                        '</li>'
+                    );
+                }).join('');
+            }
+
+            function positionRouteHistoryPopoverV185(anchor) {
+                if (!anchor || routeHistoryPopoverV185.hidden) return;
+                const rect = anchor.getBoundingClientRect();
+                const viewportWidth = document.documentElement.clientWidth;
+                const viewportHeight = document.documentElement.clientHeight;
+                const edgeGap = 12;
+                const anchorGap = 6;
+                const availableHeight = Math.max(52, viewportHeight - rect.bottom - edgeGap - anchorGap);
+                routeHistoryPopoverListV185.style.maxHeight = Math.min(332, availableHeight - 8) + 'px';
+                const panelWidth = routeHistoryPopoverV185.offsetWidth;
+                const preferredLeft = anchor.dataset.routeOverflowSide === 'after'
+                    ? rect.right - panelWidth
+                    : rect.left;
+                const maximumLeft = Math.max(edgeGap, viewportWidth - panelWidth - edgeGap);
+                routeHistoryPopoverV185.style.left = Math.max(edgeGap, Math.min(preferredLeft, maximumLeft)) + 'px';
+                routeHistoryPopoverV185.style.top = rect.bottom + anchorGap + 'px';
+            }
+
+            function closeRouteHistoryPopoverV185(restoreFocus) {
+                const anchor = routeHistoryPopoverAnchorV185;
+                if (anchor) {
+                    anchor.classList.remove('is-open');
+                    anchor.setAttribute('aria-expanded', 'false');
+                }
+                routeHistoryPopoverAnchorV185 = null;
+                routeHistoryPopoverV185.hidden = true;
+                routeHistoryPopoverListV185.innerHTML = '';
+                routeHistoryPopoverListV185.style.maxHeight = '';
+                routeHistoryPopoverV185.style.left = '';
+                routeHistoryPopoverV185.style.top = '';
+                if (restoreFocus && anchor && anchor.isConnected) anchor.focus({ preventScroll: true });
+            }
+
+            function toggleRouteHistoryPopoverV185(anchor) {
+                if (!anchor) return;
+                if (routeHistoryPopoverAnchorV185 === anchor && !routeHistoryPopoverV185.hidden) {
+                    closeRouteHistoryPopoverV185(true);
+                    return;
+                }
+                const kind = anchor.dataset.routeOverflowKind;
+                const side = anchor.dataset.routeOverflowSide;
+                const start = Number(anchor.dataset.routeOverflowStart);
+                const end = Number(anchor.dataset.routeOverflowEnd);
+                const nodes = sharedNodeRouteNodesV183();
+                if ((kind !== 'detail' && kind !== 'topology') || !Number.isInteger(start) || !Number.isInteger(end)) return;
+                const records = nodes
+                    .map(function (node, index) { return { node: node, index: index }; })
+                    .slice(start, end + 1);
+                if (!records.length) return;
+
+                closeRouteHistoryPopoverV185(false);
+                routeHistoryPopoverAnchorV185 = anchor;
+                anchor.classList.add('is-open');
+                anchor.setAttribute('aria-expanded', 'true');
+                routeHistoryPopoverV185.setAttribute(
+                    'aria-label',
+                    side === 'before' ? '左侧较早的隐藏路由历史' : '右侧较新的隐藏路由历史'
+                );
+                routeHistoryPopoverListV185.innerHTML = routeHistoryPopoverItemsMarkupV185(records, kind);
+                routeHistoryPopoverV185.hidden = false;
+                routeHistoryPopoverListV185.scrollTop = 0;
+                positionRouteHistoryPopoverV185(anchor);
             }
 
             function renderDetailPathV150() {
@@ -3840,13 +4098,13 @@
                 const nodes = sharedNodeRouteNodesV183();
                 const index = Number(pathIndex);
                 const target = Number.isInteger(index) ? nodes[index] : null;
-                if (!target || index === nodes.length - 1) return;
+                if (!target) return;
                 if (target.id === stateV10.selectedLevelNodeId) {
                     renderDetailPathV150();
                     updateDetailBackButtonV10();
                     return;
                 }
-                animateDetailSelectionV10(abilityForNodeV10(target), target, true, true);
+                animateDetailSelectionV10(abilityForNodeV10(target), target, true, false);
             }
 
             function roleLabelV10(node) {
@@ -4745,6 +5003,7 @@
             }
 
             function showPageV10(name) {
+                closeRouteHistoryPopoverV185(false);
                 if (name !== 'detail') resetDetailSwitchMotionV10();
                 if (name === 'overview') clearNodeRouteV183();
                 if (name !== 'topology' && stateV10.dependencyMode === 'global') setDependencyModeV127('direct', false);
@@ -4786,7 +5045,7 @@
             }
 
             function navigateBackFromDetailV10() {
-                const previousNode = takePreviousNodeRouteV183();
+                const previousNode = previousNodeRouteV183();
                 if (!previousNode) {
                     showPageV10('overview');
                     return;
@@ -5681,9 +5940,8 @@
                 const validPath = sharedNodeRouteNodesV183();
                 const index = Number(pathIndex);
                 const target = Number.isInteger(index) ? validPath[index] : null;
-                if (!target || index === validPath.length - 1) return;
+                if (!target) return;
                 const nodeChanged = target.id !== stateV10.selectedLevelNodeId;
-                recordNodeRouteVisitV183(target);
                 syncSelectedNodeV183(target);
                 renderTopologyPathV149();
                 if (nodeChanged) renderTopologyV10();
@@ -5705,7 +5963,7 @@
             }
 
             function navigateBackFromTopologyV162() {
-                const previousNode = takePreviousNodeRouteV183();
+                const previousNode = previousNodeRouteV183();
                 if (!previousNode) {
                     showPageV10('overview');
                     return;
@@ -7651,6 +7909,11 @@
             detailPathListV150.addEventListener('click', function (event) {
                 const element = event.target instanceof Element ? event.target : null;
                 if (!element) return;
+                const overflowButton = element.closest('[data-route-overflow-kind="detail"]');
+                if (overflowButton) {
+                    toggleRouteHistoryPopoverV185(overflowButton);
+                    return;
+                }
                 if (element.closest('[data-detail-home]')) {
                     showPageV10('overview');
                     return;
@@ -7668,6 +7931,11 @@
             topologyPathListV149.addEventListener('click', function (event) {
                 const element = event.target instanceof Element ? event.target : null;
                 if (!element) return;
+                const overflowButton = element.closest('[data-route-overflow-kind="topology"]');
+                if (overflowButton) {
+                    toggleRouteHistoryPopoverV185(overflowButton);
+                    return;
+                }
                 const homeButton = element.closest('[data-topology-home]');
                 if (homeButton) {
                     setDependencyModeV127('direct', false);
@@ -7676,6 +7944,25 @@
                 }
                 const nodeButton = element.closest('[data-topology-path-index]');
                 if (nodeButton) navigateTopologyPathV155(nodeButton.dataset.topologyPathIndex);
+            }, { signal: eventAbortV138.signal });
+            routeHistoryPopoverListV185.addEventListener('click', function (event) {
+                const element = event.target instanceof Element ? event.target.closest('[data-route-popover-index]') : null;
+                if (!element) return;
+                const kind = element.dataset.routePopoverKind;
+                const pathIndex = element.dataset.routePopoverIndex;
+                closeRouteHistoryPopoverV185(false);
+                if (kind === 'detail') navigateDetailPathV150(pathIndex);
+                if (kind === 'topology') navigateTopologyPathV155(pathIndex);
+            }, { signal: eventAbortV138.signal });
+            document.addEventListener('click', function (event) {
+                if (routeHistoryPopoverV185.hidden) return;
+                const element = event.target instanceof Element ? event.target : null;
+                if (!element) return;
+                if (routeHistoryPopoverV185.contains(element) || element.closest('[data-route-overflow-kind]')) return;
+                closeRouteHistoryPopoverV185(false);
+            }, { signal: eventAbortV138.signal });
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape' && !routeHistoryPopoverV185.hidden) closeRouteHistoryPopoverV185(true);
             }, { signal: eventAbortV138.signal });
             document.getElementById('topology-zoom-out').addEventListener('click', function () {
                 window.cancelAnimationFrame(topologyCenterFrameV138);
