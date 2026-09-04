@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<!-- 版本 21.3：延续 21.2；为黄色“学习中”节点补充三条跨能力一级直连，并保持三个新增节点同层平级展开。 -->
+<!-- 版本 22.5：首页全部能力主线仅向右突破响应式页面 gutter，延伸至 app-shell 右边缘；详情页任务类型文字保持原位并调整为 10px、600 字重。 -->
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#F8FAFD">
-    <title>抖学 AI 能力模型 21.3 · 学习中节点一对多跨能力直连</title>
+    <title>抖学 AI 能力模型 22.5 · 首页主线右侧延伸至边缘</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -706,19 +706,6 @@
             gap: 5px;
         }
 
-        .mainline-end-marker {
-            position: absolute;
-            right: 7px;
-            top: 7px;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            color: #1F5FFF;
-            font-size: 12px;
-            line-height: 1;
-            pointer-events: none;
-        }
-
         .mainline-connector::before {
             height: 1px;
         }
@@ -728,10 +715,6 @@
             background: transparent;
             font-size: 9px;
             opacity: 0.62;
-        }
-
-        .mainline-node.is-mainline-end .mainline-end-marker {
-            display: inline-flex;
         }
 
         .detail-mainline {
@@ -2643,19 +2626,12 @@
 
         }
 
-        /* 未获得的评级星保持轻量灰色，仅在老师已评级后与获得星一并展示。 */
-        .mini-stars .star-icon.is-unearned {
-            --star-fill: #C3CEDB;
-            --star-stroke: transparent;
-            --star-stroke-width: 0;
-        }
-
         /* 依赖视图直接使用任务视图的完整主线规格。 */
         .topology-workspace > .task-mainline-strip {
             flex: 0 0 auto;
         }
 
-        /* 任务类型仅由左侧图标表达，状态与任务名继续保留文字。 */
+        /* 左侧任务类型图标保持原位与原样，状态与任务名继续保留原有层级。 */
         .task-learning-grid .learning-task-copy {
             justify-content: center;
         }
@@ -2818,6 +2794,13 @@
             color: #A65300;
         }
 
+        .node-current-badge.is-awaiting {
+            border-color: #D8E0EA;
+            background: #F1F5F9;
+            color: #64748B;
+            box-shadow: none;
+        }
+
         .node-completed-badge,
         .local-dependency-passed-badge {
             display: inline-flex;
@@ -2845,22 +2828,6 @@
         .detail-mainline .node-completed-badge {
             right: 9px;
             top: 9px;
-        }
-
-        .detail-mainline .mainline-end-marker {
-            right: 9px;
-            top: 9px;
-            font-size: 13px;
-        }
-
-        .mainline-node.is-mainline-end .node-current-badge,
-        .mainline-node.is-mainline-end .node-completed-badge {
-            right: 27px;
-        }
-
-        .detail-mainline .mainline-node.is-mainline-end .node-current-badge,
-        .detail-mainline .mainline-node.is-mainline-end .node-completed-badge {
-            right: 30px;
         }
 
         .mainline-node.is-selected,
@@ -3091,6 +3058,155 @@
                 color: #1F5FFF;
             }
         }
+
+        /* 放大任务卡规格保持不变。 */
+        .task-learning-section {
+            padding-top: 12px;
+        }
+
+        .task-learning-scroll {
+            padding-top: 6px;
+        }
+
+        .task-learning-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-auto-flow: row;
+            align-items: start;
+            gap: 16px;
+        }
+
+        .task-learning-grid .learning-card,
+        .secondary-detail-page .task-learning-grid .learning-card {
+            height: auto;
+            min-height: 92px;
+            max-height: none;
+            gap: 14px;
+            border-radius: 16px;
+            padding: 14px 16px;
+        }
+
+        .task-learning-grid .learning-task-leading {
+            gap: 12px;
+        }
+
+        .task-learning-grid .learning-task-copy {
+            gap: 6px;
+        }
+
+        .task-learning-grid .learning-task-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+        }
+
+        .task-learning-grid .learning-task-icon img,
+        .task-learning-grid .learning-task-icon svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .task-learning-grid .learning-task-icon i {
+            font-size: 22px;
+        }
+
+        .task-learning-grid .learning-task-title {
+            font-size: 17px;
+            line-height: 1.25;
+        }
+
+        .task-learning-grid .learning-task-semantic {
+            width: 56px;
+            min-width: 56px;
+            height: 20px;
+            min-height: 20px;
+            font-size: 10px;
+        }
+
+        .task-learning-grid .learning-task-action {
+            width: 32px;
+            min-width: 32px;
+            min-height: 44px;
+            font-size: 19px;
+        }
+
+        /* 21.6：首页标题维持原有独立结构，路由历史作为同层组件使用剩余空间。 */
+        #overview-page .compact-header-leading {
+            flex: 0 0 auto;
+        }
+
+        #overview-page .overview-route-nav {
+            min-width: 88px;
+            flex: 1 1 0;
+        }
+
+        .task-learning-scroll {
+            padding-top: 18px;
+        }
+
+        .task-learning-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-auto-flow: row;
+            align-items: stretch;
+            column-gap: 12px;
+            row-gap: 10px;
+        }
+
+        .task-learning-grid.is-empty {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        /* 22.1：取消类型页签与分组标题，放大任务卡保持原规格并统一双列平铺。 */
+        .task-learning-scroll {
+            padding-top: 12px;
+        }
+
+        .task-learning-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-auto-flow: row;
+            align-items: stretch;
+            column-gap: 12px;
+            row-gap: 10px;
+        }
+
+        /* 22.4：仅作用于详情页学习任务网格；类型紧随状态，仅作弱辅助说明。 */
+        .task-learning-grid .learning-task-meta {
+            display: flex;
+            min-width: 0;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .task-learning-grid .learning-task-type-text {
+            color: #94A3B8;
+            font-size: 10px;
+            font-weight: 600;
+            line-height: 20px;
+            white-space: nowrap;
+        }
+
+        /* 22.5：首页主线只向右补偿页面 gutter；左缘、Header 与二级视图维持原位。 */
+        #overview-page {
+            --overview-page-gutter: 1.25rem;
+        }
+
+        #overview-page .overview-surface {
+            width: calc(100% + var(--overview-page-gutter));
+            margin-right: calc(0px - var(--overview-page-gutter));
+        }
+
+        #overview-page .overview-scroll {
+            padding-right: 0 !important;
+        }
+
+        @media (max-width: 760px) {
+            #overview-page {
+                --overview-page-gutter: 0.75rem;
+            }
+        }
+
     </style>
 </head>
 <body class="font-sans text-ink antialiased">
@@ -3123,6 +3239,9 @@
                 </button>
                 <h1 class="compact-header-title">英语能力</h1>
             </div>
+            <nav id="overview-path-nav" class="compact-route-nav overview-route-nav" aria-label="历史节点访问路径">
+                <ol id="overview-path-list" class="compact-route-list"></ol>
+            </nav>
         </header>
 
         <main class="overview-surface page-body-gap flex min-h-0 flex-1 flex-col overflow-hidden" aria-label="英语能力主线列表">
@@ -3163,7 +3282,7 @@
                     <span id="learning-count" class="learning-count" aria-live="polite"></span>
                 </div>
                 <div class="task-learning-scroll native-scroll no-scrollbar">
-                    <div id="learning-grid" class="learning-grid task-learning-grid grid"></div>
+                    <div id="learning-grid" class="learning-grid task-learning-grid grid" aria-label="学习任务列表" aria-live="polite"></div>
                 </div>
             </section>
         </main>
@@ -3450,16 +3569,14 @@
                 return Boolean(node && (abilityAccessPolicyV198.allNodesOpen || node.canStudy === true));
             }
 
-            // 21.3：仅用于依赖视图的一对多模拟样例；节点均复用既有能力线数据，不进入或改写顶部主线。
-            const learningOneToManySampleV213 = Object.freeze({
+            // 21.6：恢复 21.3 的一对多依赖样例；节点复用既有能力数据，不改写顶部主线。
+            const learningOneToManySampleV216 = Object.freeze({
                 centerNodeId: 'grammar-l2',
                 targetNodeIds: Object.freeze(['listening-l2', 'speaking-l2', 'pragmatics-l1'])
             });
 
-            // 14.5：本数组模拟后台依赖接口；只有显式 dependencyDepth: 1 的记录可进入共享一级边模型。
-            // “1800词→段落大意”保留为二级回归样本，证明任何详情或全局视图都不会把它误画成直接边。
-            // “常见句式→完整句子”保留为后台一级冗余样本；因已有“常见句式→完整句意→完整句子”，两个依赖视图都会隐藏该跨级箭头。
-            // 循环审核数据也参与同一约简；只有删除后仍可达的循环冗余边会被隐藏。
+            // 关系数组模拟后台依赖接口；只将显式 dependencyDepth: 1 的记录投影为直接边。
+            // 保留分叉、平级节点与多路径；原 21.3 指向 communication-l1 的四条统一汇聚边已删除。
             const officialLevelRelationshipsV136 = [
                 { source: 'phonics-l2', target: 'listening-l2', dependencyDepth: 1 },
                 { source: 'vocabulary-l3', target: 'sentence-l3', dependencyDepth: 1 },
@@ -3472,11 +3589,7 @@
                 { id: 'mock-learning-split-speaking', source: 'grammar-l2', target: 'speaking-l2', dependencyDepth: 1 },
                 { id: 'mock-learning-split-pragmatics', source: 'grammar-l2', target: 'pragmatics-l1', dependencyDepth: 1 },
                 { source: 'grammar-l2', target: 'writing-l1', dependencyDepth: 1 },
-                { source: 'sentence-l3', target: 'writing-l1', dependencyDepth: 1 },
-                { source: 'listening-l2', target: 'communication-l1', dependencyDepth: 1 },
-                { source: 'reading-l2', target: 'communication-l1', dependencyDepth: 1 },
-                { source: 'speaking-l2', target: 'communication-l1', dependencyDepth: 1 },
-                { source: 'writing-l1', target: 'communication-l1', dependencyDepth: 1 }
+                { source: 'sentence-l3', target: 'writing-l1', dependencyDepth: 1 }
             ];
 
             const cycleStressRelationshipsV136 = [
@@ -3500,7 +3613,7 @@
                 '课堂': Object.freeze({ phosphor: 'ph-chalkboard-teacher', tone: 'is-purple' })
             });
 
-            // 13.8：核心词汇 L3 按“音记 → 题库 → 游戏 → 课堂”循环三轮，共直显十二条任务。
+            // 22.1：核心词汇 L3 使用十六条交错模拟数据，覆盖同类型多任务、四种类型与三种状态；展示层再稳定分组排序。
             const learningTasksByNodeV127 = {
                 'vocabulary-l3': [
                     { id: 'vocabulary-l3-memory-01', form: '音记', title: '高频动词 01', status: 'in_progress' },
@@ -3514,18 +3627,30 @@
                     { id: 'vocabulary-l3-memory-09', form: '音记', title: '重点短语 03', status: 'completed' },
                     { id: 'vocabulary-l3-quiz-10', form: '题库', title: '语境选词强化', status: 'not_started' },
                     { id: 'vocabulary-l3-game-11', form: '游戏', title: '词汇记忆闯关', status: 'in_progress' },
-                    { id: 'vocabulary-l3-class-12', form: '课堂', title: '易混词重点精讲', status: 'not_started' }
+                    { id: 'vocabulary-l3-class-12', form: '课堂', title: '易混词重点精讲', status: 'not_started' },
+                    { id: 'vocabulary-l3-memory-13', form: '音记', title: '学术名词 04', status: 'not_started' },
+                    { id: 'vocabulary-l3-game-14', form: '游戏', title: '词根迷宫挑战', status: 'completed' },
+                    { id: 'vocabulary-l3-class-15', form: '课堂', title: '学术词汇辨析', status: 'in_progress' },
+                    { id: 'vocabulary-l3-quiz-16', form: '题库', title: '构词法综合测验', status: 'completed' }
                 ],
                 'phonics-l2': [
-                    { id: 'phonics-l2-class-01', form: '课堂', title: '重读与弱读精讲', status: 'in_progress' },
-                    { id: 'phonics-l2-quiz-02', form: '题库', title: '词音匹配训练', status: 'not_started' },
-                    { id: 'phonics-l2-game-03', form: '游戏', title: '音素反应挑战', status: 'not_started' }
+                    { id: 'phonics-l2-memory-01', form: '音记', title: '重读与弱读跟读', status: 'in_progress' },
+                    { id: 'phonics-l2-memory-02', form: '音记', title: '连读节奏听记', status: 'not_started' },
+                    { id: 'phonics-l2-memory-03', form: '音记', title: '音素辨析复习', status: 'completed' },
+                    { id: 'phonics-l2-quiz-04', form: '题库', title: '词音匹配训练', status: 'not_started' },
+                    { id: 'phonics-l2-quiz-05', form: '题库', title: '重音位置判断', status: 'not_started' }
                 ],
                 'grammar-l2': [
                     { id: 'grammar-l2-memory-01', form: '音记', title: '常见句式框架', status: 'completed' },
-                    { id: 'grammar-l2-quiz-02', form: '题库', title: '句式判断练习', status: 'in_progress' },
-                    { id: 'grammar-l2-class-03', form: '课堂', title: '一般疑问句精讲', status: 'not_started' },
-                    { id: 'grammar-l2-game-04', form: '游戏', title: '语序重组挑战', status: 'not_started' }
+                    { id: 'grammar-l2-memory-02', form: '音记', title: '疑问句式听记', status: 'in_progress' },
+                    { id: 'grammar-l2-memory-03', form: '音记', title: '否定句式复习', status: 'not_started' },
+                    { id: 'grammar-l2-quiz-04', form: '题库', title: '句式判断练习', status: 'in_progress' },
+                    { id: 'grammar-l2-quiz-05', form: '题库', title: '语序选择训练', status: 'not_started' },
+                    { id: 'grammar-l2-class-06', form: '课堂', title: '一般疑问句精讲', status: 'not_started' },
+                    { id: 'grammar-l2-game-07', form: '游戏', title: '语序重组挑战', status: 'not_started' },
+                    { id: 'grammar-l2-game-08', form: '游戏', title: '句型配对闯关', status: 'completed' },
+                    { id: 'grammar-l2-game-09', form: '游戏', title: '疑问句变身挑战', status: 'not_started' },
+                    { id: 'grammar-l2-game-10', form: '游戏', title: '句式纠错竞速', status: 'not_started' }
                 ],
                 'listening-l2': [
                     { id: 'listening-l2-quiz-01', form: '题库', title: '关键信息定位', status: 'in_progress' },
@@ -3542,6 +3667,18 @@
                     { id: 'reading-l2-quiz-01', form: '题库', title: '段落大意训练', status: 'not_started' },
                     { id: 'reading-l2-class-02', form: '课堂', title: '中心句定位方法', status: 'not_started' }
                 ],
+                'speaking-l1': [
+                    { id: 'speaking-l1-memory-01', form: '音记', title: '问候与告别回应', status: 'completed' },
+                    { id: 'speaking-l1-memory-02', form: '音记', title: '感谢回应', status: 'completed' },
+                    { id: 'speaking-l1-memory-03', form: '音记', title: '道歉回应', status: 'completed' },
+                    { id: 'speaking-l1-memory-04', form: '音记', title: '赞同与反对回应', status: 'completed' },
+                    { id: 'speaking-l1-memory-05', form: '音记', title: '请求回应', status: 'completed' },
+                    { id: 'speaking-l1-memory-06', form: '音记', title: '邀请回应', status: 'completed' },
+                    { id: 'speaking-l1-memory-07', form: '音记', title: '建议回应', status: 'completed' },
+                    { id: 'speaking-l1-memory-08', form: '音记', title: '喜好回应', status: 'completed' },
+                    { id: 'speaking-l1-memory-09', form: '音记', title: '日常确认回应', status: 'completed' },
+                    { id: 'speaking-l1-memory-10', form: '音记', title: '常用回应复盘', status: 'completed' }
+                ],
                 'speaking-l2': [
                     { id: 'speaking-l2-memory-01', form: '音记', title: '意图表达句型', status: 'in_progress' },
                     { id: 'speaking-l2-game-02', form: '游戏', title: '情境回应挑战', status: 'not_started' },
@@ -3549,8 +3686,16 @@
                 ],
                 'writing-l1': [
                     { id: 'writing-l1-memory-01', form: '音记', title: '完整句写作模板', status: 'completed' },
+                    { id: 'writing-l1-memory-04', form: '音记', title: '主谓结构写作模板', status: 'not_started' },
+                    { id: 'writing-l1-memory-05', form: '音记', title: '时态一致写作模板', status: 'not_started' },
                     { id: 'writing-l1-quiz-02', form: '题库', title: '病句改写练习', status: 'not_started' },
-                    { id: 'writing-l1-class-03', form: '课堂', title: '从词组到完整句', status: 'not_started' }
+                    { id: 'writing-l1-class-03', form: '课堂', title: '从词组到完整句', status: 'not_started' },
+                    { id: 'writing-l1-class-08', form: '课堂', title: '主语与谓语精讲', status: 'not_started' },
+                    { id: 'writing-l1-class-09', form: '课堂', title: '句子扩写方法', status: 'not_started' },
+                    { id: 'writing-l1-class-10', form: '课堂', title: '句末标点用法', status: 'not_started' },
+                    { id: 'writing-l1-class-11', form: '课堂', title: '基础句型变换', status: 'not_started' },
+                    { id: 'writing-l1-class-12', form: '课堂', title: '修饰语位置精讲', status: 'not_started' },
+                    { id: 'writing-l1-class-13', form: '课堂', title: '完整句自查方法', status: 'not_started' }
                 ],
                 'communication-l1': [
                     { id: 'communication-l1-game-01', form: '游戏', title: '常见问答闯关', status: 'in_progress' },
@@ -3569,8 +3714,9 @@
                 { suffix: '闯关挑战', form: '游戏', key: 'game' },
                 { suffix: '方法精讲', form: '课堂', key: 'class' }
             ];
+            const learningTaskDisplayOrderV221 = Object.freeze(['音记', '题库', '课堂', '游戏']);
             const learningTaskTypeOrderV198 = new Map(
-                learningTaskBlueprintsV159.map(function (blueprint, index) { return [blueprint.form, index]; })
+                learningTaskDisplayOrderV221.map(function (form, index) { return [form, index]; })
             );
             const generatedLearningTasksByNodeV159 = new Map();
 
@@ -3629,6 +3775,8 @@
 
             const abilityGridV10 = document.getElementById('ability-grid');
             const overviewScrollV10 = document.getElementById('overview-scroll');
+            const overviewPathListV216 = document.getElementById('overview-path-list');
+            const overviewPathNavV216 = document.getElementById('overview-path-nav');
             const detailMotionLayerV10 = document.getElementById('detail-motion-layer');
             const detailPathListV150 = document.getElementById('detail-path-list');
             const detailPathNavV150 = document.getElementById('detail-path-nav');
@@ -3778,6 +3926,10 @@
                 );
             }
 
+            function syncNodeRouteHistoryV218() {
+                stateV10.nodeRouteHistory = validUniqueNodeRouteIdsV183();
+            }
+
             function sharedNodeRouteNodesV183() {
                 return validUniqueNodeRouteIdsV183().map(levelNodeByIdV10).filter(Boolean);
             }
@@ -3799,13 +3951,15 @@
             function resetNodeRouteV183(node) {
                 if (!syncSelectedNodeV183(node)) return false;
                 cancelRouteHistoryUndoV186();
-                stateV10.nodeRouteHistory = [node.id];
+                stateV10.nodeRouteHistory = moveRouteToMostRecentV180(validUniqueNodeRouteIdsV183(), node.id);
+                syncNodeRouteHistoryV218();
                 return true;
             }
 
             function clearNodeRouteV183() {
                 cancelRouteHistoryUndoV186();
                 stateV10.nodeRouteHistory.length = 0;
+                syncNodeRouteHistoryV218();
             }
 
             function recordNodeRouteVisitV183(node) {
@@ -3815,6 +3969,7 @@
                     validUniqueNodeRouteIdsV183(),
                     node.id
                 );
+                syncNodeRouteHistoryV218();
                 return true;
             }
 
@@ -3831,9 +3986,11 @@
                 const naming = nodeNamingV137(record.node);
                 const current = markCurrent && record.node.id === currentNodeId;
                 const label = naming.stage;
-                const dataAttribute = kind === 'detail'
-                    ? ' data-detail-path-index="' + record.index + '"'
-                    : ' data-topology-path-index="' + record.index + '"';
+                const dataAttribute = kind === 'overview'
+                    ? ' data-overview-path-index="' + record.index + '"'
+                    : kind === 'detail'
+                        ? ' data-detail-path-index="' + record.index + '"'
+                        : ' data-topology-path-index="' + record.index + '"';
                 return (
                     '<li>' +
                         '<button type="button" class="operation-path-button"' + dataAttribute +
@@ -3867,8 +4024,13 @@
 
             function operationPathMarkupV150(nodes, kind, visibleStart, visibleEnd, currentNodeId, markCurrent) {
                 const records = nodes.map(function (node, index) { return { node: node, index: index }; });
-                const homeAttribute = kind === 'detail' ? 'data-detail-home' : 'data-topology-home';
-                let markup = '<li><button type="button" class="operation-path-button" ' + homeAttribute + '>英语能力</button></li>';
+                const homeAttribute = kind === 'overview'
+                    ? 'data-overview-home'
+                    : kind === 'detail'
+                        ? 'data-detail-home'
+                        : 'data-topology-home';
+                const homeCurrent = kind === 'overview' ? ' aria-current="page" disabled' : '';
+                let markup = '<li><button type="button" class="operation-path-button" ' + homeAttribute + homeCurrent + '>英语能力</button></li>';
                 if (!records.length) return markup;
 
                 const normalizedStart = Math.max(0, Math.min(records.length - 1, Number(visibleStart)));
@@ -4038,7 +4200,7 @@
                 const start = Number(anchor.dataset.routeOverflowStart);
                 const end = Number(anchor.dataset.routeOverflowEnd);
                 const nodes = sharedNodeRouteNodesV183();
-                if ((kind !== 'detail' && kind !== 'topology') || !Number.isInteger(start) || !Number.isInteger(end)) return;
+                if ((kind !== 'overview' && kind !== 'detail' && kind !== 'topology') || !Number.isInteger(start) || !Number.isInteger(end)) return;
                 const records = nodes
                     .map(function (node, index) { return { node: node, index: index }; })
                     .slice(start, end + 1);
@@ -4059,8 +4221,15 @@
             }
 
             function renderActiveNodeRoutePathV186() {
+                if (stateV10.view === 'overview') renderOverviewPathV216();
                 if (stateV10.view === 'detail') renderDetailPathV150();
                 if (stateV10.view === 'topology') renderTopologyPathV149();
+            }
+
+            function activeRouteContextNodeV216() {
+                if (stateV10.view !== 'overview') return selectedNodeV10();
+                const routeNodes = sharedNodeRouteNodesV183();
+                return routeNodes.length ? routeNodes[routeNodes.length - 1] : null;
             }
 
             function restoreClearedRouteHistoryV186() {
@@ -4070,17 +4239,18 @@
                 let restoredIds = normalizeUniqueRouteV180(snapshot.filter(function (nodeId) {
                     return Boolean(levelNodeByIdV10(nodeId));
                 }));
-                const currentNode = selectedNodeV10();
+                const currentNode = activeRouteContextNodeV216();
                 if (currentNode && !restoredIds.includes(currentNode.id)) {
                     restoredIds = moveRouteToMostRecentV180(restoredIds, currentNode.id);
                 }
                 stateV10.nodeRouteHistory = restoredIds;
+                syncNodeRouteHistoryV218();
                 renderActiveNodeRoutePathV186();
                 showToastV10('已恢复历史记录');
             }
 
             function clearOtherRouteHistoryV186() {
-                const currentNode = selectedNodeV10();
+                const currentNode = activeRouteContextNodeV216();
                 const snapshot = validUniqueNodeRouteIdsV183();
                 if (!currentNode || snapshot.length <= 1) {
                     closeRouteHistoryPopoverV185(true);
@@ -4090,6 +4260,7 @@
                 dismissToastV186(true);
                 const undoSnapshot = snapshot.slice();
                 stateV10.nodeRouteHistory = [currentNode.id];
+                syncNodeRouteHistoryV218();
                 routeHistoryUndoSnapshotV186 = undoSnapshot;
                 closeRouteHistoryPopoverV185(false);
                 renderActiveNodeRoutePathV186();
@@ -4101,6 +4272,26 @@
                         if (routeHistoryUndoSnapshotV186 === undoSnapshot) routeHistoryUndoSnapshotV186 = null;
                     }
                 });
+            }
+
+            function renderOverviewPathV216() {
+                const actualPath = sharedNodeRouteNodesV183();
+                const latestNode = actualPath.length ? actualPath[actualPath.length - 1] : null;
+                renderAdaptiveOperationPathV150(
+                    overviewPathNavV216,
+                    overviewPathListV216,
+                    actualPath,
+                    'overview',
+                    { markCurrent: false, currentNodeId: latestNode ? latestNode.id : stateV10.selectedLevelNodeId }
+                );
+            }
+
+            function navigateOverviewPathV216(pathIndex) {
+                const nodes = sharedNodeRouteNodesV183();
+                const index = Number(pathIndex);
+                const target = Number.isInteger(index) ? nodes[index] : null;
+                if (!target) return;
+                openDetailV10(target.abilityId, target.id);
             }
 
             function renderDetailPathV150() {
@@ -4129,16 +4320,20 @@
 
             function roleLabelV10(node) {
                 if (node.role === 'completed') return '已通关';
-                if (node.role === 'current') return studyStateForCurrentReleaseV198(node) === 'learning' ? '学习中' : '待学习';
+                const studyState = studyStateForCurrentReleaseV198(node);
+                if (studyState === 'learning') return '学习中';
+                if (studyState === 'available') return node.role === 'target' ? '目标，待学习' : '待学习';
                 if (node.role === 'target') return '目标';
-                return '可学习';
+                return '未解锁';
             }
 
             function overviewRoleLabelV10(node) {
                 if (node.role === 'completed') return '已通关';
-                if (node.role === 'current') return studyStateForCurrentReleaseV198(node) === 'learning' ? '学习中' : '待学习';
+                const studyState = studyStateForCurrentReleaseV198(node);
+                if (studyState === 'learning') return '学习中';
+                if (studyState === 'available') return node.role === 'target' ? '目标，待学习' : '待学习';
                 if (node.role === 'target') return '目标';
-                return '可学习';
+                return '未解锁';
             }
 
             function hasTeacherRatingV163(node) {
@@ -4174,7 +4369,7 @@
 
             function starStatusTextV165(node) {
                 if (!hasTeacherRatingV163(node)) return '';
-                return '老师评级 ' + node.masteryStars + ' 星，共 ' + abilityStarTotalV198 + ' 星；已获得星使用状态色，剩余为灰色实心星';
+                return '老师评级 ' + node.masteryStars + ' 星';
             }
 
             function starSvgMarkupV165(stateClass) {
@@ -4185,12 +4380,8 @@
             function starsMarkupV165(node) {
                 if (!shouldShowMasteryStarsV165(node)) return '';
                 let markup = '<span class="mini-stars is-rated" aria-label="' + escapeHtmlV10(starStatusTextV165(node)) + '">';
-                for (let index = 1; index <= abilityStarTotalV198; index += 1) {
-                    if (index <= node.masteryStars) {
-                        markup += starSvgMarkupV165('is-earned');
-                    } else {
-                        markup += starSvgMarkupV165('is-unearned');
-                    }
+                for (let index = 1; index <= node.masteryStars; index += 1) {
+                    markup += starSvgMarkupV165('is-earned');
                 }
                 markup += '</span>';
                 return markup;
@@ -4228,24 +4419,24 @@
                         markup += '<li class="mainline-connector ' + connectorClassV10(previousNode, node) + '" data-mainline-edge-source="' + escapeHtmlV10(previousNode.id) + '" data-mainline-edge-target="' + escapeHtmlV10(node.id) + '" data-dependency-depth="1" data-dependency-provenance="mock-mainline-adjacent" aria-hidden="true"><i class="ph-bold ph-caret-right"></i></li>';
                     }
                     const selectedClass = node.id === selectedNodeId ? ' is-selected' : '';
-                    const stateClass = ' state-' + studyStateForCurrentReleaseV198(node);
+                    const nodeStudyState = studyStateForCurrentReleaseV198(node);
+                    const stateClass = ' state-' + nodeStudyState;
                     const nodeLabel = detailMode ? roleLabelV10(node) : overviewRoleLabelV10(node);
                     const naming = nodeNamingV137(node);
-                    const isMainlineEnd = index === ability.levels.length - 1;
-                    const endMarkerMarkup = isMainlineEnd ? '<i class="mainline-end-marker ph-bold ph-flag" aria-hidden="true"></i>' : '';
                     const levelMarkup = '<span class="node-level-row"><span class="node-level">' + escapeHtmlV10(naming.level) + '</span></span>';
-                    const currentBadgeIsLearning = isCurrentLearningV164(node);
-                    const currentBadgeMarkup = currentBadgeIsLearning ? '<span class="node-current-badge is-learning">学习中</span>' : '';
+                    const currentBadgeMarkup = nodeStudyState === 'learning'
+                        ? '<span class="node-current-badge is-learning">学习中</span>'
+                        : (nodeStudyState === 'available' ? '<span class="node-current-badge is-awaiting">待学习</span>' : '');
                     const completedBadgeMarkup = node.role === 'completed' ? '<span class="node-completed-badge">已通关</span>' : '';
                     const nodeStarsMarkup = starsMarkupV165(node);
                     const nodeNameMetadata = nodeNameMetadataV208(naming.stage);
-                    const nodeContent = levelMarkup + '<span class="node-caption" data-name-length="' + nodeNameMetadata.length + '">' + escapeHtmlV10(naming.stage) + '</span>' + nodeStarsMarkup + currentBadgeMarkup + completedBadgeMarkup + endMarkerMarkup;
+                    const nodeContent = levelMarkup + '<span class="node-caption" data-name-length="' + nodeNameMetadata.length + '">' + escapeHtmlV10(naming.stage) + '</span>' + nodeStarsMarkup + currentBadgeMarkup + completedBadgeMarkup;
                     const isViewed = detailMode && node.id === selectedNodeId;
                     const masteryAria = nodeStarsMarkup ? '，' + starStatusTextV165(node) : '';
-                    const aria = naming.canonical + '，' + nodeLabel + masteryAria + (isMainlineEnd ? '，主线终点' : '') + (isViewed ? '，正在查看' : '');
+                    const aria = naming.canonical + '，' + nodeLabel + masteryAria + (isViewed ? '，正在查看' : '');
                     markup +=
                         '<li class="mainline-node-item">' +
-                            '<button type="button" data-level-node-id="' + escapeHtmlV10(node.id) + '" class="mainline-node role-' + node.role + stateClass + (isMainlineEnd ? ' is-mainline-end' : '') + selectedClass + '" aria-label="' + escapeHtmlV10(aria) + '"' + (detailMode ? ' aria-pressed="' + (isViewed ? 'true' : 'false') + '"' : '') + '>' +
+                            '<button type="button" data-level-node-id="' + escapeHtmlV10(node.id) + '" class="mainline-node role-' + node.role + stateClass + selectedClass + '" aria-label="' + escapeHtmlV10(aria) + '"' + (detailMode ? ' aria-pressed="' + (isViewed ? 'true' : 'false') + '"' : '') + '>' +
                                 nodeContent +
                             '</button>' +
                         '</li>';
@@ -4319,7 +4510,7 @@
                     const source = levelNodeByIdV10(relationship.source);
                     const target = levelNodeByIdV10(relationship.target);
                     if (!source || !target) throw new Error('子关系引用了不存在的节点。');
-                    if (source.abilityId === target.abilityId) throw new Error('能力内部连续等级不得写入子关系。');
+                    if (source.abilityId === target.abilityId) throw new Error('能力内部连续等级不得写入跨能力子关系。');
                     explicitRawEdgeKeys.add(source.id + '→' + target.id);
                 });
                 const relatedProbe = collectRelatedNodeIdsV133('root', [
@@ -4420,53 +4611,48 @@
                     });
                     if (restrictedWithoutTasks.length) throw new Error('预留受限节点缺少学习任务：' + restrictedWithoutTasks.map(function (node) { return node.id; }).join('、'));
 
-                    const vocabularyBranches = activeEdges.filter(function (edge) { return edge.source === 'vocabulary-l3'; });
-                    if (vocabularyBranches.length < 2) throw new Error('正式数据缺少普通分叉场景。');
-                    const communicationMerge = activeEdges.filter(function (edge) { return edge.target === 'communication-l1'; });
-                    if (communicationMerge.length < 4) throw new Error('正式数据缺少普通汇聚场景。');
-
-                    const learningSampleTargets = learningOneToManySampleV213.targetNodeIds.map(levelNodeByIdV10).filter(Boolean);
-                    const learningSampleTargetIds = new Set(learningOneToManySampleV213.targetNodeIds);
+                    const learningSampleTargetIds = new Set(learningOneToManySampleV216.targetNodeIds);
+                    const learningSampleTargets = learningOneToManySampleV216.targetNodeIds.map(levelNodeByIdV10).filter(Boolean);
                     const learningSampleEdges = activeEdges.filter(function (edge) {
-                        return edge.source === learningOneToManySampleV213.centerNodeId && learningSampleTargetIds.has(edge.target);
+                        return edge.source === learningOneToManySampleV216.centerNodeId && learningSampleTargetIds.has(edge.target);
                     });
                     if (learningSampleTargets.length !== 3 || new Set(learningSampleTargets.map(function (node) { return node.abilityId; })).size !== 3 ||
                         learningSampleEdges.length !== 3 || learningSampleEdges.some(function (edge) { return !edge.backendId || !edge.backendId.startsWith('mock-learning-split-'); })) {
-                        throw new Error('学习中节点的一对多模拟数据必须包含三个不同能力线的后台一级直连。');
+                        throw new Error('学习中节点的一对多数据必须保留三个不同能力线的后台一级直连。');
                     }
 
                     requireRelationship('vocabulary-l3', 'sentence-l3', '直接依赖缺少 1800词→完整句意。');
+                    requireRelationship('grammar-l2', 'sentence-l3', '直接依赖缺少 常见句式→完整句意。');
                     requireRelationship('sentence-l3', 'reading-l2', '直接依赖缺少 完整句意→段落大意。');
+                    requireRelationship('sentence-l3', 'writing-l1', '逐级依赖缺少 完整句意→完整句子。');
+                    requireHiddenRelationship('grammar-l2', 'writing-l1', '常见句式→完整句子 的跨级冗余箭头未被隐藏。');
                     if (relationshipKeys.has('vocabulary-l3→reading-l2')) {
                         throw new Error('错误生成了传递边 1800词→段落大意。');
                     }
-                    requireRelationship('grammar-l2', 'sentence-l3', '直接依赖缺少 常见句式→完整句意。');
-                    requireRelationship('sentence-l3', 'writing-l1', '逐级依赖缺少 完整句意→完整句子。');
-                    requireHiddenRelationship('grammar-l2', 'writing-l1', '常见句式→完整句子 的跨级冗余箭头未被隐藏。');
-                    const specialGraph = collectGlobalDependencyGraphV129('vocabulary-l3');
-                    const preservesInternalEdge = specialGraph.edges.some(function (edge) {
-                        return edge.source === 'sentence-l3' && edge.target === 'reading-l2';
-                    });
-                    if (!preservesInternalEdge) throw new Error('全局依赖未保留直接同侧节点之间的真实边。');
-                    if (!specialGraph.nodes.some(function (node) { return node.id === 'reading-l2'; })) {
-                        throw new Error('全局依赖未展示经直接链路可达的段落大意节点。');
-                    }
-                    if (specialGraph.edges.some(function (edge) {
-                        return edge.source === 'vocabulary-l3' && edge.target === 'reading-l2';
-                    })) {
-                        throw new Error('全局依赖把传递可达关系错误投影成了直接边。');
+                    if (activeEdges.some(function (edge) { return edge.target === 'communication-l1'; })) {
+                        throw new Error('统一最终汇聚节点仍存在。');
                     }
 
-                    const learningSampleGraph = collectGlobalDependencyGraphV129(learningOneToManySampleV213.centerNodeId);
+                    const learningSampleGraph = collectGlobalDependencyGraphV129(learningOneToManySampleV216.centerNodeId);
                     const learningSampleLayout = topologyLayeredLayoutV132(learningSampleGraph);
-                    const learningSampleCenterMetrics = learningSampleLayout.metricsById.get(learningOneToManySampleV213.centerNodeId);
-                    const learningSampleTargetMetrics = learningOneToManySampleV213.targetNodeIds.map(function (nodeId) {
+                    const learningSampleCenterMetrics = learningSampleLayout.metricsById.get(learningOneToManySampleV216.centerNodeId);
+                    const learningSampleTargetMetrics = learningOneToManySampleV216.targetNodeIds.map(function (nodeId) {
                         return learningSampleLayout.metricsById.get(nodeId);
                     });
                     if (!learningSampleCenterMetrics || learningSampleTargetMetrics.some(function (metrics) {
                         return !metrics || metrics.rank !== learningSampleCenterMetrics.rank + 1;
                     }) || new Set(learningSampleTargetMetrics.map(function (metrics) { return Math.round(metrics.centerX * 10) / 10; })).size !== 1) {
-                        throw new Error('学习中节点的三个新增直接关联节点未在下一层平级展开。');
+                        throw new Error('学习中节点的三个直接关联节点未在下一层平级展开。');
+                    }
+
+                    const naturalTerminalIds = learningSampleGraph.nodes.filter(function (node) {
+                        return !learningSampleGraph.edges.some(function (edge) { return edge.source === node.id; });
+                    }).map(function (node) { return node.id; });
+                    const terminalPathLengths = new Set(naturalTerminalIds.map(function (nodeId) {
+                        return dependencyPathHopsV145(learningSampleGraph.edges, learningOneToManySampleV216.centerNodeId, nodeId, null);
+                    }).filter(Number.isFinite));
+                    if (naturalTerminalIds.length < 2 || terminalPathLengths.size < 2) {
+                        throw new Error('多分支依赖未按实际关系形成多个不同长度的自然终点。');
                     }
                 } else {
                     const cycleEdgeIds = detectRelationshipCycleEdgeIdsV10(activeEdges);
@@ -4688,6 +4874,7 @@
                         '</article>'
                     );
                 }).join('');
+                renderOverviewPathV216();
                 scheduleOverviewMetricsV138();
             }
 
@@ -4753,6 +4940,35 @@
                 return '';
             }
 
+            function learningTaskTypeTextMarkupV222(task) {
+                return '<span class="learning-task-type-text" aria-hidden="true">' + escapeHtmlV10(task.form) + '</span>';
+            }
+
+            function learningTaskCardMarkupV214(task, disabled) {
+                const actionLabel = learningTaskActionV127(task);
+                const statusLabel = task.status === 'in_progress'
+                    ? '，进行中'
+                    : (task.status === 'completed' ? '，已完成' : (task.status === 'not_started' ? '，未开始' : ''));
+                const aria = (disabled ? '暂不可学习' : actionLabel) + '：' + task.title + '，任务类型' + task.form + statusLabel;
+                return (
+                    '<button type="button" data-learning-task-id="' + escapeHtmlV10(task.id) + '" data-learning-type="' + escapeHtmlV10(task.form) + '" data-learning-status="' + escapeHtmlV10(task.status) + '" class="learning-card group w-full active:scale-[0.95]"' + (disabled ? ' disabled aria-disabled="true"' : '') + ' aria-label="' + escapeHtmlV10(aria) + '">' +
+                        '<span class="learning-task-leading">' +
+                            learningTaskIconMarkupV165(task) +
+                            '<span class="learning-task-copy">' +
+                                '<span class="learning-task-meta">' +
+                                    learningTaskSemanticMarkupV129(task) +
+                                    learningTaskTypeTextMarkupV222(task) +
+                                '</span>' +
+                                '<strong class="learning-task-title">' + escapeHtmlV10(task.title) + '</strong>' +
+                            '</span>' +
+                        '</span>' +
+                        '<span class="learning-task-action" aria-hidden="true">' +
+                            '<i class="ph-bold ph-caret-right"></i>' +
+                        '</span>' +
+                    '</button>'
+                );
+            }
+
             function renderLearningV10(node) {
                 const tasks = learningTasksForNodeV159(node)
                     .map(function (task, index) { return { task: task, originalIndex: index }; })
@@ -4766,30 +4982,13 @@
                 const unavailable = !canStudyInCurrentReleaseV198(node);
                 document.getElementById('learning-title').textContent = '学习任务';
                 document.getElementById('learning-count').textContent = tasks.length + ' 项';
-                learningGrid.classList.remove('is-empty');
-
-                learningGrid.innerHTML = tasks.map(function (task) {
-                    const disabled = unavailable;
-                    const actionLabel = learningTaskActionV127(task);
-                    const statusLabel = task.status === 'in_progress'
-                        ? '，进行中'
-                        : (task.status === 'completed' ? '，已完成' : (task.status === 'not_started' ? '，未开始' : ''));
-                    const aria = (disabled ? '暂不可学习' : actionLabel) + '：' + task.title + '，任务类型' + task.form + statusLabel;
-                    return (
-                        '<button type="button" data-learning-task-id="' + escapeHtmlV10(task.id) + '" data-learning-type="' + escapeHtmlV10(task.form) + '" data-learning-status="' + escapeHtmlV10(task.status) + '" class="learning-card group w-full active:scale-[0.95]"' + (disabled ? ' disabled aria-disabled="true"' : '') + ' aria-label="' + escapeHtmlV10(aria) + '">' +
-                            '<span class="learning-task-leading">' +
-                                learningTaskIconMarkupV165(task) +
-                                '<span class="learning-task-copy">' +
-                                    learningTaskSemanticMarkupV129(task) +
-                                    '<strong class="learning-task-title">' + escapeHtmlV10(task.title) + '</strong>' +
-                                '</span>' +
-                            '</span>' +
-                            '<span class="learning-task-action" aria-hidden="true">' +
-                                '<i class="ph-bold ph-caret-right"></i>' +
-                            '</span>' +
-                        '</button>'
-                    );
-                }).join('');
+                learningGrid.classList.toggle('is-empty', tasks.length === 0);
+                learningGrid.setAttribute('aria-label', tasks.length
+                    ? '学习任务，共' + tasks.length + '项，按音记、题库、课堂、游戏排列'
+                    : '暂无学习任务');
+                learningGrid.innerHTML = tasks.length
+                    ? tasks.map(function (task) { return learningTaskCardMarkupV214(task, unavailable); }).join('')
+                    : '<div class="learning-empty-state" role="status">暂无学习任务</div>';
             }
 
             function renderDetailV10() {
@@ -4970,13 +5169,13 @@
             function showPageV10(name) {
                 closeRouteHistoryPopoverV185(false);
                 if (name !== 'detail') resetDetailSwitchMotionV10();
-                if (name === 'overview') clearNodeRouteV183();
                 if (name !== 'topology' && stateV10.dependencyMode === 'global') setDependencyModeV127('direct', false);
                 Object.keys(pagesV10).forEach(function (pageName) {
                     pagesV10[pageName].classList.toggle('is-active', pageName === name);
                 });
                 stateV10.view = name;
                 if (name === 'overview') {
+                    renderOverviewPathV216();
                     scheduleOverviewMetricsV138();
                 } else if (name === 'topology') {
                     scheduleTopologyCenterV138();
@@ -5209,7 +5408,7 @@
                     const sourceNode = levelNodeByIdV10(relationship.source);
                     const targetNode = levelNodeByIdV10(relationship.target);
                     if (!sourceNode || !targetNode) throw new Error('一级依赖引用了不存在的节点。');
-                    if (sourceNode.abilityId === targetNode.abilityId) throw new Error('能力内部连续等级不得写入跨主线一级依赖。');
+                    if (sourceNode.abilityId === targetNode.abilityId) throw new Error('能力内部连续等级不得写入跨能力一级依赖。');
                     const directKey = sourceNode.id + '→' + targetNode.id;
                     if (seenPairs.has(directKey)) return;
                     seenPairs.add(directKey);
@@ -6077,7 +6276,7 @@
                 const relationCopy = item.direction === 'incoming' ? '当前能力的直接前置' : '当前能力的直接后续';
                 const aria = '查看' + naming.canonical + '，' + relationCopy + (node.role === 'completed' ? '，已通关' : '');
                 return (
-                    '<button type="button" data-jump-level-node="' + escapeHtmlV10(node.id) + '" data-local-dependency-node="' + escapeHtmlV10(item.direction) + '" data-direct-edge-id="' + escapeHtmlV10(edge.id) + '" data-direct-edge-source="' + escapeHtmlV10(edge.source) + '" data-direct-edge-target="' + escapeHtmlV10(edge.target) + '" data-dependency-depth="1" data-dependency-provenance="backend-direct" class="local-dependency-node" aria-label="' + escapeHtmlV10(aria) + '">' +
+                    '<button type="button" data-jump-level-node="' + escapeHtmlV10(node.id) + '" data-local-dependency-node="' + escapeHtmlV10(item.direction) + '" data-direct-edge-id="' + escapeHtmlV10(edge.id) + '" data-direct-edge-source="' + escapeHtmlV10(edge.source) + '" data-direct-edge-target="' + escapeHtmlV10(edge.target) + '" data-dependency-depth="1" data-dependency-provenance="' + escapeHtmlV10(edge.provenance) + '" class="local-dependency-node" aria-label="' + escapeHtmlV10(aria) + '">' +
                         '<span class="local-dependency-node-copy">' +
                             '<strong class="local-dependency-node-name">' + escapeHtmlV10(naming.relationPrimary) + '</strong>' +
                             '<span class="local-dependency-node-definition">' + escapeHtmlV10(naming.relationSecondary) + '</span>' +
@@ -7906,6 +8105,18 @@
                 }
             }
 
+            overviewPathListV216.addEventListener('click', function (event) {
+                const element = event.target instanceof Element ? event.target : null;
+                if (!element) return;
+                const overflowButton = element.closest('[data-route-overflow-kind="overview"]');
+                if (overflowButton) {
+                    toggleRouteHistoryPopoverV185(overflowButton);
+                    return;
+                }
+                const nodeButton = element.closest('[data-overview-path-index]');
+                if (nodeButton) navigateOverviewPathV216(nodeButton.dataset.overviewPathIndex);
+            }, { signal: eventAbortV138.signal });
+
             abilityGridV10.addEventListener('click', function (event) {
                 const element = event.target instanceof Element ? event.target : null;
                 if (!element) return;
@@ -7995,6 +8206,7 @@
                 const kind = element.dataset.routePopoverKind;
                 const pathIndex = element.dataset.routePopoverIndex;
                 closeRouteHistoryPopoverV185(false);
+                if (kind === 'overview') navigateOverviewPathV216(pathIndex);
                 if (kind === 'detail') navigateDetailPathV150(pathIndex);
                 if (kind === 'topology') navigateTopologyPathV155(pathIndex);
             }, { signal: eventAbortV138.signal });
@@ -8038,9 +8250,11 @@
             overviewResizeObserverV138.observe(overviewScrollV10);
             overviewResizeObserverV138.observe(abilityGridV10);
             routeResizeObserverV150 = new ResizeObserver(function () {
+                if (stateV10.view === 'overview') renderOverviewPathV216();
                 if (stateV10.view === 'detail') renderDetailPathV150();
                 if (stateV10.view === 'topology') renderTopologyPathV149();
             });
+            routeResizeObserverV150.observe(overviewPathNavV216);
             routeResizeObserverV150.observe(detailPathNavV150);
             routeResizeObserverV150.observe(topologyPathNavV149);
 
