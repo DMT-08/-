@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<!-- 版本 21.2：延续 21.1；保持当前路由顺序不变，恢复 19.7 的顶部路由自适应收纳规则与“…”历史入口。 -->
+<!-- 版本 21.3：延续 21.2；为黄色“学习中”节点补充三条跨能力一级直连，并保持三个新增节点同层平级展开。 -->
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#F8FAFD">
-    <title>抖学 AI 能力模型 21.2 · 顶部路由自适应折叠恢复</title>
+    <title>抖学 AI 能力模型 21.3 · 学习中节点一对多跨能力直连</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -3450,6 +3450,12 @@
                 return Boolean(node && (abilityAccessPolicyV198.allNodesOpen || node.canStudy === true));
             }
 
+            // 21.3：仅用于依赖视图的一对多模拟样例；节点均复用既有能力线数据，不进入或改写顶部主线。
+            const learningOneToManySampleV213 = Object.freeze({
+                centerNodeId: 'grammar-l2',
+                targetNodeIds: Object.freeze(['listening-l2', 'speaking-l2', 'pragmatics-l1'])
+            });
+
             // 14.5：本数组模拟后台依赖接口；只有显式 dependencyDepth: 1 的记录可进入共享一级边模型。
             // “1800词→段落大意”保留为二级回归样本，证明任何详情或全局视图都不会把它误画成直接边。
             // “常见句式→完整句子”保留为后台一级冗余样本；因已有“常见句式→完整句意→完整句子”，两个依赖视图都会隐藏该跨级箭头。
@@ -3462,6 +3468,9 @@
                 { source: 'vocabulary-l3', target: 'reading-l2', dependencyDepth: 2, relationType: 'transitive', inferred: true },
                 { source: 'phonics-l2', target: 'speaking-l2', dependencyDepth: 1 },
                 { source: 'vocabulary-l3', target: 'speaking-l2', dependencyDepth: 1 },
+                { id: 'mock-learning-split-listening', source: 'grammar-l2', target: 'listening-l2', dependencyDepth: 1 },
+                { id: 'mock-learning-split-speaking', source: 'grammar-l2', target: 'speaking-l2', dependencyDepth: 1 },
+                { id: 'mock-learning-split-pragmatics', source: 'grammar-l2', target: 'pragmatics-l1', dependencyDepth: 1 },
                 { source: 'grammar-l2', target: 'writing-l1', dependencyDepth: 1 },
                 { source: 'sentence-l3', target: 'writing-l1', dependencyDepth: 1 },
                 { source: 'listening-l2', target: 'communication-l1', dependencyDepth: 1 },
@@ -4416,6 +4425,16 @@
                     const communicationMerge = activeEdges.filter(function (edge) { return edge.target === 'communication-l1'; });
                     if (communicationMerge.length < 4) throw new Error('正式数据缺少普通汇聚场景。');
 
+                    const learningSampleTargets = learningOneToManySampleV213.targetNodeIds.map(levelNodeByIdV10).filter(Boolean);
+                    const learningSampleTargetIds = new Set(learningOneToManySampleV213.targetNodeIds);
+                    const learningSampleEdges = activeEdges.filter(function (edge) {
+                        return edge.source === learningOneToManySampleV213.centerNodeId && learningSampleTargetIds.has(edge.target);
+                    });
+                    if (learningSampleTargets.length !== 3 || new Set(learningSampleTargets.map(function (node) { return node.abilityId; })).size !== 3 ||
+                        learningSampleEdges.length !== 3 || learningSampleEdges.some(function (edge) { return !edge.backendId || !edge.backendId.startsWith('mock-learning-split-'); })) {
+                        throw new Error('学习中节点的一对多模拟数据必须包含三个不同能力线的后台一级直连。');
+                    }
+
                     requireRelationship('vocabulary-l3', 'sentence-l3', '直接依赖缺少 1800词→完整句意。');
                     requireRelationship('sentence-l3', 'reading-l2', '直接依赖缺少 完整句意→段落大意。');
                     if (relationshipKeys.has('vocabulary-l3→reading-l2')) {
@@ -4436,6 +4455,18 @@
                         return edge.source === 'vocabulary-l3' && edge.target === 'reading-l2';
                     })) {
                         throw new Error('全局依赖把传递可达关系错误投影成了直接边。');
+                    }
+
+                    const learningSampleGraph = collectGlobalDependencyGraphV129(learningOneToManySampleV213.centerNodeId);
+                    const learningSampleLayout = topologyLayeredLayoutV132(learningSampleGraph);
+                    const learningSampleCenterMetrics = learningSampleLayout.metricsById.get(learningOneToManySampleV213.centerNodeId);
+                    const learningSampleTargetMetrics = learningOneToManySampleV213.targetNodeIds.map(function (nodeId) {
+                        return learningSampleLayout.metricsById.get(nodeId);
+                    });
+                    if (!learningSampleCenterMetrics || learningSampleTargetMetrics.some(function (metrics) {
+                        return !metrics || metrics.rank !== learningSampleCenterMetrics.rank + 1;
+                    }) || new Set(learningSampleTargetMetrics.map(function (metrics) { return Math.round(metrics.centerX * 10) / 10; })).size !== 1) {
+                        throw new Error('学习中节点的三个新增直接关联节点未在下一层平级展开。');
                     }
                 } else {
                     const cycleEdgeIds = detectRelationshipCycleEdgeIdsV10(activeEdges);
